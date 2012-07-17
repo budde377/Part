@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://christian-budde.dk/SiteConfig"
+        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xsi:schemaLocation="http://christian-budde.dk/SiteConfig SiteConfig.xsd">
+    <templates>
+        <template link="_template/MainTemplate.xhtml">_404</template>
+    </templates>
+    <pageElements>
+        <class name="title" link="_local_class/TitlePageElementImpl.php">TitlePageElementImpl</class>
+    </pageElements>
+    <MySQLConnection>
+        <host>192.168.1.1</host>
+        <database>cms2012</database>
+        <username>cms2012</username>
+        <password>plovMand50</password>
+    </MySQLConnection>
+    <optimizers>
+        <class name="css" link="_class/CSSYUICompressorOptimizerImpl.php">CSSYUICompressorOptimizerImpl</class>
+        <class name="js" link="_class/JSYUICompressorOptimizerImpl.php">JSYUICompressorOptimizerImpl</class>
+    </optimizers>
+</config>
