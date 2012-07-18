@@ -63,7 +63,11 @@ class StubPageOrderImpl implements PageOrder
      */
     public function listPages($listMode = PageOrder::LIST_ALL)
     {
-        return array();
+        $returnArray = array();
+        if($listMode == PageOrder::LIST_ACTIVE || $listMode == PageOrder::LIST_ALL){
+            $this->createPageList($returnArray);
+        }
+        return $returnArray;
     }
 
     /**
@@ -99,5 +103,14 @@ class StubPageOrderImpl implements PageOrder
     public function setOrder($order)
     {
         $this->order = $order;
+    }
+
+
+    private function createPageList(&$array, Page $parentPage = null){
+        $list = $this->getPageOrder($parentPage);
+        foreach($list as $page){
+            $array[] = $page;
+            $this->createPageList($array,$page);
+        }
     }
 }
