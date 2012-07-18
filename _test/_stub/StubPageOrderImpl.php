@@ -11,6 +11,7 @@ class StubPageOrderImpl implements PageOrder
 {
 
     private $order;
+    private $inactiveList = array();
 
     /**
      * This will return pageOrder. If null is given, it will return top-level
@@ -64,8 +65,13 @@ class StubPageOrderImpl implements PageOrder
     public function listPages($listMode = PageOrder::LIST_ALL)
     {
         $returnArray = array();
-        if($listMode == PageOrder::LIST_ACTIVE || $listMode == PageOrder::LIST_ALL){
+        if ($listMode == PageOrder::LIST_ACTIVE || $listMode == PageOrder::LIST_ALL) {
             $this->createPageList($returnArray);
+        }
+        if ($listMode == PageOrder::LIST_INACTIVE || $listMode == PageOrder::LIST_ALL) {
+            foreach ($this->inactiveList as $inactivePage) {
+                $returnArray[] = $inactivePage;
+            }
         }
         return $returnArray;
     }
@@ -106,11 +112,20 @@ class StubPageOrderImpl implements PageOrder
     }
 
 
-    private function createPageList(&$array, Page $parentPage = null){
+    private function createPageList(&$array, Page $parentPage = null)
+    {
         $list = $this->getPageOrder($parentPage);
-        foreach($list as $page){
+        foreach ($list as $page) {
             $array[] = $page;
-            $this->createPageList($array,$page);
+            $this->createPageList($array, $page);
         }
+    }
+
+    /**
+     * @param array $array
+     */
+    public function setInactiveList($array)
+    {
+        $this->inactiveList = $array;
     }
 }

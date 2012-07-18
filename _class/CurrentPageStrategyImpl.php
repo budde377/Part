@@ -45,6 +45,7 @@ class CurrentPageStrategyImpl implements CurrentPageStrategy
                 return !empty($v);
             };
             $pathArray = array_filter($pathArray, $emptyFilter);
+            $firstPathElement = isset($pathArray[0]) && count($pathArray) == 1 ? $pathArray[0] : false;
 
             $notFound = false;
             $resultPage = null;
@@ -65,10 +66,24 @@ class CurrentPageStrategyImpl implements CurrentPageStrategy
                 $notFound = $resultPage == null;
             }
 
+
             if (!$notFound) {
                 $returnArray[] = $resultPage;
             } else {
                 $returnArray = array();
+                if ($firstPathElement !== false) {
+
+                    $pageList = $this->pageOrder->listPages(PageOrder::LIST_INACTIVE);
+                    $inactiveNotFound = true;
+                    while ($inactiveNotFound && count($pageList)) {
+                        /** @var $inactivePage Page */
+                        $inactivePage = array_shift($pageList);
+                        if ($inactivePage->match($firstPathElement)) {
+                            $inactiveNotFound = false;
+                            $returnArray[] = $inactivePage;
+                        }
+                    }
+                }
             }
 
 

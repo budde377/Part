@@ -373,4 +373,31 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
 
     }
 
+    public function testCurrentPageStrategyWillLookInInactiveIfNotFoundInActive()
+    {
+        $_GET['page'] = 'page2';
+
+        $page1 = new StubPageImpl();
+        $page1->setID('page1');
+
+        $page2 = new StubPageImpl();
+        $page2->setID('page2');
+
+
+        $order = array();
+        $order[null][0] = $page1;
+
+        $this->pageOrder->setOrder($order);
+        $this->pageOrder->setInactiveList(array($page2));
+
+        $strategy = new CurrentPageStrategyImpl($this->pageOrder);
+
+        $currentPagePath = $strategy->getCurrentPagePath();
+        $this->assertTrue(is_array($currentPagePath), 'Did not return an array');
+        $this->assertArrayHasKey(0, $currentPagePath, 'Did not have index 0');
+        $this->assertTrue($page2 === $currentPagePath[0], "Did not return array of right format");
+
+
+    }
+
 }
