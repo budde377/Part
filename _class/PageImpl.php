@@ -259,7 +259,7 @@ class PageImpl implements Page, Observable
     public function match($id)
     {
 
-        return $id == $this->id || (strlen($this->getAlias()) && preg_match($this->getAlias(), $id));
+        return $id == $this->id || (strlen($this->getAlias()) && @preg_match($this->getAlias(), $id));
 
     }
 
