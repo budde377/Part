@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__FILE__) . '/MySQLConstants.php';
 require_once dirname(__FILE__) . '/_stub/StubConfigImpl.php';
 require_once dirname(__FILE__) . '/../_class/BackendSingletonContainerImpl.php';
 /**
@@ -63,7 +64,10 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetPageOrderRegisterReturnsSameInstanceOfPageOrder()
     {
-        $this->config->setMysqlCon(array('host' => '192.168.1.1', 'user' => 'cms2012', 'database' => 'cms2012testdb', 'password' => 'plovMand50'));
+        $this->config->setMysqlCon(array('host' => MySQLConstants::MYSQL_HOST,
+            'user' => MySQLConstants::MYSQL_USERNAME,
+            'database' => MySQLConstants::MYSQL_DATABASE,
+            'password' => MySQLConstants::MYSQL_PASSWORD));
         $pageOrder1 = $this->backContainer->getPageOrderInstance();
         $this->assertInstanceOf('PageOrder', $pageOrder1, 'Did not return instance of PageOrder');
         $pageOrder2 = $this->backContainer->getPageOrderInstance();
@@ -73,7 +77,10 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetCurrentPageStrategyReturnsSameInstanceOfCurrentPageStrategy()
     {
-        $this->config->setMysqlCon(array('host' => '192.168.1.1', 'user' => 'cms2012', 'database' => 'cms2012testdb', 'password' => 'plovMand50'));
+        $this->config->setMysqlCon(array('host' => MySQLConstants::MYSQL_HOST,
+            'user' => MySQLConstants::MYSQL_USERNAME,
+            'database' => MySQLConstants::MYSQL_DATABASE,
+            'password' => MySQLConstants::MYSQL_PASSWORD));
         $pageOrder1 = $this->backContainer->getCurrentPageStrategyInstance();
         $this->assertInstanceOf('CurrentPageStrategy', $pageOrder1, 'Did not return instance of CurrentPageStrategy');
         $pageOrder2 = $this->backContainer->getCurrentPageStrategyInstance();

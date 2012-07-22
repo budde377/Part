@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__FILE__) . '/MySQLConstants.php';
 require_once dirname(__FILE__) . '/../_class/PageImpl.php';
 require_once dirname(__FILE__) . '/_stub/StubDBImpl.php';
 require_once dirname(__FILE__) . '/_stub/StubObserverImpl.php';
@@ -299,10 +300,10 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
     }
 
 
-    const database = 'cms2012testdb';
-    const password = 'plovMand50';
-    const username = 'cms2012';
-    const host = '192.168.1.1';
+    const database = MySQLConstants::MYSQL_DATABASE;
+    const password = MySQLConstants::MYSQL_PASSWORD;
+    const username = MySQLConstants::MYSQL_USERNAME;
+    const host = MySQLConstants::MYSQL_HOST;
 
 
 }

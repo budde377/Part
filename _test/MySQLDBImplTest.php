@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__FILE__) . '/MySQLConstants.php';
 require_once dirname(__FILE__) . '/../_class/MySQLDBImpl.php';
 require_once dirname(__FILE__) . '/../_class/ConfigImpl.php';
 
@@ -12,13 +13,23 @@ require_once dirname(__FILE__) . '/../_class/ConfigImpl.php';
 class MySQLDBImplTest extends PHPUnit_Framework_TestCase
 {
 
+    private $host = MySQLConstants::MYSQL_HOST;
+    private $user = MySQLConstants::MYSQL_USERNAME;
+    private $pass = MySQLConstants::MYSQL_PASSWORD;
+    private $database = MySQLConstants::MYSQL_DATABASE;
+
     public function testConnectionUsesConfigInfo()
     {
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string('
-        <config xmlns="http://christian-budde.dk/SiteConfig">
-            <MySQLConnection><host>192.168.1.1</host><database>cms2012testdb</database><username>cms2012</username><password>plovMand50</password></MySQLConnection>
-        </config>');
+        $configXML = simplexml_load_string("
+        <config xmlns='http://christian-budde.dk/SiteConfig'>
+            <MySQLConnection>
+            <host>{$this->host}</host>
+            <database>{$this->database}</database>
+            <username>{$this->user}</username>
+            <password>{$this->pass}</password>
+            </MySQLConnection>
+        </config>");
 
         $config = new ConfigImpl($configXML, dirname(__FILE__));
 
@@ -58,10 +69,15 @@ class MySQLDBImplTest extends PHPUnit_Framework_TestCase
     public function testConnectionWillReuseConnection()
     {
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string('
-        <config xmlns="http://christian-budde.dk/SiteConfig">
-            <MySQLConnection><host>192.168.1.1</host><database>cms2012testdb</database><username>cms2012</username><password>plovMand50</password></MySQLConnection>
-        </config>');
+        $configXML = simplexml_load_string("
+        <config xmlns='http://christian-budde.dk/SiteConfig'>
+            <MySQLConnection>
+            <host>{$this->host}</host>
+            <database>{$this->database}</database>
+            <username>{$this->user}</username>
+            <password>{$this->pass}</password>
+            </MySQLConnection>
+        </config>");
 
         $config = new ConfigImpl($configXML, dirname(__FILE__));
 
