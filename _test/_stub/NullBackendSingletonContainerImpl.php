@@ -65,4 +65,13 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
     {
         return null;
     }
+
+    /**
+     * Will return an instance of Config, this might be the same as provided in constructor
+     * @return Config
+     */
+    public function getConfigInstance()
+    {
+        return null;
+    }
 }
