@@ -10,12 +10,13 @@ class DateTimeHelper
 
     public static function monthNumberToName($number){
         $monthArray = array('januar','februar','marts','april','maj','juni','juli','august','september','november','december');
-        return $monthArray[$number%12];
+        return $monthArray[($number-1)%12];
     }
 
     public static function dayNumberToName($number){
+
         $monthArray = array('mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag');
-        return $monthArray[$number%7];
+        return $monthArray[($number-1)%7];
     }
 
     
