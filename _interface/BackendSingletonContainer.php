@@ -53,4 +53,11 @@ interface BackendSingletonContainer
      */
     public function getCurrentPageStrategyInstance();
 
+    /**
+     * @abstract
+     * Will return an instance of Config, this might be the same as provided in constructor
+     * @return Config
+     */
+    public function getConfigInstance();
+
 }

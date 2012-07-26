@@ -88,4 +88,13 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
 
 
     }
+    public function testGetConfigInstanceWillReturnSameInstanceOfConfig()
+    {
+        $ret1 = $this->backContainer->getConfigInstance();
+        $this->assertInstanceOf('Config', $ret1, 'Did not return instance of Config');
+        //$this->config->setMysqlCon(array('host' => 'lol', 'user' => 'lol', 'database' => '', 'password' => ''));
+        $ret2 = $this->backContainer->getConfigInstance();
+        $this->assertTrue($ret1 === $ret2, 'Did not reuse instance');
+
+    }
 }

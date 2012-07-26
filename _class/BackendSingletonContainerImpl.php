@@ -109,4 +109,13 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
         }
         return $this->currentPageStrategy;
     }
+
+    /**
+     * Will return an instance of Config, this might be the same as provided in constructor
+     * @return Config
+     */
+    public function getConfigInstance()
+    {
+        return $this->config;
+    }
 }
