@@ -31,5 +31,9 @@ class HTTPHeaderHelper
         }
     }
 
+    public static function redirectToLocation($location){
+        header('Location:'.$location);
+    }
+
 
 }
