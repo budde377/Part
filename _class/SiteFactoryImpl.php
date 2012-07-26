@@ -53,7 +53,7 @@ class SiteFactoryImpl implements SiteFactory
             }
 
 
-            $preScript = new $className();
+            $preScript = new $className($backendContainer);
 
             if (!($preScript instanceof Script)) {
                 throw new ClassNotInstanceOfException($className, 'Script');
