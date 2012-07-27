@@ -42,14 +42,15 @@ class WebsiteImpl implements Website
 
         //Decide output mode
 
+        $pageStrategy = $this->backendContainer->getCurrentPageStrategyInstance();
+        $currentPage = $pageStrategy->getCurrentPage();
+        $template->setTemplateFromConfig($currentPage->getTemplate());
+
         switch (RequestHelper::GETValueOfIndexIfSetElseDefault('mode')) {
             case Website::OUTPUT_AJAX:
                 echo $ajaxRegister->getAJAXFromRegistered(RequestHelper::GETValueOfIndexIfSetElseDefault('ajax_id'));
                 break;
             default:
-                $pageStrategy = $this->backendContainer->getCurrentPageStrategyInstance();
-                $currentPage = $pageStrategy->getCurrentPage();
-                $template->setTemplateFromConfig($currentPage->getTemplate());
                 echo $template->getModifiedTemplate();
         }
 
