@@ -37,18 +37,6 @@ class TemplateImpl implements Template
      */
     public function getModifiedTemplate()
     {
-        $numMatches = preg_match_all('/<!--[\s]*pageElement:([^\>]+)-->/', $this->template, $matches, PREG_OFFSET_CAPTURE);
-        for ($i = $numMatches - 1; $i >= 0; $i--) {
-            $elementString = trim($matches[1][$i][0]);
-            /** @var $element PageElement */
-            $element = $this->pageElementFactory->getPageElement($elementString);
-            if ($element !== null) {
-                $content = $element->getContent();
-                $this->template = substr($this->template, 0, $matches[0][$i][1]) . $content . substr($this->template, $matches[0][$i][1] + strlen($matches[0][$i][0]));
-            }
-
-        }
-
         return $this->template;
     }
 
@@ -75,6 +63,18 @@ class TemplateImpl implements Template
     public function setTemplateFromString($string)
     {
         $this->template = $string;
+        $numMatches = preg_match_all('/<!--[\s]*pageElement:([^\>]+)-->/', $this->template, $matches, PREG_OFFSET_CAPTURE);
+        for ($i = $numMatches - 1; $i >= 0; $i--) {
+            $elementString = trim($matches[1][$i][0]);
+            /** @var $element PageElement */
+            $element = $this->pageElementFactory->getPageElement($elementString);
+            if ($element !== null) {
+                $content = $element->getContent();
+                $this->template = substr($this->template, 0, $matches[0][$i][1]) . $content . substr($this->template, $matches[0][$i][1] + strlen($matches[0][$i][0]));
+            }
+
+        }
+
     }
 
     /**
