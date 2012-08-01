@@ -38,20 +38,20 @@ class WebsiteImpl implements Website
 
         $elementFactory = new PageElementFactoryImpl($this->config, $this->backendContainer);
         $template = new TemplateImpl($this->config, $elementFactory);
-        $ajaxRegister = $this->backendContainer->getAJAXRegisterInstance();
+//        $ajaxRegister = $this->backendContainer->getAJAXRegisterInstance();
 
         //Decide output mode
 
-        switch (RequestHelper::GETValueOfIndexIfSetElseDefault('mode')) {
+/*        switch (RequestHelper::GETValueOfIndexIfSetElseDefault('mode')) {
             case Website::OUTPUT_AJAX:
                 echo $ajaxRegister->getAJAXFromRegistered(RequestHelper::GETValueOfIndexIfSetElseDefault('ajax_id'));
                 break;
-            default:
+            default:*/
                 $pageStrategy = $this->backendContainer->getCurrentPageStrategyInstance();
                 $currentPage = $pageStrategy->getCurrentPage();
                 $template->setTemplateFromConfig($currentPage->getTemplate());
                 echo $template->getModifiedTemplate();
-        }
+//        }
 
     }
 
