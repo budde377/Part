@@ -82,4 +82,10 @@ interface PageOrder
      */
     public function deactivatePage(Page $page);
 
+    /**
+     * @abstract
+     * @param string $id
+     * @return Page | null Page if Page with title is found, else null
+     */
+    public function getPage($id);
 }

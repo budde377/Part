@@ -464,6 +464,26 @@ class PageOrderImplTest extends PHPUnit_Extensions_Database_TestCase
     }
 
 
+    public function testGetPageWillReturnNullIfPageNotFound(){
+        $pageOrder = new PageOrderImpl($this->db);
+        $this->assertNull($pageOrder->getPage('NonExistingPage'),'Did not return null');
+    }
+
+    public function testGetPageWillReturnPage(){
+        $pageOrder = new PageOrderImpl($this->db);
+        $page = $pageOrder->getPage('page');
+        $this->assertInstanceOf('Page',$page,'Did not return right instance');
+        $this->assertEquals('page',$page->getID(),'IDs did not match');
+
+    }
+    public function testGetPageWillReturnInactivePage(){
+        $pageOrder = new PageOrderImpl($this->db);
+        $page = $pageOrder->getPage('page3');
+        $this->assertInstanceOf('Page',$page,'Did not return right instance');
+        $this->assertEquals('page3',$page->getID(),'IDs did not match');
+
+    }
+
     public function getSetUpOperation()
     {
         $cascadeTruncates = true;

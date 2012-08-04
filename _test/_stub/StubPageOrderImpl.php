@@ -128,4 +128,19 @@ class StubPageOrderImpl implements PageOrder
     {
         $this->inactiveList = $array;
     }
+
+    /**
+     * @param string $id
+     * @return Page | null Page if Page with title is found, else null
+     */
+    public function getPage($id)
+    {
+        foreach($this->listPages(PageOrder::LIST_ALL) as $page){
+            /** @var $page Page */
+            if($page->getID() == $id){
+                return $page;
+            }
+        }
+        return null;
+    }
 }

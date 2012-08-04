@@ -385,4 +385,12 @@ class PageOrderImpl implements PageOrder, Observer
         }
     }
 
+    /**
+     * @param string $id
+     * @return Page | null Page if Page with title is found, else null
+     */
+    public function getPage($id)
+    {
+        return isset($this->activePages[$id])?$this->activePages[$id]:(isset($this->inactivePages[$id])?$this->inactivePages[$id]:null);
+    }
 }
