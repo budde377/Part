@@ -22,7 +22,7 @@ interface PageOrder
      * @param null|Page $parentPage
      * @return array
      */
-    public function getPageOrder($parentPage = null);
+    public function getPageOrder(Page $parentPage = null);
 
 
     /**
@@ -36,7 +36,7 @@ interface PageOrder
      * @param null | Page $parentPage
      * @return bool
      */
-    public function setPageOrder(Page $page, $place, $parentPage = null);
+    public function setPageOrder(Page $page, $place,Page $parentPage = null);
 
 
     /**
