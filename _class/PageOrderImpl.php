@@ -64,10 +64,8 @@ class PageOrderImpl implements PageOrder, Observer
     {
         if ($parentPage instanceof Page) {
             $parentPageString = $parentPage->getID();
-        } else if ($parentPage === null) {
-            $parentPageString = null;
         } else {
-            throw new MalformedParameterException('Page|null', 1);
+            $parentPageString = null;
         }
         $retArray = array();
         if (!isset($this->pageOrder[$parentPageString]) || !is_array($this->pageOrder[$parentPageString])) {
@@ -102,10 +100,8 @@ class PageOrderImpl implements PageOrder, Observer
             } else {
                 return false;
             }
-        } else if ($parentPage === null) {
-            $parentPageID = null;
         } else {
-            throw new MalformedParameterException('Page|null', 3);
+            $parentPageID = null;
         }
 
         $findPage = $this->findPage($page);
