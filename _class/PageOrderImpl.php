@@ -60,7 +60,7 @@ class PageOrderImpl implements PageOrder, Observer
      * @throws MalformedParameterException
      * @return array
      */
-    public function getPageOrder($parentPage = null)
+    public function getPageOrder(Page $parentPage = null)
     {
         if ($parentPage instanceof Page) {
             $parentPageString = $parentPage->getID();
@@ -92,7 +92,7 @@ class PageOrderImpl implements PageOrder, Observer
      * @throws MalformedParameterException
      * @return bool
      */
-    public function setPageOrder(Page $page, $place, $parentPage = null)
+    public function setPageOrder(Page $page, $place, Page $parentPage = null)
     {
 
         if ($parentPage instanceof Page) {
