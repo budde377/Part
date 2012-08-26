@@ -12,6 +12,7 @@ class StubPageOrderImpl implements PageOrder
 
     private $order;
     private $inactiveList = array();
+    private $pagePath;
 
     /**
      * This will return pageOrder. If null is given, it will return top-level
@@ -143,4 +144,26 @@ class StubPageOrderImpl implements PageOrder
         }
         return null;
     }
+
+    /**
+     * Will return the path of an page as an array.
+     * If the page is at top level an array containing an single entrance will be returned
+     * Else a numeric array with the top level as first entrance, and lowest level as last entrance
+     * will be returned.
+     * If a page is inactive, an empty array will be returned.
+     * If a page is not found, FALSE will be returned.
+     * @param Page $page
+     * @return bool | array
+     */
+    public function getPagePath(Page $page)
+    {
+        return $this->pagePath[$page->getID()];
+    }
+
+    public function setPagePath(array $pagePath)
+    {
+        $this->pagePath = $pagePath;
+    }
+
+
 }

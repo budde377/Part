@@ -2,6 +2,7 @@
 require_once dirname(__FILE__) . '/../_class/PageOrderImpl.php';
 require_once dirname(__FILE__) . '/../_class/PageImpl.php';
 require_once dirname(__FILE__) . '/_stub/StubDBImpl.php';
+require_once dirname(__FILE__) . '/_stub/StubPageImpl.php';
 require_once dirname(__FILE__) . '/TruncateOperation.php';
 require_once dirname(__FILE__) . '/MySQLConstants.php';
 /**
@@ -483,6 +484,46 @@ class PageOrderImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals('page3',$page->getID(),'IDs did not match');
 
     }
+
+    public function testGetPagePathWillReturnFalseIfPageNIL(){
+        $pageOrder = new PageOrderImpl($this->db);
+        $page = new StubPageImpl();
+        $page->setID('someID');
+        $page->setTitle('someTitle');
+        $ret = $pageOrder->getPagePath($page);
+        $this->assertFalse($ret,'Did not return false');
+    }
+
+    public function testGetPagePathWillReturnEmptyArrayIfPageIsInactive(){
+        $pageOrder = new PageOrderImpl($this->db);
+        $page = $pageOrder->getPage('page3');
+        $ret = $pageOrder->getPagePath($page);
+        $this->assertTrue(is_array($ret),'Did not return array');
+        $this->assertEquals(0,count($ret),'Did not return empty array');
+
+    }
+
+    public function testGetPagePathWillReturnNumericArrayWithPathOfPages(){
+        $pageOrder = new PageOrderImpl($this->db);
+        $page = $pageOrder->getPage('page2');
+        $ret = $pageOrder->getPagePath($page);
+        $this->assertTrue(is_array($ret),'Did not return an array');
+        $this->assertEquals(2,count($ret),'Did not return array of right size');
+        $this->assertArrayHasKey(0,$ret,'Array was not numeric');
+        /** @var $p Page */
+        $p = $ret[0];
+        $this->assertInstanceOf('Page',$p);
+        $this->assertEquals('page',$p->getID(),'IDs did not match');
+
+        $this->assertArrayHasKey(1,$ret,'Array was not numeric');
+        /** @var $p Page */
+        $p = $ret[1];
+        $this->assertInstanceOf('Page',$p);
+        $this->assertEquals('page2',$p->getID(),'IDs did not match');
+
+    }
+
+
 
     public function getSetUpOperation()
     {

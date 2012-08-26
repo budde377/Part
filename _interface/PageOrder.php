@@ -88,4 +88,18 @@ interface PageOrder
      * @return Page | null Page if Page with title is found, else null
      */
     public function getPage($id);
+
+
+    /**
+     * @abstract
+     * Will return the path of an page as an array.
+     * If the page is at top level an array containing an single entrance will be returned
+     * Else a numeric array with the top level as first entrance, and lowest level as last entrance
+     * will be returned.
+     * If a page is inactive, an empty array will be returned.
+     * If a page is not found, FALSE will be returned.
+     * @param Page $page
+     * @return bool | array
+     */
+    public function getPagePath(Page $page);
 }

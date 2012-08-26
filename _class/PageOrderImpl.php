@@ -387,6 +387,41 @@ class PageOrderImpl implements PageOrder, Observer
      */
     public function getPage($id)
     {
-        return isset($this->activePages[$id])?$this->activePages[$id]:(isset($this->inactivePages[$id])?$this->inactivePages[$id]:null);
+        return isset($this->activePages[$id]) ? $this->activePages[$id] : (isset($this->inactivePages[$id]) ? $this->inactivePages[$id] : null);
+    }
+
+    /**
+     * Will return the path of an page as an array.
+     * If the page is at top level an array containing an single entrance will be returned
+     * Else a numeric array with the top level as first entrance, and lowest level as last entrance
+     * will be returned.
+     * If a page is inactive, an empty array will be returned.
+     * If a page is not found, FALSE will be returned.
+     * @param Page $page
+     * @return bool | array
+     */
+    public function getPagePath(Page $page)
+    {
+        if (($r = $this->findPage($page)) == 'inactive') {
+            return array();
+        } else if ($r == false) {
+            return false;
+        }
+
+        return $this->recursiveCalculatePath($page);
+    }
+
+    private function recursiveCalculatePath(Page $page, Page $parent = null)
+    {
+        $order = $this->getPageOrder($parent);
+        foreach ($order as $p) {
+            /** @var $p Page */
+            if ($p === $page) {
+                return array($p);
+            } else if (($ret = $this->recursiveCalculatePath($page, $p) )!== false) {
+                return array_merge(array($p),$ret);
+            }
+        }
+        return false;
     }
 }
