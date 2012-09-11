@@ -155,7 +155,7 @@ $(document).ready(function () {
             slideNext(slideHolder, slideContainer, slideNav);
         }
 
-    })
+    });
     navChildren = slideNav.children(':not(.prec)');
     navChildren.click(function (e) {
         if (activateSlide) {
@@ -327,7 +327,7 @@ function editTagsText(tagContainer, taglinks) {
             if (event.keyCode == 27) {
                 closeTags(tagContainer);
             }
-        })
+        });
 
         submit.appendTo(parent);
         input.appendTo(parent);
