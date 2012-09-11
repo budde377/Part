@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>CB Backend<!--pageElement:title--></title>
+    <link href="/_css/mainStyle.css" rel="stylesheet" type="text/css"/>
+    <!--pageElement:styleScriptHead-->
+</head>
+<body>
+<div id="Top">
+
+    <!--pageElement:topMenu-->
+    <a href="/"><img src="/_img/logo.png" alt="christian budde"/></a>
+
+</div>
+<div id="Container">
+    <!--pageElement:leftMenu-->
+    <div id="Content">
+        <h2>Tilføj website til administration</h2>
+        <!--pageElement:addSiteAdd-->
+
+    </div>
+</div>
+</body>
+</html>

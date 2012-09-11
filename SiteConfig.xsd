@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://christian-budde.dk/SiteConfig"
+           xmlns="http://christian-budde.dk/SiteConfig"
+           elementFormDefault="qualified">
+
+    <xs:element name="config">
+        <xs:complexType>
+            <xs:all>
+                <xs:element name="preScripts" type="scripts" minOccurs="0">
+                    <xs:unique name="preScriptName">
+                        <xs:selector xpath="preScripts/class"/>
+                        <xs:field xpath="."/>
+                    </xs:unique>
+                </xs:element>
+                <xs:element name="postScripts" type="scripts" minOccurs="0">
+                    <xs:unique name="postScriptName">
+                        <xs:selector xpath="postScripts/class"/>
+                        <xs:field xpath="."/>
+                    </xs:unique>
+                </xs:element>
+                <xs:element name="templates" type="templates" minOccurs="0"/>
+                <xs:element name="pageElements" type="pageElements" minOccurs="0">
+                    <xs:unique name="pageElementName">
+                        <xs:selector xpath="pageElements/class"/>
+                        <xs:field xpath="@name"/>
+                    </xs:unique>
+                </xs:element>
+                <xs:element name="MySQLConnection" type="dbConnection" minOccurs="0"/>
+                <xs:element name="optimizers" type="pageElements" minOccurs="0">
+                    <xs:unique name="optimizerName">
+                        <xs:selector xpath="pageElements/class"/>
+                        <xs:field xpath="@name"/>
+                    </xs:unique>
+                </xs:element>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+
+
+    <xs:complexType name="dbConnection">
+        <xs:all>
+            <xs:element name="host" type="xs:anyURI"/>
+            <xs:element name="database" type="xs:string"/>
+            <xs:element name="username" type="xs:string"/>
+            <xs:element name="password" type="xs:string"/>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="templates">
+        <xs:sequence>
+            <xs:element name="template" type="linkedVal" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="scripts">
+        <xs:sequence>
+            <xs:element name="class" type="linkedVal" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <xs:complexType name="pageElements">
+        <xs:sequence>
+            <xs:element name="class" type="namedLinkedVal" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <xs:complexType name="linkedVal">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="xs:anyURI" name="link" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+
+    <xs:complexType name="namedLinkedVal">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="name" name="name" use="required"/>
+                <xs:attribute type="xs:anyURI" name="link" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:simpleType name="name">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[0-9a-zA-Z-_]+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+
+</xs:schema>
