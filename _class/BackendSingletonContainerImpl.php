@@ -6,6 +6,9 @@ require_once dirname(__FILE__) . '/JSRegisterImpl.php';
 require_once dirname(__FILE__) . '/AJAXRegisterImpl.php';
 require_once dirname(__FILE__) . '/PageOrderImpl.php';
 require_once dirname(__FILE__) . '/CurrentPageStrategyImpl.php';
+require_once dirname(__FILE__) . '/SiteLibraryImpl.php';
+require_once dirname(__FILE__) . '/UserLibraryImpl.php';
+require_once dirname(__FILE__) . '/UserPrivilegesLibraryImpl.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -30,6 +33,12 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $pageOrder;
     /** @var $pageOrder null | CurrentPageStrategy */
     private $currentPageStrategy;
+    /** @var $pageOrder null | SiteLibrary */
+    private $siteLibrary;
+    /** @var $userLibrary null | UserLibrary */
+    private $userLibrary;
+    /** @var $userPrivilegesLibrary null | UserPrivilegesLibrary */
+    private $userPrivilegesLibrary;
 
 
     public function __construct(Config $config)
@@ -117,5 +126,42 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getConfigInstance()
     {
         return $this->config;
+    }
+
+    /**
+     * Will create and reuse an instance of SiteLibrary
+     * @return SiteLibrary
+     */
+    public function getSiteLibraryInstance()
+    {
+        if ($this->siteLibrary === null) {
+            $this->siteLibrary = new SiteLibraryImpl($this->getDBInstance());
+        }
+        return $this->siteLibrary;
+    }
+
+    /**
+     * Will create and reuse an instance of UserLibrary
+     * @return UserLibrary
+     */
+    public function getUserLibraryInstance()
+    {
+        if ($this->userLibrary === null) {
+            $this->userLibrary = new UserLibraryImpl($this->getDBInstance());
+        }
+        return $this->userLibrary;
+    }
+
+    /**
+     * Will create and reuse an instance of UserPrivilegesLibrary
+     * @return UserPrivilegesLibrary
+     */
+    public function getUserPrivilegesLibraryInstance()
+    {
+        if($this->userPrivilegesLibrary === null){
+            $this->userPrivilegesLibrary = new UserPrivilegesLibraryImpl($this->getDBInstance(),$this->getSiteLibraryInstance());
+        }
+
+        return $this->userPrivilegesLibrary;
     }
 }
