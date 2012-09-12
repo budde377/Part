@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../_interface/Mail.php';
 require_once dirname(__FILE__) . '/RealSendMailStrategyImpl.php';
+require_once dirname(__FILE__) .'/../_trait/ValidationTrait.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -9,7 +10,7 @@ require_once dirname(__FILE__) . '/RealSendMailStrategyImpl.php';
  */
 class MailImpl implements Mail
 {
-    use validationTrait;
+    use ValidationTrait;
 
     private $sendMailStrategy;
 
