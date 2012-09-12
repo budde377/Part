@@ -74,4 +74,31 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
     {
         return null;
     }
+
+    /**
+     * Will create and reuse an instance of SiteLibrary
+     * @return SiteLibrary
+     */
+    public function getSiteLibraryInstance()
+    {
+        return null;
+    }
+
+    /**
+     * Will create and reuse an instance of UserLibrary
+     * @return UserLibrary
+     */
+    public function getUserLibraryInstance()
+    {
+        return null;
+    }
+
+    /**
+     * Will create and reuse an instance of UserPrivilegesLibrary
+     * @return UserPrivilegesLibrary
+     */
+    public function getUserPrivilegesLibraryInstance()
+    {
+        return null;
+    }
 }
