@@ -1,8 +1,9 @@
 <?php
-require_once dirname(__FILE__) . '/../_interface/Site.php';
 require_once dirname(__FILE__) . '/SimpleDBImpl.php';
-require_once dirname(__FILE__) . '/../_class/PageOrderImpl.php';
+require_once dirname(__FILE__) . '/PageOrderImpl.php';
 require_once dirname(__FILE__) . '/../_interface/Observable.php';
+require_once dirname(__FILE__) . '/../_interface/Site.php';
+require_once dirname(__FILE__) . '/../_trait/EncryptionTrait.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -11,6 +12,8 @@ require_once dirname(__FILE__) . '/../_interface/Observable.php';
  */
 class SiteImpl implements Site, Observable
 {
+    use EncryptionTrait;
+
     private static $key = 'GXSqvTuLKsx1gW3VwQHQ';
 
     private $title;
@@ -154,7 +157,7 @@ class SiteImpl implements Site, Observable
      */
     public function setPassword($password)
     {
-        $password = $this->encrypt($password);
+        $password = $this->encrypt($password,self::$key);
         if ($this->updatePasswordStatement == null) {
             $this->updatePasswordStatement = $this->connection->prepare("UPDATE Sites SET password=? WHERE title=?");
             $this->updatePasswordStatement->bindParam(1, $this->password);
@@ -202,7 +205,7 @@ class SiteImpl implements Site, Observable
     public function getPassword()
     {
         $this->setInitialValues();
-        return $this->decrypt($this->password);
+        return $this->decrypt($this->password,self::$key);
     }
 
     private function titleExists($title)
@@ -326,18 +329,4 @@ class SiteImpl implements Site, Observable
         }
     }
 
-    private function encrypt($string, $key = null){
-        if($key === null){
-            $key = self::$key;
-        }
-
-        return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, md5($key), $string, MCRYPT_MODE_CBC, md5(md5($key))));
-    }
-
-    private function decrypt($string, $key = null){
-        if($key === null){
-            $key = self::$key;
-        }
-        return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($key), base64_decode($string), MCRYPT_MODE_CBC, md5(md5($key))), "\0");
-    }
 }
