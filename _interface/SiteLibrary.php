@@ -5,7 +5,7 @@
  * Date: 7/16/12
  * Time: 11:05 PM
  */
-interface SiteLibrary
+interface SiteLibrary extends Iterator
 {
     /**
      * @abstract

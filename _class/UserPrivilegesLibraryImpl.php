@@ -15,10 +15,13 @@ class UserPrivilegesLibraryImpl implements UserPrivilegesLibrary
     private $privileges = array();
     private $users = array();
 
+    private $array;
+
     public function __construct(DB $db, SiteLibrary $siteLibrary)
     {
         $this->db = $db;
         $this->siteLibrary = $siteLibrary;
+
     }
 
 
@@ -49,4 +52,5 @@ class UserPrivilegesLibraryImpl implements UserPrivilegesLibrary
         }
         return null;
     }
+
 }

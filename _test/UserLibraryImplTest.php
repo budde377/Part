@@ -39,6 +39,56 @@ class UserLibraryImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(3, count($ret), 'Did not return array of right length');
     }
 
+    public function testListUsersWillMatchResultOfIterator(){
+        $list = $this->library->listUsers();
+        foreach($this->library as $key=>$users){
+            $this->assertTrue(isset($list[$key]),'Key was not found');
+            $this->assertTrue($list[$key] === $users,'Users did not match');
+            unset($list[$key]);
+        }
+        $this->assertEquals(0,count($list),'List was not covered');
+
+    }
+
+    public function testListUsersWillMatchResultAfterDeleteChange(){
+        $user = $this->library->getUser('user2');
+        $this->assertTrue($this->library->deleteUser($user));
+        $list = $this->library->listUsers();
+        foreach($this->library as $key=>$users){
+            $this->assertTrue(isset($list[$key]),'Key was not found');
+            $this->assertTrue($list[$key] === $users,'Users did not match');
+            unset($list[$key]);
+        }
+        $this->assertEquals(0,count($list),'List was not covered');
+
+
+    }
+    public function testListUsersWillMatchResultAfterRemoteDeleteChange(){
+        $user = $this->library->getUser('user2');
+        $user->delete();
+        $list = $this->library->listUsers();
+        foreach($this->library as $key=>$users){
+            $this->assertTrue(isset($list[$key]),'Key was not found');
+            $this->assertTrue($list[$key] === $users,'Users did not match');
+            unset($list[$key]);
+        }
+        $this->assertEquals(0,count($list),'List was not covered');
+
+
+    }
+    public function testListUsersWillMatchResultAfterCreateChange(){
+        $user = $this->library->getUser('user2');
+        $this->library->createUser('user4','password','test@test.dk',$user);
+        $list = $this->library->listUsers();
+        foreach($this->library as $key=>$users){
+            $this->assertTrue(isset($list[$key]),'Key was not found');
+            $this->assertTrue($list[$key] === $users,'Users did not match');
+            unset($list[$key]);
+        }
+        $this->assertEquals(0,count($list),'List was not covered');
+    }
+
+
     public function testCreateUserWillCreateUser()
     {
         $ret = $this->library->createUser('user4', 'password', 'user3@test.dk',$this->library->getUser('user1'));
@@ -217,6 +267,7 @@ class UserLibraryImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertTrue($ret,'Did not return true');
         $this->assertEquals($user1->getUsername(),$user3->getParent(),'Parent did not match');
     }
+
 
 
 

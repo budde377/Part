@@ -5,7 +5,7 @@
  * Date: 22/07/12
  * Time: 14:26
  */
-interface UserLibrary
+interface UserLibrary extends Iterator
 {
     /**
      * @abstract

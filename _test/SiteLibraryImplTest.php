@@ -132,6 +132,56 @@ class SiteLibraryImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertNull($ret,'Did not return null');
     }
 
+    public function testListUsersAndIteratorWillMatch(){
+        $list = $this->siteLibrary->listSites();
+        foreach($this->siteLibrary as $key=>$users){
+            $this->assertTrue(isset($list[$key]),'Key was not found');
+            $this->assertTrue($list[$key] === $users,'Users did not match');
+            unset($list[$key]);
+        }
+        $this->assertEquals(0,count($list),'List was not covered');
+    }
+
+    public function testListUsersAndIteratorWillMatchAfterDelete(){
+        $site = $this->siteLibrary->getSite('cms2012');
+        $this->siteLibrary->deleteSite($site);
+        $list = $this->siteLibrary->listSites();
+        foreach($this->siteLibrary as $key=>$users){
+            $this->assertTrue(isset($list[$key]),'Key was not found');
+            $this->assertTrue($list[$key] === $users,'Users did not match');
+            unset($list[$key]);
+        }
+        $this->assertEquals(0,count($list),'List was not covered');
+
+
+    }
+
+    public function testListUsersAndIteratorWillMatchAfterRemoteDelete(){
+        $site = $this->siteLibrary->getSite('cms2012');
+        $site->delete();
+        $list = $this->siteLibrary->listSites();
+        foreach($this->siteLibrary as $key=>$users){
+            $this->assertTrue(isset($list[$key]),'Key was not found');
+            $this->assertTrue($list[$key] === $users,'Users did not match');
+            unset($list[$key]);
+        }
+        $this->assertEquals(0,count($list),'List was not covered');
+
+
+    }
+
+    public function testListUsersAndIteratorWillMatchAfterCreate(){
+        $this->siteLibrary->createSite('site1233312');
+        $list = $this->siteLibrary->listSites();
+        foreach($this->siteLibrary as $key=>$users){
+            $this->assertTrue(isset($list[$key]),'Key was not found');
+            $this->assertTrue($list[$key] === $users,'Users did not match');
+            unset($list[$key]);
+        }
+        $this->assertEquals(0,count($list),'List was not covered');
+
+
+    }
 
     public function setUp()
     {
