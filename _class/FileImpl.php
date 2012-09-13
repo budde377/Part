@@ -30,7 +30,9 @@ class FileImpl implements File
      */
     public function fileExists()
     {
-        return file_exists($this->filePath);
+        $v = $this->isDirectory();
+        $ret = file_exists($this->filePath) && !$this->isDirectory();
+        return $ret;
     }
 
     /**
@@ -40,7 +42,9 @@ class FileImpl implements File
      */
     public function getContents()
     {
-
+        if($this->isDirectory()){
+            return false;
+        }
         if ($this->fileExists()) {
             return file_get_contents($this->filePath);
         } else {
@@ -101,6 +105,9 @@ class FileImpl implements File
      */
     public function move($path)
     {
+        if($this->isDirectory()){
+            return false;
+        }
         $path = $this->relativeToAbsolute($path);
         if (($ret = @rename($this->filePath, $path)) === true) {
             $this->filePath = $path;
@@ -131,7 +138,7 @@ class FileImpl implements File
     {
 
         if ($this->isDirectory()) {
-            return @rmdir($this->filePath);
+            return false;
         }
         return @unlink($this->filePath);
     }
@@ -155,7 +162,7 @@ class FileImpl implements File
     /**
      * Sets the access mode, available options is in FileModeEnum
      * @param string $permissions
-     * @return mixed
+     * @return void
      */
     public function setAccessMode($permissions)
     {
@@ -225,14 +232,14 @@ class FileImpl implements File
         if ($this->fileExists()) {
             return filesize($this->filePath);
         }
-        return 0;
+        return -1;
     }
 
     /**
      *
      * @return bool
      */
-    public function isDirectory()
+    protected function isDirectory()
     {
         return is_dir($this->filePath);
     }

@@ -92,7 +92,7 @@ interface File
      * @abstract
      * Sets the access mode, available options is in FileModeEnum
      * @param string $permissions
-     * @return mixed
+     * @return void
      */
     public function setAccessMode($permissions);
 
@@ -112,11 +112,5 @@ interface File
      */
     public function size();
 
-    /**
-     * @abstract
-     *
-     * @return bool
-     */
-    public function isDirectory();
 
 }

@@ -23,6 +23,13 @@ class FileImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($file->fileExists(), 'Did not return true on existing file');
     }
 
+    public function testFileExistReturnFalseOnDirectory()
+    {
+        $filePath = dirname(__FILE__) .'/_stub';
+        $file = new FileImpl($filePath);
+        $this->assertFalse($file->fileExists(),'Did not return false on directory');
+    }
+
     public function testGetContentsReturnEmptyStringOnFileNotFound()
     {
         $file = new FileImpl('NotAnExistingFile');
@@ -39,7 +46,6 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetAbsolutePathReturnAbsolutePathToFile()
     {
-        $v = getcwd();
         $filePath = dirname(__FILE__) . '/.././_test/_stub/templateStub';
         $altFilePath = '_stub/templateStub';
         $file = new FileImpl($filePath);
@@ -135,7 +141,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($file->delete(), 'Did not return false');
     }
 
-    public function testDeleteReturnsTrueOnDirectoryAndCanDelete()
+    public function testDeleteReturnsFalseOnDirectoryAndCanNotDelete()
     {
         $filePath = dirname(__FILE__) . '/_stub/testFolder';
         if (file_exists($filePath)) {
@@ -144,9 +150,8 @@ class FileImplTest extends PHPUnit_Framework_TestCase
         }
         mkdir($filePath);
         $file = new FileImpl($filePath);
-        $this->assertTrue($file->fileExists(), 'Directory did not exist to begin with.');
-        $this->assertTrue($file->delete(), 'Did not return true');
-        $this->assertFalse($file->fileExists(), 'Directory was not deleted');
+        $this->assertFalse($file->delete(), 'Did not return false');
+        $this->assertTrue(file_exists($filePath),'Folder was deleted');
     }
 
 
@@ -212,7 +217,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
         }
         mkdir($fp);
         $file = new FileImpl($fp);
-        $this->assertTrue($file->fileExists(), 'File did not exist to begin with.');
+        $this->assertTrue(file_exists($fp), 'File did not exist to begin with.');
         $ret = $file->write('test');
         $this->assertFalse($ret, 'Did not return fasle');
         $file->delete();
@@ -240,37 +245,66 @@ class FileImplTest extends PHPUnit_Framework_TestCase
     {
         $filePath = dirname(__FILE__) . '/_stub/notAReadFile';
         $file = new FileImpl($filePath);
-        $this->assertEquals(0, $file->size(), 'Size did not match');
+        $this->assertEquals(-1, $file->size(), 'Size did not match');
     }
 
 
-    public function testIsDirectoryReturnTrueIfDirectory()
-    {
-        $fp = dirname(__FILE__) . '/_stub/testFolder';
-        if (file_exists($fp)) {
-            @unlink($fp);
-            @rmdir($fp);
+    public function testCopyFolderReturnsNull(){
+        $filePath = dirname(__FILE__) . '/_stub/testFolder';
+        $newPath = dirname(__FILE__) . '/_stub/_newStub';
+        if (file_exists($filePath)) {
+            @unlink($filePath);
+            @rmdir($filePath);
         }
-        mkdir($fp);
-        $file = new FileImpl($fp);
-        $this->assertTrue($file->fileExists(), 'File did not exist to begin with.');
-        $this->assertTrue($file->isDirectory(), 'Did not return true');
-        $file->delete();
+        if (file_exists($newPath)) {
+            @unlink($newPath);
+            @rmdir($newPath);
+        }
+        mkdir($filePath);
+        $file = new FileImpl($filePath);
+        $this->assertNull($file->copy($newPath), "Did not return null");
+        $this->assertFalse(file_exists($newPath), 'File was copied');
     }
 
-    public function testIsDirectoryReturnFalseIfFile()
-    {
-        $fp = dirname(__FILE__) . '/_stub/fileStub';
-        $file = new FileImpl($fp);
-        $this->assertTrue($file->fileExists(), 'File did not exist to begin with.');
-        $this->assertFalse($file->isDirectory(), 'Did not return false');
+
+    public function testMoveFolderReturnsNull(){
+        $filePath = dirname(__FILE__) . '/_stub/testFolder';
+        $newPath = dirname(__FILE__) . '/_stub/_newStub';
+        if (file_exists($filePath)) {
+            @unlink($filePath);
+            @rmdir($filePath);
+        }
+        if (file_exists($newPath)) {
+            @unlink($newPath);
+            @rmdir($newPath);
+        }
+        mkdir($filePath);
+        $file = new FileImpl($filePath);
+        $this->assertFalse($file->move($newPath), "Did not return false");
+        $this->assertFalse(file_exists($newPath), 'File was copied');
     }
 
-    public function testIsDirectoryReturnFalseIfFileNotFound()
-    {
-        $fp = dirname(__FILE__) . '/_stub/notAFile';
-        $file = new FileImpl($fp);
-        $this->assertFalse($file->fileExists(), 'File did exist to begin with.');
-        $this->assertFalse($file->isDirectory(), 'Did not return false');
+    public function testGetFileContentsWillReturnFalseIfDirectory(){
+        $filePath = dirname(__FILE__) . '/_stub/testFolder';
+        if (file_exists($filePath)) {
+            @unlink($filePath);
+            @rmdir($filePath);
+        }
+        mkdir($filePath);
+        $file = new FileImpl($filePath);
+        $this->assertFalse($file->getContents(),'Did not return false if directory');
     }
+
+    public function testSizeOfFolderWillReturnMinus1(){
+        $filePath = dirname(__FILE__) . '/_stub/testFolder';
+        if (file_exists($filePath)) {
+            @unlink($filePath);
+            @rmdir($filePath);
+        }
+        mkdir($filePath);
+        $file = new FileImpl($filePath);
+        $this->assertEquals(-1,$file->size(),'Did not return false if directory');
+    }
+
+
 }
