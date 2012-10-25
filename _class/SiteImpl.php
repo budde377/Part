@@ -335,4 +335,118 @@ class SiteImpl implements Site, Observable
     }
 
 
+    /**
+     * @return FileSystem | bool Will return the filesystem on success, else false if connection is not valid
+     */
+    public function getFileSystem()
+    {
+        // TODO: Implement getFileSystem() method.
+    }
+
+    /**
+     * @return string
+     */
+    public function getFTUser()
+    {
+        // TODO: Implement getFTUser() method.
+    }
+
+    /**
+     * Will set the File Transfer user
+     * @param string $ft_user
+     * @return void
+     */
+    public function setFTUser($ft_user)
+    {
+        // TODO: Implement setFTUser() method.
+    }
+
+    /**
+     * @return string
+     */
+    public function getFTPassword()
+    {
+        // TODO: Implement getFTPassword() method.
+    }
+
+    /**
+     * Will set the File Transfer password
+     * @param $FT_password
+     * @return string
+     */
+    public function setFTPassword($FT_password)
+    {
+        // TODO: Implement setFTPassword() method.
+    }
+
+    /**
+     * @return string
+     */
+    public function getFTHost()
+    {
+        // TODO: Implement getFTHost() method.
+    }
+
+    /**
+     * Will set the File Transfer host
+     * @param string $FT_host
+     * @return void
+     */
+    public function setFTHost($FT_host)
+    {
+        // TODO: Implement setFTHost() method.
+    }
+
+    /**
+     * @return string
+     */
+    public function getFTPort()
+    {
+        // TODO: Implement getFTPort() method.
+    }
+
+    /**
+     * Will set the File Transfer port
+     * @param string $FT_port
+     * @return void
+     */
+    public function setFTPort($FT_port)
+    {
+        // TODO: Implement setFTPort() method.
+    }
+
+    /**
+     * @return string
+     */
+    public function getFTType()
+    {
+        // TODO: Implement getFTType() method.
+    }
+
+    /**
+     * Will set the File Transfer type (either FTP or SFTP)
+     * @param string $FT_type
+     * @return void
+     */
+    public function setFTType($FT_type)
+    {
+        // TODO: Implement setFTType() method.
+    }
+
+    /**
+     * @param string $address
+     * @return void
+     */
+    public function setAddress($address)
+    {
+        // TODO: Implement setAddress() method.
+    }
+
+    /**
+     * @return string
+     */
+    public function getAddress()
+    {
+        // TODO: Implement getAddress() method.
+    }
 }

@@ -42,6 +42,16 @@ interface Site
      */
     public function setTitle($title);
 
+    /**
+     * @param string $address
+     * @return void
+     */
+    public function setAddress($address);
+
+    /**
+     * @return string
+     */
+    public function getAddress();
 
     /**
      * @abstract
