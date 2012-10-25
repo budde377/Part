@@ -42,10 +42,10 @@ class UserPrivilegesImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->siteLibrary = new SiteLibraryImpl($this->db);
         $this->site = $this->siteLibrary->getSite('cms2012');
 
-        $this->site->setDatabase(self::database);
-        $this->site->setHost(self::host);
-        $this->site->setUser(self::username);
-        $this->site->setPassword(self::password);
+        $this->site->setDBDatabase(self::database);
+        $this->site->setDBHost(self::host);
+        $this->site->setDBUser(self::username);
+        $this->site->setDBPassword(self::password);
 
         $this->pageOrder = $this->site->getPageOrder();
         $this->pages = $this->pageOrder->listPages(PageOrder::LIST_ALL);

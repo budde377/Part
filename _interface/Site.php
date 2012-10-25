@@ -8,6 +8,8 @@
 interface Site
 {
 
+    const FILE_TRANSFER_PROTOCOL_FTP = 'ftp';
+    const FILE_TRANSFER_PROTOCOL_SFTP = 'sftp';
 
     const EVENT_TITLE_UPDATE = 1;
     const EVENT_DELETE = 2;
@@ -17,6 +19,11 @@ interface Site
      * @return PageOrder | bool Will return PageOrder on success, else false if connection is not valid
      */
     public function getPageOrder();
+
+    /**
+     * @return FileSystem | bool Will return the filesystem on success, else false if connection is not valid
+     */
+    public function getFileSystem();
 
     /**
      * @abstract
@@ -38,11 +45,11 @@ interface Site
 
     /**
      * @abstract
-     * Will set the host of the site
+     * Will set the DB host of the site
      * @param string $host
      * @return void
      */
-    public function setHost($host);
+    public function setDBHost($host);
 
     /**
      * @abstract
@@ -50,55 +57,114 @@ interface Site
      * @param string $database
      * @return void
      */
-    public function setDatabase($database);
+    public function setDBDatabase($database);
 
     /**
      * @abstract
-     * Will set the user of the site
+     * Will set the DB user of the site
      * @param string $user
      * @return void
      */
-    public function setUser($user);
+    public function setDBUser($user);
 
 
     /**
      * @abstract
-     * Will set the password of the site
+     * Will set the DB password of the site
      * @param string $password
      * @return void
      */
-    public function setPassword($password);
+    public function setDBPassword($password);
 
 
     /**
      * @abstract
-     * Will return the host of the site
+     * Will return the DB host of the site
      * @return string
      */
-    public function getHost();
+    public function getDBHost();
 
     /**
      * @abstract
      * Will return the database of the site
      * @return string
      */
-    public function getDatabase();
+    public function getDBDatabase();
 
     /**
      * @abstract
-     * Will return the user of the site
+     * Will return the DB user of the site
      * @return string
      */
-    public function getUser();
+    public function getDBUser();
 
 
     /**
      * @abstract
-     * Will return the password of the site
+     * Will return the DB password of the site
      * @return string
      */
-    public function getPassword();
+    public function getDBPassword();
 
+    /**
+     * @return string
+     */
+    public function getFTUser();
+
+    /**
+     * Will set the File Transfer user
+     * @param string $ft_user
+     * @return void
+     */
+    public function setFTUser($ft_user);
+
+    /**
+     * @return string
+     */
+    public function getFTPassword();
+
+    /**
+     * Will set the File Transfer password
+     * @param $FT_password
+     * @return string
+     */
+    public function setFTPassword($FT_password);
+
+    /**
+     * @return string
+     */
+    public function getFTHost();
+
+    /**
+     * Will set the File Transfer host
+     * @param string $FT_host
+     * @return void
+     */
+    public function setFTHost($FT_host);
+
+    /**
+     * @return string
+     */
+    public function getFTPort();
+
+    /**
+     * Will set the File Transfer port
+     * @param string $FT_port
+     * @return void
+     */
+    public function setFTPort($FT_port);
+
+    /**
+     * @return string
+     */
+    public function getFTType();
+
+    /**
+     * Will set the File Transfer type (either FTP or SFTP)
+     * @param string $FT_type
+     * @return void
+     */
+    public function setFTType($FT_type);
     /**
      * @abstract
      * Create the site on persistent storage

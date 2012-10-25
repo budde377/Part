@@ -20,11 +20,16 @@ class SiteImpl implements Site, Observable
     private $database;
     private $connection;
 
-    private $user;
-    private $password;
-    private $host;
-    private $db;
+    private $db_user;
+    private $db_password;
+    private $db_host;
+    private $db_db;
 
+    private $ft_user;
+    private $ft_password;
+    private $ft_host;
+    private $ft_port;
+    private $ft_type;
 
     /** @var $updateTitleStatement PDOStatement | null */
     private $updateTitleStatement;
@@ -106,14 +111,14 @@ class SiteImpl implements Site, Observable
      * @param string $host
      * @return void
      */
-    public function setHost($host)
+    public function setDBHost($host)
     {
         if ($this->updateHostStatement == null) {
-            $this->updateHostStatement = $this->connection->prepare("UPDATE Sites SET host=? WHERE title=?");
-            $this->updateHostStatement->bindParam(1, $this->host);
+            $this->updateHostStatement = $this->connection->prepare("UPDATE Sites SET db_host=? WHERE title=?");
+            $this->updateHostStatement->bindParam(1, $this->db_host);
             $this->updateHostStatement->bindParam(2, $this->title);
         }
-        $this->host = $host;
+        $this->db_host = $host;
         $this->updateHostStatement->execute();
     }
 
@@ -122,14 +127,14 @@ class SiteImpl implements Site, Observable
      * @param string $database
      * @return void
      */
-    public function setDatabase($database)
+    public function setDBDatabase($database)
     {
         if ($this->updateDBStatement == null) {
-            $this->updateDBStatement = $this->connection->prepare("UPDATE Sites SET db=? WHERE title=?");
-            $this->updateDBStatement->bindParam(1, $this->db);
+            $this->updateDBStatement = $this->connection->prepare("UPDATE Sites SET db_db=? WHERE title=?");
+            $this->updateDBStatement->bindParam(1, $this->db_db);
             $this->updateDBStatement->bindParam(2, $this->title);
         }
-        $this->db = $database;
+        $this->db_db = $database;
         $this->updateDBStatement->execute();
     }
 
@@ -138,15 +143,15 @@ class SiteImpl implements Site, Observable
      * @param string $user
      * @return void
      */
-    public function setUser($user)
+    public function setDBUser($user)
     {
 
         if ($this->updateUserStatement == null) {
-            $this->updateUserStatement = $this->connection->prepare("UPDATE Sites SET user=? WHERE title=?");
-            $this->updateUserStatement->bindParam(1, $this->user);
+            $this->updateUserStatement = $this->connection->prepare("UPDATE Sites SET db_user=? WHERE title=?");
+            $this->updateUserStatement->bindParam(1, $this->db_user);
             $this->updateUserStatement->bindParam(2, $this->title);
         }
-        $this->user = $user;
+        $this->db_user = $user;
         $this->updateUserStatement->execute();
     }
 
@@ -155,15 +160,15 @@ class SiteImpl implements Site, Observable
      * @param string $password
      * @return void
      */
-    public function setPassword($password)
+    public function setDBPassword($password)
     {
         $password = $this->encrypt($password,self::$key);
         if ($this->updatePasswordStatement == null) {
-            $this->updatePasswordStatement = $this->connection->prepare("UPDATE Sites SET password=? WHERE title=?");
-            $this->updatePasswordStatement->bindParam(1, $this->password);
+            $this->updatePasswordStatement = $this->connection->prepare("UPDATE Sites SET db_password=? WHERE title=?");
+            $this->updatePasswordStatement->bindParam(1, $this->db_password);
             $this->updatePasswordStatement->bindParam(2, $this->title);
         }
-        $this->password = $password;
+        $this->db_password = $password;
         $this->updatePasswordStatement->execute();
 
     }
@@ -172,40 +177,40 @@ class SiteImpl implements Site, Observable
      * Will return the host of the site
      * @return string
      */
-    public function getHost()
+    public function getDBHost()
     {
         $this->setInitialValues();
-        return $this->host;
+        return $this->db_host;
     }
 
     /**
      * Will return the database of the site
      * @return string
      */
-    public function getDatabase()
+    public function getDBDatabase()
     {
         $this->setInitialValues();
-        return $this->db;
+        return $this->db_db;
     }
 
     /**
      * Will return the user of the site
      * @return string
      */
-    public function getUser()
+    public function getDBUser()
     {
         $this->setInitialValues();
-        return $this->user;
+        return $this->db_user;
     }
 
     /**
      * Will return the password of the site
      * @return string
      */
-    public function getPassword()
+    public function getDBPassword()
     {
         $this->setInitialValues();
-        return $this->decrypt($this->password,self::$key);
+        return $this->decrypt($this->db_password,self::$key);
     }
 
     private function titleExists($title)
@@ -230,12 +235,12 @@ class SiteImpl implements Site, Observable
 
         if ($this->createStatement == null) {
             $this->createStatement = $this->connection->prepare("
-            INSERT INTO Sites (title,host,db,password,user) VALUES (?,?,?,?,?)");
+            INSERT INTO Sites (title,db_host,db_db,db_password,db_user) VALUES (?,?,?,?,?)");
             $this->createStatement->bindParam(1, $this->title);
-            $this->createStatement->bindParam(2, $this->host);
-            $this->createStatement->bindParam(3, $this->db);
-            $this->createStatement->bindParam(4, $this->password);
-            $this->createStatement->bindParam(5, $this->user);
+            $this->createStatement->bindParam(2, $this->db_host);
+            $this->createStatement->bindParam(3, $this->db_db);
+            $this->createStatement->bindParam(4, $this->db_password);
+            $this->createStatement->bindParam(5, $this->db_user);
         }
 
         $this->createStatement->execute();
@@ -279,10 +284,10 @@ class SiteImpl implements Site, Observable
             $this->initialValuesHasBeenSet = true;
             $result = $this->existsStatement->fetch(PDO::FETCH_ASSOC);
             $this->title = $result['title'];
-            $this->db = $result['db'];
-            $this->user = $result['user'];
-            $this->password = $result['password'];
-            $this->host = $result['host'];
+            $this->db_db = $result['db_db'];
+            $this->db_user = $result['db_user'];
+            $this->db_password = $result['db_password'];
+            $this->db_host = $result['db_host'];
         }
     }
 
@@ -294,9 +299,9 @@ class SiteImpl implements Site, Observable
         if ($this->pageOrder == null) {
             try {
                 $connection = $this->connection = new PDO(
-                    'mysql:dbname=' . $this->getDatabase() . ';host=' . $this->getHost(),
-                    $this->getUser(),
-                    $this->getPassword(),
+                    'mysql:dbname=' . $this->getDBDatabase() . ';host=' . $this->getDBHost(),
+                    $this->getDBUser(),
+                    $this->getDBPassword(),
                     array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
                 $db = new SimpleDBImpl($connection);
                 $this->pageOrder = new PageOrderImpl($db);
@@ -328,5 +333,6 @@ class SiteImpl implements Site, Observable
             $observer->onChange($this, $event);
         }
     }
+
 
 }

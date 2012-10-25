@@ -136,10 +136,10 @@ class SiteImplTest extends PHPUnit_Extensions_Database_TestCase
     {
         $site = new SiteImpl('cms2012', $this->db);
 
-        $db = $site->getDatabase();
-        $host = $site->getHost();
-        $password = $site->getPassword();
-        $user = $site->getUser();
+        $db = $site->getDBDatabase();
+        $host = $site->getDBHost();
+        $password = $site->getDBPassword();
+        $user = $site->getDBUser();
 
         $this->assertEquals('someDB', $db, 'Database did not match');
         $this->assertEquals('someHost', $host, 'Host did not match');
@@ -150,15 +150,15 @@ class SiteImplTest extends PHPUnit_Extensions_Database_TestCase
     public function testSettersWillSetValues()
     {
 
-        $this->site->setDatabase('someDB');
-        $this->site->setHost('someHost');
-        $this->site->setPassword('somePass');
-        $this->site->setUser('someUser');
+        $this->site->setDBDatabase('someDB');
+        $this->site->setDBHost('someHost');
+        $this->site->setDBPassword('somePass');
+        $this->site->setDBUser('someUser');
 
-        $db = $this->site->getDatabase();
-        $host = $this->site->getHost();
-        $password = $this->site->getPassword();
-        $user = $this->site->getUser();
+        $db = $this->site->getDBDatabase();
+        $host = $this->site->getDBHost();
+        $password = $this->site->getDBPassword();
+        $user = $this->site->getDBUser();
 
         $this->assertEquals('someDB', $db, 'Database did not match');
         $this->assertEquals('someHost', $host, 'Host did not match');
@@ -174,16 +174,16 @@ class SiteImplTest extends PHPUnit_Extensions_Database_TestCase
         $ret = $this->site->create();
         $this->assertTrue($ret, 'Create did fail');
 
-        $this->site->setDatabase('someDB');
-        $this->site->setHost('someHost');
-        $this->site->setPassword('somePass');
-        $this->site->setUser('someUser');
+        $this->site->setDBDatabase('someDB');
+        $this->site->setDBHost('someHost');
+        $this->site->setDBPassword('somePass');
+        $this->site->setDBUser('someUser');
 
         $site = new SiteImpl($this->site->getTitle(), $this->db);
-        $db = $site->getDatabase();
-        $host = $site->getHost();
-        $password = $site->getPassword();
-        $user = $site->getUser();
+        $db = $site->getDBDatabase();
+        $host = $site->getDBHost();
+        $password = $site->getDBPassword();
+        $user = $site->getDBUser();
 
         $this->assertTrue($site->exists(), 'Site did not exists');
 
@@ -202,10 +202,10 @@ class SiteImplTest extends PHPUnit_Extensions_Database_TestCase
 
     public function testGetPageOrderWillReturnPageOrderOnValidConnection()
     {
-        $this->site->setDatabase(self::database);
-        $this->site->setHost(self::host);
-        $this->site->setPassword(self::password);
-        $this->site->setUser(self::username);
+        $this->site->setDBDatabase(self::database);
+        $this->site->setDBHost(self::host);
+        $this->site->setDBPassword(self::password);
+        $this->site->setDBUser(self::username);
 
         $ret = $this->site->getPageOrder();
 
@@ -255,10 +255,10 @@ class SiteImplTest extends PHPUnit_Extensions_Database_TestCase
 
     public function testCreateValidSiteWillReturnPageOrder(){
         $site = new SiteImpl('validSite',$this->db);
-        $site->setDatabase(self::database);
-        $site->setHost(self::host);
-        $site->setUser(self::username);
-        $site->setPassword(self::password);
+        $site->setDBDatabase(self::database);
+        $site->setDBHost(self::host);
+        $site->setDBUser(self::username);
+        $site->setDBPassword(self::password);
         $ret = $site->create();
         $this->assertTrue($ret,'site was not created');
         $newSite = new SiteImpl('validSite',$this->db);

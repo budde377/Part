@@ -49,7 +49,7 @@ class StubSiteImpl implements Site
      * @param string $host
      * @return void
      */
-    public function setHost($host)
+    public function setDBHost($host)
     {
         $this->host = $host;
     }
@@ -59,7 +59,7 @@ class StubSiteImpl implements Site
      * @param string $database
      * @return void
      */
-    public function setDatabase($database)
+    public function setDBDatabase($database)
     {
         $this->database = $database;
     }
@@ -69,7 +69,7 @@ class StubSiteImpl implements Site
      * @param string $user
      * @return void
      */
-    public function setUser($user)
+    public function setDBUser($user)
     {
         $this->user = $user;
     }
@@ -79,7 +79,7 @@ class StubSiteImpl implements Site
      * @param string $password
      * @return void
      */
-    public function setPassword($password)
+    public function setDBPassword($password)
     {
         $this->password = $password;
     }
@@ -88,7 +88,7 @@ class StubSiteImpl implements Site
      * Will return the host of the site
      * @return string
      */
-    public function getHost()
+    public function getDBHost()
     {
         return $this->host;
     }
@@ -97,7 +97,7 @@ class StubSiteImpl implements Site
      * Will return the database of the site
      * @return string
      */
-    public function getDatabase()
+    public function getDBDatabase()
     {
         return $this->database;
     }
@@ -106,7 +106,7 @@ class StubSiteImpl implements Site
      * Will return the user of the site
      * @return string
      */
-    public function getUser()
+    public function getDBUser()
     {
         return $this->user;
     }
@@ -115,7 +115,7 @@ class StubSiteImpl implements Site
      * Will return the password of the site
      * @return string
      */
-    public function getPassword()
+    public function getDBPassword()
     {
         return $this->password;
     }
