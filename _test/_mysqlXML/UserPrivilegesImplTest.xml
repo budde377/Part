@@ -13,10 +13,10 @@
         <table_data name="Sites">
             <row>
                 <field name="title">cms2012</field>
-                <field name="db">someDB</field>
-                <field name="host">someHost</field>
-                <field name="password">somePass</field>
-                <field name="user">someUser</field>
+                <field name="db_db">someDB</field>
+                <field name="db_host">someHost</field>
+                <field name="db_password">somePass</field>
+                <field name="db_user">someUser</field>
             </row>
         </table_data>
         <table_data name="UserPrivilege">

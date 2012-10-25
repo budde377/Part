@@ -217,4 +217,6 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $modTemplate = $this->template->getModifiedTemplate();
         $this->assertEquals("Hello DEAD FellowHello World",$modTemplate,'Did not return expected template');
     }
+
+    //TODO TEST FOR ORDER OF EXECUTION
 }

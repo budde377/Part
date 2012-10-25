@@ -62,20 +62,23 @@ class TemplateImpl implements Template
      */
     public function setTemplateFromString($string)
     {
+
         $this->template = $string;
         $numExtendsMatch = preg_match_all('/<!--[\s]*extends:([^\>]+)-->/', $string, $matches, PREG_OFFSET_CAPTURE);
         $replaceElementArray = array();
         if ($numExtendsMatch > 0) {
             $template = new TemplateImpl($this->config, $this->pageElementFactory);
-            $template->setTemplate(new FileImpl(trim($matches[1][0][0])));
-            $this->template = $template->getModifiedTemplate();
+            $f = new FileImpl(trim($matches[1][0][0]));
+            $this->template = $f->getContents();
+
             preg_match_all('/<!--[\s]*replaceElement\[([^\]]+)\]:([^\>]+)-->/', $string, $matches, PREG_OFFSET_CAPTURE);
             foreach ($matches[1] as $k => $match) {
                 $e = $this->pageElementFactory->getPageElement($matches[2][$k][0]);
                 if ($e !== null) {
-                    $replaceElementArray[trim($match[0])] = $e->getContent();
+                    $replaceElementArray[trim($match[0])] = $e->getContent(); //TODO DONT CALL THIS NOW, JUST REPLACE
                 }
             }
+
             $numStartMatches = preg_match_all('/<!--[\s]*replaceElementStart\[([^\]]+)\][\s]*-->/', $string, $startMatches, PREG_OFFSET_CAPTURE);
             $numEndMatches = preg_match_all('/<!--[\s]*replaceElementEnd[\s]*-->/', $string, $endMatches, PREG_OFFSET_CAPTURE);
             if($numStartMatches == $numEndMatches){

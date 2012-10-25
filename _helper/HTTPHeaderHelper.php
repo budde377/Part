@@ -1,4 +1,6 @@
 <?php
+//TODO Convert this to trait
+
 require_once dirname(__FILE__) . '/ClassHelper.php';
 /**
  * Created by JetBrains PhpStorm.
