@@ -5,7 +5,7 @@ require_once dirname(__FILE__) . '/../_class/TemplateImpl.php';
 require_once dirname(__FILE__) . '/_stub/NullPageElementFactoryImpl.php';
 require_once dirname(__FILE__) . '/_stub/HelloPageElementImpl.php';
 require_once dirname(__FILE__) . '/_stub/NullPageElementImpl.php';
-
+require_once dirname(__FILE__) . '/_stub/NullBackendSingletonContainerImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -165,8 +165,56 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->template->setTemplateFromString("prepend <!-- pageElement:main --> something <!-- pageElement:main2 --> something else ");
         $modTemplate = $this->template->getModifiedTemplate();
         $helloElement = new HelloPageElementImpl();
-        $nullElement = new NullPageElementImpl();
         $expectedString = 'prepend ' . $helloElement->getContent() . ' something <!-- pageElement:main2 --> something else ';
         $this->assertEquals($expectedString, $modTemplate, 'Did not return expected template.');
+    }
+
+    public function testGetModifiedTemplateWithAbsoluteExtension(){
+        $this->setUpConfig();
+        $templateFile = dirname(__FILE__).'/_stub/templateStub';
+        $this->template->setTemplateFromString("<!--extends:$templateFile-->");
+        $modTemplate = $this->template->getModifiedTemplate();
+        $f = new FileImpl(dirname(__FILE__).'/_stub/templateStub');
+        $this->assertEquals($f->getContents(), $modTemplate, 'Did not return expected template.');
+
+    }
+
+    public function testGetModifiedTemplateWithExtraElementsInExtension(){
+        $this->setUpConfig('
+        <config xmlns="http://christian-budde.dk/SiteConfig">
+            <pageElements>
+                <class name="main" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
+            </pageElements>
+        </config>');
+        $templateFile = dirname(__FILE__).'/_stub/templateStub2';
+        $this->template->setTemplateFromString("
+        <!--extends:$templateFile-->
+        <!--replaceElement[someElement]:main-->");
+        $modTemplate = $this->template->getModifiedTemplate();
+        $this->assertEquals("Hello World",$modTemplate,'Did not return expected template');
+    }
+
+    public function testGetModifiedTemplateWithExtendWillRemoveExtraContent(){
+        $this->setUpConfig();
+        $templateFile = dirname(__FILE__).'/_stub/templateStub';
+        $this->template->setTemplateFromString("<!--extends:$templateFile--> something something");
+        $modTemplate = $this->template->getModifiedTemplate();
+        $f = new FileImpl(dirname(__FILE__).'/_stub/templateStub');
+        $this->assertEquals($f->getContents(), $modTemplate, 'Did not return expected template.');
+    }
+
+    public function testGetModifiedTemplateWithExtendAndExtendedReplace(){
+        $this->setUpConfig('
+        <config xmlns="http://christian-budde.dk/SiteConfig">
+            <pageElements>
+                <class name="main" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
+            </pageElements>
+        </config>');
+        $templateFile = dirname(__FILE__).'/_stub/templateStub2';
+        $this->template->setTemplateFromString("
+        <!--extends:$templateFile-->
+        <!--replaceElementStart[someElement]-->Hello DEAD Fellow<!--pageElement:main--><!--replaceElementEnd-->");
+        $modTemplate = $this->template->getModifiedTemplate();
+        $this->assertEquals("Hello DEAD FellowHello World",$modTemplate,'Did not return expected template');
     }
 }

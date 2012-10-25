@@ -63,16 +63,46 @@ class TemplateImpl implements Template
     public function setTemplateFromString($string)
     {
         $this->template = $string;
+        $numExtendsMatch = preg_match_all('/<!--[\s]*extends:([^\>]+)-->/', $string, $matches, PREG_OFFSET_CAPTURE);
+        $replaceElementArray = array();
+        if ($numExtendsMatch > 0) {
+            $template = new TemplateImpl($this->config, $this->pageElementFactory);
+            $template->setTemplate(new FileImpl(trim($matches[1][0][0])));
+            $this->template = $template->getModifiedTemplate();
+            preg_match_all('/<!--[\s]*replaceElement\[([^\]]+)\]:([^\>]+)-->/', $string, $matches, PREG_OFFSET_CAPTURE);
+            foreach ($matches[1] as $k => $match) {
+                $e = $this->pageElementFactory->getPageElement($matches[2][$k][0]);
+                if ($e !== null) {
+                    $replaceElementArray[trim($match[0])] = $e->getContent();
+                }
+            }
+            $numStartMatches = preg_match_all('/<!--[\s]*replaceElementStart\[([^\]]+)\][\s]*-->/', $string, $startMatches, PREG_OFFSET_CAPTURE);
+            $numEndMatches = preg_match_all('/<!--[\s]*replaceElementEnd[\s]*-->/', $string, $endMatches, PREG_OFFSET_CAPTURE);
+            if($numStartMatches == $numEndMatches){
+                $tagConflicts = false;
+                foreach($startMatches[0] as $k=>$match){
+                    $tagConflicts = $tagConflicts || $match[1] > $endMatches[0][$k][1];
+                    if(!$tagConflicts){
+                        $start = $match[1]+strlen($match[0]);
+                        $c =  substr($string,$start,$endMatches[0][$k][1]-$start);
+                        $this->template = preg_replace("/<!--[\s]*pageElement:[\s]*{$startMatches[1][$k][0]}[\s]*-->/",$c,$this->template);
+                    }
+                }
+            }
+        }
         $numMatches = preg_match_all('/<!--[\s]*pageElement:([^\>]+)-->/', $this->template, $matches, PREG_OFFSET_CAPTURE);
         for ($i = $numMatches - 1; $i >= 0; $i--) {
+            $content = null;
             $elementString = trim($matches[1][$i][0]);
-            /** @var $element PageElement */
-            $element = $this->pageElementFactory->getPageElement($elementString);
-            if ($element !== null) {
+            if (isset($replaceElementArray[$elementString])) {
+                $content = $replaceElementArray[$elementString];
+            } else if (($element = $this->pageElementFactory->getPageElement($elementString)) !== null) {
+                /** @var $element PageElement */
                 $content = $element->getContent();
+            }
+            if ($content !== null) {
                 $this->template = substr($this->template, 0, $matches[0][$i][1]) . $content . substr($this->template, $matches[0][$i][1] + strlen($matches[0][$i][0]));
             }
-
         }
 
     }
