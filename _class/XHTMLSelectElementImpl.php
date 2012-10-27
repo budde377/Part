@@ -22,6 +22,7 @@ class XHTMLSelectElementImpl implements XHTMLSelectElement
         if($disabled){
             $this->element->setAttributes('disabled','disabled');
         }
+        $this->element->insertString('<!-- -->');
     }
 
     /**
