@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__FILE__) . '/../_trait/FilePathTrait.php';
 require_once dirname(__FILE__) . '/../_interface/File.php';
 
 /**
@@ -10,7 +11,7 @@ require_once dirname(__FILE__) . '/../_interface/File.php';
  */
 class FileImpl implements File
 {
-
+    use FilePathTrait;
     protected $filePath;
     protected $mode = File::FILE_MODE_RW_POINTER_AT_END;
 
@@ -68,20 +69,7 @@ class FileImpl implements File
      */
     public function getRelativeFilePathTo($dirName)
     {
-        $absoluteDir = $this->relativeToAbsolute($dirName);
-        $thisDirArray = explode('/', $this->filePath);
-        $newDirArray = explode('/', $absoluteDir);
-        $relativePath = '';
-        $sizeToCut = 0;
-        foreach ($newDirArray as $k => $p) {
-            if (!isset($thisDirArray[$k]) || $p != $thisDirArray[$k]) {
-                $relativePath .= '../';
-            } else {
-                $sizeToCut += strlen($p) + 1;
-            }
-        }
-        $relativePath .= substr($this->filePath, $sizeToCut, strlen($this->filePath));
-        return $relativePath;
+        return $this->relativePath($this->filePath,$dirName);
     }
 
     /**
@@ -175,41 +163,6 @@ class FileImpl implements File
                 $this->mode = $permissions;
 
         }
-
-    }
-
-    protected function relativeToAbsolute($file)
-    {
-
-
-        if (substr($file, 0, 1) != '/') {
-            $file = getcwd() . '/' . $file;
-        }
-
-        if (substr($file, -1, 1) == '/') {
-            $file = substr($file, 0, strlen($file) - 1);
-        }
-        $fileArray = explode('/', $file);
-        $pathSizeArray = array();
-        $newFile = '';
-        foreach ($fileArray as $p) {
-            switch ($p) {
-                case '.':
-                    break;
-                case '':
-                    $newFile .= '/';
-                    break;
-                case '..':
-                    $size = ($v = array_pop($pathSizeArray)) === null ? 0 : $v;
-                    $newFile = substr($newFile, 0, ($size + 1) * -1);
-                    break;
-                default:
-                    $newFile .= $p . '/';
-                    array_push($pathSizeArray, strlen($p));
-            }
-        }
-        $newFile = substr($newFile, 0, -1);
-        return $newFile;
 
     }
 

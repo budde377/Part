@@ -16,7 +16,7 @@ trait EncryptionTrait
      * @param string $key
      * @return string
      */
-    private function encrypt($string, $key){
+    protected function encrypt($string, $key){
         return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, md5($key), $string, MCRYPT_MODE_CBC, md5(md5($key))));
     }
 
@@ -28,7 +28,7 @@ trait EncryptionTrait
      * @param string $key
      * @return string
      */
-    private function decrypt($string, $key){
+    protected function decrypt($string, $key){
         return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($key), base64_decode($string), MCRYPT_MODE_CBC, md5(md5($key))), "\0");
     }
 
