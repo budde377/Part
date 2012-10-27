@@ -1,5 +1,4 @@
 <?php
-//TODO Convert this to trait
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../_interface/CurrentPageStrategy.php';
-require_once dirname(__FILE__) . '/../_helper/RequestHelper.php';
+require_once dirname(__FILE__) . '/../_trait/RequestTrait.php';
 require_once dirname(__FILE__) . '/NotFoundPageImpl.php';
 /**
  * Created by JetBrains PhpStorm.
@@ -10,6 +10,7 @@ require_once dirname(__FILE__) . '/NotFoundPageImpl.php';
  */
 class CurrentPageStrategyImpl implements CurrentPageStrategy
 {
+    use RequestTrait;
     private $pageOrder;
 
     private $currentPagePath = null;
@@ -38,7 +39,7 @@ class CurrentPageStrategyImpl implements CurrentPageStrategy
         $pageOrderArray = $this->pageOrder->getPageOrder();
         $arrayCopy = $pageOrderArray;
 
-        if (($path = RequestHelper::GETValueOfIndexIfSetElseDefault('page', false)) !== false) {
+        if (($path = $this->GETValueOfIndexIfSetElseDefault('page', false)) !== false) {
             $pathArray = explode('/', $path);
             $emptyFilter = function($v)
             {

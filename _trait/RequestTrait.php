@@ -1,22 +1,20 @@
 <?php
-//TODO Convert this to trait
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
- * Date: 6/13/12
- * Time: 7:24 PM
+ * Date: 10/27/12
+ * Time: 11:31 AM
  * To change this template use File | Settings | File Templates.
  */
-class RequestHelper
+trait RequestTrait
 {
 
-
-    public static function URLFromGET()
+    public function URLFromGET()
     {
         return '?' . http_build_query($_GET);
     }
 
-    public static function URLWithoutVariableFromGET($variable)
+    public function URLWithoutVariableFromGET($variable)
     {
         $getAr = $_GET;
         unset($getAr[$variable]);
@@ -24,25 +22,23 @@ class RequestHelper
     }
 
 
-    public static function GETValueOfIndexIfSetElseDefault($index, $default = null)
+    public function GETValueOfIndexIfSetElseDefault($index, $default = null)
     {
         return isset($_GET[$index]) ? $_GET[$index] : $default;
     }
 
-    public static function POSTValueOfIndexIfSetElseDefault($index, $default = null)
+    public function POSTValueOfIndexIfSetElseDefault($index, $default = null)
     {
         return isset($_POST[$index]) ? $_POST[$index] : $default;
     }
 
-    public static function COOKIEValueOfIndexIfSetElseDefault($index, $default = null)
+    public function COOKIEValueOfIndexIfSetElseDefault($index, $default = null)
     {
         return isset($_COOKIE[$index]) ? $_COOKIE[$index] : $default;
     }
 
-    public static function SESSIONValueOfIndexIfSetElseDefault($index, $default = null)
+    public function SESSIONValueOfIndexIfSetElseDefault($index, $default = null)
     {
         return isset($_SESSION[$index]) ? $_SESSION[$index] : $default;
     }
-
-
 }

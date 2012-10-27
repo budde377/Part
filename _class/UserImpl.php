@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../_helper/RequestHelper.php';
+require_once dirname(__FILE__) . '/../_trait/RequestTrait.php';
 require_once dirname(__FILE__) . '/../_interface/User.php';
 require_once dirname(__FILE__) . '/../_interface/Observable.php';
 require_once dirname(__FILE__) . '/../_class/UserPrivilegesImpl.php';
@@ -11,6 +11,7 @@ require_once dirname(__FILE__) . '/../_class/UserPrivilegesImpl.php';
  */
 class UserImpl implements User, Observable
 {
+    use RequestTrait;
     private static $randomString = 'S6lmSif7i3gmoyPqoAoW';
 
     private $database;
@@ -235,8 +236,8 @@ class UserImpl implements User, Observable
     {
         if (!$this->exists() ||
             !$this->verifyLogin($password) ||
-            RequestHelper::SESSIONValueOfIndexIfSetElseDefault('loginUsername', false) !== false ||
-            RequestHelper::SESSIONValueOfIndexIfSetElseDefault('loginPassword', false) !== false
+            $this->SESSIONValueOfIndexIfSetElseDefault('loginUsername', false) !== false ||
+            $this->SESSIONValueOfIndexIfSetElseDefault('loginPassword', false) !== false
         ) {
             return false;
         }
@@ -261,8 +262,8 @@ class UserImpl implements User, Observable
      */
     public function isLoggedIn()
     {
-        return RequestHelper::SESSIONValueOfIndexIfSetElseDefault('loginUsername', false) == $this->getUsername() &&
-            RequestHelper::SESSIONValueOfIndexIfSetElseDefault('loginPassword', false) == $this->getPassword();
+        return $this->SESSIONValueOfIndexIfSetElseDefault('loginUsername', false) == $this->getUsername() &&
+            $this->SESSIONValueOfIndexIfSetElseDefault('loginPassword', false) == $this->getPassword();
     }
 
     /**

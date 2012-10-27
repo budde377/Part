@@ -1,6 +1,5 @@
 <?php
 require_once dirname(__FILE__) . '/../_interface/Website.php';
-require_once dirname(__FILE__) . '/../_helper/RequestHelper.php';
 require_once dirname(__FILE__) . '/TemplateImpl.php';
 require_once dirname(__FILE__) . '/BackendSingletonContainerImpl.php';
 require_once dirname(__FILE__) . '/PageElementFactoryImpl.php';
