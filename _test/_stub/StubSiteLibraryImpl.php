@@ -72,7 +72,6 @@ class StubSiteLibraryImpl implements SiteLibrary
      */
     public function current()
     {
-        // TODO: Implement current() method.
     }
 
     /**
@@ -83,7 +82,6 @@ class StubSiteLibraryImpl implements SiteLibrary
      */
     public function next()
     {
-        // TODO: Implement next() method.
     }
 
     /**
@@ -94,7 +92,6 @@ class StubSiteLibraryImpl implements SiteLibrary
      */
     public function key()
     {
-        // TODO: Implement key() method.
     }
 
     /**
@@ -106,7 +103,6 @@ class StubSiteLibraryImpl implements SiteLibrary
      */
     public function valid()
     {
-        // TODO: Implement valid() method.
     }
 
     /**
@@ -117,6 +113,5 @@ class StubSiteLibraryImpl implements SiteLibrary
      */
     public function rewind()
     {
-        // TODO: Implement rewind() method.
     }
 }

@@ -87,7 +87,6 @@ class StubUserLibraryImpl implements UserLibrary
      */
     public function getParent(User $user)
     {
-        // TODO: Implement getParent() method.
     }
 
     /**
@@ -97,7 +96,6 @@ class StubUserLibraryImpl implements UserLibrary
      */
     public function getChildren(User $user)
     {
-        // TODO: Implement getChildren() method.
     }
 
     /**
@@ -108,7 +106,6 @@ class StubUserLibraryImpl implements UserLibrary
      */
     public function current()
     {
-        // TODO: Implement current() method.
     }
 
     /**
@@ -119,7 +116,6 @@ class StubUserLibraryImpl implements UserLibrary
      */
     public function next()
     {
-        // TODO: Implement next() method.
     }
 
     /**
@@ -130,7 +126,6 @@ class StubUserLibraryImpl implements UserLibrary
      */
     public function key()
     {
-        // TODO: Implement key() method.
     }
 
     /**
@@ -142,7 +137,6 @@ class StubUserLibraryImpl implements UserLibrary
      */
     public function valid()
     {
-        // TODO: Implement valid() method.
     }
 
     /**
@@ -153,6 +147,5 @@ class StubUserLibraryImpl implements UserLibrary
      */
     public function rewind()
     {
-        // TODO: Implement rewind() method.
     }
 }
