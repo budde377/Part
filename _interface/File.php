@@ -113,4 +113,9 @@ interface File
     public function size();
 
 
+    /**
+     * @return Folder Will return parent folder
+     */
+    public function getParentFolder();
+
 }

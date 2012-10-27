@@ -1,6 +1,6 @@
 <?php
-require_once dirname(__FILE__).'/../_interface/Folder.php';
-require_once dirname(__FILE__).'/../_trait/FilePathTrait.php';
+require_once dirname(__FILE__) . '/../_interface/Folder.php';
+require_once dirname(__FILE__) . '/../_trait/FilePathTrait.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -11,13 +11,18 @@ require_once dirname(__FILE__).'/../_trait/FilePathTrait.php';
 class FolderImpl implements Folder
 {
     use FilePathTrait;
+
     private $folderPath;
+    private $key;
+    private $folderList;
 
     /**
      * @param string $path Path to folder
      */
-    public function __construct($path){
+    public function __construct($path)
+    {
         $this->folderPath = $this->relativeToAbsolute($path);
+        $this->key = 0;
     }
 
     /**
@@ -28,7 +33,10 @@ class FolderImpl implements Folder
      */
     public function current()
     {
-        // TODO: Implement current() method.
+        if($this->folderList == null){
+            $this->folderList = $this->listFolder();
+        }
+        return $this->folderList[$this->key];
     }
 
     /**
@@ -39,7 +47,7 @@ class FolderImpl implements Folder
      */
     public function next()
     {
-        // TODO: Implement next() method.
+        $this->key++;
     }
 
     /**
@@ -50,7 +58,7 @@ class FolderImpl implements Folder
      */
     public function key()
     {
-        // TODO: Implement key() method.
+        return $this->key;
     }
 
     /**
@@ -62,7 +70,10 @@ class FolderImpl implements Folder
      */
     public function valid()
     {
-        // TODO: Implement valid() method.
+        if($this->folderList == null){
+            $this->folderList = $this->listFolder();
+        }
+        return is_array($this->folderList) && isset($this->folderList[$this->key]);
     }
 
     /**
@@ -73,7 +84,8 @@ class FolderImpl implements Folder
      */
     public function rewind()
     {
-        // TODO: Implement rewind() method.
+        $this->key = 0;
+        $this->folderList = $this->listFolder();
     }
 
     /**
@@ -82,29 +94,22 @@ class FolderImpl implements Folder
     public function listFolder()
     {
         $dir = @scandir($this->folderPath);
-        if($dir === false){
+        if ($dir === false) {
             return false;
         }
         $resultArray = array();
-        foreach($dir as $e){
-            if($e != '.' && $e != '..'){
-                if(is_dir($this->folderPath.'/'.$e)){
-                    $resultArray[] = new FolderImpl($this->folderPath.'/'.$e);
+        foreach ($dir as $e) {
+            if ($e != '.' && $e != '..') {
+                if (is_dir($this->folderPath . '/' . $e)) {
+                    $resultArray[] = new FolderImpl($this->folderPath . '/' . $e);
                 } else {
-                    $resultArray[] = new FileImpl($this->folderPath.'/'.$e);
+                    $resultArray[] = new FileImpl($this->folderPath . '/' . $e);
                 }
             }
         }
         return $resultArray;
     }
 
-    /**
-     * @return bool Return TRUE if delete was successfully else FALSE
-     */
-    public function delete()
-    {
-        return @rmdir($this->folderPath);
-    }
 
     /**
      * @return bool Return TRUE if folder exists else FALSE
@@ -129,16 +134,30 @@ class FolderImpl implements Folder
      */
     public function move($path)
     {
-        // TODO: Implement move() method.
+        $r = ($this->exists() && @rename($this->folderPath, $path));
+        if ($r) {
+            $this->folderPath = $this->relativeToAbsolute($path);
+
+        }
+        return $r;
     }
 
     /**
      * @param string $path The path to the new file
-     * @return null | File Return null on failure else an instance of File being the new file
+     * @return null | Folder Return null on failure else an instance of File being the new file
      */
     public function copy($path)
     {
-        // TODO: Implement copy() method.
+        $newFolder = new FolderImpl($path);
+        if($newFolder->getAbsolutePath() == $this->getAbsolutePath()){
+            return $newFolder;
+        }
+        if ($this->exists() && !file_exists($path)) {
+            $newFolder->create();
+            $this->recursiveCopyFolderContent($this->folderPath, $newFolder->getAbsolutePath());
+            return $newFolder;
+        }
+        return null;
     }
 
     /**
@@ -146,7 +165,7 @@ class FolderImpl implements Folder
      */
     public function getName()
     {
-        $folderArray = explode('/',$this->folderPath);
+        $folderArray = explode('/', $this->folderPath);
         return array_pop($folderArray);
     }
 
@@ -164,7 +183,7 @@ class FolderImpl implements Folder
      */
     public function getRelativePathTo($dirName)
     {
-        return $this->relativePath($this->folderPath,$dirName);
+        return $this->relativePath($this->folderPath, $dirName);
     }
 
     /**
@@ -173,9 +192,54 @@ class FolderImpl implements Folder
     public function getParentFolder()
     {
         $p = dirname($this->folderPath);
-        if($p == $this->folderPath){
+        if ($p == $this->folderPath) {
             return null;
         }
         return new FolderImpl($p);
     }
+
+    /**
+     * @param int $mode Sets the mode, if recursive non empty folders can be deleted
+     * @throws MalformedParameterException
+     * @return bool Return TRUE if delete was successfully else FALSE
+     */
+    public function delete($mode = Folder::DELETE_FOLDER_NOT_RECURSIVE)
+    {
+        switch ($mode) {
+            case Folder::DELETE_FOLDER_RECURSIVE:
+                return @$this->recRmDir($this->folderPath);
+                break;
+            case Folder::DELETE_FOLDER_NOT_RECURSIVE:
+                return @rmdir($this->folderPath);
+                break;
+            default:
+                throw new MalformedParameterException('Folder[const]', 1);
+        }
+    }
+
+    private function recRmDir($dir)
+    {
+        foreach (glob($dir . '/*') as $file) {
+            if (is_dir($file))
+                $this->recRmDir($file);
+            else
+                unlink($file);
+        }
+        return rmdir($dir);
+    }
+
+    private function recursiveCopyFolderContent($path1, $path2)
+    {
+        foreach (glob($path1 . '/*') as $file) {
+            $fn = basename($file);
+            if (is_dir($file)) {
+                mkdir($path2 . '/' . $fn);
+                $this->recursiveCopyFolderContent($path1 . '/' . $fn, $path2 . '/' . $fn);
+
+            } else {
+                copy($path1 . '/' . $fn, $path2 . '/' . $fn);
+            }
+        }
+    }
+
 }

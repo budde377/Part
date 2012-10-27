@@ -143,7 +143,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testDeleteReturnsFalseOnDirectoryAndCanNotDelete()
     {
-        $filePath = dirname(__FILE__) . '/_stub/testFolder';
+        $filePath = dirname(__FILE__) . '/_stub/testFileFolder';
         if (file_exists($filePath)) {
             @unlink($filePath);
             @rmdir($filePath);
@@ -210,7 +210,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testWriteToDirectoryReturnFalse()
     {
-        $fp = dirname(__FILE__) . '/_stub/testFolder';
+        $fp = dirname(__FILE__) . '/_stub/testFileFolder';
         if (file_exists($fp)) {
             @unlink($fp);
             @rmdir($fp);
@@ -250,7 +250,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
 
     public function testCopyFolderReturnsNull(){
-        $filePath = dirname(__FILE__) . '/_stub/testFolder';
+        $filePath = dirname(__FILE__) . '/_stub/testFileFolder';
         $newPath = dirname(__FILE__) . '/_stub/_newStub';
         if (file_exists($filePath)) {
             @unlink($filePath);
@@ -268,7 +268,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
 
     public function testMoveFolderReturnsNull(){
-        $filePath = dirname(__FILE__) . '/_stub/testFolder';
+        $filePath = dirname(__FILE__) . '/_stub/testFileFolder';
         $newPath = dirname(__FILE__) . '/_stub/_newStub';
         if (file_exists($filePath)) {
             @unlink($filePath);
@@ -285,7 +285,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
     }
 
     public function testGetFileContentsWillReturnFalseIfDirectory(){
-        $filePath = dirname(__FILE__) . '/_stub/testFolder';
+        $filePath = dirname(__FILE__) . '/_stub/testFileFolder';
         if (file_exists($filePath)) {
             @unlink($filePath);
             @rmdir($filePath);
@@ -296,7 +296,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
     }
 
     public function testSizeOfFolderWillReturnMinus1(){
-        $filePath = dirname(__FILE__) . '/_stub/testFolder';
+        $filePath = dirname(__FILE__) . '/_stub/testFileFolder';
         if (file_exists($filePath)) {
             @unlink($filePath);
             @rmdir($filePath);
@@ -304,6 +304,14 @@ class FileImplTest extends PHPUnit_Framework_TestCase
         mkdir($filePath);
         $file = new FileImpl($filePath);
         $this->assertEquals(-1,$file->size(),'Did not return false if directory');
+    }
+
+    public function testGetParentFolderWillReturnParentFolder(){
+        $fn = dirname(__FILE__).'/_stub/fileStub';
+        $file = new FileImpl($fn);
+        $folder = $file->getParentFolder();
+        $this->assertInstanceOf('Folder',$folder);
+        $this->assertEquals(dirname(__FILE__).'/_stub',$folder->getAbsolutePath(),'Parent did not match');
     }
 
 

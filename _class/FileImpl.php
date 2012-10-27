@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../_trait/FilePathTrait.php';
 require_once dirname(__FILE__) . '/../_interface/File.php';
+require_once dirname(__FILE__) . '/FolderImpl.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -194,5 +195,13 @@ class FileImpl implements File
     protected function isDirectory()
     {
         return is_dir($this->filePath);
+    }
+
+    /**
+     * @return Folder Will return parent folder
+     */
+    public function getParentFolder()
+    {
+        return new FolderImpl(dirname($this->filePath));
     }
 }

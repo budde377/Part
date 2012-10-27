@@ -130,7 +130,10 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
     }
 
     public function testDeleteNonEmptyFolderWillReturnTrueAndDeleteWithRecursiveArgument(){
-        
+        $folder = dirname(__FILE__).'/_stub/testFolder';
+        $f = $this->setUpNonEmptyFolder($folder);
+        $this->assertTrue($f->delete(Folder::DELETE_FOLDER_RECURSIVE),'Did not return true on deletion of non empty folder');
+        $this->assertFalse($f->exists(),'Folder was not deleted');
     }
 
     public function testListDirectoryWillReturnFalseOnFolderNotExisting(){
@@ -176,6 +179,116 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
             }
         }
         $this->rrmdir($folder);
+
+    }
+
+    public function testMoveFolderWillMoveFolder(){
+        $folder = dirname(__FILE__).'/_stub/testFolder';
+        @$this->rrmdir($folder);
+        @$this->rrmdir($folder.'2');
+        $f = $this->setUpNonEmptyFolder($folder);
+        $this->assertTrue($f->move($folder.'2'),'Folder move did not return true');
+        $this->assertEquals($folder.'2',$f->getAbsolutePath());
+        $this->assertTrue($f->exists(),'Folder was not moved');
+    }
+
+    public function testMoveFolderWillReturnFalseIfDestinationExists(){
+        $folder = dirname(__FILE__).'/_stub/testFolder';
+        $folder2 = dirname(__FILE__).'/_stub/testFolder2';
+        @$this->rrmdir($folder);
+        @$this->rrmdir($folder.'2');
+        $f = $this->setUpNonEmptyFolder($folder);
+        $f2 = $this->setUpNonEmptyFolder($folder2);
+        $this->assertFalse($f->move($folder2),'Folder move did not return false');
+        $this->assertTrue($f->exists(),'Folder was moved');
+        $this->assertTrue($f2->exists(),'Folder was moved');
+    }
+
+    public function testMoveFolderWillReturnFalseOnNonExistingFolder(){
+        $folder = dirname(__FILE__).'/_stub/nonExistingFolder';
+
+        $f = new FolderImpl($folder);
+        $this->assertFalse($f->move($folder.'2'));
+    }
+    public function testMoveFolderWillReturnFalseOnFolderBeingAFile(){
+        $folder = dirname(__FILE__).'/_stub/fileStub';
+
+        $f = new FolderImpl($folder);
+        $this->assertFalse($f->move($folder.'2'));
+    }
+
+    public function testMoveFolderWillReturnTrueDestinationBeingOrigin(){
+        $folder = dirname(__FILE__).'/_stub/testFolder';
+        @$this->rrmdir($folder);
+        $f = $this->setUpNonEmptyFolder($folder);
+        $this->assertTrue($f->move($folder));
+    }
+
+    public function testCopyFolderWillCopyFolder(){
+        $folder = dirname(__FILE__).'/_stub/testFolder';
+        @$this->rrmdir($folder);
+        @$this->rrmdir($folder.'2');
+        $f = $this->setUpNonEmptyFolder($folder);
+        $f2 = $f->copy($folder.'2');
+        $this->assertInstanceOf('Folder',$f2,'Did not return instance of Folder');
+        /** @var $f2  Folder */
+        $this->assertEquals($folder.'2',$f2->getAbsolutePath());
+        $this->assertTrue($f->exists(),'Folder was moved');
+        $this->assertEquals(count($f->listFolder()),count($f2->listFolder()),'Folder length did not match');
+    }
+
+    public function testCopyFolderWillReturnNullIfDestinationExists(){
+        $folder = dirname(__FILE__).'/_stub/testFolder';
+        $folder2 = dirname(__FILE__).'/_stub/testFolder2';
+        @$this->rrmdir($folder);
+        @$this->rrmdir($folder.'2');
+        $f = $this->setUpNonEmptyFolder($folder);
+        $f2 = $this->setUpNonEmptyFolder($folder2);
+        $this->assertNull($f->copy($folder2),'Did not return null');
+        $this->assertTrue($f->exists(),'Folder was moved');
+        $this->assertTrue($f2->exists(),'Folder was moved');
+    }
+
+    public function testCopyFolderWillReturnFalseOnNonExistingFolder(){
+        $folder = dirname(__FILE__).'/_stub/nonExistingFolder';
+
+        $f = new FolderImpl($folder);
+        $this->assertNull($f->copy($folder.'2'));
+    }
+    public function testCopyFolderWillReturnFalseOnFolderBeingAFile(){
+        $folder = dirname(__FILE__).'/_stub/fileStub';
+
+        $f = new FolderImpl($folder);
+        $this->assertNull($f->copy($folder.'2'));
+    }
+
+    public function testCopyFolderWillReturnFileIfDestinationBeingOrigin(){
+        $folder = dirname(__FILE__).'/_stub/testFolder';
+        @$this->rrmdir($folder);
+        $f = $this->setUpNonEmptyFolder($folder);
+        $f2 = $f->copy($folder);
+        $this->assertInstanceOf('Folder',$f2);
+        $this->assertEquals($f->getAbsolutePath(),$f2->getAbsolutePath());
+
+    }
+
+
+    public function testIteratingWillMatchList(){
+        $folder = dirname(__FILE__).'/_stub/testFolder';
+        @$this->rrmdir($folder);
+        $f = $this->setUpNonEmptyFolder($folder);
+        $count = 0;
+        foreach($f as $key=>$val){
+            $count++;
+        }
+        $this->assertEquals(3,$count,'Was not of right size');
+        $f->rewind();
+        foreach($f->listFolder() as  $k=>$v){
+            $this->assertEquals($f->key(),$k,'Keys did not match');
+            $this->assertEquals($v,$f->current());
+            $f->next();
+        }
+
 
     }
 
