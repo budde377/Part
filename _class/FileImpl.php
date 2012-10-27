@@ -25,12 +25,11 @@ class FileImpl implements File
     }
 
     /**
-     * Will return true if the file exists, elsdirname(__FILE__).'/_stub/test'e false
+     * Will return true if the file exists, else false
      * @return bool
      */
     public function fileExists()
     {
-        $v = $this->isDirectory();
         $ret = file_exists($this->filePath) && !$this->isDirectory();
         return $ret;
     }
