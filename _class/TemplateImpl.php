@@ -65,19 +65,10 @@ class TemplateImpl implements Template
 
         $this->template = $string;
         $numExtendsMatch = preg_match_all('/<!--[\s]*extends:([^\>]+)-->/', $string, $matches, PREG_OFFSET_CAPTURE);
-        $replaceElementArray = array();
         if ($numExtendsMatch > 0) {
             $template = new TemplateImpl($this->config, $this->pageElementFactory);
             $f = new FileImpl(trim($matches[1][0][0]));
             $this->template = $f->getContents();
-
-            preg_match_all('/<!--[\s]*replaceElement\[([^\]]+)\]:([^\>]+)-->/', $string, $matches, PREG_OFFSET_CAPTURE);
-            foreach ($matches[1] as $k => $match) {
-                $e = $this->pageElementFactory->getPageElement($matches[2][$k][0]);
-                if ($e !== null) {
-                    $replaceElementArray[trim($match[0])] = $e->getContent(); //TODO DONT CALL THIS NOW, JUST REPLACE
-                }
-            }
 
             $numStartMatches = preg_match_all('/<!--[\s]*replaceElementStart\[([^\]]+)\][\s]*-->/', $string, $startMatches, PREG_OFFSET_CAPTURE);
             $numEndMatches = preg_match_all('/<!--[\s]*replaceElementEnd[\s]*-->/', $string, $endMatches, PREG_OFFSET_CAPTURE);
@@ -92,19 +83,20 @@ class TemplateImpl implements Template
                     }
                 }
             }
+            preg_match_all('/<!--[\s]*replaceElement\[([^\]]+)\]:([^\>]+)-->/', $string, $matches, PREG_OFFSET_CAPTURE);
+            foreach ($matches[1] as $k => $match) {
+                $replaceName = trim($match[0]);
+                $this->template = preg_replace("/(<!--[\s]*pageElement:[\s]*){$replaceName}([\s]*-->)/","$1{$matches[2][$k][0]}$2",$this->template);
+            }
+
         }
         $numMatches = preg_match_all('/<!--[\s]*pageElement:([^\>]+)-->/', $this->template, $matches, PREG_OFFSET_CAPTURE);
         for ($i = $numMatches - 1; $i >= 0; $i--) {
-            $content = null;
             $elementString = trim($matches[1][$i][0]);
-            if (isset($replaceElementArray[$elementString])) {
-                $content = $replaceElementArray[$elementString];
-            } else if (($element = $this->pageElementFactory->getPageElement($elementString)) !== null) {
+            if (($element = $this->pageElementFactory->getPageElement($elementString)) !== null) {
                 /** @var $element PageElement */
-                $content = $element->getContent();
-            }
-            if ($content !== null) {
-                $this->template = substr($this->template, 0, $matches[0][$i][1]) . $content . substr($this->template, $matches[0][$i][1] + strlen($matches[0][$i][0]));
+                $this->template = substr($this->template, 0, $matches[0][$i][1]) . $element->getContent() . substr($this->template, $matches[0][$i][1] + strlen($matches[0][$i][0]));
+
             }
         }
 

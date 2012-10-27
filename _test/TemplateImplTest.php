@@ -25,6 +25,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        @session_start();
         $this->backFactory = new NullBackendSingletonContainerImpl();
     }
 
@@ -218,5 +219,51 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("Hello DEAD FellowHello World",$modTemplate,'Did not return expected template');
     }
 
-    //TODO TEST FOR ORDER OF EXECUTION
+
+    public function testGetModifiedTemplateHasReversedOrderOfExecutionOfElements(){
+        $this->setUpConfig('
+        <config xmlns="http://christian-budde.dk/SiteConfig">
+            <pageElements>
+                <class name="main" link="_stub/ReturnIncrementPageElementImpl.php">ReturnIncrementPageElementImpl</class>
+                <class name="main2" link="_stub/ReturnIncrementPageElementImpl.php">ReturnIncrementPageElementImpl</class>
+            </pageElements>
+        </config>');
+        $this->template->setTemplateFromString("<!--pageElement:main-->:<!--pageElement:main-->");
+        $result = $this->template->getModifiedTemplate();
+        $result = explode(':',$result);
+
+        $this->assertGreaterThan($result[1],$result[0],'Wrong order of execution');
+    }
+    public function testGetModifiedTemplateHasReversedOrderOfExecutionOfElementsWithReplace(){
+        $this->setUpConfig('
+        <config xmlns="http://christian-budde.dk/SiteConfig">
+            <pageElements>
+                <class name="main2" link="_stub/ReturnIncrementPageElementImpl.php">ReturnIncrementPageElementImpl</class>
+            </pageElements>
+        </config>');
+        $templateFile = dirname(__FILE__).'/_stub/templateStub3';
+        $this->template->setTemplateFromString("<!--extends:$templateFile--><!--replaceElement[main]:main2-->");
+        $result = $this->template->getModifiedTemplate();
+        $result = explode(':',$result);
+
+        $this->assertGreaterThan($result[1],$result[0],'Wrong order of execution');
+    }
+
+    public function testGetModifiedTemplateWillExecuteExtendedReplaceBeforeNormalReplace(){
+        $this->setUpConfig('
+        <config xmlns="http://christian-budde.dk/SiteConfig">
+            <pageElements>
+                <class name="someElement" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
+                <class name="someElement2" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
+            </pageElements>
+        </config>');
+        $templateFile = dirname(__FILE__).'/_stub/templateStub2';
+        $this->template->setTemplateFromString("
+        <!--extends:$templateFile-->
+        <!--replaceElement[someElement]:someElement2-->
+        <!--replaceElementStart[someElement]--><!--pageElement:someElement--><!--pageElement:someElement--><!--replaceElementEnd-->");
+        $result = $this->template->getModifiedTemplate();
+        $this->assertEquals("Hello WorldHello World",$result,'Wrong order of execution of replace');
+
+    }
 }
