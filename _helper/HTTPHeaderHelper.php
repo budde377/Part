@@ -26,7 +26,7 @@ class HTTPHeaderHelper
     public static function setHeaderStatusCode($code)
     {
         if (ClassHelper::classHasConstantWithValue('HTTPHeaderHelper', $code)) {
-            header($code);
+            @header($code);
         } else {
             throw new MalformedParameterException('HTTPHeaderHelper[const]', 1);
         }

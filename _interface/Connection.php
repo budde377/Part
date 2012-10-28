@@ -8,12 +8,13 @@
  */
 interface Connection
 {
+    const FILE_TYPE_DIRECTORY = 1;
+    const FILE_TYPE_FILE = 2;
 
     /**
-     * @param string $host The host to which we wish to connect to
      * @return bool Return TRUE on successful connection else FALSE
      */
-    public function connect($host);
+    public function connect();
 
     /**
      * @return bool Return TRUE on success else FALSE
@@ -28,14 +29,58 @@ interface Connection
 
     /**
      * @param string $command Executes a command on remote
-     * @return array Returns an array containing the result of the command.
+     * @return array | bool Returns an array containing the result of the command.
      */
     public function exec($command);
 
     /**
      * @param string $username
      * @param string $password
-     * @return void
+     * @return bool Returns TRUE on success or FALSE on failure.
      */
     public function login($username,$password);
+
+    /**
+     * @param $localPath
+     * @param $remotePath
+     * @return bool Returns TRUE on success or FALSE on failure.
+     */
+    public function put($localPath,$remotePath);
+
+    /**
+     * @param $localPath
+     * @param $remotePath
+     * @return bool Returns TRUE on success or FALSE on failure.
+     */
+    public function get($localPath,$remotePath);
+
+    /**
+     * @param string $path Path to the new folder
+     * @return bool Returns TRUE on success or FALSE on failure.
+     */
+    public function createDirectory($path);
+
+    /**
+     * @param string $path Path to directory to be deleted
+     * @return bool Returns TRUE on success or FALSE on failure.
+     */
+    public function deleteDirectory($path);
+
+    /**
+     * @param string $path Path to the file to be deleted
+     * @return bool Returns TRUE on success or FALSE on failure.
+     */
+    public function deleteFile($path);
+
+    /**
+     * @param string $path
+     * @return array Will return an array with associative arrays with keys: type, name
+     * Where the type will be of Connection[const] and the name will be a string
+     */
+    public function listDirectory($path);
+
+    /**
+     * @return bool Will return TRUE if connected, else FALSE
+     */
+    public function isConnected();
 }
