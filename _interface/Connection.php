@@ -74,16 +74,27 @@ interface Connection
 
     /**
      * @param string $path
-     * @return array Will return an array with associative arrays with keys: type, name
-     * Where the type will be of Connection[const] and the name will be a string
+     * @return array | bool Will return an array containing the names of the files/dirs in the directory or FALSE on failure,
      */
     public function listDirectory($path);
 
     /**
      * @param string $path Path to file
-     * @return int | bool Will return False if file/dir does not exist, else int corresponding to file type constants
+     * @return bool Will return FALSE on failure, or file does not exist, else TRUE.
      */
     public function exists($path);
+
+    /**
+     * @param string $path
+     * @return bool Will return FALSE on failure, or if not a file, else TRUE
+     */
+    public function isFile($path);
+
+    /**
+     * @param string $path
+     * @return bool Will return FALSE on failure, or if not a directory, else TRUE
+     */
+    public function isDirectory($path);
 
     /**
      * @return bool Will return TRUE if connected, else FALSE

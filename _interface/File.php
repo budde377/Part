@@ -118,4 +118,9 @@ interface File
      */
     public function getParentFolder();
 
+
+    /**
+     * @return resource | bool Returns a file pointer resource on success, or FALSE on error.
+     */
+    public function getResource();
 }

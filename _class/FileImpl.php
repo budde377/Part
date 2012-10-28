@@ -204,4 +204,12 @@ class FileImpl implements File
     {
         return new FolderImpl(dirname($this->filePath));
     }
+
+    /**
+     * @return resource | bool Returns a file pointer resource on success, or FALSE on error.
+     */
+    public function getResource()
+    {
+        // TODO: Implement getResource() method.
+    }
 }
