@@ -21,9 +21,9 @@ interface Site
     public function getPageOrder();
 
     /**
-     * @return FileSystem | bool Will return the filesystem on success, else false if connection is not valid
+     * @return Folder | bool Will return the filesystem on success, else false if connection is not valid
      */
-    public function getFileSystem();
+    public function getFolder();
 
     /**
      * @abstract

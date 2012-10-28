@@ -338,7 +338,7 @@ class SiteImpl implements Site, Observable
     /**
      * @return FileSystem | bool Will return the filesystem on success, else false if connection is not valid
      */
-    public function getFileSystem()
+    public function getFolder()
     {
         // TODO: Implement getFileSystem() method.
     }
