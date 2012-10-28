@@ -17,7 +17,7 @@ class CSSFileImplTest extends PHPUnit_Framework_TestCase
     {
         $file = dirname(__FILE__) . '/_stub/fileStub';
         $cssFile = new CSSFileImpl($file);
-        $this->assertTrue($cssFile->fileExists(), 'File did not exists to begin with');
+        $this->assertTrue($cssFile->exists(), 'File did not exists to begin with');
         $cssCopy = $cssFile->copy($file . '2');
         $this->assertInstanceOf('CSSFile', $cssCopy);
         $cssCopy->delete();
@@ -27,7 +27,7 @@ class CSSFileImplTest extends PHPUnit_Framework_TestCase
     {
         $file = dirname(__FILE__) . '/_stub/noSuchFile';
         $cssFile = new CSSFileImpl($file);
-        $this->assertFalse($cssFile->fileExists(), 'File did exists to begin with');
+        $this->assertFalse($cssFile->exists(), 'File did exists to begin with');
         $cssCopy = $cssFile->copy($file . '2');
         $this->assertNull($cssCopy, 'Did not return null');
     }
@@ -77,7 +77,7 @@ class CSSFileImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($fileCopy . '-original', $ret->getAbsoluteFilePath(), 'Did not return CSSFile with right path');
         $this->assertTrue($cssFile->isMinimized(), 'File was not minimized');
         $this->assertEquals($originalContent, $ret->getContents(), 'Content did not match');
-        $this->assertTrue($ret->fileExists(), 'Original file did not exist');
+        $this->assertTrue($ret->exists(), 'Original file did not exist');
         $cssFile->delete();
         $ret->delete();
     }

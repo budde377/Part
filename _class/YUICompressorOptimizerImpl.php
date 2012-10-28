@@ -37,14 +37,14 @@ class YUICompressorOptimizerImpl implements Optimizer
     {
         $tempName = uniqid($outputFile->getAbsoluteFilePath());
         $tempFile = $outputFile->copy($tempName);
-        while ($tempFile->fileExists()) {
+        while ($tempFile->exists()) {
             $tempName = uniqid($outputFile->getAbsoluteFilePath());
             $tempFile = $outputFile->copy($tempName);
         }
 
         $command = "yui-compressor --type {$this->type} {$file->getAbsoluteFilePath()} > {$tempFile->getAbsoluteFilePath()}";
         exec($command, $v = null, $retVal);
-        if ($retVal != 0 || !$tempFile->fileExists()) {
+        if ($retVal != 0 || !$tempFile->exists()) {
             $logger = new LoggerImpl(dirname(__FILE__) . '/../');
             $tempFile->delete();
             $logger->log($this, "Compression failed with command: '$command'");

@@ -17,7 +17,7 @@ class JSFileImplTest extends PHPUnit_Framework_TestCase
     {
         $file = dirname(__FILE__) . '/_stub/fileStub';
         $jsFile = new JSFileImpl($file);
-        $this->assertTrue($jsFile->fileExists(), 'File did not exists to begin with');
+        $this->assertTrue($jsFile->exists(), 'File did not exists to begin with');
         $jsCopy = $jsFile->copy($file . '2');
         $this->assertInstanceOf('JSFile', $jsCopy);
         $jsCopy->delete();
@@ -27,7 +27,7 @@ class JSFileImplTest extends PHPUnit_Framework_TestCase
     {
         $file = dirname(__FILE__) . '/_stub/noSuchFile';
         $jsFile = new JSFileImpl($file);
-        $this->assertFalse($jsFile->fileExists(), 'File did exists to begin with');
+        $this->assertFalse($jsFile->exists(), 'File did exists to begin with');
         $jsCopy = $jsFile->copy($file . '2');
         $this->assertNull($jsCopy, 'Did not return null');
     }
@@ -87,7 +87,7 @@ class JSFileImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($fileCopy . '-original', $ret->getAbsoluteFilePath(), 'Did not return JSFile with right path');
         $this->assertTrue($jsFile->isMinimized(), 'File was not minimized');
         $this->assertEquals($originalContent, $ret->getContents(), 'Content did not match');
-        $this->assertTrue($ret->fileExists(), 'Original file did not exist');
+        $this->assertTrue($ret->exists(), 'Original file did not exist');
         $jsFile->delete();
         $ret->delete();
     }

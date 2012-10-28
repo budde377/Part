@@ -49,7 +49,7 @@ class TemplateImpl implements Template
     public function setTemplate(File $file)
     {
 
-        if (!$file->fileExists()) {
+        if (!$file->exists()) {
             throw new FileNotFoundException($file->getAbsoluteFilePath(), 'template file');
         }
         $templateString = $file->getContents();

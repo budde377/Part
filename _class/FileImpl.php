@@ -30,7 +30,7 @@ class FileImpl implements File
      * Will return true if the file exists, else false
      * @return bool
      */
-    public function fileExists()
+    public function exists()
     {
         $ret = file_exists($this->filePath) && !$this->isDirectory();
         return $ret;
@@ -46,7 +46,7 @@ class FileImpl implements File
         if($this->isDirectory()){
             return false;
         }
-        if ($this->fileExists()) {
+        if ($this->exists()) {
             return file_get_contents($this->filePath);
         } else {
             return '';
@@ -182,7 +182,7 @@ class FileImpl implements File
      */
     public function size()
     {
-        if ($this->fileExists()) {
+        if ($this->exists()) {
             return filesize($this->filePath);
         }
         return -1;

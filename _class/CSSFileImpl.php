@@ -32,7 +32,7 @@ class CSSFileImpl extends FileImpl implements CSSFile
         }
         $resultPath = $this->filePath . "-result";
         $resultFile = new CSSFileImpl($resultPath);
-        if (!$this->fileExists()) {
+        if (!$this->exists()) {
             return false;
         }
 

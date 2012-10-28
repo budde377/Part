@@ -80,6 +80,12 @@ interface Connection
     public function listDirectory($path);
 
     /**
+     * @param string $path Path to file
+     * @return int | bool Will return False if file/dir does not exist, else int corresponding to file type constants
+     */
+    public function exists($path);
+
+    /**
      * @return bool Will return TRUE if connected, else FALSE
      */
     public function isConnected();

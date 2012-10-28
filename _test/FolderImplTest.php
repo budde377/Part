@@ -117,9 +117,9 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
         $folder = dirname(__FILE__).'/_stub/fileStub';
         $f = new FolderImpl($folder);
         $file = new FileImpl($folder);
-        $this->assertTrue($file->fileExists(),'File did not exist');
+        $this->assertTrue($file->exists(),'File did not exist');
         $this->assertFalse($f->delete(),'Did not return false on folder not existing');
-        $this->assertTrue($file->fileExists(),'File was deleted');
+        $this->assertTrue($file->exists(),'File was deleted');
     }
 
     public function testDeleteNonEmptyFolderWillReturnFalse(){

@@ -154,6 +154,13 @@ class SiteImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->site->setDBHost('someHost');
         $this->site->setDBPassword('somePass');
         $this->site->setDBUser('someUser');
+        $this->site->setFTHost('someHost');
+        $this->site->setFTPassword('somePass');
+        $this->site->setFTPath('somePath');
+        $this->site->setFTPort(123);
+        $this->site->setFTUser('someUser');
+        $this->site->setFTType(Site::FILE_TRANSFER_PROTOCOL_FTP);
+        $this->site->setAddress('someAddress');
 
         $db = $this->site->getDBDatabase();
         $host = $this->site->getDBHost();
@@ -162,9 +169,15 @@ class SiteImplTest extends PHPUnit_Extensions_Database_TestCase
 
         $this->assertEquals('someDB', $db, 'Database did not match');
         $this->assertEquals('someHost', $host, 'Host did not match');
+        $this->assertEquals('someHost', $this->site->getFTHost(), 'Host did not match');
         $this->assertEquals('somePass', $password, 'Password did not match');
+        $this->assertEquals('somePass', $this->site->getFTPassword(), 'Password did not match');
         $this->assertEquals('someUser', $user, 'User did not match');
-
+        $this->assertEquals('someUser', $this->site->getFTUser(),'User did not match');
+        $this->assertEquals(123,$this->site->getFTPort(),'Port did not match');
+        $this->assertEquals('somePath',$this->site->getFTPath(),'Paths did not match');
+        $this->assertEquals(Site::FILE_TRANSFER_PROTOCOL_FTP,$this->site->getFTType(),'Types did not match');
+        $this->assertEquals('someAddress',$this->site->getAddress(),'Address did not match');
     }
 
     public function testSettersWillBePersistent()
@@ -178,6 +191,13 @@ class SiteImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->site->setDBHost('someHost');
         $this->site->setDBPassword('somePass');
         $this->site->setDBUser('someUser');
+        $this->site->setFTHost('someHost');
+        $this->site->setFTPassword('somePass');
+        $this->site->setFTPath('somePath');
+        $this->site->setFTPort(123);
+        $this->site->setFTUser('someUser');
+        $this->site->setFTType(Site::FILE_TRANSFER_PROTOCOL_FTP);
+        $this->site->setAddress('someAddress');
 
         $site = new SiteImpl($this->site->getTitle(), $this->db);
         $db = $site->getDBDatabase();
@@ -189,8 +209,57 @@ class SiteImplTest extends PHPUnit_Extensions_Database_TestCase
 
         $this->assertEquals('someDB', $db, 'Database did not match');
         $this->assertEquals('someHost', $host, 'Host did not match');
+        $this->assertEquals('someHost', $site->getFTHost(), 'Host did not match');
         $this->assertEquals('somePass', $password, 'Password did not match');
+        $this->assertEquals('somePass', $site->getFTPassword(), 'Password did not match');
         $this->assertEquals('someUser', $user, 'User did not match');
+        $this->assertEquals('someUser', $site->getFTUser(),'User did not match');
+        $this->assertEquals(123,$site->getFTPort(),'Port did not match');
+        $this->assertEquals('somePath',$site->getFTPath(),'Paths did not match');
+        $this->assertEquals(Site::FILE_TRANSFER_PROTOCOL_FTP,$site->getFTType(),'Types did not match');
+        $this->assertEquals('someAddress',$site->getAddress(),'Address did not match');
+    }
+
+
+    public function testCreateWillCreateWithProvidedValues()
+    {
+        $this->assertFalse($this->site->exists(), 'Site did exists');
+
+        $this->site->setDBDatabase('someDB');
+        $this->site->setDBHost('someHost');
+        $this->site->setDBPassword('somePass');
+        $this->site->setDBUser('someUser');
+        $this->site->setFTHost('someHost');
+        $this->site->setFTPassword('somePass');
+        $this->site->setFTPath('somePath');
+        $this->site->setFTPort(123);
+        $this->site->setFTUser('someUser');
+        $this->site->setFTType(Site::FILE_TRANSFER_PROTOCOL_FTP);
+        $this->site->setAddress('someAddress');
+
+        $ret = $this->site->create();
+        $this->assertTrue($ret, 'Create did fail');
+
+
+        $site = new SiteImpl($this->site->getTitle(), $this->db);
+        $db = $site->getDBDatabase();
+        $host = $site->getDBHost();
+        $password = $site->getDBPassword();
+        $user = $site->getDBUser();
+
+        $this->assertTrue($site->exists(), 'Site did not exists');
+
+        $this->assertEquals('someDB', $db, 'Database did not match');
+        $this->assertEquals('someHost', $host, 'Host did not match');
+        $this->assertEquals('someHost', $site->getFTHost(), 'Host did not match');
+        $this->assertEquals('somePass', $password, 'Password did not match');
+        $this->assertEquals('somePass', $site->getFTPassword(), 'Password did not match');
+        $this->assertEquals('someUser', $user, 'User did not match');
+        $this->assertEquals('someUser', $site->getFTUser(),'User did not match');
+        $this->assertEquals(123,$site->getFTPort(),'Port did not match');
+        $this->assertEquals('somePath',$site->getFTPath(),'Paths did not match');
+        $this->assertEquals(Site::FILE_TRANSFER_PROTOCOL_FTP,$site->getFTType(),'Types did not match');
+        $this->assertEquals('someAddress',$site->getAddress(),'Address did not match');
     }
 
     public function testGetPageOrderWillReturnFalseOnInvalidConnection()
@@ -198,6 +267,16 @@ class SiteImplTest extends PHPUnit_Extensions_Database_TestCase
         $site = new SiteImpl('cms2012', $this->db);
         $ret = $site->getPageOrder();
         $this->assertFalse($ret);
+    }
+
+    public function testSetTypeMustBeOfDefinedConstants(){
+        $site = new SiteImpl('cms2012', $this->db);
+        $site->setFTType(Site::FILE_TRANSFER_PROTOCOL_FTP);
+        $this->assertEquals(Site::FILE_TRANSFER_PROTOCOL_FTP,$site->getFTType(),'Type did not match');
+        $site->setFTType(Site::FILE_TRANSFER_PROTOCOL_SFTP);
+        $this->assertEquals(Site::FILE_TRANSFER_PROTOCOL_SFTP,$site->getFTType(),'Type did not match');
+        $site->setFTType(398184298151943287);
+        $this->assertEquals(Site::FILE_TRANSFER_PROTOCOL_SFTP,$site->getFTType(),'Invalid type was set');
     }
 
     public function testGetPageOrderWillReturnPageOrderOnValidConnection()

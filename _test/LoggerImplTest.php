@@ -29,7 +29,7 @@ class LoggerImplTest extends PHPUnit_Framework_TestCase
     public function testWillLogMessageToLogInRootDir()
     {
         $log = new FileImpl(dirname(__FILE__) . '/.log');
-        if ($log->fileExists()) {
+        if ($log->exists()) {
             $log->delete();
         }
 
@@ -37,7 +37,7 @@ class LoggerImplTest extends PHPUnit_Framework_TestCase
         $logger->log($this, 'TestMessage');
         $logger->log($this, 'TestMessage2');
         $log->getContents();
-        $this->assertTrue($log->fileExists(), 'Log was not created');
+        $this->assertTrue($log->exists(), 'Log was not created');
         $this->assertNotEmpty($log->getContents(), 'Log was empty');
         $this->assertGreaterThan(0, strpos($log->getContents(), get_class($this)), 'Did not write class name');
         $this->assertGreaterThan(0, strpos($log->getContents(), 'TestMessage'), 'Did not write message');

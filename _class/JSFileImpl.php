@@ -19,7 +19,7 @@ class JSFileImpl extends FileImpl implements JSFile
      */
     public function minimize()
     {
-        if ($this->minimizer === null || !$this->fileExists()) {
+        if ($this->minimizer === null || !$this->exists()) {
             return false;
         }
         $resultPath = $this->filePath . '-result';

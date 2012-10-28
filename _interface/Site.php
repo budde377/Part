@@ -8,11 +8,11 @@
 interface Site
 {
 
-    const FILE_TRANSFER_PROTOCOL_FTP = 'ftp';
-    const FILE_TRANSFER_PROTOCOL_SFTP = 'sftp';
+    const FILE_TRANSFER_PROTOCOL_FTP = 1;
+    const FILE_TRANSFER_PROTOCOL_SFTP = 2;
 
-    const EVENT_TITLE_UPDATE = 1;
-    const EVENT_DELETE = 2;
+    const EVENT_TITLE_UPDATE = 3;
+    const EVENT_DELETE = 4;
 
     /**
      * @abstract
@@ -153,28 +153,40 @@ interface Site
     public function setFTHost($FT_host);
 
     /**
-     * @return string
+     * @return int
      */
     public function getFTPort();
 
     /**
      * Will set the File Transfer port
-     * @param string $FT_port
+     * @param int $FT_port
      * @return void
      */
     public function setFTPort($FT_port);
 
     /**
-     * @return string
+     * @return int
      */
     public function getFTType();
 
     /**
      * Will set the File Transfer type (either FTP or SFTP)
-     * @param string $FT_type
+     * @param int $FT_type
      * @return void
      */
     public function setFTType($FT_type);
+
+    /**
+     * @param string $path The root path of the remote site
+     * @return void
+     */
+    public function setFTPath($path);
+
+    /**
+     * @return string
+     */
+    public function getFTPath();
+
     /**
      * @abstract
      * Create the site on persistent storage

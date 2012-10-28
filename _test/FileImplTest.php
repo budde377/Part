@@ -13,21 +13,21 @@ class FileImplTest extends PHPUnit_Framework_TestCase
     public function testFileExistsReturnFalseOnFileNotFound()
     {
         $file = new FileImpl('NotAnExistingFile');
-        $this->assertFalse($file->fileExists(), 'Did not return false on non-existing file');
+        $this->assertFalse($file->exists(), 'Did not return false on non-existing file');
     }
 
     public function testFileExistsReturnTrueOnFileExists()
     {
         $filePath = dirname(__FILE__) . '/_stub/templateStub';
         $file = new FileImpl($filePath);
-        $this->assertTrue($file->fileExists(), 'Did not return true on existing file');
+        $this->assertTrue($file->exists(), 'Did not return true on existing file');
     }
 
     public function testFileExistReturnFalseOnDirectory()
     {
         $filePath = dirname(__FILE__) .'/_stub';
         $file = new FileImpl($filePath);
-        $this->assertFalse($file->fileExists(),'Did not return false on directory');
+        $this->assertFalse($file->exists(),'Did not return false on directory');
     }
 
     public function testGetContentsReturnEmptyStringOnFileNotFound()
@@ -82,10 +82,10 @@ class FileImplTest extends PHPUnit_Framework_TestCase
     {
         $filePath = dirname(__FILE__) . '/_stub/fileStub';
         $file = new FileImpl($filePath);
-        $this->assertTrue($file->fileExists(), 'File did not exist to begin with.');
+        $this->assertTrue($file->exists(), 'File did not exist to begin with.');
         $this->assertTrue($file->move($filePath . '2'), 'Move did not return true');
         $this->assertEquals($filePath . '2', $file->getAbsoluteFilePath(), 'The path was not updated.');
-        $this->assertTrue($file->fileExists(), 'The file was not moved');
+        $this->assertTrue($file->exists(), 'The file was not moved');
         $file->move($filePath);
     }
 
@@ -93,7 +93,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
     {
         $filePath = dirname(__FILE__) . '/_stub/notAReadFile';
         $file = new FileImpl($filePath);
-        $this->assertFalse($file->fileExists(), 'File did exist to begin with.');
+        $this->assertFalse($file->exists(), 'File did exist to begin with.');
         $this->assertFalse($file->move($filePath . '2'), 'Move did return true');
         $this->assertEquals($filePath, $file->getAbsoluteFilePath(), 'The path was updated.');
 
@@ -103,11 +103,11 @@ class FileImplTest extends PHPUnit_Framework_TestCase
     {
         $filePath = dirname(__FILE__) . '/_stub/fileStub';
         $file = new FileImpl($filePath);
-        $this->assertTrue($file->fileExists(), 'File did not exist to begin with.');
+        $this->assertTrue($file->exists(), 'File did not exist to begin with.');
         $newFile = $file->copy($filePath . '2');
         $this->assertInstanceOf('File', $newFile, 'Did not return an instance of File');
         $this->assertEquals($filePath . '2', $newFile->getAbsoluteFilePath(), 'New file did not have right path');
-        $this->assertTrue($newFile->fileExists(), 'The new file did note exists');
+        $this->assertTrue($newFile->exists(), 'The new file did note exists');
         unlink($newFile->getAbsoluteFilePath());
     }
 
@@ -115,7 +115,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
     {
         $filePath = dirname(__FILE__) . '/_stub/notAReadFile';
         $file = new FileImpl($filePath);
-        $this->assertFalse($file->fileExists(), 'File did exist to begin with.');
+        $this->assertFalse($file->exists(), 'File did exist to begin with.');
         $this->assertNull($file->copy($filePath . '2'), 'Copy did not return null');
     }
 
@@ -126,10 +126,10 @@ class FileImplTest extends PHPUnit_Framework_TestCase
             unlink($filePath . '2');
         }
         $file = new FileImpl($filePath);
-        $this->assertTrue($file->fileExists(), 'File did not exist to begin with.');
+        $this->assertTrue($file->exists(), 'File did not exist to begin with.');
         $newFile = $file->copy($filePath . '2');
         $this->assertTrue($newFile->delete(), 'Did not return true');
-        $this->assertFalse($newFile->fileExists(), 'File was not deleted');
+        $this->assertFalse($newFile->exists(), 'File was not deleted');
 
     }
 
@@ -137,7 +137,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
     {
         $filePath = dirname(__FILE__) . '/_stub/notAReadFile';
         $file = new FileImpl($filePath);
-        $this->assertFalse($file->fileExists(), 'File did exist to begin with.');
+        $this->assertFalse($file->exists(), 'File did exist to begin with.');
         $this->assertFalse($file->delete(), 'Did not return false');
     }
 
@@ -188,7 +188,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
             unlink($filePath . '2');
         }
         $file = new FileImpl($filePath);
-        $this->assertTrue($file->fileExists(), 'File did not exist to begin with.');
+        $this->assertTrue($file->exists(), 'File did not exist to begin with.');
         $newFile = $file->copy($filePath . '2');
 
         $ret = $newFile->write('test123');
@@ -230,7 +230,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
             unlink($filePath . '2');
         }
         $file = new FileImpl($filePath);
-        $this->assertTrue($file->fileExists(), 'File did not exist to begin with.');
+        $this->assertTrue($file->exists(), 'File did not exist to begin with.');
         $newFile = $file->copy($filePath . '2');
 
         $ret = $newFile->write('test123');

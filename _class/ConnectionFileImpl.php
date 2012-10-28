@@ -17,7 +17,7 @@ class ConnectionFileImpl implements File
      * Will return true if the file exists, else false
      * @return bool
      */
-    public function fileExists()
+    public function exists()
     {
         // TODO: Implement fileExists() method.
     }

@@ -30,22 +30,18 @@ class SiteImpl implements Site, Observable
     private $ft_host;
     private $ft_port;
     private $ft_type;
+    private $ft_path;
 
-    /** @var $updateTitleStatement PDOStatement | null */
     private $updateTitleStatement;
-    /** @var $updateDBStatement PDOStatement | null */
     private $updateDBStatement;
-    /** @var $updateHostStatement PDOStatement | null */
-    private $updateHostStatement;
-    /** @var $updatePasswordStatement PDOStatement | null */
-    private $updatePasswordStatement;
-    /** @var $updateUserStatement PDOStatement | null */
-    private $updateUserStatement;
+    private $updateDBHostStatement;
+    private $updateDBPasswordStatement;
+    private $updateDBUserStatement;
     /** @var $existsStatement PDOStatement | null */
     private $existsStatement;
     /** @var $createStatement PDOStatement | null */
     private $createStatement;
-    /** @var $deleteStatement PDOStatement | null  */
+    /** @var $deleteStatement PDOStatement | null */
     private $deleteStatement;
 
     private $initialValuesHasBeenSet = false;
@@ -54,6 +50,14 @@ class SiteImpl implements Site, Observable
     private $pageOrder;
 
     private $observers = array();
+    private $address;
+    private $updateFTHostStatement;
+    private $updateFTPasswordStatement;
+    private $updateFTUserStatement;
+    private $updateFTPortStatement;
+    private $updateFTPathStatement;
+    private $updateFTTypeStatement;
+    private $updateAddressStatement;
 
 
     /**
@@ -113,13 +117,13 @@ class SiteImpl implements Site, Observable
      */
     public function setDBHost($host)
     {
-        if ($this->updateHostStatement == null) {
-            $this->updateHostStatement = $this->connection->prepare("UPDATE Sites SET db_host=? WHERE title=?");
-            $this->updateHostStatement->bindParam(1, $this->db_host);
-            $this->updateHostStatement->bindParam(2, $this->title);
+        if ($this->updateDBHostStatement == null) {
+            $this->updateDBHostStatement = $this->connection->prepare("UPDATE Sites SET db_host=? WHERE title=?");
+            $this->updateDBHostStatement->bindParam(1, $this->db_host);
+            $this->updateDBHostStatement->bindParam(2, $this->title);
         }
         $this->db_host = $host;
-        $this->updateHostStatement->execute();
+        $this->updateDBHostStatement->execute();
     }
 
     /**
@@ -146,13 +150,13 @@ class SiteImpl implements Site, Observable
     public function setDBUser($user)
     {
 
-        if ($this->updateUserStatement == null) {
-            $this->updateUserStatement = $this->connection->prepare("UPDATE Sites SET db_user=? WHERE title=?");
-            $this->updateUserStatement->bindParam(1, $this->db_user);
-            $this->updateUserStatement->bindParam(2, $this->title);
+        if ($this->updateDBUserStatement == null) {
+            $this->updateDBUserStatement = $this->connection->prepare("UPDATE Sites SET db_user=? WHERE title=?");
+            $this->updateDBUserStatement->bindParam(1, $this->db_user);
+            $this->updateDBUserStatement->bindParam(2, $this->title);
         }
         $this->db_user = $user;
-        $this->updateUserStatement->execute();
+        $this->updateDBUserStatement->execute();
     }
 
     /**
@@ -162,14 +166,14 @@ class SiteImpl implements Site, Observable
      */
     public function setDBPassword($password)
     {
-        $password = $this->encrypt($password,self::$key);
-        if ($this->updatePasswordStatement == null) {
-            $this->updatePasswordStatement = $this->connection->prepare("UPDATE Sites SET db_password=? WHERE title=?");
-            $this->updatePasswordStatement->bindParam(1, $this->db_password);
-            $this->updatePasswordStatement->bindParam(2, $this->title);
+        $password = $this->encrypt($password, self::$key);
+        if ($this->updateDBPasswordStatement == null) {
+            $this->updateDBPasswordStatement = $this->connection->prepare("UPDATE Sites SET db_password=? WHERE title=?");
+            $this->updateDBPasswordStatement->bindParam(1, $this->db_password);
+            $this->updateDBPasswordStatement->bindParam(2, $this->title);
         }
         $this->db_password = $password;
-        $this->updatePasswordStatement->execute();
+        $this->updateDBPasswordStatement->execute();
 
     }
 
@@ -210,7 +214,7 @@ class SiteImpl implements Site, Observable
     public function getDBPassword()
     {
         $this->setInitialValues();
-        return $this->decrypt($this->db_password,self::$key);
+        return $this->decrypt($this->db_password, self::$key);
     }
 
     private function titleExists($title)
@@ -229,18 +233,27 @@ class SiteImpl implements Site, Observable
      */
     public function create()
     {
-        if ($this->exists()){
+        if ($this->exists()) {
             return false;
         }
 
         if ($this->createStatement == null) {
             $this->createStatement = $this->connection->prepare("
-            INSERT INTO Sites (title,db_host,db_db,db_password,db_user) VALUES (?,?,?,?,?)");
+            INSERT INTO Sites (title,db_host,db_db,db_password,db_user,ft_host,ft_password,ft_user,ft_port,ft_path,ft_type,address)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
             $this->createStatement->bindParam(1, $this->title);
             $this->createStatement->bindParam(2, $this->db_host);
             $this->createStatement->bindParam(3, $this->db_db);
             $this->createStatement->bindParam(4, $this->db_password);
             $this->createStatement->bindParam(5, $this->db_user);
+            $this->createStatement->bindParam(6, $this->ft_host);
+            $this->createStatement->bindParam(7, $this->ft_password);
+            $this->createStatement->bindParam(8, $this->ft_user);
+            $this->createStatement->bindParam(9, $this->ft_port);
+            $this->createStatement->bindParam(10, $this->ft_path);
+            $this->createStatement->bindParam(11, $this->ft_type);
+            $this->createStatement->bindParam(12, $this->address);
+
         }
 
         $this->createStatement->execute();
@@ -288,6 +301,13 @@ class SiteImpl implements Site, Observable
             $this->db_user = $result['db_user'];
             $this->db_password = $result['db_password'];
             $this->db_host = $result['db_host'];
+            $this->ft_host = $result['ft_host'];
+            $this->ft_password = $result['ft_password'];
+            $this->ft_user = $result['ft_user'];
+            $this->ft_port = $result['ft_port'];
+            $this->ft_path = $result['ft_path'];
+            $this->ft_type = $result['ft_type'];
+            $this->address = $result['address'];
         }
     }
 
@@ -336,7 +356,7 @@ class SiteImpl implements Site, Observable
 
 
     /**
-     * @return FileSystem | bool Will return the filesystem on success, else false if connection is not valid
+     * @return Folder | bool Will return the filesystem on success, else false if connection is not valid
      */
     public function getFolder()
     {
@@ -348,7 +368,7 @@ class SiteImpl implements Site, Observable
      */
     public function getFTUser()
     {
-        // TODO: Implement getFTUser() method.
+        return $this->ft_user;
     }
 
     /**
@@ -358,7 +378,14 @@ class SiteImpl implements Site, Observable
      */
     public function setFTUser($ft_user)
     {
-        // TODO: Implement setFTUser() method.
+        if ($this->updateFTUserStatement == null) {
+            $this->updateFTUserStatement = $this->connection->prepare("UPDATE Sites SET ft_user=? WHERE title=?");
+            $this->updateFTUserStatement->bindParam(1, $this->ft_user);
+            $this->updateFTUserStatement->bindParam(2, $this->title);
+        }
+        $this->ft_user = $ft_user;
+        $this->updateFTUserStatement->execute();
+
     }
 
     /**
@@ -366,7 +393,10 @@ class SiteImpl implements Site, Observable
      */
     public function getFTPassword()
     {
-        // TODO: Implement getFTPassword() method.
+        $this->setInitialValues();
+        $pass = $this->decrypt($this->ft_password, self::$key);
+        ;
+        return $pass;
     }
 
     /**
@@ -376,7 +406,14 @@ class SiteImpl implements Site, Observable
      */
     public function setFTPassword($FT_password)
     {
-        // TODO: Implement setFTPassword() method.
+        if ($this->updateFTPasswordStatement == null) {
+            $this->updateFTPasswordStatement = $this->connection->prepare("UPDATE Sites SET ft_password=? WHERE title=?");
+            $this->updateFTPasswordStatement->bindParam(1, $this->ft_password);
+            $this->updateFTPasswordStatement->bindParam(2, $this->title);
+        }
+        $this->ft_password = $this->encrypt($FT_password, self::$key);
+        $this->updateFTPasswordStatement->execute();
+
     }
 
     /**
@@ -384,7 +421,8 @@ class SiteImpl implements Site, Observable
      */
     public function getFTHost()
     {
-        // TODO: Implement getFTHost() method.
+        $this->setInitialValues();
+        return $this->ft_host;
     }
 
     /**
@@ -394,7 +432,13 @@ class SiteImpl implements Site, Observable
      */
     public function setFTHost($FT_host)
     {
-        // TODO: Implement setFTHost() method.
+        if ($this->updateFTHostStatement == null) {
+            $this->updateFTHostStatement = $this->connection->prepare("UPDATE Sites SET ft_host=? WHERE title=?");
+            $this->updateFTHostStatement->bindParam(1, $this->ft_host);
+            $this->updateFTHostStatement->bindParam(2, $this->title);
+        }
+        $this->ft_host = $FT_host;
+        $this->updateFTHostStatement->execute();
     }
 
     /**
@@ -402,35 +446,52 @@ class SiteImpl implements Site, Observable
      */
     public function getFTPort()
     {
-        // TODO: Implement getFTPort() method.
+        $this->setInitialValues();
+        return $this->ft_port;
     }
 
     /**
      * Will set the File Transfer port
-     * @param string $FT_port
+     * @param int $FT_port
      * @return void
      */
     public function setFTPort($FT_port)
     {
-        // TODO: Implement setFTPort() method.
+        if ($this->updateFTPortStatement == null) {
+            $this->updateFTPortStatement = $this->connection->prepare("UPDATE Sites SET ft_port=? WHERE title=?");
+            $this->updateFTPortStatement->bindParam(1, $this->ft_port);
+            $this->updateFTPortStatement->bindParam(2, $this->title);
+        }
+        $this->ft_port = $FT_port;
+        $this->updateFTPortStatement->execute();
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getFTType()
     {
-        // TODO: Implement getFTType() method.
+        $this->setInitialValues();
+        return $this->ft_type;
     }
 
     /**
      * Will set the File Transfer type (either FTP or SFTP)
-     * @param string $FT_type
+     * @param int $FT_type
      * @return void
      */
     public function setFTType($FT_type)
     {
-        // TODO: Implement setFTType() method.
+        if($FT_type != Site::FILE_TRANSFER_PROTOCOL_SFTP && $FT_type != Site::FILE_TRANSFER_PROTOCOL_FTP){
+            return;
+        }
+        if ($this->updateFTTypeStatement == null) {
+            $this->updateFTTypeStatement = $this->connection->prepare("UPDATE Sites SET ft_type = ? WHERE title = ?");
+            $this->updateFTTypeStatement->bindParam(1, $this->ft_type);
+            $this->updateFTTypeStatement->bindParam(2, $this->title);
+        }
+        $this->ft_type = $FT_type;
+        $this->updateFTTypeStatement->execute();
     }
 
     /**
@@ -439,7 +500,13 @@ class SiteImpl implements Site, Observable
      */
     public function setAddress($address)
     {
-        // TODO: Implement setAddress() method.
+        if ($this->updateAddressStatement == null) {
+            $this->updateAddressStatement = $this->connection->prepare("UPDATE Sites SET address = ? WHERE title = ? ");
+            $this->updateAddressStatement->bindParam(1, $this->address);
+            $this->updateAddressStatement->bindParam(2, $this->title);
+        }
+        $this->address = $address;
+        $this->updateAddressStatement->execute();
     }
 
     /**
@@ -447,6 +514,30 @@ class SiteImpl implements Site, Observable
      */
     public function getAddress()
     {
-        // TODO: Implement getAddress() method.
+        return $this->address;
+    }
+
+    /**
+     * @param string $path The root path of the remote site
+     * @return void
+     */
+    public function setFTPath($path)
+    {
+        if ($this->updateFTPathStatement == null) {
+            $this->updateFTPathStatement = $this->connection->prepare("UPDATE Sites SET ft_path = ? WHERE title = ? ");
+            $this->updateFTPathStatement->bindParam(1, $this->ft_path);
+            $this->updateFTPathStatement->bindParam(2, $this->title);
+        }
+        $this->ft_path = $path;
+        $this->updateFTPathStatement->execute();
+    }
+
+    /**
+     * @return string
+     */
+    public function getFTPath()
+    {
+        $this->setInitialValues();
+        return $this->ft_path;
     }
 }
