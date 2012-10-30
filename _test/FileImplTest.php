@@ -315,4 +315,11 @@ class FileImplTest extends PHPUnit_Framework_TestCase
     }
 
 
+    public function testGetResourceWillReturnFileResource(){
+        $fn = dirname(__FILE__).'/_stub/fileStub';
+        $file = new FileImpl($fn);
+        $resType = @get_resource_type($file->getResource());
+        $this->assertTrue('file'==$resType || $resType == 'stream','Did not return resource of right type');
+    }
+
 }

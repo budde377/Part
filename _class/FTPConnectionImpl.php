@@ -76,7 +76,7 @@ class FTPConnectionImpl implements Connection
      */
     public function put($localPath, $remotePath)
     {
-        // TODO: Implement put() method.
+        return $this->isConnected() && @ftp_put($this->connection,$remotePath,$localPath,FTP_BINARY);
     }
 
     /**
@@ -113,7 +113,7 @@ class FTPConnectionImpl implements Connection
      */
     public function deleteFile($path)
     {
-        // TODO: Implement deleteFile() method.
+        return @ftp_delete($this->connection,$path) && !$this->exists($path);
     }
 
 
@@ -179,5 +179,35 @@ class FTPConnectionImpl implements Connection
     public function isDirectory($path)
     {
         return $this->exists($path) && ftp_size($this->connection,$path) == "-1";
+    }
+
+    /**
+     * Will copy the file/folder to a new location (on the connection) cannot be used as put/get
+     * @param string $oldFile
+     * @param string $newFile
+     * @return bool Returns TRUE on success or FALSE on failure.
+     */
+    public function copy($oldFile, $newFile)
+    {
+        // TODO: Implement copy() method.
+    }
+
+    /**
+     * Will move the file/folder to a new location (on the connection) cannot be used as put/get
+     * @param string $oldFile
+     * @param string $newFile
+     * @return bool Returns TRUE on success or FALSE on failure.
+     */
+    public function move($oldFile, $newFile)
+    {
+        // TODO: Implement move() method.
+    }
+
+    /**
+     * @return string Returns a wrapper used for connecting to resource (by fopen or such)
+     */
+    public function getWrapper()
+    {
+        // TODO: Implement getWrapper() method.
     }
 }

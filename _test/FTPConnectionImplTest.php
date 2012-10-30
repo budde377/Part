@@ -202,6 +202,59 @@ class FTPConnectionImplTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->connection->deleteDirectory($dir),'Did not return false');
     }
 
+    public function testDeleteFileWillReturnFalseOnNoConnection(){
+        $file = self::$path.'/testFile';
+        $localFile = dirname(__FILE__).'/_stub/fileStub';
+        $this->connection->put($localFile,$file);
+        $this->assertFalse($this->connection->deleteFile($file),'Did not return false on delete failure');
+
+    }
+
+    public function testDeleteFileWillReturnFalseIfFileNotFound(){
+        $this->setUpLogin();
+        $file = self::$path.'/nonExistingFile';
+        $this->assertFalse($this->connection->deleteFile($file),'Did not return false on delete failure');
+    }
+
+    public function testDeleteFileWillDeleteFileAndReturnTrue(){
+        $this->setUpLogin();
+        $file = self::$path.'/newFile';
+        $this->assertTrue($this->connection->put(dirname(__FILE__).'/_stub/fileStub',$file),'Could not put file');
+        $this->assertTrue($this->connection->deleteFile($file),'Could Not delete File');
+        $this->assertFalse($this->connection->exists($file),'File was not deleted');
+
+    }
+
+    public function testPutFileWillPutFile(){
+        $this->setUpLogin();
+        $localFile = dirname(__FILE__).'/_stub/fileStub';
+        $remoteFile = self::$path.'/newFile';
+        $this->connection->deleteFile($remoteFile);
+        $this->assertTrue($this->connection->put($localFile,$remoteFile),'Could not put file');
+        $this->assertTrue($this->connection->exists($remoteFile),'Did not exists');
+    }
+
+    public function testPutReturnFalseWhenNotConnected(){
+        $localFile = dirname(__FILE__).'/_stub/fileStub';
+        $remoteFile = self::$path.'/newFile';
+        $this->connection->deleteFile($remoteFile);
+        $this->assertFalse($this->connection->put($localFile,$remoteFile),'Did not return false on no connection');
+
+    }
+
+    public function testPutReturnFalseWhenLocalFileNotFound(){
+        $this->setUpLogin();
+        $localFile = dirname(__FILE__).'/_stub/nonExistingFile';
+        $remoteFile = self::$path.'/newFile';
+        $this->connection->deleteFile($remoteFile);
+        $this->assertFalse($this->connection->put($localFile,$remoteFile),'Did not return false on no connection');
+
+    }
+
+    public function testGetPullFileFromServer(){
+
+    }
+
     public function tearDown(){
         $this->connection->close();
     }

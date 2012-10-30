@@ -100,4 +100,25 @@ interface Connection
      * @return bool Will return TRUE if connected, else FALSE
      */
     public function isConnected();
+
+    /**
+     * Will copy the file/folder to a new location (on the connection) cannot be used as put/get
+     * @param string $oldFile
+     * @param string $newFile
+     * @return bool Returns TRUE on success or FALSE on failure.
+     */
+    public function copy($oldFile, $newFile);
+
+    /**
+     * Will move the file/folder to a new location (on the connection) cannot be used as put/get
+     * @param string $oldFile
+     * @param string $newFile
+     * @return bool Returns TRUE on success or FALSE on failure.
+     */
+    public function move($oldFile, $newFile);
+
+    /**
+     * @return string Returns a wrapper used for connecting to resource (by fopen or such)
+     */
+    public function getWrapper();
 }

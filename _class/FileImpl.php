@@ -210,6 +210,6 @@ class FileImpl implements File
      */
     public function getResource()
     {
-        // TODO: Implement getResource() method.
+        return fopen($this->filePath,$this->mode);
     }
 }
