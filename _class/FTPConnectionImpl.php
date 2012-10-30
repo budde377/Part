@@ -11,6 +11,8 @@ class FTPConnectionImpl implements Connection
     private $host;
     private $port;
     private $connection;
+    private $user;
+    private $pass;
 
     /**
      * @param string $host
@@ -66,7 +68,12 @@ class FTPConnectionImpl implements Connection
      */
     public function login($username, $password)
     {
-        return $this->connection !== null && ftp_login($this->connection,$username,$password);
+        $ret = $this->connection !== null && ftp_login($this->connection,$username,$password);
+        if($ret){
+            $this->user = $username;
+            $this->pass = $password;
+        }
+        return $ret;
     }
 
     /**
@@ -86,7 +93,7 @@ class FTPConnectionImpl implements Connection
      */
     public function get($localPath, $remotePath)
     {
-        // TODO: Implement get() method.
+        return $this->isConnected() && @ftp_get($this->connection,$localPath,$remotePath,FTP_BINARY);
     }
 
     /**
@@ -200,7 +207,7 @@ class FTPConnectionImpl implements Connection
      */
     public function move($oldFile, $newFile)
     {
-        // TODO: Implement move() method.
+        return $this->isConnected() && @ftp_rename($this->connection,$oldFile,$newFile);
     }
 
     /**
@@ -208,6 +215,10 @@ class FTPConnectionImpl implements Connection
      */
     public function getWrapper()
     {
-        // TODO: Implement getWrapper() method.
+        $userString = "";
+        if($this->user != null && $this->pass != null){
+            $userString = "{$this->user}:{$this->pass}@";
+        }
+        return "ftp://$userString{$this->host}";
     }
 }

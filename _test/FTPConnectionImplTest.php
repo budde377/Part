@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__).'/../_class/FTPConnectionImpl.php';
+require_once dirname(__FILE__).'/../_class/FileImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -16,6 +17,17 @@ class FTPConnectionImplTest extends PHPUnit_Framework_TestCase
 
     /** @var $connection FTPConnectionImpl */
     private $connection;
+
+    public function deleteContent(){
+        $remoteFolder = self::$path.'/newFolder';
+        $remoteFolder2 = self::$path.'/newFolder2';
+        $this->connection->deleteFile( self::$path.'/newFile2');
+        $this->connection->deleteFile( self::$path.'/newFile');
+        $this->connection->deleteFile($remoteFolder.'/newFile');
+        $this->connection->deleteFile($remoteFolder2.'/newFile');
+        $this->connection->deleteDirectory($remoteFolder);
+        $this->connection->deleteDirectory($remoteFolder2);
+    }
 
     public function setUp(){
         $this->connection = new FTPConnectionImpl(self::$host,self::$port);
@@ -252,7 +264,139 @@ class FTPConnectionImplTest extends PHPUnit_Framework_TestCase
     }
 
     public function testGetPullFileFromServer(){
+        $this->setUpLogin();
+        $localFile = dirname(__FILE__).'/_stub/fileStub';
+        $remoteFile = self::$path.'/newFile';
+        $this->connection->put($localFile,$remoteFile);
+        $this->assertTrue($this->connection->exists($remoteFile),'File was not put');
+        $newLocalFile = dirname(__FILE__).'/_stub/newFileStub';
+        $this->assertTrue($this->connection->get($newLocalFile,$remoteFile),'Did not return true on get');
+        $file = new FileImpl($newLocalFile);
+        $this->assertTrue($file->exists(),'File was not get');
+        $this->connection->deleteFile($remoteFile);
+        $file->delete();
+    }
 
+    public function testGetReturnFalseOnNoConnection(){
+        $this->setUpLogin();
+        $localFile = dirname(__FILE__).'/_stub/fileStub';
+        $remoteFile = self::$path.'/newFile';
+        $this->connection->put($localFile,$remoteFile);
+        $this->assertTrue($this->connection->exists($remoteFile),'File was not put');
+        $this->connection->close();
+        $newLocalFile = dirname(__FILE__).'/_stub/newFileStub';
+        $this->assertFalse($this->connection->get($newLocalFile,$remoteFile),'Did not return false on no connection');
+    }
+
+    public function testGetReturnFalseOnNoRemoteFile(){
+        $this->setUpLogin();
+        $remoteFile = self::$path.'/newFile';
+        $this->connection->deleteFile($remoteFile);
+        $localFile = dirname(__FILE__).'/_stub/newFileStub';
+        $this->assertFalse($this->connection->get($localFile,$remoteFile),'Did not return false on no file');
+    }
+
+    public function testDeleteFolderFailsWithNonEmptyFolder(){
+        $this->setUpLogin();
+        $folder = self::$path.'/newFolder';
+        $remoteFile = $folder.'/newFile';
+        $localFile = dirname(__FILE__).'/_stub/fileStub';
+        $this->connection->createDirectory($folder);
+        $this->connection->put($localFile,$remoteFile);
+        $this->assertFalse($this->connection->deleteDirectory($remoteFile),'Did return true on non-empty folder delete');
+    }
+
+    public function testGetFolderWillReturnFalse(){
+        $this->setUpLogin();
+        $folder = self::$path.'/newFolder';
+        $remoteFile = $folder.'/newFile';
+        $localFile = dirname(__FILE__).'/_stub/fileStub';
+        $localFolder = dirname(__FILE__).'/_stub/folderStub';
+        $this->connection->createDirectory($folder);
+        $this->connection->put($localFile,$remoteFile);
+        $f = new FolderImpl($localFolder);
+        $f->delete(Folder::DELETE_FOLDER_RECURSIVE);
+        $this->assertFalse($this->connection->get($localFolder,$folder),'Did not return true');
+        $this->assertFalse($f->exists(),'Folder was created');
+    }
+
+    public function testPutFolderWillReturnFalse(){
+        $this->setUpLogin();
+        $localFolder = dirname(__FILE__).'/_stub/folderStub';
+        $folder = self::$path.'/newFolder';
+        $f = new FolderImpl($localFolder);
+        $f->create();
+        $this->assertFalse($this->connection->put($localFolder,$folder),'Did not return false');
+        $f->delete(Folder::DELETE_FOLDER_RECURSIVE);
+    }
+
+    public function testMatchWrapper(){
+        $user = self::$user;
+        $pass = self::$password;
+        $host = self::$host;
+        $this->assertEquals("ftp://$host",$this->connection->getWrapper(),'Wrapper did not match');
+        $this->setUpLogin();
+        $this->assertEquals("ftp://$user:$pass@$host",$this->connection->getWrapper(),'Wrapper did not match');
+    }
+
+    public function testMoveWillMoveFile(){
+        $this->setUpLogin();
+        $localFile = dirname(__FILE__).'/_stub/fileStub';
+        $remoteFile = self::$path.'/newFile';
+        $newRemoteFile = self::$path.'/newFile2';
+        $this->connection->put($localFile,$remoteFile);
+        $this->assertTrue($this->connection->exists($remoteFile),'The file was not created');
+        $this->assertTrue($this->connection->move($remoteFile,$newRemoteFile),'Did not return true on move file');
+        $this->assertFalse($this->connection->exists($remoteFile),'The file was not moved');
+        $this->assertTrue($this->connection->exists($newRemoteFile),'The file was not moved');
+    }
+
+    public function testMoveWillMoveFolder(){
+        $this->setUpLogin();
+        $remoteFolder = self::$path.'/newFolder';
+        $newRemoteFolder = self::$path.'/newFolder2';
+        $this->deleteContent();
+        $this->connection->createDirectory($remoteFolder);
+        $this->assertTrue($this->connection->exists($remoteFolder),'The folder was not created');
+        $this->assertTrue($this->connection->move($remoteFolder,$newRemoteFolder),'Did not return true on move folder');
+        $this->assertFalse($this->connection->exists($remoteFolder),'The folder was not moved');
+        $this->assertTrue($this->connection->exists($newRemoteFolder),'The folder was not moved');
+        $this->connection->deleteDirectory($newRemoteFolder);
+    }
+
+    public function testMoveWillMoveFolderWithContent(){
+        $this->setUpLogin();
+        $remoteFolder = self::$path.'/newFolder';
+        $newRemoteFolder = self::$path.'/newFolder2';
+        $localFile = dirname(__FILE__).'/_stub/fileStub';
+        $remoteFile = $remoteFolder.'/newFile';
+        $this->deleteContent();
+        $this->connection->createDirectory($remoteFolder);
+        $this->connection->put($localFile,$remoteFile);
+        $this->assertTrue($this->connection->exists($remoteFolder),'The folder was not created');
+        $this->assertTrue($this->connection->move($remoteFolder,$newRemoteFolder),'Did not return true on move folder');
+        $this->assertTrue($this->connection->exists($newRemoteFolder.'/newFile'),'File was not moved');
+    }
+
+    public function testMoveFileWillReturnFalseOnNoConnection(){
+        $this->setUpLogin();
+        $localFile = dirname(__FILE__).'/_stub/fileStub';
+        $remoteFile = self::$path.'/newFile';
+        $newRemoteFile = self::$path.'/newFile2';
+        $this->deleteContent();
+        $this->connection->put($localFile,$remoteFile);
+        $this->assertTrue($this->connection->exists($remoteFile),'The file was not created');
+        $this->connection->close();
+        $this->assertFalse($this->connection->move($remoteFile,$newRemoteFile),'Did not return false on no connection');
+
+    }
+
+    public function testMoveFileWillReturnFalseOnNoFile(){
+        $this->setUpLogin();
+        $remoteFile = self::$path.'/nonExistingFile';
+        $newRemoteFile = self::$path.'/newFile2';
+        $this->assertFalse($this->connection->exists($remoteFile),'The file existed');
+        $this->assertFalse($this->connection->move($remoteFile,$newRemoteFile),'Did not return false on no file');
     }
 
     public function tearDown(){
