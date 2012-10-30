@@ -64,4 +64,21 @@ interface Folder extends Iterator
      * @return Folder | null Will return Folder if parent folder exists else null
      */
     public function getParentFolder();
+
+    /**
+     * Will put a folder to the folder (copy the folder into current folder)
+     * @param Folder $folder
+     * @param null $newName The new name of the folder, if Null then new folder will preserve name
+     * @return bool Return TRUE on success and FALSE on failure
+     */
+    public function putFolder(Folder $folder,$newName = null);
+
+    /**
+     * Will put a folder to the folder (copy the folder into current folder)
+     * @param File $file
+     * @param null $newName The new name of the file, if Null then new file will preserve name
+     * @return bool Return TRUE on success and FALSE on failure
+     */
+
+    public function putFile(File $file, $newName = null);
 }
