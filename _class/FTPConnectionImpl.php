@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__).'/../_interface/Connection.php';
+require_once dirname(__FILE__) . '/../_interface/Connection.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -18,9 +18,11 @@ class FTPConnectionImpl implements Connection
      * @param string $host
      * @param int $port
      */
-    public function __construct($host,$port = 21){
+    public function __construct($host, $port = 21)
+    {
         $this->host = $host;
         $this->port = $port;
+
     }
 
     /**
@@ -28,7 +30,7 @@ class FTPConnectionImpl implements Connection
      */
     public function connect()
     {
-        if(($con = @ftp_connect($this->host,$this->port)) !== false){
+        if (($con = @ftp_connect($this->host, $this->port)) !== false) {
             $this->connection = $con;
             return true;
         }
@@ -58,7 +60,7 @@ class FTPConnectionImpl implements Connection
      */
     public function exec($command)
     {
-        return $this->isConnected() && is_array($a = @ftp_raw($this->connection,$command))?$a:false;
+        return $this->isConnected() && is_array($a = @ftp_raw($this->connection, $command)) ? $a : false;
     }
 
     /**
@@ -68,10 +70,11 @@ class FTPConnectionImpl implements Connection
      */
     public function login($username, $password)
     {
-        $ret = $this->connection !== null && ftp_login($this->connection,$username,$password);
-        if($ret){
+        $ret = $this->connection !== null && ftp_login($this->connection, $username, $password);
+        if ($ret) {
             $this->user = $username;
             $this->pass = $password;
+
         }
         return $ret;
     }
@@ -83,7 +86,7 @@ class FTPConnectionImpl implements Connection
      */
     public function put($localPath, $remotePath)
     {
-        return $this->isConnected() && @ftp_put($this->connection,$remotePath,$localPath,FTP_BINARY);
+        return $this->isConnected() && @ftp_put($this->connection, $remotePath, $localPath, FTP_BINARY);
     }
 
     /**
@@ -93,7 +96,7 @@ class FTPConnectionImpl implements Connection
      */
     public function get($localPath, $remotePath)
     {
-        return $this->isConnected() && @ftp_get($this->connection,$localPath,$remotePath,FTP_BINARY);
+        return $this->isConnected() && @ftp_get($this->connection, $localPath, $remotePath, FTP_BINARY);
     }
 
     /**
@@ -102,7 +105,7 @@ class FTPConnectionImpl implements Connection
      */
     public function createDirectory($path)
     {
-        return $this->isConnected() && @ftp_mkdir($this->connection,$path) !== false;
+        return $this->isConnected() && @ftp_mkdir($this->connection, $path) !== false;
     }
 
     /**
@@ -111,7 +114,7 @@ class FTPConnectionImpl implements Connection
      */
     public function deleteDirectory($path)
     {
-        return $this->isConnected() && @ftp_rmdir($this->connection,$path);
+        return $this->isConnected() && @ftp_rmdir($this->connection, $path);
     }
 
     /**
@@ -120,9 +123,8 @@ class FTPConnectionImpl implements Connection
      */
     public function deleteFile($path)
     {
-        return @ftp_delete($this->connection,$path) && !$this->exists($path);
+        return @ftp_delete($this->connection, $path) && !$this->exists($path);
     }
-
 
 
     /**
@@ -141,10 +143,10 @@ class FTPConnectionImpl implements Connection
     {
 //        $path = escapeshellarg($path);
 
-        if($this->isConnected() && is_array($a = ftp_nlist($this->connection,$path))){
+        if ($this->isConnected() && is_array($a = ftp_nlist($this->connection, $path))) {
             $returnArray = array();
-            foreach($a as $file){
-                $v = ftp_nlist($this->connection,$file);
+            foreach ($a as $file) {
+                $v = ftp_nlist($this->connection, $file);
                 $returnArray[] = basename($file);
             }
             return $returnArray;
@@ -160,9 +162,9 @@ class FTPConnectionImpl implements Connection
     {
         $containingDir = dirname($path);
         $fileName = basename($path);
-        if(($a = $this->listDirectory($containingDir)) !== false){
-            foreach($a as $file){
-                if($file == $fileName){
+        if (($a = $this->listDirectory($containingDir)) !== false) {
+            foreach ($a as $file) {
+                if ($file == $fileName) {
                     return true;
                 }
             }
@@ -176,7 +178,7 @@ class FTPConnectionImpl implements Connection
      */
     public function isFile($path)
     {
-        return $this->isConnected() && ftp_size($this->connection,$path) != '-1';
+        return $this->isConnected() && ftp_size($this->connection, $path) != '-1';
     }
 
     /**
@@ -185,7 +187,7 @@ class FTPConnectionImpl implements Connection
      */
     public function isDirectory($path)
     {
-        return $this->exists($path) && ftp_size($this->connection,$path) == "-1";
+        return $this->exists($path) && ftp_size($this->connection, $path) == "-1";
     }
 
     /**
@@ -196,7 +198,33 @@ class FTPConnectionImpl implements Connection
      */
     public function copy($oldFile, $newFile)
     {
-        // TODO: Implement copy() method.
+        $folderName = '.tmp';
+        $i = 0;
+        while (file_exists($folderName . $i)) {
+            $i++;
+        }
+        $tempFolder = new FolderImpl($folderName . $i);
+        $tempFolder->create();
+
+        $copyFunction = function ($oldFile, $newFile, $tmpPath) use (&$copyFunction) {
+            if ($this->isDirectory($oldFile)) {
+                $res = $this->createDirectory($newFile);
+                foreach ($this->listDirectory($oldFile) as $file) {
+                        $res = $res && $copyFunction($oldFile.'/'.$file,$newFile.'/'.$file,$tmpPath);
+                }
+            } else {
+                $tempFile = $tmpPath . '/' . basename($oldFile);
+                $res = $this->get($tempFile, $oldFile);
+                $res = $res && $this->put($tempFile, $newFile);
+                @unlink($tempFile);
+
+            }
+            return $res;
+        };
+        $res = $copyFunction($oldFile, $newFile, $tempFolder->getAbsolutePath());
+        $res = $tempFolder->delete(Folder::DELETE_FOLDER_RECURSIVE) && $res;
+
+        return  $res;
     }
 
     /**
@@ -207,7 +235,7 @@ class FTPConnectionImpl implements Connection
      */
     public function move($oldFile, $newFile)
     {
-        return $this->isConnected() && @ftp_rename($this->connection,$oldFile,$newFile);
+        return $this->isConnected() && @ftp_rename($this->connection, $oldFile, $newFile);
     }
 
     /**
@@ -216,7 +244,7 @@ class FTPConnectionImpl implements Connection
     public function getWrapper()
     {
         $userString = "";
-        if($this->user != null && $this->pass != null){
+        if ($this->user != null && $this->pass != null) {
             $userString = "{$this->user}:{$this->pass}@";
         }
         return "ftp://$userString{$this->host}";

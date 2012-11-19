@@ -9,8 +9,12 @@ require_once dirname(__FILE__).'/../_interface/File.php';
  */
 class ConnectionFileImpl implements File
 {
-    public function __construct($path,Connection $connection){
+    private $connection;
+    private $path;
 
+    public function __construct($path,Connection $connection){
+        $this->connection = $connection;
+        $this->path = $path;
     }
 
     /**
@@ -19,7 +23,7 @@ class ConnectionFileImpl implements File
      */
     public function exists()
     {
-        // TODO: Implement fileExists() method.
+        return $this->connection->exists($this->path) && $this->connection->isFile($this->path);
     }
 
     /**
@@ -58,7 +62,7 @@ class ConnectionFileImpl implements File
      */
     public function getFileName()
     {
-        // TODO: Implement getFileName() method.
+        return basename($this->path);
     }
 
     /**

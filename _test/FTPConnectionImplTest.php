@@ -399,7 +399,71 @@ class FTPConnectionImplTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->connection->move($remoteFile,$newRemoteFile),'Did not return false on no file');
     }
 
+    public function testCopyWillReturnFalseIfNoFile(){
+        $this->assertFalse($this->connection->copy(self::$path.'/nonExistingFolder',self::$path.'/anotherNonExistingFolder'));
+    }
+
+
+    public function testCopyWillCopyFileOnServer(){
+        $this->setUpLogin();
+        $string = "HELLO";
+        $localFilePath = dirname(__FILE__).'/_stub/FTPFileStub';
+        $newLocalFilePath = dirname(__FILE__).'/_stub/FTPFileStub2';
+        $localFile = new FileImpl($localFilePath);
+        $localFile->setAccessMode(File::FILE_MODE_W_TRUNCATE_FILE_TO_ZERO_LENGTH);
+        $localFile->write($string);
+        $remoteFile = self::$path.'/newFile';
+        $newRemoteFile = self::$path.'/newFile2';
+        $this->connection->put($localFilePath,$remoteFile);
+        $this->connection->deleteFile($newRemoteFile);
+        $this->assertTrue($this->connection->copy($remoteFile,$newRemoteFile),'Did not return true on copy file');
+        $this->assertTrue($this->connection->exists($newRemoteFile),'New file was not created');
+        $this->assertTrue($this->connection->exists($remoteFile),'New file was not created');
+        $this->connection->get($newLocalFilePath,$newRemoteFile);
+        $newLocalFile = new FileImpl($newLocalFilePath);
+        $this->assertEquals($string,$newLocalFile->getContents(),"Contents did not match");
+
+    }
+
+    public function testCopyWillCopyFolderOnServer(){
+        $this->setUpLogin();
+        $string = "HELLO";
+        $localFilePath = dirname(__FILE__).'/_stub/FTPFileStub';
+        $newLocalFilePath = dirname(__FILE__).'/_stub/FTPFileStub2';
+
+        $localFile = new FileImpl($localFilePath);
+        $localFile->setAccessMode(File::FILE_MODE_W_TRUNCATE_FILE_TO_ZERO_LENGTH);
+        $localFile->write($string);
+
+        $remoteDir = self::$path.'/newFolder';
+        $newRemoteDir = self::$path.'/newFolder2';
+
+        $this->connection->deleteFile($remoteDir);
+        $this->connection->deleteDirectory($remoteDir);
+        $this->connection->deleteFile($newRemoteDir);
+        $this->connection->deleteDirectory($newRemoteDir);
+
+        $this->connection->createDirectory($remoteDir);
+
+        $remoteFileName = 'newFile';
+
+        $this->connection->put($localFilePath,$remoteDir.'/'.$remoteFileName);
+
+
+        $this->assertTrue($this->connection->copy($remoteDir,$newRemoteDir),'Did not return true on copy folder');
+        $this->assertTrue($this->connection->exists($newRemoteDir),'New file was not created');
+        $this->assertTrue($this->connection->exists($remoteDir),'New file was not created');
+        $this->connection->get($newLocalFilePath,$newRemoteDir.'/'.$remoteFileName);
+        $newLocalFile = new FileImpl($newLocalFilePath);
+        $this->assertEquals($string,$newLocalFile->getContents(),"Contents did not match");
+    }
+
+
     public function tearDown(){
+        $localFilePath = dirname(__FILE__).'/_stub/FTPFileStub';
+        $newLocalFilePath = dirname(__FILE__).'/_stub/FTPFileStub2';
+        @unlink($localFilePath);
+        @unlink($newLocalFilePath);
         $this->connection->close();
     }
 
