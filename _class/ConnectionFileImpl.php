@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__FILE__) .'/../_class/ConnectionFolderImpl.php';
 require_once dirname(__FILE__) . '/../_interface/File.php';
 require_once dirname(__FILE__) . '/../_trait/FilePathTrait.php';
 /**
@@ -163,7 +164,8 @@ class ConnectionFileImpl implements File
      */
     public function getParentFolder()
     {
-        // TODO: Implement getParentFolder() method.
+        $dir = dirname($this->path);
+        return $dir == $this->path? null : new ConnectionFolderImpl($dir,$this->connection);
     }
 
     /**

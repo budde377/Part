@@ -27,6 +27,8 @@ class StubConnectionImpl implements Connection
     public $sizeArray = array();
     public $wrapper = 'wrapper://';
     public $deleteFileCalled = false;
+    public $createDirectoryReturn = true;
+    public $deleted = array();
 
     /**
      * @return bool Return TRUE on successful connection else FALSE
@@ -102,7 +104,7 @@ class StubConnectionImpl implements Connection
     public function createDirectory($path)
     {
         $this->dirsCreated[] = $path;
-        return true;
+        return $this->createDirectoryReturn;
     }
 
     /**
@@ -111,6 +113,7 @@ class StubConnectionImpl implements Connection
      */
     public function deleteDirectory($path)
     {
+        $this->deleted[] = $path;
         return $this->deleteDirReturn;
     }
 
@@ -120,6 +123,8 @@ class StubConnectionImpl implements Connection
      */
     public function deleteFile($path)
     {
+
+        $this->deleted[] = $path;
         $this->deleteFileCalled = true;
         return $this->deleteFileReturn;
     }

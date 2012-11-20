@@ -192,10 +192,11 @@ class ConnectionFileImplTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('File',$f,'Did not return true on success');
         $this->assertEquals($this->file->getAbsoluteFilePath(),'/'.$this->fileName,'Did change location');
         $this->assertEquals($f->getAbsoluteFilePath(),'/'.$newLocation,'Did not return folder with right path');
-        $notFound = true;
+        $found = false;
         foreach($this->connection->copies as $move){
-            $notFound = $notFound || ($move['oldFile'] == '/'.$this->fileName && $move['newFile'] == '/'.$newLocation);
+            $found = $found || ($move['oldFile'] == '/'.$this->fileName && $move['newFile'] == '/'.$newLocation);
         }
+        $this->assertTrue($found,'Could not find copy');
     }
 
     public function testDeleteWillReturnFalseIfNotExists(){
@@ -213,4 +214,15 @@ class ConnectionFileImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->connection->deleteFileCalled,'Did not call delete file');
     }
 
+    public function testGetParentFolderWillReturnNullIfRoot(){
+        $file = new ConnectionFileImpl('/',$this->connection);
+        $parent = $file->getParentFolder();
+        $this->assertNull($parent);
+    }
+
+    public function testGetParentFolderWillReturnFolderIfNotRoot(){
+        $f = $this->file->getParentFolder();
+        $this->assertInstanceOf('Folder',$f);
+        $this->assertEquals('',$f->getAbsolutePath());
+    }
 }

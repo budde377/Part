@@ -1,5 +1,7 @@
 <?php
-require_once dirname(__FILE__).'/../_interface/Folder.php';
+require_once dirname(__FILE__) . '/../_class/ConnectionFileImpl.php';
+require_once dirname(__FILE__) . '/../_interface/Folder.php';
+require_once dirname(__FILE__) . '/../_trait/FilePathTrait.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -10,8 +12,18 @@ require_once dirname(__FILE__).'/../_interface/Folder.php';
 class ConnectionFolderImpl implements Folder
 {
 
-    public function __construct($path,Connection $connection){
+    use FilePathTrait;
 
+    private $path;
+    private $connection;
+    /** @var Iterator */
+    private $folderIterator;
+
+    public function __construct($path, Connection $connection)
+    {
+        $this->path = $this->relativeToAbsolute($path, '/');
+        $this->connection = $connection;
+        $this->setUpIterator();
     }
 
     /**
@@ -22,7 +34,7 @@ class ConnectionFolderImpl implements Folder
      */
     public function current()
     {
-        // TODO: Implement current() method.
+        return $this->folderIterator->current();
     }
 
     /**
@@ -33,7 +45,7 @@ class ConnectionFolderImpl implements Folder
      */
     public function next()
     {
-        // TODO: Implement next() method.
+        $this->folderIterator->next();
     }
 
     /**
@@ -44,7 +56,7 @@ class ConnectionFolderImpl implements Folder
      */
     public function key()
     {
-        // TODO: Implement key() method.
+        return $this->folderIterator->key();
     }
 
     /**
@@ -56,7 +68,7 @@ class ConnectionFolderImpl implements Folder
      */
     public function valid()
     {
-        // TODO: Implement valid() method.
+        return $this->folderIterator->valid();
     }
 
     /**
@@ -67,7 +79,7 @@ class ConnectionFolderImpl implements Folder
      */
     public function rewind()
     {
-        // TODO: Implement rewind() method.
+        $this->setUpIterator();
     }
 
     /**
@@ -75,7 +87,20 @@ class ConnectionFolderImpl implements Folder
      */
     public function listFolder()
     {
-        // TODO: Implement listFolder() method.
+        if ($this->connection->isDirectory($this->path)) {
+            $res = array();
+            foreach ($this->connection->listDirectory($this->path) as $element) {
+                $path = $this->relativeToAbsolute($this->path . '/' . $element);
+                if ($this->connection->isDirectory($path)) {
+                    $res[] = new ConnectionFolderImpl($path, $this->connection);
+                } else if ($this->connection->isFile($path)) {
+                    $res[] = new ConnectionFileImpl($path, $this->connection);
+                }
+
+            }
+            return $res;
+        }
+        return false;
     }
 
     /**
@@ -84,7 +109,33 @@ class ConnectionFolderImpl implements Folder
      */
     public function delete($mode = Folder::DELETE_FOLDER_NOT_RECURSIVE)
     {
-        // TODO: Implement delete() method.
+        if ($this->connection->isDirectory($this->path)) {
+            switch ($mode) {
+                case Folder::DELETE_FOLDER_NOT_RECURSIVE:
+                    $l = $this->listFolder();
+                    if(is_array($l) && count($l)==0){
+                        return $this->connection->deleteDirectory($this->path);
+                    }
+
+                    break;
+                case Folder::DELETE_FOLDER_RECURSIVE:
+                    $l = $this->listFolder();
+                    if(is_array($l)){
+                        $res = true;
+                        foreach($l as $element){
+                            if($element instanceof File){
+                                $res = $res && $element->delete();
+                            } else if($element instanceof Folder){
+                                $res = $res && $element->delete($mode);
+                            }
+                        }
+                        return $res && $this->connection->deleteDirectory($this->path);
+                    }
+
+                    break;
+            }
+        }
+        return false;
     }
 
     /**
@@ -92,7 +143,7 @@ class ConnectionFolderImpl implements Folder
      */
     public function exists()
     {
-        // TODO: Implement exists() method.
+        return $this->connection->isDirectory($this->path) && $this->connection->exists($this->path);
     }
 
     /**
@@ -100,7 +151,8 @@ class ConnectionFolderImpl implements Folder
      */
     public function create()
     {
-        // TODO: Implement create() method.
+        $this->setUpIterator();
+        return $this->connection->createDirectory($this->path);
     }
 
     /**
@@ -109,7 +161,12 @@ class ConnectionFolderImpl implements Folder
      */
     public function move($path)
     {
-        // TODO: Implement move() method.
+        $path = $this->relativeToAbsolute($path, '/');
+        if ($this->connection->isDirectory($this->path) && $this->connection->move($this->path, $path)) {
+            $this->path = $path;
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -118,7 +175,11 @@ class ConnectionFolderImpl implements Folder
      */
     public function copy($path)
     {
-        // TODO: Implement copy() method.
+        $path = $this->relativeToAbsolute($path, '/');
+        if ($this->connection->isDirectory($this->path) && $this->connection->copy($this->path, $path)) {
+            return new ConnectionFolderImpl($path, $this->connection);
+        }
+        return null;
     }
 
     /**
@@ -126,7 +187,7 @@ class ConnectionFolderImpl implements Folder
      */
     public function getName()
     {
-        // TODO: Implement getName() method.
+        return basename($this->path);
     }
 
     /**
@@ -134,7 +195,7 @@ class ConnectionFolderImpl implements Folder
      */
     public function getAbsolutePath()
     {
-        // TODO: Implement getAbsolutePath() method.
+        return $this->path;
     }
 
     /**
@@ -143,7 +204,7 @@ class ConnectionFolderImpl implements Folder
      */
     public function getRelativePathTo($dirName)
     {
-        // TODO: Implement getRelativePathTo() method.
+        return $this->relativePath($this->path, $dirName, '/');
     }
 
     /**
@@ -151,7 +212,8 @@ class ConnectionFolderImpl implements Folder
      */
     public function getParentFolder()
     {
-        // TODO: Implement getParentFolder() method.
+        $parentFolder = dirname($this->path);
+        return $parentFolder == $this->path ? null : new ConnectionFolderImpl($parentFolder, $this->connection);
     }
 
     /**
@@ -174,5 +236,11 @@ class ConnectionFolderImpl implements Folder
     public function putFile(File $file, $newName = null)
     {
         // TODO: Implement putFile() method.
+    }
+
+    private function setUpIterator(){
+        $array = $this->listFolder();
+        $arrayObject = new ArrayObject($array == false? array():$array);
+        $this->folderIterator = $arrayObject->getIterator();
     }
 }
