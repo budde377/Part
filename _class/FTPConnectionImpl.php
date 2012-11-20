@@ -249,4 +249,15 @@ class FTPConnectionImpl implements Connection
         }
         return "ftp://$userString{$this->host}";
     }
+
+
+    /**
+     * Will return the size of a file or null on error
+     * @param string $file
+     * @return int | null
+     */
+    public function size($file)
+    {
+        return $this->isConnected()? @ftp_size($this->connection,$file) : -1;
+    }
 }

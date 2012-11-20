@@ -8,15 +8,19 @@
  */
 trait FilePathTrait
 {
-    protected function relativeToAbsolute($file)
+    protected function relativeToAbsolute($file,$currentWorkingDir = null)
     {
+        if($currentWorkingDir == null){
+            $currentWorkingDir = getcwd();
+        }
         if (substr($file, 0, 1) != '/') {
-            $file = getcwd() . '/' . $file;
+            $file = $currentWorkingDir . '/' . $file;
         }
 
         if (substr($file, -1, 1) == '/') {
             $file = substr($file, 0, strlen($file) - 1);
         }
+        $file = preg_replace('/\/[\/]+/','/',$file);
         $fileArray = explode('/', $file);
         $pathSizeArray = array();
         $newFile = '';
@@ -44,12 +48,17 @@ trait FilePathTrait
     /**
      * @param string $path The path that should be evaluated
      * @param string $relative The path that $path will be relative to
+     * @param string | null $currentWorkingDir If null then current working dir will be gained from getcwd()
      * @return string The relative path
      */
-    protected function relativePath($path,$relative)
+    protected function relativePath($path,$relative,$currentWorkingDir = null)
     {
-        $absoluteFilePath = $this->relativeToAbsolute($path);
-        $absoluteDir = $this->relativeToAbsolute($relative);
+        if($currentWorkingDir == null){
+            $currentWorkingDir = getcwd();
+        }
+
+        $absoluteFilePath = $this->relativeToAbsolute($path,$currentWorkingDir);
+        $absoluteDir = $this->relativeToAbsolute($relative,$currentWorkingDir);
         $thisDirArray = explode('/', $absoluteFilePath);
         $newDirArray = explode('/', $absoluteDir);
         $relativePath = '';

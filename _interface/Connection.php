@@ -121,4 +121,11 @@ interface Connection
      * @return string Returns a wrapper used for connecting to resource (by fopen or such)
      */
     public function getWrapper();
+
+    /**
+     * Will return the size of a file or null on error
+     * @param string $file
+     * @return int Will return size on success else -1
+     */
+    public function size($file);
 }

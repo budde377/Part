@@ -24,7 +24,9 @@ class StubConnectionImpl implements Connection
     public $existsReturn = true;
     public $isFileReturn = array();
     public $isDirectoryReturn = array();
+    public $sizeArray = array();
     public $wrapper = 'wrapper://';
+    public $deleteFileCalled = false;
 
     /**
      * @return bool Return TRUE on successful connection else FALSE
@@ -118,6 +120,7 @@ class StubConnectionImpl implements Connection
      */
     public function deleteFile($path)
     {
+        $this->deleteFileCalled = true;
         return $this->deleteFileReturn;
     }
 
@@ -174,7 +177,7 @@ class StubConnectionImpl implements Connection
      */
     public function copy($oldFile, $newFile)
     {
-        $this->copies = array('oldFile'=>$oldFile,'newFile'=>$newFile);
+        $this->copies[] = array('oldFile'=>$oldFile,'newFile'=>$newFile);
         return true;
     }
 
@@ -186,7 +189,7 @@ class StubConnectionImpl implements Connection
      */
     public function move($oldFile, $newFile)
     {
-        $this->moves = array('oldFile'=>$oldFile,'newFile'=>$newFile);
+        $this->moves[] = array('oldFile'=>$oldFile,'newFile'=>$newFile);
         return true;
     }
 
@@ -199,4 +202,13 @@ class StubConnectionImpl implements Connection
     }
 
 
+    /**
+     * Will return the size of a file or null on error
+     * @param string $file
+     * @return int
+     */
+    public function size($file)
+    {
+        return isset($this->sizeArray[$file]) ? $this->sizeArray[$file] : -1;
+    }
 }

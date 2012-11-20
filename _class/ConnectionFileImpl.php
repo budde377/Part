@@ -1,5 +1,6 @@
 <?php
-require_once dirname(__FILE__).'/../_interface/File.php';
+require_once dirname(__FILE__) . '/../_interface/File.php';
+require_once dirname(__FILE__) . '/../_trait/FilePathTrait.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -9,12 +10,16 @@ require_once dirname(__FILE__).'/../_interface/File.php';
  */
 class ConnectionFileImpl implements File
 {
+    use FilePathTrait;
+
+    private $mode = File::FILE_MODE_RW_POINTER_AT_END;
     private $connection;
     private $path;
 
-    public function __construct($path,Connection $connection){
+    public function __construct($path, Connection $connection)
+    {
         $this->connection = $connection;
-        $this->path = $path;
+        $this->path = $this->relativeToAbsolute($path, '/');
     }
 
     /**
@@ -33,7 +38,8 @@ class ConnectionFileImpl implements File
      */
     public function getContents()
     {
-        // TODO: Implement getContents() method.
+        $res = $this->connection->exists($this->path) ? @file_get_contents($this->connection->getWrapper() . $this->path) : '';
+        return $this->connection->isDirectory($this->path) ? false : $res;
     }
 
     /**
@@ -44,7 +50,7 @@ class ConnectionFileImpl implements File
      */
     public function getRelativeFilePathTo($dirName)
     {
-        // TODO: Implement getRelativeFilePathTo() method.
+        return $this->relativePath($this->path, $dirName, '/');
     }
 
     /**
@@ -53,7 +59,7 @@ class ConnectionFileImpl implements File
      */
     public function getAbsoluteFilePath()
     {
-        // TODO: Implement getAbsoluteFilePath() method.
+        return $this->path;
     }
 
     /**
@@ -72,7 +78,12 @@ class ConnectionFileImpl implements File
      */
     public function move($path)
     {
-        // TODO: Implement move() method.
+        $path = $this->relativeToAbsolute($path,'/');
+        if($this->connection->isFile($this->path) && $this->connection->move($this->path,$path)){
+            $this->path = $path;
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -81,7 +92,11 @@ class ConnectionFileImpl implements File
      */
     public function copy($path)
     {
-        // TODO: Implement copy() method.
+        $path = $this->relativeToAbsolute($path,'/');
+        if($this->connection->isFile($this->path) && $this->connection->copy($this->path,$path)){
+            return new ConnectionFileImpl($path,$this->connection);
+        }
+        return null;
     }
 
     /**
@@ -90,7 +105,7 @@ class ConnectionFileImpl implements File
      */
     public function delete()
     {
-        // TODO: Implement delete() method.
+        return $this->connection->isFile($this->path) && $this->connection->deleteFile($this->path);
     }
 
     /**
@@ -100,7 +115,11 @@ class ConnectionFileImpl implements File
      */
     public function write($string)
     {
-        // TODO: Implement write() method.
+        $handle = @fopen($this->path, $this->mode);
+        if ($handle === false) {
+            return false;
+        }
+        return  $handle = @fopen($this->path, $this->mode) !== false? @fwrite($handle, $string): false;
     }
 
     /**
@@ -110,7 +129,15 @@ class ConnectionFileImpl implements File
      */
     public function setAccessMode($permissions)
     {
-        // TODO: Implement setAccessMode() method.
+        switch ($permissions) {
+            case File::FILE_MODE_W_POINTER_AT_END:
+            case File::FILE_MODE_RW_POINTER_AT_END:
+            case File::FILE_MODE_R_POINTER_AT_BEGINNING:
+            case File::FILE_MODE_RW_POINTER_AT_BEGINNING:
+            case File::FILE_MODE_W_TRUNCATE_FILE_TO_ZERO_LENGTH:
+            case File::FILE_MODE_RW_TRUNCATE_FILE_TO_ZERO_LENGTH:
+                $this->mode = $permissions;
+        }
     }
 
     /**
@@ -119,7 +146,7 @@ class ConnectionFileImpl implements File
      */
     public function getAccessMode()
     {
-        // TODO: Implement getAccessMode() method.
+        return $this->mode;
     }
 
     /**
@@ -128,7 +155,7 @@ class ConnectionFileImpl implements File
      */
     public function size()
     {
-        // TODO: Implement size() method.
+        return $this->connection->size($this->path);
     }
 
     /**
@@ -144,6 +171,6 @@ class ConnectionFileImpl implements File
      */
     public function getResource()
     {
-        // TODO: Implement getResource() method.
+        return @fopen($this->connection->getWrapper() . $this->path, $this->mode);
     }
 }

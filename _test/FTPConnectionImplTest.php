@@ -459,6 +459,43 @@ class FTPConnectionImplTest extends PHPUnit_Framework_TestCase
     }
 
 
+    public function testSizeWillReturnFalseOnNoConnection(){
+        $this->assertEquals($this->connection->size(self::$path.'/'."rootFile"),-1);
+    }
+
+    public function testSizeWillReturnNullOnNoFile(){
+        $this->setUpLogin();
+        $this->assertEquals($this->connection->size('NonExistingFile'),-1,'Did not return null on size of non existing file');
+    }
+
+    public function testSizeWillReturnNullOnFolder(){
+        $this->setUpLogin();
+        $folder = self::$path.'/'.'testFolder';
+        $this->connection->deleteFile($folder);
+        $this->connection->deleteDirectory($folder);
+        $this->connection->createDirectory($folder);
+        $this->assertEquals($this->connection->size($folder),-1);
+    }
+
+    public function testSizeWillReturnSizeOnFile(){
+        $this->setUpLogin();
+        $string = "HELLO WORLD";
+        $localFilePath = dirname(__FILE__).'/_stub/FTPFileStub';
+        $remoteFile = self::$path.'/'.'testFolder';
+
+        $file = new FileImpl($localFilePath);
+        $file->setAccessMode(File::FILE_MODE_W_TRUNCATE_FILE_TO_ZERO_LENGTH);
+        $file->write($string);
+
+        $this->connection->deleteFile($remoteFile);
+        $this->connection->deleteDirectory($remoteFile);
+
+        $this->connection->put($localFilePath,$remoteFile);
+
+        $this->assertTrue($this->connection->exists($remoteFile),'Remote file did not exist');
+        $this->assertGreaterThan(0,$this->connection->size($remoteFile),'Did not return right size');
+    }
+
     public function tearDown(){
         $localFilePath = dirname(__FILE__).'/_stub/FTPFileStub';
         $newLocalFilePath = dirname(__FILE__).'/_stub/FTPFileStub2';
