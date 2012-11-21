@@ -69,7 +69,7 @@ interface Folder extends Iterator
      * Will put a folder to the folder (copy the folder into current folder)
      * @param Folder $folder
      * @param null $newName The new name of the folder, if Null then new folder will preserve name
-     * @return bool Return TRUE on success and FALSE on failure
+     * @return null | Folder Return new folder in folder on success and Null on failure
      */
     public function putFolder(Folder $folder,$newName = null);
 
@@ -77,7 +77,7 @@ interface Folder extends Iterator
      * Will put a folder to the folder (copy the folder into current folder)
      * @param File $file
      * @param null $newName The new name of the file, if Null then new file will preserve name
-     * @return bool Return TRUE on success and FALSE on failure
+     * @return null | File Return new file in folder on success and Null on failure
      */
 
     public function putFile(File $file, $newName = null);

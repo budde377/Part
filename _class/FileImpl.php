@@ -32,8 +32,7 @@ class FileImpl implements File
      */
     public function exists()
     {
-        $ret = file_exists($this->filePath) && !$this->isDirectory();
-        return $ret;
+        return file_exists($this->filePath) && !$this->isDirectory();
     }
 
     /**

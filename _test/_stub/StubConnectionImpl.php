@@ -29,6 +29,7 @@ class StubConnectionImpl implements Connection
     public $deleteFileCalled = false;
     public $createDirectoryReturn = true;
     public $deleted = array();
+    public $localCreate = false;
 
     /**
      * @return bool Return TRUE on successful connection else FALSE
@@ -104,7 +105,8 @@ class StubConnectionImpl implements Connection
     public function createDirectory($path)
     {
         $this->dirsCreated[] = $path;
-        return $this->createDirectoryReturn;
+        return $this->localCreate? @mkdir($path):$this->createDirectoryReturn;
+
     }
 
     /**

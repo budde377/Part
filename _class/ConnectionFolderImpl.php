@@ -216,31 +216,67 @@ class ConnectionFolderImpl implements Folder
         return $parentFolder == $this->path ? null : new ConnectionFolderImpl($parentFolder, $this->connection);
     }
 
+
+
+    private function setUpIterator(){
+        $array = $this->listFolder();
+        $arrayObject = new ArrayObject($array == false? array():$array);
+        $this->folderIterator = $arrayObject->getIterator();
+    }
+
     /**
      * Will put a folder to the folder (copy the folder into current folder)
      * @param Folder $folder
      * @param null $newName The new name of the folder, if Null then new folder will preserve name
-     * @return bool Return TRUE on success and FALSE on failure
+     * @return null | Folder Return new folder in folder on success and Null on failure
      */
     public function putFolder(Folder $folder, $newName = null)
     {
-        // TODO: Implement putFolder() method.
+        if($this->connection->isDirectory($this->path) && $folder->exists()){
+            $newName = $newName == null? $folder->getName():$newName;
+            $newFolder = new ConnectionFolderImpl($this->path.'/'.$newName,$this->connection);
+            if($newFolder->create()){
+                $error = false;
+                foreach($folder as $elem){
+                    if($elem instanceof Folder){
+                        $error = $error || $newFolder->putFolder($elem) === null;
+                    } else if($elem instanceof File){
+                        $error = $error || $newFolder->putFile($elem) === null;
+                    }
+                }
+
+                return $error?null:$newFolder;
+            }
+        }
+
+        return null;
     }
 
     /**
      * Will put a folder to the folder (copy the folder into current folder)
      * @param File $file
      * @param null $newName The new name of the file, if Null then new file will preserve name
-     * @return bool Return TRUE on success and FALSE on failure
+     * @return null | File Return new file in folder on success and Null on failure
      */
     public function putFile(File $file, $newName = null)
     {
-        // TODO: Implement putFile() method.
-    }
+        if($this->connection->isDirectory($this->path) && $file->exists()){
+            $newName = $newName == null? $file->getFileName():$newName;
+            $newFile = new ConnectionFileImpl($this->getAbsolutePath().'/'.$newName,$this->connection);
+            $newFile->setAccessMode(File::FILE_MODE_W_TRUNCATE_FILE_TO_ZERO_LENGTH);
+            if(($newRes = $newFile->getResource()) !== false && ($oldRes = $file->getResource()) !== false){
+                $error = false;
+                while(!feof($oldRes) && !$error){
+                    $line = fread($oldRes,1028);
+                    $error = fwrite($newRes,$line) === false?true:false;
 
-    private function setUpIterator(){
-        $array = $this->listFolder();
-        $arrayObject = new ArrayObject($array == false? array():$array);
-        $this->folderIterator = $arrayObject->getIterator();
+                }
+                @fclose($newRes);
+                @fclose($oldRes);
+                return $error?null:$newFile;
+            }
+        }
+
+        return null;
     }
 }
