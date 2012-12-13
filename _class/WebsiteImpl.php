@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../_interface/Website.php';
+require_once dirname(__FILE__) . '/../_trait/RequestTrait.php';
 require_once dirname(__FILE__) . '/TemplateImpl.php';
 require_once dirname(__FILE__) . '/BackendSingletonContainerImpl.php';
 require_once dirname(__FILE__) . '/PageElementFactoryImpl.php';
@@ -16,6 +17,8 @@ class WebsiteImpl implements Website
     private $factory;
     private $backendContainer;
     private $config;
+
+    use RequestTrait;
 
     public function __construct(SiteFactory $factory)
     {
@@ -37,20 +40,21 @@ class WebsiteImpl implements Website
 
         $elementFactory = new PageElementFactoryImpl($this->config, $this->backendContainer);
         $template = new TemplateImpl($this->config, $elementFactory);
-//        $ajaxRegister = $this->backendContainer->getAJAXRegisterInstance();
+        $pageStrategy = $this->backendContainer->getCurrentPageStrategyInstance();
+        $currentPage = $pageStrategy->getCurrentPage();
+        $template->setTemplateFromConfig($currentPage->getTemplate());
+
+        $ajaxRegister = $this->backendContainer->getAJAXRegisterInstance();
 
         //Decide output mode
+        if($this->GETValueOfIndexIfSetElseDefault('ajax',null) !== null &&
+            ($id = $this->GETValueOfIndexIfSetElseDefault('ajax_id',null)) !== null &&
+            ($ajax = $ajaxRegister->getAJAXFromRegistered($id)) !== null){
+            echo $ajax;
+        } else {
+            echo $template->getModifiedTemplate();
 
-/*        switch (RequestHelper::GETValueOfIndexIfSetElseDefault('mode')) {
-            case Website::OUTPUT_AJAX:
-                echo $ajaxRegister->getAJAXFromRegistered(RequestHelper::GETValueOfIndexIfSetElseDefault('ajax_id'));
-                break;
-            default:*/
-                $pageStrategy = $this->backendContainer->getCurrentPageStrategyInstance();
-                $currentPage = $pageStrategy->getCurrentPage();
-                $template->setTemplateFromConfig($currentPage->getTemplate());
-                echo $template->getModifiedTemplate();
-//        }
+        }
 
     }
 
