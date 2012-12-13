@@ -28,6 +28,9 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         @session_start();
         $this->backFactory = new NullBackendSingletonContainerImpl();
     }
+    protected function tearDown(){
+        @session_destroy();
+    }
 
     private function setUpConfig($config = '<config></config>')
     {
@@ -265,5 +268,33 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $result = $this->template->getModifiedTemplate();
         $this->assertEquals("Hello WorldHello World",$result,'Wrong order of execution of replace');
 
+    }
+
+    public function testWillInitializeOnSet(){
+        $this->setUpConfig('
+        <config xmlns="http://christian-budde.dk/SiteConfig">
+            <pageElements>
+                <class name="main" link="_stub/CheckInitializedPageElementImpl.php">CheckInitializedPageElementImpl</class>
+            </pageElements>
+        </config>');
+        $_SESSION['initialized'] = 0;
+        $origVal = $_SESSION['initialized'];
+        $this->template->setTemplateFromString("<!--pageElement:main-->");
+        $newVal = $_SESSION['initialized'];
+
+        $this->assertGreaterThan($origVal,$newVal,'Did not initialize');
+    }
+
+    public function testWillNotCallGetContentOnSet(){
+        $this->setUpConfig('
+        <config xmlns="http://christian-budde.dk/SiteConfig">
+            <pageElements>
+                <class name="main" link="_stub/ReturnIncrementPageElementImpl.php">ReturnIncrementPageElementImpl</class>
+            </pageElements>
+        </config>');
+        $orgVal = $_SESSION['inc'] = 0;
+        $this->template->setTemplateFromString("<!--pageElement:main-->");
+        $newVal = $_SESSION['inc'];
+        $this->assertEquals($orgVal,$newVal);
     }
 }

@@ -292,6 +292,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     }
 
+
     private function setUpNonEmptyFolder($folder)
     {
         $f = new FolderImpl($folder);
@@ -305,5 +306,6 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
         $folder1->create();
         return $f;
     }
+
 
 }

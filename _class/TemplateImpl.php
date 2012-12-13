@@ -16,6 +16,7 @@ class TemplateImpl implements Template
     private $config;
     private $pageElementFactory;
     private $template;
+    private $pageElements = array();
 
 
     /**
@@ -37,6 +38,11 @@ class TemplateImpl implements Template
      */
     public function getModifiedTemplate()
     {
+        foreach($this->pageElements as $array){
+            /** @var $element PageElement */
+            $element = $array['element'];
+            $this->template = substr($this->template, 0, $array['offset_start']) . $element->getContent() . substr($this->template, $array['offset_end']);
+        }
         return $this->template;
     }
 
@@ -90,14 +96,14 @@ class TemplateImpl implements Template
             }
 
         }
-        $numMatches = preg_match_all('/<!--[\s]*pageElement:([^\>]+)-->/', $this->template, $matches, PREG_OFFSET_CAPTURE);
-        for ($i = $numMatches - 1; $i >= 0; $i--) {
+
+        $numMatches = preg_match_all('/<!--[\s]*pageElement:([^\>]+)-->/', $this->template, $matches,PREG_OFFSET_CAPTURE);
+        for($i = $numMatches -1; $i >=0;$i--){
             $elementString = trim($matches[1][$i][0]);
             if (($element = $this->pageElementFactory->getPageElement($elementString)) !== null) {
                 /** @var $element PageElement */
-                $this->template = substr($this->template, 0, $matches[0][$i][1]) . $element->getContent() . substr($this->template, $matches[0][$i][1] + strlen($matches[0][$i][0]));
-
-            }
+                $this->pageElements[] = array('element'=>$element,'offset_start'=>$matches[0][$i][1], 'offset_end' => $matches[0][$i][1] + strlen($matches[0][$i][0]));
+             }
         }
 
     }
