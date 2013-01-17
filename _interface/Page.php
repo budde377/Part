@@ -104,4 +104,10 @@ interface Page
      */
     public function match($id);
 
+    /**
+     * Return TRUE if is editable, else FALSE
+     * @return bool
+     */
+    public function isEditable();
+
 }

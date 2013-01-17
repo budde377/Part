@@ -26,7 +26,7 @@ interface Config
 
     /**
      * Will return an array with default pages. Pages hardcoded into the website.
-     * The array will have the page title as key and another array, containing alias', as value.
+     * The array will have the page title as key and another array, containing keys [template], [alias] and [id], as value.
      * @return array
      */
     public function getDefaultPages();

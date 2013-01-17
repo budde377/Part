@@ -57,10 +57,13 @@
         <xs:sequence>
             <xs:element name="page" maxOccurs="unbounded" minOccurs="0">
                 <xs:complexType>
-                    <xs:sequence>
-                        <xs:element name="alias" maxOccurs="unbounded" minOccurs="0" type="xs:string"/>
-                    </xs:sequence>
-                    <xs:attribute name="title" />
+                    <xs:simpleContent>
+                        <xs:extension base="xs:string">
+                            <xs:attribute name="alias" type="xs:string" use="required"/>
+                            <xs:attribute name="template" type="xs:string" use="required"/>
+                            <xs:attribute name="id" type="name" use="required" />
+                        </xs:extension>
+                    </xs:simpleContent>
                 </xs:complexType>
             </xs:element>
         </xs:sequence>

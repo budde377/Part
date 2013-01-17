@@ -1,19 +1,23 @@
 <?php
-require_once dirname(__FILE__) . '/../../_interface/Page.php';
+require_once dirname(__FILE__).'/../_interface/Page.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
- * Date: 6/20/12
- * Time: 10:18 PM
- * To change this template use File | Settings | File Templates.
+ * Date: 17/01/13
+ * Time: 21:18
  */
-class StubPageImpl implements Page
+class DefaultPageImpl implements Page
 {
 
-    private $id;
-    private $title;
-    private $template;
-    private $alias;
+    private $template,$title,$alias,$id;
+    public function __construct($id,$title,$template,$alias = null)
+    {
+        $this->id = $id;
+        $this->template = $template;
+        $this->title = $title;
+        $this->alias = @preg_match($alias,"") === false?'':$alias;
+    }
+
 
     /**
      * @return string
@@ -58,7 +62,7 @@ class StubPageImpl implements Page
      */
     public function setID($id)
     {
-        $this->id = $id;
+        return false;
     }
 
     /**
@@ -67,17 +71,16 @@ class StubPageImpl implements Page
      */
     public function setTitle($title)
     {
-        $this->title = $title;
+
     }
 
     /**
      * Set the template, the template should match element in config.
      * @param $template string
-     * @return bool
+     * @return void
      */
     public function setTemplate($template)
     {
-        $this->template = $template;
     }
 
     /**
@@ -87,7 +90,7 @@ class StubPageImpl implements Page
      */
     public function setAlias($alias)
     {
-        $this->alias = $alias;
+        return false;
     }
 
     /**
@@ -125,7 +128,7 @@ class StubPageImpl implements Page
      */
     public function match($id)
     {
-        return $id == $this->id || $id == $this->alias;
+        return $id == $this->id || (strlen($this->getAlias()) && @preg_match($this->getAlias(), $id));
     }
 
     /**

@@ -279,11 +279,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $configXML = simplexml_load_string("
         <config>
         <defaultPages>
-            <page title='someTitle' />
-            <page title='someTitle2' >
-                <alias>test</alias>
-                <alias>test3</alias>
-            </page>
+            <page alias='' id='t1' template='someTemplate'>someTitle</page>
+            <page alias='/alias/' id='t2' template='someTemplate2' >someTitle2</page>
         </defaultPages>
         </config>");
 
@@ -291,17 +288,23 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $config = new ConfigImpl($configXML, $rootPath);
         $pages = $config->getDefaultPages();
         $this->assertTrue(is_array($pages), "Did not return array");
-        $this->assertEquals(2, count($pages), "Did not return empty array");
+        $this->assertEquals(2, count($pages));
         $this->assertArrayHasKey("someTitle", $pages);
         $this->assertArrayHasKey("someTitle2", $pages);
-        $this->assertTrue(is_array($pages['someTitle']));
-        $this->assertTrue(is_array($pages['someTitle2']));
-        $this->assertEquals(0, count($pages['someTitle']));
-        $this->assertEquals(2, count($pages['someTitle2']));
-        $this->assertArrayHasKey(0, $pages['someTitle2']);
-        $this->assertArrayHasKey(1, $pages['someTitle2']);
-        $this->assertEquals('test', $pages['someTitle2'][0]);
-        $this->assertEquals('test3', $pages['someTitle2'][1]);
+
+        $this->assertArrayHasKey("template", $pages['someTitle']);
+        $this->assertArrayHasKey("template", $pages['someTitle2']);
+        $this->assertArrayHasKey("alias", $pages['someTitle']);
+        $this->assertArrayHasKey("alias", $pages['someTitle2']);
+        $this->assertArrayHasKey("id", $pages['someTitle']);
+        $this->assertArrayHasKey("id", $pages['someTitle2']);
+        $this->assertEquals("someTemplate",$pages["someTitle"]["template"]);
+        $this->assertEquals("someTemplate2",$pages["someTitle2"]["template"]);
+        $this->assertEquals("",$pages["someTitle"]["alias"]);
+        $this->assertEquals("/alias/",$pages["someTitle2"]["alias"]);
+        $this->assertEquals("t1",$pages["someTitle"]["id"]);
+        $this->assertEquals("t2",$pages["someTitle2"]["id"]);
+
     }
 
     public function testListTemplateNamesWillReturnEmptyArrayOnEmptyConfig()

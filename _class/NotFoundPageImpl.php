@@ -129,4 +129,12 @@ class NotFoundPageImpl implements Page
     }
 
 
+    /**
+     * Return TRUE if is editable, else FALSE
+     * @return bool
+     */
+    public function isEditable()
+    {
+        return false;
+    }
 }

@@ -105,4 +105,23 @@ class StubConfigImpl implements Config
     {
         $this->pageElement = $pageElement;
     }
+
+    /**
+     * Will return a array containing all possible templates by name.
+     * @return array
+     */
+    public function listTemplateNames()
+    {
+        return array();
+    }
+
+    /**
+     * Will return an array with default pages. Pages hardcoded into the website.
+     * The array will have the page title as key and another array, containing alias', as value.
+     * @return array
+     */
+    public function getDefaultPages()
+    {
+        return array();
+    }
 }

@@ -27,6 +27,9 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->db->setConnection($this->pdo);
     }
 
+
+
+
     public function testGetIDWillReturnIDGivenInConstructorAndReflectChangesInSetTitle()
     {
 
@@ -39,6 +42,12 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
 
     }
 
+    public function testIsEditableWillBeTrue(){
+        $page = new PageImpl('someID', $this->db);
+        $this->assertTrue($page->isEditable());
+    }
+
+
     public function testGetTitleWillReflectChangesInSetTitle()
     {
         $page = new PageImpl('someID', $this->db);
@@ -48,6 +57,8 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
         $page->setTitle($newTitle);
         $this->assertEquals($newTitle, $page->getTitle(), 'Title was not changed');
     }
+
+
 
     public function testGetTemplateWillReflectChangesInSetTemplate()
     {

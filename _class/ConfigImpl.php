@@ -191,11 +191,10 @@ class ConfigImpl implements Config
             $this->defaultPages = array();
             if($this->configFile->defaultPages->getName()){
                 foreach($this->configFile->defaultPages->page as $page){
-                    $title = (string)$page["title"];
-                    $this->defaultPages[$title] = array();
-                    foreach($page->alias as $alias){
-                        $this->defaultPages[$title][] = (string) $alias;
-                    }
+                    $title = (string)$page;
+                    $this->defaultPages[$title]["template"] = (string)$page["template"];
+                    $this->defaultPages[$title]["alias"] = (string)$page["alias"];
+                    $this->defaultPages[$title]["id"] = (string)$page["id"];
                 }
 
             }
