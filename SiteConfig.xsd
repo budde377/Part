@@ -7,29 +7,35 @@
     <xs:element name="config">
         <xs:complexType>
             <xs:all>
+                <xs:element name="defaultPages" type="pages" minOccurs="0">
+                    <xs:unique name="pageTitle">
+                        <xs:selector xpath="page"/>
+                        <xs:field xpath="@title"/>
+                    </xs:unique>
+                </xs:element>
                 <xs:element name="preScripts" type="scripts" minOccurs="0">
                     <xs:unique name="preScriptName">
-                        <xs:selector xpath="preScripts/class"/>
+                        <xs:selector xpath="class"/>
                         <xs:field xpath="."/>
                     </xs:unique>
                 </xs:element>
                 <xs:element name="postScripts" type="scripts" minOccurs="0">
                     <xs:unique name="postScriptName">
-                        <xs:selector xpath="postScripts/class"/>
+                        <xs:selector xpath="class"/>
                         <xs:field xpath="."/>
                     </xs:unique>
                 </xs:element>
                 <xs:element name="templates" type="templates" minOccurs="0"/>
                 <xs:element name="pageElements" type="pageElements" minOccurs="0">
                     <xs:unique name="pageElementName">
-                        <xs:selector xpath="pageElements/class"/>
+                        <xs:selector xpath="class"/>
                         <xs:field xpath="@name"/>
                     </xs:unique>
                 </xs:element>
                 <xs:element name="MySQLConnection" type="dbConnection" minOccurs="0"/>
                 <xs:element name="optimizers" type="pageElements" minOccurs="0">
                     <xs:unique name="optimizerName">
-                        <xs:selector xpath="pageElements/class"/>
+                        <xs:selector xpath="class"/>
                         <xs:field xpath="@name"/>
                     </xs:unique>
                 </xs:element>
@@ -46,6 +52,20 @@
             <xs:element name="password" type="xs:string"/>
         </xs:all>
     </xs:complexType>
+
+    <xs:complexType name="pages">
+        <xs:sequence>
+            <xs:element name="page" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="alias" maxOccurs="unbounded" minOccurs="0" type="xs:string"/>
+                    </xs:sequence>
+                    <xs:attribute name="title" />
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
 
     <xs:complexType name="templates">
         <xs:sequence>
@@ -87,7 +107,7 @@
 
     <xs:simpleType name="name">
         <xs:restriction base="xs:string">
-            <xs:pattern value="[0-9a-zA-Z-_]+"/>
+            <xs:pattern value="[0-9a-zA-Z\-_]+"/>
         </xs:restriction>
     </xs:simpleType>
 

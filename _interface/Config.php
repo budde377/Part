@@ -19,6 +19,19 @@ interface Config
     public function getTemplate($name);
 
     /**
+     * Will return a array containing all possible templates by name.
+     * @return array
+     */
+    public function listTemplateNames();
+
+    /**
+     * Will return an array with default pages. Pages hardcoded into the website.
+     * The array will have the page title as key and another array, containing alias', as value.
+     * @return array
+     */
+    public function getDefaultPages();
+
+    /**
      * @abstract
      * Will return PreScripts as an array, with the ClassName as key and the link as value.
      * The link should be relative to a root path provided.

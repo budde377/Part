@@ -261,6 +261,82 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     }
 
+    public function testGetDefaultPagesWillReturnArrayOnEmptyConfig()
+    {
+        $configXML = simplexml_load_string("
+        <config>
+        </config>");
+
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $pages = $config->getDefaultPages();
+        $this->assertTrue(is_array($pages), "Did not return array");
+        $this->assertEquals(0, count($pages), "Did not return empty array");
+    }
+
+    public function testGetDefaultPagesWillReturnArraySimilarToConfig()
+    {
+        $configXML = simplexml_load_string("
+        <config>
+        <defaultPages>
+            <page title='someTitle' />
+            <page title='someTitle2' >
+                <alias>test</alias>
+                <alias>test3</alias>
+            </page>
+        </defaultPages>
+        </config>");
+
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $pages = $config->getDefaultPages();
+        $this->assertTrue(is_array($pages), "Did not return array");
+        $this->assertEquals(2, count($pages), "Did not return empty array");
+        $this->assertArrayHasKey("someTitle", $pages);
+        $this->assertArrayHasKey("someTitle2", $pages);
+        $this->assertTrue(is_array($pages['someTitle']));
+        $this->assertTrue(is_array($pages['someTitle2']));
+        $this->assertEquals(0, count($pages['someTitle']));
+        $this->assertEquals(2, count($pages['someTitle2']));
+        $this->assertArrayHasKey(0, $pages['someTitle2']);
+        $this->assertArrayHasKey(1, $pages['someTitle2']);
+        $this->assertEquals('test', $pages['someTitle2'][0]);
+        $this->assertEquals('test3', $pages['someTitle2'][1]);
+    }
+
+    public function testListTemplateNamesWillReturnEmptyArrayOnEmptyConfig()
+    {
+        $configXML = simplexml_load_string("
+        <config>
+        </config>");
+
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $templates = $config->listTemplateNames();
+        $this->assertTrue(is_array($templates), "Did not return array");
+        $this->assertEquals(0, count($templates), "Did not return empty array");
+    }
+
+    public function testListTemplateNamesWillReturnArraySimilarToConfig()
+    {
+        $configXML = simplexml_load_string("
+        <config>
+        <templates>
+            <template link='some_link'>main</template>
+            <template link='some_link2'>main2</template>
+        </templates>
+        </config>");
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $templates = $config->listTemplateNames();
+        $this->assertTrue(is_array($templates), "Did not return array");
+        $this->assertEquals(2, count($templates), "Did not return empty array");
+        $this->assertArrayHasKey(0, $templates);
+        $this->assertArrayHasKey(1, $templates);
+        $this->assertEquals("main", $templates[0]);
+        $this->assertEquals("main2", $templates[1]);
+    }
+
 
     public function testGetMySQLConnectionWillReturnArrayWithInfoAsInConfigXML()
     {

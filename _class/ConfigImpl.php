@@ -19,6 +19,7 @@ class ConfigImpl implements Config
     private $postScripts = null;
     private $optimizers = null;
     private $mysql = null;
+    private $defaultPages;
 
     /**
      * @param SimpleXMLElement $configFile
@@ -56,18 +57,8 @@ class ConfigImpl implements Config
      */
     public function getTemplate($name)
     {
-
-        if ($this->templates === null && $this->configFile->templates->getName()) {
-            $this->templates = array();
-            $templates = $this->configFile->templates->template;
-            foreach ($templates as $template) {
-                $this->templates[(string)$template] = $this->rootPath . (string)$template['link'];
-            }
-        }
-        if (isset($this->templates[$name])) {
-            return $this->templates[$name];
-        }
-        return null;
+        $this->setUpTemplate();
+        return isset($this->templates[$name])?$this->templates[$name]:null;
     }
 
     /**
@@ -173,5 +164,56 @@ class ConfigImpl implements Config
 
         return $this->mysql;
 
+    }
+
+    /**
+     * Will return a array containing all possible templates by name.
+     * @return array
+     */
+    public function listTemplateNames()
+    {
+        $this->setUpTemplate();
+        $ret = array();
+        foreach($this->templates as $key=>$val){
+            $ret[] = $key;
+        }
+        return $ret;
+    }
+
+    /**
+     * Will return an array with default pages. Pages hardcoded into the website.
+     * The array will have the page title as key and another array, containing alias', as value.
+     * @return array
+     */
+    public function getDefaultPages()
+    {
+        if($this->defaultPages === null){
+            $this->defaultPages = array();
+            if($this->configFile->defaultPages->getName()){
+                foreach($this->configFile->defaultPages->page as $page){
+                    $title = (string)$page["title"];
+                    $this->defaultPages[$title] = array();
+                    foreach($page->alias as $alias){
+                        $this->defaultPages[$title][] = (string) $alias;
+                    }
+                }
+
+            }
+        }
+        return $this->defaultPages;
+    }
+
+    private function setUpTemplate()
+    {
+        if ($this->templates === null ) {
+            $this->templates = array();
+            if($this->configFile->templates->getName()){
+                $templates = $this->configFile->templates->template;
+                foreach ($templates as $template) {
+                    $this->templates[(string)$template] = $this->rootPath . (string)$template['link'];
+                }
+            }
+
+        }
     }
 }
