@@ -11,7 +11,7 @@ interface HTMLElement
      * @abstract
      * @return string
      */
-    public function getXHTMLString();
+    public function getHTMLString();
 
     /**
      * @abstract
@@ -34,7 +34,7 @@ interface HTMLElement
      * @param HTMLElement $element
      * @return void
      */
-    public function insertXHTMLElement(HTMLElement $element);
+    public function insertHTMLElement(HTMLElement $element);
 
     /**
      * @abstract

@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__).'/XHTMLElement.php';
+require_once dirname(__FILE__) . '/HTMLElement.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -7,7 +7,7 @@ require_once dirname(__FILE__).'/XHTMLElement.php';
  * Date: 25/07/12
  * Time: 14:53
  */
-interface HTMLFormElement extends XHTMLElement
+interface HTMLFormElement extends HTMLElement
 {
     const FORM_METHOD_GET = 'get';
     const FORM_METHOD_POST = 'post';
@@ -50,7 +50,7 @@ interface HTMLFormElement extends XHTMLElement
      * @param string $id
      * @param string $label
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertInputText($name,$id,$value= '',$label='',array $attributes = array());
 
@@ -62,7 +62,7 @@ interface HTMLFormElement extends XHTMLElement
      * @param string $id
      * @param string $label
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertInputPassword($name,$id,$value='',$label='',array $attributes = array());
 
@@ -71,7 +71,7 @@ interface HTMLFormElement extends XHTMLElement
      * @param string $value
      * @param string $name
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertInputHidden($name,$value,array $attributes = array());
 
@@ -83,7 +83,7 @@ interface HTMLFormElement extends XHTMLElement
      * @param string $id
      * @param string $label
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertTextArea($name,$id,$value='',$label='',array $attributes = array());
 
@@ -92,7 +92,7 @@ interface HTMLFormElement extends XHTMLElement
      * Will insert an input submit
      * @param string $value
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertInputSubmit($value,array $attributes = array());
 
@@ -102,7 +102,7 @@ interface HTMLFormElement extends XHTMLElement
      * @param string $id
      * @param string $label
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertInputFileUpload($name,$id,$label='',array $attributes= array());
 
@@ -113,7 +113,7 @@ interface HTMLFormElement extends XHTMLElement
      * @param string $label
      * @param null $select
      * @param array $attributes
-     * @return XHTMLSelectElement
+     * @return HTMLSelectElement
      */
     public function insertSelect($name,$id,$label = '',&$select = null, array $attributes = array());
 
@@ -125,7 +125,7 @@ interface HTMLFormElement extends XHTMLElement
      * @param string $value
      * @param string $label
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertCheckbox($name,$id,$value = '', $label = '', array $attributes = array());
 
@@ -136,7 +136,7 @@ interface HTMLFormElement extends XHTMLElement
      * @param string $value
      * @param string $label
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertRadioButton($name,$id,$value = '', $label = '', array $attributes = array());
 }
