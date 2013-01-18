@@ -5,7 +5,7 @@
  * Date: 25/07/12
  * Time: 14:52
  */
-interface XHTMLElement
+interface HTMLElement
 {
     /**
      * @abstract
@@ -31,10 +31,10 @@ interface XHTMLElement
     /**
      * @abstract
      * Inserts an XHTML Element
-     * @param XHTMLElement $element
+     * @param HTMLElement $element
      * @return void
      */
-    public function insertXHTMLElement(XHTMLElement $element);
+    public function insertXHTMLElement(HTMLElement $element);
 
     /**
      * @abstract

@@ -6,7 +6,7 @@ require_once dirname(__FILE__) . '/../_interface/XHTMLElement.php';
  * Date: 25/07/12
  * Time: 15:19
  */
-class XHTMLElementImpl implements XHTMLElement
+class HTMLElementImpl implements XHTMLElement
 {
     private $tagName;
     private $attributes;

@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/XHTMLElementImpl.php';
+require_once dirname(__FILE__) . '/HTMLElementImpl.php';
 require_once dirname(__FILE__) . '/../_interface/XHTMLSelectElement.php';
 /**
  * Created by JetBrains PhpStorm.
@@ -7,15 +7,15 @@ require_once dirname(__FILE__) . '/../_interface/XHTMLSelectElement.php';
  * Date: 31/08/12
  * Time: 21:46
  */
-class XHTMLSelectElementImpl implements XHTMLSelectElement
+class HTMLSelectElementImpl implements XHTMLSelectElement
 {
 
     private $element;
     private $groups = array();
 
-    public function XHTMLSelectElementImpl($name, $id, $multiple = false, $size = 1, $disabled = false)
+    public function HTMLSelectElementImpl($name, $id, $multiple = false, $size = 1, $disabled = false)
     {
-        $this->element = new XHTMLElementImpl('select',array('name'=>$name,'id'=>$id,'size'=>$size));
+        $this->element = new HTMLElementImpl('select',array('name'=>$name,'id'=>$id,'size'=>$size));
         if($multiple){
             $this->element->setAttributes('multiple','multiple');
         }
@@ -91,7 +91,7 @@ class XHTMLSelectElementImpl implements XHTMLSelectElement
     public function insertOption($text, $value, $group_id = null, array $attributes = array())
     {
         $attributes['value'] = $value;
-        $option = new XHTMLElementImpl('option',$attributes);
+        $option = new HTMLElementImpl('option',$attributes);
         $option->insertString($text);
         if($group_id != null && isset($this->groups[$group_id])){
             /** @var $group XHTMLElement */
@@ -110,7 +110,7 @@ class XHTMLSelectElementImpl implements XHTMLSelectElement
      */
     public function insertOptionGroup($id, $label)
     {
-        $group = new XHTMLElementImpl('optgroup',array('label'=>$label));
+        $group = new HTMLElementImpl('optgroup',array('label'=>$label));
         $this->groups[$id] = $group;
         $this->element->insertXHTMLElement($group);
         return $group;

@@ -7,7 +7,7 @@ require_once dirname(__FILE__).'/XHTMLElement.php';
  * Date: 25/07/12
  * Time: 14:53
  */
-interface XHTMLFormElement extends XHTMLElement
+interface HTMLFormElement extends XHTMLElement
 {
     const FORM_METHOD_GET = 'get';
     const FORM_METHOD_POST = 'post';
@@ -23,7 +23,7 @@ interface XHTMLFormElement extends XHTMLElement
      * @param string $method
      * @return void
      */
-    public function setMethod($method = XHTMLFormElementImpl::FORM_METHOD_GET);
+    public function setMethod($method = HTMLFormElementImpl::FORM_METHOD_GET);
 
     /**
      * @abstract Sets the action of the form, default is #
@@ -40,7 +40,7 @@ interface XHTMLFormElement extends XHTMLElement
      * @param string $type
      * @return void
      */
-    public function setNotion($notion,$type=XHTMLFormElementImpl::NOTION_TYPE_INFORMATION);
+    public function setNotion($notion,$type=HTMLFormElementImpl::NOTION_TYPE_INFORMATION);
 
     /**
      * @abstract

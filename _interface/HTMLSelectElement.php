@@ -1,12 +1,12 @@
 <?php
-require_once dirname(__FILE__) . '/XHTMLElement.php';
+require_once dirname(__FILE__) . '/HTMLElement.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 31/08/12
  * Time: 21:22
  */
-interface XHTMLSelectElement extends XHTMLElement
+interface HTMLSelectElement extends HTMLElement
 {
     /**
      * @abstract
@@ -14,7 +14,7 @@ interface XHTMLSelectElement extends XHTMLElement
      * @param string $value
      * @param string $group_id
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertOption($text, $value, $group_id = null, array $attributes = array());
 
@@ -22,7 +22,7 @@ interface XHTMLSelectElement extends XHTMLElement
      * @abstract
      * @param $id
      * @param string $label
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertOptionGroup($id, $label);
 
