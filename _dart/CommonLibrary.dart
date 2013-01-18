@@ -1,5 +1,7 @@
 library CommonLibrary;
 import "dart:html";
+import "dart:json";
+import "dart:uri" as Uri;
 import "dart:math" as Math;
 
 
@@ -187,7 +189,7 @@ class ChangeableList {
       element.children.add(e);
       i++;
     });
-    if(!same){
+    if (!same) {
       this.lis = lis;
       element.on.change.dispatch(new Event("change", true, false));
     }
@@ -236,6 +238,95 @@ class ChangeableList {
       }
       return list;
     }
+  }
+}
+
+class BetterForm {
+  FormElement form;
+  DivElement filter = new DivElement();
+  static String NOTION_TYPE_ERROR = "error";
+  static String NOTION_TYPE_INFORMATION = "info";
+  static String NOTION_TYPE_SUCCESS = "success";
+
+  BetterForm(FormElement form) {
+    this.form = form;
+    filter.classes.add('filter');
+  }
+
+
+  void setNotion(String message, String notion_type) {
+    if (notion_type != NOTION_TYPE_SUCCESS && notion_type != NOTION_TYPE_ERROR && notion_type != NOTION_TYPE_INFORMATION) {
+      return;
+    }
+    removeNotion();
+    DivElement notion = new DivElement();
+    notion.classes.add(notion_type);
+    notion.classes.add("notion");
+    notion.text = message;
+    form.insertAdjacentElement("afterBegin", notion);
+
+  }
+
+  void removeNotion() {
+    form.queryAll("div.notion").forEach((Element e) {e.remove();});
+
+  }
+
+  void blur() {
+    form.classes.add("blur");
+    form.insertAdjacentElement("afterBegin", filter);
+
+  }
+
+  void unBlur() {
+    form.classes.remove("blur");
+    filter.remove();
+  }
+
+}
+
+class AJAXForm extends BetterForm {
+
+  String id;
+  Function callbackSuccess, callbackError;
+
+  AJAXForm(FormElement form, String id, [void callbackSuccess(Map map), void callbackError()]) : super(form) {
+    this.id = id;
+    this.callbackSuccess = callbackSuccess == null ? (Map map) {} : callbackSuccess;
+    this.callbackError = callbackError == null ? () {} : callbackError;
+    _initialize();
+  }
+
+  void _initialize() {
+
+    HttpRequest req = new HttpRequest();
+    req.on.readyStateChange.add((Event e) {
+      if (req.readyState == 4) {
+        super.unBlur();
+        if ((req.status == 200 || req.status == 0)) {
+          print(req.responseText);
+          try {
+            Map responseData = JSON.parse(req.responseText);
+            callbackSuccess(responseData);
+
+          } catch(e) {
+            callbackError();
+          }
+        } else {
+          callbackError();
+        }
+      }});
+    form.on.submit.add((Event event) {
+      super.blur();
+      List<Element> elements = queryAll("textarea, input:not([type=submit]), select");
+      req.open(form.method.toUpperCase(), "?ajax=1&ajax_id=${Uri.encodeUriComponent(id)}");
+      req.send(new FormData(form));
+      event.preventDefault();
+    });
+  }
+
+  String generateDataString(Map<String, String> map) {
+    return Strings.join(map.keys.map((String s) => "${Uri.encodeUriComponent(s)}=${Uri.encodeUriComponent(map[s])}"), "&");
   }
 
 
