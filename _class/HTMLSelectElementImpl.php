@@ -1,13 +1,13 @@
 <?php
 require_once dirname(__FILE__) . '/HTMLElementImpl.php';
-require_once dirname(__FILE__) . '/../_interface/XHTMLSelectElement.php';
+require_once dirname(__FILE__) . '/../_interface/HTMLSelectElement.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 31/08/12
  * Time: 21:46
  */
-class HTMLSelectElementImpl implements XHTMLSelectElement
+class HTMLSelectElementImpl implements HTMLSelectElement
 {
 
     private $element;
@@ -28,9 +28,9 @@ class HTMLSelectElementImpl implements XHTMLSelectElement
     /**
      * @return string
      */
-    public function getXHTMLString()
+    public function getHTMLString()
     {
-        return $this->element->getXHTMLString();
+        return $this->element->getHTMLString();
     }
 
     /**
@@ -54,12 +54,12 @@ class HTMLSelectElementImpl implements XHTMLSelectElement
 
     /**
      * Inserts an XHTML Element
-     * @param XHTMLElement $element
+     * @param HTMLElement $element
      * @return void
      */
-    public function insertXHTMLElement(XHTMLElement $element)
+    public function insertHTMLElement(HTMLElement $element)
     {
-        $this->element->insertXHTMLElement($element);
+        $this->element->insertHTMLElement($element);
     }
 
     /**
@@ -86,7 +86,7 @@ class HTMLSelectElementImpl implements XHTMLSelectElement
      * @param string $value
      * @param string $group_id
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertOption($text, $value, $group_id = null, array $attributes = array())
     {
@@ -94,11 +94,11 @@ class HTMLSelectElementImpl implements XHTMLSelectElement
         $option = new HTMLElementImpl('option',$attributes);
         $option->insertString($text);
         if($group_id != null && isset($this->groups[$group_id])){
-            /** @var $group XHTMLElement */
+            /** @var $group HTMLElement */
             $group = $this->groups[$group_id];
-            $group->insertXHTMLElement($option);
+            $group->insertHTMLElement($option);
         } else {
-            $this->element->insertXHTMLElement($option);
+            $this->element->insertHTMLElement($option);
         }
         return $option;
     }
@@ -106,13 +106,13 @@ class HTMLSelectElementImpl implements XHTMLSelectElement
     /**
      * @param $id
      * @param string $label
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertOptionGroup($id, $label)
     {
         $group = new HTMLElementImpl('optgroup',array('label'=>$label));
         $this->groups[$id] = $group;
-        $this->element->insertXHTMLElement($group);
+        $this->element->insertHTMLElement($group);
         return $group;
     }
 

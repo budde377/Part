@@ -1,34 +1,34 @@
 <?php
-require_once dirname(__FILE__) . '/../_interface/XHTMLFormElement.php';
+require_once dirname(__FILE__) . '/../_interface/HTMLFormElement.php';
 require_once dirname(__FILE__) . '/HTMLElementImpl.php';
-require_once dirname(__FILE__) . '/XHTMLSelectElementImpl.php';
+require_once dirname(__FILE__) . '/HTMLSelectElementImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 25/07/12
  * Time: 15:34
  */
-class HTMLFormElementImpl implements XHTMLFormElement
+class HTMLFormElementImpl implements HTMLFormElement
 {
 
     private $formElement;
-    /** @var $notion XHTMLElement | null*/
+    /** @var $notion HTMLElement | null*/
     private $notion;
 
-    public function __construct($method = XHTMLFormElement::FORM_METHOD_GET, $action = "#")
+    public function __construct($method = HTMLFormElement::FORM_METHOD_GET, $action = "#")
     {
         $this->formElement = new HTMLElementImpl('form', array('action' => $action, 'method' => $method));
         $this->notion = new HTMLElementImpl('div');
-        $this->formElement->insertXHTMLElement($this->notion);
+        $this->formElement->insertHTMLElement($this->notion);
     }
 
     /**
      * @return string
      */
-    public function getXHTMLString()
+    public function getHTMLString()
     {
 
-        return $this->formElement->getXHTMLString();
+        return $this->formElement->getHTMLString();
     }
 
     /**
@@ -52,12 +52,12 @@ class HTMLFormElementImpl implements XHTMLFormElement
 
     /**
      * Inserts an XHTML Element
-     * @param XHTMLElement $element
-     * @return XHTMLElement
+     * @param \|\HTMLElement $element
+     * @return HTMLElement
      */
-    public function insertXHTMLElement(XHTMLElement $element)
+    public function insertHTMLElement(HTMLElement $element)
     {
-        $this->formElement->insertXHTMLElement($element);
+        $this->formElement->insertHTMLElement($element);
     }
 
     /**
@@ -79,7 +79,7 @@ class HTMLFormElementImpl implements XHTMLFormElement
      */
     public function setMethod($method = HTMLFormElementImpl::FORM_METHOD_GET)
     {
-        if ($method != XHTMLFormElement::FORM_METHOD_GET && $method != XHTMLFormElement::FORM_METHOD_POST) {
+        if ($method != HTMLFormElement::FORM_METHOD_GET && $method != HTMLFormElement::FORM_METHOD_POST) {
             throw new MalformedParameterException('XHTMLFormElement[FORM_METHOD_GET|FORM_METHOD_POST]', 1);
         }
         $this->formElement->setAttributes('method', $method);
@@ -105,8 +105,8 @@ class HTMLFormElementImpl implements XHTMLFormElement
      */
     public function setNotion($notion, $type = HTMLFormElementImpl::NOTION_TYPE_INFORMATION)
     {
-        if ($type != XHTMLFormElement::NOTION_TYPE_ERROR && $type != XHTMLFormElement::NOTION_TYPE_INFORMATION &&
-            $type != XHTMLFormElement::NOTION_TYPE_SUCCESS
+        if ($type != HTMLFormElement::NOTION_TYPE_ERROR && $type != HTMLFormElement::NOTION_TYPE_INFORMATION &&
+            $type != HTMLFormElement::NOTION_TYPE_SUCCESS
         ) {
             throw new MalformedParameterException('XHTMLFormElement[NOTION_TYPE_ERROR|NOTION_TYPE_INFORMATION|NOTION_TYPE_SUCCESS]', 2);
         }
@@ -122,7 +122,7 @@ class HTMLFormElementImpl implements XHTMLFormElement
      * @param string $id
      * @param string $label
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertInputText($name, $id, $value = '', $label = '', array $attributes = array())
     {
@@ -131,9 +131,9 @@ class HTMLFormElementImpl implements XHTMLFormElement
         $this->insertAttributesNot($input, $attributes, array('type', 'name', 'value', 'id'));
         $labelElement = new HTMLElementImpl('label', array('for' => $id));
         $labelElement->insertString($label);
-        $container->insertXHTMLElement($labelElement);
-        $container->insertXHTMLElement($input);
-        $this->formElement->insertXHTMLElement($container);
+        $container->insertHTMLElement($labelElement);
+        $container->insertHTMLElement($input);
+        $this->formElement->insertHTMLElement($container);
         return $container;
     }
 
@@ -142,7 +142,7 @@ class HTMLFormElementImpl implements XHTMLFormElement
      * @param string $value
      * @param string $name
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertInputHidden($value, $name, array $attributes = array())
     {
@@ -157,15 +157,15 @@ class HTMLFormElementImpl implements XHTMLFormElement
      * Will insert an input submit
      * @param string $value
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertInputSubmit($value, array $attributes = array())
     {
         $input = new HTMLElementImpl('input', array('value' => $value, 'type' => 'submit'));
         $this->insertAttributesNot($input, $attributes, array('value', 'name', 'type'));
         $container = new HTMLElementImpl('div',array('class'=>'submit'));
-        $container->insertXHTMLElement($input);
-        $this->formElement->insertXHTMLElement($container);
+        $container->insertHTMLElement($input);
+        $this->formElement->insertHTMLElement($container);
         return $container;
     }
 
@@ -174,7 +174,7 @@ class HTMLFormElementImpl implements XHTMLFormElement
      * @param string $id
      * @param string $label
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertInputFileUpload($name, $id, $label = '', array $attributes = array())
     {
@@ -183,9 +183,9 @@ class HTMLFormElementImpl implements XHTMLFormElement
         $this->insertAttributesNot($input, $attributes, array('type', 'id'));
         $labelElement = new HTMLElementImpl('label', array('for' => $id));
         $labelElement->insertString($label);
-        $container->insertXHTMLElement($labelElement);
-        $container->insertXHTMLElement($input);
-        $this->formElement->insertXHTMLElement($container);
+        $container->insertHTMLElement($labelElement);
+        $container->insertHTMLElement($input);
+        $this->formElement->insertHTMLElement($container);
         $this->formElement->setAttributes('enctype','multipart/form-data');
         return $container;
     }
@@ -207,7 +207,7 @@ class HTMLFormElementImpl implements XHTMLFormElement
      * @param string $id
      * @param string $label
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertInputPassword($name, $id, $value = '', $label = '', array $attributes = array())
     {
@@ -216,9 +216,9 @@ class HTMLFormElementImpl implements XHTMLFormElement
         $this->insertAttributesNot($input, $attributes, array('type', 'name', 'value', 'id'));
         $labelElement = new HTMLElementImpl('label', array('for' => $id));
         $labelElement->insertString($label);
-        $container->insertXHTMLElement($labelElement);
-        $container->insertXHTMLElement($input);
-        $this->formElement->insertXHTMLElement($container);
+        $container->insertHTMLElement($labelElement);
+        $container->insertHTMLElement($input);
+        $this->formElement->insertHTMLElement($container);
         return $container;
     }
 
@@ -229,7 +229,7 @@ class HTMLFormElementImpl implements XHTMLFormElement
      * @param string $id
      * @param string $label
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertTextArea($name, $id, $value = '', $label = '', array $attributes = array())
     {
@@ -239,13 +239,13 @@ class HTMLFormElementImpl implements XHTMLFormElement
         $this->insertAttributesNot($input, $attributes, array('name', 'id'));
         $labelElement = new HTMLElementImpl('label', array('for' => $id));
         $labelElement->insertString($label);
-        $container->insertXHTMLElement($labelElement);
-        $container->insertXHTMLElement($input);
-        $this->formElement->insertXHTMLElement($container);
+        $container->insertHTMLElement($labelElement);
+        $container->insertHTMLElement($input);
+        $this->formElement->insertHTMLElement($container);
         return $container;
     }
 
-    private function insertAttributesNot(XHTMLElement $element, array $attributes, array $exceptions)
+    private function insertAttributesNot(HTMLElement $element, array $attributes, array $exceptions)
     {
         foreach ($attributes as $attribute => $value) {
             if (!in_array($attribute, $exceptions)) {
@@ -260,17 +260,17 @@ class HTMLFormElementImpl implements XHTMLFormElement
      * @param string $label
      * @param null $select
      * @param array $attributes
-     * @return XHTMLSelectElement
+     * @return HTMLSelectElement
      */
     public function insertSelect($name, $id, $label = '',&$select = null, array $attributes = array())
     {
         $container = new HTMLElementImpl('div', array('class' => 'select'));
-        $select = new XHTMLSelectElementImpl($name,$id);
+        $select = new HTMLSelectElementImpl($name,$id);
         $labelElement = new HTMLElementImpl('label', array('for' => $id));
         $labelElement->insertString($label);
-        $container->insertXHTMLElement($labelElement);
-        $container->insertXHTMLElement($select);
-        $this->formElement->insertXHTMLElement($container);
+        $container->insertHTMLElement($labelElement);
+        $container->insertHTMLElement($select);
+        $this->formElement->insertHTMLElement($container);
         return $container;
     }
 
@@ -280,7 +280,7 @@ class HTMLFormElementImpl implements XHTMLFormElement
      * @param string $value
      * @param string $label
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertCheckbox($name, $id, $value = '', $label = '', array $attributes = array())
     {
@@ -288,9 +288,9 @@ class HTMLFormElementImpl implements XHTMLFormElement
         $input = new HTMLElementImpl('input', array_merge(array('type' => 'checkbox', 'name' => $name, 'value' => $value, 'id' => $id),$attributes));
         $labelElement = new HTMLElementImpl('label', array('for' => $id));
         $labelElement->insertString($label);
-        $container->insertXHTMLElement($labelElement);
-        $container->insertXHTMLElement($input);
-        $this->formElement->insertXHTMLElement($container);
+        $container->insertHTMLElement($labelElement);
+        $container->insertHTMLElement($input);
+        $this->formElement->insertHTMLElement($container);
         return $container;
     }
 
@@ -300,7 +300,7 @@ class HTMLFormElementImpl implements XHTMLFormElement
      * @param string $value
      * @param string $label
      * @param array $attributes
-     * @return XHTMLElement
+     * @return HTMLElement
      */
     public function insertRadioButton($name, $id, $value = '', $label = '', array $attributes = array())
     {
@@ -308,9 +308,9 @@ class HTMLFormElementImpl implements XHTMLFormElement
         $input = new HTMLElementImpl('input', array_merge(array('type' => 'radio', 'name' => $name, 'value' => $value, 'id' => $id),$attributes));
         $labelElement = new HTMLElementImpl('label', array('for' => $id));
         $labelElement->insertString($label);
-        $container->insertXHTMLElement($labelElement);
-        $container->insertXHTMLElement($input);
-        $this->formElement->insertXHTMLElement($container);
+        $container->insertHTMLElement($labelElement);
+        $container->insertHTMLElement($input);
+        $this->formElement->insertHTMLElement($container);
         return $container;
     }
 }

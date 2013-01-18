@@ -1,12 +1,12 @@
 <?php
-require_once dirname(__FILE__) . '/../_interface/XHTMLElement.php';
+require_once dirname(__FILE__) . '/../_interface/HTMLElement.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 25/07/12
  * Time: 15:19
  */
-class HTMLElementImpl implements XHTMLElement
+class HTMLElementImpl implements HTMLElement
 {
     private $tagName;
     private $attributes;
@@ -20,7 +20,7 @@ class HTMLElementImpl implements XHTMLElement
     /**
      * @return string
      */
-    public function getXHTMLString()
+    public function getHTMLString()
     {
         $attributeString = '';
         foreach($this->attributes as $attribute=>$value){
@@ -29,9 +29,9 @@ class HTMLElementImpl implements XHTMLElement
         }
         $contentString = '';
         foreach($this->content as $content){
-            /** @var $content XHTMLElement|string */
-            if($content instanceof XHTMLElement){
-                $contentString .= $content->getXHTMLString();
+            /** @var $content HTMLElement|string */
+            if($content instanceof HTMLElement){
+                $contentString .= $content->getHTMLString();
             } else {
                 $contentString .= $content;
             }
@@ -72,10 +72,10 @@ class HTMLElementImpl implements XHTMLElement
 
     /**
      * Inserts an XHTML Element
-     * @param XHTMLElement $element
-     * @return XHTMLElement
+     * @param HTMLElement $element
+     * @return HTMLElement
      */
-    public function insertXHTMLElement(XHTMLElement $element)
+    public function insertHTMLElement(HTMLElement $element)
     {
         $this->content[] = $element;
     }
