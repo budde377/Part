@@ -11,12 +11,21 @@ require_once dirname(__FILE__) . '/../../_interface/Config.php';
 class StubConfigImpl implements Config
 {
 
-    private $template;
+    private $templates;
     private $preScripts;
     private $postScripts;
     private $pageElement;
     private $optimizer;
     private $mysqlCon;
+    private $defaultPages = array();
+
+    /**
+     * @param array $defaultPages
+     */
+    public function setDefaultPages($defaultPages)
+    {
+        $this->defaultPages = $defaultPages;
+    }
 
     /**
      * Will return the link to the template file as a string.
@@ -27,7 +36,7 @@ class StubConfigImpl implements Config
      */
     public function getTemplate($name)
     {
-        return isset($this->template[$name]) ? $this->template[$name] : null;
+        return isset($this->templates[$name]) ? $this->templates[$name] : null;
     }
 
     /**
@@ -86,9 +95,9 @@ class StubConfigImpl implements Config
         $this->optimizer = $optimizer;
     }
 
-    public function setTemplate($template)
+    public function setTemplates($template)
     {
-        $this->template = $template;
+        $this->templates = $template;
     }
 
     public function setPreScripts($preScripts)
@@ -112,7 +121,11 @@ class StubConfigImpl implements Config
      */
     public function listTemplateNames()
     {
-        return array();
+        $ret = array();
+        foreach($this->templates as $template){
+            $ret[] = $template;
+        }
+        return $ret;
     }
 
     /**
@@ -122,6 +135,6 @@ class StubConfigImpl implements Config
      */
     public function getDefaultPages()
     {
-        return array();
+        return $this->defaultPages;
     }
 }

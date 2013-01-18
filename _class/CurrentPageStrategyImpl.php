@@ -12,11 +12,12 @@ class CurrentPageStrategyImpl implements CurrentPageStrategy
 {
     use RequestTrait;
     private $pageOrder;
-
+    private $defaultPages;
     private $currentPagePath = null;
 
-    public function __construct(PageOrder $pageOrder)
+    public function __construct(PageOrder $pageOrder, DefaultPageLibrary $defaultPages)
     {
+        $this->defaultPages = $defaultPages;
         $this->pageOrder = $pageOrder;
 
     }
@@ -83,6 +84,19 @@ class CurrentPageStrategyImpl implements CurrentPageStrategy
                             $inactiveNotFound = false;
                             $returnArray[] = $inactivePage;
                         }
+                    }
+                    if($inactiveNotFound && $this->defaultPages !== null){
+                        $defaultPages = $this->defaultPages->listPages();
+                        $defaultPageNotFound = true;
+                        while(count($defaultPages) && $defaultPageNotFound){
+                            /** @var $page Page */
+                            $page = array_shift($defaultPages);
+                            if($page->match($firstPathElement)){
+                                $defaultPageNotFound = false;
+                                $returnArray[] = $page;
+                            }
+                        }
+
                     }
                 }
             }

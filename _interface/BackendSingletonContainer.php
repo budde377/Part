@@ -82,4 +82,10 @@ interface BackendSingletonContainer
      */
     public function getUserPrivilegesLibraryInstance();
 
+    /**
+     * Will create and reuse an instance of DefaultPageLibrary
+     * @return DefaultPageLibrary
+     */
+    public function getDefaultPageLibraryInstance();
+
 }

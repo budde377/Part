@@ -9,6 +9,7 @@ require_once dirname(__FILE__) . '/CurrentPageStrategyImpl.php';
 require_once dirname(__FILE__) . '/SiteLibraryImpl.php';
 require_once dirname(__FILE__) . '/UserLibraryImpl.php';
 require_once dirname(__FILE__) . '/UserPrivilegesLibraryImpl.php';
+require_once dirname(__FILE__) . '/DefaultPageLibraryImpl.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -39,7 +40,8 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $userLibrary;
     /** @var $userPrivilegesLibrary null | UserPrivilegesLibrary */
     private $userPrivilegesLibrary;
-
+    /** @var DefaultPageLibrary */
+    private $defaultPageLibrary;
 
     public function __construct(Config $config)
     {
@@ -114,7 +116,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getCurrentPageStrategyInstance()
     {
         if ($this->currentPageStrategy === null) {
-            $this->currentPageStrategy = new CurrentPageStrategyImpl($this->getPageOrderInstance());
+            $this->currentPageStrategy = new CurrentPageStrategyImpl($this->getPageOrderInstance(),$this->getDefaultPageLibraryInstance());
         }
         return $this->currentPageStrategy;
     }
@@ -163,5 +165,18 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
         }
 
         return $this->userPrivilegesLibrary;
+    }
+
+    /**
+     * Will create and reuse an instance of DefaultPageLibrary
+     * @return DefaultPageLibrary
+     */
+    public function getDefaultPageLibraryInstance()
+    {
+        if($this->defaultPageLibrary === null){
+            $this->defaultPageLibrary = new DefaultPageLibraryImpl($this->getConfigInstance());
+        }
+
+        return $this->defaultPageLibrary;
     }
 }

@@ -141,4 +141,13 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($ret1 === $ret2, 'Did not reuse instance');
 
     }
+    public function testGetDefaultPageLibraryWillReturnASameInstanceOfDefaultPageLibrary()
+    {
+        $ret1 = $this->backContainer->getDefaultPageLibraryInstance();
+        $this->assertInstanceOf('DefaultPageLibrary', $ret1, 'Did not return instance of DefaultPageLibrary');
+        //$this->config->setMysqlCon(array('host' => 'lol', 'user' => 'lol', 'database' => '', 'password' => ''));
+        $ret2 = $this->backContainer->getDefaultPageLibraryInstance();
+        $this->assertTrue($ret1 === $ret2, 'Did not reuse instance');
+
+    }
 }
