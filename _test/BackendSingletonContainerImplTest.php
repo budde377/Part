@@ -42,6 +42,16 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
 
     }
 
+    public function testGetDartRegisterReturnsSameInstanceOfDartRegister()
+    {
+        $dart1 = $this->backContainer->getDartRegisterInstance();
+        $this->assertInstanceOf('DartRegister', $dart1, 'Did not return instance of CSSRegister');
+        $this->config->setMysqlCon(array('host' => 'lol', 'user' => 'lol', 'database' => '', 'password' => ''));
+        $dart2 = $this->backContainer->getDartRegisterInstance();
+        $this->assertTrue($dart1 === $dart2, 'Did not reuse instance');
+
+    }
+
     public function testGetJSRegisterReturnsSameInstanceOfJSRegister()
     {
         $js1 = $this->backContainer->getJSRegisterInstance();

@@ -37,6 +37,12 @@ interface BackendSingletonContainer
      */
     public function getAJAXRegisterInstance();
 
+    /**
+     * This will return an dart register, and reuse it from time to time
+     * @return DartRegister
+     */
+    public function getDartRegisterInstance();
+
 
     /**
      * @abstract

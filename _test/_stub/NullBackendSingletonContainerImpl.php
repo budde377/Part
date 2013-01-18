@@ -110,4 +110,13 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
     {
         return null;
     }
+
+    /**
+     * This will return an dart register, and reuse it from time to time
+     * @return DartRegister
+     */
+    public function getDartRegisterInstance()
+    {
+        return null;
+    }
 }

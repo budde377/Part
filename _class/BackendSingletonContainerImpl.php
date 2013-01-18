@@ -4,6 +4,7 @@ require_once dirname(__FILE__) . '/MySQLDBImpl.php';
 require_once dirname(__FILE__) . '/CSSRegisterImpl.php';
 require_once dirname(__FILE__) . '/JSRegisterImpl.php';
 require_once dirname(__FILE__) . '/AJAXRegisterImpl.php';
+require_once dirname(__FILE__) . '/DartRegisterImpl.php';
 require_once dirname(__FILE__) . '/PageOrderImpl.php';
 require_once dirname(__FILE__) . '/CurrentPageStrategyImpl.php';
 require_once dirname(__FILE__) . '/SiteLibraryImpl.php';
@@ -42,6 +43,8 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $userPrivilegesLibrary;
     /** @var DefaultPageLibrary */
     private $defaultPageLibrary;
+    /** @var DartRegister */
+    private $dartRegister;
 
     public function __construct(Config $config)
     {
@@ -178,5 +181,17 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
         }
 
         return $this->defaultPageLibrary;
+    }
+
+    /**
+     * This will return an dart register, and reuse it from time to time
+     * @return DartRegister
+     */
+    public function getDartRegisterInstance()
+    {
+        if($this->dartRegister === null){
+            $this->dartRegister = new DartRegisterImpl();
+        }
+        return $this->dartRegister;
     }
 }
