@@ -135,7 +135,7 @@ class StubUserImpl implements User
     }
 
     /**
-     * @return UserPrivileges
+     * @return MultiSiteUserPrivileges
      */
     public function getUserPrivileges()
     {

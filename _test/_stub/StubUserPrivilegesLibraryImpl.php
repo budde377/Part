@@ -1,18 +1,18 @@
 <?php
-require_once dirname(__FILE__) . '/../../_interface/UserPrivilegesLibrary.php';
+require_once dirname(__FILE__) . '/../../_interface/MultiSiteUserPrivilegesLibrary.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 06/08/12
  * Time: 22:28
  */
-class StubUserPrivilegesLibraryImpl implements UserPrivilegesLibrary
+class StubMultiSiteUserPrivilegesLibraryImpl implements MultiSiteUserPrivilegesLibrary
 {
     public $privileges = array();
 
     /**
      * @param User $user
-     * @return UserPrivileges
+     * @return MultiSiteUserPrivileges
      */
     public function getPrivileges(User $user)
     {

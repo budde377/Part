@@ -9,8 +9,9 @@ require_once dirname(__FILE__) . '/PageOrderImpl.php';
 require_once dirname(__FILE__) . '/CurrentPageStrategyImpl.php';
 require_once dirname(__FILE__) . '/SiteLibraryImpl.php';
 require_once dirname(__FILE__) . '/UserLibraryImpl.php';
-require_once dirname(__FILE__) . '/UserPrivilegesLibraryImpl.php';
+require_once dirname(__FILE__) . '/MultiSiteUserPrivilegesLibraryImpl.php';
 require_once dirname(__FILE__) . '/DefaultPageLibraryImpl.php';
+require_once dirname(__FILE__) . '/UserPrivilegesLibraryImpl.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -39,12 +40,14 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $siteLibrary;
     /** @var $userLibrary null | UserLibrary */
     private $userLibrary;
-    /** @var $userPrivilegesLibrary null | UserPrivilegesLibrary */
-    private $userPrivilegesLibrary;
+    /** @var $userPrivilegesLibrary null | MultiSiteUserPrivilegesLibrary */
+    private $multiSiteUserPrivilegesLibrary;
     /** @var DefaultPageLibrary */
     private $defaultPageLibrary;
     /** @var DartRegister */
     private $dartRegister;
+    /** @var  UserPrivilegesLibrary*/
+    private $userPrivilegesLibrary;
 
     public function __construct(Config $config)
     {
@@ -159,15 +162,15 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * Will create and reuse an instance of UserPrivilegesLibrary
-     * @return UserPrivilegesLibrary
+     * @return MultiSiteUserPrivilegesLibrary
      */
-    public function getUserPrivilegesLibraryInstance()
+    public function getMultiSiteUserPrivilegesLibraryInstance()
     {
-        if($this->userPrivilegesLibrary === null){
-            $this->userPrivilegesLibrary = new UserPrivilegesLibraryImpl($this->getDBInstance(),$this->getSiteLibraryInstance());
+        if($this->multiSiteUserPrivilegesLibrary === null){
+            $this->multiSiteUserPrivilegesLibrary = new MultiSiteUserPrivilegesLibraryImpl($this->getDBInstance(),$this->getSiteLibraryInstance());
         }
 
-        return $this->userPrivilegesLibrary;
+        return $this->multiSiteUserPrivilegesLibrary;
     }
 
     /**
@@ -193,5 +196,18 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
             $this->dartRegister = new DartRegisterImpl();
         }
         return $this->dartRegister;
+    }
+
+    /**
+     * Will create and reuse an instance of UserPrivilegesLibrary
+     * @return UserPrivilegesLibrary
+     */
+    public function getUserPrivilegesLibraryInstance()
+    {
+        if($this->userPrivilegesLibrary == null){
+            $this->userPrivilegesLibrary = new UserPrivilegesLibraryImpl($this->getDBInstance());
+        }
+
+        return $this->userPrivilegesLibrary;
     }
 }

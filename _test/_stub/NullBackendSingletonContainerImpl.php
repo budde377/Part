@@ -95,9 +95,9 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * Will create and reuse an instance of UserPrivilegesLibrary
-     * @return UserPrivilegesLibrary
+     * @return MultiSiteUserPrivilegesLibrary
      */
-    public function getUserPrivilegesLibraryInstance()
+    public function getMultiSiteUserPrivilegesLibraryInstance()
     {
         return null;
     }
@@ -116,6 +116,15 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
      * @return DartRegister
      */
     public function getDartRegisterInstance()
+    {
+        return null;
+    }
+
+    /**
+     * Will create and reuse an instance of UserPrivilegesLibrary
+     * @return UserPrivilegesLibrary
+     */
+    public function getUserPrivilegesLibraryInstance()
     {
         return null;
     }

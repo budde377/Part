@@ -134,9 +134,9 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
             'user' => MySQLConstants::MYSQL_USERNAME,
             'database' => MySQLConstants::MYSQL_DATABASE,
             'password' => MySQLConstants::MYSQL_PASSWORD));
-        $ret1 = $this->backContainer->getUserPrivilegesLibraryInstance();
-        $this->assertInstanceOf('UserPrivilegesLibrary', $ret1, 'Did not return instance of SiteLibrary');
-        $ret2 = $this->backContainer->getUserPrivilegesLibraryInstance();
+        $ret1 = $this->backContainer->getMultiSiteUserPrivilegesLibraryInstance();
+        $this->assertInstanceOf('MultiSiteUserPrivilegesLibrary', $ret1, 'Did not return instance of SiteLibrary');
+        $ret2 = $this->backContainer->getMultiSiteUserPrivilegesLibraryInstance();
         $this->assertTrue($ret1 === $ret2, 'Did not reuse instance');
 
 
@@ -157,6 +157,16 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('DefaultPageLibrary', $ret1, 'Did not return instance of DefaultPageLibrary');
         //$this->config->setMysqlCon(array('host' => 'lol', 'user' => 'lol', 'database' => '', 'password' => ''));
         $ret2 = $this->backContainer->getDefaultPageLibraryInstance();
+        $this->assertTrue($ret1 === $ret2, 'Did not reuse instance');
+
+    }
+
+    public function testGetDefaultPageLibraryWillReturnASameInstanceOfUserPrivilegesLibrary()
+    {
+        $ret1 = $this->backContainer->getUserPrivilegesLibraryInstance();
+        $this->assertInstanceOf('UserPrivilegesLibrary', $ret1, 'Did not return instance of UserPrivilegesLibrary');
+        //$this->config->setMysqlCon(array('host' => 'lol', 'user' => 'lol', 'database' => '', 'password' => ''));
+        $ret2 = $this->backContainer->getUserPrivilegesLibraryInstance();
         $this->assertTrue($ret1 === $ret2, 'Did not reuse instance');
 
     }

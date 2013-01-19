@@ -1,286 +1,192 @@
 <?php
-require_once dirname(__FILE__) . '/../_interface/UserPrivileges.php';
+require_once dirname(__FILE__).'/../_interface/UserPrivileges.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
- * Date: 02/08/12
- * Time: 17:17
+ * Date: 18/01/13
+ * Time: 22:29
  */
 class UserPrivilegesImpl implements UserPrivileges
 {
-    private $user;
-    private $siteLibrary;
     private $connection;
-    private $privileges = array();
-    private $overrideMap = array();
-    /** @var $addPrivilegePreparedStatement PDOStatement */
-    private $addPrivilegePreparedStatement;
-    private $isInitialized = false;
-    /** @var $deletePreparedStatement PDOStatement */
-    private $deleteRootPreparedStatement;
-    /** @var $deletePagePreparedStatement PDOStatement */
-    private $deletePagePreparedStatement;
-    /** @var $deleteSitePreparedStatement PDOStatement */
-    private $deleteSitePreparedStatement;
-    /** @var $deleteAllPreparedStatement PDOStatement */
-    private $deleteAllPreparedStatement;
+    /** @var User */
+    private $user;
+    private $username;
+    private $rootPrivilege = 0;
+    private $sitePrivilege = 0;
+    private $pagePrivilege = array();
+    private $addSitePrivilegeStatement;
+    private $addRootPrivilegeStatement;
+    private $addPagePrivilegeStatement;
+    private $valuesHasBeenSet;
+    private $revokeRootStatement;
+    private $revokeSiteStatement;
+    private $revokePageStatement;
+    private $revokeAllStatement;
 
-    public function __construct(DB $database, User $user, SiteLibrary $siteLibrary)
+    function __construct(User $user, DB $database)
     {
         $this->user = $user;
-        $this->siteLibrary = $siteLibrary;
+        $this->username = $user->getUsername();
         $this->connection = $database->getConnection();
-
     }
 
-    /**
-     * Will add root privileges to user
-     * @return bool FALSE on failure, else TRUE
-     */
-    public function addRootPrivilege()
-    {
-        return $this->addPrivilege(UserPrivileges::USER_PRIVILEGES_TYPE_ROOT);
-    }
 
     /**
-     * Will add site privileges to user
-     * @param string $site Must be valid site title
-     * @return bool FALSE on failure, else TRUE
+     * Will add root privileges
+     * @return void
      */
-    public function addSitePrivilege($site)
+    public function addRootPrivileges()
     {
-        return $this->addPrivilege(UserPrivileges::USER_PRIVILEGES_TYPE_SITE, $site);
-    }
-
-    /**
-     * Will add Page privileges to user
-     * @param string $site
-     * @param string $page
-     * @return bool FALSE on failure else TRUE
-     */
-    public function addPagePrivilege($site, $page)
-    {
-        return $this->addPrivilege(UserPrivileges::USER_PRIVILEGES_TYPE_PAGE, $site, $page);
-    }
-
-    /**
-     * Will revoke the privileges specified
-     * If Root privilege should be revoked, $site and $page must be null,
-     * If Site privilege should be revoked, $site should be not null and $page null
-     * If Page privilege should be revoked, $site and $page should be not null
-     * @param string | null $site
-     * @param string | null $page
-     * @return bool FALSE on failure as not found, else TRUE
-     */
-    public function revokePrivilege($site = null, $page = null)
-    {
-
-        if ($site == null && $page == null) {
-            if (isset($this->overrideMap[UserPrivileges::USER_PRIVILEGES_TYPE_ROOT])) {
-                if ($this->deleteRootPreparedStatement == null) {
-                    $this->deleteRootPreparedStatement = $this->connection->prepare("DELETE FROM UserPrivilege
-                    WHERE username = ? AND type=?");
-                }
-                $this->deleteRootPreparedStatement->execute(array($this->user->getUsername(),
-                    UserPrivileges::USER_PRIVILEGES_TYPE_ROOT));
-
-                unset($this->overrideMap[UserPrivileges::USER_PRIVILEGES_TYPE_ROOT]);
-                $nevPrivileges = array();
-
-                foreach ($this->privileges as $privilege) {
-                    if ($privilege['type'] != UserPrivileges::USER_PRIVILEGES_TYPE_ROOT) {
-                        $nevPrivileges[] = $privilege;
-                    }
-                }
-
-                $this->privileges = $nevPrivileges;
-                return true;
-            }
-        } else if ($page == null) {
-            if (isset($this->overrideMap[UserPrivileges::USER_PRIVILEGES_TYPE_SITE][$site])) {
-
-                if ($this->deleteSitePreparedStatement == null) {
-                    $this->deleteSitePreparedStatement = $this->connection->prepare("DELETE FROM UserPrivilege
-                    WHERE username = ?  AND site = ? AND type=?");
-                }
-
-                $this->deleteSitePreparedStatement->execute(array($this->user->getUsername(), $site,
-                    UserPrivileges::USER_PRIVILEGES_TYPE_SITE));
-
-                unset($this->overrideMap[UserPrivileges::USER_PRIVILEGES_TYPE_SITE][$site]);
-                $nevPrivileges = array();
-
-                foreach ($this->privileges as $privilege) {
-                    if ($privilege['type'] != UserPrivileges::USER_PRIVILEGES_TYPE_SITE || $privilege['site'] != $site) {
-                        $nevPrivileges[] = $privilege;
-                    }
-                }
-                $this->privileges = $nevPrivileges;
-                return true;
-            }
-        } else if ($site != null) {
-            if (isset($this->overrideMap[UserPrivileges::USER_PRIVILEGES_TYPE_PAGE][$site][$page])) {
-
-                if ($this->deletePagePreparedStatement == null) {
-                    $this->deletePagePreparedStatement = $this->connection->prepare("DELETE FROM UserPrivilege
-                    WHERE username = ?  AND site = ? AND page = ? AND type=?");
-                }
-
-                $this->deletePagePreparedStatement->execute(array($this->user->getUsername(), $site,$page,
-                    UserPrivileges::USER_PRIVILEGES_TYPE_PAGE));
-
-                unset($this->overrideMap[UserPrivileges::USER_PRIVILEGES_TYPE_PAGE][$site][$page]);
-                $nevPrivileges = array();
-
-                foreach ($this->privileges as $privilege) {
-                    if ($privilege['type'] != UserPrivileges::USER_PRIVILEGES_TYPE_PAGE || $privilege['site'] != $site
-                        || $privilege['page'] != $page
-                    ) {
-                        $nevPrivileges[] = $privilege;
-                    }
-                }
-                $this->privileges = $nevPrivileges;
-                return true;
-            }
+        if($this->addRootPrivilegeStatement == null){
+            $this->addRootPrivilegeStatement = $this->connection->prepare("
+              INSERT INTO UserPrivileges (username, rootPrivileges, sitePrivileges, pageId) VALUES (?,1,0,NULL)");
+            $this->addRootPrivilegeStatement->bindParam(1,$this->user->getUsername());
         }
-        return false;
+        $this->addRootPrivilegeStatement->execute();
+        $this->rootPrivilege = 1;
     }
-
-
 
     /**
-     * Will test if privileged.
-     * If test for Root privilege, test with site and page equal null
-     * If test for site, test with page equal null and site not null.
-     * If test for page privilege, test with page and site not null
-     * @param null | string $site Site title
-     * @param null | string $page Page title within site
-     * @return bool FALSE on not privileged else TRUE
+     * Will add Site privileges
+     * @return void
      */
-    public function isPrivileged($site = null, $page = null)
+    public function addSitePrivileges()
     {
-        $this->initializePrivileges();
-        if ($site == null && $page == null) {
-            return isset($this->overrideMap[UserPrivileges::USER_PRIVILEGES_TYPE_ROOT]);
-        } else if ($page == null) {
-            return isset($this->overrideMap[UserPrivileges::USER_PRIVILEGES_TYPE_SITE][$site]) || $this->isPrivileged();
-        } else if ($site != null) {
-            return isset($this->overrideMap[UserPrivileges::USER_PRIVILEGES_TYPE_PAGE][$site][$page]) || $this->isPrivileged($site);
+        if($this->addSitePrivilegeStatement == null){
+            $this->addSitePrivilegeStatement = $this->connection->prepare("
+              INSERT INTO UserPrivileges (username, rootPrivileges, sitePrivileges, pageId) VALUES (?,0,1,NULL)");
+            $this->addSitePrivilegeStatement->bindParam(1,$this->user->getUsername());
         }
-        return false;
+        $this->addSitePrivilegeStatement->execute();
+        $this->sitePrivilege = 1;
     }
 
-    private function addPrivilege($type, $site = null, $page = null, $insertIntoDB = true)
+    /**
+     * Will add privileges to given page
+     * @param Page $page
+     * @return void
+     */
+    public function addPagePrivileges(Page $page)
     {
-
-
-        if (($type == UserPrivileges::USER_PRIVILEGES_TYPE_SITE || $type == UserPrivileges::USER_PRIVILEGES_TYPE_PAGE)) {
-            $s = $this->siteLibrary->getSite($site);
-            if ($s == null) {
-                return false;
-            }
-
-            if ($type == UserPrivileges::USER_PRIVILEGES_TYPE_PAGE) {
-                $pageOrder = $s->getPageOrder();
-                if ($pageOrder->getPage($page) == null || isset($this->overrideMap[$type][$site][$page])) {
-                    return false;
-                }
-                $this->overrideMap[$type][$site][$page] = 1;
-            } else {
-                if (isset($this->overrideMap[$type][$site])) {
-                    return false;
-                }
-                $this->overrideMap[$type][$site] = 1;
-            }
-        } else if ($type == UserPrivileges::USER_PRIVILEGES_TYPE_ROOT) {
-            if (isset($this->overrideMap[$type])) {
-                return false;
-            }
-            $this->overrideMap[$type] = 1;
+        if($this->addPagePrivilegeStatement == null){
+            $this->addPagePrivilegeStatement = $this->connection->prepare("
+              INSERT INTO UserPrivileges (username, rootPrivileges, sitePrivileges, pageId) VALUES (?,0,0,?)");
         }
-        if ($insertIntoDB) {
-            if ($this->addPrivilegePreparedStatement == null) {
-                $this->addPrivilegePreparedStatement = $this->connection->prepare("INSERT INTO UserPrivilege (page,site,type,username) VALUES (?,?,?,?)");
-            }
-
-            $this->addPrivilegePreparedStatement->execute(array($page, $site, $type, $this->user->getUsername()));
+        $success = true;
+        try{
+            $this->addPagePrivilegeStatement->execute(array($this->user->getUsername(),$page->getID()));
+        } catch(PDOException $e){
+            $success = false;
         }
-
-        $this->privileges[] = array('type' => $type, 'site' => $site, 'page' => $page);
-
-
-        return true;
-    }
-
-    private function initializePrivileges()
-    {
-        if (!$this->isInitialized) {
-            $this->isInitialized = true;
-            $statement = $this->connection->prepare("SELECT * FROM UserPrivilege WHERE username = ?");
-            $statement->execute(array($this->user->getUsername()));
-            $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-            foreach ($rows as $row) {
-                $this->addPrivilege($row['type'], $row['site'], $row['page'], false);
-                switch ($row['type']) {
-                    case UserPrivileges::USER_PRIVILEGES_TYPE_ROOT:
-                        $this->overrideMap[$row['type']] = 1;
-                        break;
-                    case UserPrivileges::USER_PRIVILEGES_TYPE_SITE:
-                        $this->overrideMap[$row['type']][$row['site']] = 1;
-                        break;
-                    case UserPrivileges::USER_PRIVILEGES_TYPE_PAGE:
-                        $this->overrideMap[$row['type']][$row['site']][$row['page']] = 1;
-                        break;
-
-                }
-            }
+        if($success){
+            $this->pagePrivilege[$page->getID()] = 1;
         }
     }
 
     /**
-     * Will revoke all privileges
+     * @return bool Return TRUE if has privilege else FALSE
+     */
+    public function hasRootPrivileges()
+    {
+        $this->initialize();
+        return $this->rootPrivilege == 1;
+    }
+
+    /**
+     * @return bool Return TRUE if has privilege else FALSE
+     */
+    public function hasSitePrivileges()
+    {
+        $this->initialize();
+        return $this->sitePrivilege == 1 || $this->hasRootPrivileges();
+    }
+
+    /**
+     * @param Page $page
+     * @return bool Return TRUE if has privilege else FALSE
+     */
+    public function hasPagePrivileges(Page $page)
+    {
+        $this->initialize();
+        return $this->hasRootPrivileges() || $this->hasSitePrivileges() || isset($this->pagePrivilege[$page->getID()]);
+    }
+
+    /**
+     * Will revoke Root privileges
+     * @return void
+     */
+    public function revokeRootPrivileges()
+    {
+        if($this->revokeRootStatement == null){
+            $this->revokeRootStatement =
+                $this->connection->prepare("DELETE FROM UserPrivileges WHERE username = ? AND rootPrivileges = 1");
+            $this->revokeRootStatement->bindParam(1,$this->user->getUsername());
+        }
+        $this->revokeRootStatement->execute();
+        $this->rootPrivilege = false;
+    }
+
+    /**
+     * Will revoke Site privileges
+     * @return void
+     */
+    public function revokeSitePrivileges()
+    {
+        if($this->revokeSiteStatement == null){
+            $this->revokeSiteStatement =
+                $this->connection->prepare("DELETE FROM UserPrivileges WHERE username = ? AND sitePrivileges = 1");
+            $this->revokeSiteStatement->bindParam(1,$this->user->getUsername());
+        }
+        $this->revokeSiteStatement->execute();
+        $this->sitePrivilege = false;
+    }
+
+    /**
+     * Will revoke privileges from given Page
+     * @param Page $page
+     * @return void
+     */
+    public function revokePagePrivileges(Page $page)
+    {
+        if($this->revokePageStatement == null){
+            $this->revokePageStatement =
+                $this->connection->prepare("DELETE FROM UserPrivileges WHERE username = ? AND pageId = ?");
+        }
+        $this->revokePageStatement->execute(array($this->user->getUsername(),$page->getID()));
+        unset($this->pagePrivilege[$page->getID()]);
+    }
+
+    /**
+     * This will revoke all privileges
      * @return void
      */
     public function revokeAllPrivileges()
     {
-        if($this->deleteAllPreparedStatement == null){
-            $this->deleteAllPreparedStatement = $this->connection->prepare("DELETE FROM UserPrivilege WHERE username=?");
+        if($this->revokeAllStatement == null){
+            $this->revokeAllStatement =
+                $this->connection->prepare("DELETE FROM UserPrivileges WHERE username = ?");
+            $this->revokeAllStatement->bindParam(1,$this->user->getUsername());
         }
-
-        $this->deleteAllPreparedStatement->execute(array($this->user->getUsername()));
-        $this->overrideMap = array();
-        $this->privileges = array();
-
+        $this->revokeAllStatement->execute();
+        $this->rootPrivilege = $this->sitePrivilege = 0;
+        $this->pagePrivilege = array();
     }
 
-
-    /**
-     * Will return an array with all privileges.
-     * Every entrance will have another array with entrances type, site, page
-     * @param String $mode
-     * @return array
-     */
-    public function listPrivileges($mode = UserPrivileges::LIST_MODE_LIST_ALL)
+    private function initialize()
     {
-        $this->initializePrivileges();
-        $returnArray = array();
-
-        switch ($mode) {
-            case UserPrivileges::LIST_MODE_LIST_PAGE:
-            case UserPrivileges::LIST_MODE_LIST_ROOT:
-            case UserPrivileges::LIST_MODE_LIST_SITE:
-                foreach ($this->privileges as $privilege) {
-                    if ($privilege['type'] == $mode) {
-                        $returnArray[] = $privilege;
-                    }
+        if(!$this->valuesHasBeenSet){
+            $stm = $this->connection->prepare("SELECT * FROM UserPrivileges WHERE username = ?");
+            $stm->bindParam(1,$this->user->getUsername());
+            $stm->execute();
+            foreach($stm->fetchAll(PDO::FETCH_ASSOC) as $row){
+                $this->rootPrivilege = $this->rootPrivilege || $row['rootPrivileges'] == 1;
+                $this->sitePrivilege = $this->sitePrivilege || $row['sitePrivileges'] == 1;
+                if(($p = $row['pageId']) != null){
+                    $this->pagePrivilege[$p] = 1;
                 }
-                break;
-            case UserPrivileges::LIST_MODE_LIST_ALL:
-                $returnArray = $this->privileges;
-                break;
+            }
+            $this->valuesHasBeenSet = true;
         }
-
-        return $returnArray;
-
     }
 }

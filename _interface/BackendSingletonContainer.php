@@ -84,14 +84,20 @@ interface BackendSingletonContainer
     /**
      * @abstract
      * Will create and reuse an instance of UserPrivilegesLibrary
-     * @return UserPrivilegesLibrary
+     * @return MultiSiteUserPrivilegesLibrary
      */
-    public function getUserPrivilegesLibraryInstance();
+    public function getMultiSiteUserPrivilegesLibraryInstance();
 
     /**
      * Will create and reuse an instance of DefaultPageLibrary
      * @return DefaultPageLibrary
      */
     public function getDefaultPageLibraryInstance();
+
+    /**
+     * Will create and reuse an instance of UserPrivilegesLibrary
+     * @return UserPrivilegesLibrary
+     */
+    public function getUserPrivilegesLibraryInstance();
 
 }

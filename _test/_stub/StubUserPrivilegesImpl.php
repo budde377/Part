@@ -1,12 +1,12 @@
 <?php
-require_once dirname(__FILE__) . '/../../_interface/UserPrivileges.php';
+require_once dirname(__FILE__) . '/../../_interface/MultiSiteUserPrivileges.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 06/08/12
  * Time: 22:34
  */
-class StubUserPrivilegesImpl implements UserPrivileges
+class StubMultiSiteUserPrivilegesImpl implements MultiSiteUserPrivileges
 {
     private $privileges;
     private $isPrivileged;
@@ -68,11 +68,11 @@ class StubUserPrivilegesImpl implements UserPrivileges
     public function isPrivileged($site = null, $page = null)
     {
         if ($site == null && $page == null) {
-            return isset($this->isPrivileged[UserPrivileges::USER_PRIVILEGES_TYPE_ROOT]);
+            return isset($this->isPrivileged[MultiSiteUserPrivileges::USER_PRIVILEGES_TYPE_ROOT]);
         } else if ($page == null) {
-            return isset($this->isPrivileged[UserPrivileges::USER_PRIVILEGES_TYPE_SITE][$site]) || $this->isPrivileged();
+            return isset($this->isPrivileged[MultiSiteUserPrivileges::USER_PRIVILEGES_TYPE_SITE][$site]) || $this->isPrivileged();
         } else if ($site != null) {
-            return isset($this->isPrivileged[UserPrivileges::USER_PRIVILEGES_TYPE_PAGE][$site][$page]) || $this->isPrivileged($site);
+            return isset($this->isPrivileged[MultiSiteUserPrivileges::USER_PRIVILEGES_TYPE_PAGE][$site][$page]) || $this->isPrivileged($site);
         }
         return false;
     }
@@ -94,11 +94,11 @@ class StubUserPrivilegesImpl implements UserPrivileges
     public function setIsPrivileged($site = null, $page = null)
     {
         if ($site == null && $page == null) {
-            $this->isPrivileged[UserPrivileges::USER_PRIVILEGES_TYPE_ROOT] = 1;
+            $this->isPrivileged[MultiSiteUserPrivileges::USER_PRIVILEGES_TYPE_ROOT] = 1;
         } else if ($page == null) {
-            $this->isPrivileged[UserPrivileges::USER_PRIVILEGES_TYPE_SITE][$site] = 1;
+            $this->isPrivileged[MultiSiteUserPrivileges::USER_PRIVILEGES_TYPE_SITE][$site] = 1;
         } else if ($site != null) {
-            $this->isPrivileged[UserPrivileges::USER_PRIVILEGES_TYPE_PAGE][$site][$page] = 1;
+            $this->isPrivileged[MultiSiteUserPrivileges::USER_PRIVILEGES_TYPE_PAGE][$site][$page] = 1;
         }
 
     }
@@ -109,21 +109,21 @@ class StubUserPrivilegesImpl implements UserPrivileges
      * @param String $mode
      * @return array
      */
-    public function listPrivileges($mode = UserPrivileges::LIST_MODE_LIST_ALL)
+    public function listPrivileges($mode = MultiSiteUserPrivileges::LIST_MODE_LIST_ALL)
     {
         $returnArray = array();
 
         switch ($mode) {
-            case UserPrivileges::LIST_MODE_LIST_PAGE:
-            case UserPrivileges::LIST_MODE_LIST_ROOT:
-            case UserPrivileges::LIST_MODE_LIST_SITE:
+            case MultiSiteUserPrivileges::LIST_MODE_LIST_PAGE:
+            case MultiSiteUserPrivileges::LIST_MODE_LIST_ROOT:
+            case MultiSiteUserPrivileges::LIST_MODE_LIST_SITE:
                 foreach ($this->privileges as $privilege) {
                     if ($privilege['type'] = $mode) {
                         $returnArray[] = $privilege;
                     }
                 }
                 break;
-            case UserPrivileges::LIST_MODE_LIST_ALL:
+            case MultiSiteUserPrivileges::LIST_MODE_LIST_ALL:
                 $returnArray = $this->privileges;
                 break;
         }

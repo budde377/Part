@@ -1,36 +1,34 @@
 <?php
 require_once dirname(__FILE__) . '/../_test/TruncateOperation.php';
 require_once dirname(__FILE__) . '/../_test/MySQLConstants.php';
-require_once dirname(__FILE__) . '/../_test/_stub/StubDBImpl.php';
+require_once dirname(__FILE__) . '/_stub/StubDBImpl.php';
 require_once dirname(__FILE__) . '/../_class/UserImpl.php';
-require_once dirname(__FILE__) . '/../_class/UserPrivilegesImpl.php';
-require_once dirname(__FILE__) . '/../_class/SiteLibraryImpl.php';
+require_once dirname(__FILE__) . '/../_class/PageImpl.php';
+require_once dirname(__FILE__).'/../_class/UserPrivilegesImpl.php';
+require_once dirname(__FILE__).'/_stub/StubPageImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
- * Date: 04/08/12
- * Time: 10:38
+ * Date: 19/01/13
+ * Time: 10:32
  */
 class UserPrivilegesImplTest extends PHPUnit_Extensions_Database_TestCase
 {
-    /** @var $user StubUserImpl */
-    private $user;
-    /** @var $privileges UserPrivilegesImpl */
-    private $privileges;
-    /** @var $siteLibrary SiteLibraryImpl */
-    private $siteLibrary;
-    /** @var $pdo PDO */
-    private $pdo;
-    /** @var $db StubDBImpl */
-    private $db;
-    /** @var $site Site */
-    private $site;
-    /** @var $pageOrder PageOrder */
-    private $pageOrder;
-    /** @var $pages array */
-    private $pages;
 
-    protected function setUp()
+    /** @var User */
+    private $user;
+    /** @var UserPrivilegesImpl */
+    private $userPrivileges;
+    /** @var PDO */
+    private $pdo;
+    /** @var DB */
+    private $db;
+    /** @var Page */
+    private $page1;
+    /** @var $page2 */
+    private $page2;
+
+    public function setUp()
     {
         parent::setUp();
         $this->pdo = new PDO('mysql:dbname=' . self::database . ';host=' . self::host, self::username, self::password, array(
@@ -38,314 +36,121 @@ class UserPrivilegesImplTest extends PHPUnit_Extensions_Database_TestCase
             PDO::ATTR_PERSISTENT=>true));
         $this->db = new StubDBImpl();
         $this->db->setConnection($this->pdo);
-        $this->user = new UserImpl('root', $this->db);
-        $this->siteLibrary = new SiteLibraryImpl($this->db);
-        $this->site = $this->siteLibrary->getSite('cms2012');
-
-        $this->site->setDBDatabase(self::database);
-        $this->site->setDBHost(self::host);
-        $this->site->setDBUser(self::username);
-        $this->site->setDBPassword(self::password);
-
-        $this->pageOrder = $this->site->getPageOrder();
-        $this->pages = $this->pageOrder->listPages(PageOrder::LIST_ALL);
-        $this->privileges = new UserPrivilegesImpl($this->db, $this->user, $this->siteLibrary);
-    }
-
-    protected function tearDown()
-    {
-        $this->pdo = null;
-        parent::tearDown();
-    }
-
-    public function testAddRootPrivilegeWillAddRootPrivilege()
-    {
-        $ret = $this->privileges->addRootPrivilege();
-        $this->assertTrue($ret, 'Did not return true');
-        $ret = $this->privileges->listPrivileges();
-        $this->assertTrue(is_array($ret), 'Did not return array');
-        $found = false;
-        foreach ($ret as $privilege) {
-            $found = (isset($privilege['type'])
-                && $privilege['type'] == UserPrivileges::USER_PRIVILEGES_TYPE_ROOT
-                && $privilege['site'] == null && $privilege['page'] == null) || $found;
-        }
-
-        $this->assertTrue($found, 'Root privilege was not added');
-    }
-
-    public function testAddRootPrivilegeCantBeDoneTwice()
-    {
-        $this->privileges->addRootPrivilege();
-        $count1 = count($this->privileges->listPrivileges());
-        $ret = $this->privileges->addRootPrivilege();
-        $this->assertFalse($ret, 'Did not return false');
-        $count2 = count($this->privileges->listPrivileges());
-
-        $this->assertEquals($count1, $count2, 'Did add root privilege twice');
-    }
-
-    public function testAddSitePrivilegeWillAddSitePrivilege()
-    {
-        $ret = $this->privileges->addSitePrivilege($this->site->getTitle());
-        $this->assertTrue($ret, 'Did not return true');
-        $ret = $this->privileges->listPrivileges();
-        $found = false;
-        foreach ($ret as $privilege) {
-            $found = (isset($privilege['type'])
-                && $privilege['type'] == UserPrivileges::USER_PRIVILEGES_TYPE_SITE
-                && $privilege['site'] == $this->site->getTitle() && $privilege['page'] == null) || $found;
-        }
-
-        $this->assertTrue($found, 'Root privilege was not added');
+        $this->user = new UserImpl('root',$this->db);
+        $this->page1 = new PageImpl('page',$this->db);
+        $this->page2 = new PageImpl('page2',$this->db);
+        $this->userPrivileges = new UserPrivilegesImpl($this->user, $this->db);
 
     }
 
-    public function testAddNILSiteWillReturnFalse()
-    {
-        $count1 = count($this->privileges->listPrivileges());
-        $ret = $this->privileges->addSitePrivilege('NonExistingSite');
-        $this->assertFalse($ret, 'Did not return false');
-        $count2 = count($this->privileges->listPrivileges());
-        $this->assertEquals($count1, $count2, 'Did change privileges');
-    }
-
-    public function testAddPagePrivilegeWillAddPagePrivilege()
-    {
-        /** @var $page Page */
-        $page = $this->pages[0];
-        $ret = $this->privileges->addPagePrivilege($this->site->getTitle(), $page->getID());
-        $this->assertTrue($ret, 'Did not return true');
-        $ret = $this->privileges->listPrivileges();
-        $found = false;
-        foreach ($ret as $privilege) {
-            $found = (isset($privilege['type'])
-                && $privilege['type'] == UserPrivileges::USER_PRIVILEGES_TYPE_PAGE
-                && $privilege['site'] == $this->site->getTitle()
-                && $privilege['page'] == $page->getID()) || $found;
-        }
-
-        $this->assertTrue($found, 'Root privilege was not added');
+    private function setUpAllPrivileges(){
+        $this->userPrivileges->addRootPrivileges();
+        $this->userPrivileges->addSitePrivileges();
+        $this->userPrivileges->addPagePrivileges($this->page1);
+        $this->userPrivileges->addPagePrivileges($this->page2);
 
     }
 
-    public function testAddPagePrivilegeWillReturnFalseOnSiteNIL()
-    {
-        $count1 = count($this->privileges->listPrivileges());
-        /** @var $page Page */
-        $page = $this->pages[0];
-        $ret = $this->privileges->addPagePrivilege('NonExistingSite', $page->getID());
-        $this->assertFalse($ret, 'Did not return false');
-        $count2 = count($this->privileges->listPrivileges());
-        $this->assertEquals($count1, $count2, 'Did change privileges');
-    }
 
-    public function testAddPagePrivilegeWillReturnFalseOnPageNIL()
-    {
-        $count1 = count($this->privileges->listPrivileges());
-        /** @var $page Page */
-        $ret = $this->privileges->addPagePrivilege($this->site->getTitle(), 'NonExistingPage');
-        $this->assertFalse($ret, 'Did not return false');
-        $count2 = count($this->privileges->listPrivileges());
-        $this->assertEquals($count1, $count2, 'Did change privileges');
-    }
-
-    public function testAddSitePrivilegeDuplicateWillReturnFalse()
-    {
-        $this->privileges->addSitePrivilege($this->site->getTitle());
-        $count1 = count($this->privileges->listPrivileges());
-        $ret = $this->privileges->addSitePrivilege($this->site->getTitle());
-        $this->assertFalse($ret, 'Did not return false');
-        $count2 = count($this->privileges->listPrivileges());
-        $this->assertEquals($count1, $count2, 'Did change privileges');
-    }
-
-    public function testAddPagePrivilegeDuplicateWillReturnFalse()
-    {
-        /** @var $page Page */
-        $page = $this->pages[0];
-        $this->privileges->addPagePrivilege($this->site->getTitle(), $page->getID());
-        $count1 = count($this->privileges->listPrivileges());
-        $ret = $this->privileges->addPagePrivilege($this->site->getTitle(), $page->getID());
-        $this->assertFalse($ret, 'Did not return false');
-        $count2 = count($this->privileges->listPrivileges());
-        $this->assertEquals($count1, $count2, 'Did change privileges');
-    }
-
-    public function testRevokeSitePrivilegeWillRevokePrivilege()
-    {
-        $this->privileges->addSitePrivilege($this->site->getTitle());
-        $count1 = count($this->privileges->listPrivileges());
-        $ret = $this->privileges->revokePrivilege($this->site->getTitle());
-        $count2 = count($this->privileges->listPrivileges());
-        $this->assertEquals($count1 - 1, $count2, 'Did not revoke privilege');
-        $this->assertTrue($ret, 'Did not return true');
-    }
-
-    public function testRevokeRootPrivilegeWillRevokePrivilege()
-    {
-        $this->privileges->addRootPrivilege();
-        $count1 = count($this->privileges->listPrivileges());
-        $ret = $this->privileges->revokePrivilege();
-        $count2 = count($this->privileges->listPrivileges());
-        $this->assertEquals($count1 - 1, $count2, 'Did not revoke privilege');
-        $this->assertTrue($ret, 'Did not return true');
-    }
-
-
-    public function testRevokePagePrivilegeWillRevokePrivilege()
-    {
-        /** @var $page Page */
-        $page = $this->pages[0];
-        $this->privileges->addPagePrivilege($this->site->getTitle(), $page->getID());
-        $count1 = count($this->privileges->listPrivileges());
-        $ret = $this->privileges->revokePrivilege($this->site->getTitle(), $page->getID());
-        $count2 = count($this->privileges->listPrivileges());
-        $this->assertEquals($count1 - 1, $count2, 'Did not revoke privilege');
-        $this->assertTrue($ret, 'Did not return true');
-    }
-
-    public function testRevokeInvalidPermissionWillReturnFalse()
-    {
-        /** @var $page Page */
-        $page = $this->pages[0];
-        $this->assertFalse($this->privileges->revokePrivilege(null, $page->getID()), 'Did not return false');
-    }
-
-    public function testRevokePermissionNotFoundWillReturnFalse()
-    {
-        $this->assertFalse($this->privileges->revokePrivilege(), 'Did not return false');
-        $this->assertFalse($this->privileges->revokePrivilege('NILSite'), 'Did not return false');
-        $this->assertFalse($this->privileges->revokePrivilege('NILSite', 'NILPage'), 'Did not return false');
-    }
-
-    public function testIsPrivilegedWillreturnFalseIfInvalidPermission()
-    {
-        /** @var $page Page */
-        $page = $this->pages[0];
-        $this->assertFalse($this->privileges->isPrivileged(null, $page->getID()), 'Did not return false');
-    }
-
-    public function testIsPrivilegedWillReturnTrueIfPagePrivileged()
-    {
-        /** @var $page Page */
-        $page = $this->pages[0];
-        $this->privileges->addPagePrivilege($this->site->getTitle(), $page->getID());
-        $this->assertTrue($this->privileges->isPrivileged($this->site->getTitle(), $page->getID()));
-        $this->assertFalse($this->privileges->isPrivileged($this->site->getTitle()));
-        $this->assertFalse($this->privileges->isPrivileged());
-
+    public function testAddersWillSet(){
+        $this->setUpAllPrivileges();
+        $this->assertTrue($this->userPrivileges->hasRootPrivileges());
+        $this->assertTrue($this->userPrivileges->hasSitePrivileges());
+        $this->assertTrue($this->userPrivileges->hasPagePrivileges($this->page1));
+        $this->assertTrue($this->userPrivileges->hasPagePrivileges($this->page2));
 
     }
 
-    public function testIsPrivilegedWillReturnTrueIfSitePrivileged()
-    {
-        /** @var $page Page */
-        $page = $this->pages[0];
-        $this->privileges->addSitePrivilege($this->site->getTitle());
-        $this->assertTrue($this->privileges->isPrivileged($this->site->getTitle(), $page->getID()));
-        $this->assertTrue($this->privileges->isPrivileged($this->site->getTitle()));
-        $this->assertFalse($this->privileges->isPrivileged());
-
-
+    public function testRevokeAllPrivilegesRevokeAllPrivileges(){
+        $this->setUpAllPrivileges();
+        $this->userPrivileges->revokeAllPrivileges();
+        $this->assertFalse($this->userPrivileges->hasRootPrivileges());
+        $this->assertFalse($this->userPrivileges->hasSitePrivileges());
+        $this->assertFalse($this->userPrivileges->hasPagePrivileges($this->page1));
+        $this->assertFalse($this->userPrivileges->hasPagePrivileges($this->page2));
     }
 
-    public function testIsPrivilegedWillReturnTrueIfRootPrivileged()
-    {
-        /** @var $page Page */
-        $page = $this->pages[0];
-        $this->privileges->addRootPrivilege();
-        $this->assertTrue($this->privileges->isPrivileged($this->site->getTitle(), $page->getID()));
-        $this->assertTrue($this->privileges->isPrivileged($this->site->getTitle()));
-        $this->assertTrue($this->privileges->isPrivileged());
-
+    public function testRemoveWillRemovePrivileges(){
+        $this->setUpAllPrivileges();
+        $this->userPrivileges->revokeRootPrivileges();
+        $this->userPrivileges->revokeSitePrivileges();
+        $this->userPrivileges->revokePagePrivileges($this->page2);
+        $this->assertFalse($this->userPrivileges->hasRootPrivileges());
+        $this->assertFalse($this->userPrivileges->hasSitePrivileges());
+        $this->assertTrue($this->userPrivileges->hasPagePrivileges($this->page1));
+        $this->assertFalse($this->userPrivileges->hasPagePrivileges($this->page2));
     }
 
-    public function testChangesArePersistent()
-    {
-        /** @var $page Page */
-        $page = $this->pages[0];
-        $this->privileges->addRootPrivilege();
-        $this->privileges->addSitePrivilege($this->site->getTitle());
-        $this->privileges->addPagePrivilege($this->site->getTitle(), $page->getID());
+    public function testRootAccessWillGrantSiteAndPageAccess(){
+        $this->userPrivileges->addRootPrivileges();
+        $this->assertTrue($this->userPrivileges->hasRootPrivileges());
+        $this->assertTrue($this->userPrivileges->hasSitePrivileges());
+        $this->assertTrue($this->userPrivileges->hasPagePrivileges($this->page1));
+        $this->assertTrue($this->userPrivileges->hasPagePrivileges($this->page2));
+    }
 
-        $this->privileges = new UserPrivilegesImpl($this->db, $this->user, $this->siteLibrary);
-        $this->assertEquals(3, count($this->privileges->listPrivileges()), 'Count did not match');
-        $this->assertTrue($this->privileges->revokePrivilege(), 'Root privileges was not persistent');
-        $this->assertTrue($this->privileges->revokePrivilege($this->site->getTitle()), 'Page privileges was not persistent');
-        $this->assertTrue($this->privileges->revokePrivilege($this->site->getTitle(), $page->getID()), 'Site privileges was not persistent');
+    public function testSiteAccessWillGrantPageAccess(){
+        $this->userPrivileges->addSitePrivileges();
+        $this->assertFalse($this->userPrivileges->hasRootPrivileges());
+        $this->assertTrue($this->userPrivileges->hasSitePrivileges());
+        $this->assertTrue($this->userPrivileges->hasPagePrivileges($this->page1));
+        $this->assertTrue($this->userPrivileges->hasPagePrivileges($this->page2));
+    }
+
+    public function testAddRootWillBePersistent(){
+        $this->userPrivileges->addRootPrivileges();
+        $this->userPrivileges = new UserPrivilegesImpl($this->user,$this->db);
+        $this->assertTrue($this->userPrivileges->hasRootPrivileges());
+    }
+
+    public function testRemoveRootWillBePersistent(){
+        $this->userPrivileges->addRootPrivileges();
+        $this->userPrivileges->revokeRootPrivileges();
+        $this->userPrivileges = new UserPrivilegesImpl($this->user,$this->db);
+        $this->assertFalse($this->userPrivileges->hasRootPrivileges());
+    }
+
+    public function testAddSitePrivilegesWillBePersistent(){
+        $this->userPrivileges->addSitePrivileges();
+        $this->userPrivileges = new UserPrivilegesImpl($this->user,$this->db);
+        $this->assertTrue($this->userPrivileges->hasSitePrivileges());
+    }
+    public function testRemoveSitePrivilegesWillBePersistent(){
+        $this->userPrivileges->addSitePrivileges();
+        $this->userPrivileges->revokeSitePrivileges();
+        $this->userPrivileges = new UserPrivilegesImpl($this->user,$this->db);
+        $this->assertFalse($this->userPrivileges->hasSitePrivileges());
+    }
+
+    public function testAddPagePrivilegesWillBePersistent(){
+        $this->userPrivileges->addPagePrivileges($this->page1);
+        $this->userPrivileges = new UserPrivilegesImpl($this->user,$this->db);
+        $this->assertTrue($this->userPrivileges->hasPagePrivileges($this->page1));
     }
 
 
-    public function testDeletesWillReflectOnPersistentStorage()
-    {
-        /** @var $page Page */
-        $page = $this->pages[0];
-        $this->privileges->addRootPrivilege();
-        $this->privileges->addSitePrivilege($this->site->getTitle());
-        $this->privileges->addPagePrivilege($this->site->getTitle(), $page->getID());
-        $this->assertEquals(3, count($this->privileges->listPrivileges()), 'Count did not match');
-
-        $this->privileges->revokePrivilege();
-        $this->privileges->revokePrivilege($this->site->getTitle());
-        $this->privileges->revokePrivilege($this->site->getTitle(), $page->getID());
-
-        $this->privileges = new UserPrivilegesImpl($this->db, $this->user, $this->siteLibrary);
-        $this->assertEquals(0, count($this->privileges->listPrivileges()), 'Count did not match');
-
-
+    public function testRemovePagePrivilegesWillBePersistent(){
+        $this->userPrivileges->addPagePrivileges($this->page1);
+        $this->userPrivileges->revokePagePrivileges($this->page1);
+        $this->userPrivileges = new UserPrivilegesImpl($this->user,$this->db);
+        $this->assertFalse($this->userPrivileges->hasPagePrivileges($this->page1));
     }
 
-    public function testIsPrivilegedWillReflectPersistentStorage()
-    {
-        /** @var $page Page */
-        $page = $this->pages[0];
-        $this->privileges->addRootPrivilege();
-        $this->privileges->addSitePrivilege($this->site->getTitle());
-        $this->privileges->addPagePrivilege($this->site->getTitle(), $page->getID());
-        $this->assertEquals(3, count($this->privileges->listPrivileges()), 'Count did not match');
-
-        $this->privileges = new UserPrivilegesImpl($this->db, $this->user, $this->siteLibrary);
-        $this->assertTrue($this->privileges->isPrivileged());
-        $this->assertTrue($this->privileges->isPrivileged($this->site->getTitle()));
-        $this->assertTrue($this->privileges->isPrivileged($this->site->getTitle(), $page->getID()));
-
-
+    public function testRevokeAllPrivilegesWillBePersistent(){
+        $this->setUpAllPrivileges();
+        $this->userPrivileges->revokeAllPrivileges();
+        $this->userPrivileges = new UserPrivilegesImpl($this->user,$this->db);
+        $this->assertFalse($this->userPrivileges->hasRootPrivileges());
+        $this->assertFalse($this->userPrivileges->hasSitePrivileges());
+        $this->assertFalse($this->userPrivileges->hasPagePrivileges($this->page1));
+        $this->assertFalse($this->userPrivileges->hasPagePrivileges($this->page2));
     }
 
-    public function testRevokeAllWillRevokeAll()
-    {
-        /** @var $page Page */
-        $page = $this->pages[0];
-        $this->privileges->addRootPrivilege();
-        $this->privileges->addSitePrivilege($this->site->getTitle());
-        $this->privileges->addPagePrivilege($this->site->getTitle(), $page->getID());
-        $this->assertEquals(3, count($this->privileges->listPrivileges()), 'Count did not match');
-
-        $this->privileges->revokeAllPrivileges();
-        $this->assertEquals(0, count($this->privileges->listPrivileges()), 'Count did not match');
-
-        $this->privileges = new UserPrivilegesImpl($this->db, $this->user, $this->siteLibrary);
-        $this->assertEquals(0, count($this->privileges->listPrivileges()), 'Count did not match');
-
-
-    }
-
-    public function testListModeWillReflectOnListPrivileges()
-    {
-        /** @var $page Page */
-        $page = $this->pages[0];
-        $this->privileges->addRootPrivilege();
-        $this->privileges->addSitePrivilege($this->site->getTitle());
-        $this->privileges->addPagePrivilege($this->site->getTitle(), $page->getID());
-
-
-        $this->assertEquals(3, count($this->privileges->listPrivileges()), 'Count did not match');
-        $this->assertEquals(1, count($this->privileges->listPrivileges(UserPrivileges::LIST_MODE_LIST_PAGE)), 'Count did not match');
-        $this->assertEquals(1, count($this->privileges->listPrivileges(UserPrivileges::LIST_MODE_LIST_SITE)), 'Count did not match');
-        $this->assertEquals(1, count($this->privileges->listPrivileges(UserPrivileges::LIST_MODE_LIST_ROOT)), 'Count did not match');
-
-
+    public function testAddNonExistingPageWillNotAddPrivilege(){
+        $pageStub = new StubPageImpl();
+        $pageStub->setID("testID");
+        $this->userPrivileges->addPagePrivileges($pageStub);
+        $this->assertFalse($this->userPrivileges->hasPagePrivileges($pageStub));
     }
 
     public function getSetUpOperation()
@@ -361,10 +166,8 @@ class UserPrivilegesImplTest extends PHPUnit_Extensions_Database_TestCase
      */
     protected function getConnection()
     {
-
         $pdo = new PDO('mysql:dbname=' . self::database . ';host=' . self::host, self::username, self::password);
         return $this->createDefaultDBConnection($pdo);
-
     }
 
     /**
@@ -381,6 +184,4 @@ class UserPrivilegesImplTest extends PHPUnit_Extensions_Database_TestCase
     const password = MySQLConstants::MYSQL_PASSWORD;
     const username = MySQLConstants::MYSQL_USERNAME;
     const host = MySQLConstants::MYSQL_HOST;
-
-
 }

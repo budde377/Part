@@ -1,14 +1,13 @@
 <?php
-require_once dirname(__FILE__) . '/../_test/_stub/StubDBImpl.php';
-require_once dirname(__FILE__) . '/../_test/_stub/StubSiteLibraryImpl.php';
-require_once dirname(__FILE__) . '/../_class/UserPrivilegesLibraryImpl.php';
-require_once dirname(__FILE__) . '/../_test/_stub/StubUserImpl.php';
+require_once dirname(__FILE__).'/_stub/StubDBImpl.php';
+require_once dirname(__FILE__).'/_stub/StubUserImpl.php';
+require_once dirname(__FILE__).'/../_class/UserPrivilegesLibraryImpl.php';
 
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
- * Date: 05/08/12
- * Time: 20:24
+ * Date: 19/01/13
+ * Time: 13:22
  */
 class UserPrivilegesLibraryImplTest extends PHPUnit_Framework_TestCase
 {
@@ -21,8 +20,7 @@ class UserPrivilegesLibraryImplTest extends PHPUnit_Framework_TestCase
 
     public function setUp(){
         $db = new StubDBImpl();
-        $siteLibrary = new StubSiteLibraryImpl();
-        $this->privilegesLibrary = new UserPrivilegesLibraryImpl($db,$siteLibrary);
+        $this->privilegesLibrary = new UserPrivilegesLibraryImpl($db);
         $this->user1 = new StubUserImpl();
         $this->user1->setUsername('someUsername');
         $this->user2 = new StubUserImpl();
@@ -30,20 +28,20 @@ class UserPrivilegesLibraryImplTest extends PHPUnit_Framework_TestCase
     }
 
     public function testGetPrivilegeWillReturnPrivilege(){
-        $ret = $this->privilegesLibrary->getPrivileges($this->user1);
+        $ret = $this->privilegesLibrary->getUserPrivileges($this->user1);
         $this->assertInstanceOf('UserPrivileges',$ret);
     }
 
     public function testWillCachePrivilegesInstance(){
-        $ret1 = $this->privilegesLibrary->getPrivileges($this->user1);
-        $ret2 = $this->privilegesLibrary->getPrivileges($this->user1);
+        $ret1 = $this->privilegesLibrary->getUserPrivileges($this->user1);
+        $ret2 = $this->privilegesLibrary->getUserPrivileges($this->user1);
 
         $this->assertTrue($ret1 === $ret2,'Did not cache instance');
     }
 
     public function testWillCachePrivilegesInstanceNotOnUsername(){
-        $ret1 = $this->privilegesLibrary->getPrivileges($this->user1);
-        $ret2 = $this->privilegesLibrary->getPrivileges($this->user2);
+        $ret1 = $this->privilegesLibrary->getUserPrivileges($this->user1);
+        $ret2 = $this->privilegesLibrary->getUserPrivileges($this->user2);
 
         $this->assertTrue($ret1 !== $ret2,'Did not cache instance');
     }

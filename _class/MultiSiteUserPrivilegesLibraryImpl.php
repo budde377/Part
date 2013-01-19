@@ -1,39 +1,42 @@
 <?php
-require_once dirname(__FILE__).'/../_interface/UserPrivilegesLibrary.php';
-require_once dirname(__FILE__).'/UserPrivilegesImpl.php';
+require_once dirname(__FILE__) . '/../_interface/MultiSiteUserPrivilegesLibrary.php';
+require_once dirname(__FILE__) . '/MultiSiteUserPrivilegesImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
- * Date: 19/01/13
- * Time: 13:20
+ * Date: 05/08/12
+ * Time: 19:59
  */
-class UserPrivilegesLibraryImpl implements UserPrivilegesLibrary
+class MultiSiteUserPrivilegesLibraryImpl implements MultiSiteUserPrivilegesLibrary
 {
     private $db;
+    private $siteLibrary;
 
     private $privileges = array();
     private $users = array();
 
-    function __construct(DB $db)
+
+    public function __construct(DB $db, SiteLibrary $siteLibrary)
     {
         $this->db = $db;
+        $this->siteLibrary = $siteLibrary;
+
     }
 
 
     /**
-     * This will keep and reuse instances of UserPrivilege
      * @param User $user
-     * @return UserPrivileges
+     * @return MultiSiteUserPrivileges
      */
-    public function getUserPrivileges(User $user)
+    public function getPrivileges(User $user)
     {
         if (($privilege = $this->getCachePrivilege($user)) == null) {
-            $privilege = new UserPrivilegesImpl($user, $this->db);
+            $privilege = new MultiSiteUserPrivilegesImpl($this->db,$user,$this->siteLibrary);
             $this->users[] = $user;
             $this->privileges[] = $privilege;
         }
-        return $privilege;    }
-
+        return $privilege;
+    }
 
     /**
      * @param $user
@@ -48,4 +51,5 @@ class UserPrivilegesLibraryImpl implements UserPrivilegesLibrary
         }
         return null;
     }
+
 }
