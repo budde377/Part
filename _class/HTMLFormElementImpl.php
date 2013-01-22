@@ -18,7 +18,7 @@ class HTMLFormElementImpl implements HTMLFormElement
     public function __construct($method = HTMLFormElement::FORM_METHOD_GET, $action = "#")
     {
         $this->formElement = new HTMLElementImpl('form', array('action' => $action, 'method' => $method));
-        $this->notion = new HTMLElementImpl('div');
+        $this->notion = new HTMLElementImpl('span');
         $this->formElement->insertHTMLElement($this->notion);
     }
 

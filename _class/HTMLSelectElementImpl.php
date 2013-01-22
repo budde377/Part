@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/HTMLElementImpl.php';
+require_once dirname(__FILE__) . '/HTMLOptionElementImpl.php';
 require_once dirname(__FILE__) . '/../_interface/HTMLSelectElement.php';
 /**
  * Created by JetBrains PhpStorm.
@@ -86,13 +87,11 @@ class HTMLSelectElementImpl implements HTMLSelectElement
      * @param string $value
      * @param string $group_id
      * @param array $attributes
-     * @return HTMLElement
+     * @return HTMLOptionElement
      */
     public function insertOption($text, $value, $group_id = null, array $attributes = array())
     {
-        $attributes['value'] = $value;
-        $option = new HTMLElementImpl('option',$attributes);
-        $option->insertString($text);
+        $option = new HTMLOptionElementImpl($text,$value,$group_id,$attributes);
         if($group_id != null && isset($this->groups[$group_id])){
             /** @var $group HTMLElement */
             $group = $this->groups[$group_id];

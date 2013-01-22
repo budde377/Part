@@ -14,7 +14,7 @@ interface HTMLSelectElement extends HTMLElement
      * @param string $value
      * @param string $group_id
      * @param array $attributes
-     * @return HTMLElement
+     * @return HTMLOptionElement
      */
     public function insertOption($text, $value, $group_id = null, array $attributes = array());
 
