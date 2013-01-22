@@ -120,9 +120,7 @@ class CurrentPageStrategyImpl implements CurrentPageStrategy
      */
     public function getCurrentPage()
     {
-
         $pageArray = $this->getCurrentPagePath();
-
         return array_pop($pageArray);
 
 

@@ -3,7 +3,7 @@ import "dart:html";
 import "dart:json";
 import "dart:uri" as Uri;
 import "dart:math" as Math;
-
+import "dart:isolate";
 
 class Animation {
 
@@ -61,13 +61,14 @@ class BetterSelect {
     _initialize();
   }
 
-  void _initialize() {
+  String selectedString() => element.query("option") != null ? Strings.join(element.selectedOptions.map((Node n) => n.text), ", ") : "";
 
+  void _initialize() {
     container = new DivElement();
     container.classes.add("better_select");
     currentSelection = new DivElement();
     currentSelection.classes.add("current_selection");
-    currentSelection.text = element.value;
+    currentSelection.text = selectedString();
     arrow = new DivElement();
     arrow.classes.add("arrow_down");
     currentSelection.children.add(arrow);
@@ -78,7 +79,7 @@ class BetterSelect {
     container.children.add(currentSelection);
     container.style.width = "${element.offsetWidth}px";
     element.on.change.add((event) {
-      currentSelection.text = element.value;
+      currentSelection.text = selectedString();
       currentSelection.children.add(arrow);
     });
   }
@@ -86,6 +87,7 @@ class BetterSelect {
 
 class ChangeableList {
   Element element;
+  LIElement currentlyDragging;
   List<LIElement> lis;
 
   ChangeableList.unorderetList(UListElement listElement) {
@@ -101,49 +103,54 @@ class ChangeableList {
   void _initialize() {
     lis = element.queryAll("li");
 
+
+    element.on["update_list"].add((CustomEvent event) {
+      element.queryAll('li.new').forEach((LIElement li){
+        li.classes.remove('new');
+        _makeDraggable(li);
+        lis = element.queryAll("li");
+      });
+    });
+
+
+    lis.forEach((LIElement li) {
+
+      _makeDraggable(li);
+
+    });
+  }
+
+  void _makeDraggable(LIElement li) {
     Element handle;
-    LIElement currentlyDragging;
+    if ((handle = li.query(".handle")) == null) {
+      handle = new DivElement();
+      handle.classes.add("handle");
+      li.children.add(handle);
+    }
 
-    lis.forEach((e) {
-      int y, startY;
-      if ((handle = e.query(".handle")) == null) {
-        handle = new DivElement();
-        handle.classes.add("handle");
-        e.children.add(handle);
-      }
-      String width, height;
-      e.computedStyle.then((style) {
-        width = style.width;
-        height = style.height;
-      });
-      handle.on.mouseDown.add((event) {
+    handle.on.mouseDown.add((MouseEvent me) {
+      int y = 0, startY = me.pageY;
+      _resetLI(currentlyDragging);
+      li.classes.add("dragging");
+      currentlyDragging = li;
+      Element shadow = _addShadow(me.pageX, me.pageY);
+      shadow.on.mouseUp.add((event) {
+        _reorderLIs(lis);
+        _removeShadow();
         _resetLI(currentlyDragging);
-        e.classes.add("dragging");
-
-        currentlyDragging = e;
-        MouseEvent me = event;
-        startY = me.pageY;
-        y = 0;
-        Element shadow = _addShadow(me.pageX, me.pageY);
-        shadow.on.mouseUp.add((event) {
-          _reorderLIs(lis);
-          _removeShadow();
-          _resetLI(currentlyDragging);
-          currentlyDragging = null;
-          y = startY = 0;
-        });
-        int offset = e.offsetTop;
-        int offsetBottom = offset - element.clientHeight + e.clientHeight;
-        shadow.on.mouseMove.add((event) {
-          MouseEvent me = event;
-          if (currentlyDragging == e) {
-            int oldY = y;
-            y = Math.max(Math.min(startY - me.pageY, offset), offsetBottom);
-            e.style.top = "${-y}px";
-          }
-        });
-
+        currentlyDragging = null;
+        y = startY = 0;
       });
+      int offset = li.offsetTop;
+      int offsetBottom = offset - element.clientHeight + li.clientHeight;
+      shadow.on.mouseMove.add((MouseEvent me) {
+        if (currentlyDragging == li) {
+          int oldY = y;
+          y = Math.max(Math.min(startY - me.pageY, offset), offsetBottom);
+          li.style.top = "${-y}px";
+        }
+      });
+
     });
   }
 
@@ -243,7 +250,7 @@ class ChangeableList {
 
 class BetterForm {
   FormElement form;
-  DivElement filter = new DivElement();
+  SpanElement filter = new SpanElement();
   static String NOTION_TYPE_ERROR = "error";
   static String NOTION_TYPE_INFORMATION = "info";
   static String NOTION_TYPE_SUCCESS = "success";
@@ -255,11 +262,13 @@ class BetterForm {
 
 
   void setNotion(String message, String notion_type) {
+    print(notion_type);
     if (notion_type != NOTION_TYPE_SUCCESS && notion_type != NOTION_TYPE_ERROR && notion_type != NOTION_TYPE_INFORMATION) {
       return;
     }
+
     removeNotion();
-    DivElement notion = new DivElement();
+    SpanElement notion = new SpanElement();
     notion.classes.add(notion_type);
     notion.classes.add("notion");
     notion.text = message;
@@ -268,7 +277,7 @@ class BetterForm {
   }
 
   void removeNotion() {
-    form.queryAll("div.notion").forEach((Element e) {e.remove();});
+    form.queryAll("span.notion").forEach((Element e) {e.remove();});
 
   }
 
@@ -303,18 +312,15 @@ class AJAXForm extends BetterForm {
     req.on.readyStateChange.add((Event e) {
       if (req.readyState == 4) {
         super.unBlur();
-        if ((req.status == 200 || req.status == 0)) {
-          print(req.responseText);
-          try {
-            Map responseData = JSON.parse(req.responseText);
-            callbackSuccess(responseData);
+        print(req.responseText);
+        try {
+          Map responseData = JSON.parse(req.responseText);
+          callbackSuccess(responseData);
 
-          } catch(e) {
-            callbackError();
-          }
-        } else {
+        } catch(e) {
           callbackError();
         }
+
       }});
     form.on.submit.add((Event event) {
       super.blur();
@@ -329,5 +335,74 @@ class AJAXForm extends BetterForm {
     return Strings.join(map.keys.map((String s) => "${Uri.encodeUriComponent(s)}=${Uri.encodeUriComponent(map[s])}"), "&");
   }
 
+
+}
+
+class KeepAlive {
+  String address;
+  int interval;
+  Timer timer;
+  HttpRequest request;
+
+  KeepAlive(String address, [int intervalSeconds=60]) {
+    this.address = address;
+    this.interval = intervalSeconds * 1000;
+  }
+
+  void start() {
+    stop();
+    Function callback;
+    callback = (Timer timer) {
+      request = new HttpRequest.get(address, (request) {});
+      this.timer = new Timer(interval, callback);
+    };
+
+    timer = new Timer(interval, callback);
+  }
+
+  void stop() {
+    if (timer != null) {
+      timer.cancel();
+    }
+  }
+}
+
+class AJAXRequest {
+  String id;
+  Map<String, String> data;
+  Function callbackSuccess, callbackFailure;
+  HttpRequest request;
+
+  AJAXRequest(String id, Map<String, String> data, [void callbackSuccess(Map data), void callbackFailure()]) {
+    this.id = id;
+    this.data = data;
+    this.callbackSuccess = callbackSuccess == null ? (data) {} : callbackSuccess;
+    this.callbackFailure = callbackFailure == null ? () {} : callbackFailure;
+  }
+
+  void send() {
+    request = new HttpRequest();
+    request.on.readyStateChange.add((Event e) {
+      if (request.readyState == 4) {
+        print(request.responseText);
+        try {
+          Map response = JSON.parse(request.responseText);
+          callbackSuccess(response);
+        } catch(e) {
+          callbackFailure();
+        }
+
+      } else if (request.readyState == 4) {
+        callbackFailure();
+      }
+
+    });
+    request.open("POST", "/?ajax=1&ajax_id=$id");
+    FormData formData = new FormData(new FormElement());
+    data.forEach((String key, String value) {
+      formData.append(key, value);
+    });
+    request.send(formData);
+  }
 
 }

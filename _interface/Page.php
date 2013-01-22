@@ -110,4 +110,18 @@ interface Page
      */
     public function isEditable();
 
+    /**
+     * Check if given id is valid
+     * @param String $id
+     * @return bool
+     */
+    public function isValidId($id);
+
+    /**
+     * Check if given alias is valid
+     * @param String $alias
+     * @return bool
+     */
+    public function isValidAlias($alias);
+
 }

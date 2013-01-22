@@ -215,6 +215,13 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
 
     }
 
+    public function testSetAliasCanBeEmpty(){
+        $page = new PageImpl('somePage', $this->db);
+        $idRet = $page->setAlias('');
+        $this->assertTrue($idRet, 'setAlias did not return false');
+        $this->assertEquals('', $page->getAlias(), 'Did change alias');
+    }
+
 
     public function testMatchWillReturnTrueIfCurrentIDGiven()
     {
@@ -281,6 +288,15 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertTrue($observer1->hasBeenCalled());
         $this->assertTrue($page === $observer1->getLastCallSubject());
         $this->assertEquals(Page::EVENT_DELETE, $observer1->getLastCallType());
+    }
+
+    public function testValidatorWillValidate(){
+        $page = new PageImpl('testpage', $this->db);
+        $this->assertTrue($page->isValidAlias('/validAlias/'));
+        $this->assertFalse($page->isValidAlias('invalidAlias'));
+        $this->assertTrue($page->isValidId('validid'));
+        $this->assertFalse($page->isValidId('testpage'));
+
     }
 
     public function getSetUpOperation()

@@ -159,4 +159,34 @@ class StubUserImpl implements User
         $this->parent = $parent;
         return true;
     }
+
+    /**
+     * Will return TRUE if valid mail else FALSE
+     * @param string $mail
+     * @return bool
+     */
+    public function isValidMail($mail)
+    {
+        return true;
+    }
+
+    /**
+     * Will return TRUE if valid username else FALSE
+     * @param string $username
+     * @return bool
+     */
+    public function isValidUsername($username)
+    {
+        return true;
+    }
+
+    /**
+     * Will return TRUE if valid password else FALSE
+     * @param string $password
+     * @return bool
+     */
+    public function isValidPassword($password)
+    {
+        return true;
+    }
 }

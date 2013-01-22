@@ -104,12 +104,18 @@ class UserImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertFalse($ret, 'Did not return false');
     }
 
+    public function testSetUsernameToCurrentWillReturnTrue(){
+        $user = new UserImpl('root',$this->db);
+        $this->assertTrue($user->exists());
+        $this->assertTrue($user->setUsername($user->getUsername()));
+    }
+
     public function testSetUsernameNonUniqueWillReturnFalse()
     {
         $password = 'somePassword';
         $this->user->setMail('test@test.dk');
         $this->user->setPassword($password);
-        $ret = $this->user->setUsername('root', $password);
+        $ret = $this->user->setUsername('root');
         $this->assertFalse($ret, 'Did not return false');
     }
 

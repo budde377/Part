@@ -41,9 +41,8 @@ class UserPrivilegesImpl implements UserPrivileges
         if($this->addRootPrivilegeStatement == null){
             $this->addRootPrivilegeStatement = $this->connection->prepare("
               INSERT INTO UserPrivileges (username, rootPrivileges, sitePrivileges, pageId) VALUES (?,1,0,NULL)");
-            $this->addRootPrivilegeStatement->bindParam(1,$this->user->getUsername());
         }
-        $this->addRootPrivilegeStatement->execute();
+        $this->addRootPrivilegeStatement->execute(array($this->user->getUsername()));
         $this->rootPrivilege = 1;
     }
 
@@ -56,9 +55,8 @@ class UserPrivilegesImpl implements UserPrivileges
         if($this->addSitePrivilegeStatement == null){
             $this->addSitePrivilegeStatement = $this->connection->prepare("
               INSERT INTO UserPrivileges (username, rootPrivileges, sitePrivileges, pageId) VALUES (?,0,1,NULL)");
-            $this->addSitePrivilegeStatement->bindParam(1,$this->user->getUsername());
         }
-        $this->addSitePrivilegeStatement->execute();
+        $this->addSitePrivilegeStatement->execute(array($this->user->getUsername()));
         $this->sitePrivilege = 1;
     }
 
@@ -177,8 +175,7 @@ class UserPrivilegesImpl implements UserPrivileges
     {
         if(!$this->valuesHasBeenSet){
             $stm = $this->connection->prepare("SELECT * FROM UserPrivileges WHERE username = ?");
-            $stm->bindParam(1,$this->user->getUsername());
-            $stm->execute();
+            $stm->execute(array($this->user->getUsername()));
             foreach($stm->fetchAll(PDO::FETCH_ASSOC) as $row){
                 $this->rootPrivilege = $this->rootPrivilege || $row['rootPrivileges'] == 1;
                 $this->sitePrivilege = $this->sitePrivilege || $row['sitePrivileges'] == 1;

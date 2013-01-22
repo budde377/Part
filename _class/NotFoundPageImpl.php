@@ -13,7 +13,9 @@ class NotFoundPageImpl implements Page
 
     public function __construct()
     {
-        HTTPHeaderHelper::setHeaderStatusCode(HTTPHeaderHelper::HTTPHeaderStatusCode404);
+        if(!isset($_GET['ajax'],$_GET['ajax_id'])){
+            HTTPHeaderHelper::setHeaderStatusCode(HTTPHeaderHelper::HTTPHeaderStatusCode404);
+        }
     }
 
     /**
@@ -134,6 +136,26 @@ class NotFoundPageImpl implements Page
      * @return bool
      */
     public function isEditable()
+    {
+        return false;
+    }
+
+    /**
+     * Check if given id is valid
+     * @param String $id
+     * @return bool
+     */
+    public function isValidId($id)
+    {
+        return false;
+    }
+
+    /**
+     * Check if given alias is valid
+     * @param String $alias
+     * @return bool
+     */
+    public function isValidAlias($alias)
     {
         return false;
     }

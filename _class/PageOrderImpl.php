@@ -21,6 +21,9 @@ class PageOrderImpl implements PageOrder, Observer
     private $activePages = array();
     private $pageOrder = array();
 
+    /** @var PDOStatement */
+    private $deactivatePageStatement;
+
 
     public function __construct(DB $database)
     {
@@ -90,7 +93,7 @@ class PageOrderImpl implements PageOrder, Observer
      * @throws MalformedParameterException
      * @return bool
      */
-    public function setPageOrder(Page $page, $place, Page $parentPage = null)
+    public function setPageOrder(Page $page, $place = PageOrder::PAGE_ORDER_LAST, Page $parentPage = null)
     {
 
         if ($parentPage instanceof Page) {
@@ -189,9 +192,14 @@ class PageOrderImpl implements PageOrder, Observer
      */
     public function deactivatePage(Page $page)
     {
+        if($this->deactivatePageStatement == null){
+            $this->deactivatePageStatement = $this->connection->prepare("DELETE FROM PageOrder WHERE page_id = ?");
+        }
+
         if ($this->findPage($page) == 'active') {
             $this->inactivePages[$page->getID()] = $this->activePages[$page->getID()];
             unset($this->activePages[$page->getID()]);
+            $this->deactivatePageStatement->execute(array($page->getID()));
         }
     }
 

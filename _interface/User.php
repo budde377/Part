@@ -118,4 +118,25 @@ interface User
      */
     public function exists();
 
+    /**
+     * Will return TRUE if valid mail else FALSE
+     * @param string $mail
+     * @return bool
+     */
+    public function isValidMail($mail);
+
+    /**
+     * Will return TRUE if valid username else FALSE
+     * @param string $username
+     * @return bool
+     */
+    public function isValidUsername($username);
+
+    /**
+     * Will return TRUE if valid password else FALSE
+     * @param string $password
+     * @return bool
+     */
+    public function isValidPassword($password);
+
 }

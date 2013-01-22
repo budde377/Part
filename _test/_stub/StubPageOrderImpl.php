@@ -42,7 +42,7 @@ class StubPageOrderImpl implements PageOrder
      * @param null | Page $parentPage
      * @return bool
      */
-    public function setPageOrder(Page $page, $place, Page $parentPage = null)
+    public function setPageOrder(Page $page, $place = PageOrder::PAGE_ORDER_LAST, Page $parentPage = null)
     {
         return false;
     }

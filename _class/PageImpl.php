@@ -105,7 +105,7 @@ class PageImpl implements Page, Observable
             return true;
         }
 
-        if (!$this->validID($id) || $this->IDExists($id)) {
+        if (!$this->isValidId($id)) {
             return false;
         }
 
@@ -160,7 +160,7 @@ class PageImpl implements Page, Observable
      */
     public function setAlias($alias)
     {
-        if (@preg_match($alias, '') === false) {
+        if (!$this->isValidAlias($alias)) {
             return false;
         }
 
@@ -298,5 +298,25 @@ class PageImpl implements Page, Observable
     public function isEditable()
     {
         return true;
+    }
+
+    /**
+     * Check if given id is valid
+     * @param String $id
+     * @return bool
+     */
+    public function isValidId($id)
+    {
+        return $this->validID($id) && !$this->IDExists($id);
+    }
+
+    /**
+     * Check if given alias is valid
+     * @param String $alias
+     * @return bool
+     */
+    public function isValidAlias($alias)
+    {
+        return strlen($alias)==0 || @preg_match($alias,'') !== false;
     }
 }

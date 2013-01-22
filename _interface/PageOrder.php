@@ -13,6 +13,8 @@ interface PageOrder
     const LIST_INACTIVE = 2;
     const LIST_ALL = 3;
 
+    const PAGE_ORDER_LAST = -1;
+
     /**
      * @abstract
      * This will return pageOrder. If null is given, it will return top-level
@@ -36,7 +38,7 @@ interface PageOrder
      * @param null | Page $parentPage
      * @return bool
      */
-    public function setPageOrder(Page $page, $place,Page $parentPage = null);
+    public function setPageOrder(Page $page, $place = PageOrder::PAGE_ORDER_LAST,Page $parentPage = null);
 
 
     /**

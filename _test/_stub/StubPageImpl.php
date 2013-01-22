@@ -136,4 +136,24 @@ class StubPageImpl implements Page
     {
         return false;
     }
+
+    /**
+     * Check if given id is valid
+     * @param String $id
+     * @return bool
+     */
+    public function isValidId($id)
+    {
+        return false;
+    }
+
+    /**
+     * Check if given alias is valid
+     * @param String $alias
+     * @return bool
+     */
+    public function isValidAlias($alias)
+    {
+        return false;
+    }
 }

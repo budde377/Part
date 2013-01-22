@@ -160,6 +160,19 @@ class PageOrderImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertFalse($pageOrder->isActive($page));
     }
 
+    public function testDeactivatePageWillBePersistent(){
+        $pageOrder = new PageOrderImpl($this->db);
+        $activePages = $pageOrder->listPages(PageOrder::LIST_ACTIVE);
+        /** @var $page Page */
+        $page = array_pop($activePages);
+        $this->assertTrue($pageOrder->isActive($page));
+        $pageOrder->deactivatePage($page);
+        $this->assertFalse($pageOrder->isActive($page));
+        $pageOrder = new PageOrderImpl($this->db);
+        $newPage = $pageOrder->getPage($page->getID());
+        $this->assertFalse($pageOrder->isActive($newPage));
+    }
+
 
     public function testDeleteWillDeletePageAndReturnTrueOnSuccess()
     {
@@ -356,6 +369,21 @@ class PageOrderImplTest extends PHPUnit_Extensions_Database_TestCase
         $order = $pageOrder->getPageOrder();
         $this->assertTrue($order[1] === $page, 'Order was not set');
 
+    }
+
+
+    public function testSetPageLastWillSetPageLast(){
+
+        $pageOrder = new PageOrderImpl($this->db);
+        $page = $pageOrder->createPage('somePage');
+        $page2 = $pageOrder->createPage('somePage2');
+        $setPageRet = $pageOrder->setPageOrder($page,PageOrder::PAGE_ORDER_LAST);
+        $this->assertTrue($setPageRet, 'Did not return true');
+        $setPageRet = $pageOrder->setPageOrder($page2,PageOrder::PAGE_ORDER_LAST);
+        $this->assertTrue($setPageRet, 'Did not return true');
+        $order = $pageOrder->getPageOrder();
+        $this->assertTrue($order[1] === $page, 'Order was not set');
+        $this->assertTrue($order[2] === $page2, 'Order was not set');
     }
 
 

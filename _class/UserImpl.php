@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../_trait/RequestTrait.php';
+require_once dirname(__FILE__) . '/../_trait/ValidationTrait.php';
 require_once dirname(__FILE__) . '/../_interface/User.php';
 require_once dirname(__FILE__) . '/../_interface/Observable.php';
 /**
@@ -11,6 +12,7 @@ require_once dirname(__FILE__) . '/../_interface/Observable.php';
 class UserImpl implements User, Observable
 {
     use RequestTrait;
+    use ValidationTrait;
     private static $randomString = 'S6lmSif7i3gmoyPqoAoW';
 
     private $database;
@@ -74,12 +76,15 @@ class UserImpl implements User, Observable
     }
 
     /**
-     * Will set the username, if password is the current password and username is unique.
+     * Will set the username, if username is unique.
      * @param string $username
-     * @return bool FALSE if password does not match or username invalid, TRUE on success
+     * @return bool FALSE if username invalid, TRUE on success
      */
     public function setUsername($username)
     {
+        if($username == $this->username){
+            return true;
+        }
         if ($this->usernameExists($username)) {
             return false;
         }
@@ -109,7 +114,7 @@ class UserImpl implements User, Observable
      */
     public function setMail($mail)
     {
-        if (@preg_match('/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i', $mail) == 0) {
+        if (!$this->validMail($mail)) {
             return false;
         }
 
@@ -130,7 +135,7 @@ class UserImpl implements User, Observable
      */
     public function setPassword($password)
     {
-        if (!is_string($password) || strlen($password) == 0) {
+        if(!$this->isValidPassword($password)){
             return false;
         }
 
@@ -407,5 +412,35 @@ class UserImpl implements User, Observable
 
         }
         return $success;
+    }
+
+    /**
+     * Will return TRUE if valid mail else FALSE
+     * @param string $mail
+     * @return bool
+     */
+    public function isValidMail($mail)
+    {
+        return $this->validMail($mail);
+    }
+
+    /**
+     * Will return TRUE if valid username else FALSE
+     * @param string $username
+     * @return bool
+     */
+    public function isValidUsername($username)
+    {
+        return !$this->usernameExists($username);
+    }
+
+    /**
+     * Will return TRUE if valid password else FALSE
+     * @param string $password
+     * @return bool
+     */
+    public function isValidPassword($password)
+    {
+        return is_string($password) && strlen($password) > 0;
     }
 }
