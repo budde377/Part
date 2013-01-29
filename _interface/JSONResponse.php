@@ -10,18 +10,29 @@ require_once dirname(__FILE__).'/JSONElement.php';
 interface JSONResponse extends JSONElement
 {
     const RESPONSE_TYPE_SUCCESS = "success";
-    const RESPONSE_TYPE_INFORMATION = "information";
     const RESPONSE_TYPE_ERROR = "error";
 
-    const ERROR_CODE_NO_SUCH_METHOD = 1;
-    const ERROR_WRONG_PARAMETERS = 2;
+    const ERROR_CODE_NO_SUCH_FUNCTION = 1;
+    const ERROR_CODE_MISSING_ARGUMENT = 2;
     const ERROR_CODE_MALFORMED_REQUEST = 3;
+    const ERROR_CODE_PAGE_NOT_FOUND = 4;
+    const ERROR_CODE_PAGE_ORDER_PARTIAL_SET = 5;
+    const ERROR_CODE_INVALID_PAGE_ID = 6;
+    const ERROR_CODE_INVALID_PAGE_ALIAS = 7;
+    const ERROR_CODE_UNAUTHORISED = 8;
+    const ERROR_CODE_INVALID_PAGE_TITLE = 9;
+    const ERROR_CODE_INVALID_USER_NAME = 10;
+    const ERROR_CODE_USER_NOT_FOUND = 11;
+    const ERROR_CODE_INVALID_PRIVILEGES = 12;
+    const ERROR_CODE_INVALID_USER_MAIL = 13;
+    const ERROR_CODE_WRONG_PASSWORD = 14;
+    const ERROR_CODE_INVALID_PASSWORD = 15;
 
 
     /**
      * @return String
      */
-    public function getType();
+    public function getResponseType();
 
 
     /**
@@ -37,12 +48,12 @@ interface JSONResponse extends JSONElement
 
 
     /**
-     * @return String $id
+     * @return int | null
      */
     public function getID();
 
     /**
-     * @param String $id
+     * @param int | null $id
      * @return void
      */
     public function setID($id);
@@ -52,9 +63,5 @@ interface JSONResponse extends JSONElement
      */
     public function getErrorCode();
 
-    /**
-     * @return string
-     */
-    public function getErrorMessage();
 
 }

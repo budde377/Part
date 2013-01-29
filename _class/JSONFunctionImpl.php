@@ -52,6 +52,6 @@ class JSONFunctionImpl implements JSONFunction
     public function call(array $args = array())
     {
         $call = $this->callFunction;
-        return $call($args);
+        return call_user_func_array($call,$args);
     }
 }

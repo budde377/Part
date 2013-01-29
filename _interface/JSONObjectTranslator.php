@@ -8,10 +8,11 @@
  */
 interface JSONObjectTranslator
 {
+
     /**
      * This will encode a object matching the current JSONObject into a JSONObject
      * @param $object
-     * @return JSONObject
+     * @return JSONObject | bool Will return JSONObject on success else FALSE
      */
     public function encode($object);
 

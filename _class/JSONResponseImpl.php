@@ -10,16 +10,14 @@ require_once dirname(__FILE__) . '/../_interface/JSONResponse.php';
 class JSONResponseImpl implements JSONResponse
 {
     private $errorCode;
-    private $errorMessage;
     private $type;
     private $id;
     /** @var JSONObject | String */
     private $payload;
 
-    function __construct($type = JSONResponse::RESPONSE_TYPE_INFORMATION, $errorCode = null, $errorMessage = null)
+    function __construct($type = JSONResponse::RESPONSE_TYPE_SUCCESS, $errorCode = null)
     {
         $this->type = $type;
-        $this->errorMessage = $errorMessage;
         $this->errorCode = $errorCode;
     }
 
@@ -38,30 +36,40 @@ class JSONResponseImpl implements JSONResponse
     public function getAsArray()
     {
         $returnArray = array();
-        $returnArray['type'] = $this->type;
+        $returnArray['type'] = 'response';
+        $returnArray['response_type'] = $this->type;
 
-        if($this->errorMessage != null){
-            $returnArray['error_message'] = $this->errorMessage;
-        }
         if($this->errorCode != null){
             $returnArray['error_code'] = $this->errorCode;
         }
         if($this->payload != null){
-            if($this->payload instanceof JSONObject){
-                $returnArray['payload'] = $this->payload->getAsArray();
-            } else{
-                $returnArray['payload'] = $this->payload;
-            }
+            $returnArray['payload'] = $this->generatePayloadArray($this->payload);
+        }
+        if($this->id != null){
+            $returnArray['id'] = $this->id;
         }
 
-
         return $returnArray;
+    }
+
+    private function generatePayloadArray($payload){
+        if(is_scalar($payload)){
+            return $payload;
+        } else if($payload instanceof JSONObject){
+            return $payload->getAsArray();
+        } else {
+            $returnArray = array();
+            foreach($payload as $key=>$val){
+                $returnArray[$key] = $this->generatePayloadArray($val);
+            }
+            return $returnArray;
+        }
     }
 
     /**
      * @return String
      */
-    public function getType()
+    public function getResponseType()
     {
         return $this->type;
     }
@@ -72,11 +80,24 @@ class JSONResponseImpl implements JSONResponse
      */
     public function setPayload($payload)
     {
-        if (!is_scalar($payload) && !($payload instanceof JSONObject)) {
+        if(!$this->checkPayload($payload)){
             return;
         }
 
         $this->payload = $payload;
+    }
+
+    private function checkPayload($payload){
+        if(is_scalar($payload) || $payload instanceof JSONObject){
+            return true;
+        } else if (is_array($payload)){
+            $ok_array = true;
+            foreach($payload as $val){
+                $ok_array = $ok_array && $this->checkPayload($val);
+            }
+            return $ok_array;
+        }
+        return false;
     }
 
     /**
@@ -88,7 +109,7 @@ class JSONResponseImpl implements JSONResponse
     }
 
     /**
-     * @return String $id
+     * @return int | null
      */
     public function getID()
     {
@@ -96,12 +117,12 @@ class JSONResponseImpl implements JSONResponse
     }
 
     /**
-     * @param String $id
+     * @param int | null $id
      * @return void
      */
     public function setID($id)
     {
-        $this->id = $id;
+        $this->id = intval($id);
     }
 
     /**
@@ -110,14 +131,6 @@ class JSONResponseImpl implements JSONResponse
     public function getErrorCode()
     {
         return $this->errorCode;
-    }
-
-    /**
-     * @return string
-     */
-    public function getErrorMessage()
-    {
-        return $this->errorMessage;
     }
 
 

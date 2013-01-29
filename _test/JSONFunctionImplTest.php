@@ -45,9 +45,10 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase
     }
 
     public function testCallWillCallByReference(){
-        $function = new JSONFunctionImpl($this->functionName,function(array $args){return $args;});
+        $function = new JSONFunctionImpl($this->functionName,function($a){return $a;});
         $callArgs = array("test");
-        $this->assertEquals(0,count(array_diff($callArgs,$function->call($callArgs))));
+        $this->assertEquals("test",$function->call($callArgs));
     }
+
 
 }
