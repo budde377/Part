@@ -47,8 +47,7 @@ class WebsiteImpl implements Website
         $ajaxRegister = $this->backendContainer->getAJAXRegisterInstance();
 
         //Decide output mode
-        if($this->GETValueOfIndexIfSetElseDefault('ajax',null) !== null &&
-            ($id = $this->GETValueOfIndexIfSetElseDefault('ajax_id',null)) !== null &&
+        if(($id = $this->GETValueOfIndexIfSetElseDefault('ajax',null)) !== null &&
             ($ajax = $ajaxRegister->getAJAXFromRegistered($id)) !== null){
             echo $ajax;
         } else {

@@ -61,7 +61,7 @@ class StubUserLibraryImpl implements UserLibrary
     {
         foreach($this->userList as $user){
             /** @var $user User */
-            if($user instanceof User && $user->getUsername() == $user){
+            if($user instanceof User && $user->getUsername() == $username){
                 return $user;
             }
 
