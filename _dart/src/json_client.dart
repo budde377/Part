@@ -23,7 +23,7 @@ class AJAXJSONClient extends JSONClient {
   AJAXJSONClient._internal(this.ajaxID);
 
   void _setUpRequest(HttpRequest request) {
-    request.on.readyStateChange.add((Event e) {
+    request.onReadyStateChange.listen((Event e) {
       if (request.readyState != 4) {
         return;
       }

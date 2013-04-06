@@ -2,24 +2,18 @@ part of core;
 
 class KeepAlive {
   String address;
-  int interval;
+  Duration interval;
   Timer _timer;
-  HttpRequest _request;
 
   KeepAlive({String address: "/", int intervalSeconds:60}) {
     this.address = address;
-    this.interval = intervalSeconds * 1000;
+    interval = new Duration(seconds:intervalSeconds);
   }
 
   void start() {
     stop();
-    Function callback;
-    callback = (Timer timer) {
-      request = new HttpRequest.get(address, (request) {});
-      this._timer = new Timer(interval, callback);
-    };
+    _timer = new Timer.periodic(interval, (Timer timer){HttpRequest.getString(address);});
 
-    _timer = new Timer(interval, callback);
   }
 
   void stop() {

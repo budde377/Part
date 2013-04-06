@@ -3,10 +3,9 @@ part of json;
 class JSONFunction {
   final Map arguments = new Map();
   final String name;
-  final int id = new Date.now().millisecondsSinceEpoch;
+  final int id = new DateTime.now().millisecondsSinceEpoch;
 
   JSONFunction(String name):this.name = name;
-
   String get jsonString => JSON.stringify({"type":"function", "name":name, "id":id, "args":arguments});
 }
 

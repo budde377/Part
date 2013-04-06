@@ -15,11 +15,13 @@ abstract class PageOrder {
 
   List<Page> get inactivePages;
 
+  Map<String, Page> get pages;
+
   bool pageExists(String page_id);
 
   void deactivatePage(String page_id, [ChangeCallback callback]);
 
-  void changePageOrder(List<String> user_id_list, [ChangeCallback callback]);
+  void changePageOrder(List<String> page_id_list, [ChangeCallback callback]);
 
   void registerListener(PageOrderChangeListener listener);
 
@@ -34,7 +36,7 @@ class JSONPageOrder extends PageOrder {
   JSONClient _client;
   bool _hasBeenSetUp = false;
   final Map<String, Page> _pages = <String, Page>{};
-  List<String> _pageOrder = <String>[];
+  List<String> _pageOrder = new List<String>();
   final List<PageOrderChangeListener> _listeners = <PageOrderChangeListener>[];
 
 
@@ -119,14 +121,25 @@ class JSONPageOrder extends PageOrder {
       if (callback != null) {
         callback(response.type, response.error_code);
       }
-      if (RESPONSE_TYPE_SUCCESS) {
+      if (response.type == RESPONSE_TYPE_SUCCESS) {
+        _removeFromPageOrder(page_id);
         _callListeners(PAGE_ORDER_CHANGE_DEACTIVATE, _pages[page_id]);
       }
     });
   }
 
-  void changePageOrder(List<String> user_id_list, [ChangeCallback callback]) {
-    var function = new SetPageOrderJSONFunction(user_id_list);
+  void _removeFromPageOrder(String id) {
+    var newPageOrder = new List<String>();
+    _pageOrder.forEach((String s) {
+      if (id != s) {
+        newPageOrder.add(s);
+      }
+    });
+    _pageOrder = newPageOrder;
+  }
+
+  void changePageOrder(List<String> page_id_list, [ChangeCallback callback]) {
+    var function = new SetPageOrderJSONFunction(page_id_list);
     var functionCallback = (JSONResponse response) {
       if (callback != null) {
         callback(response.type, response.error_code);
@@ -139,7 +152,9 @@ class JSONPageOrder extends PageOrder {
     _client.callFunction(function, functionCallback);
   }
 
-  List<Page> get activePages => _pageOrder.mappedBy((String id) => _pages[id]).toList();
+  Map<String, Page> get pages => new Map<String, Page>.from(_pages);
+
+  List<Page> get activePages => _pageOrder.map((String id) => _pages[id]).toList();
 
   List<Page> get inactivePages {
     var map = new Map.from(_pages);
@@ -185,7 +200,7 @@ class JSONPageOrder extends PageOrder {
       if (response.type == RESPONSE_TYPE_SUCCESS) {
         var page = _pages[id];
         _pages.remove(id);
-        _pageOrder.remove(id);
+        _removeFromPageOrder(id);
         _callListeners(PAGE_ORDER_CHANGE_DELETE_PAGE, page);
       }
 

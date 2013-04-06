@@ -8,7 +8,6 @@ class JSONObject {
 
   String get jsonString => JSON.stringify({"type":"object", "name":name, "variables":variables});
 
-
 }
 
 class PageJSONObject extends JSONObject {

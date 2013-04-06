@@ -12,6 +12,7 @@ part "src/core_slide_decoration.dart";
 part "src/core_input_validator.dart";
 part "src/core_validating_form.dart";
 part "src/core_keep_alive.dart";
+part "src/core_form_decoration.dart";
 
 class BetterSelect {
   SelectElement _element;
@@ -22,14 +23,14 @@ class BetterSelect {
     _initialize();
   }
 
-  String selectedString() => _element.query("option") != null ? Strings.join(_element.selectedOptions.mappedBy((Node n) => n.text), ", ") : "";
+  String get selectedString => _element.query("option") != null ? _element.selectedOptions.map((Node n) => n.text).join(", ") : "";
 
   void _initialize() {
     _container = new DivElement();
     _container.classes.add("better_select");
     _currentSelection = new DivElement();
     _currentSelection.classes.add("current_selection");
-    _currentSelection.text = selectedString();
+    _currentSelection.text = selectedString;
     _arrow = new DivElement();
     _arrow.classes.add("arrow_down");
     _currentSelection.children.add(_arrow);
@@ -39,8 +40,8 @@ class BetterSelect {
     _container.children.add(_element);
     _container.children.add(_currentSelection);
     _container.style.width = "${_element.offsetWidth}px";
-    _element.on.change.add((event) {
-      _currentSelection.text = selectedString();
+    _element.onChange.listen((event) {
+      _currentSelection.text = selectedString;
       _currentSelection.children.add(_arrow);
     });
   }
@@ -65,8 +66,8 @@ class ChangeableList {
     lis = element.queryAll("li");
 
 
-    element.on["update_list"].add((CustomEvent event) {
-      element.queryAll('li.new').forEach((LIElement li){
+    element.on["update_list"].listen((CustomEvent event) {
+      element.queryAll('li.new').forEach((LIElement li) {
         li.classes.remove('new');
         _makeDraggable(li);
         lis = element.queryAll("li");
@@ -89,13 +90,13 @@ class ChangeableList {
       li.children.add(handle);
     }
 
-    handle.on.mouseDown.add((MouseEvent me) {
+    handle.onMouseDown.listen((MouseEvent me) {
       int y = 0, startY = me.pageY;
       _resetLI(currentlyDragging);
       li.classes.add("dragging");
       currentlyDragging = li;
       Element shadow = _addShadow(me.pageX, me.pageY);
-      shadow.on.mouseUp.add((event) {
+      shadow.onMouseUp.listen((event) {
         _reorderLIs(lis);
         _removeShadow();
         _resetLI(currentlyDragging);
@@ -104,7 +105,7 @@ class ChangeableList {
       });
       int offset = li.offsetTop;
       int offsetBottom = offset - element.clientHeight + li.clientHeight;
-      shadow.on.mouseMove.add((MouseEvent me) {
+      shadow.onMouseMove.listen((MouseEvent me) {
         if (currentlyDragging == li) {
           int oldY = y;
           y = Math.max(Math.min(startY - me.pageY, offset), offsetBottom);
@@ -130,7 +131,7 @@ class ChangeableList {
     document.body.children.add(shadow);
     shadow.style.left = "${x - 25}px";
     shadow.style.top = "${y - 25}px";
-    document.on.mouseMove.add((event) {
+    document.onMouseMove.listen((event) {
       MouseEvent me = event;
       shadow.style.left = "${me.pageX - 25}px";
       shadow.style.top = "${me.pageY - 25}px";
@@ -159,7 +160,7 @@ class ChangeableList {
     });
     if (!same) {
       this.lis = lis;
-      element.on.change.dispatch(new Event("change", true, false));
+      element.dispatchEvent(new Event("change", canBubble: true, cancelable:false));
     }
   }
 
@@ -209,58 +210,13 @@ class ChangeableList {
   }
 }
 
-class BetterForm {
-  FormElement form;
-  SpanElement filter = new SpanElement();
-  static String NOTION_TYPE_ERROR = "error";
-  static String NOTION_TYPE_INFORMATION = "info";
-  static String NOTION_TYPE_SUCCESS = "success";
-
-  BetterForm(FormElement form) {
-    this.form = form;
-    filter.classes.add('filter');
-  }
-
-
-  void setNotion(String message, String notion_type) {
-    print(notion_type);
-    if (notion_type != NOTION_TYPE_SUCCESS && notion_type != NOTION_TYPE_ERROR && notion_type != NOTION_TYPE_INFORMATION) {
-      return;
-    }
-
-    removeNotion();
-    SpanElement notion = new SpanElement();
-    notion.classes.add(notion_type);
-    notion.classes.add("notion");
-    notion.text = message;
-    form.insertAdjacentElement("afterBegin", notion);
-
-  }
-
-  void removeNotion() {
-    form.queryAll("span.notion").forEach((Element e) {e.remove();});
-
-  }
-
-  void blur() {
-    form.classes.add("blur");
-    form.insertAdjacentElement("afterBegin", filter);
-
-  }
-
-  void unBlur() {
-    form.classes.remove("blur");
-    filter.remove();
-  }
-
-}
-
-class AJAXForm extends BetterForm {
+/* Deprecated, use FormDecoration with setUpAJAXSubmit instead
+class AJAXForm implements FormDecoration {
 
   String id;
   Function callbackSuccess, callbackError;
 
-  AJAXForm(FormElement form, String id, [void callbackSuccess(Map map), void callbackError()]) : super(form) {
+  AJAXForm(FormElement form, String id, [void callbackSuccess(Map map), void callbackError()])  {
     this.id = id;
     this.callbackSuccess = callbackSuccess == null ? (Map map) {} : callbackSuccess;
     this.callbackError = callbackError == null ? () {} : callbackError;
@@ -270,7 +226,7 @@ class AJAXForm extends BetterForm {
   void _initialize() {
 
     HttpRequest req = new HttpRequest();
-    req.on.readyStateChange.add((Event e) {
+    req.onReadyStateChange.listen((Event e) {
       if (req.readyState == 4) {
         super.unBlur();
         print(req.responseText);
@@ -283,7 +239,7 @@ class AJAXForm extends BetterForm {
         }
 
       }});
-    form.on.submit.add((Event event) {
+    form.onSubmit.listen((Event event) {
       super.blur();
       List<Element> elements = queryAll("textarea, input:not([type=submit]), select");
       req.open(form.method.toUpperCase(), "?ajax=${Uri.encodeUriComponent(id)}");
@@ -293,12 +249,13 @@ class AJAXForm extends BetterForm {
   }
 
   String generateDataString(Map<String, String> map) {
-    return Strings.join(map.keys.mappedBy((String s) => "${Uri.encodeUriComponent(s)}=${Uri.encodeUriComponent(map[s])}"), "&");
+    return map.keys.map((String s) => "${Uri.encodeUriComponent(s)}=${Uri.encodeUriComponent(map[s])}").join("&");
   }
 
 
 }
 
+*/
 
 
 class AJAXRequest {
@@ -316,7 +273,7 @@ class AJAXRequest {
 
   void send() {
     request = new HttpRequest();
-    request.on.readyStateChange.add((Event e) {
+    request.onReadyStateChange.listen((Event e) {
       if (request.readyState == 4) {
         print(request.responseText);
         try {

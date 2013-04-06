@@ -20,25 +20,39 @@ class ValidatingForm {
 
   void _setUp() {
 
-    _element.on.submit.add((Event e) {
+    _element.onSubmit.listen((Event e) {
+      print(1);
       if (_element.classes.contains('invalid')) {
         e.preventDefault();
+        e.stopImmediatePropagation();
       }
-    }, true);
+    }); //There used to be a sencond parameter, properly for execution on the way back or something. That is missing
 
     var inputs = _element.queryAll('input:not([type=submit]), textarea');
     inputs.forEach((Element element) {
       element.classes.add('valid');
-      element.on.keyUp.add((Event e) => _checkElement(element));
-      _checkElement(element);
+      element.onKeyUp.listen((Event e) => _checkElement(element));
     });
     var selects = _element.queryAll('select');
     selects.forEach((Element element) {
       element.classes.add('valid');
-      element.on.change.add((Event e) => _checkElement(element));
-      _checkElement(element);
+      element.onChange.listen((Event e) => _checkElement(element));
     });
     _element.classes.add('initial');
+  }
+
+  void validate([bool initial = true]){
+    var inputs = _element.queryAll('input:not([type=submit]), textarea');
+    inputs.forEach((Element element) {
+      _checkElement(element);
+    });
+    var selects = _element.queryAll('select');
+    selects.forEach((Element element) {
+      _checkElement(element);
+    });
+    if(initial){
+      _element.classes.add('initial');
+    }
   }
 
   void _checkElement(Element element) {
