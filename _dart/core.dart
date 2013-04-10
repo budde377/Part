@@ -1,21 +1,36 @@
 library core;
+
 import "dart:html";
+
 import "dart:json";
+
 import "dart:uri" as Uri;
+
 import "dart:math" as Math;
+
 import "dart:isolate";
+
 import "dart:async";
+
 import "pcre_syntax_checker.dart";
+
 part "src/core_animation.dart";
+
 part "src/core_expand_decoration.dart";
+
 part "src/core_slide_decoration.dart";
+
 part "src/core_input_validator.dart";
+
 part "src/core_validating_form.dart";
+
 part "src/core_keep_alive.dart";
+
 part "src/core_form_decoration.dart";
 
 class BetterSelect {
   SelectElement _element;
+
   DivElement _container, _arrow, _currentSelection;
 
   BetterSelect(SelectElement element) {
@@ -48,10 +63,41 @@ class BetterSelect {
 }
 
 class ChangeableList {
-  Element element;
+  final Element element;
+
   LIElement currentlyDragging;
+
   List<LIElement> lis;
 
+  static Map<Element, ChangeableList> _cache;
+
+  factory ChangeableList.unorderedList(UListElement listElement){
+    return _redeemList(listElement);
+  }
+
+  factory ChangeableList.orderedList(OListElement listElement){
+    return _redeemList(listElement);
+  }
+
+  static ChangeableList _redeemList(Element listElement){
+    if (_cache == null) {
+      _cache = new Map<Element, ChangeableList>();
+    }
+
+    if (_cache.containsKey(listElement)) {
+      return _cache[listElement];
+    } else {
+      var list = new ChangeableList._internal(listElement);
+      _cache[listElement] = list;
+      return list;
+    }
+  }
+
+  ChangeableList._internal(this.element){
+    _initialize();
+  }
+
+/*
   ChangeableList.unorderetList(UListElement listElement) {
     element = listElement;
     _initialize();
@@ -61,16 +107,19 @@ class ChangeableList {
     element = listElement;
     _initialize();
   }
+*/
+
+  List<LIElement> _findLIList() => element.children.where((Element e) => e.tagName == "LI").toList();
 
   void _initialize() {
-    lis = element.queryAll("li");
+    lis = _findLIList();
 
 
     element.on["update_list"].listen((CustomEvent event) {
-      element.queryAll('li.new').forEach((LIElement li) {
+      element.children.where((Element e) => e.tagName == "LI" && e.classes.contains("new")).forEach((LIElement li) {
         li.classes.remove('new');
         _makeDraggable(li);
-        lis = element.queryAll("li");
+        lis = _findLIList();
       });
     });
 
@@ -84,7 +133,7 @@ class ChangeableList {
 
   void _makeDraggable(LIElement li) {
     Element handle;
-    if ((handle = li.query(".handle")) == null) {
+    if ((handle = li.children.firstWhere((Element c) => c.classes.contains('handle'), orElse:() => null)) == null) {
       handle = new DivElement();
       handle.classes.add("handle");
       li.children.add(handle);
@@ -260,15 +309,20 @@ class AJAXForm implements FormDecoration {
 
 class AJAXRequest {
   String id;
+
   Map<String, String> data;
+
   Function callbackSuccess, callbackFailure;
+
   HttpRequest request;
 
   AJAXRequest(String id, Map<String, String> data, [void callbackSuccess(Map data), void callbackFailure()]) {
     this.id = id;
     this.data = data;
-    this.callbackSuccess = callbackSuccess == null ? (data) {} : callbackSuccess;
-    this.callbackFailure = callbackFailure == null ? () {} : callbackFailure;
+    this.callbackSuccess = callbackSuccess == null ? (data) {
+    } : callbackSuccess;
+    this.callbackFailure = callbackFailure == null ? () {
+    } : callbackFailure;
   }
 
   void send() {

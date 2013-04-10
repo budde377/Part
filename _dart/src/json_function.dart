@@ -49,8 +49,9 @@ class DeactivatePageJSONFunction extends JSONFunction {
 class SetPageOrderJSONFunction extends JSONFunction {
   static const POSITION_LAST = -1;
 
-  SetPageOrderJSONFunction(List<String> order):super('setPageOrder') {
+  SetPageOrderJSONFunction(String parent, List<String> order):super('setPageOrder') {
     this.arguments['order'] = order;
+    this.arguments['parent'] = parent;
   }
 }
 
