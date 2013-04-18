@@ -13,7 +13,7 @@ class NotFoundPageImpl implements Page
 
     public function __construct()
     {
-        if(!isset($_GET['ajax'],$_GET['ajax_id'])){
+        if(!isset($_GET['ajax'])){
             HTTPHeaderHelper::setHeaderStatusCode(HTTPHeaderHelper::HTTPHeaderStatusCode404);
         }
     }
@@ -158,5 +158,31 @@ class NotFoundPageImpl implements Page
     public function isValidAlias($alias)
     {
         return false;
+    }
+
+    /**
+     * @return bool Return TRUE if the page has been marked as hidden, else false
+     */
+    public function isHidden()
+    {
+        return false;
+    }
+
+    /**
+     * This will mark the page as hidden.
+     * If the page is already hidden, nothing will happen.
+     * @return void
+     */
+    public function hide()
+    {
+    }
+
+    /**
+     * This will un-mark the page as hidden, iff it is hidden.
+     * If the page is not hidden, nothing will happen.
+     * @return void
+     */
+    public function show()
+    {
     }
 }

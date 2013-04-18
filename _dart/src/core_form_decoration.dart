@@ -68,7 +68,7 @@ class FormDecoration {
     });
   }
 
-  void setNotion(String message, String notion_type) {
+  void changeNotion(String message, String notion_type) {
     if (notion_type != NOTION_TYPE_SUCCESS && notion_type != NOTION_TYPE_ERROR && notion_type != NOTION_TYPE_INFORMATION) {
       return;
     }

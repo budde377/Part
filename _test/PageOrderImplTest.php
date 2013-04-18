@@ -173,6 +173,21 @@ class PageOrderImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertFalse($pageOrder->isActive($newPage));
     }
 
+    public function testDeactivatePageWillNotPerserverSubPageOrder(){
+        $pageOrder = new PageOrderImpl($this->db);
+        $page = $pageOrder->getPage('page');
+        $this->assertTrue($pageOrder->isActive($page));
+        $order = $pageOrder->getPageOrder($page);
+        $this->assertTrue(is_array($order));
+        $this->assertEquals(1,count($order));
+        $subPage = array_pop($order);
+        $this->assertInstanceOf('Page',$subPage);
+        $pageOrder->deactivatePage($page);
+        $this->assertFalse($pageOrder->isActive($subPage));
+        $pageOrder->setPageOrder($page);
+        $this->assertFalse($pageOrder->isActive($subPage));
+    }
+
 
     public function testDeleteWillDeletePageAndReturnTrueOnSuccess()
     {
@@ -294,7 +309,6 @@ class PageOrderImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals('page', $page->getID());
 
     }
-
 
     public function testGetPageOrderWithParentPageWillReturnArrayWithPageOrder()
     {

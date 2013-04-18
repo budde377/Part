@@ -13,6 +13,25 @@ interface Page
     const EVENT_DELETE = 2;
 
     /**
+     * @return bool Return TRUE if the page has been marked as hidden, else false
+     */
+    public function isHidden();
+
+    /**
+     * This will mark the page as hidden.
+     * If the page is already hidden, nothing will happen.
+     * @return void
+     */
+    public function hide();
+
+    /**
+     * This will un-mark the page as hidden, iff it is hidden.
+     * If the page is not hidden, nothing will happen.
+     * @return void
+     */
+    public function show();
+
+    /**
      * @abstract
      * @return string
      */

@@ -50,7 +50,7 @@ class AJAXJSONClient extends JSONClient {
     }
     var request = new HttpRequest();
     _setUpRequest(request);
-    request.open("POST", "/?ajax=$ajaxID");
+    request.open("POST", "?ajax=$ajaxID");
     request.send(function.jsonString);
   }
 

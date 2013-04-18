@@ -9,14 +9,21 @@ require_once dirname(__FILE__).'/JSONObjectImpl.php';
  */
 class PageJSONObjectImpl extends JSONObjectImpl
 {
-    function __construct($id,$title = '',$template = '',$alias='')
+    /**
+     * @param String $id
+     * @param string $title
+     * @param string $template
+     * @param string $alias
+     * @param bool $hidden
+     */
+    function __construct($id,$title = '',$template = '',$alias='',$hidden=false)
     {
         parent::__construct('page');
         $this->setVariable('id',$id);
         $this->setVariable('title',$title);
         $this->setVariable('template',$template);
         $this->setVariable('alias',$alias);
-
+        $this->setVariable('hidden',$hidden);
     }
 
 

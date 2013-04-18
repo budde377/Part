@@ -18,6 +18,8 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
     private $db;
     /** @var $pdo PDO */
     private $pdo;
+    /** @var $page PageImpl */
+    private $testPage;
 
     public function setUp()
     {
@@ -25,6 +27,7 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->pdo = new PDO('mysql:dbname=' . self::database . ';host=' . self::host, self::username, self::password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
         $this->db = new StubDBImpl();
         $this->db->setConnection($this->pdo);
+        $this->testPage = new PageImpl('testpage',$this->db);
     }
 
 
@@ -84,8 +87,7 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
 
     public function testExistsWillBeTrueIfPageExistsInDatabase()
     {
-        $page = new PageImpl('testpage', $this->db);
-        $this->assertTrue($page->exists(), 'Was not true');
+        $this->assertTrue($this->testPage->exists(), 'Was not true');
 
     }
 
@@ -108,17 +110,16 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
 
     public function testCreateWillReturnTrueIfEntranceExists()
     {
-        $page = new PageImpl('testpage', $this->db);
-        $this->assertTrue($page->exists(), 'Did not exists');
-        $this->assertFalse($page->create(), 'Did not return true when exists');
+
+        $this->assertTrue($this->testPage->exists(), 'Did not exists');
+        $this->assertFalse($this->testPage->create(), 'Did not return true when exists');
     }
 
     public function testDeleteWillReturnTrueOnSuccess()
     {
-        $page = new PageImpl('testpage', $this->db);
-        $this->assertTrue($page->exists(), 'Did not exist');
-        $deleteRet = $page->delete();
-        $this->assertFalse($page->exists(), 'Did not delete');
+        $this->assertTrue($this->testPage->exists(), 'Did not exist');
+        $deleteRet = $this->testPage->delete();
+        $this->assertFalse($this->testPage->exists(), 'Did not delete');
         $this->assertTrue($deleteRet, 'Did not return true');
     }
 
@@ -131,23 +132,21 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
 
     public function testGetsWillMatchThatOfDatabase()
     {
-        $page = new PageImpl('testpage', $this->db);
-        $this->assertEquals('title', $page->getTitle());
-        $this->assertEquals('template', $page->getTemplate());
-        $this->assertEquals('alias', $page->getAlias());
-        $this->assertEquals('testpage', $page->getID());
+        $this->assertEquals('title', $this->testPage->getTitle());
+        $this->assertEquals('template', $this->testPage->getTemplate());
+        $this->assertEquals('alias', $this->testPage->getAlias());
+        $this->assertEquals('testpage', $this->testPage->getID());
     }
 
 
     public function testSetsWillBePersistent()
     {
-        $page = new PageImpl('testpage', $this->db);
-        $this->assertTrue($page->exists(), 'Page did not exists');
+        $this->assertTrue($this->testPage->exists(), 'Page did not exists');
         $newString = 'string';
-        $page->setAlias('/' . $newString . '/');
-        $page->setID($newString);
-        $page->setTemplate($newString);
-        $page->setTitle($newString);
+        $this->testPage->setAlias('/' . $newString . '/');
+        $this->testPage->setID($newString);
+        $this->testPage->setTemplate($newString);
+        $this->testPage->setTitle($newString);
 
         $newPage = new PageImpl('string', $this->db);
         $this->assertTrue($newPage->exists(), 'Did not exists');
@@ -200,10 +199,9 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
 
     public function testSetIDToCurrentIDReturnTrue()
     {
-        $page = new PageImpl('testpage', $this->db);
-        $idRet = $page->setID('testpage');
+        $idRet = $this->testPage->setID('testpage');
         $this->assertTrue($idRet, 'setID did not return true');
-        $this->assertEquals('testpage', $page->getID(), 'Did change id');
+        $this->assertEquals('testpage', $this->testPage->getID(), 'Did change id');
     }
 
     public function testSetAliasMustMatchPatternOfPregMatch()
@@ -281,23 +279,55 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
 
     public function testDeleteWillCallObserver()
     {
-        $page = new PageImpl('testpage', $this->db);
         $observer1 = new StubObserverImpl();
-        $page->attachObserver($observer1);
-        $page->delete();
+        $this->testPage->attachObserver($observer1);
+        $this->testPage->delete();
         $this->assertTrue($observer1->hasBeenCalled());
-        $this->assertTrue($page === $observer1->getLastCallSubject());
+        $this->assertTrue($this->testPage === $observer1->getLastCallSubject());
         $this->assertEquals(Page::EVENT_DELETE, $observer1->getLastCallType());
     }
 
     public function testValidatorWillValidate(){
-        $page = new PageImpl('testpage', $this->db);
-        $this->assertTrue($page->isValidAlias('/validAlias/'));
-        $this->assertFalse($page->isValidAlias('invalidAlias'));
-        $this->assertTrue($page->isValidId('validid'));
-        $this->assertFalse($page->isValidId('testpage'));
+        $this->assertTrue($this->testPage->isValidAlias('/validAlias/'));
+        $this->assertFalse($this->testPage->isValidAlias('invalidAlias'));
+        $this->assertTrue($this->testPage->isValidId('validid'));
+        $this->assertFalse($this->testPage->isValidId('testpage'));
 
     }
+
+    public function testHiddenHasCorrectValue(){
+        $this->assertFalse($this->testPage->isHidden());
+    }
+
+    public function testHideDoesHidePage(){
+        $this->testPage->hide();
+        $this->assertTrue($this->testPage->isHidden());
+    }
+
+    public function testShowPageDoesShowPage(){
+        $this->testPage->hide();
+        $this->assertTrue($this->testPage->isHidden());
+        $this->testPage->show();
+        $this->assertFalse($this->testPage->isHidden());
+    }
+
+    public function testHiddingIsPersistent(){
+        $this->assertFalse($this->testPage->isHidden());
+        $this->testPage->hide();
+        $page = new PageImpl('testpage',$this->db);
+        $this->assertTrue($page->isHidden());
+    }
+
+    public function testCreateWillSaveHidden(){
+        $id = 'nonExistingID';
+        $page = new PageImpl($id,$this->db);
+        $page->hide();
+        $page->create();
+        $this->assertTrue($page->isHidden());
+        $page = new PageImpl($id,$this->db);
+        $this->assertTrue($page->isHidden());
+    }
+
 
     public function getSetUpOperation()
     {

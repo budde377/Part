@@ -17,6 +17,8 @@ class PageImpl implements Page, Observable
     private $template = '';
     private $alias = '';
 
+    private $hidden = 0;
+
     private $database;
     private $connection;
 
@@ -34,6 +36,9 @@ class PageImpl implements Page, Observable
     private $updateTemplateStatement;
     /** @var $updateAliasStatement PDOStatement | null */
     private $updateAliasStatement;
+    /** @var $updateHiddenStatement PDOStatement | null */
+    private $updateHiddenStatement;
+
 
 
     private $initialValuesHasBeenSet = false;
@@ -205,11 +210,14 @@ class PageImpl implements Page, Observable
 
 
         if ($this->createStatement === null) {
-            $this->createStatement = $this->connection->prepare("INSERT INTO Page (page_id,template,title,alias) VALUES (?,?,?,?)");
+            $this->createStatement = $this->connection->prepare("
+            INSERT INTO Page (page_id,template,title,alias,hidden)
+            VALUES (?,?,?,?,?)");
             $this->createStatement->bindParam(1, $this->id);
             $this->createStatement->bindParam(2, $this->template);
             $this->createStatement->bindParam(3, $this->title);
             $this->createStatement->bindParam(4, $this->alias);
+            $this->createStatement->bindParam(5, $this->hidden);
         }
         try {
             $this->createStatement->execute();
@@ -248,6 +256,7 @@ class PageImpl implements Page, Observable
             $this->alias = $result['alias'];
             $this->title = $result['title'];
             $this->template = $result['template'];
+            $this->hidden = $result['hidden'];
         }
     }
 
@@ -318,5 +327,54 @@ class PageImpl implements Page, Observable
     public function isValidAlias($alias)
     {
         return strlen($alias)==0 || @preg_match($alias,'') !== false;
+    }
+
+    /**
+     * @return bool Return TRUE if the page has been marked as hidden, else false
+     */
+    public function isHidden()
+    {
+        $this->setInitialValues();
+        return $this->hidden > 0;
+    }
+
+    /**
+     * This will mark the page as hidden.
+     * If the page is already hidden, nothing will happen.
+     * @return void
+     */
+    public function hide()
+    {
+        if($this->isHidden())
+            return;
+
+        if($this->updateHiddenStatement === null){
+            $this->updateHiddenStatement = $this->connection->prepare("UPDATE Page SET hidden=? WHERE page_id = ?");
+            $this->updateHiddenStatement->bindParam(1, $this->hidden);
+            $this->updateHiddenStatement->bindParam(2, $this->id);
+        }
+
+        $this->hidden = 1;
+        $this->updateHiddenStatement->execute();
+    }
+
+    /**
+     * This will un-mark the page as hidden, iff it is hidden.
+     * If the page is not hidden, nothing will happen.
+     * @return void
+     */
+    public function show()
+    {
+        if(!$this->isHidden())
+            return;
+
+        if($this->updateHiddenStatement === null){
+            $this->updateHiddenStatement = $this->connection->prepare("UPDATE Page SET hidden=? WHERE page_id = ?");
+            $this->updateHiddenStatement->bindParam(1, $this->hidden);
+            $this->updateHiddenStatement->bindParam(2, $this->id);
+        }
+
+        $this->hidden = 0;
+        $this->updateHiddenStatement->execute();
     }
 }

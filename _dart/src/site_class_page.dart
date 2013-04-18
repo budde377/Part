@@ -12,14 +12,16 @@ abstract class Page {
 
   String get alias;
 
-  void changeInfo({String id, String title, String template, String alias, ChangeCallback callback});
+  bool get hidden;
+
+  void changeInfo({String id, String title, String template, String alias, bool hidden, ChangeCallback callback});
 
   void registerListener(PageInfoChangeListener listener);
 
 }
 
 class JSONPage extends Page {
-  String _id, _title, _template, _alias;
+  String _id, _title, _template, _alias, _hidden = false;
   final List<PageInfoChangeListener> _listeners = [];
   final JSONClient _client;
 
@@ -31,20 +33,24 @@ class JSONPage extends Page {
 
   String get alias => _alias;
 
-  JSONPage(String id, String title, String template, String alias, JSONClient client):_client = client {
+  bool get hidden => _hidden;
+
+  JSONPage(String id, String title, String template, String alias, bool hidden, JSONClient client):_client = client {
     _id = id;
     _title = title;
     _template = template;
     _alias = alias;
+    _hidden = hidden;
   }
 
-  void changeInfo({String id, String title, String template, String alias, ChangeCallback callback}) {
+  void changeInfo({String id, String title, String template, String alias, bool hidden, ChangeCallback callback}) {
     id = ?id ? id : _id;
     title = ?title ? title : _title;
     template = ?template ? template : _template;
     alias = ?alias ? alias : _alias;
+    hidden = ?hidden ? hidden : _hidden;
     callback = ?callback?callback:(a1,[a2]){};
-    var function = new ChangePageInfoJSONFunction(_id,id, title, template, alias);
+    var function = new ChangePageInfoJSONFunction(_id,id, title, template, alias, hidden);
     var functionCallback = (JSONResponse response) {
       switch (response.type) {
         case RESPONSE_TYPE_SUCCESS:
@@ -52,6 +58,7 @@ class JSONPage extends Page {
           _template = template;
           _title = title;
           _alias = alias;
+          _hidden = hidden;
           callListeners();
           callback(response.type);
           break;

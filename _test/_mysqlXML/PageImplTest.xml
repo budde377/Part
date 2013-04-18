@@ -7,6 +7,7 @@
                 <field name="title">title</field>
                 <field name="template">template</field>
                 <field name="alias">alias</field>
+                <field name="hidden">0</field>
             </row>
         </table_data>
 

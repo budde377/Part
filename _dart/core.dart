@@ -79,7 +79,7 @@ class ChangeableList {
     return _redeemList(listElement);
   }
 
-  static ChangeableList _redeemList(Element listElement){
+  static ChangeableList _redeemList(Element listElement) {
     if (_cache == null) {
       _cache = new Map<Element, ChangeableList>();
     }
@@ -97,19 +97,7 @@ class ChangeableList {
     _initialize();
   }
 
-/*
-  ChangeableList.unorderetList(UListElement listElement) {
-    element = listElement;
-    _initialize();
-  }
-
-  ChangeableList.orderetList(OListElement listElement) {
-    element = listElement;
-    _initialize();
-  }
-*/
-
-  List<LIElement> _findLIList() => element.children.where((Element e) => e.tagName == "LI").toList();
+  List<LIElement> _findLIList() => element.children.where((Element e) => e.tagName == "LI" && !e.classes.contains('emptyListInfo')).toList();
 
   void _initialize() {
     lis = _findLIList();
@@ -118,7 +106,7 @@ class ChangeableList {
     element.on["update_list"].listen((CustomEvent event) {
       element.children.where((Element e) => e.tagName == "LI" && e.classes.contains("new")).forEach((LIElement li) {
         li.classes.remove('new');
-        _makeDraggable(li);
+        _makeChangeable(li);
         lis = _findLIList();
       });
     });
@@ -126,12 +114,22 @@ class ChangeableList {
 
     lis.forEach((LIElement li) {
 
-      _makeDraggable(li);
+      _makeChangeable(li);
 
     });
   }
 
-  void _makeDraggable(LIElement li) {
+  void refreshLIs(){
+    lis = _findLIList();
+  }
+
+  void appendLi(LIElement li){
+    element.children.add(li);
+    _makeChangeable(li);
+    lis = _findLIList();
+  }
+
+  void _makeChangeable(LIElement li) {
     Element handle;
     if ((handle = li.children.firstWhere((Element c) => c.classes.contains('handle'), orElse:() => null)) == null) {
       handle = new DivElement();

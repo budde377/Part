@@ -72,7 +72,7 @@ class TemplateImpl implements Template
         $this->template = $string;
         $numExtendsMatch = preg_match_all('/<!--[\s]*extends:([^\>]+)-->/', $string, $matches, PREG_OFFSET_CAPTURE);
         if ($numExtendsMatch > 0) {
-            $template = new TemplateImpl($this->config, $this->pageElementFactory);
+//            $template = new TemplateImpl($this->config, $this->pageElementFactory);
             $f = new FileImpl(trim($matches[1][0][0]));
             $this->template = $f->getContents();
 
@@ -96,7 +96,6 @@ class TemplateImpl implements Template
             }
 
         }
-
         $numMatches = preg_match_all('/<!--[\s]*pageElement:([^\>]+)-->/', $this->template, $matches,PREG_OFFSET_CAPTURE);
         for($i = $numMatches -1; $i >=0;$i--){
             $elementString = trim($matches[1][$i][0]);

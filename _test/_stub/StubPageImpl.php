@@ -14,6 +14,7 @@ class StubPageImpl implements Page
     private $title;
     private $template;
     private $alias;
+    private $hidden = false;
 
     /**
      * @return string
@@ -155,5 +156,33 @@ class StubPageImpl implements Page
     public function isValidAlias($alias)
     {
         return false;
+    }
+
+    /**
+     * @return bool Return TRUE if the page has been marked as hidden, else false
+     */
+    public function isHidden()
+    {
+        return $this->hidden;
+    }
+
+    /**
+     * This will mark the page as hidden.
+     * If the page is already hidden, nothing will happen.
+     * @return void
+     */
+    public function hide()
+    {
+        $this->hidden = true;
+    }
+
+    /**
+     * This will un-mark the page as hidden, iff it is hidden.
+     * If the page is not hidden, nothing will happen.
+     * @return void
+     */
+    public function show()
+    {
+        $this->hidden = false;
     }
 }

@@ -133,10 +133,7 @@ class PageOrderImpl implements PageOrder, Observer
      */
     public function isActive(Page $page)
     {
-        if ($this->findPage($page) == 'active') {
-            return true;
-        }
-        return false;
+        return $this->findPage($page) == 'active';
     }
 
     /**
@@ -197,8 +194,12 @@ class PageOrderImpl implements PageOrder, Observer
         }
 
         if ($this->findPage($page) == 'active') {
+            foreach($this->getPageOrder($page) as $p){
+                $this->deactivatePage($p);
+            }
             $this->inactivePages[$page->getID()] = $this->activePages[$page->getID()];
             unset($this->activePages[$page->getID()]);
+            $this->removeIDFromSubLists($page->getID());
             $this->deactivatePageStatement->execute(array($page->getID()));
         }
     }

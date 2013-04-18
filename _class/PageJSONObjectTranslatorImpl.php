@@ -29,7 +29,7 @@ class PageJSONObjectTranslatorImpl implements JSONObjectTranslator
             return false;
         }
         $jsonObject = new PageJSONObjectImpl($object->getID(),$object->getTitle(),
-            $object->getTemplate(),$object->getAlias());
+            $object->getTemplate(),$object->getAlias(),$object->isHidden());
 
         return $jsonObject;
     }

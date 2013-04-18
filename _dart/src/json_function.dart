@@ -27,12 +27,13 @@ class ChangeUserPasswordJSONFunction extends JSONFunction {
 }
 
 class ChangePageInfoJSONFunction extends JSONFunction {
-  ChangePageInfoJSONFunction(String page_id, String new_page_id, String title, String template, String alias):super('changePageInfo') {
+  ChangePageInfoJSONFunction(String page_id, String new_page_id, String title, String template, String alias, bool hidden):super('changePageInfo') {
     this.arguments['page_id'] = page_id;
     this.arguments['new_page_id'] = new_page_id;
     this.arguments['title'] = title;
     this.arguments['template'] = template;
     this.arguments['alias'] = alias;
+    this.arguments['hidden'] = hidden;
   }
 }
 
@@ -81,5 +82,12 @@ class CreateUserJSONFunction extends JSONFunction {
   CreateUserJSONFunction(String mail, String privileges):super('createUser') {
     this.arguments['mail'] = mail;
     this.arguments['privileges'] = privileges;
+  }
+}
+
+class UserLoginJSONFunction extends JSONFunction {
+  UserLoginJSONFunction(String username, String password):super('userLogin'){
+    this.arguments['username'] = username;
+    this.arguments['password'] = password;
   }
 }

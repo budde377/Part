@@ -1,5 +1,7 @@
 part of core;
 
+typedef bool validator();
+
 class ValidatingForm {
   final FormElement _element;
   static final Map<FormElement, ValidatingForm> _cache = new Map<FormElement, ValidatingForm>();
@@ -19,9 +21,7 @@ class ValidatingForm {
   ValidatingForm._internal(this._element);
 
   void _setUp() {
-
     _element.onSubmit.listen((Event e) {
-      print(1);
       if (_element.classes.contains('invalid')) {
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -31,13 +31,21 @@ class ValidatingForm {
     var inputs = _element.queryAll('input:not([type=submit]), textarea');
     inputs.forEach((Element element) {
       element.classes.add('valid');
-      element.onKeyUp.listen((Event e) => _checkElement(element));
+      var val = element.value;
+      element.onKeyUp.listen((Event e) {
+        if(val == element.value){
+          return;
+        }
+        _checkElement(element);
+        val=element.value;
+      });
     });
     var selects = _element.queryAll('select');
     selects.forEach((Element element) {
       element.classes.add('valid');
       element.onChange.listen((Event e) => _checkElement(element));
     });
+
     _element.classes.add('initial');
   }
 
@@ -50,6 +58,7 @@ class ValidatingForm {
     selects.forEach((Element element) {
       _checkElement(element);
     });
+    _checkElement(_element);
     if(initial){
       _element.classes.add('initial');
     }

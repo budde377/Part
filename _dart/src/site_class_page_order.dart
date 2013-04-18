@@ -2,7 +2,7 @@ part of site_classes;
 
 const PAGE_ORDER_CHANGE_DEACTIVATE = 1;
 
-const PAGE_ORDER_CHANGE_ACTIVE_ORDER = 2;
+const PAGE_ORDER_CHANGE_ACTIVATE = 2;
 
 const PAGE_ORDER_CHANGE_DELETE_PAGE = 3;
 
@@ -14,9 +14,15 @@ abstract class PageOrder {
 
   Page get currentPage;
 
+  List<Page> get currentPagePath;
+
+  List<Page> pagePath(String page_id);
+
   List<Page> get activePages;
 
   List<Page> get inactivePages;
+
+  bool isActive(String page_id);
 
   Map<String, Page> get pages;
 
@@ -28,7 +34,7 @@ abstract class PageOrder {
 
   void deactivatePage(String page_id, [ChangeCallback callback]);
 
-  void changePageOrder(List<String> page_id_list , {ChangeCallback callback:null,String parent_id:""});
+  void changePageOrder(List<String> page_id_list , {ChangeCallback callback:null,String parent_id:null});
 
   void registerListener(PageOrderChangeListener listener);
 
@@ -42,6 +48,8 @@ class JSONPageOrder extends PageOrder {
   final String ajax_id;
 
   JSONClient _client;
+
+  List<Page> _currentPagePath;
 
   bool _hasBeenSetUp = false;
 
@@ -97,7 +105,7 @@ class JSONPageOrder extends PageOrder {
           _addPageFromObject(o);
         });
         _pageOrderBuilder(response.payload['page_order']);
-        _callListeners(PAGE_ORDER_CHANGE_ACTIVE_ORDER);
+        _callListeners(PAGE_ORDER_CHANGE_ACTIVATE);
       } else {
         throw "Could not load PageOrder. Returned response of type ${response.type}";
       }
@@ -140,7 +148,7 @@ class JSONPageOrder extends PageOrder {
   }
 
   String _addPageFromObject(JSONObject o) {
-    var page = new JSONPage(o.variables['id'], o.variables['title'], o.variables['template'], o.variables['alias'], _client);
+    var page = new JSONPage(o.variables['id'], o.variables['title'], o.variables['template'], o.variables['alias'], o.variables['hidden'],_client);
     _pages[page.id] = page;
     return page.id;
   }
@@ -159,19 +167,19 @@ class JSONPageOrder extends PageOrder {
   }
 
   void _removeFromPageOrder(String id) {
-    _pageOrder.remove(id);
+    if(_pageOrder.containsKey(id)){
+      _pageOrder[id].forEach((String v){
+        _removeFromPageOrder(v);
+      });
+      _pageOrder.remove(id);
+    }
     _pageOrder.forEach((String k, List l) {
-      var l = _pageOrder[k].length;
       _pageOrder[k].remove(id);
-      while(l > _pageOrder[k].length){
-        l = _pageOrder[k].length;
-        _pageOrder[k].remove(id);
-      }
     });
   }
 
-  void changePageOrder(List<String> page_id_list, {ChangeCallback callback:null,String parent_id:""}) {
-    var function = new SetPageOrderJSONFunction(parent_id, page_id_list);
+  void changePageOrder(List<String> page_id_list, {ChangeCallback callback:null,String parent_id:null}) {
+    var function = new SetPageOrderJSONFunction(parent_id==null?"":parent_id, page_id_list);
     var functionCallback = (JSONResponse response) {
       if (callback != null) {
         callback(response.type, response.error_code);
@@ -179,7 +187,7 @@ class JSONPageOrder extends PageOrder {
       if (response.type == RESPONSE_TYPE_SUCCESS) {
         var p,parent = (p = response.payload['parent']).length<=0?null:p;
         _pageOrder[parent] = response.payload['order'];
-        _callListeners(PAGE_ORDER_CHANGE_ACTIVE_ORDER);
+        _callListeners(PAGE_ORDER_CHANGE_ACTIVATE);
       }
     };
     _client.callFunction(function, functionCallback);
@@ -187,7 +195,7 @@ class JSONPageOrder extends PageOrder {
 
   List<Page> listPageOrder({
                            String parent_id:null
-                           }) => _pageOrder[parent_id] == null ? [] : _pageOrder[parent_id].map((String id) => _pages[id]);
+                           }) => _pageOrder[parent_id] == null ? [] : _pageOrder[parent_id].map((String id) => _pages[id]).toList();
 
 
   Map<String, Page> get pages => new Map<String, Page>.from(_pages);
@@ -205,6 +213,52 @@ class JSONPageOrder extends PageOrder {
     });
     return map.values.toList();
   }
+
+  List<Page> get currentPagePath{
+    if(_currentPagePath == null){
+      _currentPagePath = pagePath(_currentPageId);
+    }
+    return _currentPagePath;
+
+  }
+
+  List<Page> pagePath(String page_id){
+    if(!pageExists(page_id)){
+      return [];
+    }
+    var path;
+    if(!isActive(page_id)){
+      path = new List<Page>();
+      path.add(pages[page_id]);
+    } else {
+
+      path = _listPath(page_id);
+
+    }
+    return path.toList();
+  }
+
+
+  List<Page> _listPath(String page_id){
+    var ret = new List<Page>();
+    _pageOrder.forEach((String k, List<String> v){
+      v.forEach((String id){
+        if(page_id == id){
+          if(k != null){
+            var l = _listPath(k);
+            l.forEach((Page p){
+              ret.add(p);
+            });
+          }
+          ret.add(_pages[page_id]);
+          return ret;
+        }
+      });
+    });
+    return ret;
+  }
+
+  bool isActive(String page_id) => activePages.contains(_pages[page_id]);
 
   Page get currentPage => _pages[_currentPageId];
 
