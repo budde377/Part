@@ -16,13 +16,16 @@ abstract class Page {
 
   void changeInfo({String id, String title, String template, String alias, bool hidden, ChangeCallback callback});
 
-  void registerListener(PageInfoChangeListener listener);
+  void registerListener(void f(Page page));
 
 }
 
 class JSONPage extends Page {
-  String _id, _title, _template, _alias, _hidden = false;
+  String _id, _title, _template, _alias;
+  bool _hidden = false;
+
   final List<PageInfoChangeListener> _listeners = [];
+
   final JSONClient _client;
 
   String get id => _id;
@@ -49,8 +52,9 @@ class JSONPage extends Page {
     template = ?template ? template : _template;
     alias = ?alias ? alias : _alias;
     hidden = ?hidden ? hidden : _hidden;
-    callback = ?callback?callback:(a1,[a2]){};
-    var function = new ChangePageInfoJSONFunction(_id,id, title, template, alias, hidden);
+    callback = ?callback ? callback : (a1, [a2]) {
+    };
+    var function = new ChangePageInfoJSONFunction(_id, id, title, template, alias, hidden);
     var functionCallback = (JSONResponse response) {
       switch (response.type) {
         case RESPONSE_TYPE_SUCCESS:
@@ -63,19 +67,20 @@ class JSONPage extends Page {
           callback(response.type);
           break;
         default:
-          callback(response.type,response.error_code);
-      }};
+          callback(response.type, response.error_code);
+      }
+    };
     _client.callFunction(function, functionCallback);
   }
 
   void callListeners() {
-    _listeners.forEach((PageInfoChangeListener listener) {
-      listener(this);
+    _listeners.forEach((void f(Page page)) {
+      f(this);
     });
   }
 
-  void registerListener(PageInfoChangeListener listener) {
-    _listeners.add(listener);
+  void registerListener(void f(Page page)) {
+    _listeners.add(f);
   }
 
 }

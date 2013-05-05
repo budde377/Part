@@ -11,7 +11,6 @@ part "src/site_class_user_library.dart";
 const CALLBACK_STATUS_SUCCESS = "success";
 const CALLBACK_STATUS_ERROR = "error";
 
-
 typedef void ChangeCallback(String status, [int error_code, dynamic payload]);
 
 

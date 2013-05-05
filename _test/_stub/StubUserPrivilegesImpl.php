@@ -1,133 +1,110 @@
 <?php
-require_once dirname(__FILE__) . '/../../_interface/MultiSiteUserPrivileges.php';
+require_once dirname(__FILE__).'/../../_interface/UserPrivileges.php';
+require_once dirname(__FILE__).'/StubUserPrivilegesImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
- * Date: 06/08/12
- * Time: 22:34
+ * Date: 23/04/13
+ * Time: 22:47
+ * To change this template use File | Settings | File Templates.
  */
-class StubMultiSiteUserPrivilegesImpl implements MultiSiteUserPrivileges
-{
-    private $privileges;
-    private $isPrivileged;
 
-    /**
-     * Will add root privileges to user
-     * @return bool FALSE on failure, else TRUE
-     */
-    public function addRootPrivilege()
-    {
-        return false;
+class StubUserPrivilegesImpl implements  UserPrivileges{
+    private $root, $site, $page;
+
+    public function __construct($root, $site, $page){
+        $this->root = $root;
+        $this->site = $site;
+        $this->page = $page;
     }
 
     /**
-     * Will add site privileges to user
-     * @param string $site Must be valid site title
-     * @return bool FALSE on failure, else TRUE
+     * Will add root privileges
+     * @return void
      */
-    public function addSitePrivilege($site)
+    public function addRootPrivileges()
     {
-        return false;
+        // TODO: Implement addRootPrivileges() method.
     }
 
     /**
-     * Will add Page privileges to user
-     * @param string $site
-     * @param string $page
-     * @return bool FALSE on failure else TRUE
+     * Will add Site privileges
+     * @return void
      */
-    public function addPagePrivilege($site, $page)
+    public function addSitePrivileges()
     {
-        return false;
+        // TODO: Implement addSitePrivileges() method.
     }
 
     /**
-     * Will revoke the privileges specified
-     * If Root privilege should be revoked, $site and $page must be null,
-     * If Site privilege should be revoked, $site should be not null and $page null
-     * If Page privilege should be revoked, $site and $page should be not null
-     * @param string | null $site
-     * @param string | null $page
-     * @return bool FALSE on failure as not found, else TRUE
+     * Will add privileges to given page
+     * @param Page $page
+     * @return void
      */
-    public function revokePrivilege($site = null, $page = null)
+    public function addPagePrivileges(Page $page)
     {
-        return false;
-    }
-
-
-    /**
-     * Will test if privileged.
-     * If test for Root privilege, test with site and page equal null
-     * If test for site, test with page equal null and site not null.
-     * If test for page privilege, test with page and site not null
-     * @param null | string $site Site title
-     * @param null | string $page Page title within site
-     * @return bool FALSE on not privileged else TRUE
-     */
-    public function isPrivileged($site = null, $page = null)
-    {
-        if ($site == null && $page == null) {
-            return isset($this->isPrivileged[MultiSiteUserPrivileges::USER_PRIVILEGES_TYPE_ROOT]);
-        } else if ($page == null) {
-            return isset($this->isPrivileged[MultiSiteUserPrivileges::USER_PRIVILEGES_TYPE_SITE][$site]) || $this->isPrivileged();
-        } else if ($site != null) {
-            return isset($this->isPrivileged[MultiSiteUserPrivileges::USER_PRIVILEGES_TYPE_PAGE][$site][$page]) || $this->isPrivileged($site);
-        }
-        return false;
+        // TODO: Implement addPagePrivileges() method.
     }
 
     /**
-     * Will revoke all privileges
+     * @return bool Return TRUE if has privilege else FALSE
+     */
+    public function hasRootPrivileges()
+    {
+        return $this->root;
+    }
+
+    /**
+     * @return bool Return TRUE if has privilege else FALSE
+     */
+    public function hasSitePrivileges()
+    {
+        return $this->site;
+    }
+
+    /**
+     * @param Page $page
+     * @return bool Return TRUE if has privilege else FALSE
+     */
+    public function hasPagePrivileges(Page $page)
+    {
+        return $this->page;
+    }
+
+    /**
+     * Will revoke Root privileges
+     * @return void
+     */
+    public function revokeRootPrivileges()
+    {
+        // TODO: Implement revokeRootPrivileges() method.
+    }
+
+    /**
+     * Will revoke Site privileges
+     * @return void
+     */
+    public function revokeSitePrivileges()
+    {
+        // TODO: Implement revokeSitePrivileges() method.
+    }
+
+    /**
+     * Will revoke privileges from given Page
+     * @param Page $page
+     * @return void
+     */
+    public function revokePagePrivileges(Page $page)
+    {
+        // TODO: Implement revokePagePrivileges() method.
+    }
+
+    /**
+     * This will revoke all privileges
      * @return void
      */
     public function revokeAllPrivileges()
     {
-
-    }
-
-    public function setPrivileges(array $privileges)
-    {
-        $this->privileges = $privileges;
-    }
-
-    public function setIsPrivileged($site = null, $page = null)
-    {
-        if ($site == null && $page == null) {
-            $this->isPrivileged[MultiSiteUserPrivileges::USER_PRIVILEGES_TYPE_ROOT] = 1;
-        } else if ($page == null) {
-            $this->isPrivileged[MultiSiteUserPrivileges::USER_PRIVILEGES_TYPE_SITE][$site] = 1;
-        } else if ($site != null) {
-            $this->isPrivileged[MultiSiteUserPrivileges::USER_PRIVILEGES_TYPE_PAGE][$site][$page] = 1;
-        }
-
-    }
-
-    /**
-     * Will return an array with all privileges.
-     * Every entrance will have another array with entrances type, site, page
-     * @param String $mode
-     * @return array
-     */
-    public function listPrivileges($mode = MultiSiteUserPrivileges::LIST_MODE_LIST_ALL)
-    {
-        $returnArray = array();
-
-        switch ($mode) {
-            case MultiSiteUserPrivileges::LIST_MODE_LIST_PAGE:
-            case MultiSiteUserPrivileges::LIST_MODE_LIST_ROOT:
-            case MultiSiteUserPrivileges::LIST_MODE_LIST_SITE:
-                foreach ($this->privileges as $privilege) {
-                    if ($privilege['type'] = $mode) {
-                        $returnArray[] = $privilege;
-                    }
-                }
-                break;
-            case MultiSiteUserPrivileges::LIST_MODE_LIST_ALL:
-                $returnArray = $this->privileges;
-                break;
-        }
-
-        return $returnArray;
+        // TODO: Implement revokeAllPrivileges() method.
     }
 }

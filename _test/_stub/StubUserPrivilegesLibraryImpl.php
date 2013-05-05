@@ -1,26 +1,31 @@
 <?php
-require_once dirname(__FILE__) . '/../../_interface/MultiSiteUserPrivilegesLibrary.php';
+require_once dirname(__FILE__).'/../../_interface/UserPrivilegesLibrary.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
- * Date: 06/08/12
- * Time: 22:28
+ * Date: 23/04/13
+ * Time: 22:47
+ * To change this template use File | Settings | File Templates.
  */
-class StubMultiSiteUserPrivilegesLibraryImpl implements MultiSiteUserPrivilegesLibrary
-{
-    public $privileges = array();
+
+class StubUserPrivilegesLibraryImpl implements  UserPrivilegesLibrary{
+
+    private $userPrivileges;
 
     /**
+     * This will keep and reuse instances of UserPrivilege
      * @param User $user
-     * @return MultiSiteUserPrivileges
+     * @return UserPrivileges
      */
-    public function getPrivileges(User $user)
+    public function getUserPrivileges(User $user)
     {
-        return $this->privileges[$user->getUsername()];
+        return $this->userPrivileges;
+    }
+
+    public function setUserPrivileges(UserPrivileges $userPrivileges)
+    {
+        $this->userPrivileges = $userPrivileges;
     }
 
 
-    public function setPrivileges(array $privileges){
-        $this->privileges = $privileges;
-    }
 }

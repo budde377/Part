@@ -9,10 +9,11 @@ require_once dirname(__FILE__).'/JSONObjectImpl.php';
  */
 class UserJSONObjectImpl extends JSONObjectImpl
 {
-    public function __construct($username,$email,$parent = ''){
+    public function __construct($username,$email,$privileges,$parent = ''){
         parent::__construct('user');
         $this->setVariable('username',$username);
         $this->setVariable('mail',$email);
         $this->setVariable('parent',$parent);
+        $this->setVariable('privileges',$privileges);
     }
 }

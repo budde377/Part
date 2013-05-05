@@ -3,9 +3,6 @@ part of site_classes;
 const USER_LIBRARY_CHANGE_DELETE = 1;
 const USER_LIBRARY_CHANGE_CREATE = 2;
 
-const USER_ROOT_PRIVILEGES = "root";
-const USER_SITE_PRIVILEGES = "site";
-const USER_PAGE_PRIVILEGES = "page";
 
 typedef void UserLibraryChangeListener(int changeType, User user);
 
@@ -17,13 +14,13 @@ abstract class UserLibrary {
 
   void registerListener(UserLibraryChangeListener listener);
 
-  Map<String, User> get userList;
+  Map<String, User> get users;
 
-  Map<String, User> get rootUserList;
+  Map<String, User> get rootUsers;
 
-  Map<String, User> get siteUserList;
+  Map<String, User> get siteUsers;
 
-  Map<String, User> get pageUserList;
+  Map<String, User> get pageUsers;
 
   User get userLoggedIn;
 }
@@ -33,7 +30,6 @@ class JSONUserLibrary extends UserLibrary {
   JSONClient _client;
   String _userLoggedInId;
   Map<String, User> _users = <String, User>{};
-  List<String> _rootUsers = <String>[], _siteUsers = <String>[], _pageUsers = <String>[];
   final List<UserLibraryChangeListener> _listeners = <UserLibraryChangeListener>[];
   bool _hasBeenSetUp = false;
 
@@ -48,12 +44,11 @@ class JSONUserLibrary extends UserLibrary {
   }
 
   factory JSONUserLibrary.initializeFromLists(String ajax_id,
-                                              List<User> rootUsers,
-                                              List<User> siteUsers,
-                                              List<User> pageUsers,
+                                              List<User> users,
                                               String currentUserName){
-    var library = _retrieveInstance(ajax_id);
-    library._setUpFromLists(rootUsers, siteUsers, pageUsers,currentUserName);
+    var lib = _retrieveInstance(ajax_id);
+    lib._setUpFromLists(users,currentUserName);
+    return lib;
   }
 
   static JSONUserLibrary _retrieveInstance(String ajax_id) {
@@ -66,9 +61,7 @@ class JSONUserLibrary extends UserLibrary {
     }
   }
 
-  void _setUpFromLists(List<User> rootUsers,
-                       List<User> siteUsers,
-                       List<User> pageUsers,
+  void _setUpFromLists(List<User> users,
                        String current_username) {
     if (_hasBeenSetUp) {
       return;
@@ -78,17 +71,9 @@ class JSONUserLibrary extends UserLibrary {
     _client = new AJAXJSONClient(ajax_id);
 
     _userLoggedInId = current_username;
-    rootUsers.forEach((User u) {
+    users.forEach((User u) {
+      _addUserListener(u);
       _users[u.username] = u;
-      _rootUsers.add(u.username);
-    });
-    siteUsers.forEach((User u) {
-      _users[u.username] = u;
-      _siteUsers.add(u.username);
-    });
-    pageUsers.forEach((User u) {
-      _users[u.username] = u;
-      _pageUsers.add(u.username);
     });
 
   }
@@ -107,41 +92,49 @@ class JSONUserLibrary extends UserLibrary {
         return;
       }
       _userLoggedInId = response.payload['user_logged_in'];
-      response.payload['root_users'].forEach((JSONObject o) =>
-      _rootUsers.add(_addUserFromObjectToUsers(o)));
-      response.payload['site_users'].forEach((JSONObject o) =>
-      _siteUsers.add(_addUserFromObjectToUsers(o)));
-      response.payload['page_users'].forEach((JSONObject o) =>
-      _pageUsers.add(_addUserFromObjectToUsers(o)));
+
+      response.payload['users'].forEach((JSONObject o) => _addUserFromObjectToUsers(o,response.payload['page_privileges'].containsKey(o.variables['username'])?response.payload['page_privileges'][o.variables['username']]:[]));
+
     };
     _client.callFunction(function, functionCallback);
   }
 
-  String _addUserFromObjectToUsers(JSONObject o) {
-    var user = new JSONUser(o.variables['username'], o.variables['mail'], o.variables['parent'], _client);
+  String _addUserFromObjectToUsers(JSONObject o, List<String> page_ids) {
+    var privString = o.variables['privileges'];
+    var privileges = privString == 'root'?User.PRIVILEGE_ROOT:(privString == 'site'?User.PRIVILEGE_SITE:User.PRIVILEGE_PAGE);
+    var user = new JSONUser(o.variables['username'], o.variables['mail'], o.variables['parent'], privileges, page_ids , _client);
+    _addUserListener(user);
     _users[user.username] = user;
     return user.username;
   }
 
 
+  void _addUserListener(User user){
+    user.registerListener((User u){
+      if(_users.containsKey(u.username)){
+        return;
+      }
+      var removeKey;
+      _users.forEach((String k,User v){
+        if(v == u){
+          if(k == _userLoggedInId){
+            _userLoggedInId = u.username;
+          }
+          removeKey = k;
+        }
+      });
+      _users.remove(removeKey);
+      _users[u.username] = u;
+    });
+  }
+
   void createUser(String mail, String privileges, [ChangeCallback callback]) {
     var function = new CreateUserJSONFunction(mail, privileges);
     var functionCallback = (JSONResponse response) {
 
-      if (response.type = RESPONSE_TYPE_SUCCESS) {
+      if (response.type == RESPONSE_TYPE_SUCCESS) {
         var o = response.payload;
-        var username = _addUserFromObjectToUsers(o);
-        switch (privileges) {
-          case USER_ROOT_PRIVILEGES:
-            _rootUsers.add(username);
-            break;
-          case USER_SITE_PRIVILEGES:
-            _siteUsers.add(username);
-            break;
-          case USER_PAGE_PRIVILEGES:
-            _pageUsers.add(username);
-            break;
-        }
+        var username = _addUserFromObjectToUsers(o, []);
         _callListeners(USER_LIBRARY_CHANGE_CREATE, _users[username]);
       }
       if (callback != null) {
@@ -158,7 +151,7 @@ class JSONUserLibrary extends UserLibrary {
 
       if (response.type == RESPONSE_TYPE_SUCCESS) {
         var user = _users[username];
-        _removeUser(username);
+        _users.remove(username);
         _callListeners(USER_LIBRARY_CHANGE_DELETE, user);
       }
       if (callback != null) {
@@ -169,12 +162,6 @@ class JSONUserLibrary extends UserLibrary {
 
   }
 
-  void _removeUser(String username) {
-    _users.remove(username);
-    _rootUsers.remove(username);
-    _siteUsers.remove(username);
-    _pageUsers.remove(username);
-  }
 
   void registerListener(UserLibraryChangeListener listener) {
     _listeners.add(listener);
@@ -186,21 +173,24 @@ class JSONUserLibrary extends UserLibrary {
     });
   }
 
-  Map<String, User> get userList => new Map.from(_users);
+  Map<String, User> get users => new Map.from(_users);
 
-  Map<String, User> get rootUserList => _userListToMap(_rootUsers);
+  Map<String, User> get rootUsers => _generateUserList(User.PRIVILEGE_ROOT);
 
-  Map<String, User> get siteUserList => _userListToMap(_siteUsers);
+  Map<String, User> get siteUsers => _generateUserList(User.PRIVILEGE_SITE);
 
-  Map<String, User> get pageUserList => _userListToMap(_pageUsers);
+  Map<String, User> get pageUsers => _generateUserList(User.PRIVILEGE_PAGE);
 
   User get userLoggedIn => _users[_userLoggedInId];
 
-  Map<String, User> _userListToMap(List<String> userList) {
-    var returnMap = <String, User>{};
-    userList.forEach((String username) {
-      returnMap[username] = _users[username];
+  Map<String, User> _generateUserList(int privilege){
+    var retMap = new Map<String,User>();
+    _users.forEach((String k, User val){
+      if(val.privilege == privilege){
+        retMap[k] = val;
+      }
     });
-    return returnMap;
+    return retMap;
   }
+
 }

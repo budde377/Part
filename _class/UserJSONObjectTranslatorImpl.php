@@ -11,10 +11,12 @@ require_once dirname(__FILE__).'/UserJSONObjectImpl.php';
 class UserJSONObjectTranslatorImpl implements JSONObjectTranslator
 {
     private $userLibrary;
+    private $userPrivileges;
 
-    function __construct(UserLibrary $userLibrary)
+    function __construct(UserLibrary $userLibrary, UserPrivilegesLibrary $userPrivileges)
     {
         $this->userLibrary = $userLibrary;
+        $this->userPrivileges = $userPrivileges;
     }
 
 
@@ -28,7 +30,9 @@ class UserJSONObjectTranslatorImpl implements JSONObjectTranslator
         if(!($object instanceof User)){
             return false;
         }
-        $jsonUser = new UserJSONObjectImpl($object->getUsername(),$object->getMail(),$object->getParent());
+        $privilege = $this->userPrivileges->getUserPrivileges($object);
+        $p = $privilege->hasRootPrivileges()?'root':($privilege->hasSitePrivileges()?'site':'page');
+        $jsonUser = new UserJSONObjectImpl($object->getUsername(),$object->getMail(),$p, $object->getParent());
 
         return $jsonUser;
     }

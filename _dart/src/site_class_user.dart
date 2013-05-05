@@ -4,15 +4,27 @@ typedef void UserInfoChangeListener(User user);
 
 abstract class User {
 
+  static const PRIVILEGE_ROOT = 1;
+  static const PRIVILEGE_SITE = 2;
+  static const PRIVILEGE_PAGE = 3;
+
   String get username;
 
   String get mail;
 
   String get parent;
 
+  int get privilege;
+
+  List<String> get page_ids;
+
   void changeInfo({String username, String mail, ChangeCallback callback});
 
   void changePassword(String currentPassword, String newPassword, [ChangeCallback callback]);
+
+  void addPagePrivilege(String page_id, [ChangeCallback callback]);
+
+  void revokePagePrivilege(String page_id, [ChangeCallback callback]);
 
   void registerListener(UserInfoChangeListener listener);
 }
@@ -22,11 +34,15 @@ class JSONUser extends User {
   String _username, _mail, _parent;
   final JSONClient _client;
   final List<UserInfoChangeListener> _listeners = [];
+  int _privileges;
+  List<String> _page_ids;
 
-  JSONUser(String username, String mail, String parent, JSONClient client):_client = client{
+  JSONUser(String username, String mail, String parent, int privileges, List<String> page_ids, JSONClient client):_client = client{
     _username = username;
     _mail = mail;
     _parent = parent;
+    _page_ids = privileges == User.PRIVILEGE_PAGE?page_ids:null;
+    _privileges = privileges;
   }
 
   String get username => _username;
@@ -73,5 +89,37 @@ class JSONUser extends User {
       listener(this);
     });
   }
+
+  int get privilege => _privileges;
+
+  List<String> get page_ids => _page_ids == null?[]:new List<String>.from(_page_ids);
+
+
+  void addPagePrivilege(String page_id, [ChangeCallback callback]){
+    var function = new AddUserPagePrivilegeJSONFunction(_username,page_id);
+    _client.callFunction(function,(JSONResponse response){
+      if(response.type==RESPONSE_TYPE_SUCCESS){
+        _page_ids.add(page_id);
+        callback(response.type);
+        _callListeners();
+      } else {
+        callback(RESPONSE_TYPE_ERROR, response.error_code);
+      }
+    });
+  }
+
+  void revokePagePrivilege(String page_id, [ChangeCallback callback]){
+    var function = new RevokeUserPagePrivilegeJSONFunction(_username,page_id);
+    _client.callFunction(function,(JSONResponse response){
+      if(response.type==RESPONSE_TYPE_SUCCESS){
+        _page_ids.remove(page_id);
+        callback(response.type);
+        _callListeners();
+      } else {
+        callback(RESPONSE_TYPE_ERROR, response.error_code);
+      }
+    });
+  }
+
 
 }

@@ -2,6 +2,9 @@
 require_once  dirname(__FILE__) . '/../_class/UserJSONObjectTranslatorImpl.php';
 require_once dirname(__FILE__) . '/_stub/StubUserImpl.php';
 require_once dirname(__FILE__) . '/_stub/StubUserLibraryImpl.php';
+require_once dirname(__FILE__) . '/_stub/StubUserPrivilegesLibraryImpl.php';
+require_once dirname(__FILE__).'/_stub/StubUserPrivilegesImpl.php';
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -17,11 +20,15 @@ class UserJSONObjectTranslatorImplTest extends PHPUnit_Framework_TestCase
     private $user;
     /** @var StubUserLibraryImpl */
     private $userLibrary;
+    /** @var StubUserPrivilegesLibraryImpl */
+    private $userPrivilegesLibrary;
 
     public function setUp()
     {
         $this->userLibrary = new StubUserLibraryImpl();
-        $this->translator = new UserJSONObjectTranslatorImpl($this->userLibrary);
+        $this->userPrivilegesLibrary = new StubUserPrivilegesLibraryImpl();
+        $this->userPrivilegesLibrary->setUserPrivileges(new StubUserPrivilegesImpl(false,true,true));
+        $this->translator = new UserJSONObjectTranslatorImpl($this->userLibrary,$this->userPrivilegesLibrary);
         $this->user = new StubUserImpl();
     }
 
@@ -42,6 +49,7 @@ class UserJSONObjectTranslatorImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($mail,$jsonObject->getVariable('mail'));
         $this->assertEquals($username,$jsonObject->getVariable('username'));
         $this->assertEquals($parent,$jsonObject->getVariable('parent'));
+        $this->assertEquals('site',$jsonObject->getVariable('privileges'));
     }
 
     public function testDecodeWillReturnFalseIfNotInstanceOfJSONObject(){
@@ -64,13 +72,13 @@ class UserJSONObjectTranslatorImplTest extends PHPUnit_Framework_TestCase
     }
 
     public function testDecodeWillReturnFalseIfNotInUserLibrary(){
-        $jsonObject = new UserJSONObjectImpl('someUser','someMail');
+        $jsonObject = new UserJSONObjectImpl('someUser','someMail','root');
         $this->assertFalse($this->translator->decode($jsonObject));
     }
 
     public function testDecodeWillReturnInstanceOfUserFromUserName(){
         $this->setUpUserLibrary();
-        $jsonObject = new UserJSONObjectImpl('someUser','someMail');
+        $jsonObject = new UserJSONObjectImpl('someUser','someMail','root');
         $user = $this->translator->decode($jsonObject);
         $this->assertTrue($user === $this->user);
     }

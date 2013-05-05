@@ -7,6 +7,7 @@ abstract class JSONClient {
 
 class AJAXJSONClient extends JSONClient {
   final String ajaxID;
+  String urlPrefix = "";
   final Map<int, Function> pendingFunctions = new Map<int, Function>();
 
   static final Map<String, JSONClient> _cache = <String, JSONClient>{};
@@ -50,7 +51,8 @@ class AJAXJSONClient extends JSONClient {
     }
     var request = new HttpRequest();
     _setUpRequest(request);
-    request.open("POST", "?ajax=$ajaxID");
+    request.open("POST", urlPrefix+"?ajax=$ajaxID");
+    print(urlPrefix+"?ajax=$ajaxID");
     request.send(function.jsonString);
   }
 

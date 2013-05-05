@@ -2,11 +2,16 @@ part of json;
 
 class JSONFunction {
   final Map arguments = new Map();
+
   final String name;
+
   final int id = new DateTime.now().millisecondsSinceEpoch;
 
   JSONFunction(String name):this.name = name;
-  String get jsonString => JSON.stringify({"type":"function", "name":name, "id":id, "args":arguments});
+
+  String get jsonString => JSON.stringify({
+      "type":"function", "name":name, "id":id, "args":arguments
+  });
 }
 
 class ChangeUserInfoJSONFunction extends JSONFunction {
@@ -19,7 +24,7 @@ class ChangeUserInfoJSONFunction extends JSONFunction {
 
 
 class ChangeUserPasswordJSONFunction extends JSONFunction {
-  ChangeUserPasswordJSONFunction(String username,String oldPassword, String newPassword):super('changeUserPassword') {
+  ChangeUserPasswordJSONFunction(String username, String oldPassword, String newPassword):super('changeUserPassword') {
     this.arguments['username'] = username;
     this.arguments['old_password'] = oldPassword;
     this.arguments['new_password'] = newPassword;
@@ -34,6 +39,19 @@ class ChangePageInfoJSONFunction extends JSONFunction {
     this.arguments['template'] = template;
     this.arguments['alias'] = alias;
     this.arguments['hidden'] = hidden;
+  }
+}
+
+class AddUserPagePrivilegeJSONFunction extends JSONFunction {
+  AddUserPagePrivilegeJSONFunction(String username, String page_id):super('addUserPagePrivilege'){
+    this.arguments['username'] = username;
+    this.arguments['page_id'] = page_id;
+  }
+}
+class RevokeUserPagePrivilegeJSONFunction extends JSONFunction {
+  RevokeUserPagePrivilegeJSONFunction(String username, String page_id):super('revokeUserPagePrivilege') {
+    this.arguments['username'] = username;
+    this.arguments['page_id'] = page_id;
   }
 }
 
@@ -86,7 +104,7 @@ class CreateUserJSONFunction extends JSONFunction {
 }
 
 class UserLoginJSONFunction extends JSONFunction {
-  UserLoginJSONFunction(String username, String password):super('userLogin'){
+  UserLoginJSONFunction(String username, String password):super('userLogin') {
     this.arguments['username'] = username;
     this.arguments['password'] = password;
   }

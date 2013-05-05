@@ -28,19 +28,33 @@ part "src/core_keep_alive.dart";
 
 part "src/core_form_decoration.dart";
 
+part 'src/core_dialog.dart';
+
+part 'src/core_progressbar.dart';
+
+part 'src/core_status_bar.dart';
+
+part 'src/core_infobox.dart';
+
 class BetterSelect {
-  SelectElement _element;
+  static final Map<SelectElement, BetterSelect> _cached = new Map<SelectElement, BetterSelect>();
+  final SelectElement _element;
 
   DivElement _container, _arrow, _currentSelection;
 
-  BetterSelect(SelectElement element) {
-    this._element = element;
-    _initialize();
+  factory BetterSelect(SelectElement element) {
+
+    if(!_cached.containsKey(element)){
+      _cached[element] = new BetterSelect._internal(element);
+    }
+    return _cached[element];
   }
+
+
 
   String get selectedString => _element.query("option") != null ? _element.selectedOptions.map((Node n) => n.text).join(", ") : "";
 
-  void _initialize() {
+  BetterSelect._internal(this._element) {
     _container = new DivElement();
     _container.classes.add("better_select");
     _currentSelection = new DivElement();
@@ -119,11 +133,11 @@ class ChangeableList {
     });
   }
 
-  void refreshLIs(){
+  void refreshLIs() {
     lis = _findLIList();
   }
 
-  void appendLi(LIElement li){
+  void appendLi(LIElement li) {
     element.children.add(li);
     _makeChangeable(li);
     lis = _findLIList();
@@ -196,7 +210,7 @@ class ChangeableList {
 
   void _reorderLIs(List<LIElement> lis) {
     Function compare = (Element e1, Element e2) => e1.offsetTop - e2.offsetTop;
-    lis = _sort(lis, compare);
+    (lis = lis.toList()).sort(compare);
     bool same = true;
     int i = 0;
     lis.forEach((e) {
@@ -211,98 +225,7 @@ class ChangeableList {
     }
   }
 
-  List<dynamic> _sort(List<dynamic> list, int compare(dynamic e1, dynamic e2)) {
-    if (list.length > 2) {
-      int l1Length = (list.length / 2).floor().toInt();
-      List<dynamic> l1 = _sort(list.getRange(0, l1Length), compare), l2 = _sort(list.getRange(l1Length, list.length - l1Length), compare);
-      List<dynamic> newList = [];
-      dynamic l1First = l1.first, l2First = l2.first;
-      while (!l1.isEmpty && !l2.isEmpty) {
-        if (compare(l1First, l2First) <= 0) {
-          newList.add(l1First);
-          if (l1.length > 1) {
-            l1 = l1.getRange(1, l1.length - 1);
-            l1First = l1.first;
-          } else {
-            l1 = [];
-          }
-        } else {
-          newList.add(l2First);
-          if (l2.length > 1) {
-            l2 = l2.getRange(1, l2.length - 1);
-            l2First = l2.first;
-          } else {
-            l2 = [];
-          }
-        }
-      }
-      if (!l1.isEmpty) {
-        l1.forEach((e) {
-          newList.add(e);
-        });
-      } else if (!l2.isEmpty) {
-        l2.forEach((e) {
-          newList.add(e);
-        });
-      }
-      return newList;
-
-    } else {
-      dynamic e1, e2;
-      if (list.length == 2 && compare(e1 = list.first, e2 = list.last) > 0) {
-        return [e2, e1];
-      }
-      return list;
-    }
-  }
 }
-
-/* Deprecated, use FormDecoration with setUpAJAXSubmit instead
-class AJAXForm implements FormDecoration {
-
-  String id;
-  Function callbackSuccess, callbackError;
-
-  AJAXForm(FormElement form, String id, [void callbackSuccess(Map map), void callbackError()])  {
-    this.id = id;
-    this.callbackSuccess = callbackSuccess == null ? (Map map) {} : callbackSuccess;
-    this.callbackError = callbackError == null ? () {} : callbackError;
-    _initialize();
-  }
-
-  void _initialize() {
-
-    HttpRequest req = new HttpRequest();
-    req.onReadyStateChange.listen((Event e) {
-      if (req.readyState == 4) {
-        super.unBlur();
-        print(req.responseText);
-        try {
-          Map responseData = parse(req.responseText);
-          callbackSuccess(responseData);
-
-        } catch(e) {
-          callbackError();
-        }
-
-      }});
-    form.onSubmit.listen((Event event) {
-      super.blur();
-      List<Element> elements = queryAll("textarea, input:not([type=submit]), select");
-      req.open(form.method.toUpperCase(), "?ajax=${Uri.encodeUriComponent(id)}");
-      req.send(new FormData(form));
-      event.preventDefault();
-    });
-  }
-
-  String generateDataString(Map<String, String> map) {
-    return map.keys.map((String s) => "${Uri.encodeUriComponent(s)}=${Uri.encodeUriComponent(map[s])}").join("&");
-  }
-
-
-}
-
-*/
 
 
 class AJAXRequest {

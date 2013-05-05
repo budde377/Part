@@ -139,18 +139,48 @@ class JSONPageOrder extends PageOrder {
     pageOrder.forEach((String key,List<Page> l){
       _pageOrder[key] = l.map((Page p){
         _pages[p.id] = p;
+        _addPageListener(p);
         return p.id;
       }).toList();
     });
     inactivePages.forEach((Page p) {
       _pages[p.id] = p;
+      _addPageListener(p);
     });
   }
 
   String _addPageFromObject(JSONObject o) {
     var page = new JSONPage(o.variables['id'], o.variables['title'], o.variables['template'], o.variables['alias'], o.variables['hidden'],_client);
+    _addPageListener(page);
     _pages[page.id] = page;
     return page.id;
+  }
+
+  void _addPageListener(Page page){
+    page.registerListener((Page p){
+      if(_pages.containsKey(p.id)){
+        return;
+      }
+      var removeKey;
+      _pages.forEach((String k,Page v){
+        if(v == p){
+          if(k == _currentPageId){
+            _currentPageId= p.id;
+          }
+          if(_pageOrder.containsKey(k)){
+            _pageOrder[p.id] = _pageOrder[k];
+          }
+          _pageOrder.forEach((lk,List<String> l){
+            _pageOrder[lk] = l.map((String s)=>s==k?p.id:s);
+          });
+
+          removeKey = k;
+        }
+      });
+      _pages.remove(removeKey);
+      _pages[p.id] = p;
+    });
+
   }
 
   void deactivatePage(String page_id, [ChangeCallback callback]) {
