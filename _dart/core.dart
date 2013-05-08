@@ -1,40 +1,25 @@
 library core;
 
 import "dart:html";
-
 import "dart:json";
-
 import "dart:uri" as Uri;
-
 import "dart:math" as Math;
-
 import "dart:isolate";
-
 import "dart:async";
-
 import "pcre_syntax_checker.dart";
 
 part "src/core_animation.dart";
-
 part "src/core_expand_decoration.dart";
-
 part "src/core_slide_decoration.dart";
-
 part "src/core_input_validator.dart";
-
 part "src/core_validating_form.dart";
-
 part "src/core_keep_alive.dart";
-
 part "src/core_form_decoration.dart";
-
 part 'src/core_dialog.dart';
-
 part 'src/core_progressbar.dart';
-
 part 'src/core_status_bar.dart';
-
 part 'src/core_infobox.dart';
+part 'src/core_initializer.dart';
 
 class BetterSelect {
   static final Map<SelectElement, BetterSelect> _cached = new Map<SelectElement, BetterSelect>();
@@ -250,7 +235,6 @@ class AJAXRequest {
     request = new HttpRequest();
     request.onReadyStateChange.listen((Event e) {
       if (request.readyState == 4) {
-        print(request.responseText);
         try {
           Map response = parse(request.responseText);
           callbackSuccess(response);

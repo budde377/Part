@@ -1,12 +1,10 @@
 part of core;
 
-typedef bool SubmitFunction(Map<String,String> data);
-
 class FormDecoration {
   final FormElement form;
   final SpanElement filter = new SpanElement();
 
-  SubmitFunction _submitFunction;
+  Function _submitFunction;
 
 
   static const String NOTION_TYPE_ERROR = "error";
@@ -31,11 +29,13 @@ class FormDecoration {
   }
 
 
-  void set submitFunction(SubmitFunction f){
+  void set submitFunction(bool f(Map<String,String> data)){
     _submitFunction = f;
     form.onSubmit.listen((Event e){
+      e.preventDefault();
+      e.stopImmediatePropagation();
       var data = <String,String>{};
-      var input = form.queryAll('input:not([type=submit]), textarea, select').forEach((SelectElement e){
+      var input = form.queryAll('input:not([type=submit]), textarea, select').forEach((Element e){
         data[e.name] = e.value;
       });
       if(!f(data)){

@@ -22,6 +22,7 @@ abstract class Page {
 
 class JSONPage extends Page {
   String _id, _title, _template, _alias;
+
   bool _hidden = false;
 
   final List<PageInfoChangeListener> _listeners = [];
@@ -54,6 +55,7 @@ class JSONPage extends Page {
     hidden = ?hidden ? hidden : _hidden;
     callback = ?callback ? callback : (a1, [a2]) {
     };
+
     var function = new ChangePageInfoJSONFunction(_id, id, title, template, alias, hidden);
     var functionCallback = (JSONResponse response) {
       switch (response.type) {
@@ -63,7 +65,7 @@ class JSONPage extends Page {
           _title = title;
           _alias = alias;
           _hidden = hidden;
-          callListeners();
+          _callListeners();
           callback(response.type);
           break;
         default:
@@ -73,7 +75,7 @@ class JSONPage extends Page {
     _client.callFunction(function, functionCallback);
   }
 
-  void callListeners() {
+  void _callListeners() {
     _listeners.forEach((void f(Page page)) {
       f(this);
     });

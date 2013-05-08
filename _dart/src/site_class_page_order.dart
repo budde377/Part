@@ -1,11 +1,8 @@
 part of site_classes;
 
 const PAGE_ORDER_CHANGE_DEACTIVATE = 1;
-
 const PAGE_ORDER_CHANGE_ACTIVATE = 2;
-
 const PAGE_ORDER_CHANGE_DELETE_PAGE = 3;
-
 const PAGE_ORDER_CHANGE_CREATE_PAGE = 4;
 
 typedef void PageOrderChangeListener(int changeType, [ Page page]);
@@ -48,8 +45,6 @@ class JSONPageOrder extends PageOrder {
   final String ajax_id;
 
   JSONClient _client;
-
-  List<Page> _currentPagePath;
 
   bool _hasBeenSetUp = false;
 
@@ -245,10 +240,7 @@ class JSONPageOrder extends PageOrder {
   }
 
   List<Page> get currentPagePath{
-    if(_currentPagePath == null){
-      _currentPagePath = pagePath(_currentPageId);
-    }
-    return _currentPagePath;
+    return pagePath(_currentPageId);
 
   }
 
