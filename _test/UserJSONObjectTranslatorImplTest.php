@@ -2,7 +2,6 @@
 require_once  dirname(__FILE__) . '/../_class/UserJSONObjectTranslatorImpl.php';
 require_once dirname(__FILE__) . '/_stub/StubUserImpl.php';
 require_once dirname(__FILE__) . '/_stub/StubUserLibraryImpl.php';
-require_once dirname(__FILE__) . '/_stub/StubUserPrivilegesLibraryImpl.php';
 require_once dirname(__FILE__).'/_stub/StubUserPrivilegesImpl.php';
 
 /**

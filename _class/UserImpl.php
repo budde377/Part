@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/../_trait/RequestTrait.php';
 require_once dirname(__FILE__) . '/../_trait/ValidationTrait.php';
 require_once dirname(__FILE__) . '/../_interface/User.php';
 require_once dirname(__FILE__) . '/../_interface/Observable.php';
+require_once dirname(__FILE__) . '/UserPrivilegesImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -13,6 +14,7 @@ class UserImpl implements User, Observable
 {
     use RequestTrait;
     use ValidationTrait;
+
     private static $randomString = 'S6lmSif7i3gmoyPqoAoW';
 
     private $database;
@@ -24,6 +26,7 @@ class UserImpl implements User, Observable
     private $lastLogin;
     private $id;
 
+    private $privileges;
 
     /** @var $existsStatement PDOStatement | null */
     private $existsStatement;
@@ -82,7 +85,7 @@ class UserImpl implements User, Observable
      */
     public function setUsername($username)
     {
-        if($username == $this->username){
+        if ($username == $this->username) {
             return true;
         }
         if ($this->usernameExists($username)) {
@@ -135,7 +138,7 @@ class UserImpl implements User, Observable
      */
     public function setPassword($password)
     {
-        if(!$this->isValidPassword($password)){
+        if (!$this->isValidPassword($password)) {
             return false;
         }
 
@@ -177,9 +180,9 @@ class UserImpl implements User, Observable
             $this->deleteStatement = $this->connection->prepare("DELETE FROM User WHERE username = ?");
             $this->deleteStatement->bindParam(1, $this->username);
         }
-        try{
+        try {
             $this->deleteStatement->execute();
-        } catch (PDOException $exception){
+        } catch (PDOException $exception) {
             return false;
         }
         if ($this->exists()) {
@@ -267,7 +270,7 @@ class UserImpl implements User, Observable
     public function isLoggedIn()
     {
         return $this->SESSIONValueOfIndexIfSetElseDefault('loginUsername', false) == $this->getUsername() &&
-            $this->SESSIONValueOfIndexIfSetElseDefault('loginPassword', false) == $this->getPassword();
+        $this->SESSIONValueOfIndexIfSetElseDefault('loginPassword', false) == $this->getPassword();
     }
 
     /**
@@ -442,5 +445,17 @@ class UserImpl implements User, Observable
     public function isValidPassword($password)
     {
         return is_string($password) && strlen($password) > 0;
+    }
+
+    /**
+     * This will get the UserPrivileges
+     * @return UserPrivileges
+     */
+    public function getUserPrivileges()
+    {
+        if($this->privileges == null){
+            $this->privileges = new UserPrivilegesImpl($this,$this->database);
+        }
+        return $this->privileges;
     }
 }

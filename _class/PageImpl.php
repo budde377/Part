@@ -2,6 +2,7 @@
 require_once dirname(__FILE__) . '/../_interface/Page.php';
 require_once dirname(__FILE__) . '/../_interface/Observable.php';
 require_once dirname(__FILE__) . '/../_exception/MalformedParameterException.php';
+require_once dirname(__FILE__) . '/PageContentImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -21,6 +22,8 @@ class PageImpl implements Page, Observable
 
     private $database;
     private $connection;
+
+    private $content = array();
 
     /** @var $existsStatement PDOStatement | null */
     private $existsStatement = null;
@@ -376,5 +379,19 @@ class PageImpl implements Page, Observable
 
         $this->hidden = 0;
         $this->updateHiddenStatement->execute();
+    }
+
+    /**
+     * This will return an object used to retrieve the content.
+     * @param null | string $id Optional parameter specifying an id for the content.
+     * @return PageContent
+     */
+    public function getContent($id = null)
+    {
+        if(!isset($this->content[$id])){
+            $this->content[$id] = new PageContentImpl($this->database,$this,$id);
+        }
+
+        return $this->content[$id];
     }
 }

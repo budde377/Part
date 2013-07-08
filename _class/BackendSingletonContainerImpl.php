@@ -11,7 +11,6 @@ require_once dirname(__FILE__) . '/SiteLibraryImpl.php';
 require_once dirname(__FILE__) . '/UserLibraryImpl.php';
 require_once dirname(__FILE__) . '/MultiSiteUserPrivilegesLibraryImpl.php';
 require_once dirname(__FILE__) . '/DefaultPageLibraryImpl.php';
-require_once dirname(__FILE__) . '/UserPrivilegesLibraryImpl.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -46,8 +45,6 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $defaultPageLibrary;
     /** @var DartRegister */
     private $dartRegister;
-    /** @var  UserPrivilegesLibrary*/
-    private $userPrivilegesLibrary;
 
     public function __construct(Config $config)
     {
@@ -198,16 +195,4 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
         return $this->dartRegister;
     }
 
-    /**
-     * Will create and reuse an instance of UserPrivilegesLibrary
-     * @return UserPrivilegesLibrary
-     */
-    public function getUserPrivilegesLibraryInstance()
-    {
-        if($this->userPrivilegesLibrary == null){
-            $this->userPrivilegesLibrary = new UserPrivilegesLibraryImpl($this->getDBInstance());
-        }
-
-        return $this->userPrivilegesLibrary;
-    }
 }

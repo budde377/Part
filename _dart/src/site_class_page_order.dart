@@ -166,7 +166,7 @@ class JSONPageOrder extends PageOrder {
             _pageOrder[p.id] = _pageOrder[k];
           }
           _pageOrder.forEach((lk,List<String> l){
-            _pageOrder[lk] = l.map((String s)=>s==k?p.id:s);
+            _pageOrder[lk] = l.map((String s)=>s==k?p.id:s).toList();
           });
 
           removeKey = k;
@@ -193,9 +193,11 @@ class JSONPageOrder extends PageOrder {
 
   void _removeFromPageOrder(String id) {
     if(_pageOrder.containsKey(id)){
-      _pageOrder[id].forEach((String v){
-        _removeFromPageOrder(v);
-      });
+      var l = _pageOrder[id];
+      var i = 0;
+      while(l.length > 0){
+        _removeFromPageOrder(l.removeAt(0));
+      }
       _pageOrder.remove(id);
     }
     _pageOrder.forEach((String k, List l) {

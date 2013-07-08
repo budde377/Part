@@ -2,7 +2,6 @@ library core;
 
 import "dart:html";
 import "dart:json";
-import "dart:uri" as Uri;
 import "dart:math" as Math;
 import "dart:isolate";
 import "dart:async";
@@ -255,4 +254,8 @@ class AJAXRequest {
     request.send(formData);
   }
 
+}
+
+class RefreshPage{
+  
 }

@@ -328,6 +328,23 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertTrue($page->isHidden());
     }
 
+    public function testGetContentReturnsInstanceOfPageContent(){
+        $this->assertInstanceOf("PageContent",$this->testPage->getContent());
+    }
+
+    public function testGetContentReturnSameInstanceOnSameId(){
+        $content = $this->testPage->getContent();
+        $content2 = $this->testPage->getContent();
+        $this->assertTrue($content === $content2);
+    }
+
+    public function testGetContentReturnDifferentInstanceOnDifferentId(){
+        $content = $this->testPage->getContent();
+        $content2 = $this->testPage->getContent('someId');
+        $this->assertFalse($content === $content2);
+
+    }
+
 
     public function getSetUpOperation()
     {

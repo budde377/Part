@@ -185,4 +185,14 @@ class StubPageImpl implements Page
     {
         $this->hidden = false;
     }
+
+    /**
+     * This will return an object used to retrieve the content.
+     * @param null | string $id Optional parameter specifying an id for the content.
+     * @return PageContent
+     */
+    public function getContent($id = null)
+    {
+        // TODO: Implement getContent() method.
+    }
 }

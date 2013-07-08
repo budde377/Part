@@ -34,6 +34,15 @@ interface User
      * @return null | string Will return username as string if the parent is set. Else it will return null
      */
     public function getParent();
+
+
+    /**
+     * This will get the UserPrivileges
+     * @return UserPrivileges
+     */
+    public function getUserPrivileges();
+
+
     /**
      * @abstract
      * Will set the username, if password is the current password and username is unique.

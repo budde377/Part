@@ -559,7 +559,13 @@ class UserImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertFalse($user->delete(),'Did not return false');
     }
 
+    public function testGetUserPrivilegesWillReturnInstanceOfUserPrivileges(){
+        $this->assertInstanceOf('UserPrivileges',$this->user->getUserPrivileges());
+    }
 
+    public function testGetUserPrivilegesWillReturnSameInstance(){
+        $this->assertTrue($this->user->getUserPrivileges() === $this->user->getUserPrivileges());
+    }
 
     public function getSetUpOperation()
     {

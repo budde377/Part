@@ -11,7 +11,6 @@ class UserPrivilegesImpl implements UserPrivileges
     private $connection;
     /** @var User */
     private $user;
-    private $username;
     private $rootPrivilege = 0;
     private $sitePrivilege = 0;
     private $pagePrivilege = array();
@@ -27,7 +26,6 @@ class UserPrivilegesImpl implements UserPrivileges
     function __construct(User $user, DB $database)
     {
         $this->user = $user;
-        $this->username = $user->getUsername();
         $this->connection = $database->getConnection();
     }
 
