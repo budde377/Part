@@ -29,11 +29,6 @@ interface User
     public function getLastLogin();
 
     /**
-     * @return UserPrivileges
-     */
-    public function getUserPrivileges();
-
-    /**
      * @abstract
      * @return null | string Will return username as string if the parent is set. Else it will return null
      */

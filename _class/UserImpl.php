@@ -3,6 +3,8 @@ require_once dirname(__FILE__) . '/../_trait/RequestTrait.php';
 require_once dirname(__FILE__) . '/../_trait/ValidationTrait.php';
 require_once dirname(__FILE__) . '/../_interface/User.php';
 require_once dirname(__FILE__) . '/../_interface/Observable.php';
+require_once dirname(__FILE__) . '/UserPrivilegesImpl.php';
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
