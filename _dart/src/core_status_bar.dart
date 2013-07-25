@@ -42,7 +42,7 @@ class SavingBar{
           _statusBar.remove();
         }
       });
-      _updatePercentage(1);
+      _updatePercentage(1.toDouble());
       return;
     }
     if(_endedJobs.length == 0 && _runningJobs.length == 1){

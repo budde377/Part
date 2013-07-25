@@ -17,6 +17,7 @@ class ConfigImpl implements Config
     private $pageElements = null;
     private $preScripts = null;
     private $postScripts = null;
+    private $ajaxRegistrable = null;
     private $optimizers = null;
     private $mysql = null;
     private $defaultPages;
@@ -58,7 +59,7 @@ class ConfigImpl implements Config
     public function getTemplate($name)
     {
         $this->setUpTemplate();
-        return isset($this->templates[$name])?$this->templates[$name]:null;
+        return isset($this->templates[$name]) ? $this->templates[$name] : null;
     }
 
     /**
@@ -174,7 +175,7 @@ class ConfigImpl implements Config
     {
         $this->setUpTemplate();
         $ret = array();
-        foreach($this->templates as $key=>$val){
+        foreach ($this->templates as $key => $val) {
             $ret[] = $key;
         }
         return $ret;
@@ -187,10 +188,10 @@ class ConfigImpl implements Config
      */
     public function getDefaultPages()
     {
-        if($this->defaultPages === null){
+        if ($this->defaultPages === null) {
             $this->defaultPages = array();
-            if($this->configFile->defaultPages->getName()){
-                foreach($this->configFile->defaultPages->page as $page){
+            if ($this->configFile->defaultPages->getName()) {
+                foreach ($this->configFile->defaultPages->page as $page) {
                     $title = (string)$page;
                     $this->defaultPages[$title]["template"] = (string)$page["template"];
                     $this->defaultPages[$title]["alias"] = (string)$page["alias"];
@@ -204,9 +205,9 @@ class ConfigImpl implements Config
 
     private function setUpTemplate()
     {
-        if ($this->templates === null ) {
+        if ($this->templates === null) {
             $this->templates = array();
-            if($this->configFile->templates->getName()){
+            if ($this->configFile->templates->getName()) {
                 $templates = $this->configFile->templates->template;
                 foreach ($templates as $template) {
                     $this->templates[(string)$template] = $this->rootPath . (string)$template['link'];
@@ -214,5 +215,31 @@ class ConfigImpl implements Config
             }
 
         }
+    }
+
+    /**
+     * Will return AJAXRegistrable as an array, with the num key and an array containing "class_name", "path" and "ajaxId" as value.
+     * The link should be relative to a root path provided.
+     * @return array
+     */
+    public function getAJAXRegistrable()
+    {
+
+        if ($this->ajaxRegistrable != null) {
+            return $this->ajaxRegistrable;
+        }
+
+        $this->ajaxRegistrable = array();
+
+        if (!$this->configFile->AJAXRegistrable->getName()) {
+            return $this->ajaxRegistrable;
+        }
+
+
+        foreach ($this->configFile->AJAXRegistrable->class as $registrable) {
+            $this->ajaxRegistrable[] = array("class_name" => (string)$registrable, "path" => $this->rootPath . $registrable['link'],
+                "ajax_id" => (string)$registrable['ajax_id']);
+        }
+        return $this->ajaxRegistrable;
     }
 }

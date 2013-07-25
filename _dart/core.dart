@@ -7,6 +7,9 @@ import "dart:isolate";
 import "dart:async";
 import "pcre_syntax_checker.dart";
 
+import "json.dart" as JSON;
+import "site_classes.dart" as SiteClasses;
+
 part "src/core_animation.dart";
 part "src/core_expand_decoration.dart";
 part "src/core_slide_decoration.dart";
@@ -17,8 +20,9 @@ part "src/core_form_decoration.dart";
 part 'src/core_dialog.dart';
 part 'src/core_progressbar.dart';
 part 'src/core_status_bar.dart';
-part 'src/core_infobox.dart';
+part 'src/core_floating_box.dart';
 part 'src/core_initializer.dart';
+part 'src/core_content_editor.dart';
 
 class BetterSelect {
   static final Map<SelectElement, BetterSelect> _cached = new Map<SelectElement, BetterSelect>();

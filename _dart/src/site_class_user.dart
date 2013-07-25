@@ -5,7 +5,9 @@ typedef void UserInfoChangeListener(User user);
 abstract class User {
 
   static const PRIVILEGE_ROOT = 1;
+
   static const PRIVILEGE_SITE = 2;
+
   static const PRIVILEGE_PAGE = 3;
 
   String get username;
@@ -16,15 +18,17 @@ abstract class User {
 
   int get privilege;
 
-  List<String> get page_ids;
+  List<Page> get pages;
 
-  void changeInfo({String username, String mail, ChangeCallback callback});
+  void changeInfo({String username:null, String mail:null, ChangeCallback callback:null});
 
   void changePassword(String currentPassword, String newPassword, [ChangeCallback callback]);
 
-  void addPagePrivilege(String page_id, [ChangeCallback callback]);
+  void addPagePrivilege(Page page, [ChangeCallback callback]);
 
-  void revokePagePrivilege(String page_id, [ChangeCallback callback]);
+  void revokePagePrivilege(Page page, [ChangeCallback callback]);
+
+  bool canModifyPage(Page page);
 
   void registerListener(UserInfoChangeListener listener);
 }
@@ -32,17 +36,22 @@ abstract class User {
 
 class JSONUser extends User {
   String _username, _mail, _parent;
-  final JSONClient _client;
-  final List<UserInfoChangeListener> _listeners = [];
-  int _privileges;
-  List<String> _page_ids;
 
-  JSONUser(String username, String mail, String parent, int privileges, List<String> page_ids, JSONClient client):_client = client{
+  final JSONClient _client;
+
+  final List<UserInfoChangeListener> _listeners = [];
+
+  int _privileges;
+
+  List<Page> _pages;
+
+  JSONUser(String username, String mail, String parent, int privileges, List<Page> pages, JSONClient client):_client = client {
     _username = username;
     _mail = mail;
     _parent = parent;
-    _page_ids = privileges == User.PRIVILEGE_PAGE?page_ids:null;
+    _pages = privileges == User.PRIVILEGE_PAGE ? new List<Page>.from(pages) : <Page>[];
     _privileges = privileges;
+
   }
 
   String get username => _username;
@@ -51,9 +60,11 @@ class JSONUser extends User {
 
   String get parent => _parent;
 
-  void changeInfo({String username, String mail, ChangeCallback callback}) {
-    mail = ?mail ? mail : _mail;
-    username = ?username ? username : _username;
+  void changeInfo({String username:null, String mail:null, ChangeCallback callback:null}) {
+    mail = mail != null ? mail : _mail;
+    username = username != null ? username : _username;
+    callback = callback != null ? callback : (e1, [e2, e3]) {
+    };
     var jsonFunction = new ChangeUserInfoJSONFunction(_username, username, mail);
     _client.callFunction(jsonFunction, (JSONResponse response) {
       if (response.type == RESPONSE_TYPE_SUCCESS) {
@@ -61,14 +72,14 @@ class JSONUser extends User {
         _mail = mail;
         callback(CALLBACK_STATUS_SUCCESS);
         _callListeners();
-      } else  {
+      } else {
         callback(CALLBACK_STATUS_ERROR, response.error_code);
       }
     });
   }
 
   void changePassword(String currentPassword, String newPassword, [ChangeCallback callback]) {
-    var jsonFunction = new ChangeUserPasswordJSONFunction(_username,currentPassword, newPassword);
+    var jsonFunction = new ChangeUserPasswordJSONFunction(_username, currentPassword, newPassword);
     _client.callFunction(jsonFunction, (JSONResponse response) {
       switch (response.type) {
         case RESPONSE_TYPE_SUCCESS:
@@ -92,14 +103,15 @@ class JSONUser extends User {
 
   int get privilege => _privileges;
 
-  List<String> get page_ids => _page_ids == null?[]:new List<String>.from(_page_ids);
+
+  List<Page> get pages => new List<Page>.from(_pages);
 
 
-  void addPagePrivilege(String page_id, [ChangeCallback callback]){
-    var function = new AddUserPagePrivilegeJSONFunction(_username,page_id);
-    _client.callFunction(function,(JSONResponse response){
-      if(response.type==RESPONSE_TYPE_SUCCESS){
-        _page_ids.add(page_id);
+  void addPagePrivilege(Page page, [ChangeCallback callback]) {
+    var function = new AddUserPagePrivilegeJSONFunction(_username, page.id);
+    _client.callFunction(function, (JSONResponse response) {
+      if (response.type == RESPONSE_TYPE_SUCCESS) {
+        _pages.add(page);
         callback(response.type);
         _callListeners();
       } else {
@@ -108,11 +120,11 @@ class JSONUser extends User {
     });
   }
 
-  void revokePagePrivilege(String page_id, [ChangeCallback callback]){
-    var function = new RevokeUserPagePrivilegeJSONFunction(_username,page_id);
-    _client.callFunction(function,(JSONResponse response){
-      if(response.type==RESPONSE_TYPE_SUCCESS){
-        _page_ids.remove(page_id);
+  void revokePagePrivilege(Page page, [ChangeCallback callback]) {
+    var function = new RevokeUserPagePrivilegeJSONFunction(_username, page.id);
+    _client.callFunction(function, (JSONResponse response) {
+      if (response.type == RESPONSE_TYPE_SUCCESS) {
+        _pages.remove(page);
         callback(response.type);
         _callListeners();
       } else {
@@ -120,6 +132,8 @@ class JSONUser extends User {
       }
     });
   }
+
+  bool canModifyPage(Page page) => _privileges == User.PRIVILEGE_ROOT || _privileges == User.PRIVILEGE_SITE ||  _pages.map((Page p) => p.id).contains(page.id);
 
 
 }

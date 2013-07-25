@@ -1,6 +1,9 @@
 <?php
 require_once dirname(__FILE__) . '/../_class/AJAXRegisterImpl.php';
 require_once dirname(__FILE__) . '/_stub/NullRegistrableImpl.php';
+require_once dirname(__FILE__) . '/_stub/StubConfigImpl.php';
+require_once dirname(__FILE__) . '/_stub/NullBackendSingletonContainerImpl.php';
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -16,7 +19,7 @@ class AJAXRegisterImplTest extends PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->register = new AJAXRegisterImpl();
+        $this->register = new AJAXRegisterImpl(new NullBackendSingletonContainerImpl());
     }
 
     public function testListRegisterWillReturnArrayWithNoRegistered()
@@ -60,7 +63,7 @@ class AJAXRegisterImplTest extends PHPUnit_Framework_TestCase
         $this->assertNull($registeredVal, 'Was not null');
     }
 
-    public function testOnDuplicatesWillOldBeKept()
+    public function testOnDuplicatesBothWillBeKeptOldWillBeReturnIfNotNull()
     {
         $id = 'id1';
         $val1 = 'val1';
@@ -70,8 +73,124 @@ class AJAXRegisterImplTest extends PHPUnit_Framework_TestCase
         $this->register->registerAJAX($id, $registrable1);
         $this->register->registerAJAX($id, $registrable2);
         $registeredVal = $this->register->getAJAXFromRegistered($id);
-        $this->assertEquals($val1, $registeredVal, 'Did not keep old registrable');
+        $this->assertEquals($val1, $registeredVal);
+    }
+
+    public function testOnDuplicatesBothWillBeKeptNewestWillBeReturnedIfFirstNull()
+    {
+        $id = 'id1';
+        $val1 = null;
+        $val2 = null;
+        $val3 = 'val3';
+        $registrable1 = new NullRegistrableImpl(array($id => $val1));
+        $registrable2 = new NullRegistrableImpl(array($id => $val2));
+        $registrable3 = new NullRegistrableImpl(array($id => $val3));
+        $this->register->registerAJAX($id, $registrable1);
+        $this->register->registerAJAX($id, $registrable2);
+        $this->register->registerAJAX($id, $registrable3);
+        $registeredVal = $this->register->getAJAXFromRegistered($id);
+        $this->assertEquals($val3, $registeredVal);
+    }
+
+    public function testRegisterFromConfigWillRegisterOnEmptyInput(){
+        $config = new StubConfigImpl();
+        $config->setAJAXRegistrable(array());
+        $this->assertEquals(0, count($this->register->listRegistered()));
+        $this->register->registerAJAXFromConfig($config);
+        $this->assertEquals(0, count($this->register->listRegistered()));
+
+    }
+
+    public function testRegisterWillThrowExceptionOnInvalidLink(){
+        $config = new StubConfigImpl();
+        $config->setAJAXRegistrable(array(array('class_name'=>'nonExistingClass', 'path'=>'notARealFile', 'ajax_id'=>'someId')));
+        $this->assertEquals(0, count($this->register->listRegistered()));
+        $exceptionWasThrown = false;
+        try{
+            $this->register->registerAJAXFromConfig($config);
+        } catch (Exception $e){
+            $exceptionWasThrown = true;
+            $this->assertInstanceOf('FileNotFoundException', $e);
+        }
+        $this->assertTrue($exceptionWasThrown);
     }
 
 
+    public function testRegisterWillThrowExceptionOnInvalidClassName(){
+        $config = new StubConfigImpl();
+        $config->setAJAXRegistrable(array(array('class_name'=>'nonExistingClass','path'=>__FILE__, 'ajax_id'=>'someId')));
+        $this->assertEquals(0, count($this->register->listRegistered()));
+        $exceptionWasThrown = false;
+        try{
+            $this->register->registerAJAXFromConfig($config);
+        } catch (Exception $e){
+            $exceptionWasThrown = true;
+            $this->assertInstanceOf('ClassNotDefinedException', $e);
+        }
+        $this->assertTrue($exceptionWasThrown);
+    }
+
+    public function testRegisterWillThrowExceptionOnNotRightInstance(){
+        $config = new StubConfigImpl();
+        $config->setAJAXRegistrable(array(array('class_name'=>'AJAXRegisterImplTest', 'path'=>__FILE__, 'ajax_id'=>'someId')));
+        $this->assertEquals(0, count($this->register->listRegistered()));
+        $exceptionWasThrown = false;
+        try{
+            $this->register->registerAJAXFromConfig($config);
+        } catch (Exception $e){
+            $exceptionWasThrown = true;
+            $this->assertInstanceOf('ClassNotInstanceOfException', $e);
+        }
+        $this->assertTrue($exceptionWasThrown);
+    }
+
+    public function testRegisterWillRegisterOnRightInstanceInConfig(){
+        $config = new StubConfigImpl();
+        $config->setAJAXRegistrable(array(array('class_name'=>'NullRegistrableImpl', 'path'=>dirname(__FILE__).'/_stub/NullRegistrableImpl.php', 'ajax_id'=>'someId')));
+        $this->assertEquals(0, count($this->register->listRegistered()));
+        $this->assertEquals(0, count($this->register->listRegistered()));
+        $this->register->registerAJAXFromConfig($config);
+        $registered = $this->register->listRegistered();
+        $this->assertEquals(1, count($registered));
+        $this->assertEquals('someId', $registered[0]);
+    }
+
+
+    public function testRegisterWillRegisterTwoOnRightInstanceInConfig(){
+        $config = new StubConfigImpl();
+        $config->setAJAXRegistrable(array(array('class_name'=> 'NullRegistrableImpl', 'path'=>dirname(__FILE__).'/_stub/NullRegistrableImpl.php', 'ajax_id'=>'someId'),array('class_name'=> 'NullRegistrableImpl', 'path'=>dirname(__FILE__).'/_stub/NullRegistrableImpl.php', 'ajax_id'=>'someId2')));
+        $this->assertEquals(0, count($this->register->listRegistered()));
+        $this->assertEquals(0, count($this->register->listRegistered()));
+        $this->register->registerAJAXFromConfig($config);
+        $registered = $this->register->listRegistered();
+        $this->assertEquals(2, count($registered));
+        $this->assertEquals('someId', $registered[0]);
+        $this->assertEquals('someId2', $registered[1]);
+    }
+    /*
+     * $chain = new ScriptChainImpl();
+
+        $postScriptArray = $this->config->getPostScripts();
+        foreach ($postScriptArray as $className => $location) {
+
+            if (!file_exists($location)) {
+                throw new FileNotFoundException($location);
+            }
+            require_once $location;
+
+            if (!class_exists($className)) {
+                throw new ClassNotDefinedException($className);
+            }
+
+            $preScript = new $className();
+
+            if (!($preScript instanceof Script)) {
+                throw new ClassNotInstanceOfException($className, 'Script');
+            }
+
+            $chain->addScript($preScript);
+        }
+
+        return $chain;
+     */
 }

@@ -49,11 +49,11 @@ class JSONPage extends Page {
 
   void changeInfo({String id:null, String title:null, String template:null, String alias:null, bool hidden:null, ChangeCallback callback:null}) {
     id = id != null ? id : _id;
-    title = title != null? title : _title;
+    title = title != null ? title : _title;
     template = template != null ? template : _template;
-    alias = alias != null? alias : _alias;
-    hidden = hidden != null? hidden : _hidden;
-    callback = callback != null? callback : (a1, [a2]) {
+    alias = alias != null ? alias : _alias;
+    hidden = hidden != null ? hidden : _hidden;
+    callback = callback != null ? callback : (a1, [a2, a3]) {
     };
 
     var function = new ChangePageInfoJSONFunction(_id, id, title, template, alias, hidden);

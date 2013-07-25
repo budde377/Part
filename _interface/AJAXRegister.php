@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__FILE__).'/../_interface/Config.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -16,6 +17,11 @@ interface AJAXRegister
      */
     public function registerAJAX($id, Registrable $callback);
 
+    /**
+     * @param Config $config
+     * @return void
+     */
+    public function registerAJAXFromConfig(Config $config);
     /**
      * @abstract
      * Returns the result of callback() function on the registrable object.

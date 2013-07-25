@@ -378,6 +378,6 @@ class SiteImplTest extends PHPUnit_Extensions_Database_TestCase
     const database = 'cms2012testdb';
     const password = 'plovMand50';
     const username = 'cms2012';
-    const host = '192.168.1.1';
+    const host = '10.8.0.1';
 
 }

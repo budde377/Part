@@ -109,3 +109,11 @@ class UserLoginJSONFunction extends JSONFunction {
     this.arguments['password'] = password;
   }
 }
+
+class SaveContentChangesJSONFunction extends JSONFunction{
+  SaveContentChangesJSONFunction(String id, String new_text, String username): super('saveTextChanges'){
+    this.arguments['id'] = id;
+    this.arguments['new_text'] = new_text;
+    this.arguments['username'] = username;
+  }
+}

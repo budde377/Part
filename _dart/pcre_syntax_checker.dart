@@ -32,7 +32,7 @@ bool _checkDelimiters(String exp) {
   if(!re.hasMatch(exp)){
     return false;
   }
-  var match = (re.allMatches(exp).toList())[0];
+  var match = (re.allMatches(exp)).toList()[0];
   var notEqual;
   if((notEqual = match.group(1) != match.group(3)) && (match.group(1) != "{" || match.group(3) != "}")){
     return false;

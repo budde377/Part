@@ -19,6 +19,12 @@
                         <xs:field xpath="."/>
                     </xs:unique>
                 </xs:element>
+                <xs:element name="AJAXRegistrable" type="ajaxRegistrable" minOccurs="0">
+                    <xs:unique name="AJAXRegistrableName">
+                        <xs:selector xpath="class"/>
+                        <xs:field xpath="."/>
+                    </xs:unique>
+                </xs:element>
                 <xs:element name="postScripts" type="scripts" minOccurs="0">
                     <xs:unique name="postScriptName">
                         <xs:selector xpath="class"/>
@@ -83,6 +89,12 @@
     </xs:complexType>
 
 
+    <xs:complexType name="ajaxRegistrable">
+        <xs:sequence>
+            <xs:element name="class" type="ajaxIdLinkedVal" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
     <xs:complexType name="pageElements">
         <xs:sequence>
             <xs:element name="class" type="namedLinkedVal" maxOccurs="unbounded" minOccurs="0"/>
@@ -107,6 +119,16 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
+
+    <xs:complexType name="ajaxIdLinkedVal">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="name" name="ajax_id" use="required"/>
+                <xs:attribute type="xs:anyURI" name="link" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
 
     <xs:simpleType name="name">
         <xs:restriction base="xs:string">

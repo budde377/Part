@@ -95,7 +95,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getAJAXRegisterInstance()
     {
         if ($this->ajaxRegister === null) {
-            $this->ajaxRegister = new AJAXRegisterImpl();
+            $this->ajaxRegister = new AJAXRegisterImpl($this);
         }
         return $this->ajaxRegister;
     }

@@ -42,7 +42,7 @@ class ValidatingForm {
 
 
     var inputs = _element.queryAll('input:not([type=submit]), textarea');
-    inputs.forEach((Element element) {
+    inputs.forEach((InputElement element) {
       element.onBlur.listen(listener(element,true));
       element.onFocus.listen(listener(element,false));
       element.classes.add('valid');
@@ -68,7 +68,7 @@ class ValidatingForm {
 
   void validate([bool initial = true]) {
     var inputs = _element.queryAll('input:not([type=submit]), textarea');
-    inputs.forEach((Element element) {
+    inputs.forEach((InputElement element) {
       if (_valueMap[element] != element.value) {
         _checkElement(element);
       }
