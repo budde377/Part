@@ -14,7 +14,7 @@ abstract class Page {
 
   bool get hidden;
 
-  void changeInfo({String id, String title, String template, String alias, bool hidden, ChangeCallback callback});
+  void changeInfo({String id:null, String title:null, String template:null, String alias:null, bool hidden:null, ChangeCallback callback:null});
 
   void registerListener(void f(Page page));
 
@@ -47,13 +47,13 @@ class JSONPage extends Page {
     _hidden = hidden;
   }
 
-  void changeInfo({String id, String title, String template, String alias, bool hidden, ChangeCallback callback}) {
-    id = ?id ? id : _id;
-    title = ?title ? title : _title;
-    template = ?template ? template : _template;
-    alias = ?alias ? alias : _alias;
-    hidden = ?hidden ? hidden : _hidden;
-    callback = ?callback ? callback : (a1, [a2]) {
+  void changeInfo({String id:null, String title:null, String template:null, String alias:null, bool hidden:null, ChangeCallback callback:null}) {
+    id = id != null ? id : _id;
+    title = title != null ? title : _title;
+    template = template != null ? template : _template;
+    alias = alias != null ? alias : _alias;
+    hidden = hidden != null ? hidden : _hidden;
+    callback = callback != null ? callback : (a1, [a2, a3]) {
     };
 
     var function = new ChangePageInfoJSONFunction(_id, id, title, template, alias, hidden);

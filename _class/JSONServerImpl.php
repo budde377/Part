@@ -65,4 +65,14 @@ class JSONServerImpl implements JSONServer
     {
         $this->functions[$function->getName()] = $function;
     }
+
+    /**
+     * This will evaluate php://input
+     * @return JSONResponse
+     */
+    public function evaluatePostInput()
+    {
+        $postData = file_get_contents("php://input");
+        return $this->evaluate($postData);
+    }
 }

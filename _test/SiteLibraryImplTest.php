@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/../_test/TruncateOperation.php';
 require_once dirname(__FILE__) . '/../_test/_stub/StubDBImpl.php';
 require_once dirname(__FILE__) . '/../_class/SiteLibraryImpl.php';
 require_once dirname(__FILE__) . '/../_class/SiteImpl.php';
+require_once dirname(__FILE__) . '/MySQLConstants.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -223,8 +224,8 @@ class SiteLibraryImplTest extends PHPUnit_Extensions_Database_TestCase
     }
 
 
-    const database = 'cms2012testdb';
-    const password = 'plovMand50';
-    const username = 'cms2012';
-    const host = '192.168.1.1';
+    const database = MySQLConstants::MYSQL_DATABASE;
+    const password = MySQLConstants::MYSQL_PASSWORD;
+    const username = MySQLConstants::MYSQL_USERNAME;
+    const host = MySQLConstants::MYSQL_HOST;
 }

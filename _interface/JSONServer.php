@@ -8,6 +8,13 @@
  */
 interface JSONServer
 {
+
+    /**
+     * This will evaluate php://input
+     * @return JSONResponse
+     */
+    public function evaluatePostInput();
+
     /**
      * This will evaluate a JSON string
      * @param String $jsonString

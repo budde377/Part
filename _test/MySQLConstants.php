@@ -9,6 +9,6 @@ class MySQLConstants
 {
     const MYSQL_USERNAME = 'cms2012';
     const MYSQL_PASSWORD = 'plovMand50';
-    const MYSQL_HOST = '192.168.1.1';
+    const MYSQL_HOST = '10.8.0.1';
     const MYSQL_DATABASE = 'cms2012testdb';
 }

@@ -8,9 +8,9 @@ typedef void UserLibraryChangeListener(int changeType, User user);
 
 abstract class UserLibrary {
 
-  void createUser(String mail, String privileges, [ChangeCallback callback]);
+  void createUser(String mail, String privileges, [ChangeCallback callback = null]);
 
-  void deleteUser(String username, [ChangeCallback callback]);
+  void deleteUser(String username, [ChangeCallback callback = null]);
 
   void registerListener(UserLibraryChangeListener listener);
 
@@ -27,6 +27,7 @@ abstract class UserLibrary {
 
 class JSONUserLibrary extends UserLibrary {
   final String ajax_id;
+  final PageOrder _pageOrder;
   JSONClient _client;
   String _userLoggedInId;
   Map<String, User> _users = <String, User>{};
@@ -35,27 +36,28 @@ class JSONUserLibrary extends UserLibrary {
 
   static final Map<String, JSONUserLibrary> _cache = <String, JSONUserLibrary>{};
 
-  JSONUserLibrary._internal(this.ajax_id);
+  JSONUserLibrary._internal(this.ajax_id, this._pageOrder);
 
-  factory JSONUserLibrary(String ajax_id){
-    var library = _retrieveInstance(ajax_id);
+  factory JSONUserLibrary(String ajax_id, PageOrder pageOrder){
+    var library = _retrieveInstance(ajax_id, pageOrder);
     library._setUp();
 
   }
 
   factory JSONUserLibrary.initializeFromLists(String ajax_id,
                                               List<User> users,
-                                              String currentUserName){
-    var lib = _retrieveInstance(ajax_id);
+                                              String currentUserName,
+                                              PageOrder pageOrder){
+    var lib = _retrieveInstance(ajax_id, pageOrder);
     lib._setUpFromLists(users,currentUserName);
     return lib;
   }
 
-  static JSONUserLibrary _retrieveInstance(String ajax_id) {
+  static JSONUserLibrary _retrieveInstance(String ajax_id, PageOrder pageOrder) {
     if (_cache.containsKey(ajax_id)) {
       return _cache[ajax_id];
     } else {
-      var library = new JSONUserLibrary._internal(ajax_id);
+      var library = new JSONUserLibrary._internal(ajax_id, pageOrder);
       _cache[ajax_id] = library;
       return library;
     }
@@ -100,9 +102,10 @@ class JSONUserLibrary extends UserLibrary {
   }
 
   String _addUserFromObjectToUsers(JSONObject o, List<String> page_ids) {
-    var privString = o.variables['privileges'];
-    var privileges = privString == 'root'?User.PRIVILEGE_ROOT:(privString == 'site'?User.PRIVILEGE_SITE:User.PRIVILEGE_PAGE);
-    var user = new JSONUser(o.variables['username'], o.variables['mail'], o.variables['parent'], privileges, page_ids , _client);
+    var privilegesString = o.variables['privileges'];
+    var pages = page_ids.map((String id) => _pageOrder.pages[id]);
+    var privileges = privilegesString == 'root'?User.PRIVILEGE_ROOT:(privilegesString == 'site'?User.PRIVILEGE_SITE:User.PRIVILEGE_PAGE);
+    var user = new JSONUser(o.variables['username'], o.variables['mail'], o.variables['parent'], privileges, pages , _client);
     _addUserListener(user);
     _users[user.username] = user;
     return user.username;
@@ -128,7 +131,7 @@ class JSONUserLibrary extends UserLibrary {
     });
   }
 
-  void createUser(String mail, String privileges, [ChangeCallback callback]) {
+  void createUser(String mail, String privileges, [ChangeCallback callback = null]) {
     var function = new CreateUserJSONFunction(mail, privileges);
     var functionCallback = (JSONResponse response) {
 
@@ -145,7 +148,7 @@ class JSONUserLibrary extends UserLibrary {
 
   }
 
-  void deleteUser(String username, [ChangeCallback callback]) {
+  void deleteUser(String username, [ChangeCallback callback = null]) {
     var function = new DeleteUserJSONFunction(username);
     var functionCallback = (JSONResponse response) {
 

@@ -1,6 +1,9 @@
 <?php
 require_once dirname(__FILE__) . '/../_interface/AJAXRegister.php';
-
+require_once dirname(__FILE__) . '/../_interface/Registrable.php';
+require_once dirname(__FILE__) . '/../_exception/FileNotFoundException.php';
+require_once dirname(__FILE__) . '/../_exception/ClassNotDefinedException.php';
+require_once dirname(__FILE__) . '/../_exception/ClassNotInstanceOfException.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -13,6 +16,12 @@ class AJAXRegisterImpl implements AJAXRegister
 
     private $registeredIDs = array();
     private $registeredObjects = array();
+    private $container;
+
+    function __construct(BackendSingletonContainer $container)
+    {
+        $this->container = $container;
+    }
 
     /**
      * @param $id string
@@ -21,10 +30,13 @@ class AJAXRegisterImpl implements AJAXRegister
     public function registerAJAX($id, Registrable $callback)
     {
         if (!isset($this->registeredObjects[$id])) {
-            $this->registeredObjects[$id] = $callback;
+            $this->registeredObjects[$id] = array($callback);
             $this->registeredIDs[] = $id;
+        } else {
+            array_push($this->registeredObjects[$id], $callback);
         }
     }
+
 
     /**
      * @param $id string
@@ -35,9 +47,13 @@ class AJAXRegisterImpl implements AJAXRegister
         if (!isset($this->registeredObjects[$id])) {
             return null;
         }
-        /** @var $callback Registrable */
-        $callback = $this->registeredObjects[$id];
-        return $callback->callback($id);
+        $callbacks = $this->registeredObjects[$id];
+        $ret = null;
+        while (count($callbacks) > 0 && $ret == null) {
+            $callback = array_splice($callbacks, 0, 1);
+            $ret = $callback[0]->callback($id);
+        }
+        return $ret;
     }
 
     /**
@@ -46,5 +62,37 @@ class AJAXRegisterImpl implements AJAXRegister
     public function listRegistered()
     {
         return $this->registeredIDs;
+    }
+
+    /**
+     * @param Config $config
+     * @throws ClassNotDefinedException
+     * @throws FileNotFoundException
+     * @throws ClassNotInstanceOfException
+     * @return void
+     */
+    public function registerAJAXFromConfig(Config $config)
+    {
+        $registrable = $config->getAJAXRegistrable();
+        foreach ($registrable as $fileArray) {
+            $className = $fileArray['class_name'];
+            $path = $fileArray['path'];
+            $ajaxId = $fileArray['ajax_id'];
+            if (!file_exists($path)) {
+                throw new FileNotFoundException($path);
+            }
+            require_once $path;
+
+            if (!class_exists($className)) {
+                throw new ClassNotDefinedException($className);
+            }
+            $instance = new $className($this->container);
+
+            if (!($instance instanceof Registrable)) {
+                throw new ClassNotInstanceOfException($className,"Registrable");
+            }
+
+            $this->registerAJAX($ajaxId, $instance);
+        }
     }
 }

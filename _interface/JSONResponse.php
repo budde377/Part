@@ -27,6 +27,7 @@ interface JSONResponse extends JSONElement
     const ERROR_CODE_INVALID_USER_MAIL = 13;
     const ERROR_CODE_WRONG_PASSWORD = 14;
     const ERROR_CODE_INVALID_PASSWORD = 15;
+    const ERROR_CODE_CANT_DELETE_CURRENT_PAGE = 16;
 
 
     /**

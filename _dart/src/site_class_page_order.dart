@@ -29,15 +29,15 @@ abstract class PageOrder {
 
   bool pageExists(String page_id);
 
-  void deactivatePage(String page_id, [ChangeCallback callback]);
+  void deactivatePage(String page_id, [ChangeCallback callback = null]);
 
   void changePageOrder(List<String> page_id_list , {ChangeCallback callback:null,String parent_id:null});
 
   void registerListener(PageOrderChangeListener listener);
 
-  void createPage(String title, [ChangeCallback callback]);
+  void createPage(String title, [ChangeCallback callback = null]);
 
-  void deletePage(String id, [ChangeCallback callback]);
+  void deletePage(String id, [ChangeCallback callback = null]);
 
 }
 
@@ -178,7 +178,7 @@ class JSONPageOrder extends PageOrder {
 
   }
 
-  void deactivatePage(String page_id, [ChangeCallback callback]) {
+  void deactivatePage(String page_id, [ChangeCallback callback = null]) {
     var function = new DeactivatePageJSONFunction(page_id);
     _client.callFunction(function, (JSONResponse response) {
       if (callback != null) {
@@ -298,7 +298,7 @@ class JSONPageOrder extends PageOrder {
     });
   }
 
-  void createPage(String title, [ChangeCallback callback]) {
+  void createPage(String title, [ChangeCallback callback = null]) {
     var function = new CreatePageJSONFunction(title);
     var functionCallback = (JSONResponse response) {
       if (response.type == RESPONSE_TYPE_SUCCESS) {
@@ -312,7 +312,7 @@ class JSONPageOrder extends PageOrder {
     _client.callFunction(function, functionCallback);
   }
 
-  void deletePage(String id, [ChangeCallback callback]) {
+  void deletePage(String id, [ChangeCallback callback = null]) {
     var function = new DeletePageJSONFunction(id);
     var functionCallback = (JSONResponse response) {
       if (response.type == RESPONSE_TYPE_SUCCESS) {

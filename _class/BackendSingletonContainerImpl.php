@@ -46,8 +46,6 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $defaultPageLibrary;
     /** @var DartRegister */
     private $dartRegister;
-    /** @var  UserPrivilegesLibrary*/
-    private $userPrivilegesLibrary;
 
     public function __construct(Config $config)
     {
@@ -98,7 +96,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getAJAXRegisterInstance()
     {
         if ($this->ajaxRegister === null) {
-            $this->ajaxRegister = new AJAXRegisterImpl();
+            $this->ajaxRegister = new AJAXRegisterImpl($this);
         }
         return $this->ajaxRegister;
     }
@@ -198,16 +196,4 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
         return $this->dartRegister;
     }
 
-    /**
-     * Will create and reuse an instance of UserPrivilegesLibrary
-     * @return UserPrivilegesLibrary
-     */
-    public function getUserPrivilegesLibraryInstance()
-    {
-        if($this->userPrivilegesLibrary == null){
-            $this->userPrivilegesLibrary = new UserPrivilegesLibraryImpl($this->getDBInstance());
-        }
-
-        return $this->userPrivilegesLibrary;
-    }
 }

@@ -28,6 +28,10 @@ interface User
      */
     public function getLastLogin();
 
+    /**
+     * @return UserPrivileges
+     */
+    public function getUserPrivileges();
 
     /**
      * @abstract

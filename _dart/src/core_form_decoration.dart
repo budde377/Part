@@ -35,7 +35,7 @@ class FormDecoration {
       e.preventDefault();
       e.stopImmediatePropagation();
       var data = <String,String>{};
-      var input = form.queryAll('input:not([type=submit]), textarea, select').forEach((Element e){
+      form.queryAll('input:not([type=submit]), textarea, select').forEach((InputElement e){
         data[e.name] = e.value;
       });
       if(!f(data)){

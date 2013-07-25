@@ -11,6 +11,7 @@ class AJAXJSONClient extends JSONClient {
   final Map<int, Function> pendingFunctions = new Map<int, Function>();
 
   static final Map<String, JSONClient> _cache = <String, JSONClient>{};
+
   factory AJAXJSONClient(String ajaxID){
     if (_cache.containsKey(ajaxID)) {
       return _cache[ajaxID];

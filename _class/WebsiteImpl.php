@@ -45,6 +45,7 @@ class WebsiteImpl implements Website
         $template->setTemplateFromConfig($currentPage->getTemplate());
 
         $ajaxRegister = $this->backendContainer->getAJAXRegisterInstance();
+        $ajaxRegister->registerAJAXFromConfig($this->config);
 
         //Decide output mode
         if(($id = $this->GETValueOfIndexIfSetElseDefault('ajax',null)) !== null &&

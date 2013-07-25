@@ -9,6 +9,7 @@ require_once dirname(__FILE__) . '/../../_interface/User.php';
 class StubUserImpl implements User
 {
 
+    private $userPrivileges;
     private $username;
     private $mail;
     private $lastLogin;
@@ -133,13 +134,20 @@ class StubUserImpl implements User
     {
         return false;
     }
+    /**
+     * @param UserPrivileges $userPrivileges
+     */
+    public function setUserPrivileges($userPrivileges)
+    {
+        $this->userPrivileges = $userPrivileges;
+    }
 
     /**
-     * @return MultiSiteUserPrivileges
+     * @return UserPrivileges
      */
     public function getUserPrivileges()
     {
-        return null;
+        return $this->userPrivileges;
     }
 
     /**

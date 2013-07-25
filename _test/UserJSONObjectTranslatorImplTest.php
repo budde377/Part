@@ -44,6 +44,7 @@ class UserJSONObjectTranslatorImplTest extends PHPUnit_Framework_TestCase
         $this->user->setUsername($username);
         $parent = 'bob';
         $this->user->setParent($parent);
+        $this->user->setUserPrivileges($this->userPrivilegesLibrary->getUserPrivileges($this->user));
         $jsonObject = $this->translator->encode($this->user);
         $this->assertInstanceOf('UserJSONObjectImpl',$jsonObject);
         $this->assertEquals($mail,$jsonObject->getVariable('mail'));

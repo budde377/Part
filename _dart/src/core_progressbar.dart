@@ -6,7 +6,7 @@ class ProgressBar{
   final DivElement bar = new DivElement(), indicator = new DivElement();
 //  final List<ProgressBarListener> listeners = new List<ProgressBarListener>();
 
-  double _percentage = -1;
+  double _percentage = -1.0;
 
   ProgressBar(){
     bar.classes.add('progressBar');

@@ -44,7 +44,7 @@ class MySQLDBImplTest extends PHPUnit_Framework_TestCase
         /** @var $configXML SimpleXMLElement */
         $configXML = simplexml_load_string('
         <config xmlns="http://christian-budde.dk/SiteConfig">
-            <MySQLConnection><host>192.168.1.1</host><database>thisIsNotAValidDB</database><username>nosSchUser</username><password>password</password></MySQLConnection>
+            <MySQLConnection><host>10.8.0.1</host><database>thisIsNotAValidDB</database><username>nosSchUser</username><password>password</password></MySQLConnection>
         </config>');
 
         $config = new ConfigImpl($configXML, dirname(__FILE__));
