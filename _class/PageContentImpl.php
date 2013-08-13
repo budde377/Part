@@ -16,6 +16,7 @@ class PageContentImpl implements PageContent
     private $id;
 
     private $content;
+    private $time;
     private $history;
 
     /** @var  PDOStatement */
@@ -37,10 +38,10 @@ class PageContentImpl implements PageContent
     {
         $this->initializeHistory();
         $result = $this->history;
-        if($from != null){
+        if ($from != null) {
             $result = array();
-            foreach($this->history as $e){
-                if($e['time'] >= $from){
+            foreach ($this->history as $e) {
+                if ($e['time'] >= $from) {
                     $result[] = $e;
                 }
             }
@@ -53,18 +54,9 @@ class PageContentImpl implements PageContent
      */
     public function latestContent()
     {
-        if ($this->content == null && $this->history == null && $this->content == null) {
-            if ($this->id == null) {
-                $prep = $this->db->getConnection()->prepare("SELECT content FROM PageContent WHERE id is NULL AND page_id=? ORDER BY time DESC LIMIT 1");
-                $prep->execute(array($this->page->getID()));
-            } else {
-                $prep = $this->db->getConnection()->prepare("SELECT content FROM PageContent WHERE id=? AND page_id = ? ORDER BY time DESC LIMIT 1");
-                $prep->execute(array($this->id, $this->page->getID()));
-            }
-            $this->content = $prep->fetch(PDO::FETCH_ASSOC);
-            $this->content = $this->content['content'];
-        } else if($this->content == null && $this->history != null){
-            $this->content = $this->history[count($this->history)-1]['content'];
+        $this->initializeHistory();
+        if ($this->content == null && $this->history != null) {
+            $this->content = $this->history[count($this->history) - 1]['content'];
         }
 
         return $this->content;
@@ -76,6 +68,9 @@ class PageContentImpl implements PageContent
      */
     public function addContent($content)
     {
+        if (!$this->page->exists()) {
+            return;
+        }
         $this->initializeHistory();
         if ($this->preparedAddStatement == null) {
             $this->preparedAddStatement = $this->db->getConnection()->prepare("
@@ -83,7 +78,7 @@ class PageContentImpl implements PageContent
             VALUES (?, ?, ?, ?)");
         }
         $t = time();
-        $this->preparedAddStatement->execute(array($this->id, $this->page->getID(), date("Y-m-d H:i:s",$t), $content));
+        $this->preparedAddStatement->execute(array($this->id, $this->page->getID(), date("Y-m-d H:i:s", $t), $content));
         $this->content = $content;
         $this->history[] = array('content' => $content, 'time' => $t);
     }
@@ -94,13 +89,25 @@ class PageContentImpl implements PageContent
             return;
         }
         if ($this->id == null) {
-            $prep = $this->db->getConnection()->prepare("SELECT content, UNIX_TIMESTAMP(time) as time FROM PageContent WHERE id is NULL AND page_id = ? ORDER BY time ASC");
+            $prep = $this->db->getConnection()->prepare("SELECT content, UNIX_TIMESTAMP(time) AS time FROM PageContent WHERE id IS NULL AND page_id = ? ORDER BY time ASC");
             $prep->execute(array($this->page->getID()));
         } else {
-            $prep = $this->db->getConnection()->prepare("SELECT content, UNIX_TIMESTAMP(time) as time FROM PageContent WHERE id=? AND page_id = ? ORDER BY time ASC");
+            $prep = $this->db->getConnection()->prepare("SELECT content, UNIX_TIMESTAMP(time) AS time FROM PageContent WHERE id=? AND page_id = ? ORDER BY time ASC");
             $prep->execute(array($this->id, $this->page->getID()));
         }
         $this->history = $prep->fetchAll(PDO::FETCH_ASSOC);
 
+    }
+
+    /**
+     * @return int | null Returns the time of latest content as timestamp since epoc. If no content, then return null;
+     */
+    public function latestTime()
+    {
+        $this->initializeHistory();
+        if ($this->time == null && $this->history != null) {
+            $this->time = $this->history[count($this->history) - 1]['time'];
+        }
+        return $this->time;
     }
 }

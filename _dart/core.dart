@@ -5,6 +5,7 @@ import "dart:json";
 import "dart:math" as Math;
 import "dart:isolate";
 import "dart:async";
+
 import "pcre_syntax_checker.dart";
 
 import "json.dart" as JSON;
@@ -23,6 +24,9 @@ part 'src/core_status_bar.dart';
 part 'src/core_floating_box.dart';
 part 'src/core_initializer.dart';
 part 'src/core_content_editor.dart';
+part 'src/core_color_palette.dart';
+part 'src/core_file_uploader.dart';
+part 'src/core_scrollbars.dart';
 
 class BetterSelect {
   static final Map<SelectElement, BetterSelect> _cached = new Map<SelectElement, BetterSelect>();

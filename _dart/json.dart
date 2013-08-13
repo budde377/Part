@@ -1,6 +1,7 @@
 library json;
 import "dart:json" as JSON;
 import "dart:html";
+import "core.dart";
 
 part "src/json_client.dart";
 part "src/json_function.dart";

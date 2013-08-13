@@ -35,4 +35,12 @@ class NullPageContentImpl implements PageContent{
     {
         return null;
     }
+
+    /**
+     * @return int | null Returns the time of latest content as timestamp since epoc. If no content, then return null;
+     */
+    public function latestTime()
+    {
+        return null;
+    }
 }

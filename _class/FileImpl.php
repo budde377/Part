@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../_trait/FilePathTrait.php';
+require_once dirname(__FILE__) . '/../_trait/FileTrait.php';
 require_once dirname(__FILE__) . '/../_interface/File.php';
 require_once dirname(__FILE__) . '/FolderImpl.php';
 
@@ -12,7 +12,7 @@ require_once dirname(__FILE__) . '/FolderImpl.php';
  */
 class FileImpl implements File
 {
-    use FilePathTrait;
+    use FileTrait;
     protected $filePath;
     protected $mode = File::FILE_MODE_RW_POINTER_AT_END;
 

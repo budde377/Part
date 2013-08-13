@@ -110,10 +110,19 @@ class UserLoginJSONFunction extends JSONFunction {
   }
 }
 
-class SaveContentChangesJSONFunction extends JSONFunction{
-  SaveContentChangesJSONFunction(String id, String new_text, String username): super('saveTextChanges'){
+class AddContentJSONFunction extends JSONFunction{
+  AddContentJSONFunction(String id, String content): super('addContent'){
     this.arguments['id'] = id;
-    this.arguments['new_text'] = new_text;
-    this.arguments['username'] = username;
+    this.arguments['content'] = content;
   }
 }
+
+class UploadImageURIJSONFunction extends JSONFunction{
+  UploadImageURIJSONFunction(String fileName, String data, [List<ImageSize> sizes = null]): super('uploadImageURI'){
+    this.arguments['data'] = data;
+    this.arguments['fileName'] = fileName;
+    this.arguments['sizes'] = sizes;
+  }
+}
+
+

@@ -1,63 +1,100 @@
 part of core;
 
-InfoBox addInfoBoxToElement(Element element,String infoHtml, [String color = InfoBox.COLOR_WHITE]){
-  var infoBox = new InfoBox(infoHtml);
-  var p = element.offsetParent;
-  var top = element.offsetTop, left = element.offsetLeft;
-  while(p != null){
-    top+= p.offsetTop;
-    left+= p.offsetLeft;
-    p = p.offsetParent;
-  }
-  infoBox.showAt(left+(element.clientWidth/2).toInt(), top);
-  infoBox.backgroundColor = color;
-  return infoBox;
-}
-
-
-
-
 abstract class FloatingBox{
   final DivElement element =  new DivElement();
   Function _removeFunction = (){};
   StreamSubscription _escSubscription, _mouseDownSubscription;
+  bool _f = false;
 
   FloatingBox(){
     element.classes.add('floating_box');
   }
 
   bool get _inDom => element.parent != null;
+  void _changeListener (void f()) => (_) {
+    if(_inDom){
+      f();
+    }
+  };
+
+  bool get _fixed => _f;
+
+  set _fixed (bool b){
+    if(b == _fixed){
+      return;
+    }
+    if(b){
+      element.style.position = "fixed";
+    } else {
+      element.style.removeProperty("position");
+    }
+    _f = b;
+  }
+
+
+  int _elementOffsetTop(Element e) => _elementOffset(e, (Element e)=>e.getComputedStyle().top, () => window.scrollY, (Element e) => e.offsetTop);
+  int _elementOffsetLeft(Element e) => _elementOffset(e, (Element e)=>e.getComputedStyle().left, () => window.scrollX, (Element e) => e.offsetLeft);
+
+  int  _elementOffset(Element e, String computedStyleOffset(Element e), int scroll(), int offset(Element e)){
+    var fixed = _fixed;
+    var recursiveCall;
+    recursiveCall = (Element e){
+      if(e == null){
+        return 0;
+      }
+      var computedOffset = computedStyleOffset(e).trim();
+      var p = e.getComputedStyle().position;
+      fixed = p == "fixed";
+      switch( computedOffset == "auto"?"static":p){
+        case "fixed":
+          var i = int.parse(computedOffset.substring(0, computedOffset.length-2));
+          return i;
+          break;
+        case "absolute":
+          return int.parse(computedOffset.substring(0, computedOffset.length-2)) + recursiveCall(e.offsetParent);
+          break;
+        default:
+          return e == null ? 0 : offset(e) + recursiveCall(e.offsetParent);
+          break;
+      }
+
+    };
+    var r = recursiveCall(e);
+    _fixed = fixed;
+    return r;
+
+  }
 
   void showAboveCenterOfElement(Element e){
-    var p = e.offsetParent;
-    var top = e.offsetTop, left = e.offsetLeft;
-    while(p != null){
-      top+= p.offsetTop;
-      left+= p.offsetLeft;
-      p = p.offsetParent;
-    }
-    showAt(left+(element.clientWidth/2).toInt(), top);
-    window.onResize.listen((_){
-      if(_inDom){
-        showAboveCenterOfElement(e);
-      }
-    });
+    var s = () => showAt( _elementOffsetLeft(e)+e.clientWidth~/2, _elementOffsetTop(e));
+    s();
+    _setUpChangeListener(_changeListener(s));
+
+  }
+
+  void showAboveRightOfElement(Element e){
+    var s = () => showAt( _elementOffsetLeft(e)+e.clientWidth, _elementOffsetTop(e));
+    s();
+    _setUpChangeListener(_changeListener(s));
+
+  }
+
+  void showBelowCenterOfElement(Element e){
+    var s = () => showAt( _elementOffsetLeft(e)+e.clientWidth~/2, _elementOffsetTop(e)+e.clientHeight);
+    s();
+    _setUpChangeListener(_changeListener(s));
+
+  }
+
+  void _setUpChangeListener(void l(Event e)){
+    window.onResize.listen(l);
+    window.onScroll.listen(l);
   }
 
   void showBelowLeftOfElement(Element e){
-    var p = e.offsetParent;
-    var top = e.offsetTop, left = e.offsetLeft;
-    while(p != null){
-      top+= p.offsetTop;
-      left+= p.offsetLeft;
-      p = p.offsetParent;
-    }
-    showAt(left, top+e.clientHeight);
-    window.onResize.listen((_){
-      if(_inDom){
-        showBelowLeftOfElement(e);
-      }
-    });
+    var s = () => showAt(_elementOffsetLeft(e), _elementOffsetTop(e)+e.clientHeight);
+    s();
+    _setUpChangeListener(_changeListener(s));
   }
 
 
@@ -125,26 +162,45 @@ class InfoBox extends FloatingBox{
   static const String COLOR_RED = "red";
   static const String COLOR_WHITE = "white";
   static const String COLOR_BLACK = "black";
+  final Element  content;
+  DivElement _arrowElement = new DivElement();
 
-  DivElement  _textElement, _arrowElement;
+  bool _reversed = false;
 
-  InfoBox(infoHtml){
-    _textElement = new DivElement();
-    _arrowElement = new DivElement();
-    _textElement.innerHtml = infoHtml;
+  InfoBox.elementContent(this.content){
+    _setUp();
+  }
+
+  InfoBox(String infoHtml) : content = new DivElement(){
+    content.innerHtml = infoHtml;
+    _setUp();
+  }
+
+  void _setUp(){
     element.classes.add('info_box');
-    _textElement.classes.add('text');
+    content.classes.add('text');
     _arrowElement.classes.add('arrow');
 
-    element.append(_textElement);
+    element.append(content);
     element.append(_arrowElement);
   }
 
-  String get infoHtml => _textElement.innerHtml;
+  String get infoHtml => content.innerHtml;
 
   void set infoHtml(String html){
-    _textElement.innerHtml = html;
+    content.innerHtml = html;
   }
+
+  bool get reversed => _reversed;
+
+       set reversed(bool b){
+         if(b == _reversed){
+           return;
+         }
+         element.classes.toggle('reversed');
+         element.append(_reversed?_arrowElement:content);
+         _reversed = b;
+       }
 
 
   String get backgroundColor => element.classes.contains('red')?COLOR_RED:(element.classes.contains('white')?COLOR_WHITE:COLOR_BLACK);
@@ -163,7 +219,7 @@ class InfoBox extends FloatingBox{
   void showAt(int x, int y){
     query('body').append(element);
     x = x-(element.clientWidth/2).toInt();
-    y = y-element.clientHeight-_arrowElement.clientHeight;
+    y = y-(reversed ? 0: element.clientHeight-_arrowElement.clientHeight);
     element.style.top = "${y}px";
     element.style.left = "${x}px";
   }
@@ -171,25 +227,28 @@ class InfoBox extends FloatingBox{
 }
 
 class DropDown{
-  final DivElement content, element = new DivElement();
+  final Element content;
+  final DivElement element = new DivElement();
   DivElement _arrow = new DivElement(), _text = new DivElement();
   StreamSubscription _preventDefaultElement, _preventDefaultDropBox;
   DropDownBox _dropBox;
+  static final Map<Element, DropDown> _cache = new Map<Element, DropDown>();
 
-  DropDown(this.content){
-    setUp();
+  factory DropDown(element) => _cache.putIfAbsent(element, ()=>new DropDown._internal(element));
+
+  factory DropDown.fromLIList(List<LIElement> lis){
+    var ul = new UListElement();
+    ul.children = lis;
+    return _cache[ul] = new DropDown._internal(ul);
   }
 
-  DropDown.fromLIList(List<LIElement> lis) : content = new UListElement() {
-    content.children = lis;
-    setUp();
-  }
 
-  void setUp(){
+
+  DropDown._internal(this.content){
     _dropBox = new DropDownBox(content);
-    _arrow.classes.add('arrowDown');
+    _arrow.classes.add('arrow_down');
+    _text.classes.add('text');
     element..classes.add('drop_down')
-    ..append(_text)
     ..append(_arrow);
     _dropBox.listenOnRemove(()=>element.classes.remove('active'));
     closeOnESC = true;
@@ -213,7 +272,16 @@ class DropDown{
     _dropBox.remove();
   }
 
-  set text(String t) => _text.text = t;
+  set text(String t){
+    if(t.length > 0){
+      _text.text = t;
+      element.children.insert(0, _text);
+    } else {
+      _text.remove();
+    }
+
+  }
+  String get text => _text.parent == null? "":_text.text;
 
   bool get preventDefaultOnClick => _preventDefaultDropBox != null;
 
@@ -235,6 +303,7 @@ class DropDown{
   bool get closeOnMouseOutside => _dropBox.removeOnMouseDownOutsideOfBox;
   set closeOnMouseOutside (bool b) => _dropBox.removeOnMouseDownOutsideOfBox = b;
 
+  DropDownBox get dropDownBox => _dropBox;
 
 }
 

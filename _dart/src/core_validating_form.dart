@@ -108,7 +108,10 @@ class ValidatingForm {
       element.classes.remove('valid');
       element.classes.add('invalid');
       if (v.errorMessage.length > 0) {
-        (_infoBoxMap[element] = addInfoBoxToElement(element, v.errorMessage)).backgroundColor = InfoBox.COLOR_RED;
+        var box = new InfoBox(v.errorMessage);
+        box..backgroundColor = InfoBox.COLOR_RED
+           ..showAboveCenterOfElement(element);
+        _infoBoxMap[element] = box;
       }
       if (_validForm) {
         _validForm = false;

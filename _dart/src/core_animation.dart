@@ -2,37 +2,37 @@ part of core;
 
 class Animation {
 
-  bool exactHasBeenSeen = false, run = false;
-  double startTime, duration, currentTime;
-  Function animationFunction, callbackFunction;
+  bool _exactHasBeenSeen = false, _run = false;
+  double _startTime, _duration, _currentTime;
+  Function _animationFunction, _callbackFunction;
 
-  Animation(double duration, void animationFunction(double pct), [void callback(bool success)]) {
-    this.animationFunction = animationFunction;
-    this.duration = duration;
-    this.callbackFunction = callback;
+  Animation(Duration duration, void animationFunction(double pct), [void callback(bool success)]) {
+    this._animationFunction = animationFunction;
+    this._duration = duration.inMilliseconds;
+    this._callbackFunction = callback;
   }
 
 
   Animation start() {
-    run = true;
+    _run = true;
     window.requestAnimationFrame((time) {
-      startTime = time;
+      _startTime = time;
       _animate(time);});
     return this;
   }
 
   void _animate(double time) {
-    currentTime = time - startTime;
-    if (currentTime <= duration && run) {
-      exactHasBeenSeen = currentTime == duration;
-      animationFunction(currentTime / duration);
+    _currentTime = time - _startTime;
+    if (_currentTime <= _duration && _run) {
+      _exactHasBeenSeen = _currentTime == _duration;
+      _animationFunction(_currentTime / _duration);
       window.requestAnimationFrame(_animate);
     } else {
-      if (!exactHasBeenSeen && run) {
-        animationFunction(1);
+      if (!_exactHasBeenSeen && _run) {
+        _animationFunction(1);
       }
-      if (callbackFunction != null) {
-        callbackFunction(run);
+      if (_callbackFunction != null) {
+        _callbackFunction(_run);
       }
       stop();
     }
@@ -40,7 +40,7 @@ class Animation {
   }
 
   Animation stop() {
-    run = false;
+    _run = false;
     return this;
   }
 

@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../_interface/Folder.php';
-require_once dirname(__FILE__) . '/../_trait/FilePathTrait.php';
+require_once dirname(__FILE__) . '/../_trait/FileTrait.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -10,7 +10,7 @@ require_once dirname(__FILE__) . '/../_trait/FilePathTrait.php';
  */
 class FolderImpl implements Folder
 {
-    use FilePathTrait;
+    use FileTrait;
 
     private $folderPath;
     private $key;

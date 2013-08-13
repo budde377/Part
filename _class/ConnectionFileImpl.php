@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) .'/../_class/ConnectionFolderImpl.php';
 require_once dirname(__FILE__) . '/../_interface/File.php';
-require_once dirname(__FILE__) . '/../_trait/FilePathTrait.php';
+require_once dirname(__FILE__) . '/../_trait/FileTrait.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -11,7 +11,7 @@ require_once dirname(__FILE__) . '/../_trait/FilePathTrait.php';
  */
 class ConnectionFileImpl implements File
 {
-    use FilePathTrait;
+    use FileTrait;
 
     private $mode = File::FILE_MODE_RW_POINTER_AT_END;
     private $connection;

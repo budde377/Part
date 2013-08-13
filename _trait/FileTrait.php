@@ -6,7 +6,7 @@
  * Time: 1:11 PM
  * To change this template use File | Settings | File Templates.
  */
-trait FilePathTrait
+trait FileTrait
 {
     protected function relativeToAbsolute($file,$currentWorkingDir = null)
     {
@@ -73,5 +73,29 @@ trait FilePathTrait
         $relativePath .= substr($absoluteFilePath, $sizeToCut, strlen($absoluteFilePath));
         return $relativePath;
     }
+
+    /**
+     * Will generate a new file in the given path from name.
+     * @param String $path
+     * @param String $name
+     * @param bool $hashName
+     * @return File
+     */
+    public function newFileFromName($path, $name, $hashName = false){
+        $info = pathinfo($name);
+        $ext = strlen($e = $info['extension']) > 0 ? ".$e":"";
+        $name = $info['filename'];
+        $n = $hashName?md5($name):$name;
+        $file = new FileImpl("$path/$n$ext");
+        $i = 0;
+        while($file->exists()){
+            $i++;
+            $n = $hashName?md5($name.$i):"$name ($i)";
+            $file = new FileImpl("$path/$n$ext");
+        }
+        return $file;
+
+    }
+
 
 }

@@ -19,7 +19,7 @@ interface JSONResponse extends JSONElement
     const ERROR_CODE_PAGE_ORDER_PARTIAL_SET = 5;
     const ERROR_CODE_INVALID_PAGE_ID = 6;
     const ERROR_CODE_INVALID_PAGE_ALIAS = 7;
-    const ERROR_CODE_UNAUTHORISED = 8;
+    const ERROR_CODE_UNAUTHORIZED = 8;
     const ERROR_CODE_INVALID_PAGE_TITLE = 9;
     const ERROR_CODE_INVALID_USER_NAME = 10;
     const ERROR_CODE_USER_NOT_FOUND = 11;
@@ -28,7 +28,9 @@ interface JSONResponse extends JSONElement
     const ERROR_CODE_WRONG_PASSWORD = 14;
     const ERROR_CODE_INVALID_PASSWORD = 15;
     const ERROR_CODE_CANT_DELETE_CURRENT_PAGE = 16;
-
+    const ERROR_CODE_NOT_IMPLEMENTED = 17;
+    const ERROR_CODE_CANT_EDIT_PAGE = 18;
+    const ERROR_CODE_INVALID_FILE = 19;
     /**
      * @return String
      */

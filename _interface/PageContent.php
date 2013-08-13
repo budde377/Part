@@ -22,11 +22,14 @@ interface PageContent {
     public function latestContent();
 
     /**
+     * @return int | null Returns the time of latest content as timestamp since epoc. If no content, then return null;
+     */
+    public function latestTime();
+
+    /**
      * @param string $content Adds new content. This will be the latest upon addition.
      * @return void
      */
     public function addContent($content);
-
-
 
 }

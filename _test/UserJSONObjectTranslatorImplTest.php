@@ -19,16 +19,15 @@ class UserJSONObjectTranslatorImplTest extends PHPUnit_Framework_TestCase
     private $user;
     /** @var StubUserLibraryImpl */
     private $userLibrary;
-    /** @var StubUserPrivilegesLibraryImpl */
-    private $userPrivilegesLibrary;
+    /** @var UserPrivileges */
+    private $userPrivileges;
 
     public function setUp()
     {
         $this->userLibrary = new StubUserLibraryImpl();
-        $this->userPrivilegesLibrary = new StubUserPrivilegesLibraryImpl();
-        $this->userPrivilegesLibrary->setUserPrivileges(new StubUserPrivilegesImpl(false,true,true));
-        $this->translator = new UserJSONObjectTranslatorImpl($this->userLibrary,$this->userPrivilegesLibrary);
+        $this->translator = new UserJSONObjectTranslatorImpl($this->userLibrary);
         $this->user = new StubUserImpl();
+        $this->userPrivileges = new StubUserPrivilegesImpl(false,true,true);
     }
 
     public function testEncodeNonUserInstanceWillReturnFalse()
@@ -43,7 +42,7 @@ class UserJSONObjectTranslatorImplTest extends PHPUnit_Framework_TestCase
         $this->user->setUsername($username);
         $parent = 'bob';
         $this->user->setParent($parent);
-        $this->user->setUserPrivileges($this->userPrivilegesLibrary->getUserPrivileges($this->user));
+        $this->user->setUserPrivileges($this->userPrivileges);
         $jsonObject = $this->translator->encode($this->user);
         $this->assertInstanceOf('UserJSONObjectImpl',$jsonObject);
         $this->assertEquals($mail,$jsonObject->getVariable('mail'));
