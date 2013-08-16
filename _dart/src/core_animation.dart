@@ -3,7 +3,8 @@ part of core;
 class Animation {
 
   bool _exactHasBeenSeen = false, _run = false;
-  double _startTime, _duration, _currentTime;
+  double _startTime, _currentTime;
+  int _duration;
   Function _animationFunction, _callbackFunction;
 
   Animation(Duration duration, void animationFunction(double pct), [void callback(bool success)]) {

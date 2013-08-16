@@ -118,7 +118,7 @@ class AddContentJSONFunction extends JSONFunction{
 }
 
 class UploadImageURIJSONFunction extends JSONFunction{
-  UploadImageURIJSONFunction(String fileName, String data, [List<ImageSize> sizes = null]): super('uploadImageURI'){
+  UploadImageURIJSONFunction(String fileName, String data, [List<ImageTransform> sizes = null]): super('uploadImageURI'){
     this.arguments['data'] = data;
     this.arguments['fileName'] = fileName;
     this.arguments['sizes'] = sizes;
@@ -126,3 +126,18 @@ class UploadImageURIJSONFunction extends JSONFunction{
 }
 
 
+class UploadFileURIJSONFunction extends JSONFunction{
+  UploadFileURIJSONFunction(String fileName, String data): super('uploadFileURI'){
+    this.arguments['data'] = data;
+    this.arguments['fileName'] = fileName;
+  }
+}
+
+class ListContentRevisionsJSONFunction extends JSONFunction{
+  ListContentRevisionsJSONFunction(String id, {int from:0, int to:-1, bool includeContent:false}) : super('listContentRevisions'){
+    this.arguments['id'] = id;
+    this.arguments['from'] = from;
+    this.arguments['to'] = to;
+    this.arguments['content'] = includeContent;
+  }
+}

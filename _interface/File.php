@@ -53,8 +53,18 @@ interface File
      * Will return the file name as a string
      * @return string
      */
-    public function getFileName();
+    public function getBaseName();
 
+
+    /**
+     * @return string
+     */
+    public function getExtension();
+
+    /**
+     * @return string
+     */
+    public function getFileName();
 
     /**
      * @abstract
@@ -123,4 +133,15 @@ interface File
      * @return resource | bool Returns a file pointer resource on success, or FALSE on error.
      */
     public function getResource();
+
+
+    /**
+     * @return string | null Will return string if available.
+     */
+    public function getMimeType();
+
+    /**
+     * @return string
+     */
+    public function getDataURI();
 }

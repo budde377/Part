@@ -10,14 +10,6 @@ require_once dirname(__FILE__).'/../_interface/PageContent.php';
 
 class NullPageContentImpl implements PageContent{
 
-    /**
-     * @param int $from List history from a specific time. If null the whole history will be returned.
-     * @return array An array containing arrays with keys: "time" and "content"
-     */
-    public function listContentHistory($from = null)
-    {
-        return array();
-    }
 
 
     /**
@@ -42,5 +34,15 @@ class NullPageContentImpl implements PageContent{
     public function latestTime()
     {
         return null;
+    }
+
+    /**
+     * @param int | null $from List history from a specific time. If null the whole history will be returned.
+     * @param int| null $to List history to a specific time.
+     * @return array An array containing arrays with keys: "time" and "content"
+     */
+    public function listContentHistory($from = null, $to = null)
+    {
+        return array();
     }
 }

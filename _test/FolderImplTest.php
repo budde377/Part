@@ -165,12 +165,12 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
                 case 0:
                     /** @var $e File */
                     $this->assertInstanceOf('File',$e);
-                    $this->assertEquals('1',$e->getFileName());
+                    $this->assertEquals('1',$e->getBaseName());
                     break;
                 case 1:
                     /** @var $e File */
                     $this->assertInstanceOf('File',$e);
-                    $this->assertEquals('2',$e->getFileName());
+                    $this->assertEquals('2',$e->getBaseName());
                     break;
                 case 2:
                     /** @var $e Folder */

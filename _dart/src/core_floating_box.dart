@@ -11,7 +11,7 @@ abstract class FloatingBox{
   }
 
   bool get _inDom => element.parent != null;
-  void _changeListener (void f()) => (_) {
+  Function _changeListener (void f()) => (_) {
     if(_inDom){
       f();
     }
@@ -49,13 +49,11 @@ abstract class FloatingBox{
         case "fixed":
           var i = int.parse(computedOffset.substring(0, computedOffset.length-2));
           return i;
-          break;
         case "absolute":
           return int.parse(computedOffset.substring(0, computedOffset.length-2)) + recursiveCall(e.offsetParent);
-          break;
         default:
           return e == null ? 0 : offset(e) + recursiveCall(e.offsetParent);
-          break;
+
       }
 
     };
@@ -261,8 +259,13 @@ class DropDown{
     });
   }
 
-  void toggle() => _dropBox.element.parent == null? open() : close();
-
+  void toggle() {
+    if(_dropBox.element.parent == null){
+      open();
+    } else {
+      close();
+    }
+  }
   void open(){
     _dropBox.showBelowLeftOfElement(element);
     element.classes.add('active');

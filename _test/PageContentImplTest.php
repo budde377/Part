@@ -21,6 +21,9 @@ class PageContentImplTest extends PHPUnit_Extensions_Database_TestCase{
     /** @var  PageContentImpl */
     private $existingContent;
     /** @var  PageContentImpl */
+    private $existingContent2;
+
+    /** @var  PageContentImpl */
     private $nonExistingContent;
     /** @var  Page */
     private $existingPage;
@@ -35,6 +38,8 @@ class PageContentImplTest extends PHPUnit_Extensions_Database_TestCase{
         $this->db->setConnection($pdo);
         $this->existingPage = new PageImpl('testpage', $this->db);
         $this->existingContent = new PageContentImpl($this->db, $this->existingPage);
+
+        $this->existingContent2 = new PageContentImpl($this->db, $this->existingPage, "Test");
 
         $this->nonExistingPage = new PageImpl('nonExisting', $this->db);
         $this->nonExistingContent = new PageContentImpl($this->db, $this->nonExistingPage);
@@ -51,13 +56,25 @@ class PageContentImplTest extends PHPUnit_Extensions_Database_TestCase{
     public function testListContentWillReturnArrayOfRightSize(){
 
         $this->assertEquals(1, count($ar = $this->existingContent->listContentHistory()));
+        $this->assertEquals(2, count($ar[0]));
         $this->assertEquals("Some Content", trim($ar[0]['content']));
         $this->assertGreaterThan(0, trim($ar[0]['time']));
-        $this->assertEquals(2, count($ar[0]));
     }
 
     public function testFromWillLimitList(){
         $this->assertEquals(0, count($this->existingContent->listContentHistory(time())));
+    }
+
+    public function testToWillLimitList(){
+        $this->existingContent->addContent("TEST!");
+        $this->assertEquals(1, count($this->existingContent->listContentHistory(null, time()-100)));
+
+    }
+
+    public function testFromToWillBeAccurate(){
+        $this->existingContent2->addContent("3");
+        $this->assertEquals(3, count($this->existingContent2->listContentHistory()));
+        $this->assertEquals(1, count($this->existingContent2->listContentHistory(1356994000, 1356995000)));
     }
 
 

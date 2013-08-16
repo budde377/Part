@@ -19,7 +19,7 @@ class ProgressBar {
     bar.classes.add('progress_bar');
     indicator.classes.add('indicator');
     bar.append(indicator);
-    percentage = 0;
+    percentage = 0.0;
   }
 
   bool get showInfoBox => _showInfoBox;
@@ -40,6 +40,7 @@ class ProgressBar {
     if (pct == _percentage) {
       return;
     }
+    pct = pct.isNaN?0:pct;
     _percentage = Math.max(0, Math.min(1, pct));
     _percentageString = "${( _percentage * 100).toInt()}%";
     indicator.style.width = _percentageString;

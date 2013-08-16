@@ -11,10 +11,11 @@ interface PageContent {
 
 
     /**
-     * @param int $from List history from a specific time. If null the whole history will be returned.
+     * @param int | null $from List history from a specific time. If null the whole history will be returned.
+     * @param int| null $to List history to a specific time.
      * @return array An array containing arrays with keys: "time" and "content"
      */
-    public function listContentHistory($from = null);
+    public function listContentHistory($from = null, $to = null);
 
     /**
      * @return string | null Returns the latest content as a string or null if no content exists.

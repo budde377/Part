@@ -1,13 +1,14 @@
 part of core;
 
-class ImageSize{
+class ImageTransform{
   final int maxHeight, maxWidth, minWidth, minHeight;
-  ImageSize.atLeast(this.minWidth, this.minHeight): maxWidth = -1, maxHeight = -1;
-  ImageSize.atMost(this.maxWidth, this.maxHeight): minWidth =-1,  minHeight = -1;
-  ImageSize.exactHeight(int height): maxHeight = height, minHeight = height, maxWidth = -1, minWidth = -1;
-  ImageSize.exactWidth(int width) : maxWidth = width, minWidth = width, maxHeight = minHeight = -1;
-  ImageSize.exact(int width, int height) : maxWidth = width, minWidth = width, maxHeight = height, minHeight = height;
-  Map<String, int> toJson() => {"maxHeight":maxHeight, "minHeight":minHeight, "maxWidth":maxWidth, "minWidth":minWidth};
+  final bool dataURI;
+  ImageTransform.atLeast(this.minWidth, this.minHeight, {bool dataURI:false}): maxWidth = -1, maxHeight = -1, this.dataURI = dataURI;
+  ImageTransform.atMost(this.maxWidth, this.maxHeight, {bool dataURI:false}): minWidth =-1,  minHeight = -1, this.dataURI = dataURI;
+  ImageTransform.exactHeight(int height, {bool dataURI:false}): maxHeight = height, minHeight = height, maxWidth = -1, minWidth = -1, this.dataURI = dataURI;
+  ImageTransform.exactWidth(int width, {bool dataURI:false}) : maxWidth = width, minWidth = width, maxHeight = minHeight = -1, this.dataURI = dataURI;
+  ImageTransform.exact(int width, int height, {bool dataURI:false}) : maxWidth = width, minWidth = width, maxHeight = height, minHeight = height, this.dataURI = dataURI;
+  Map<String, int> toJson() => {"maxHeight":maxHeight, "minHeight":minHeight, "maxWidth":maxWidth, "minWidth":minWidth, "dataURI":dataURI};
 }
 
 class ListenerRegister {
@@ -33,7 +34,7 @@ class FileProgress {
 
   final File file;
 
-  double _progress = 0;
+  double _progress = 0.0;
 
   String _path, _previewPath;
 
@@ -49,7 +50,7 @@ class FileProgress {
            if(_path != null){
              return;
            }
-           progress = 1;
+           progress = 1.0;
            _path = p;
            _notifyPath();
          }
@@ -57,9 +58,6 @@ class FileProgress {
   String get previewPath => _previewPath;
 
          set previewPath(String p){
-           if(_previewPath != null){
-             return;
-           }
            _previewPath = p;
            _notifyPreviewPath();
          }
@@ -92,6 +90,8 @@ abstract class UploadStrategy{
   Pattern filter;
   void upload(FileProgress fileProgress, String data, {void callback(String path):null, void progress(double pct):null});
 
+  void read(FileReader reader,File file);
+
   const Pattern FILTER_IMAGE = "image/";
   const Pattern FILTER_VIDEO = "video/";
 
@@ -100,10 +100,14 @@ abstract class UploadStrategy{
 class AJAXImageURIUploadStrategy extends UploadStrategy{
   final String ajax_id;
   JSON.JSONClient _client;
-  List<ImageSize> _sizes;
+  List<ImageTransform> _sizes;
+  ImageTransform _size, _preview;
 
-  AJAXImageURIUploadStrategy(this.ajax_id, [ImageSize size = null, ImageSize preview = null]){
+  AJAXImageURIUploadStrategy(this.ajax_id, [ImageTransform size = null, ImageTransform preview = null]){
+    _size = size;
+    _preview = preview;
     _sizes = [size, preview];
+    _sizes.removeWhere((ImageTransform s)=>s==null);
     filter = FILTER_IMAGE;
     _client = new JSON.AJAXJSONClient(ajax_id);
 
@@ -111,7 +115,43 @@ class AJAXImageURIUploadStrategy extends UploadStrategy{
 
   void upload(FileProgress fileProgress, String data, {void callback(String path):null, void progress(double pct):null}){
     fileProgress.previewPath = data;
+    if(progress == null){
+      progress = (_){};
+    }
     _client.callFunction(new JSON.UploadImageURIJSONFunction(fileProgress.file.name, data, _sizes), (JSON.JSONResponse response){
+      progress(1);
+      var c = (String path){
+        fileProgress.path = path;
+        if(callback != null){
+          callback(path);
+        }
+      };
+      if(response.type == JSON.RESPONSE_TYPE_SUCCESS){
+        c(_size == null?response.payload['path']:response.payload['thumbs'][0]);
+        if(_preview != null){
+          fileProgress.previewPath = response.payload['thumbs'][1];
+        }
+      } else {
+        c(null);
+      }
+    }, progress);
+  }
+
+  void read(FileReader reader,File file) => reader.readAsDataUrl(file);
+
+}
+
+class AJAXFileURIUploadStrategy extends UploadStrategy{
+  final String ajax_id;
+  JSON.JSONClient _client;
+
+  AJAXFileURIUploadStrategy(this.ajax_id){
+    _client = new JSON.AJAXJSONClient(ajax_id);
+
+  }
+
+  void upload(FileProgress fileProgress, String data, {void callback(String path):null, void progress(double pct):null}){
+    _client.callFunction(new JSON.UploadFileURIJSONFunction(fileProgress.file.name, data), (JSON.JSONResponse response){
       if(progress != null){
         progress(1);
       }
@@ -122,9 +162,9 @@ class AJAXImageURIUploadStrategy extends UploadStrategy{
         }
       };
       c(response.type == JSON.RESPONSE_TYPE_SUCCESS?response.payload['path']:null);
-
     });
   }
+  void read(FileReader reader,File file) => reader.readAsDataUrl(file);
 
 }
 
@@ -166,7 +206,8 @@ class FileUploader {
       _size += f.size;
       var fp = new FileProgress(f);
       fp.listenOnProgress((){
-        _currentlyUploading = (fp.progress*f.size).toInt();
+        var i = fp.progress*f.size;
+        _currentlyUploading = i.isNaN || i.isInfinite? 0:i.toInt();
         _notifyProgress();
       });
       fp.listenOnPathAvailable((){
@@ -191,7 +232,7 @@ class FileUploader {
     }
     _currentFile = _queue.removeAt(0);
     _currentFileProcess = new FileProgress(_currentFile);
-    _reader.readAsDataUrl(_currentFile);
+    uploadStrategy.read(_reader, _currentFile);
 
   }
 

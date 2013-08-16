@@ -57,6 +57,41 @@ interface ImageFile extends File{
     public function scaleToOuterBox($width, $height);
 
     /**
+     * Will limit the image to an inner box. If the image is contained in the box, nothing will happen.
+     * @param int $width
+     * @param int $height
+     * @return void
+     */
+    public function limitToInnerBox($width, $height);
+
+    /**
+     * Will limit the image to an outer box. If the image is contained in the box, nothing will happen.
+     * @param int $width
+     * @param int $height
+     * @return mixed
+     */
+    public function limitToOuterBox($width, $height);
+
+    /**
+     * Will extend image to box. If the box is contained in the image, nothing will happen.
+     * @param int $width
+     * @param int $height
+     * @return void
+     */
+    public function extendToInnerBox($width, $height);
+
+
+    /**
+     * Will extend image to box, such that at least one side touches the box.
+     * If the image is larger than the box on one side, nothing will happen.
+     * @param int $width
+     * @param int $height
+     * @return void
+     */
+    public function extendToOuterBox($width, $height);
+
+
+    /**
      * Will force the size of the image, ignoring the ratio.
      * @param int $width
      * @param int $height

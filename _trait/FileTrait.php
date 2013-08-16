@@ -83,7 +83,7 @@ trait FileTrait
      */
     public function newFileFromName($path, $name, $hashName = false){
         $info = pathinfo($name);
-        $ext = strlen($e = $info['extension']) > 0 ? ".$e":"";
+        $ext = isset($info['extension'])? ".{$info['extension']}":"";
         $name = $info['filename'];
         $n = $hashName?md5($name):$name;
         $file = new FileImpl("$path/$n$ext");

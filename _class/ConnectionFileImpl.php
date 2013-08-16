@@ -67,7 +67,7 @@ class ConnectionFileImpl implements File
      * Will return the file name as a string
      * @return string
      */
-    public function getFileName()
+    public function getBaseName()
     {
         return basename($this->path);
     }
@@ -174,5 +174,21 @@ class ConnectionFileImpl implements File
     public function getResource()
     {
         return @fopen($this->connection->getWrapper() . $this->path, $this->mode);
+    }
+
+    /**
+     * @return string
+     */
+    public function getExtension()
+    {
+        return pathinfo($this->path, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * @return string
+     */
+    public function getFileName()
+    {
+        return pathinfo($this->path, PATHINFO_FILENAME);
     }
 }

@@ -71,8 +71,8 @@ class ConnectionFileImplTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testReturnFileNameWillReturnFileName(){
-        $this->assertEquals(basename($this->fileName),$this->file->getFileName(),'Filenames did not match');
+    public function testReturnBaseNameWillReturnFileName(){
+        $this->assertEquals(basename($this->fileName),$this->file->getBaseName(),'Filenames did not match');
     }
 
     public function testGetAbsolutePathWillReturnAbsolutePath(){

@@ -76,7 +76,7 @@ class FileImpl implements File
      * Will return the file name as a string
      * @return string
      */
-    public function getFileName()
+    public function getBaseName()
     {
         $pathArray = explode('/', $this->filePath);
 
@@ -210,5 +210,39 @@ class FileImpl implements File
     public function getResource()
     {
         return fopen($this->filePath,$this->mode);
+    }
+
+    /**
+     * @return string
+     */
+    public function getExtension()
+    {
+        return pathinfo($this->filePath, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * @return string
+     */
+    public function getFileName()
+    {
+        return pathinfo($this->filePath, PATHINFO_FILENAME);
+    }
+
+    /**
+     * @return string | null Will return string if available.
+     */
+    public function getMimeType()
+    {
+        $m = @finfo_file(finfo_open(FILEINFO_MIME_TYPE), $this->filePath);
+        return $m?$m:null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDataURI()
+    {
+        $contents = base64_encode($this->getContents());
+        return ($m = $this->getMimeType()) == null?null:"data:{$this->getMimeType()};base64,$contents";
     }
 }

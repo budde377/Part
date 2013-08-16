@@ -62,20 +62,59 @@ class FileImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $file->getRelativeFilePathTo($relativeDir), 'Paths did not match');
     }
 
-    public function testGetFileNameReturnsFileName()
+    public function testGetBaseNameReturnsBaseName()
     {
         $file = 'someFile';
         $path = dirname(__FILE__) . '/' . $file;
         $f = new FileImpl($path);
-        $this->assertEquals($file, $f->getFileName(), 'Did not return expected filename');
+        $this->assertEquals($file, $f->getBaseName(), 'Did not return expected BaseName');
     }
 
-    public function testGetFileNameReturnsFileNameIfFileIsDir()
+    public function testGetBaseNameReturnsBaseNameIfFileIsDir()
     {
         $file = 'someFile';
         $path = dirname(__FILE__) . '/' . $file . '/';
         $f = new FileImpl($path);
-        $this->assertEquals($file, $f->getFileName(), 'Did not return expected filename');
+        $this->assertEquals($file, $f->getBaseName(), 'Did not return expected BaseName');
+    }
+
+    public function testGetExtensionReturnsFileName(){
+        $file = 'someFile.test';
+        $path = dirname(__FILE__) . '/' . $file;
+        $f = new FileImpl($path);
+        $this->assertEquals('someFile', $f->getFileName(), 'Did not return expected FileName');
+
+    }
+    public function testGetFileNameReturnsFileNameIfFileIsDir(){
+        $file = 'someFile.test';
+        $path = dirname(__FILE__) . '/' . $file . '/';
+        $f = new FileImpl($path);
+        $this->assertEquals('someFile', $f->getFileName(), 'Did not return expected FileName');
+
+    }
+
+
+    public function testGetExtensionReturnsExtension(){
+        $file = 'someFile.test';
+        $path = dirname(__FILE__) . '/' . $file;
+        $f = new FileImpl($path);
+        $this->assertEquals('test', $f->getExtension(), 'Did not return expected FileName');
+
+    }
+    public function testGetExtensionReturnsExtensionIfFileIsDir(){
+        $file = 'someFile.test';
+        $path = dirname(__FILE__) . '/' . $file . '/';
+        $f = new FileImpl($path);
+        $this->assertEquals('test', $f->getExtension(), 'Did not return expected FileName');
+
+    }
+
+    public function testGetExtensionReturnsNoExtensionIfAbsent(){
+        $file = 'someFile';
+        $path = dirname(__FILE__) . '/' . $file . '/';
+        $f = new FileImpl($path);
+        $this->assertEquals('', $f->getExtension(), 'Did not return expected FileName');
+
     }
 
     public function testMoveMovesAndReturnTrueOnSuccess()
@@ -321,5 +360,32 @@ class FileImplTest extends PHPUnit_Framework_TestCase
         $resType = @get_resource_type($file->getResource());
         $this->assertTrue('file'==$resType || $resType == 'stream','Did not return resource of right type');
     }
+
+    public function testGetMimeTypeWillReturnMimeType(){
+        $fn = dirname(__FILE__).'/_stub/fileStub';
+        $file = new FileImpl($fn);
+        $this->assertEquals("inode/x-empty", $file->getMimeType());
+
+    }
+    public function testGetMimeTypeWillReturnNullOnNoFile(){
+        $fn = dirname(__FILE__).'/_stub/nonExistingFile';
+        $file = new FileImpl($fn);
+        $this->assertNull($file->getMimeType());
+
+    }
+
+    public function testGetDataURIWillReturnNullOnNoFile(){
+        $fn = dirname(__FILE__).'/_stub/nonExistingFile';
+        $file = new FileImpl($fn);
+        $this->assertNull($file->getDataURI());
+    }
+
+    public function testGetDataURIWillReturnURIOnFile(){
+        $fn = dirname(__FILE__).'/_stub/imageFileStub300x200.png';
+        $file = new FileImpl($fn);
+        $this->assertNotNull($file->getDataURI());
+        $this->assertStringStartsWith("data:{$file->getMimeType()};base64,",$file->getDataURI());
+    }
+
 
 }

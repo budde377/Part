@@ -99,8 +99,8 @@ class ImageFileImpl extends FileImpl implements ImageFile
      */
     public function scaleToOuterBox($width, $height)
     {
-        $wr = $width/$this->getWidth();
-        $hr = $height/$this->getHeight();
+        $wr = $width == 0 ? $height/$this->getHeight(): $width/$this->getWidth();
+        $hr = $height == 0? $width/$this->getWidth() : $height/$this->getHeight();
         if($wr < $hr){
             $this->forceSize($this->getWidth()*$wr, 0);
         } else {
@@ -117,6 +117,9 @@ class ImageFileImpl extends FileImpl implements ImageFile
     public function forceSize($width, $height)
     {
         $this->updateInfo();
+        if($this->imagick == null){
+            return;
+        }
         $this->imagick->resizeimage($width,$height,Imagick::FILTER_CATROM, 1);
         $this->imagick->writeimage($this->getAbsoluteFilePath());
         $this->imagick = null;
@@ -134,6 +137,9 @@ class ImageFileImpl extends FileImpl implements ImageFile
     public function crop($x, $y, $width, $height)
     {
         $this->updateInfo();
+        if($this->imagick == null){
+            return;
+        }
         $this->imagick->cropimage($width,$height,$x,$y);
         $this->imagick->writeimage($this->getAbsoluteFilePath());
         $this->imagick = null;
@@ -145,4 +151,65 @@ class ImageFileImpl extends FileImpl implements ImageFile
     }
 
 
+
+
+
+
+    /**
+     * Will limit the image to an outer box. If the image is contained in the box, nothing will happen.
+     * @param int $width
+     * @param int $height
+     * @return mixed
+     */
+    public function limitToOuterBox($width, $height)
+    {
+        if($this->getWidth() < $width && $this->getHeight() < $height){
+            return;
+        }
+        $this->scaleToOuterBox($width, $height);
+    }
+
+    /**
+     * Will limit the image to an inner box. If the image is contained in the box, nothing will happen.
+     * @param int $width
+     * @param int $height
+     * @return void
+     */
+    public function limitToInnerBox($width, $height)
+    {
+        if($this->getWidth() < $width || $this->getHeight() < $height){
+            return;
+        }
+        $this->scaleToInnerBox($width, $height);
+    }
+
+    /**
+     * Will extend image to box. If the box is contained in the image, nothing will happen.
+     * @param int $width
+     * @param int $height
+     * @return void
+     */
+    public function extendToInnerBox($width, $height)
+    {
+        if($this->getWidth() >= $width && $this->getHeight() >= $height){
+            return;
+        }
+        $this->scaleToInnerBox($width, $height);
+    }
+
+    /**
+     * Will extend image to box, such that at least one side touches the box.
+     * If the image is larger than the box on one side, nothing will happen.
+     * @param int $width
+     * @param int $height
+     * @return void
+     */
+    public function extendToOuterBox($width, $height)
+    {
+        if(($this->getWidth() >= $width && $width != 0) || ($this->getHeight() >= $height && $height != 0) ){
+            return;
+        }
+        $this->scaleToOuterBox($width, $height);
+
+    }
 }

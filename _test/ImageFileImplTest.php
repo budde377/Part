@@ -82,6 +82,12 @@ class ImageFileImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(300, $this->imageFile->getHeight());
     }
 
+    public function testScaleToInnerBoxWillScaleWith0Argument(){
+        $this->imageFile->scaleToInnerBox(0,100);
+        $this->assertEquals(150, $this->imageFile->getWidth());
+        $this->assertEquals(100, $this->imageFile->getHeight());
+    }
+
     public function testScaleToOuterBoxWillScaleToOuterBox(){
         $this->imageFile->scaleToOuterBox(150,150);
         $this->assertEquals(150, $this->imageFile->getWidth());
@@ -94,6 +100,18 @@ class ImageFileImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(400, $this->imageFile->getHeight());
     }
 
+    public function testScaleToOuterBoxWillScaleWith0Argument(){
+        $this->imageFile->scaleToOuterBox(150,0);
+        $this->assertEquals(150, $this->imageFile->getWidth());
+        $this->assertEquals(100, $this->imageFile->getHeight());
+    }
+
+    public function testScaleToOuterBoxWillScaleWith0WidthArgument(){
+        $this->imageFile->scaleToOuterBox(0,100);
+        $this->assertEquals(150, $this->imageFile->getWidth());
+        $this->assertEquals(100, $this->imageFile->getHeight());
+    }
+
     public function testCropWillCropImage(){
         $this->imageFile->crop(40,40,100,100);
         $this->assertEquals(100, $this->imageFile->getWidth());
@@ -104,6 +122,122 @@ class ImageFileImplTest extends PHPUnit_Framework_TestCase
         $this->imageFile->crop(200,100,200,200);
         $this->assertEquals(100, $this->imageFile->getWidth());
         $this->assertEquals(100, $this->imageFile->getHeight());
+    }
+
+    public function testLimitToInnerBoxWillLimitOnLargeImage(){
+        $this->imageFile->limitToInnerBox(100,100);
+        $this->assertEquals(150, $this->imageFile->getWidth());
+        $this->assertEquals(100, $this->imageFile->getHeight());
+    }
+
+    public function testLimitToInnerBoxWillLimitOnHalfLargeImage(){
+        $this->imageFile->limitToInnerBox(100,1000);
+        $this->assertEquals(300, $this->imageFile->getWidth());
+        $this->assertEquals(200, $this->imageFile->getHeight());
+    }
+
+    public function testLimitToInnerBoxWillNotScaleOnSmallImage(){
+        $this->imageFile->limitToInnerBox(1000,1000);
+        $this->assertEquals(300, $this->imageFile->getWidth());
+        $this->assertEquals(200, $this->imageFile->getHeight());
+
+    }
+
+    public function testLimitToInnerBoxWith0ArgumentWillAuto(){
+        $this->imageFile->limitToInnerBox(150,0);
+        $this->assertEquals(150, $this->imageFile->getWidth());
+        $this->assertEquals(100, $this->imageFile->getHeight());
+
+    }
+
+
+
+    public function testLimitToOuterBoxWillNotLimitOnLargeImage(){
+        $this->imageFile->limitToOuterBox(150,150);
+        $this->assertEquals(150, $this->imageFile->getWidth());
+        $this->assertEquals(100, $this->imageFile->getHeight());
+    }
+
+    public function testLimitToOuterBoxWillNotScaleOnHalfLargeImage(){
+        $this->imageFile->limitToOuterBox(150,1000);
+        $this->assertEquals(150, $this->imageFile->getWidth());
+        $this->assertEquals(100, $this->imageFile->getHeight());
+
+    }
+
+    public function testLimitToOuterBoxWillNotScaleOnSmallImage(){
+        $this->imageFile->limitToOuterBox(1000,1000);
+        $this->assertEquals(300, $this->imageFile->getWidth());
+        $this->assertEquals(200, $this->imageFile->getHeight());
+
+    }
+
+    public function testLimitOuterBoxWith0AsArgumentWillAuto(){
+        $this->imageFile->limitToOuterBox(150,0);
+        $this->assertEquals(150, $this->imageFile->getWidth());
+        $this->assertEquals(100, $this->imageFile->getHeight());
+
+    }
+
+
+    public function testExtendToInnerBoxWillExtendToInnerBox(){
+        $this->imageFile->extendToInnerBox(400, 400);
+        $this->assertEquals(600,  $this->imageFile->getWidth());
+        $this->assertEquals(400, $this->imageFile->getHeight());
+    }
+
+    public function testExtendToInnerBoxWillNotExtendToInnerBoxWithSmallBox(){
+        $this->imageFile->extendToInnerBox(100, 100);
+        $this->assertEquals(300,  $this->imageFile->getWidth());
+        $this->assertEquals(200, $this->imageFile->getHeight());
+    }
+
+
+    public function testExtendToInnerBoxWillExtendToInnerBoxWithHalfLargeBox(){
+        $this->imageFile->extendToInnerBox(10, 400);
+        $this->assertEquals(600,  $this->imageFile->getWidth());
+        $this->assertEquals(400, $this->imageFile->getHeight());
+    }
+
+    public function testExtendToInnerBoxWillExtendToInnerBoxWith0Argument(){
+        $this->imageFile->extendToInnerBox(0, 400);
+        $this->assertEquals(600,  $this->imageFile->getWidth());
+        $this->assertEquals(400, $this->imageFile->getHeight());
+    }
+
+    public function testExtendToOuterBoxWillExtendToOuterBox(){
+        $this->imageFile->extendToOuterBox(600, 600);
+        $this->assertEquals(600, $this->imageFile->getWidth());
+        $this->assertEquals(400, $this->imageFile->getHeight());
+    }
+
+    public function testExtendToOuterBoxNotExtendOnHalfLargeBox(){
+        $this->imageFile->extendToOuterBox(600, 100);
+        $this->assertEquals(300, $this->imageFile->getWidth());
+        $this->assertEquals(200, $this->imageFile->getHeight());
+    }
+
+    public function testExtendToOuterBoxNotExtendOnSmallBox(){
+        $this->imageFile->extendToOuterBox(100, 100);
+        $this->assertEquals(300, $this->imageFile->getWidth());
+        $this->assertEquals(200, $this->imageFile->getHeight());
+    }
+
+    public function testExtendToOuterBoxWillAutoOn0Argument(){
+        $this->imageFile->extendToOuterBox(600, 0);
+        $this->assertEquals(600, $this->imageFile->getWidth());
+        $this->assertEquals(400, $this->imageFile->getHeight());
+    }
+
+    public function testCropNonImageDoesNothing(){
+        $this->notImageFile->crop(0,0,10,10);
+        $this->nonExistingFile->crop(0,0,10,10);
+
+    }
+
+    public function testScaleNonImageDoesNothing(){
+        $this->nonExistingFile->forceSize(10,10);
+        $this->notImageFile->forceSize(10,10);
     }
 
 
