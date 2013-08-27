@@ -41,6 +41,12 @@ interface User
      */
     public function getUserPrivileges();
 
+    /**
+     * Will get a unique id, which is persistent with regard to changes made to any user information
+     * @return String
+     */
+    public function getUniqueId();
+
 
     /**
      * @abstract

@@ -10,7 +10,7 @@ class ImageTransform{
   ImageTransform.exact(int width, int height, {bool dataURI:false}) : maxWidth = width, minWidth = width, maxHeight = height, minHeight = height, this.dataURI = dataURI;
   Map<String, int> toJson() => {"maxHeight":maxHeight, "minHeight":minHeight, "maxWidth":maxWidth, "minWidth":minWidth, "dataURI":dataURI};
 }
-
+// TODO Replace all usage of this with Streams!
 class ListenerRegister {
   Map<String, Function> _listeners = new Map<String, Function>();
 
@@ -118,7 +118,7 @@ class AJAXImageURIUploadStrategy extends UploadStrategy{
     if(progress == null){
       progress = (_){};
     }
-    _client.callFunction(new JSON.UploadImageURIJSONFunction(fileProgress.file.name, data, _sizes), (JSON.JSONResponse response){
+    _client.callFunction(new JSON.UploadImageURIJSONFunction(fileProgress.file.name, data, _sizes), progress).then((JSON.JSONResponse response){
       progress(1);
       var c = (String path){
         fileProgress.path = path;
@@ -134,7 +134,7 @@ class AJAXImageURIUploadStrategy extends UploadStrategy{
       } else {
         c(null);
       }
-    }, progress);
+    });
   }
 
   void read(FileReader reader,File file) => reader.readAsDataUrl(file);
@@ -151,7 +151,7 @@ class AJAXFileURIUploadStrategy extends UploadStrategy{
   }
 
   void upload(FileProgress fileProgress, String data, {void callback(String path):null, void progress(double pct):null}){
-    _client.callFunction(new JSON.UploadFileURIJSONFunction(fileProgress.file.name, data), (JSON.JSONResponse response){
+    _client.callFunction(new JSON.UploadFileURIJSONFunction(fileProgress.file.name, data)).then((JSON.JSONResponse response){
       if(progress != null){
         progress(1);
       }

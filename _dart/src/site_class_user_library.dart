@@ -98,7 +98,7 @@ class JSONUserLibrary extends UserLibrary {
       response.payload['users'].forEach((JSONObject o) => _addUserFromObjectToUsers(o,response.payload['page_privileges'].containsKey(o.variables['username'])?response.payload['page_privileges'][o.variables['username']]:[]));
 
     };
-    _client.callFunction(function, functionCallback);
+    _client.callFunction(function).then(functionCallback);
   }
 
   String _addUserFromObjectToUsers(JSONObject o, List<String> page_ids) {
@@ -144,7 +144,7 @@ class JSONUserLibrary extends UserLibrary {
         callback(response.type, response.error_code);
       }
     };
-    _client.callFunction(function, functionCallback);
+    _client.callFunction(function).then(functionCallback);
 
   }
 
@@ -161,7 +161,7 @@ class JSONUserLibrary extends UserLibrary {
         callback(response.type, response.error_code);
       }
     };
-    _client.callFunction(function, functionCallback);
+    _client.callFunction(function).then(functionCallback);
 
   }
 

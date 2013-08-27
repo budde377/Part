@@ -2,6 +2,7 @@ library site_classes;
 
 import "dart:async";
 import "json.dart";
+import "dart:math" as Math;
 
 part "src/site_class_page.dart";
 part "src/site_class_page_order.dart";

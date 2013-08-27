@@ -66,7 +66,7 @@ class JSONUser extends User {
     callback = callback != null ? callback : (e1, [e2, e3]) {
     };
     var jsonFunction = new ChangeUserInfoJSONFunction(_username, username, mail);
-    _client.callFunction(jsonFunction, (JSONResponse response) {
+    _client.callFunction(jsonFunction).then( (JSONResponse response) {
       if (response.type == RESPONSE_TYPE_SUCCESS) {
         _username = username;
         _mail = mail;
@@ -80,7 +80,7 @@ class JSONUser extends User {
 
   void changePassword(String currentPassword, String newPassword, [ChangeCallback callback]) {
     var jsonFunction = new ChangeUserPasswordJSONFunction(_username, currentPassword, newPassword);
-    _client.callFunction(jsonFunction, (JSONResponse response) {
+    _client.callFunction(jsonFunction).then((JSONResponse response) {
       switch (response.type) {
         case RESPONSE_TYPE_SUCCESS:
           callback(response.type);
@@ -109,7 +109,7 @@ class JSONUser extends User {
 
   void addPagePrivilege(Page page, [ChangeCallback callback]) {
     var function = new AddUserPagePrivilegeJSONFunction(_username, page.id);
-    _client.callFunction(function, (JSONResponse response) {
+    _client.callFunction(function).then( (JSONResponse response) {
       if (response.type == RESPONSE_TYPE_SUCCESS) {
         _pages.add(page);
         callback(response.type);
@@ -122,7 +122,7 @@ class JSONUser extends User {
 
   void revokePagePrivilege(Page page, [ChangeCallback callback]) {
     var function = new RevokeUserPagePrivilegeJSONFunction(_username, page.id);
-    _client.callFunction(function, (JSONResponse response) {
+    _client.callFunction(function).then((JSONResponse response) {
       if (response.type == RESPONSE_TYPE_SUCCESS) {
         _pages.remove(page);
         callback(response.type);

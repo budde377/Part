@@ -45,4 +45,13 @@ class NullPageContentImpl implements PageContent{
     {
         return array();
     }
+
+    /**
+     * @param int $time Seconds since epoch
+     * @return String | null Returns content at time or null if no content
+     */
+    public function getContentAt($time)
+    {
+        return null;
+    }
 }

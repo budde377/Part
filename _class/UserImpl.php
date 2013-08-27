@@ -314,7 +314,7 @@ class UserImpl implements User, Observable
             $result = $statement->fetch(PDO::FETCH_ASSOC);
             $this->parent = isset($result['username']) ? $result['username'] : null;
 
-        } else {
+        } else if($this->id == null){
             $this->id = uniqid('', true);
         }
     }
@@ -454,5 +454,15 @@ class UserImpl implements User, Observable
     public function getUserPrivileges()
     {
         return $this->userPrivileges == null ? $this->userPrivileges = new UserPrivilegesImpl($this, $this->database) : $this->userPrivileges;
+    }
+
+    /**
+     * Will get a unique id, which is persistent with regard to changes made to any user information
+     * @return String
+     */
+    public function getUniqueId()
+    {
+        $this->setInitialValues();
+        return $this->id;
     }
 }

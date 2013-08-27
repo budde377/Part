@@ -92,7 +92,7 @@ class JSONPageOrder extends PageOrder {
     _hasBeenSetUp = true;
     _client = new AJAXJSONClient(ajax_id);
     var listFunction = new ListPagesJSONFunction();
-    _client.callFunction(listFunction, (JSONResponse response) {
+    _client.callFunction(listFunction).then((JSONResponse response) {
       if (response.type == RESPONSE_TYPE_SUCCESS) {
         _currentPageId = response.payload['current_page_id'];
 
@@ -180,7 +180,7 @@ class JSONPageOrder extends PageOrder {
 
   void deactivatePage(String page_id, [ChangeCallback callback = null]) {
     var function = new DeactivatePageJSONFunction(page_id);
-    _client.callFunction(function, (JSONResponse response) {
+    _client.callFunction(function).then((JSONResponse response) {
       if (callback != null) {
         callback(response.type, response.error_code);
       }
@@ -217,7 +217,7 @@ class JSONPageOrder extends PageOrder {
         _callListeners(PAGE_ORDER_CHANGE_ACTIVATE);
       }
     };
-    _client.callFunction(function, functionCallback);
+    _client.callFunction(function).then(functionCallback);
   }
 
   List<Page> listPageOrder({
@@ -311,7 +311,7 @@ class JSONPageOrder extends PageOrder {
         callback(response.type, response.error_code);
       }
     };
-    _client.callFunction(function, functionCallback);
+    _client.callFunction(function).then(functionCallback);
   }
 
   void deletePage(String id, [ChangeCallback callback = null]) {
@@ -328,7 +328,7 @@ class JSONPageOrder extends PageOrder {
         callback(response.type, response.error_code);
       }
     };
-    _client.callFunction(function, functionCallback);
+    _client.callFunction(function).then(functionCallback);
   }
 
   bool pageExists(String page_id) => _pages[page_id] != null;

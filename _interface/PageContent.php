@@ -29,8 +29,14 @@ interface PageContent {
 
     /**
      * @param string $content Adds new content. This will be the latest upon addition.
-     * @return void
+     * @return int | null Returns null on error else the latest time
      */
     public function addContent($content);
+
+    /**
+     * @param int $time Seconds since epoch
+     * @return Array | null Returns content at time or null if no content
+     */
+    public function getContentAt($time);
 
 }

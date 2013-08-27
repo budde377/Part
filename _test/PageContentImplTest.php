@@ -80,7 +80,7 @@ class PageContentImplTest extends PHPUnit_Extensions_Database_TestCase{
 
     public function testAddContentWillAddContent(){
         $content = "Lorem Ipsum";
-        $this->existingContent->addContent($content);
+        $this->assertGreaterThan(time()-100, $this->existingContent->addContent($content));
         $ec = $this->existingContent->listContentHistory(time()-100);
         $this->assertEquals(2, count($this->existingContent->listContentHistory()));
         $this->assertEquals(1, count($ec));
@@ -111,6 +111,18 @@ class PageContentImplTest extends PHPUnit_Extensions_Database_TestCase{
         $content = "LoremIp";
         $this->existingContent->addContent($content);
         $this->assertEquals($content, $this->existingContent->latestContent());
+    }
+
+    public function testGetContentBeforeTimeReturnsNull(){
+        $this->assertNull($this->existingContent2->getContentAt(1));
+    }
+
+    public function testGetContentNowReturnsRightResult(){
+        $this->assertEquals($this->existingContent2->latestContent(), $this->existingContent2->getContentAt(time()));
+    }
+
+    public function testGetContentBetweenTimesReturnRightResult (){
+        $this->assertEquals("1", $this->existingContent2->getContentAt(1356994000));
     }
 
     public function testLatestContentWillReturnNullOnNoContent(){

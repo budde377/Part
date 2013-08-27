@@ -1,36 +1,14 @@
 part of core;
 
-abstract class SaveStrategy {
+/*abstract class SaveStrategy {
   void save(ContentEditor editor);
-}
+}*/
 
 String sizeToString(int bytes) {
   var s = (bytes <= 102 ? "${bytes} B" : (bytes < 1024 * 1024 / 10 ? "${bytes / 1024} KB" : "${bytes / (1024 * 1024)} MB"));
   var r = new RegExp("([0-9]+\.?[0-9]?[0-9]?)[^ ]*(.+)");
   var m = r.firstMatch(s);
   return m[1] + m[2];
-}
-
-
-class JSONSaveStrategy implements SaveStrategy {
-  final String ajax_id;
-
-  Function _callback;
-
-  JSON.JSONClient _jsonClient;
-
-  JSONSaveStrategy(this.ajax_id, [void callback(int error_code)]): _callback = (callback == null?(_){}:callback) {
-    _jsonClient = new JSON.AJAXJSONClient(ajax_id);
-
-  }
-
-  void save(ContentEditor editor) {
-    var function = new JSON.AddContentJSONFunction(editor.id, editor.element.innerHtml);
-    _jsonClient.callFunction(function, (JSON.JSONResponse response) {
-      _callback(response.type == JSON.RESPONSE_TYPE_SUCCESS ? 0 : response.error_code);
-    });
-
-  }
 }
 
 
@@ -53,7 +31,6 @@ class EditorCommandExecutor {
       _inElement = element.contains(window.getSelection().baseNode);
       _listenerChain();
     };
-    element.contentEditable = "true";
     element.document.onSelectionChange.listen(_listenerFunction);
   }
 
@@ -87,6 +64,14 @@ class EditorCommandExecutor {
   void justifyRight() => _execCommand("justifyright");
 
   void justifyFull() => _execCommand("justifyfull");
+
+  void toggleSuperScript() => _execCommand("superscript");
+
+  void toggleSubScript() => _execCommand("subscript");
+
+  void toggleStrikeThrough() => _execCommand("strikethrough");
+
+  void createLink(String address) => _execCommand("createLink", value:address);
 
   void indent() => _execCommand("indent");
 
@@ -137,6 +122,12 @@ class EditorCommandExecutor {
   bool get alignCenter => _commandState('justifycenter');
 
   bool get alignJust => _commandState('justifyfull');
+
+  bool get superScript => _commandState('superscript');
+
+  bool get subScript => _commandState('subscript');
+
+  bool get strikeThrough => _commandState('strikethrough');
 
   int get fontSize {
     var s = _commandValue('fontsize');
@@ -391,6 +382,7 @@ class Calendar {
   DateTime _showDate, _now = new DateTime.now();
 
   final DivElement element = new DivElement(), nav = new DivElement(), leftNav = new DivElement(), rightNav = new DivElement();
+
   final SpanElement navText = new SpanElement();
 
   TableElement _table = new TableElement();
@@ -399,36 +391,41 @@ class Calendar {
 
   Calendar() {
     date = _now;
-    leftNav.classes..add('nav')
-    ..add('left_nav');
+    leftNav.classes..add('nav')..add('left_nav');
     leftNav.append(new DivElement());
-    rightNav.classes..add('nav')
-    ..add('right_nav');
+    rightNav.classes..add('nav')..add('right_nav');
     rightNav.append(new DivElement());
 
-    rightNav.onClick.listen((_)=>showNextMonth());
-    leftNav.onClick.listen((_)=>showPrevMonth());
+    rightNav.onClick.listen((_) => showNextMonth());
+    leftNav.onClick.listen((_) => showPrevMonth());
 
-    nav..append(leftNav)
-    ..append(rightNav)
-    ..append(navText)
-    ..classes.add('calendar_nav');
+    nav..append(leftNav)..append(rightNav)..append(navText)..classes.add('calendar_nav');
 
     element..append(nav)..append(_table)..classes.add('calendar');
   }
 
-  Element markDate(DateTime date){
+  bool get showNav => nav.hidden;
+
+  set showNav(bool b) => nav.hidden = b;
+
+  Element markDate(DateTime date) {
     var cell = _createCell(date);
     cell.classes.add('marked');
     return cell;
   }
 
-  String _dateToString(DateTime dt){
+  String _dateToString(DateTime dt) {
     var m = ["", "Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
     return "${m[dt.month]} ${dt.year.toString()}";
   }
-  void showNextMonth(){ date = new DateTime(_showDate.year, _showDate.month+1);}
-  void showPrevMonth() {date = new DateTime(_showDate.year, _showDate.month-1);}
+
+  void showNextMonth() {
+    date = new DateTime(_showDate.year, _showDate.month + 1);
+  }
+
+  void showPrevMonth() {
+    date = new DateTime(_showDate.year, _showDate.month - 1);
+  }
 
   DateTime get date => _showDate;
 
@@ -437,8 +434,7 @@ class Calendar {
     navText.text = _dateToString(_showDate);
     _table.queryAll('td.another_month').classes.remove('another_month');
     _table.children.clear();
-    var d = dt.subtract(new Duration(days:dt.day+dt.weekday-(dt.day%7)-1));
-    print(d.weekday);
+    var d = dt.subtract(new Duration(days:dt.day + ((dt.weekday - dt.day) % 7) - 1));
     while (_table.children.length < 6) {
       var row = new TableRowElement();
       for (var i = 0;i < 7;i++) {
@@ -452,15 +448,15 @@ class Calendar {
   }
 
   TableCellElement _createCell(DateTime dt) {
-    var cell = _cellMap.putIfAbsent(dt.year*10000+dt.month*100+dt.day, ()=>new TableCellElement());
-    if(cell.text.length == 0){
+    var cell = _cellMap.putIfAbsent(dt.year * 10000 + dt.month * 100 + dt.day, () => new TableCellElement());
+    if (cell.text.length == 0) {
       cell.text = "${dt.day}";
-      if(dt.day == _now.day && dt.month == _now.month && dt.year == _now.year){
+      if (dt.day == _now.day && dt.month == _now.month && dt.year == _now.year) {
         cell.classes.add('today');
       }
 
     }
-    if(dt.month != _showDate.month){
+    if (dt.month != _showDate.month) {
       cell.classes.add('another_month');
     }
     return cell;
@@ -485,61 +481,281 @@ class EditorAction {
 
 
 class ContentEditor {
+
+  static Map<Element, ContentEditor> _cache = new Map<Element, ContentEditor>();
+
+  factory ContentEditor(Element element, SiteClasses.PageOrder pageOrder) => _cache.putIfAbsent(element, ()=>new ContentEditor._internal(element, pageOrder));
+
+
   final Element element;
 
-  static final Map<Element, ContentEditor> _cache = new Map<Element, ContentEditor>();
+  final SiteClasses.PageOrder pageOrder;
 
-  DivElement _contentWrapper, _topBar, _toolBarPlaceholder = new DivElement(), _wrapper = new DivElement();
+  DivElement _contentWrapper = new DivElement(), _topBar, _toolBarPlaceholder = new DivElement(), _wrapper = new DivElement(), _preview = new DivElement();
 
   EditorCommandExecutor _executor;
 
   Map<Element, Element> _elementToSubMenu = new Map<Element, Element>();
 
+  SiteClasses.PageContent _currentContent;
 
-  factory ContentEditor(Element element) => _cache.putIfAbsent(element, () => new ContentEditor._internal(element));
+  SiteClasses.Revision _currentRevision;
+  SiteClasses.Revision _lastSavedRevision;
 
-  ContentEditor._internal(this.element){
+  PropertyAnimation _previewAnimation;
+
+  StreamController<bool> _onContentChangeStreamController = new StreamController<bool>();
+  Stream<bool> _onContentChangeStream;
+
+  StreamController<bool> _onOpenStateChangeStreamController = new StreamController<bool>();
+  Stream<bool> _onOpenStateChangeStream;
+
+  StreamSubscription<KeyboardEvent> _escSubscription;
+
+
+  bool _inputSinceSave = false, _closed = true;
+
+  int _hash;
+
+  ContentEditor._internal(this.element, this.pageOrder) {
+    _setUpStream();
+    _currentContent = pageOrder.currentPage[id];
     _toolBarPlaceholder.classes.add('tool_bar_placeholder');
-    _executor = new EditorCommandExecutor(element);
-    _contentWrapper = new DivElement();
-    _contentWrapper.append(_wrapper);
-    _wrapper..append(_topBar = _generateToolBar())..classes.add('tool_bar_wrapper');
-
     _contentWrapper.classes.add('edit_content_wrapper');
-    element.insertAdjacentElement("afterEnd", _contentWrapper);
-    _contentWrapper.append(element);
-    window.onScroll.listen((_) => _updateBarPosition());
+    _wrapper.classes.add('tool_bar_wrapper');
+    _preview.classes.add('preview');
+    _preview.hidden = true;
+    _executor = new EditorCommandExecutor(element);
+    _lastSavedRevision = new SiteClasses.Revision(null, element.innerHtml);
+    element.onDoubleClick.listen((Event event){
+      if(!_closed){
+        return;
+      }
+      window.getSelection().empty();
+      open();
+    });
+  }
+
+  Stream<bool> get onOpenStateChange => _onContentChangeStream == null? _onContentChangeStream = _onContentChangeStreamController.stream.asBroadcastStream():_onContentChangeStream;
+
+
+  void _setUpStream(){
+    _onContentChangeStream = _onContentChangeStreamController.stream.asBroadcastStream();
+    element.onInput.listen((_) => _onContentChangeStreamController.add(true));
+    _onContentChangeStream.listen((bool b){
+      if(b){
+        _inputSinceSave = true;
+      }
+    });
+  }
+
+  Future<bool> _useRevision(SiteClasses.Revision rev){
+    var completer = new Completer<bool>();
+
+    if(changed && _inputSinceSave){
+      var dialog = new DialogContainer();
+      var f = dialog.confirm("Du forsøger at hente en tidligere version af siden, <br /> uden at have gemt dine ændringer. <br /> Er du sikker på at du vil fortsætte?").result;
+      f.then((bool b){
+        if(!b){
+          completer.complete(false);
+          return;
+        }
+        _inputSinceSave = false;
+        _loadRevision(rev);
+        completer.complete(true);
+      });
+      return completer.future;
+    }
+    _loadRevision(rev);
+    completer.complete(true);
+    return completer.future;
+  }
+
+
+  void _loadRevision (SiteClasses.Revision rev){
+    element.innerHtml = rev.content;
+    _currentRevision = rev;
+    _notifyChange();
 
   }
 
+  void _showPreview(SiteClasses.Revision rev) {
+    _animatePreview(rev);
+
+  }
+
+  void _hidePreview() {
+    _animatePreview();
+
+  }
+
+  void _animatePreview([SiteClasses.Revision content]){
+    if (_previewAnimation == null) {
+      _previewAnimation = new HeightPropertyAnimation(_contentWrapper);
+      _previewAnimation.removePropertyOnComplete = true;
+    }
+    _contentWrapper.style.height = "${_contentWrapper.clientHeight.toString()}px";
+
+    _previewAnimation.stop();
+    var hidePreview = true;
+    if(content != null){
+      _preview.innerHtml = content.content;
+      hidePreview = false;
+    }
+    element.hidden = !(_preview.hidden = hidePreview);
+    var images = _preview.queryAll("img");
+    if (images.length > 0) {
+      var i = 0;
+      images.forEach((Element e) {
+        e.onLoad.listen((_) {
+          i++;
+          if (i == images.length) {
+            _previewAnimation.animateTo(maxChildrenHeight(_contentWrapper).toString(), onComplete:_updateBarPosition);
+          }
+        });
+      });
+
+    } else {
+      _previewAnimation.animateTo(maxChildrenHeight(_contentWrapper).toString(), onComplete:_updateBarPosition);
+
+    }
+  }
+
+  bool get changed => _currentHash != _hash;
+
+  void toggelOpen(){
+    if(_closed){
+      open();
+    } else {
+      close();
+    }
+  }
+
   void open() {
+    if(!_closed){
+      return;
+    }
+    _closed = false;
+    element.contentEditable = "true";
+
+    _escSubscription = document.onKeyUp.listen((KeyboardEvent kev){
+      if(kev.keyCode != 27){
+        return;
+      }
+      kev.preventDefault();
+      kev.cancelBubble = true;
+      close();
+    });
+
+    if(_contentWrapper.parent != null){
+      _updateBarPosition();
+      return;
+    }
+    window.onBeforeUnload.listen((BeforeUnloadEvent event){
+      if(_closed || !changed){
+        return;
+      }
+      event.returnValue = "Du har ikke gemt dine ændringer.";
+    });
+
+    _contentWrapper.append(_wrapper);
+    _wrapper.style.height = "0";
+    _wrapper.append(_topBar == null?_topBar = _generateToolBar():_topBar);
+    element.insertAdjacentElement("afterEnd", _contentWrapper);
+    _contentWrapper.append(element);
+    element.insertAdjacentElement("afterEnd", _preview);
+    window.onScroll.listen((_) => _updateBarPosition());
+    window.onResize.listen((_) => _updateBarPosition());
+    _saveCurrentHash();
     _updateBarPosition();
   }
 
   void close() {
+    if(_closed){
+      return;
+    }
+
+
+
+    if(changed){
+      var dialog = new DialogContainer();
+      var c = dialog.confirm("Du har ikke gemt dine ændringer. <br /> Er du sikker på at du vil afslutte?").result;
+      c.then((bool b){
+        if(b){
+          _loadRevision(_lastSavedRevision);
+          close();
+        }
+      });
+      return;
+    }
+    _escSubscription.cancel();
+    var b = _topBar.query(".tool_bar button.active");
+    if(b != null){
+      b.click();
+    }
+    _closed = true;
+
+    _wrapper.style.height = "0";
+    _toolBarPlaceholder.style.height = "0";
+
+    element.contentEditable = "false";
+
 
   }
 
-  void save(SaveStrategy saveStrategy) => saveStrategy.save(this);
+  void _saveCurrentHash() {
+    _hash = _currentHash;
 
+  }
+
+  int get _currentHash => element.innerHtml.hashCode;
+
+
+  void save() {
+    var savingBar = new SavingBar();
+    var jobId = savingBar.startJob();
+    _inputSinceSave = false;
+    _currentContent.addContent(element.innerHtml).then((SiteClasses.Revision rev) {
+      _saveCurrentHash();
+      savingBar.endJob(jobId);
+      _lastSavedRevision = rev;
+
+    });
+  }
 
   void _updateBarPosition() {
-    if (!_wrapper.classes.contains('floating') && window.scrollY > _elementOffsetTop(_topBar)) {
+    if(_closed){
+      return;
+    }
+    var floatCandidate = window.scrollY > _elementOffsetTop(_contentWrapper) + _contentWrapper.offsetHeight - _topBar.clientHeight;
+    _wrapper.style.removeProperty("top");
+    if (floatCandidate) {
+      _wrapper.style.width = "${_wrapper.clientWidth}px";
+      _wrapper.classes..remove('floating')..add('fixed');
+      _wrapper.style.top = "${_contentWrapper.offsetHeight - _topBar.clientHeight}px";
+    } else if (!_wrapper.classes.contains('floating') && window.scrollY > _elementOffsetTop(_topBar) && !floatCandidate) {
       _toolBarPlaceholder.style.height = "${_topBar.clientHeight}px";
       _wrapper.insertAdjacentElement("afterEnd", _toolBarPlaceholder);
       _wrapper.style.width = "${_wrapper.clientWidth}px";
-      _wrapper.classes.add('floating');
+      _wrapper.classes..add('floating')..remove('fixed');
     } else if (window.scrollY <= _elementOffsetTop(_toolBarPlaceholder)) {
       _toolBarPlaceholder.remove();
-
-      _wrapper..style.removeProperty("width")..classes.remove('floating');
+      _wrapper..style.removeProperty("width")..classes.remove('floating')..classes.remove('fixed');
 
     }
+    if(_wrapper.classes.contains('floating')){
+      _wrapper.style.left = "${_elementOffsetLeft(_contentWrapper)-window.scrollX}px";
+    }
+
     _updatePlaceholder();
 
   }
 
   void _updatePlaceholder() {
+    if(_closed){
+      return;
+    }
+
     _wrapper.style.height = _topBar.getComputedStyle().height;
     if (_toolBarPlaceholder.parent == null) {
       return;
@@ -548,6 +764,7 @@ class ContentEditor {
   }
 
   int _elementOffsetTop(Element e) => e == null ? 0 : e.offsetTop + _elementOffsetTop(e.offsetParent);
+  int _elementOffsetLeft(Element e) => e == null ? 0 : e.offsetLeft + _elementOffsetLeft(e.offsetParent);
 
 
   void _setUpSubMenu(Element element, Element menu, Element subMenu, void menuFiller(Element)) {
@@ -578,7 +795,7 @@ class ContentEditor {
 
 
   DivElement _generateToolBar() {
-    var bar = new DivElement(), textEdit = new ButtonElement(), addImage = new ButtonElement(), addFile = new ButtonElement(), history = new ButtonElement(), save = new ButtonElement(), wrapper = new DivElement(), textMenu = new DivElement(), imageMenu = new DivElement(), fileMenu = new DivElement(), historyMenu = new DivElement();
+    var bar = new DivElement(), textEdit = new ButtonElement(), addImage = new ButtonElement(), addFile = new ButtonElement(), history = new ButtonElement(), saveElement = new ButtonElement(), closeElement = new ButtonElement(), wrapper = new DivElement(), textMenu = new DivElement(), imageMenu = new DivElement(), fileMenu = new DivElement(), historyMenu = new DivElement();
 
     bar.onMouseDown.listen((MouseEvent e) => e.preventDefault());
     textMenu.onMouseDown.listen((MouseEvent e) => e.preventDefault());
@@ -591,23 +808,47 @@ class ContentEditor {
     _setUpSubMenu(addImage, bar, imageMenu, (Element e) => _fillUploadMenu(e, true));
     _addTitleToElement("Indsæt billede", addImage);
 
-    addFile..classes.add('file');
+    addFile.classes.add('file');
     _setUpSubMenu(addFile, bar, fileMenu, (Element e) => _fillUploadMenu(e));
     _addTitleToElement("Indsæt fil", addFile);
 
-    history..classes.add('history');
+    history.classes.add('history');
     _setUpSubMenu(history, bar, historyMenu, (Element e) => _fillHistoryMenu(e));
     _addTitleToElement("Se historik", history);
 
-    save..classes.add('save')..classes.add('enabled')..onClick.listen((_) {
-      var ss = new JSONSaveStrategy("EditContent");
-      this.save(ss);
+    closeElement.classes.add('close');
+    _addTitleToElement("Afslut redigering", closeElement);
+    closeElement.onClick.listen((_)=>close());
+
+    saveElement.classes.add('save');
+    var saveBox = new InfoBox("Gem ændringer");
+    saveBox..backgroundColor = InfoBox.COLOR_BLACK..reversed = true;
+    saveElement..onMouseOver.listen((_) {
+      if (changed) {
+        saveBox.showBelowCenterOfElement(saveElement);
+      }
+    })..onMouseOut.listen((_) => saveBox.remove())..onClick.listen((_) {
+      if (changed) {
+        save();
+      }
+      saveBox.remove();
     });
-    _addTitleToElement("Gem ændringer", save);
+
+    _currentContent.onAddContent.listen((_) => _notifyChange());
+
+    _onContentChangeStream.listen((_) {
+      if (changed) {
+        saveElement.classes.add('enabled');
+      } else {
+        saveElement.classes.remove('enabled');
+        saveBox.remove();
+      }
+    });
+
 
     bar.classes.add('tool_bar');
 
-    bar..append(textEdit)..append(addImage)..append(addFile)..append(history)..append(save);
+    bar..append(textEdit)..append(addImage)..append(addFile)..append(history)..append(closeElement)..append(saveElement);
 
     wrapper.append(bar);
 
@@ -615,69 +856,120 @@ class ContentEditor {
     return wrapper;
   }
 
+  void _notifyChange() => _onContentChangeStreamController.add(false);
+
   void _fillHistoryMenu(Element menu) {
-    //TODO move responsibility for listing revisions to SaveStrategy. Add listener for change in SaveStrategy.
     var calendar = new Calendar(), historyList = new UListElement();
-    menu
-    ..classes.add('history_menu')
-    ..classes.add('loading');
+    menu..classes.add('history_menu')..classes.add('loading');
 
     historyList.classes.add("history_list");
-    var client = new JSON.AJAXJSONClient("EditContent");
-    client.callFunction(new JSON.ListContentRevisionsJSONFunction(id),(JSON.JSONResponse response){
-      if(response.type != JSON.RESPONSE_TYPE_SUCCESS){
-        return;
-      }
-      menu..classes.remove('loading')
-      ..append(calendar.element)
-      ..append(historyList);
+
+    _currentContent.changeTimes.then((List<DateTime> changeTimes) {
+      menu..classes.remove('loading')..append(calendar.element)..append(historyList);
       _updatePlaceholder();
-      var last =new DateTime.fromMillisecondsSinceEpoch(0);
-      var markMap = new Map<TableCellElement,List<int>>(), payloadCache = new Map<TableCellElement,List<LIElement>>();
-      response.payload.forEach((int time){
-        var date = new DateTime.fromMillisecondsSinceEpoch(time*1000);
-        var el = calendar.markDate(date);
-        markMap.putIfAbsent(el,()=>[]).add(time);
+
+      var last = new DateTime.fromMillisecondsSinceEpoch(0);
+      var markMap = new Map<TableCellElement, List<DateTime>>(), payloadCache = new Map<TableCellElement, List<LIElement>>();
+      changeTimes.forEach((DateTime dt) {
+        var el = calendar.markDate(dt);
+        markMap.putIfAbsent(el, () => []).add(dt);
+
       });
-      var current;
-      markMap.forEach((TableCellElement cell, List<int> times){
-        cell.onClick.listen((_){
-          if(current != null){
-            current.classes.remove('current');
+      var currentCell;
+      var createLi = (SiteClasses.Revision revision, [UListElement historyList]) {
+        var li = new LIElement(), dt = revision.time;
+        li.text = "${dt.hour < 10 ? "0" + dt.hour.toString() : dt.hour}:${dt.minute < 10 ? "0" + dt.minute.toString() : dt.minute}:${dt.second< 10 ? "0" + dt.second.toString() : dt.second}";
+        if(historyList != null){
+          historyList.append(li);
+        }
+        li.onMouseOver.listen((_){
+          var ss;
+          ss = document.onMouseOut.listen((_) {
+            _hidePreview();
+            ss.cancel();
+          });
+          _showPreview(revision);
+        });
+        li.onMouseOut.listen((MouseEvent ev){
+          ev.cancelBubble = true;
+        });
+        li.onClick.listen((_){
+          if(revision == _currentRevision && !changed){
+            return;
           }
-          current = cell;
+          li.classes.add('current');
+          _useRevision(revision).then((bool b){
+            if(b){
+              return;
+            }
+            li.classes.remove('current');
+          });
+        });
+        _onContentChangeStream.listen((_){
+          if(_currentRevision == revision || _currentRevision == null || !li.classes.contains('current')){
+            return;
+          }
+          li.classes.remove('current');
+        });
+        return li;
+      };
+      var setUp = (TableCellElement cell, List<DateTime> times) {
+        var len = markMap[cell].length;
+        var box = new InfoBox("Gemt $len gang${len > 1 ? "e" : ""}");
+        cell.onMouseOver.listen((_) => box.showBelowCenterOfElement(cell));
+        cell.onMouseOut.listen((_) => box.remove());
+        box.reversed = true;
+        box.backgroundColor = InfoBox.COLOR_BLACK;
+        cell.onClick.listen((_) {
+          if (currentCell != null) {
+            currentCell.classes.remove('current');
+          }
+          currentCell = cell;
           cell.classes.add('current');
           historyList.children.clear();
           _updatePlaceholder();
-          if(payloadCache.containsKey(cell)){
+          if (payloadCache.containsKey(cell)) {
             historyList.children.addAll(payloadCache[cell]);
             _updatePlaceholder();
             return;
           }
           historyList.classes.add('loading');
-          client.callFunction(new JSON.ListContentRevisionsJSONFunction(id,from:times.first, to:times.last, includeContent:true), (JSON.JSONResponse response){
+          _currentContent.listRevisions(from:times.first, to:times.last).then((List<SiteClasses.Revision> revisions) {
             historyList.classes.remove('loading');
-            if(response.type != JSON.RESPONSE_TYPE_SUCCESS){
-              return;
-            }
             var l = payloadCache[cell] = new List<LIElement>();
-            response.payload.forEach((Map<String, dynamic> map){
-              var li = new LIElement(), dt = new DateTime.fromMillisecondsSinceEpoch(map['time']*1000);
-              li.text = "${dt.hour<10?"0"+dt.hour.toString():dt.hour}:${dt.minute<10?"0"+dt.minute.toString():dt.minute}";
-              l.add(li);
-              historyList.append(li);
+            revisions.forEach((SiteClasses.Revision revision){
+              var li = createLi(revision, historyList);
+              l.add(li );
+              if(_currentRevision == null && revision.time == changeTimes.last){
+                li.classes.add('current');
+              }
             });
             _updatePlaceholder();
           });
         });
-        if(cell.classes.contains('today')){
+      };
+      markMap.forEach((TableCellElement cell, List<DateTime> times) {
+        setUp(cell, times);
+        if (cell.classes.contains('today')) {
           cell.click();
         }
       });
-    });;
+      _currentContent.onAddContent.listen((SiteClasses.Revision r) {
+        var c = calendar.markDate(r.time);
+        var li = createLi(r,c == currentCell?historyList:null);
+        li.classes.add("current");
+        _currentRevision = r;
+        payloadCache.putIfAbsent(c, ()=>[]).add(li);
+        markMap.putIfAbsent(c, () => []).add(r.time);
+        setUp(c, [r.time]);
+        if (currentCell == null && c.classes.contains('today')) {
+          c.click();
+        }
+        _notifyChange();
+      });
+    });
 
   }
-
 
 
   void _fillUploadMenu(DivElement menu, [bool images = false]) {
@@ -802,6 +1094,38 @@ class ContentEditor {
 
 
     menuHandler.addToMenu(colorSelect.element);
+    var dialog = new DialogContainer();
+
+    dialog.dialogBg.onMouseDown.listen((MouseEvent evt){
+      evt.cancelBubble = true;
+//      evt.preventDefault();
+    });
+
+    var dialogLink = (){
+
+      var selection = window.getSelection();
+      if(!element.contains(selection.baseNode)){
+        return;
+      }
+
+      var ranges = [];
+      for(var i = 0; i< selection.rangeCount; i++){
+        ranges.add(selection.getRangeAt(i));
+      }
+
+      selection.removeAllRanges();
+      var box = dialog.text("Indtast link adresse");
+      box.textInput.value = "http://";
+      box.result.then((String s){
+        s = s.trim();
+        print(ranges);
+        ranges.forEach((Range r)=>selection.addRange(r));
+        if(s.length <= 0 || s == "http://"){
+          return;
+        }
+        _executor.createLink(s);
+      });
+    };
 
     var textIconMap = {
         "bold":{
@@ -826,6 +1150,14 @@ class ContentEditor {
             "title":"Indryk mere", "selChange":null, "func":() => _executor.indent()
         }, "m_indent":{
             "title":"Indryk mindre", "selChange":null, "func":() => _executor.outdent()
+        }, "superscript":{
+            "title":"Hævet skrift", "selChange":() => _executor.superScript, "func":() => _executor.toggleSuperScript()
+        }, "subscript":{
+            "title":"Sænket skrift", "selChange":() => _executor.subScript, "func":() => _executor.toggleSubscript()
+        }, "strikethrough":{
+            "title":"Gennemstreget", "selChange":() => _executor.strikeThrough, "func":() => _executor.toggleStrikeThrough()
+        }, "insert_link":{
+            "title":"Indsæt link", "selChange":null, "func":dialogLink
         }, "no_format":{
             "title":"Fjern formatering", "selChange":null, "func":() => _executor.removeFormat()
         }
@@ -856,10 +1188,9 @@ class ContentEditor {
 
   InfoBox _addTitleToElement(String title, Element e) {
     var i = new InfoBox(title);
-
     i..backgroundColor = InfoBox.COLOR_BLACK..reversed = true;
-
     e..onMouseOver.listen((_) => i.showBelowCenterOfElement(e))..onMouseOut.listen((_) => i.remove())..onClick.listen((_) => i.remove());
+    _onContentChangeStream.listen((_) => i.remove());
     return i;
   }
 

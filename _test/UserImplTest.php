@@ -86,6 +86,22 @@ class UserImplTest extends PHPUnit_Extensions_Database_TestCase
 
     }
 
+    public function testSettersWillNotChangeId(){
+        $id = $this->user->getUniqueId();
+        $this->user->setMail("test@test.dk");
+        $this->assertEquals($id, $this->user->getUniqueId());
+        $this->user->setPassword("asd");
+        $this->assertEquals($id, $this->user->getUniqueId());
+        $this->user->setUsername("asdasdasdasd");
+        $this->assertEquals($id, $this->user->getUniqueId());
+    }
+
+    public function testCreateUserWillCreateDifferentIDs(){
+        $user1 = new UserImpl('test1', $this->db);
+        $user2 = new UserImpl('test2', $this->db);
+        $this->assertNotEquals($user1->getUniqueId(), $user2->getUniqueId());
+    }
+
     public function testSetMailMustBeValidMail()
     {
         $mail = 'invalidMail';
@@ -419,6 +435,8 @@ class UserImplTest extends PHPUnit_Extensions_Database_TestCase
         $user->setUsername('someUser');
         $this->assertTrue($user->isLoggedIn(), 'User was logged out');
     }
+
+
 
     public function testCreateTwoUsersCanBeDone(){
         $user1 = new UserImpl('user1',$this->db);

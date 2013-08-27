@@ -2,8 +2,8 @@ part of core;
 
 abstract class FloatingBox{
   final DivElement element =  new DivElement();
-  Function _removeFunction = (){};
   StreamSubscription _escSubscription, _mouseDownSubscription;
+  StreamController<Event> _removeController = new StreamController<Event>();
   bool _f = false;
 
   FloatingBox(){
@@ -94,6 +94,17 @@ abstract class FloatingBox{
     s();
     _setUpChangeListener(_changeListener(s));
   }
+  void showBelowRightOfElement(Element e){
+    var s = () => showAt(_elementOffsetLeft(e)+e.clientWidth, _elementOffsetTop(e)+e.clientHeight);
+    s();
+    _setUpChangeListener(_changeListener(s));
+  }
+ void showBelowAlignRightOfElement(Element e){
+    var s = () => showAt(_elementOffsetLeft(e)+e.clientWidth-element.clientWidth, _elementOffsetTop(e)+e.clientHeight);
+    s();
+    s();
+    _setUpChangeListener(_changeListener(s));
+  }
 
 
   bool get removeOnESC => _escSubscription != null;
@@ -134,21 +145,15 @@ abstract class FloatingBox{
   }
 
 
-  void _addRemoveFunction(void f()){
-    var rf = _removeFunction;
-    _removeFunction = (){
-      rf();
-      f();
-    };
-  }
 
-  void listenOnRemove(void f()) => _addRemoveFunction(f);
+  Stream<Event> get onRemove => _removeController.stream;
+
 
   void remove(){
     if(!_inDom){
       return;
     }
-    _removeFunction();
+    _removeController.add(new Event("remove", canBubble:false, cancelable:false));
     element.remove();
   }
   void showAt(int x, int y);
@@ -225,6 +230,11 @@ class InfoBox extends FloatingBox{
 }
 
 class DropDown{
+  static const int SHOW_BELOW_LEFT_OF_ELEMENT = 1,
+            SHOW_BELOW_CENTER_OF_ELEMENT = 2,
+            SHOW_BELOW_ALIGN_RIGHT = 3;
+
+  int _showMode = SHOW_BELOW_LEFT_OF_ELEMENT;
   final Element content;
   final DivElement element = new DivElement();
   DivElement _arrow = new DivElement(), _text = new DivElement();
@@ -241,6 +251,10 @@ class DropDown{
   }
 
 
+  set showMode(int i) => _showMode = Math.min(3, Math.max(1, i));
+
+  int get showMode => _showMode;
+
 
   DropDown._internal(this.content){
     _dropBox = new DropDownBox(content);
@@ -248,7 +262,7 @@ class DropDown{
     _text.classes.add('text');
     element..classes.add('drop_down')
     ..append(_arrow);
-    _dropBox.listenOnRemove(()=>element.classes.remove('active'));
+    _dropBox.onRemove.listen((_)=>element.classes.remove('active'));
     closeOnESC = true;
     element.onClick.listen((_)=>toggle());
     document.onMouseDown.listen((MouseEvent e){
@@ -267,7 +281,18 @@ class DropDown{
     }
   }
   void open(){
-    _dropBox.showBelowLeftOfElement(element);
+    switch(_showMode){
+      case SHOW_BELOW_LEFT_OF_ELEMENT:
+        _dropBox.showBelowLeftOfElement(element);
+    break;
+    case SHOW_BELOW_CENTER_OF_ELEMENT:
+    _dropBox.showBelowCenterOfElement(element);
+    break;
+    case SHOW_BELOW_ALIGN_RIGHT:
+    _dropBox.showBelowAlignRightOfElement(element);
+    break;
+
+    }
     element.classes.add('active');
   }
 

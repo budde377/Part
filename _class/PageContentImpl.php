@@ -46,12 +46,12 @@ class PageContentImpl implements PageContent
 
     /**
      * @param string $content Adds new content. This will be the latest upon addition.
-     * @return void
+     * @return int | null Returns null on error else the latest time
      */
     public function addContent($content)
     {
         if (!$this->page->exists()) {
-            return;
+            return null;
         }
         $this->initializeHistory();
         if ($this->preparedAddStatement == null) {
@@ -63,6 +63,7 @@ class PageContentImpl implements PageContent
         $this->preparedAddStatement->execute(array($this->id, $this->page->getID(), date("Y-m-d H:i:s", $t), $content));
         $this->content = $content;
         $this->history[] = array('content' => $content, 'time' => $t);
+        return $t;
     }
 
     private function initializeHistory()
@@ -121,5 +122,24 @@ class PageContentImpl implements PageContent
         }
 
         return $result;
+    }
+
+    /**
+     * @param int $time Seconds since epoch
+     * @return array | null Returns content at time or null if no content
+     */
+    public function getContentAt($time)
+    {
+        $this->initializeHistory();
+        $h = $this->history;
+        $found = false;
+        $e = null;
+        while(count($h) > 0 && !$found){
+            $e = array_pop($h);
+            $found = $e['time'] <= $time;
+        }
+
+        return $found?$e:null;
+
     }
 }

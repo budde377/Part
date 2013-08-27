@@ -28,15 +28,23 @@ class FormDecoration {
     filter.classes.add('filter');
   }
 
-
-  void set submitFunction(bool f(Map<String,String> data)){
+    set submitFunction(bool f(Map<String,String> data)){
     _submitFunction = f;
     form.onSubmit.listen((Event e){
       e.preventDefault();
       e.stopImmediatePropagation();
       var data = <String,String>{};
-      form.queryAll('input:not([type=submit]), textarea, select').forEach((InputElement e){
-        data[e.name] = e.value;
+      form.queryAll('input:not([type=submit]), textarea, select').forEach((Element e){
+        if(e is SelectElement){
+          SelectElement ee  = e;
+          data[ee.name] = ee.value;
+        } else if (e is InputElement){
+          InputElement ee = e;
+          data[ee.name] = ee.value;
+        } else if(e is TextAreaElement){
+          TextAreaElement ee = e;
+          data[ee.name] = ee.value;
+        }
       });
       if(!f(data)){
         e.preventDefault();

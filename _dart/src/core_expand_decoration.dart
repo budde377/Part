@@ -94,3 +94,4 @@ class OpacityExpandDecoration extends ExpandDecoration{
   void _setOpacity(double pct) => element.style.opacity = "${startOpacity+(endOpacity-startOpacity)*pct}";
 
 }
+

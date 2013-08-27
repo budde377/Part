@@ -14,6 +14,7 @@ class StubUserImpl implements User
     private $mail;
     private $lastLogin;
     private $parent;
+    private $id ;
 
     /**
      * @return string Username as string
@@ -196,5 +197,14 @@ class StubUserImpl implements User
     public function isValidPassword($password)
     {
         return true;
+    }
+
+    /**
+     * Will get a unique id, which is persistent with regard to changes made to any user information
+     * @return String
+     */
+    public function getUniqueId()
+    {
+        return $this->id== null?$this->id = uniqid():$this->id;
     }
 }

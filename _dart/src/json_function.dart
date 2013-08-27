@@ -110,13 +110,6 @@ class UserLoginJSONFunction extends JSONFunction {
   }
 }
 
-class AddContentJSONFunction extends JSONFunction{
-  AddContentJSONFunction(String id, String content): super('addContent'){
-    this.arguments['id'] = id;
-    this.arguments['content'] = content;
-  }
-}
-
 class UploadImageURIJSONFunction extends JSONFunction{
   UploadImageURIJSONFunction(String fileName, String data, [List<ImageTransform> sizes = null]): super('uploadImageURI'){
     this.arguments['data'] = data;
@@ -133,11 +126,28 @@ class UploadFileURIJSONFunction extends JSONFunction{
   }
 }
 
-class ListContentRevisionsJSONFunction extends JSONFunction{
-  ListContentRevisionsJSONFunction(String id, {int from:0, int to:-1, bool includeContent:false}) : super('listContentRevisions'){
+class AddPageContentJSONFunction extends JSONFunction{
+  AddPageContentJSONFunction(String page_id, String id, String content): super('addPageContent'){
+    this.arguments['page_id'] = page_id;
+    this.arguments['id'] = id;
+    this.arguments['content'] = content;
+  }
+}
+
+class ListPageContentRevisionsJSONFunction extends JSONFunction{
+  ListPageContentRevisionsJSONFunction(String page_id, String id, {int from:0, int to:-1, bool includeContent:false}) : super('listPageContentRevisions'){
+    this.arguments['page_id'] = page_id;
     this.arguments['id'] = id;
     this.arguments['from'] = from;
     this.arguments['to'] = to;
     this.arguments['content'] = includeContent;
+  }
+}
+
+class PageContentAtTimeJSONFunction extends JSONFunction{
+  PageContentAtTimeJSONFunction(String page_id, String id, int time) : super('pageContentAtTime'){
+    this.arguments['page_id'] = page_id;
+    this.arguments['id'] = id;
+    this.arguments['time'] = time;
   }
 }
