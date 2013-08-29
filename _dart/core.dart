@@ -264,6 +264,27 @@ class AJAXRequest {
 
 }
 
-class RefreshPage{
-  
+class ESCQueue{
+  static ESCQueue _cache = new ESCQueue._internal();
+
+  List<Function> _queue = new List<Function>();
+
+  factory ESCQueue() => _cache;
+
+  ESCQueue._internal(){
+    document.onKeyUp.listen((KeyboardEvent kev){
+      if(kev.keyCode != 27 || _queue.length == 0 ){
+        return;
+      }
+
+      while(_queue.length > 0 && !_queue.removeLast()()){
+
+      }
+    });
+  }
+
+  void add(bool action()) => _queue.add(action);
 }
+
+
+ESCQueue get escQueue => new ESCQueue();

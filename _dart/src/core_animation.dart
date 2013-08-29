@@ -82,7 +82,6 @@ class PxPropertyAnimation extends PropertyAnimation {
     if (from == "auto" || to == "auto") {
       return;
     }
-    print("ANIMATING FROM ${from} TO ${to}");
     stop();
 
     _fromm = parsePx(from);
@@ -92,10 +91,12 @@ class PxPropertyAnimation extends PropertyAnimation {
     _animation = new Animation(duration == null ? new Duration(milliseconds:100) : duration, (double pct) {
       element.style.setProperty(property, "${linearAnimationFunction(pct, _fromm, _too).toInt()}px");
     }, (bool b) {
+
       running = false;
       if (!b) {
         return;
       }
+
       if (removePropertyOnComplete) {
         element.style.removeProperty(property);
       }

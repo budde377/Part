@@ -2,9 +2,9 @@ part of core;
 
 abstract class FloatingBox{
   final DivElement element =  new DivElement();
-  StreamSubscription _escSubscription, _mouseDownSubscription;
+  StreamSubscription _mouseDownSubscription;
   StreamController<Event> _removeController = new StreamController<Event>();
-  bool _f = false;
+  bool _f = false, _removeOnESC;
 
   FloatingBox(){
     element.classes.add('floating_box');
@@ -64,21 +64,21 @@ abstract class FloatingBox{
   }
 
   void showAboveCenterOfElement(Element e){
-    var s = () => showAt( _elementOffsetLeft(e)+e.clientWidth~/2, _elementOffsetTop(e));
+    var s = () => showAt( _elementOffsetLeft(e)+e.offsetWidth~/2, _elementOffsetTop(e));
     s();
     _setUpChangeListener(_changeListener(s));
 
   }
 
   void showAboveRightOfElement(Element e){
-    var s = () => showAt( _elementOffsetLeft(e)+e.clientWidth, _elementOffsetTop(e));
+    var s = () => showAt( _elementOffsetLeft(e)+e.offsetWidth, _elementOffsetTop(e));
     s();
     _setUpChangeListener(_changeListener(s));
 
   }
 
   void showBelowCenterOfElement(Element e){
-    var s = () => showAt( _elementOffsetLeft(e)+e.clientWidth~/2, _elementOffsetTop(e)+e.clientHeight);
+    var s = () => showAt( _elementOffsetLeft(e)+e.offsetWidth~/2, _elementOffsetTop(e)+e.offsetHeight);
     s();
     _setUpChangeListener(_changeListener(s));
 
@@ -90,39 +90,47 @@ abstract class FloatingBox{
   }
 
   void showBelowLeftOfElement(Element e){
-    var s = () => showAt(_elementOffsetLeft(e), _elementOffsetTop(e)+e.clientHeight);
+    var s = () => showAt(_elementOffsetLeft(e), _elementOffsetTop(e)+e.offsetHeight);
     s();
     _setUpChangeListener(_changeListener(s));
   }
   void showBelowRightOfElement(Element e){
-    var s = () => showAt(_elementOffsetLeft(e)+e.clientWidth, _elementOffsetTop(e)+e.clientHeight);
+    var s = () => showAt(_elementOffsetLeft(e)+e.offsetWidth, _elementOffsetTop(e)+e.offsetHeight);
     s();
     _setUpChangeListener(_changeListener(s));
   }
  void showBelowAlignRightOfElement(Element e){
-    var s = () => showAt(_elementOffsetLeft(e)+e.clientWidth-element.clientWidth, _elementOffsetTop(e)+e.clientHeight);
+    var s = () => showAt(_elementOffsetLeft(e)+e.offsetWidth-element.offsetWidth, _elementOffsetTop(e)+e.offsetHeight);
     s();
     s();
     _setUpChangeListener(_changeListener(s));
   }
 
 
-  bool get removeOnESC => _escSubscription != null;
+  bool get removeOnESC => _removeOnESC == true;
 
   set removeOnESC(bool b){
-    if(b == removeOnESC) {
+
+    if(removeOnESC == b) {
       return;
     }
-    if(b){
-      _escSubscription = window.onKeyDown.listen((KeyboardEvent e){
-        if(e.keyCode == 27){
-          remove();
-        }
-      });
-    } else {
-      _escSubscription.cancel();
-      _escSubscription = null;
+    if(_removeOnESC != null){
+      _removeOnESC = b;
+      return;
     }
+    _removeOnESC = b;
+
+  }
+
+  bool _escRemover(){
+    if(element.parent == null){
+      return false;
+    }
+    if(_removeOnESC){
+      remove();
+      return true;
+    }
+    return false;
   }
 
   bool get removeOnMouseDownOutsideOfBox => _mouseDownSubscription != null;
@@ -156,8 +164,16 @@ abstract class FloatingBox{
     _removeController.add(new Event("remove", canBubble:false, cancelable:false));
     element.remove();
   }
-  void showAt(int x, int y);
-}
+  void showAt(int x, int y){
+    if(element.parent == null){
+      query('body').append(element);
+    }
+    if(removeOnESC){
+      escQueue.add(_escRemover);
+    }
+    element.style.top = "${y}px";
+    element.style.left = "${x}px";
+  }}
 
 
 class InfoBox extends FloatingBox{
@@ -165,6 +181,7 @@ class InfoBox extends FloatingBox{
   static const String COLOR_RED = "red";
   static const String COLOR_WHITE = "white";
   static const String COLOR_BLACK = "black";
+  static const String COLOR_GREYSCALE = "greyscale";
   final Element  content;
   DivElement _arrowElement = new DivElement();
 
@@ -206,7 +223,7 @@ class InfoBox extends FloatingBox{
        }
 
 
-  String get backgroundColor => element.classes.contains('red')?COLOR_RED:(element.classes.contains('white')?COLOR_WHITE:COLOR_BLACK);
+  String get backgroundColor => element.classes.contains('red')?COLOR_RED:(element.classes.contains('white')?COLOR_WHITE:(element.classes.contains(COLOR_GREYSCALE)?COLOR_GREYSCALE:COLOR_BLACK));
 
   void set backgroundColor(String color){
     element.classes.remove(COLOR_RED);
@@ -217,14 +234,16 @@ class InfoBox extends FloatingBox{
       break;
       case COLOR_BLACK:
         element.classes.add(COLOR_BLACK);
+        break;
+      case COLOR_GREYSCALE:
+        element.classes.add(COLOR_GREYSCALE);
     }
   }
   void showAt(int x, int y){
     query('body').append(element);
     x = x-(element.clientWidth/2).toInt();
     y = y-(reversed ? 0: element.clientHeight-_arrowElement.clientHeight);
-    element.style.top = "${y}px";
-    element.style.left = "${x}px";
+    super.showAt(x,y);
   }
 
 }
@@ -353,11 +372,7 @@ class DropDownBox extends FloatingBox{
   }
 
 
-  void showAt(int x, int y){
-    query('body').append(element);
-    element.style.top = "${y}px";
-    element.style.left = "${x}px";
-  }
+  void showAt(int x, int y) => super.showAt(x, y);
 
 
 }
