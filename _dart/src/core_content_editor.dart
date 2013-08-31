@@ -466,92 +466,103 @@ class Calendar {
 }
 
 
-class LinkImageHandler{
+class LinkImageHandler {
   final Element element;
+
   final ContentEditor editor;
+
   bool _enabled;
+
   InfoBox _infoBox;
+
   DivElement _boxElement = new DivElement();
+
   ButtonElement _unlinkButton = new ButtonElement(), _openButton = new ButtonElement(), _editImageButton = new ButtonElement();
+
   AnchorElement _foundLink;
+
   ImageElement _foundImage;
-  LinkImageHandler(this.element, this.editor){
+
+  ImageEditor _imageEditor = new ImageEditor();
+
+  LinkImageHandler(this.element, this.editor) {
+    _imageEditor.open(element.query('img'));
     _enabled = editor.isOpen;
-    editor.onOpenChange.listen((bool b){
+    editor.onOpenChange.listen((bool b) {
       _setUp();
       _infoBox.remove();
       _enabled = b;
     });
   }
 
-  void _setUp(){
-    if(_infoBox != null){
+  void _setUp() {
+    if (_infoBox != null) {
       return;
     }
 
-    _unlinkButton..classes.add('unlink')
-                 ..onClick.listen((MouseEvent mev){
+    _unlinkButton..classes.add('unlink')..onClick.listen((MouseEvent mev) {
       mev.cancelBubble = true;
-      _foundLink.insertAdjacentHtml("afterEnd",_foundLink.innerHtml);
+      _foundLink.insertAdjacentHtml("afterEnd", _foundLink.innerHtml);
       _foundLink.remove();
       _infoBox.remove();
       editor.executor.triggerCommandStateChangeListener();
     });
-    _openButton..classes.add('open')
-               ..onClick.listen((MouseEvent mev){
+    _openButton..classes.add('open')..onClick.listen((MouseEvent mev) {
       mev.cancelBubble = true;
       _infoBox.remove();
-      window.open(_foundLink.href,"_blank");
+      window.open(_foundLink.href, "_blank");
     });
-    _editImageButton.classes.add('edit_image');
+    _editImageButton..classes.add('edit_image')..onClick.listen((MouseEvent mev) {
+      mev.cancelBubble = true;
+      _infoBox.remove();
+      _imageEditor.open(_foundImage);
+    });
 
     _infoBox = new InfoBox.elementContent(_boxElement);
-    _infoBox..backgroundColor = InfoBox.COLOR_GREYSCALE
-            ..removeOnESC = true
-            ..element.classes.add('edit_link_image_popup');
+    _infoBox..backgroundColor = InfoBox.COLOR_GREYSCALE..removeOnESC = true..element.classes.add('edit_link_image_popup');
 
     document.onClick.listen(_clickHandler);
 
   }
 
 
-  void _clickHandler(MouseEvent event){
-    if(!_enabled){
+  void _clickHandler(MouseEvent event) {
+    if (!_enabled) {
       return;
     }
     var elm = event.toElement;
-    if(_infoBox.element.contains(elm)){
+    if (_infoBox.element.contains(elm)) {
       return;
     }
 
-    if(!element.contains(elm)){
+    if (!element.contains(elm)) {
       _infoBox.remove();
       return;
     }
     _foundLink = _foundImage = null;
 
-    while(elm != element && _foundLink == null){
-      _foundLink = elm is AnchorElement?elm:null;
-      if(_foundImage == null && elm is ImageElement){
+    while (elm != element && _foundLink == null) {
+      _foundLink = elm is AnchorElement ? elm : null;
+      if (_foundImage == null && elm is ImageElement) {
         _foundImage = elm;
       }
       elm = elm.parent;
 
     }
-    if(_foundLink == null && _foundImage == null){
+    if (_foundLink == null && _foundImage == null) {
       _infoBox.remove();
       return;
     }
     _boxElement.children.clear();
-    if(_foundImage != null){
+    if (_foundImage != null) {
       _boxElement.append(_editImageButton);
     }
 
-    if(_foundLink != null){
+    if (_foundLink != null) {
       _boxElement.append(_unlinkButton);
       _boxElement.append(_openButton);
     }
-    _infoBox.showAboveCenterOfElement(_foundLink== null? _foundImage:_foundLink);
+    _infoBox.showAboveCenterOfElement(_foundLink == null ? _foundImage : _foundLink);
 
   }
 
@@ -573,12 +584,163 @@ class EditorAction {
   final Function onClickAction, selectionStateChanger;
 }
 
+class ImageEditor {
+  static ImageEditor _cache = new ImageEditor._internal();
+
+  factory ImageEditor() => _cache;
+
+  ImageElement _currentImage;
+
+  ImageElement _originalImage = new ImageElement();
+
+  int _x, _y, _width, _height, _cropHeight, _cropWidth, _rotate = 0;
+
+  int _maxHeight, _maxWidth;
+
+  DivElement _background = new DivElement(), _cropBox = new DivElement(), _container = new DivElement(), _editorContainer = new DivElement();
+
+  UListElement _toolBar = new UListElement();
+
+  ImageEditor._internal(){
+    _background.classes..add('full_background')..add('edit_image_popup');
+    _container.classes.add('container');
+    _cropBox.classes.add('crop_box');
+    _editorContainer.classes.add('editor_container');
+    _toolBar.classes.add('tool_bar');
+    _originalImage.draggable = false;
+    _originalImage.onClick.listen((_)=>rotate++);
+  }
+
+  int get rotate => _rotate;
+  set rotate(int r){
+    _rotate = r%4;
+    _updatePos();
+  }
+
+  void open(ImageElement image, {int maxWidth:null, int maxHeight:null}) {
+    if (_currentImage != null || image == null) {
+      return;
+    }
+    var matches = new RegExp(r"(/_files/[^/]+/[^-]+)(-[S]_([0-9]+)_([0-9]+))?(-[C]_([0-9]+)_([0-9]+)_([0-9]+)_([0-9]+))?(-[R]_([0-9]))?(\.[a-zA-Z]+)").allMatches(image.src);
+    if (matches.length != 1) {
+      return;
+    }
+
+    var match = matches.first;
+
+    _originalImage.src = match.group(1) + match.group(match.groupCount);
+    if (match.group(2) != null) {
+      _width = int.parse(match.group(3));
+      _height = int.parse(match.group(4));
+
+    }
+    if (match.group(5) != null) {
+      _x = int.parse(match.group(6));
+      _y = int.parse(match.group(7));
+      _cropWidth = int.parse(match.group(8));
+      _cropHeight = int.parse(match.group(9));
+    }
+    if (match.group(10) != null) {
+      _rotate = int.parse(match.group(11)) % 4;
+    }
+    _currentImage = image;
+    _maxHeight = maxHeight;
+    _maxWidth = maxWidth;
+
+    escQueue.add(() {
+      if (_currentImage == null) {
+        return false;
+      }
+      close();
+      return true;
+    });
+
+
+    _showImage();
+
+  }
+
+  void _showImage() {
+    if (_background.parent == null) {
+      query('body')..append(_background);
+      enableNoScrollBody();
+    }
+
+    _background.append(_container);
+    _container.append(_editorContainer);
+    _editorContainer.append(_cropBox);
+    _cropBox.append(_originalImage);
+    _cropBox.append(_toolBar);
+    _updatePos();
+
+  }
+
+  void _updatePos() {
+    _originalImage.style.height = _height == null ? "" : "${_height}px";
+    _originalImage.style.width = _width == null ? "" : "${_width}px";
+
+    var x = _x == null? 0:_x;
+    var y = _y == null? 0:_y;
+    _originalImage.classes.removeWhere((String c)=>c.startsWith('rotate'));
+    switch(_rotate){
+      case 1:
+        _originalImage.classes.add('rotate90');
+        x += _height;
+
+        break;
+      case 2:
+        _originalImage.classes.add('rotate180');
+        x += _width;
+        y += _height;
+        break;
+      case 3:
+        _originalImage.classes.add('rotate270');
+      y += _width;
+        break;
+    }
+    if(y>0){
+      _originalImage.style.top = "${y}px";
+
+    } else {
+      _originalImage.style.removeProperty('top');
+    }
+    if(x>0){
+      _originalImage.style.left = "${x}px";
+
+    } else {
+      _originalImage.style.removeProperty('left');
+
+    }
+
+    _cropBox.style.width = _cropWidth == null ? "${_rotate%2 == 1?_height:_width}px" : "${-_x}px";
+    _cropBox.style.height = _cropHeight == null ? "${_rotate%2 == 1?_width:_height}px" : "${-_x}px";
+    _container.style.width = "${_cropBox.clientWidth}px";
+
+  }
+
+  void close() {
+    if (_currentImage == null) {
+      return;
+    }
+    _currentImage = null;
+    _background.remove();
+    disableNoScrollBody();
+    _originalImage.remove();
+
+  }
+
+  void save() {
+
+  }
+
+}
+
 
 class ContentEditor {
 
   static Map<Element, ContentEditor> _cache = new Map<Element, ContentEditor>();
 
-  factory ContentEditor(Element element, SiteClasses.PageOrder pageOrder) => _cache.putIfAbsent(element, ()=>new ContentEditor._internal(element, pageOrder));
+  factory ContentEditor(Element element, SiteClasses.PageOrder pageOrder) => _cache.putIfAbsent(element, () => new ContentEditor._internal(element, pageOrder));
 
 
   final Element element;
@@ -589,20 +751,22 @@ class ContentEditor {
 
   DivElement _contentWrapper = new DivElement(), _topBar, _toolBarPlaceholder = new DivElement(), _wrapper = new DivElement(), _preview = new DivElement();
 
-
   Map<Element, Element> _elementToSubMenu = new Map<Element, Element>();
 
   SiteClasses.PageContent _currentContent;
 
   SiteClasses.Revision _currentRevision;
+
   SiteClasses.Revision _lastSavedRevision;
 
   PropertyAnimation _previewAnimation;
 
   StreamController<bool> _onContentChangeStreamController = new StreamController<bool>();
+
   Stream<bool> _onContentChangeStream;
 
   StreamController<bool> _onOpenChangeStreamController = new StreamController<bool>();
+
   Stream<bool> _onOpenChangeStream;
 
 
@@ -611,6 +775,7 @@ class ContentEditor {
   int _hash;
 
   ContentEditor._internal(Element element, this.pageOrder) : this.element = element, executor = new EditorCommandExecutor(element){
+
     _setUpStream();
     _currentContent = pageOrder.currentPage[id];
     _toolBarPlaceholder.classes.add('tool_bar_placeholder');
@@ -619,39 +784,40 @@ class ContentEditor {
     _preview.classes.add('preview');
     _preview.hidden = true;
     _lastSavedRevision = new SiteClasses.Revision(null, element.innerHtml);
-    element.onDoubleClick.listen((Event event){
-      if(!_closed){
+    element.onDoubleClick.listen((Event event) {
+      if (!_closed) {
         return;
       }
       window.getSelection().empty();
       open();
     });
     new LinkImageHandler(element, this);
+
   }
 
-  Stream<bool> get onChange => _onContentChangeStream == null? _onContentChangeStream = _onContentChangeStreamController.stream.asBroadcastStream():_onContentChangeStream;
+  Stream<bool> get onChange => _onContentChangeStream == null ? _onContentChangeStream = _onContentChangeStreamController.stream.asBroadcastStream() : _onContentChangeStream;
 
-  Stream<bool> get onOpenChange => _onOpenChangeStream== null? _onOpenChangeStream = _onOpenChangeStreamController.stream.asBroadcastStream():_onOpenChangeStream;
+  Stream<bool> get onOpenChange => _onOpenChangeStream == null ? _onOpenChangeStream = _onOpenChangeStreamController.stream.asBroadcastStream() : _onOpenChangeStream;
 
   bool get isOpen => !_closed;
 
-  void _setUpStream(){
+  void _setUpStream() {
     element.onInput.listen((_) => _onContentChangeStreamController.add(true));
-    onChange.listen((bool b){
-      if(b){
+    onChange.listen((bool b) {
+      if (b) {
         _inputSinceSave = true;
       }
     });
   }
 
-  Future<bool> _useRevision(SiteClasses.Revision rev){
+  Future<bool> _useRevision(SiteClasses.Revision rev) {
     var completer = new Completer<bool>();
 
-    if(changed && _inputSinceSave){
+    if (changed && _inputSinceSave) {
       var dialog = new DialogContainer();
       var f = dialog.confirm("Du forsøger at hente en tidligere version af siden, <br /> uden at have gemt dine ændringer. <br /> Er du sikker på at du vil fortsætte?").result;
-      f.then((bool b){
-        if(!b){
+      f.then((bool b) {
+        if (!b) {
           completer.complete(false);
           return;
         }
@@ -667,7 +833,7 @@ class ContentEditor {
   }
 
 
-  void _loadRevision (SiteClasses.Revision rev){
+  void _loadRevision(SiteClasses.Revision rev) {
     element.innerHtml = rev.content;
     _currentRevision = rev;
     _notifyChange();
@@ -684,7 +850,7 @@ class ContentEditor {
 
   }
 
-  void _animatePreview([SiteClasses.Revision content]){
+  void _animatePreview([SiteClasses.Revision content]) {
     if (_previewAnimation == null) {
       _previewAnimation = new HeightPropertyAnimation(_contentWrapper);
       _previewAnimation.removePropertyOnComplete = true;
@@ -692,13 +858,13 @@ class ContentEditor {
     _contentWrapper.style.height = "${_contentWrapper.clientHeight.toString()}px";
     _previewAnimation.stop();
     var hidePreview = true;
-    if(content != null){
+    if (content != null) {
       _preview.innerHtml = content.content;
       hidePreview = false;
     }
 
     element.hidden = !(_preview.hidden = hidePreview);
-    var images = hidePreview?element.queryAll("img"):_preview.queryAll('img');
+    var images = hidePreview ? element.queryAll("img") : _preview.queryAll('img');
     if (images.length > 0) {
       var i = 0;
       images.forEach((ImageElement e) {
@@ -708,7 +874,7 @@ class ContentEditor {
             _previewAnimation.animateTo(maxChildrenHeight(_contentWrapper).toString(), onComplete:_updateBarPosition);
           }
         });
-        if(e.complete){
+        if (e.complete) {
           e.dispatchEvent(new Event('load', canBubble:false));
         }
 
@@ -722,8 +888,8 @@ class ContentEditor {
 
   bool get changed => _currentHash != _hash;
 
-  void toggelOpen(){
-    if(_closed){
+  void toggelOpen() {
+    if (_closed) {
       open();
     } else {
       close();
@@ -731,11 +897,9 @@ class ContentEditor {
   }
 
 
-
-
   void open() {
-    escQueue.add((){
-      if(_closed){
+    escQueue.add(() {
+      if (_closed) {
         return false;
       }
       close();
@@ -743,7 +907,7 @@ class ContentEditor {
     });
 
 
-    if(!_closed){
+    if (!_closed) {
       return;
     }
 
@@ -752,20 +916,28 @@ class ContentEditor {
     _onOpenChangeStreamController.add(isOpen);
 
 
-    if(_contentWrapper.parent != null){
+    if (_contentWrapper.parent != null) {
       _updateBarPosition();
       return;
     }
-    window.onBeforeUnload.listen((BeforeUnloadEvent event){
-      if(_closed || !changed){
+    window.onBeforeUnload.listen((BeforeUnloadEvent event) {
+      if (_closed || !changed) {
         return;
       }
       event.returnValue = "Du har ikke gemt dine ændringer.";
     });
+    element.onKeyDown.listen((KeyboardEvent kev) {
+      if (_closed || kev.keyCode != 83 || !kev.ctrlKey) {
+        return;
+      }
+      kev.preventDefault();
+      kev.cancelBubble = true;
+      save();
+    });
 
     _contentWrapper.append(_wrapper);
     _wrapper.style.height = "0";
-    _wrapper.append(_topBar == null?_topBar = _generateToolBar():_topBar);
+    _wrapper.append(_topBar == null ? _topBar = _generateToolBar() : _topBar);
     element.insertAdjacentElement("afterEnd", _contentWrapper);
     _contentWrapper.append(element);
     element.insertAdjacentElement("afterEnd", _preview);
@@ -777,14 +949,14 @@ class ContentEditor {
   }
 
   void close() {
-    if(_closed){
+    if (_closed) {
       return;
     }
-    if(changed){
+    if (changed) {
       var dialog = new DialogContainer();
       var c = dialog.confirm("Du har ikke gemt dine ændringer. <br /> Er du sikker på at du vil afslutte?").result;
-      c.then((bool b){
-        if(b){
+      c.then((bool b) {
+        if (b) {
           _loadRevision(_lastSavedRevision);
           close();
         } else {
@@ -795,7 +967,7 @@ class ContentEditor {
     }
 
     var b = _topBar.query(".tool_bar button.active");
-    if(b != null){
+    if (b != null) {
       b.click();
     }
 
@@ -830,7 +1002,7 @@ class ContentEditor {
   }
 
   void _updateBarPosition() {
-    if(_closed){
+    if (_closed) {
       return;
     }
     var floatCandidate = window.scrollY > _elementOffsetTop(_contentWrapper) + _contentWrapper.offsetHeight - _topBar.clientHeight;
@@ -849,8 +1021,8 @@ class ContentEditor {
       _wrapper..style.removeProperty("width")..classes.remove('floating')..classes.remove('fixed');
 
     }
-    if(_wrapper.classes.contains('floating')){
-      _wrapper.style.left = "${_elementOffsetLeft(_contentWrapper)-window.scrollX}px";
+    if (_wrapper.classes.contains('floating')) {
+      _wrapper.style.left = "${_elementOffsetLeft(_contentWrapper) - window.scrollX}px";
     }
 
     _updatePlaceholder();
@@ -858,7 +1030,7 @@ class ContentEditor {
   }
 
   void _updatePlaceholder() {
-    if(_closed){
+    if (_closed) {
       return;
     }
 
@@ -870,6 +1042,7 @@ class ContentEditor {
   }
 
   int _elementOffsetTop(Element e) => e == null ? 0 : e.offsetTop + _elementOffsetTop(e.offsetParent);
+
   int _elementOffsetLeft(Element e) => e == null ? 0 : e.offsetLeft + _elementOffsetLeft(e.offsetParent);
 
 
@@ -924,7 +1097,7 @@ class ContentEditor {
 
     closeElement.classes.add('close');
     _addTitleToElement("Afslut redigering", closeElement);
-    closeElement.onClick.listen((_)=>close());
+    closeElement.onClick.listen((_) => close());
 
     saveElement.classes.add('save');
     var saveBox = new InfoBox("Gem ændringer");
@@ -984,11 +1157,11 @@ class ContentEditor {
       var currentCell;
       var createLi = (SiteClasses.Revision revision, [UListElement historyList]) {
         var li = new LIElement(), dt = revision.time;
-        li.text = "${dt.hour < 10 ? "0" + dt.hour.toString() : dt.hour}:${dt.minute < 10 ? "0" + dt.minute.toString() : dt.minute}:${dt.second< 10 ? "0" + dt.second.toString() : dt.second}";
-        if(historyList != null){
+        li.text = "${dt.hour < 10 ? "0" + dt.hour.toString() : dt.hour}:${dt.minute < 10 ? "0" + dt.minute.toString() : dt.minute}:${dt.second < 10 ? "0" + dt.second.toString() : dt.second}";
+        if (historyList != null) {
           historyList.append(li);
         }
-        li.onMouseOver.listen((_){
+        li.onMouseOver.listen((_) {
           var ss;
           ss = document.onMouseOut.listen((_) {
             _hidePreview();
@@ -996,23 +1169,23 @@ class ContentEditor {
           });
           _showPreview(revision);
         });
-        li.onMouseOut.listen((MouseEvent ev){
+        li.onMouseOut.listen((MouseEvent ev) {
           ev.cancelBubble = true;
         });
-        li.onClick.listen((_){
-          if(revision == _currentRevision && !changed){
+        li.onClick.listen((_) {
+          if (revision == _currentRevision && !changed) {
             return;
           }
           li.classes.add('current');
-          _useRevision(revision).then((bool b){
-            if(b){
+          _useRevision(revision).then((bool b) {
+            if (b) {
               return;
             }
             li.classes.remove('current');
           });
         });
-        onChange.listen((_){
-          if(_currentRevision == revision || _currentRevision == null || !li.classes.contains('current')){
+        onChange.listen((_) {
+          if (_currentRevision == revision || _currentRevision == null || !li.classes.contains('current')) {
             return;
           }
           li.classes.remove('current');
@@ -1043,10 +1216,10 @@ class ContentEditor {
           _currentContent.listRevisions(from:times.first, to:times.last).then((List<SiteClasses.Revision> revisions) {
             historyList.classes.remove('loading');
             var l = payloadCache[cell] = new List<LIElement>();
-            revisions.forEach((SiteClasses.Revision revision){
+            revisions.forEach((SiteClasses.Revision revision) {
               var li = createLi(revision, historyList);
-              l.add(li );
-              if(_currentRevision == null && revision.time == changeTimes.last){
+              l.add(li);
+              if (_currentRevision == null && revision.time == changeTimes.last) {
                 li.classes.add('current');
               }
             });
@@ -1062,10 +1235,10 @@ class ContentEditor {
       });
       _currentContent.onAddContent.listen((SiteClasses.Revision r) {
         var c = calendar.markDate(r.time);
-        var li = createLi(r,c == currentCell?historyList:null);
+        var li = createLi(r, c == currentCell ? historyList : null);
         li.classes.add("current");
         _currentRevision = r;
-        payloadCache.putIfAbsent(c, ()=>[]).add(li);
+        payloadCache.putIfAbsent(c, () => []).add(li);
         markMap.putIfAbsent(c, () => []).add(r.time);
         setUp(c, [r.time]);
         if (currentCell == null && c.classes.contains('today')) {
@@ -1085,7 +1258,7 @@ class ContentEditor {
     uploadIcon.classes.add('upload_icon');
     uploadIconWrapper..classes.add('upload_icon_wrapper')..append(uploadIcon);
 
-    var setUpFileUpload = (){
+    var setUpFileUpload = () {
       var fileUploadElement = new FileUploadInputElement();
       fileUploadElement..hidden = true..multiple = true;
       fileUploadElementWrapper.append(fileUploadElement);
@@ -1094,7 +1267,7 @@ class ContentEditor {
     };
 
     fileUploadElement = setUpFileUpload();
-    //TODO Fix close fileupload with ESC
+//TODO Fix close fileupload with ESC
     preview.classes.add('preview');
 
     var uploadStrategy = images ? new AJAXImageURIUploadStrategy("EditContent", new ImageTransform.atMost(element.clientWidth, 500), new ImageTransform.atMost(70, 70, dataURI:true)) : new AJAXFileURIUploadStrategy('EditContent');
@@ -1210,30 +1383,30 @@ class ContentEditor {
     menuHandler.addToMenu(colorSelect.element);
     var dialog = new DialogContainer();
 
-    dialog.dialogBg.onMouseDown.listen((MouseEvent evt){
+    dialog.dialogBg.onMouseDown.listen((MouseEvent evt) {
       evt.cancelBubble = true;
 //      evt.preventDefault();
     });
 
-    var dialogLink = (){
+    var dialogLink = () {
 
       var selection = window.getSelection();
-      if(!element.contains(selection.baseNode)){
+      if (!element.contains(selection.baseNode)) {
         return;
       }
 
       var ranges = [];
-      for(var i = 0; i< selection.rangeCount; i++){
+      for (var i = 0; i < selection.rangeCount; i++) {
         ranges.add(selection.getRangeAt(i));
       }
 
       selection.removeAllRanges();
       var box = dialog.text("Indtast link adresse", value:"http://");
 
-      box.result.then((String s){
+      box.result.then((String s) {
         s = s.trim();
-        ranges.forEach((Range r)=>selection.addRange(r));
-        if(s.length <= 0 || s == "http://"){
+        ranges.forEach((Range r) => selection.addRange(r));
+        if (s.length <= 0 || s == "http://") {
           return;
         }
         ranges.first.selectNode(element);
