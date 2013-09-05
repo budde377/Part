@@ -242,6 +242,7 @@ class AJAXRequest {
     request = new HttpRequest();
     request.onReadyStateChange.listen((Event e) {
       if (request.readyState == 4) {
+
         try {
           Map response = parse(request.responseText);
           callbackSuccess(response);

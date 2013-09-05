@@ -103,16 +103,18 @@ class DialogContainer {
 
   List<DialogBox> _pendingDialogs = new List<DialogBox>();
 
-  DivElement dialogBg = new DivElement(), _container = new DivElement();
+  DivElement dialogBg = new DivElement(), _container = new DivElement(), _cell = new DivElement();
 
   DialogBox _currentDialog;
 
   factory DialogContainer() => _cache;
 
   DialogContainer._internal(){
-    dialogBg.classes.add('dialog_bg');
+    _cell.classes.add('cell');
+    dialogBg.classes..add('full_background')..add('dialog_bg');
     dialogBg.append(_container);
-    _container.classes.add('dialog_container');
+    _container.append(_cell);
+    _container.classes.add('container');
 
 
   }
@@ -149,7 +151,7 @@ class DialogContainer {
   }
 
   void _appendDialog(DialogBox dialog) {
-    _container.append(dialog.element);
+    _cell.append(dialog.element);
     dialog.open();
     _currentDialog = dialog;
     escQueue.add(() {

@@ -605,7 +605,7 @@ class ImageEditor {
     _background.classes..add('full_background')..add('edit_image_popup');
     _container.classes.add('container');
     _cropBox.classes.add('crop_box');
-    _editorContainer.classes.add('editor_container');
+    _editorContainer.classes.add('cell');
     _toolBar.classes.add('tool_bar');
     _originalImage.draggable = false;
     _originalImage.onClick.listen((_)=>rotate++);
@@ -711,10 +711,10 @@ class ImageEditor {
       _originalImage.style.removeProperty('left');
 
     }
-
-    _cropBox.style.width = _cropWidth == null ? "${_rotate%2 == 1?_height:_width}px" : "${-_x}px";
-    _cropBox.style.height = _cropHeight == null ? "${_rotate%2 == 1?_width:_height}px" : "${-_x}px";
-    _container.style.width = "${_cropBox.clientWidth}px";
+    var i = _cropWidth == null ? _rotate%2 == 1?_height:_width : -_x;
+    _cropBox.style.width = "${_maxWidth == null?i:Math.min(i,_maxWidth)}px";
+    i = _cropHeight == null ? _rotate%2 == 1?_width:_height : -_x;
+    _cropBox.style.height = "${_maxHeight== null?i:Math.min(i, _maxHeight)}px";
 
   }
 
