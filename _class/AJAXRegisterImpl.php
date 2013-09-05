@@ -29,6 +29,7 @@ class AJAXRegisterImpl implements AJAXRegister
      */
     public function registerAJAX($id, Registrable $callback)
     {
+
         if (!isset($this->registeredObjects[$id])) {
             $this->registeredObjects[$id] = array($callback);
             $this->registeredIDs[] = $id;
@@ -94,5 +95,17 @@ class AJAXRegisterImpl implements AJAXRegister
 
             $this->registerAJAX($ajaxId, $instance);
         }
+    }
+
+    /**
+     * Returns the result of callback() function on the registrable object.
+     * ID calculated from function name such as Page.[fn](..)
+     * @param string $functionName
+     * @return string | null Will return null if id is not found else string
+     */
+    public function getAJAXFromRegisteredFromFunctionName($functionName)
+    {
+        $idAr = explode('.', $functionName);
+        return $this->getAJAXFromRegistered(is_array($idAr) && count($idAr) > 0?$idAr[0]:null);
     }
 }

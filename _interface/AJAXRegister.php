@@ -32,6 +32,15 @@ interface AJAXRegister
 
 
     /**
+     * Returns the result of callback() function on the registrable object.
+     * ID calculated from function name such as Page.[fn](..)
+     * @param string $functionName
+     * @return string | null Will return null if id is not found else string
+     */
+    public function getAJAXFromRegisteredFromFunctionName($functionName);
+
+
+    /**
      * @abstract
      * List all registered AJAX as an array with id's as entry
      * @return array

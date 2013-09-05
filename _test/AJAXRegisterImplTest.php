@@ -56,6 +56,16 @@ class AJAXRegisterImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($val, $registeredVal, 'Values did not match');
     }
 
+    public function testGetAJAXFromRegisteredWillReturnValueOfCallbackWithFunctionName()
+    {
+        $id = 'id1';
+        $val = 'someVal';
+        $registrable = new NullRegistrableImpl(array($id => $val));
+        $this->register->registerAJAX($id, $registrable);
+        $registeredVal = $this->register->getAJAXFromRegisteredFromFunctionName($id.".someFunction");
+        $this->assertEquals($val, $registeredVal, 'Values did not match');
+    }
+
     public function testGetAJAXFromRegisteredWillReturnNullIfIDNotThere()
     {
         $id = 'id1';

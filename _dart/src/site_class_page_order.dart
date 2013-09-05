@@ -42,7 +42,7 @@ abstract class PageOrder {
 }
 
 class JSONPageOrder extends PageOrder {
-  final String ajax_id;
+
 
   JSONClient _client;
 
@@ -56,41 +56,30 @@ class JSONPageOrder extends PageOrder {
   final List<PageOrderChangeListener> _listeners = <PageOrderChangeListener>[];
 
 
-  static Map<String, JSONPageOrder> _cache = <String, JSONPageOrder>{
-  };
+  static JSONPageOrder _cache = new JSONPageOrder._internal();
 
   String _currentPageId;
 
-  factory JSONPageOrder(String ajax_id){
-    var pageOrder = _retrieveInstance(ajax_id);
-    pageOrder._setup();
-    return pageOrder;
+  factory JSONPageOrder(){
+
+    _cache._setup();
+    return _cache;
   }
 
-  factory JSONPageOrder.initializeFromLists(String ajax_id, Map<String,List<Page>> pageOrderMap, List<Page> inactivePages, String current_page_id){
-    var pageOrder = _retrieveInstance(ajax_id);
-    pageOrder._setUpFromLists(pageOrderMap, inactivePages, current_page_id);
-    return pageOrder;
+  factory JSONPageOrder.initializeFromLists(Map<String,List<Page>> pageOrderMap, List<Page> inactivePages, String current_page_id){
+
+    _cache._setUpFromLists(pageOrderMap, inactivePages, current_page_id);
+    return _cache;
   }
 
-  static JSONPageOrder _retrieveInstance(String ajax_id) {
-    if (_cache.containsKey(ajax_id)) {
-      return _cache[ajax_id];
-    } else {
-      var pageOrder = new JSONPageOrder._internal(ajax_id);
-      _cache[ajax_id] = pageOrder;
-      return pageOrder;
-    }
-  }
-
-  JSONPageOrder._internal(this.ajax_id);
+  JSONPageOrder._internal();
 
   void _setup() {
     if (_hasBeenSetUp) {
       return;
     }
     _hasBeenSetUp = true;
-    _client = new AJAXJSONClient(ajax_id);
+    _client = new AJAXJSONClient();
     var listFunction = new ListPagesJSONFunction();
     _client.callFunction(listFunction).then((JSONResponse response) {
       if (response.type == RESPONSE_TYPE_SUCCESS) {
@@ -127,7 +116,7 @@ class JSONPageOrder extends PageOrder {
     if (_hasBeenSetUp) {
       return;
     }
-    _client = new AJAXJSONClient(ajax_id);
+    _client = new AJAXJSONClient();
     _hasBeenSetUp = true;
     _currentPageId = current_page_id;
 

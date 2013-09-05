@@ -49,7 +49,7 @@ class WebsiteImpl implements Website
 
         //Decide output mode
         if(($id = $this->GETValueOfIndexIfSetElseDefault('ajax',null)) !== null &&
-            ($ajax = $ajaxRegister->getAJAXFromRegistered($id)) !== null){
+            ($ajax = $ajaxRegister->getAJAXFromRegisteredFromFunctionName($id)) !== null){
             echo $ajax;
         } else {
             echo $template->getModifiedTemplate();

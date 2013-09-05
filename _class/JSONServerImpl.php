@@ -12,11 +12,19 @@ class JSONServerImpl implements JSONServer
 {
     private $functions = array();
 
+    private function stripPrefix($string){
+        $prefAr = explode('.',$string);
+        return is_array($prefAr) && count($prefAr) > 0?$prefAr[1]:$string;
+    }
+
+
+
     /**
      * This will evaluate a JSON string
      * @param String $jsonString
      * @return JSONResponse
      */
+
     public function evaluate($jsonString)
     {
         $jsonArray = json_decode($jsonString,true);
@@ -28,7 +36,7 @@ class JSONServerImpl implements JSONServer
             $result->setID($id);
             return $result;
         }
-        $functionName = $jsonArray['name'];
+        $functionName = $this->stripPrefix($jsonArray['name']);
         if(!isset($this->functions[$functionName])){
             $result =  new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR,JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION);
             $result->setID($id);

@@ -98,18 +98,18 @@ abstract class UploadStrategy{
 }
 
 class AJAXImageURIUploadStrategy extends UploadStrategy{
-  final String ajax_id;
+
   JSON.JSONClient _client;
   List<ImageTransform> _sizes;
   ImageTransform _size, _preview;
 
-  AJAXImageURIUploadStrategy(this.ajax_id, [ImageTransform size = null, ImageTransform preview = null]){
+  AJAXImageURIUploadStrategy([ImageTransform size = null, ImageTransform preview = null]){
     _size = size;
     _preview = preview;
     _sizes = [size, preview];
     _sizes.removeWhere((ImageTransform s)=>s==null);
     filter = FILTER_IMAGE;
-    _client = new JSON.AJAXJSONClient(ajax_id);
+    _client = new JSON.AJAXJSONClient();
 
   }
 
@@ -142,11 +142,11 @@ class AJAXImageURIUploadStrategy extends UploadStrategy{
 }
 
 class AJAXFileURIUploadStrategy extends UploadStrategy{
-  final String ajax_id;
+
   JSON.JSONClient _client;
 
-  AJAXFileURIUploadStrategy(this.ajax_id){
-    _client = new JSON.AJAXJSONClient(ajax_id);
+  AJAXFileURIUploadStrategy(){
+    _client = new JSON.AJAXJSONClient();
 
   }
 

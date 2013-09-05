@@ -42,7 +42,9 @@ class Color {
     return r.length == 0 ? "00" : (r.length == 1 ? "0${r}" : r.substring(0, 2));
   }
 
-  bool operator == (Color c) => c.r == r && c.g == g && c.b == b && c.a == a;
+  bool operator ==(Color c) => c.r == r && c.g == g && c.b == b && c.a == a;
+
+  get hashCode=>"${r}+${g}+${b}+${a}".hashCode;
 }
 
 

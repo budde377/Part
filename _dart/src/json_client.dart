@@ -10,20 +10,7 @@ abstract class JSONClient {
 class AJAXJSONClient extends JSONClient {
   final String ajax_id;
 
-  static final Map<String, JSONClient> _cache = <String, JSONClient>{
-  };
-
-  factory AJAXJSONClient(String ajaxID){
-    if (_cache.containsKey(ajaxID)) {
-      return _cache[ajaxID];
-    } else {
-      var client = new AJAXJSONClient._internal(ajaxID);
-      _cache[ajaxID] = client;
-      return client;
-    }
-  }
-
-  AJAXJSONClient._internal(this.ajax_id);
+  AJAXJSONClient();
 
   Future<JSONResponse> _setUpRequest(HttpRequest request) {
     var completer = new Completer();
@@ -51,7 +38,8 @@ class AJAXJSONClient extends JSONClient {
     if (progress != null) {
       request.onLoad.listen((ProgressEvent evt) => progress(evt.loaded / evt.total));
     }
-    request.open("POST", urlPrefix + "?ajax=$ajax_id");
+
+    request.open("POST", urlPrefix + "?ajax=${function.name}");
     request.send(function.jsonString);
     return future;
   }

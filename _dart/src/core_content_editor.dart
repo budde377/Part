@@ -460,6 +460,8 @@ class Calendar {
     }
     if (dt.month != _showDate.month) {
       cell.classes.add('another_month');
+    } else {
+      cell.classes.remove('another_month');
     }
     return cell;
   }
@@ -1270,7 +1272,7 @@ class ContentEditor {
 //TODO Fix close fileupload with ESC
     preview.classes.add('preview');
 
-    var uploadStrategy = images ? new AJAXImageURIUploadStrategy("EditContent", new ImageTransform.atMost(element.clientWidth, 500), new ImageTransform.atMost(70, 70, dataURI:true)) : new AJAXFileURIUploadStrategy('EditContent');
+    var uploadStrategy = images ? new AJAXImageURIUploadStrategy( new ImageTransform.atMost(element.clientWidth, 500), new ImageTransform.atMost(70, 70, dataURI:true)) : new AJAXFileURIUploadStrategy();;
     var uploader = new FileUploader(uploadStrategy);
     var container = new EditorFileContainer(new DivElement(), uploadIcon);
     container.listenOnContentChange(() => _updatePlaceholder());

@@ -26,7 +26,6 @@ abstract class UserLibrary {
 }
 
 class JSONUserLibrary extends UserLibrary {
-  final String ajax_id;
   final PageOrder _pageOrder;
   JSONClient _client;
   String _userLoggedInId;
@@ -34,34 +33,25 @@ class JSONUserLibrary extends UserLibrary {
   final List<UserLibraryChangeListener> _listeners = <UserLibraryChangeListener>[];
   bool _hasBeenSetUp = false;
 
-  static final Map<String, JSONUserLibrary> _cache = <String, JSONUserLibrary>{};
+  static JSONUserLibrary _cache;
 
-  JSONUserLibrary._internal(this.ajax_id, this._pageOrder);
+  JSONUserLibrary._internal( this._pageOrder);
 
-  factory JSONUserLibrary(String ajax_id, PageOrder pageOrder){
-    var library = _retrieveInstance(ajax_id, pageOrder);
+  factory JSONUserLibrary(PageOrder pageOrder){
+    var library = _retrieveInstance(pageOrder);
     library._setUp();
 
   }
 
-  factory JSONUserLibrary.initializeFromLists(String ajax_id,
-                                              List<User> users,
+  factory JSONUserLibrary.initializeFromLists(List<User> users,
                                               String currentUserName,
                                               PageOrder pageOrder){
-    var lib = _retrieveInstance(ajax_id, pageOrder);
+    var lib = _retrieveInstance( pageOrder);
     lib._setUpFromLists(users,currentUserName);
     return lib;
   }
 
-  static JSONUserLibrary _retrieveInstance(String ajax_id, PageOrder pageOrder) {
-    if (_cache.containsKey(ajax_id)) {
-      return _cache[ajax_id];
-    } else {
-      var library = new JSONUserLibrary._internal(ajax_id, pageOrder);
-      _cache[ajax_id] = library;
-      return library;
-    }
-  }
+  static JSONUserLibrary _retrieveInstance(PageOrder pageOrder) => _cache == null?_cache = new JSONUserLibrary._internal(pageOrder):_cache;
 
   void _setUpFromLists(List<User> users,
                        String current_username) {
@@ -70,7 +60,7 @@ class JSONUserLibrary extends UserLibrary {
     }
     _hasBeenSetUp = true;
 
-    _client = new AJAXJSONClient(ajax_id);
+    _client = new AJAXJSONClient();
 
     _userLoggedInId = current_username;
     users.forEach((User u) {
@@ -87,7 +77,7 @@ class JSONUserLibrary extends UserLibrary {
     }
     _hasBeenSetUp = true;
 
-    _client = new AJAXJSONClient(ajax_id);
+    _client = new AJAXJSONClient();
     var function = new ListUsersJSONFunction();
     var functionCallback = (JSONResponse response) {
       if (response.type != RESPONSE_TYPE_SUCCESS) {
