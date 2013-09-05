@@ -8,7 +8,6 @@ abstract class JSONClient {
 
 
 class AJAXJSONClient extends JSONClient {
-  final String ajax_id;
 
   AJAXJSONClient();
 
