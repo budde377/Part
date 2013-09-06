@@ -434,7 +434,6 @@ class Calendar {
   set date(DateTime dt) {
     _showDate = dt;
     navText.text = _dateToString(_showDate);
-    _table.queryAll('td.another_month').classes.remove('another_month');
     _table.children.clear();
     var d = dt.subtract(new Duration(days:dt.day + ((dt.weekday - dt.day) % 7) - 1));
     while (_table.children.length < 6) {
@@ -992,6 +991,9 @@ class ContentEditor {
 
 
   void save() {
+    if(!changed){
+      return;
+    }
     var savingBar = new SavingBar();
     var jobId = savingBar.startJob();
     _inputSinceSave = false;
@@ -1061,9 +1063,22 @@ class ContentEditor {
         if (active != element) {
           _elementToSubMenu[active].hidden = true;
           element.classes.add('active');
+
         }
         subMenu.hidden = active == element;
 
+      }
+
+      if(element.classes.contains('active')){
+        escQueue.add((){
+
+          if(!element.classes.contains('active')){
+            return false;
+          }
+
+          element.click();
+          return true;
+        });
       }
 
       if (subMenu.parent == null) {

@@ -45,11 +45,12 @@ class WebsiteImpl implements Website
         $template->setTemplateFromConfig($currentPage->getTemplate());
 
         $ajaxRegister = $this->backendContainer->getAJAXRegisterInstance();
-        $ajaxRegister->registerAJAXFromConfig($this->config);
+        if($id = $this->GETValueOfIndexIfSetElseDefault('ajax',null) !== null){
+            $ajaxRegister->registerAJAXFromConfig($this->config);
+        }
 
         //Decide output mode
-        if(($id = $this->GETValueOfIndexIfSetElseDefault('ajax',null)) !== null &&
-            ($ajax = $ajaxRegister->getAJAXFromRegisteredFromFunctionName($id)) !== null){
+        if($id !== null && ($ajax = $ajaxRegister->getAJAXFromRegisteredFromFunctionName($id)) !== null){
             echo $ajax;
         } else {
             echo $template->getModifiedTemplate();

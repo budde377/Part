@@ -157,4 +157,12 @@ class StubConfigImpl implements Config
     {
         $this->AJAXRegistrable = $AJAXRegistrable;
     }
+
+    /**
+     * @return bool
+     */
+    public function isDebugMode()
+    {
+        return false;
+    }
 }

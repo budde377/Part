@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../_interface/Config.php';
+require_once dirname(__FILE__) . '/../_class/FileImpl.php';
 require_once dirname(__FILE__) . '/../_exception/InvalidXMLException.php';
 
 /**
@@ -20,6 +21,7 @@ class ConfigImpl implements Config
     private $ajaxRegistrable = null;
     private $optimizers = null;
     private $mysql = null;
+    private $debugMode;
     private $defaultPages;
 
     /**
@@ -32,7 +34,7 @@ class ConfigImpl implements Config
         $namespaces = $configFile->getDocNamespaces();
 
         if (!count($namespaces)) {
-            $configFile->addAttribute('xmlns', 'http://christian-budde.dk/SiteConfig');
+            $configFile->addAttribute('xmlns', 'http://christianbud.de/SiteConfig');
         }
 
         $configFile->asXML();
@@ -150,7 +152,7 @@ class ConfigImpl implements Config
     }
 
     /**
-     * @return array | null Array with entries host, user, password, prefix, database, or null if not specified
+     * @return array | null Array with entries host, user, password, prefix, database and File setupFile, or null if not specified
      */
     public function getMySQLConnection()
     {
@@ -160,7 +162,8 @@ class ConfigImpl implements Config
                 'user' => (string)$this->configFile->MySQLConnection->username,
                 'password' => (string)$this->configFile->MySQLConnection->password,
                 'database' => (string)$this->configFile->MySQLConnection->database,
-                'host' => (string)$this->configFile->MySQLConnection->host);
+                'host' => (string)$this->configFile->MySQLConnection->host,
+                'setupFile' => new FileImpl($this->rootPath.'/'.$this->configFile->MySQLConnection->setupFile));
         }
 
         return $this->mysql;
@@ -241,5 +244,21 @@ class ConfigImpl implements Config
                 "ajax_id" => (string)$registrable['ajax_id']);
         }
         return $this->ajaxRegistrable;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDebugMode()
+    {
+        if($this->debugMode != null){
+            return $this->debugMode;
+        }
+
+        if(!$this->configFile->debugMode->getName()){
+            return $this->debugMode = false;
+        }
+
+        return $this->debugMode = (string)$this->configFile->debugMode == "true";
     }
 }

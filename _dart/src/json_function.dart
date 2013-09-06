@@ -32,7 +32,7 @@ class PageContentJSONFunction extends JSONFunction{
 }
 
 class PageOrderJSONFunction extends JSONFunction{
-  PageOrderJSONFunction(String name): super("PageContent.${name}");
+  PageOrderJSONFunction(String name): super("PageOrder.${name}");
 }
 
 class UsersJSONFunction extends JSONFunction{

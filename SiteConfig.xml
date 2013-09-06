@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<config xmlns="http://christian-budde.dk/SiteConfig"
+<config xmlns="http://christianbud.de/SiteConfig"
         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-        xsi:schemaLocation="http://christian-budde.dk/SiteConfig SiteConfig.xsd">
+        xsi:schemaLocation="http://christianbud.de/SiteConfig SiteConfig.xsd">
     <templates>
         <template link="_template/MainTemplate.xhtml">_404</template>
     </templates>
@@ -13,6 +13,7 @@
         <database>cms2012</database>
         <username>cms2012</username>
         <password>plovMand50</password>
+        <setupFile>setupDatabase.sql</setupFile>
     </MySQLConnection>
     <optimizers>
         <class name="css" link="_class/CSSYUICompressorOptimizerImpl.php">CSSYUICompressorOptimizerImpl</class>

@@ -119,12 +119,12 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $template = $config->getOptimizer('main');
         $this->assertNull($template, 'The getOptimizer was not null with empty config XML');
     }
-
+    //TODO Fix config tests
     public function testGetOptimizerReturnNullWithTemplateElementNIL()
     {
         /** @var $configXML SimpleXMLElement */
         $configXML = simplexml_load_string('
-        <config xmlns="http://christian-budde.dk/SiteConfig">
+        <config>
             <optimizers>
                 <class name="someName" link="someLink">SomeClass</class>
             </optimizers>
@@ -138,7 +138,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetOptimizerReturnArrayWithOptimizerInList()
     {
         $configXML = simplexml_load_string('
-        <config xmlns="http://christian-budde.dk/SiteConfig">
+        <config>
         <optimizers>
         <class name="someName" link="someLink">SomeClassName</class>
         </optimizers>
@@ -410,12 +410,13 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     {
         /** @var $configXML SimpleXMLElement */
         $configXML = simplexml_load_string('
-        <config xmlns="http://christian-budde.dk/SiteConfig">
+        <config>
             <MySQLConnection>
                 <host>someHost</host>
                 <database>someDatabase</database>
                 <username>someUser</username>
                 <password>somePassword</password>
+                <setupFile>someFile</setupFile>
             </MySQLConnection>
         </config>');
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
@@ -424,11 +425,13 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('host', $connArray, 'Did not have host entry');
         $this->assertArrayHasKey('password', $connArray, 'Did not have password entry');
         $this->assertArrayHasKey('database', $connArray, 'Did not have database entry');
+        $this->assertArrayHasKey('setupFile', $connArray, 'Did not have setupFile entry');
 
         $this->assertEquals('someHost', $connArray['host'], 'Host was not right');
         $this->assertEquals('someDatabase', $connArray['database'], 'Host was not right');
         $this->assertEquals('somePassword', $connArray['password'], 'Host was not right');
         $this->assertEquals('someUser', $connArray['user'], 'Host was not right');
+        $this->assertInstanceOf('File', $connArray['setupFile']);
     }
 
     public function testWillReturnNullIfNotSpecifiedInConfig()
@@ -439,6 +442,34 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
         $connArray = $config->getMySQLConnection();
         $this->assertNull($connArray, 'Was not null.');
+    }
+
+    public function testIsDebugModeWillReturnFalseOnEmpty(){
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string('<config></config>');
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertFalse($config->isDebugMode());
+
+    }
+
+    public function testIsDebugModeWillReturnFalseOnFalse(){
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string('<config>
+        <debugMode>false</debugMode>
+        </config>');
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertFalse($config->isDebugMode());
+
+    }
+
+    public function testIsDebugModeWillReturnTrueOnTrue(){
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string('<config>
+        <debugMode>true</debugMode>
+        </config>');
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertTrue($config->isDebugMode());
+
     }
 
 }

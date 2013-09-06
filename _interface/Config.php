@@ -72,8 +72,13 @@ interface Config
 
     /**
      * @abstract
-     * @return array | null Array with entries host, user, password, prefix, database, or null if not specified
+     * @return array | null Array with entries host, user, password, prefix, database and File setupFile, or null if not specified
      */
     public function getMySQLConnection();
+
+    /**
+     * @return bool
+     */
+    public function isDebugMode();
 
 }
