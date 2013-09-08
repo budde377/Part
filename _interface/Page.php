@@ -149,4 +149,16 @@ interface Page
      */
     public function isValidAlias($alias);
 
+    /**
+     * Will update the page with a new modify timestamp
+     * @return int Last modified time
+     */
+    public function modify();
+
+    /**
+     * Returns the time of last modification. This is for caching, and should reflect all content of the page.
+     * @return int
+     */
+    public function lastModified();
+
 }

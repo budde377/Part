@@ -11,6 +11,7 @@ require_once dirname(__FILE__) . '/SiteLibraryImpl.php';
 require_once dirname(__FILE__) . '/UserLibraryImpl.php';
 require_once dirname(__FILE__) . '/MultiSiteUserPrivilegesLibraryImpl.php';
 require_once dirname(__FILE__) . '/DefaultPageLibraryImpl.php';
+require_once dirname(__FILE__) . '/CacheControlImpl.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -45,6 +46,8 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $defaultPageLibrary;
     /** @var DartRegister */
     private $dartRegister;
+    /** @var  CacheControl */
+    private $cacheControl;
 
     public function __construct(Config $config)
     {
@@ -195,4 +198,15 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
         return $this->dartRegister;
     }
 
+    /**
+     * Will create and reuse an instance of CacheControl
+     * @return CacheControl
+     */
+    public function getCacheControlInstance()
+    {
+        if($this->cacheControl == null){
+            $this->cacheControl = new CacheControlImpl($this->getCurrentPageStrategyInstance());
+        }
+        return $this->cacheControl;
+    }
 }

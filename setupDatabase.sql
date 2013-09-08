@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS `Page` (
   `title` varchar(255) DEFAULT NULL,
   `template` varchar(255) DEFAULT NULL,
   `alias` varchar(255) DEFAULT NULL,
+  `last_modified` datetime NOT NULL,
   `hidden` tinyint(1) NOT NULL,
   PRIMARY KEY (`page_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

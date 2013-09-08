@@ -18,6 +18,8 @@ class PageImpl implements Page, Observable
     private $template = '';
     private $alias = '';
 
+    private $lastModified = -1;
+
     private $hidden = 0;
 
     private $database;
@@ -41,6 +43,8 @@ class PageImpl implements Page, Observable
     private $updateAliasStatement;
     /** @var $updateHiddenStatement PDOStatement | null */
     private $updateHiddenStatement;
+    /** @var PDOStatement | null */
+    private $updateLastModifiedStatement;
 
 
 
@@ -196,7 +200,7 @@ class PageImpl implements Page, Observable
     private function IDExists($id)
     {
         if ($this->existsStatement === null) {
-            $this->existsStatement = $this->connection->prepare("SELECT * FROM Page WHERE page_id=?");
+            $this->existsStatement = $this->connection->prepare("SELECT *, UNIX_TIMESTAMP(last_modified) AS last_modified FROM Page WHERE page_id=?");
         }
 
         $this->existsStatement->execute(array($id));
@@ -259,6 +263,7 @@ class PageImpl implements Page, Observable
             $this->alias = $result['alias'];
             $this->title = $result['title'];
             $this->template = $result['template'];
+            $this->lastModified = intval($result['last_modified']);
             $this->hidden = $result['hidden'];
         }
     }
@@ -393,5 +398,32 @@ class PageImpl implements Page, Observable
         }
 
         return $this->content[$id];
+    }
+
+    /**
+     * Returns the time of last modification. This is for caching, and should reflect all content of the page.
+     * @return int
+     */
+    public function lastModified()
+    {
+        $this->setInitialValues();
+        return $this->lastModified;
+    }
+
+    /**
+     * Will update the page with a new modify timestamp
+     * @return int New modified time
+     */
+    public function modify()
+    {
+        if($this->updateLastModifiedStatement == null){
+            $this->updateLastModifiedStatement = $this->connection->prepare("UPDATE Page SET last_modified=FROM_UNIXTIME(?) WHERE page_id=?");
+            $this->updateLastModifiedStatement->bindParam(1, $this->lastModified);
+            $this->updateLastModifiedStatement->bindParam(2, $this->id);
+        }
+        $this->lastModified = time();
+        $this->updateLastModifiedStatement->execute();
+        return $this->lastModified;
+
     }
 }

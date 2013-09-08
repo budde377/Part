@@ -15,6 +15,7 @@ class StubPageImpl implements Page
     private $template;
     private $alias;
     private $hidden = false;
+    private $lastModified = -1;
 
     /**
      * @return string
@@ -193,6 +194,24 @@ class StubPageImpl implements Page
      */
     public function getContent($id = null)
     {
-        // TODO: Implement getContent() method.
+        return null;
+    }
+
+    /**
+     * Returns the time of last modification. This is for caching, and should reflect all content of the page.
+     * @return int
+     */
+    public function lastModified()
+    {
+        return $this->lastModified;
+    }
+
+    /**
+     * Will update the page with a new modify timestamp
+     * @return int
+     */
+    public function modify()
+    {
+        return $this->lastModified = time();
     }
 }

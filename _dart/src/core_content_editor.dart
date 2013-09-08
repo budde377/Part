@@ -609,7 +609,6 @@ class ImageEditor {
     _editorContainer.classes.add('cell');
     _toolBar.classes.add('tool_bar');
     _originalImage.draggable = false;
-    _originalImage.onClick.listen((_)=>rotate++);
   }
 
   int get rotate => _rotate;
@@ -617,6 +616,53 @@ class ImageEditor {
     _rotate = r%4;
     _updatePos();
   }
+
+
+  int get width => _width;
+
+      set width(int w){
+        _width = w;
+        _updatePos();
+      }
+
+
+  int get height => _height;
+
+      set height(int w){
+        _height = w;
+        _updatePos();
+      }
+
+  int get cropWidth => _cropWidth == null?_originalImage.clientWidth:_cropWidth;
+
+      set cropWidth(int w){
+        _cropWidth = w;
+        _updatePos();
+      }
+
+
+  int get cropHeight => _cropHeight == null?_originalImage.clientHeight:_cropHeight;
+
+      set cropHeight(int w){
+        _cropHeight = w;
+        _updatePos();
+      }
+
+  int get x => _x == null?0:_x;
+
+      set x(int x){
+        print(x);
+        _x = x;
+        _updatePos();
+      }
+
+  int get y => _y == null?0:_y;
+
+      set y(int y){
+        print(y);
+        _y = y;
+        _updatePos();
+      }
 
   void open(ImageElement image, {int maxWidth:null, int maxHeight:null}) {
     if (_currentImage != null || image == null) {
@@ -634,15 +680,22 @@ class ImageEditor {
       _width = int.parse(match.group(3));
       _height = int.parse(match.group(4));
 
+    } else {
+      _height= _originalImage.clientHeight;
+      _width = _originalImage.clientWidth;
     }
     if (match.group(5) != null) {
       _x = int.parse(match.group(6));
       _y = int.parse(match.group(7));
       _cropWidth = int.parse(match.group(8));
       _cropHeight = int.parse(match.group(9));
+    } else {
+      _x = _y = _cropHeight = _cropWidth = null;
     }
     if (match.group(10) != null) {
       _rotate = int.parse(match.group(11)) % 4;
+    } else {
+      _rotate = 0;
     }
     _currentImage = image;
     _maxHeight = maxHeight;
@@ -672,6 +725,76 @@ class ImageEditor {
     _editorContainer.append(_cropBox);
     _cropBox.append(_originalImage);
     _cropBox.append(_toolBar);
+    var x = _originalImage.offsetLeft, y = _originalImage.offsetTop;
+    var resizing = false, moving = false;
+    _cropBox.onMouseMove.listen((MouseEvent ev){
+
+      if(resizing){
+        return;
+      }
+      var w = _originalImage.clientWidth, h = _originalImage.clientHeight;
+
+      if(x+5 >= ev.offsetX){
+        _cropBox.classes.add('res_left');
+      } else {
+        _cropBox.classes.remove('res_left');
+
+      }
+
+      if(x+w-5< ev.offsetX){
+        _cropBox.classes.add('res_right');
+      } else {
+        _cropBox.classes.remove('res_right');
+      }
+
+      if(y>= ev.offsetY){
+        _cropBox.classes.add('res_top');
+      } else {
+        _cropBox.classes.remove('res_top');
+      }
+
+      if(y+h < ev.offsetY){
+        _cropBox.classes.add('res_bottom');
+      } else {
+        _cropBox.classes.remove('res_bottom');
+      }
+    });
+
+    _cropBox.onMouseDown.listen((MouseEvent ev){
+      moving = ev.toElement != _cropBox;
+
+      var movSub = document.onMouseMove.listen((MouseEvent ev){
+        if(moving){
+          this.x += ev.movementX;
+          this.y += ev.movementY;
+
+        } else {
+          resizing = true;
+          if(_cropBox.classes.contains('res_left')){
+            cropWidth -= ev.movementX*2;
+          } else if(_cropBox.classes.contains('res_right')){
+            cropWidth += ev.movementX*2;
+          }
+
+
+          if(_cropBox.classes.contains('res_top')){
+            cropHeight -= ev.movementY*2;
+          } else if(_cropBox.classes.contains('res_bottom')){
+            cropHeight += ev.movementY*2;
+          }
+
+        }
+
+
+      }), mouseUpSub = null;
+      mouseUpSub = document.onMouseUp.listen((_){
+        movSub.cancel();
+        resizing = false;
+        mouseUpSub.cancel();
+      });
+
+    });
+
     _updatePos();
 
   }
@@ -679,7 +802,6 @@ class ImageEditor {
   void _updatePos() {
     _originalImage.style.height = _height == null ? "" : "${_height}px";
     _originalImage.style.width = _width == null ? "" : "${_width}px";
-
     var x = _x == null? 0:_x;
     var y = _y == null? 0:_y;
     _originalImage.classes.removeWhere((String c)=>c.startsWith('rotate'));
@@ -699,22 +821,24 @@ class ImageEditor {
       y += _width;
         break;
     }
-    if(y>0){
+    if(y!=0){
       _originalImage.style.top = "${y}px";
 
     } else {
       _originalImage.style.removeProperty('top');
     }
-    if(x>0){
+    if(x!=0){
       _originalImage.style.left = "${x}px";
 
     } else {
       _originalImage.style.removeProperty('left');
 
     }
-    var i = _cropWidth == null ? _rotate%2 == 1?_height:_width : -_x;
+    var w = _cropWidth == null?_width:_cropWidth, h = _cropHeight == null?_height:_cropHeight;
+
+    var i =  _rotate%2 == 1?h:w;
     _cropBox.style.width = "${_maxWidth == null?i:Math.min(i,_maxWidth)}px";
-    i = _cropHeight == null ? _rotate%2 == 1?_width:_height : -_x;
+    i =  _rotate%2 == 1?w:h;
     _cropBox.style.height = "${_maxHeight== null?i:Math.min(i, _maxHeight)}px";
 
   }

@@ -67,7 +67,8 @@ class JSONPageContent extends PageContent {
           completer.complete(null);
           return;
         }
-        completer.complete(_generateRevision(new DateTime.fromMillisecondsSinceEpoch(response.payload['time'] * 1000), response.payload['content']));
+
+        completer.complete(_generateRevision(new DateTime.fromMillisecondsSinceEpoch(int.parse(response.payload['time']) * 1000), response.payload['content']));
       });
 //    }
     return completer.future;
@@ -81,7 +82,7 @@ class JSONPageContent extends PageContent {
         return;
       }
       var r;
-      completer.complete(r = _generateRevision(new DateTime.fromMillisecondsSinceEpoch(response.payload * 1000), content));
+      completer.complete(r = _generateRevision(new DateTime.fromMillisecondsSinceEpoch(int.parse(response.payload )* 1000), content));
       _streamController.add(r);
     });
     return completer.future;

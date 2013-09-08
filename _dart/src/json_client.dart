@@ -39,6 +39,7 @@ class AJAXJSONClient extends JSONClient {
     }
 
     request.open("POST", urlPrefix + "?ajax=${function.name}");
+    print(urlPrefix + "?ajax=${function.name}");
     request.send(function.jsonString);
     return future;
   }

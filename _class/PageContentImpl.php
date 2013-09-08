@@ -59,7 +59,7 @@ class PageContentImpl implements PageContent
             INSERT INTO PageContent (id,page_id,time, content)
             VALUES (?, ?, ?, ?)");
         }
-        $t = time();
+        $t = $this->page->modify();
         $this->preparedAddStatement->execute(array($this->id, $this->page->getID(), date("Y-m-d H:i:s", $t), $content));
         $this->content = $content;
         $this->history[] = array('content' => $content, 'time' => $t);

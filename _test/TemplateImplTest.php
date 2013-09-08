@@ -64,7 +64,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     public function testWillThrowExceptionIfTemplateFileIsNotFoundFromConfig()
     {
         $this->setUpConfig("
-        <config xmlns='http://christian-budde.dk/SiteConfig'>
+        <config>
             <templates>
                 <template link='NonExistingFile'>main</template>
             </templates>
@@ -125,7 +125,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     public function testGetModifiedTemplateWillReturnTemplateWithNoModificationsIfNonModifiableFromConfig()
     {
         $this->setUpConfig("
-        <config xmlns='http://christian-budde.dk/SiteConfig'>
+        <config>
             <templates>
                 <template link='_stub/templateStub'>main</template>
             </templates>
@@ -142,7 +142,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     public function testGetModifiedTemplateReturnsTemplateWithChangesIfModifiable()
     {
         $this->setUpConfig('
-        <config xmlns="http://christian-budde.dk/SiteConfig">
+        <config>
             <pageElements>
                 <class name="main" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
                 <class name="main2" link="_stub/NullPageElementImpl.php">NullPageElementImpl</class>
@@ -160,7 +160,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     public function testGetModifiedTemplateReturnsTemplateWithEntryNotFoundStillThere()
     {
         $this->setUpConfig('
-        <config xmlns="http://christian-budde.dk/SiteConfig">
+        <config>
             <pageElements>
                 <class name="main" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
             </pageElements>
@@ -185,7 +185,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetModifiedTemplateWithExtraElementsInExtension(){
         $this->setUpConfig('
-        <config xmlns="http://christian-budde.dk/SiteConfig">
+        <config>
             <pageElements>
                 <class name="main" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
             </pageElements>
@@ -209,7 +209,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetModifiedTemplateWithExtendAndExtendedReplace(){
         $this->setUpConfig('
-        <config xmlns="http://christian-budde.dk/SiteConfig">
+        <config>
             <pageElements>
                 <class name="main" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
             </pageElements>
@@ -225,7 +225,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetModifiedTemplateHasReversedOrderOfExecutionOfElements(){
         $this->setUpConfig('
-        <config xmlns="http://christian-budde.dk/SiteConfig">
+        <config >
             <pageElements>
                 <class name="main" link="_stub/ReturnIncrementPageElementImpl.php">ReturnIncrementPageElementImpl</class>
                 <class name="main2" link="_stub/ReturnIncrementPageElementImpl.php">ReturnIncrementPageElementImpl</class>
@@ -239,7 +239,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     }
     public function testGetModifiedTemplateHasReversedOrderOfExecutionOfElementsWithReplace(){
         $this->setUpConfig('
-        <config xmlns="http://christian-budde.dk/SiteConfig">
+        <config >
             <pageElements>
                 <class name="main2" link="_stub/ReturnIncrementPageElementImpl.php">ReturnIncrementPageElementImpl</class>
             </pageElements>
@@ -254,7 +254,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetModifiedTemplateWillExecuteExtendedReplaceBeforeNormalReplace(){
         $this->setUpConfig('
-        <config xmlns="http://christian-budde.dk/SiteConfig">
+        <config>
             <pageElements>
                 <class name="someElement" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
                 <class name="someElement2" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
@@ -272,7 +272,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     public function testWillInitializeOnSet(){
         $this->setUpConfig('
-        <config xmlns="http://christian-budde.dk/SiteConfig">
+        <config >
             <pageElements>
                 <class name="main" link="_stub/CheckInitializedPageElementImpl.php">CheckInitializedPageElementImpl</class>
             </pageElements>
@@ -287,7 +287,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     public function testWillNotCallGetContentOnSet(){
         $this->setUpConfig('
-        <config xmlns="http://christian-budde.dk/SiteConfig">
+        <config >
             <pageElements>
                 <class name="main" link="_stub/ReturnIncrementPageElementImpl.php">ReturnIncrementPageElementImpl</class>
             </pageElements>

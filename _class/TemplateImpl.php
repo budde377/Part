@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/FileImpl.php';
 require_once dirname(__FILE__) . '/../_interface/Template.php';
 require_once dirname(__FILE__) . '/../_exception/FileNotFoundException.php';
 require_once dirname(__FILE__) . '/../_exception/EntryNotFoundException.php';
+require_once dirname(__FILE__) . '/../_helper/HTTPHeaderHelper.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -70,6 +71,23 @@ class TemplateImpl implements Template
     {
 
         $this->template = $string;
+        if(preg_match('/<!--[\s]*headerStatusCode:([0-9]+)-->/', $this->template, $matches,PREG_OFFSET_CAPTURE)){
+            $statusCode = $matches[1][0];
+            $this->template = substr($this->template,0,$matches[0][1]).substr($this->template, $matches[0][1]+strlen($matches[0][0]));
+            switch($statusCode){
+                case 500:
+                    HTTPHeaderHelper::setHeaderStatusCode(HTTPHeaderHelper::HTTPHeaderStatusCode500);
+                    break;
+                case 200:
+                    HTTPHeaderHelper::setHeaderStatusCode(HTTPHeaderHelper::HTTPHeaderStatusCode200);
+                    break;
+                case 404:
+                    HTTPHeaderHelper::setHeaderStatusCode(HTTPHeaderHelper::HTTPHeaderStatusCode404);
+
+            }
+        }
+
+
         $numExtendsMatch = preg_match_all('/<!--[\s]*extends:([^\>]+)-->/', $string, $matches, PREG_OFFSET_CAPTURE);
         if ($numExtendsMatch > 0) {
 //            $template = new TemplateImpl($this->config, $this->pageElementFactory);
@@ -96,6 +114,7 @@ class TemplateImpl implements Template
             }
 
         }
+
         $numMatches = preg_match_all('/<!--[\s]*pageElement:([^\>]+)-->/', $this->template, $matches,PREG_OFFSET_CAPTURE);
         for($i = $numMatches -1; $i >=0;$i--){
             $elementString = trim($matches[1][$i][0]);

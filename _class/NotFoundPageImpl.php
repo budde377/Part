@@ -197,4 +197,21 @@ class NotFoundPageImpl implements Page
     {
         return new NullPageContentImpl();
     }
+
+    /**
+     * Returns the time of last modification. This is for caching, and should reflect all content of the page.
+     * @return int
+     */
+    public function lastModified()
+    {
+        return -1;
+    }
+
+    /**
+     * Will update the page with a new modify timestamp
+     * @return void
+     */
+    public function modify()
+    {
+    }
 }

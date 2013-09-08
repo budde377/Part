@@ -121,4 +121,12 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
     }
 
 
+    /**
+     * Will create and reuse an instance of CacheControl
+     * @return CacheControl
+     */
+    public function getCacheControlInstance()
+    {
+        return null;
+    }
 }

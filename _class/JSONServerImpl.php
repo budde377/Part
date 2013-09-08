@@ -14,7 +14,7 @@ class JSONServerImpl implements JSONServer
 
     private function stripPrefix($string){
         $prefAr = explode('.',$string);
-        return is_array($prefAr) && count($prefAr) > 0?$prefAr[1]:$string;
+        return is_array($prefAr) && count($prefAr) > 1?$prefAr[1]:$string;
     }
 
 

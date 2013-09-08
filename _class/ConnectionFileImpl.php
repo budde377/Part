@@ -191,4 +191,20 @@ class ConnectionFileImpl implements File
     {
         return pathinfo($this->path, PATHINFO_FILENAME);
     }
+
+    /**
+     * @return string | null Will return string if available.
+     */
+    public function getMimeType()
+    {
+
+    }
+
+    /**
+     * @return string
+     */
+    public function getDataURI()
+    {
+
+    }
 }

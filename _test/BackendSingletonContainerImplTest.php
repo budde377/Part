@@ -20,6 +20,7 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->config = new StubConfigImpl();
+        $this->config->setMysqlCon(array('host'=>MySQLConstants::MYSQL_HOST, 'user'=>MySQLConstants::MYSQL_USERNAME, 'password'=>MySQLConstants::MYSQL_PASSWORD, 'database'=>MySQLConstants::MYSQL_DATABASE));
         $this->backContainer = new BackendSingletonContainerImpl($this->config);
     }
 
@@ -159,6 +160,13 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
         $ret2 = $this->backContainer->getDefaultPageLibraryInstance();
         $this->assertTrue($ret1 === $ret2, 'Did not reuse instance');
 
+    }
+
+    public function testGetCacheControlWillReturnSameInstanceOfCacheControl(){
+        $ret1 = $this->backContainer->getCacheControlInstance();
+        $this->assertInstanceOf('CacheControl',$ret1);
+        $ret2 =$this->backContainer->getCacheControlInstance();
+        $this->assertTrue($ret1 === $ret2);
     }
 
 }

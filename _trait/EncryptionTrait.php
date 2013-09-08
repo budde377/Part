@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__FILE__).'/../_class/FileImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -31,5 +32,6 @@ trait EncryptionTrait
     protected function decrypt($string, $key){
         return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($key), base64_decode($string), MCRYPT_MODE_CBC, md5(md5($key))), "\0");
     }
+
 
 }

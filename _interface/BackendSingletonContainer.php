@@ -95,5 +95,10 @@ interface BackendSingletonContainer
     public function getDefaultPageLibraryInstance();
 
 
+    /**
+     * Will create and reuse an instance of CacheControl
+     * @return CacheControl
+     */
+    public function getCacheControlInstance();
 
 }

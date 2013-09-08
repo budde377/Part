@@ -11,7 +11,7 @@ class FTPConnectionImplTest extends PHPUnit_Framework_TestCase
 {
     private static $user = 'testcms2012';
     private static $password = 'T73LWgPeOwLlxh';
-    private static $host = 'christian-budde.dk';
+    private static $host = '10.8.0.1';
     private static $port = 21;
     private static $path = '/home/testcms2012/test';
 
@@ -57,7 +57,7 @@ class FTPConnectionImplTest extends PHPUnit_Framework_TestCase
     }
 
     public function testLoginWillReturnFalseIfLoginFailure(){
-        $this->assertFalse($this->connection->login('asdasdasdasd','ipiopi124jkllæasd'));
+        $this->assertFalse($this->connection->login('asdasdasdasd','ipiopi124jkllï¿½asd'));
     }
 
     public function testIsConnectedReturnFalseIfNotConnected(){

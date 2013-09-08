@@ -118,11 +118,11 @@ class PageContentImplTest extends PHPUnit_Extensions_Database_TestCase{
     }
 
     public function testGetContentNowReturnsRightResult(){
-        $this->assertEquals($this->existingContent2->latestContent(), $this->existingContent2->getContentAt(time()));
+        $this->assertEquals($this->existingContent2->latestContent(), $this->existingContent2->getContentAt(time())['content']);
     }
 
     public function testGetContentBetweenTimesReturnRightResult (){
-        $this->assertEquals("1", $this->existingContent2->getContentAt(1356994000));
+        $this->assertEquals("1", $this->existingContent2->getContentAt(1356994000)['content']);
     }
 
     public function testLatestContentWillReturnNullOnNoContent(){
@@ -141,7 +141,11 @@ class PageContentImplTest extends PHPUnit_Extensions_Database_TestCase{
     }
 
 
-
+    public function testChangePageContentWillUpdatePage(){
+        $lastTime = $this->existingPage->lastModified();
+        $this->existingContent->addContent("HELLO");
+        $this->assertGreaterThan($lastTime, $this->existingPage->lastModified());
+    }
 
 
 

@@ -18,8 +18,10 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
     private $db;
     /** @var $pdo PDO */
     private $pdo;
-    /** @var $page PageImpl */
+    /** @var PageImpl */
     private $testPage;
+    /** @var PageImpl */
+    private $testPage2;
 
     public function setUp()
     {
@@ -28,6 +30,7 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->db = new StubDBImpl();
         $this->db->setConnection($this->pdo);
         $this->testPage = new PageImpl('testpage',$this->db);
+        $this->testPage2 = new PageImpl('testpage2',$this->db);
     }
 
 
@@ -345,6 +348,14 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
 
     }
 
+    public function testWillReturnMinusOneOnNotModified(){
+        $this->assertEquals(0, $this->testPage->lastModified());
+    }
+
+    public function testWillReturnLaterTimestampOnModifiedCalled(){
+        $this->testPage->modify();
+        $this->assertGreaterThan(0, $this->testPage->lastModified());
+    }
 
     public function getSetUpOperation()
     {
