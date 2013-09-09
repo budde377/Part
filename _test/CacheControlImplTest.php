@@ -39,9 +39,12 @@ class CacheControlImplTest extends  PHPUnit_Framework_TestCase{
      * @runInSeparateProcess
      */
     public function testCantDisableAfterSetUp(){
-        $this->cacheControl->setUpCache();
+
+        $this->assertFalse($this->cacheControl->setUpCache());
         $this->cacheControl->disableCache();
         $this->assertTrue($this->cacheControl->isEnabled());
     }
+
+
 
 }

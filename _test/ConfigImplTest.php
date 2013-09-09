@@ -416,7 +416,6 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
                 <database>someDatabase</database>
                 <username>someUser</username>
                 <password>somePassword</password>
-                <setupFile>someFile</setupFile>
             </MySQLConnection>
         </config>');
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
@@ -425,13 +424,12 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('host', $connArray, 'Did not have host entry');
         $this->assertArrayHasKey('password', $connArray, 'Did not have password entry');
         $this->assertArrayHasKey('database', $connArray, 'Did not have database entry');
-        $this->assertArrayHasKey('setupFile', $connArray, 'Did not have setupFile entry');
 
         $this->assertEquals('someHost', $connArray['host'], 'Host was not right');
         $this->assertEquals('someDatabase', $connArray['database'], 'Host was not right');
         $this->assertEquals('somePassword', $connArray['password'], 'Host was not right');
         $this->assertEquals('someUser', $connArray['user'], 'Host was not right');
-        $this->assertInstanceOf('File', $connArray['setupFile']);
+
     }
 
     public function testWillReturnNullIfNotSpecifiedInConfig()

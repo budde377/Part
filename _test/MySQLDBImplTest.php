@@ -28,7 +28,6 @@ class MySQLDBImplTest extends PHPUnit_Framework_TestCase
             <database>{$this->database}</database>
             <username>{$this->user}</username>
             <password>{$this->pass}</password>
-            <setupFile>testFile</setupFile>
             </MySQLConnection>
         </config>");
 
@@ -45,7 +44,7 @@ class MySQLDBImplTest extends PHPUnit_Framework_TestCase
         /** @var $configXML SimpleXMLElement */
         $configXML = simplexml_load_string('
         <config>
-            <MySQLConnection><setupFile>testFile</setupFile><host>10.8.0.1</host><database>thisIsNotAValidDB</database><username>nosSchUser</username><password>password</password></MySQLConnection>
+            <MySQLConnection><host>10.8.0.1</host><database>thisIsNotAValidDB</database><username>nosSchUser</username><password>password</password></MySQLConnection>
         </config>');
 
         $config = new ConfigImpl($configXML, dirname(__FILE__));
@@ -77,7 +76,6 @@ class MySQLDBImplTest extends PHPUnit_Framework_TestCase
             <database>{$this->database}</database>
             <username>{$this->user}</username>
             <password>{$this->pass}</password>
-            <setupFile>testFile</setupFile>
             </MySQLConnection>
         </config>");
 

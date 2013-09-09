@@ -58,7 +58,7 @@
             <xs:element name="database" type="xs:string"/>
             <xs:element name="username" type="xs:string"/>
             <xs:element name="password" type="xs:string"/>
-            <xs:element name="setupFile" type="xs:string"/>
+
         </xs:all>
     </xs:complexType>
 

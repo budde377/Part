@@ -162,8 +162,7 @@ class ConfigImpl implements Config
                 'user' => (string)$this->configFile->MySQLConnection->username,
                 'password' => (string)$this->configFile->MySQLConnection->password,
                 'database' => (string)$this->configFile->MySQLConnection->database,
-                'host' => (string)$this->configFile->MySQLConnection->host,
-                'setupFile' => new FileImpl($this->rootPath.'/'.$this->configFile->MySQLConnection->setupFile));
+                'host' => (string)$this->configFile->MySQLConnection->host);
         }
 
         return $this->mysql;
