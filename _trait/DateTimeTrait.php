@@ -20,4 +20,9 @@ trait DateTimeTrait
         return $monthArray[($number-1)%7];
     }
 
+
+    protected function addLeadingZero($number){
+        return $number < 10 ? "0$number":"$number";
+    }
+
 }

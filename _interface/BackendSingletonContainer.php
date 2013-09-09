@@ -101,4 +101,10 @@ interface BackendSingletonContainer
      */
     public function getCacheControlInstance();
 
+    /**
+     * Will create and reuse an instance of Updater
+     * @return mixed
+     */
+    public function getUpdater();
+
 }

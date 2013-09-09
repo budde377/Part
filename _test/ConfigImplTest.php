@@ -29,6 +29,12 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     }
 
 
+    public function testRootPathWillReturnRootPath(){
+        $p = dirname(__FILE__);
+        $config = new ConfigImpl(simplexml_load_string("<config></config>"), $p);
+        $this->assertEquals($p, $config->getRootPath());
+    }
+
     public function testGetTemplateReturnNullWithEmptyConfigXML()
     {
         $emptyConfigXML = simplexml_load_string('<config></config>');

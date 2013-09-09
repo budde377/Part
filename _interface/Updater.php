@@ -24,14 +24,13 @@ interface Updater {
 
 
     /**
-     * Last check for updates.
-     * @return int Timestamp of last check
-     */
-    public function lastChecked();
-
-    /**
      * Last update
      * @return int Timestamp of last update
      */
     public function lastUpdated();
+
+    /**
+     * @return string This should return a string containing some representation for the version for support reference
+     */
+    public function getVersion();
 }

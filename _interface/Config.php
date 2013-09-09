@@ -81,4 +81,9 @@ interface Config
      */
     public function isDebugMode();
 
+    /**
+     * @return string Root path
+     */
+    public function getRootPath();
+
 }

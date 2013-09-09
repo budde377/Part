@@ -165,4 +165,12 @@ class StubConfigImpl implements Config
     {
         return false;
     }
+
+    /**
+     * @return string Root path
+     */
+    public function getRootPath()
+    {
+        return dirname(__FILE__);
+    }
 }

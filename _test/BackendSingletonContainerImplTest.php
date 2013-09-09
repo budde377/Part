@@ -169,4 +169,11 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($ret1 === $ret2);
     }
 
+    public function testGetUpdaterWillReturnSameInstanceOfUpdater(){
+        $ret1 = $this->backContainer->getUpdater();
+        $this->assertInstanceOf('Updater',$ret1);
+        $ret2 =$this->backContainer->getUpdater();
+        $this->assertTrue($ret1 === $ret2);
+    }
+
 }

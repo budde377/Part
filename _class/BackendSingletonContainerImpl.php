@@ -12,6 +12,7 @@ require_once dirname(__FILE__) . '/UserLibraryImpl.php';
 require_once dirname(__FILE__) . '/MultiSiteUserPrivilegesLibraryImpl.php';
 require_once dirname(__FILE__) . '/DefaultPageLibraryImpl.php';
 require_once dirname(__FILE__) . '/CacheControlImpl.php';
+require_once dirname(__FILE__) . '/GitUpdaterImpl.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -48,6 +49,8 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $dartRegister;
     /** @var  CacheControl */
     private $cacheControl;
+    /** @var  Updater */
+    private $updater;
 
     public function __construct(Config $config)
     {
@@ -208,5 +211,17 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
             $this->cacheControl = new CacheControlImpl($this->getCurrentPageStrategyInstance());
         }
         return $this->cacheControl;
+    }
+
+    /**
+     * Will create and reuse an instance of Updater
+     * @return mixed
+     */
+    public function getUpdater()
+    {
+        if($this->updater == null){
+            $this->updater = new GitUpdaterImpl($this->getConfigInstance()->getRootPath());
+        }
+        return $this->updater;
     }
 }

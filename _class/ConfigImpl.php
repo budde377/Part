@@ -260,4 +260,12 @@ class ConfigImpl implements Config
 
         return $this->debugMode = (string)$this->configFile->debugMode == "true";
     }
+
+    /**
+     * @return string Root path
+     */
+    public function getRootPath()
+    {
+        return $this->rootPath;
+    }
 }
