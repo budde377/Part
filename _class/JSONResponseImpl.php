@@ -39,13 +39,13 @@ class JSONResponseImpl implements JSONResponse
         $returnArray['type'] = 'response';
         $returnArray['response_type'] = $this->type;
 
-        if($this->errorCode != null){
+        if($this->errorCode !== null){
             $returnArray['error_code'] = $this->errorCode;
         }
-        if($this->payload != null){
+        if($this->payload !== null){
             $returnArray['payload'] = $this->generatePayloadArray($this->payload);
         }
-        if($this->id != null){
+        if($this->id !== null){
             $returnArray['id'] = $this->id;
         }
 
@@ -83,7 +83,6 @@ class JSONResponseImpl implements JSONResponse
         if(!$this->checkPayload($payload)){
             return;
         }
-
         $this->payload = $payload;
     }
 

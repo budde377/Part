@@ -103,7 +103,7 @@ interface BackendSingletonContainer
 
     /**
      * Will create and reuse an instance of Updater
-     * @return mixed
+     * @return Updater
      */
     public function getUpdater();
 

@@ -29,7 +29,6 @@ class AlertDialogBox extends DialogBox {
   AlertDialogBox(String alertText) : super(new DivElement()) {
     element.classes..add('dialog')..add('alert');
     _okButton..onClick.listen((_) {
-      _completer.complete(true);
       close();
     })..text = "OK";
     _alertText.innerHtml = alertText;
@@ -98,6 +97,27 @@ class TextInputDialogBox extends DialogBox {
 
 }
 
+class LoadingDialog extends DialogBox{
+
+  LoadingDialog(String loadingText) :super(new DivElement()){
+    element.classes..add('dialog')..add('loading');
+    element.innerHtml = loadingText;
+  }
+
+  void open(){
+    escQueue.enabled = false;
+  }
+
+  void close(){
+    escQueue.enabled = true;
+    super.close();
+
+  }
+
+
+
+}
+
 class DialogContainer {
   static final _cache = new DialogContainer._internal();
 
@@ -134,6 +154,12 @@ class DialogContainer {
 
   TextInputDialogBox text(String message, {String value:""}) {
     var dialog = new TextInputDialogBox(message, value:value);
+    addDialogBox(dialog);
+    return dialog;
+  }
+
+  LoadingDialog loading(String text){
+    var dialog = new LoadingDialog(text);
     addDialogBox(dialog);
     return dialog;
   }
@@ -178,6 +204,9 @@ class DialogContainer {
 
 
 }
+
+DialogContainer get dialogContainer => new DialogContainer();
+
 
 void enableNoScrollBody(){
   var body = query('body');

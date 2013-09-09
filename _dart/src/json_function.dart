@@ -43,6 +43,10 @@ class FileUploadJSONFunction extends JSONFunction{
   FileUploadJSONFunction(String name) : super("FileUpload.${name}");
 }
 
+class UpdaterJSONFunction extends JSONFunction{
+  UpdaterJSONFunction(String name) : super("Updater.${name}");
+}
+
 // User functions
 
 class ChangeUserInfoJSONFunction extends UserJSONFunction {
@@ -201,3 +205,13 @@ class UploadFileURIJSONFunction extends FileUploadJSONFunction{
 }
 
 // Edit image functions
+
+// Updater functions
+
+class CheckForSiteUpdatesJSONFunction extends UpdaterJSONFunction{
+  CheckForSiteUpdatesJSONFunction() : super('checkForUpdates');
+}
+
+class UpdateSiteJSONFunction extends UpdaterJSONFunction{
+  UpdateSiteJSONFunction() : super('update');
+}

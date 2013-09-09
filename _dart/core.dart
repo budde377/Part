@@ -270,11 +270,14 @@ class ESCQueue{
 
   List<Function> _queue = new List<Function>();
 
+  bool enabled = true;
+
   factory ESCQueue() => _cache;
+
 
   ESCQueue._internal(){
     document.onKeyUp.listen((KeyboardEvent kev){
-      if(kev.keyCode != 27 || _queue.length == 0 ){
+      if(kev.keyCode != 27 || _queue.length == 0 || !enabled){
         return;
       }
 
