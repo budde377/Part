@@ -45,8 +45,10 @@ class GitUpdaterImpl implements Updater{
     public function update()
     {
         $this->exec('git pull');
-		$this->exec('git submodule sync');
-		$this->exec('git submodule update');
+        foreach($this->updaters as $updater){
+            /** @var $updater Updater */
+            $updater->update();
+        }
     }
 
     /**
@@ -73,16 +75,16 @@ class GitUpdaterImpl implements Updater{
     }
 
     private function getRevision($where){
-        return $this->exec("cd $this->path && git rev-parse --short $where");
+        return $this->exec("git rev-parse --short $where");
     }
 
     private function listSubmodules(){
         exec("cd $this->path && grep path .gitmodules | sed 's/.*= //'", $modulesList);
         return $modulesList;
-
     }
 
     private function exec($command){
-        return trim(exec($command));
+        $ret = trim(shell_exec("cd $this->path && $command"));
+        return $ret;
     }
 }
