@@ -15,7 +15,6 @@
         <password>plovMand50</password>
         <setupFile>setupDatabase.sql</setupFile>
     </MySQLConnection>
-
     <optimizers>
         <class name="css" link="_class/CSSYUICompressorOptimizerImpl.php">CSSYUICompressorOptimizerImpl</class>
         <class name="js" link="_class/JSYUICompressorOptimizerImpl.php">JSYUICompressorOptimizerImpl</class>
