@@ -82,6 +82,11 @@ interface Config
     public function isDebugMode();
 
     /**
+     * @return bool
+     */
+    public function isUpdaterEnabled();
+
+    /**
      * @return string Root path
      */
     public function getRootPath();

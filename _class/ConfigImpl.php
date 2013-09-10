@@ -23,6 +23,7 @@ class ConfigImpl implements Config
     private $mysql = null;
     private $debugMode;
     private $defaultPages;
+    private $enableUpdater;
 
     /**
      * @param SimpleXMLElement $configFile
@@ -267,5 +268,21 @@ class ConfigImpl implements Config
     public function getRootPath()
     {
         return $this->rootPath;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUpdaterEnabled()
+    {
+        if($this->enableUpdater !== null){
+            return $this->enableUpdater;
+        }
+        if(!$this->configFile->enableUpdater->getName()){
+            return $this->enableUpdater = true;
+        }
+
+        return $this->enableUpdater = (string)$this->configFile->enableUpdater == "true";
+
     }
 }

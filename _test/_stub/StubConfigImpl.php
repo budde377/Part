@@ -173,4 +173,12 @@ class StubConfigImpl implements Config
     {
         return dirname(__FILE__);
     }
+
+    /**
+     * @return bool
+     */
+    public function isUpdaterEnabled()
+    {
+        return true;
+    }
 }

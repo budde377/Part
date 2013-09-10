@@ -476,4 +476,32 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     }
 
+    public function testIsUpdaterEnabledWillReturnTrueOnEmpty(){
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string('<config></config>');
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertTrue($config->isUpdaterEnabled());
+
+    }
+
+    public function testIsUpdaterEnabledWillReturnFalseOnFalse(){
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string('<config>
+        <enableUpdater>false</enableUpdater>
+        </config>');
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertFalse($config->isUpdaterEnabled());
+
+    }
+
+    public function testIsUpdaterEnabledWillReturnTrueOnTrue(){
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string('<config>
+        <enableUpdater>true</enableUpdater>
+        </config>');
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertTrue($config->isUpdaterEnabled());
+
+    }
+
 }
