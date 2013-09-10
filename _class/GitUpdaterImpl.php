@@ -119,6 +119,6 @@ class GitUpdaterImpl implements Updater{
      */
     public function lastChecked()
     {
-        return $this->readTime();
+        return max($this->readTime(), $this->lastUpdated());
     }
 }
