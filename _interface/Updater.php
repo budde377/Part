@@ -24,6 +24,12 @@ interface Updater {
 
 
     /**
+     * Will return timestamp of last checked
+     * @return int
+     */
+    public function lastChecked();
+
+    /**
      * Last update
      * @return int Timestamp of last update
      */

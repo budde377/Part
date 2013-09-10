@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__).'/../_interface/Updater.php';
+require_once dirname(__FILE__).'/../_class/FileImpl.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -12,14 +13,19 @@ require_once dirname(__FILE__).'/../_interface/Updater.php';
 class GitUpdaterImpl implements Updater{
 
     private $path;
+    private $branch;
+    private $currentVersion;
+    private $lastCheckedFile;
+    private $lastCheckedTime;
+    private $canBeUpdated = false;
 
     private $updaters = array();
 
     public function __construct($path){
         $this->path = $path;
-
+        $this->lastCheckedFile = new FileImpl($path.'/.lastCheckForUpdates');
+        $this->lastCheckedFile->setAccessMode(File::FILE_MODE_W_TRUNCATE_FILE_TO_ZERO_LENGTH);
         foreach($this->listSubmodules() as $module){
-
             $this->updaters[$module] = new GitUpdaterImpl($path."/$module");
 
         }
@@ -32,9 +38,22 @@ class GitUpdaterImpl implements Updater{
      */
     public function checkForUpdates()
     {
-
+        $this->writeTime();
+        if($this->canBeUpdated){
+            return true;
+        }
         $this->exec("git fetch");
-        return $this->getRevision('HEAD') != $this->getRevision("origin/".$this->currentBranch()) ||  array_reduce($this->updaters, function($result, Updater $input){return $result || $input->checkForUpdates();}, false);
+        return $this->canBeUpdated = ($this->getRevision('HEAD') != $this->getRevision("origin/".$this->currentBranch()) ||  array_reduce($this->updaters, function($result, Updater $input){return $result || $input->checkForUpdates();}, false));
+    }
+
+    private function writeTime(){
+
+        $this->lastCheckedFile->write($this->lastCheckedTime = time());
+        return $this->lastCheckedTime;
+    }
+
+    private function readTime(){
+        return $this->lastCheckedTime == null?($this->lastCheckedTime = $this->lastCheckedFile->exists()?intval($this->lastCheckedFile->getContents()):$this->lastUpdated()):$this->lastCheckedTime;
     }
 
     /**
@@ -44,6 +63,11 @@ class GitUpdaterImpl implements Updater{
      */
     public function update()
     {
+        if(!$this->checkForUpdates()){
+            return;
+        }
+
+
         $this->exec('git pull');
         foreach($this->updaters as $updater){
             /** @var $updater Updater */
@@ -67,11 +91,12 @@ class GitUpdaterImpl implements Updater{
     public function getVersion()
     {
 
-        return array_reduce($this->updaters, function(&$result, Updater $item){$result.= "-".$item->getVersion(); return $result;}, $this->getRevision('HEAD'));
+        return $this->currentVersion == null?$this->currentVersion = array_reduce($this->updaters, function(&$result, Updater $item){$result.= "-".$item->getVersion(); return $result;}, $this->getRevision('HEAD')):$this->currentVersion;
     }
 
     private function currentBranch(){
-        return $this->exec("git branch | sed -n '/\\* /s///p'");
+
+        return $this->branch == null?$this->branch = $this->exec("git branch | sed -n '/\\* /s///p'"):$this->branch;
     }
 
     private function getRevision($where){
@@ -86,5 +111,14 @@ class GitUpdaterImpl implements Updater{
     private function exec($command){
         $ret = trim(shell_exec("cd $this->path && $command"));
         return $ret;
+    }
+
+    /**
+     * Will return timestamp of last checked
+     * @return int
+     */
+    public function lastChecked()
+    {
+        return $this->readTime();
     }
 }
