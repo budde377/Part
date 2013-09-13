@@ -484,10 +484,8 @@ class LinkImageHandler {
 
   ImageElement _foundImage;
 
-  ImageEditor _imageEditor = new ImageEditor();
-
   LinkImageHandler(this.element, this.editor) {
-    _imageEditor.open(element.query('img'));
+//    _imageEditor.open(element.query('img'));
     _enabled = editor.isOpen;
     editor.onOpenChange.listen((bool b) {
       _setUp();
@@ -516,7 +514,8 @@ class LinkImageHandler {
     _editImageButton..classes.add('edit_image')..onClick.listen((MouseEvent mev) {
       mev.cancelBubble = true;
       _infoBox.remove();
-      _imageEditor.open(_foundImage);
+      var i = new ImageEditor(_foundImage);
+      i.open();
     });
 
     _infoBox = new InfoBox.elementContent(_boxElement);
@@ -584,6 +583,41 @@ class EditorAction {
 
   final Function onClickAction, selectionStateChanger;
 }
+
+
+class ImageEditor{
+  static Map<ImageElement, ImageEditor> _cache = new Map<ImageElement,ImageEditor>();
+  final ImageElement element;
+
+  StreamController _onChangeController = new StreamController();
+  StreamSubscription _onChangeSub;
+  bool _modified = false;
+
+  ImageElement _image = new ImageElement();
+
+  factory ImageEditor(ImageElement img) => _cache.putIfAbsent(img, ()=>new ImageEditor._internal(img));
+
+  ImageEditor._internal(this.element);
+
+
+  int get rotate;
+      set rotate(int i);
+
+  double get zoom;
+         set zoom(double zoom);
+
+  void save(){
+
+  }
+
+  bool get modified => _modified;
+
+  Stream get onChange => _onChangeSub == null?_onChangeSub = _onChangeController.stream.asBroadcastStream():_onChangeSub;
+
+}
+
+
+/*
 
 class ImageEditor {
   static ImageEditor _cache = new ImageEditor._internal();
@@ -860,7 +894,7 @@ class ImageEditor {
 
 }
 
-
+*/
 class ContentEditor {
 
   static Map<Element, ContentEditor> _cache = new Map<Element, ContentEditor>();
