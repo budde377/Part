@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<config xmlns="http://christianbud.de/SiteConfig"
+<config xmlns="http://christianbud.de/site-config"
         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-        xsi:schemaLocation="http://christianbud.de/SiteConfig SiteConfig.xsd">
+        xsi:schemaLocation="http://christianbud.de/site-config site-config.xsd">
     <templates>
         <template link="_template/MainTemplate.xhtml">_404</template>
     </templates>

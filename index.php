@@ -12,7 +12,7 @@ require_once(dirname(__FILE__) . '/_class/WebsiteImpl.php');
  */
 
 /** @var $siteConfig SimpleXMLElement */
-$siteConfig = simplexml_load_file('SiteConfig.xml');
+$siteConfig = simplexml_load_file('site-config.xml');
 $config = new ConfigImpl($siteConfig, dirname(__FILE__) . '/');
 $factory = new SiteFactoryImpl($config);
 $storedEx = null;

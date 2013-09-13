@@ -35,16 +35,16 @@ class ConfigImpl implements Config
         $namespaces = $configFile->getDocNamespaces();
 
         if (!count($namespaces)) {
-            $configFile->addAttribute('xmlns', 'http://christianbud.de/SiteConfig');
+            $configFile->addAttribute('xmlns', 'http://christianbud.de/site-config');
         }
 
         $configFile->asXML();
         $dom = new DOMDocument(1, 'UTF-8');
         $dom->loadXML($configFile->asXML());
-        $schema = dirname(__FILE__) . "/../SiteConfig.xsd";
+        $schema = dirname(__FILE__) . "/../site-config.xsd";
 
         if (!@$dom->schemaValidate($schema)) {
-            throw new InvalidXMLException('SiteConfig', 'ConfigXML');
+            throw new InvalidXMLException('site-config', 'ConfigXML');
         }
 
         $this->configFile = $configFile;
