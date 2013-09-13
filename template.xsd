@@ -18,19 +18,17 @@
 
     <xs:element name="extend-template" >
         <xs:complexType>
-            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
                 <xs:element ref="replace-page-element" />
                 <xs:element ref="header" />
-            </xs:sequence>
+            </xs:choice>
             <xs:attribute name="url" type="xs:anyURI" use="required"/>
         </xs:complexType>
     </xs:element>
     
     <xs:element name="replace-page-element" >
         <xs:complexType>
-            <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                <xs:any namespace="http://www.w3.org/1999/xhtml"/>
-            </xs:sequence>
+            <xs:group ref="mixed-content" maxOccurs="unbounded" minOccurs="0" />
             <xs:attribute name="name" type="xs:string" use="required"/>
         </xs:complexType>
 
@@ -49,12 +47,16 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:group name="mixed-content">
+        <xs:choice>
+            <xs:any namespace="http://www.w3.org/1999/xhtml http://christianbud.de/template" processContents="skip"/>
+        </xs:choice>
+    </xs:group>
+
     <xs:element name="condition">
         <xs:complexType>
-            <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                <xs:any namespace="http://www.w3.org/1999/xhtml" />
-            </xs:sequence>
-            <xs:attribute name="expression" type="expression"/>
+            <xs:group ref="mixed-content" maxOccurs="unbounded" minOccurs="0" />
+            <xs:attribute name="expression" type="expression" use="required"/>
         </xs:complexType>
     </xs:element>
     
