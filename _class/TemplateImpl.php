@@ -65,11 +65,22 @@ class TemplateImpl implements Template
 
     /**
      * @param string $string The template as a string
+     * @throws InvalidXMLException
      * @return void
      */
     public function setTemplateFromString($string)
     {
+        try{
+            $this->template = new DOMDocument();
+            $this->template->loadXML($string);
+        } catch (Exception $e){
+            throw new InvalidXMLException();
+        }
 
+       // $this->template->registerXPathNamespace('html', 'http://www.w3.org/1999/xhtml');
+        $result = $this->template->saveXML();
+        $result = $result;
+/*
         $this->template = $string;
         if(preg_match('/<!--[\s]*headerStatusCode:([0-9]+)-->/', $this->template, $matches,PREG_OFFSET_CAPTURE)){
             $statusCode = $matches[1][0];
@@ -119,10 +130,10 @@ class TemplateImpl implements Template
         for($i = $numMatches -1; $i >=0;$i--){
             $elementString = trim($matches[1][$i][0]);
             if (($element = $this->pageElementFactory->getPageElement($elementString)) !== null) {
-                /** @var $element PageElement */
                 $this->pageElements[] = array('element'=>$element,'offset_start'=>$matches[0][$i][1], 'offset_end' => $matches[0][$i][1] + strlen($matches[0][$i][0]));
              }
         }
+*/
 
     }
 

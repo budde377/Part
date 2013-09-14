@@ -18,7 +18,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testFileExistsReturnTrueOnFileExists()
     {
-        $filePath = dirname(__FILE__) . '/_stub/templateStub';
+        $filePath = dirname(__FILE__) . '/_stub/templateStub.xml';
         $file = new FileImpl($filePath);
         $this->assertTrue($file->exists(), 'Did not return true on existing file');
     }
@@ -38,7 +38,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetContentsReturnContentOnFileFound()
     {
-        $filePath = dirname(__FILE__) . '/_stub/templateStub';
+        $filePath = dirname(__FILE__) . '/_stub/templateStub.xml';
         $file = new FileImpl($filePath);
         $this->assertEquals(file_get_contents($filePath), $file->getContents(), 'Content did not match');
     }
@@ -46,8 +46,8 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetAbsolutePathReturnAbsolutePathToFile()
     {
-        $filePath = dirname(__FILE__) . '/.././_test/_stub/templateStub';
-        $altFilePath = '_stub/templateStub';
+        $filePath = dirname(__FILE__) . '/.././_test/_stub/templateStub.xml';
+        $altFilePath = '_stub/templateStub.xml';
         $file = new FileImpl($filePath);
         $this->assertEquals(dirname(__FILE__) . '/' . $altFilePath, $file->getAbsoluteFilePath(),
             'Did not return right absolute file path');

@@ -102,10 +102,25 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($exceptionWasThrown, 'Exception was not thrown');
     }
 
+
+    public function testSetTemplateWillThrowExceptionIfNotValidXML(){
+        $this->setUpConfig();
+        $exceptionWasThrown = false;
+        try {
+            $this->template->setTemplateFromString('asd');
+        } catch (Exception $exception) {
+            $this->assertInstanceOf('InvalidXMLException', $exception, 'Got the wrong exception');
+            /** @var $exception InvalidXMLException*/
+            $exceptionWasThrown = true;
+        }
+
+        $this->assertTrue($exceptionWasThrown, 'Exception was not thrown');
+    }
+
     public function testGetModifiedTemplateWillReturnTemplateWithNoModificationsIfNonModifiable()
     {
         $this->setUpConfig();
-        $oldTemplate = 'Hello';
+        $oldTemplate = '<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body>Hello</body></html>';
         $this->template->setTemplateFromString($oldTemplate);
         $newTemplate = $this->template->getModifiedTemplate();
         $this->assertEquals($oldTemplate, $newTemplate, 'Did not return the right template');
@@ -114,7 +129,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     public function testGetModifiedTemplateWillReturnTemplateWithNoModificationsIfNonModifiableFromFile()
     {
         $this->setUpConfig();
-        $file = dirname(__FILE__) . '/_stub/templateStub';
+        $file = dirname(__FILE__) . '/_stub/templateStub.xml';
         $f = new FileImpl($file);
         $oldTemplate = $f->getContents();
         $this->template->setTemplate($f);
@@ -127,17 +142,19 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->setUpConfig("
         <config>
             <templates>
-                <template link='_stub/templateStub'>main</template>
+                <template link='_stub/templateStub.xml'>main</template>
             </templates>
         </config>");
 
 
-        $file = $this->rootPath . '_stub/templateStub';
+        $file = $this->rootPath . '_stub/templateStub.xml';
         $oldTemplate = file_get_contents($file);
         $this->template->setTemplateFromConfig('main');
         $newTemplate = $this->template->getModifiedTemplate();
         $this->assertEquals($oldTemplate, $newTemplate, 'Did not return the right template');
     }
+
+
 
     public function testGetModifiedTemplateReturnsTemplateWithChangesIfModifiable()
     {
@@ -149,12 +166,17 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
             </pageElements>
         </config>');
 
-        $this->template->setTemplateFromString("prepend <!-- pageElement:main --> something <!-- pageElement:main2 --> something else ");
+        $this->template->setTemplateFromString("<html xmlns='http://www.w3.org/1999/xhtml' xmlns:cb='http://christianbud.de/template'>
+        <head></head>
+        <body>
+        prepend <cb:page-element name='main' /> something <cb:page-element name='main2' />something else
+        </body>
+        </html>");
         $modTemplate = $this->template->getModifiedTemplate();
         $helloElement = new HelloPageElementImpl();
         $nullElement = new NullPageElementImpl();
         $expectedString = 'prepend ' . $helloElement->getContent() . ' something ' . $nullElement->getContent() . ' something else ';
-        $this->assertEquals($expectedString, $modTemplate, 'Did not return expected template.');
+        $this->assertTrue(strpos($modTemplate, $expectedString) !== FALSE);
     }
 
     public function testGetModifiedTemplateReturnsTemplateWithEntryNotFoundStillThere()
@@ -166,7 +188,13 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
             </pageElements>
         </config>');
 
-        $this->template->setTemplateFromString("prepend <!-- pageElement:main --> something <!-- pageElement:main2 --> something else ");
+        $this->template->setTemplateFromString("
+        <html xmlns='http://www.w3.org/1999/xhtml'>
+        <head></head>
+        <body>
+        prepend <!-- pageElement:main --> something <!-- pageElement:main2 --> something else
+        </body>
+        </html>");
         $modTemplate = $this->template->getModifiedTemplate();
         $helloElement = new HelloPageElementImpl();
         $expectedString = 'prepend ' . $helloElement->getContent() . ' something <!-- pageElement:main2 --> something else ';
@@ -175,10 +203,11 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetModifiedTemplateWithAbsoluteExtension(){
         $this->setUpConfig();
-        $templateFile = dirname(__FILE__).'/_stub/templateStub';
-        $this->template->setTemplateFromString("<!--extends:$templateFile-->");
+        $templateFile = dirname(__FILE__).'/_stub/templateStub.xml';
+        $this->template->setTemplateFromString("
+        <extend-template xmlns='http://christianbud.de/template' url='$templateFile'/>");
         $modTemplate = $this->template->getModifiedTemplate();
-        $f = new FileImpl(dirname(__FILE__).'/_stub/templateStub');
+        $f = new FileImpl(dirname(__FILE__).'/_stub/templateStub.xml');
         $this->assertEquals($f->getContents(), $modTemplate, 'Did not return expected template.');
 
     }
@@ -190,21 +219,15 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
                 <class name="main" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
             </pageElements>
         </config>');
-        $templateFile = dirname(__FILE__).'/_stub/templateStub2';
+        $templateFile = dirname(__FILE__).'/_stub/templateStub2.xml';
         $this->template->setTemplateFromString("
-        <!--extends:$templateFile-->
-        <!--replaceElement[someElement]:main-->");
+         <extend-template xmlns='http://christianbud.de/template' url='$templateFile'>
+            <replace-page-element name='someElement'>
+            <page-element name='main'/>
+            </replace-page-element>
+         </extend-template>");
         $modTemplate = $this->template->getModifiedTemplate();
         $this->assertEquals("Hello World",$modTemplate,'Did not return expected template');
-    }
-
-    public function testGetModifiedTemplateWithExtendWillRemoveExtraContent(){
-        $this->setUpConfig();
-        $templateFile = dirname(__FILE__).'/_stub/templateStub';
-        $this->template->setTemplateFromString("<!--extends:$templateFile--> something something");
-        $modTemplate = $this->template->getModifiedTemplate();
-        $f = new FileImpl(dirname(__FILE__).'/_stub/templateStub');
-        $this->assertEquals($f->getContents(), $modTemplate, 'Did not return expected template.');
     }
 
     public function testGetModifiedTemplateWithExtendAndExtendedReplace(){
@@ -214,10 +237,13 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
                 <class name="main" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
             </pageElements>
         </config>');
-        $templateFile = dirname(__FILE__).'/_stub/templateStub2';
+        $templateFile = dirname(__FILE__).'/_stub/templateStub2.xml';
         $this->template->setTemplateFromString("
-        <!--extends:$templateFile-->
-        <!--replaceElementStart[someElement]-->Hello DEAD Fellow<!--pageElement:main--><!--replaceElementEnd-->");
+        <extend-template xmlns='http://christianbud.de/template' url='$templateFile'>
+            <replace-page-element name='someElement'>
+            Hello DEAD Fellow
+            </replace-page-element>
+         </extend-template>");
         $modTemplate = $this->template->getModifiedTemplate();
         $this->assertEquals("Hello DEAD FellowHello World",$modTemplate,'Did not return expected template');
     }
@@ -231,7 +257,10 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
                 <class name="main2" link="_stub/ReturnIncrementPageElementImpl.php">ReturnIncrementPageElementImpl</class>
             </pageElements>
         </config>');
-        $this->template->setTemplateFromString("<!--pageElement:main-->:<!--pageElement:main-->");
+        $this->template->setTemplateFromString("
+        <html xmlns='http://www.w3.org/1999/xhtml' xmlns:cb='http://christianbud.de/template'>
+            <cb:page-element name='main' />:<cb:page-element name='main' />
+        </html>");
         $result = $this->template->getModifiedTemplate();
         $result = explode(':',$result);
 
@@ -244,30 +273,17 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
                 <class name="main2" link="_stub/ReturnIncrementPageElementImpl.php">ReturnIncrementPageElementImpl</class>
             </pageElements>
         </config>');
-        $templateFile = dirname(__FILE__).'/_stub/templateStub3';
-        $this->template->setTemplateFromString("<!--extends:$templateFile--><!--replaceElement[main]:main2-->");
+        $templateFile = dirname(__FILE__).'/_stub/templateStub3.xml';
+        $this->template->setTemplateFromString("
+        <extend-template xmlns='http://christianbud.de/template' url='$templateFile'>
+            <replace-page-element name='main'>
+                <page-element name='main2'/>
+            </replace-page-element>
+         </extend-template>");
         $result = $this->template->getModifiedTemplate();
         $result = explode(':',$result);
 
         $this->assertGreaterThan($result[1],$result[0],'Wrong order of execution');
-    }
-
-    public function testGetModifiedTemplateWillExecuteExtendedReplaceBeforeNormalReplace(){
-        $this->setUpConfig('
-        <config>
-            <pageElements>
-                <class name="someElement" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
-                <class name="someElement2" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
-            </pageElements>
-        </config>');
-        $templateFile = dirname(__FILE__).'/_stub/templateStub2';
-        $this->template->setTemplateFromString("
-        <!--extends:$templateFile-->
-        <!--replaceElement[someElement]:someElement2-->
-        <!--replaceElementStart[someElement]--><!--pageElement:someElement--><!--pageElement:someElement--><!--replaceElementEnd-->");
-        $result = $this->template->getModifiedTemplate();
-        $this->assertEquals("Hello WorldHello World",$result,'Wrong order of execution of replace');
-
     }
 
     public function testWillInitializeOnSet(){
@@ -279,7 +295,9 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         </config>');
         $_SESSION['initialized'] = 0;
         $origVal = $_SESSION['initialized'];
-        $this->template->setTemplateFromString("<!--pageElement:main-->");
+        $this->template->setTemplateFromString("<html xmlns='http://www.w3.org/1999/xhtml' xmlns:cb='http://christianbud.de/template'>
+            <cb:page-element name='main' />
+        </html>");
         $newVal = $_SESSION['initialized'];
 
         $this->assertGreaterThan($origVal,$newVal,'Did not initialize');
@@ -293,7 +311,9 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
             </pageElements>
         </config>');
         $orgVal = $_SESSION['inc'] = 0;
-        $this->template->setTemplateFromString("<!--pageElement:main-->");
+        $this->template->setTemplateFromString("<html xmlns='http://www.w3.org/1999/xhtml' xmlns:cb='http://christianbud.de/template'>
+            <cb:page-element name='main' />
+        </html>");
         $newVal = $_SESSION['inc'];
         $this->assertEquals($orgVal,$newVal);
     }

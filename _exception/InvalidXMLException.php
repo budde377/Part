@@ -14,11 +14,11 @@ class InvalidXMLException extends Exception
      * @param string $expectedSchema
      * @param string $xmlDesc
      */
-    public function __construct($expectedSchema, $xmlDesc)
+    public function __construct($expectedSchema = null, $xmlDesc = null)
     {
         $this->expectedSchema = $expectedSchema;
         $this->xmlDesc = $xmlDesc;
-        parent::__construct("InvalidXMLException: XML ($xmlDesc) was not valid according to schema: $expectedSchema");
+        parent::__construct("InvalidXMLException: XML".($xmlDesc!=null?" ($xmlDesc)":"")." was not valid".($expectedSchema!=null?" according to schema: $expectedSchema":""));
     }
 
     /**
