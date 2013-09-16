@@ -47,7 +47,6 @@ class GitUpdaterImpl implements Updater{
     }
 
     private function writeTime(){
-
         $this->lastCheckedFile->write($this->lastCheckedTime = time());
         return $this->lastCheckedTime;
     }
