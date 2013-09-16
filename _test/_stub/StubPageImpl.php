@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../../_interface/Page.php';
+require_once dirname(__FILE__) . '/StubPageContentImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -16,6 +17,8 @@ class StubPageImpl implements Page
     private $alias;
     private $hidden = false;
     private $lastModified = -1;
+    private $pageContent  = array();
+
 
     /**
      * @return string
@@ -194,8 +197,9 @@ class StubPageImpl implements Page
      */
     public function getContent($id = null)
     {
-        return null;
+        return isset($this->pageContent[$id])?$this->pageContent[$id]:$this->pageContent[$id] = new StubPageContentImpl();
     }
+
 
     /**
      * Returns the time of last modification. This is for caching, and should reflect all content of the page.

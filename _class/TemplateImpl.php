@@ -16,19 +16,29 @@ class TemplateImpl implements Template
 
     private $config;
     private $pageElementFactory;
+    private $backendContainer;
+    /** @var  DOMDocument */
     private $template;
     private $pageElements = array();
 
 
     /**
-     * @param Config $config
      * @param PageElementFactory $pageElementFactory
+     * @param BackendSingletonContainer $container
+     * @internal param \Config $config
      */
 
-    public function __construct(Config $config, PageElementFactory $pageElementFactory)
+    public function __construct(PageElementFactory $pageElementFactory, BackendSingletonContainer $container)
     {
-        $this->config = $config;
+        $this->config = $container->getConfigInstance();
         $this->pageElementFactory = $pageElementFactory;
+        $this->backendContainer = $container;
+    }
+
+    private function cleanUp($string){
+
+
+        return $string;
     }
 
     /**
@@ -39,14 +49,67 @@ class TemplateImpl implements Template
      */
     public function getModifiedTemplate()
     {
-        foreach($this->pageElements as $array){
-            /** @var $element PageElement */
-            $element = $array['element'];
-            $this->template = substr($this->template, 0, $array['offset_start']) . $element->getContent() . substr($this->template, $array['offset_end']);
+
+        // Building output
+        $query = $this->xPathOnTemplate("//cb:page-element");
+        /** @var $pageElement DOMElement */
+        foreach ($query as $pageElement) {
+            $newNode = $this->template->createDocumentFragment();
+            /** @var PageElement $pe */
+            $pe = $this->pageElements[$pageElement->getAttribute('name')];
+            if($pe == null){
+                continue;
+            }
+            $newNode->appendXML("<![CDATA[".str_replace('>','&gt;', str_replace('<','&lt;',$pe->getContent()))."]]>");
+            $pageElement->parentNode->replaceChild($newNode, $pageElement);
         }
-        return $this->template;
+
+        // Getting content
+        $contentQuery = $this->xPathOnTemplate("//cb:page-content");
+        if($contentQuery->length > 0){
+            $currentPage = $this->backendContainer->getCurrentPageStrategyInstance()->getCurrentPage();
+            /** @var $pageContent DOMElement */
+            foreach($contentQuery as $pageContent){
+                $content = $currentPage->getContent($pageContent->hasAttribute('id')?$pageContent->getAttribute('id'):null);
+                $fragment = $this->template->createDocumentFragment();
+                $fragment->appendXML("<![CDATA[".str_replace('>','&gt;', str_replace('<','&lt;',$content->latestContent()))."]]>");
+                if($fragment->childNodes->length == 0){
+                    continue;
+                }
+                $pageContent->parentNode->insertBefore($fragment,$pageContent);
+                $pageContent->parentNode->removeChild($pageContent);
+
+            }
+
+        }
+        /** @var $pe DOMElement */
+        foreach($this->xPathOnTemplate('//cb:*') as $pe){
+            $pe->parentNode->removeChild($pe);
+        }
+
+        $result = $this->template->saveXML();
+        // Remove xmlns
+        $result = preg_replace('/(<[^>]+)xmlns(:[a-z]*)?\s*=\s*"[^"]*template\s*"([^>]*>)/','$1 $3', $result);
+
+        // Remove CDATA blocks
+        preg_match_all('/<!\[CDATA\[([^>]*)\]\]>/', $result, $matches, PREG_OFFSET_CAPTURE);
+        for($i = count($matches[0])-1; $i >= 0; $i--){
+
+            $match = $matches[0][$i];
+            $result = substr($result, 0, $match[1]).str_replace("&lt;", "<", str_replace("&gt;", ">", $matches[1][$i][0])).substr($result, $match[1]+strlen($match[0]));
+        }
+
+        return $result;
     }
 
+
+    private function xPathOnTemplate($xpath)
+    {
+        $pageElementsXPath = new DOMXPath($this->template);
+        $pageElementsXPath->registerNamespace("cb", "http://christianbud.de/template");
+        return $pageElementsXPath->query($xpath);
+
+    }
 
     /**
      * @param File $file
@@ -63,6 +126,13 @@ class TemplateImpl implements Template
         $this->setTemplateFromString($templateString);
     }
 
+    private function evaluateCondition($expression)
+    {
+        $backendContainer = $this->backendContainer;
+        $result = eval("return $expression;");
+        return $result;
+    }
+
     /**
      * @param string $string The template as a string
      * @throws InvalidXMLException
@@ -70,70 +140,81 @@ class TemplateImpl implements Template
      */
     public function setTemplateFromString($string)
     {
-        try{
+        //Cleaning up and building template
+        try {
+
+            $string = html_entity_decode($string);
             $this->template = new DOMDocument();
             $this->template->loadXML($string);
-        } catch (Exception $e){
+
+        } catch (Exception $e) {
             throw new InvalidXMLException();
         }
 
-       // $this->template->registerXPathNamespace('html', 'http://www.w3.org/1999/xhtml');
-        $result = $this->template->saveXML();
-        $result = $result;
-/*
-        $this->template = $string;
-        if(preg_match('/<!--[\s]*headerStatusCode:([0-9]+)-->/', $this->template, $matches,PREG_OFFSET_CAPTURE)){
-            $statusCode = $matches[1][0];
-            $this->template = substr($this->template,0,$matches[0][1]).substr($this->template, $matches[0][1]+strlen($matches[0][0]));
-            switch($statusCode){
-                case 500:
-                    HTTPHeaderHelper::setHeaderStatusCode(HTTPHeaderHelper::HTTPHeaderStatusCode500);
-                    break;
-                case 200:
-                    HTTPHeaderHelper::setHeaderStatusCode(HTTPHeaderHelper::HTTPHeaderStatusCode200);
-                    break;
-                case 404:
-                    HTTPHeaderHelper::setHeaderStatusCode(HTTPHeaderHelper::HTTPHeaderStatusCode404);
-
-            }
-        }
-
-
-        $numExtendsMatch = preg_match_all('/<!--[\s]*extends:([^\>]+)-->/', $string, $matches, PREG_OFFSET_CAPTURE);
-        if ($numExtendsMatch > 0) {
-//            $template = new TemplateImpl($this->config, $this->pageElementFactory);
-            $f = new FileImpl(trim($matches[1][0][0]));
-            $this->template = $f->getContents();
-
-            $numStartMatches = preg_match_all('/<!--[\s]*replaceElementStart\[([^\]]+)\][\s]*-->/', $string, $startMatches, PREG_OFFSET_CAPTURE);
-            $numEndMatches = preg_match_all('/<!--[\s]*replaceElementEnd[\s]*-->/', $string, $endMatches, PREG_OFFSET_CAPTURE);
-            if($numStartMatches == $numEndMatches){
-                $tagConflicts = false;
-                foreach($startMatches[0] as $k=>$match){
-                    $tagConflicts = $tagConflicts || $match[1] > $endMatches[0][$k][1];
-                    if(!$tagConflicts){
-                        $start = $match[1]+strlen($match[0]);
-                        $c =  substr($string,$start,$endMatches[0][$k][1]-$start);
-                        $this->template = preg_replace("/<!--[\s]*pageElement:[\s]*{$startMatches[1][$k][0]}[\s]*-->/",$c,$this->template);
-                    }
+        // Manage condition elements
+        $conditions = $this->xPathOnTemplate('//cb:condition');
+        /** @var DOMElement $condition */
+        foreach ($conditions as $condition) {
+            $parent = $condition->parentNode;
+            if ($this->evaluateCondition($condition->getAttribute('expression'))) {
+                $fragment = $this->template->createDocumentFragment();
+                while($condition->childNodes->length){
+                    $fragment->appendChild($condition->childNodes->item(0));
                 }
-            }
-            preg_match_all('/<!--[\s]*replaceElement\[([^\]]+)\]:([^\>]+)-->/', $string, $matches, PREG_OFFSET_CAPTURE);
-            foreach ($matches[1] as $k => $match) {
-                $replaceName = trim($match[0]);
-                $this->template = preg_replace("/(<!--[\s]*pageElement:[\s]*){$replaceName}([\s]*-->)/","$1{$matches[2][$k][0]}$2",$this->template);
-            }
+                $condition->parentNode->insertBefore($fragment, $condition);
 
+            }
+            $parent->removeChild($condition);
         }
 
-        $numMatches = preg_match_all('/<!--[\s]*pageElement:([^\>]+)-->/', $this->template, $matches,PREG_OFFSET_CAPTURE);
-        for($i = $numMatches -1; $i >=0;$i--){
-            $elementString = trim($matches[1][$i][0]);
-            if (($element = $this->pageElementFactory->getPageElement($elementString)) !== null) {
-                $this->pageElements[] = array('element'=>$element,'offset_start'=>$matches[0][$i][1], 'offset_end' => $matches[0][$i][1] + strlen($matches[0][$i][0]));
-             }
+        // Remove page-element tags with false condition
+        $conditionPageElements = $this->xPathOnTemplate("//cb:page-element[@condition]");
+        /** @var DOMElement $conditionalPE */
+        foreach ($conditionPageElements as $conditionalPE) {
+            if ($this->evaluateCondition($conditionalPE->getAttribute('condition'))) {
+                continue;
+            }
+            $conditionalPE->parentNode->removeChild($conditionalPE);
         }
-*/
+
+        // Resolve extension
+        $extendsMatches = $this->xPathOnTemplate("/cb:extend-template");
+        if ($extendsMatches->length > 0) {
+
+            /** @var DOMElement $match */
+            $match = $extendsMatches->item(0);
+            $f = new FileImpl($match->getAttribute("url"));
+            $matches = $this->xPathOnTemplate("/*/cb:replace-page-element");
+            $this->setTemplate($f);
+            /** @var $m DOMElement */
+            foreach ($matches as $m) {
+                $pageElements = $this->xPathOnTemplate($s = "//cb:page-element[@name=\"{$m->getAttribute('name')}\"]");
+                if ($pageElements->length == 0) {
+                    continue;
+                }
+                /** @var DOMElement $firstMatch */
+                $firstMatch = $pageElements->item(0);
+                $newChildren = $this->template->createDocumentFragment();
+                foreach ($m->childNodes as $child) {
+                    $newChildren->appendChild($this->template->importNode($child, true));
+                }
+                $firstMatch->parentNode->replaceChild($newChildren, $firstMatch);
+
+
+            }
+        }
+
+        //Initialize page elements
+        $finalPageElements = $this->xPathOnTemplate("//cb:page-element[@name]");
+        /** @var $attr DOMElement */
+        foreach ($finalPageElements as $attr) {
+            $attrString = $attr->getAttribute("name");
+            if (isset($this->pageElements[$attrString])) {
+                continue;
+            }
+            $this->pageElements[$attrString] = $this->pageElementFactory->getPageElement($attrString);
+
+        }
 
     }
 

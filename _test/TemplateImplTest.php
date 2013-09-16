@@ -5,7 +5,9 @@ require_once dirname(__FILE__) . '/../_class/TemplateImpl.php';
 require_once dirname(__FILE__) . '/_stub/NullPageElementFactoryImpl.php';
 require_once dirname(__FILE__) . '/_stub/HelloPageElementImpl.php';
 require_once dirname(__FILE__) . '/_stub/NullPageElementImpl.php';
-require_once dirname(__FILE__) . '/_stub/NullBackendSingletonContainerImpl.php';
+require_once dirname(__FILE__) . '/_stub/StubBackendSingletonContainerImpl.php';
+require_once dirname(__FILE__) . '/_stub/StubCurrentPageStrategyImpl.php';
+require_once dirname(__FILE__) . '/_stub/StubPageImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -22,24 +24,35 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     /** @var $template TemplateImpl */
     private $template;
     private $rootPath;
+    /** @var  StubPageImpl */
+    private $currentPage;
 
     protected function setUp()
     {
         @session_start();
-        $this->backFactory = new NullBackendSingletonContainerImpl();
+
     }
-    protected function tearDown(){
+
+    protected function tearDown()
+    {
         @session_destroy();
     }
 
     private function setUpConfig($config = '<config></config>')
     {
+
         /** @var $configXML SimpleXMLElement */
         $configXML = simplexml_load_string($config);
         $this->rootPath = dirname(__FILE__) . '/';
         $config = new ConfigImpl($configXML, $this->rootPath);
+        $this->backFactory = new StubBackendSingletonContainerImpl();
         $nullPageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
-        $this->template = new TemplateImpl($config, $nullPageElementFactory);
+        $currentPageStrategy = new StubCurrentPageStrategyImpl();
+        $this->currentPage = new StubPageImpl();
+        $currentPageStrategy->setCurrentPage($this->currentPage);
+        $this->backFactory->setCurrentPageStrategyInstance($currentPageStrategy);
+        $this->backFactory->setConfigInstance($config);
+        $this->template = new TemplateImpl($nullPageElementFactory, $this->backFactory);
     }
 
     public function testWillThrowExceptionIfTemplateIsNotFound()
@@ -103,14 +116,15 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testSetTemplateWillThrowExceptionIfNotValidXML(){
+    public function testSetTemplateWillThrowExceptionIfNotValidXML()
+    {
         $this->setUpConfig();
         $exceptionWasThrown = false;
         try {
             $this->template->setTemplateFromString('asd');
         } catch (Exception $exception) {
             $this->assertInstanceOf('InvalidXMLException', $exception, 'Got the wrong exception');
-            /** @var $exception InvalidXMLException*/
+            /** @var $exception InvalidXMLException */
             $exceptionWasThrown = true;
         }
 
@@ -120,10 +134,10 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     public function testGetModifiedTemplateWillReturnTemplateWithNoModificationsIfNonModifiable()
     {
         $this->setUpConfig();
-        $oldTemplate = '<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body>Hello</body></html>';
+        $oldTemplate = '<html><head></head><body>Hello</body></html>';
         $this->template->setTemplateFromString($oldTemplate);
         $newTemplate = $this->template->getModifiedTemplate();
-        $this->assertEquals($oldTemplate, $newTemplate, 'Did not return the right template');
+        $this->assertEquals(preg_replace("/\s+/", "", $oldTemplate), preg_replace("/\s+/", "", $newTemplate), 'Did not return the right template');
     }
 
     public function testGetModifiedTemplateWillReturnTemplateWithNoModificationsIfNonModifiableFromFile()
@@ -155,7 +169,6 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-
     public function testGetModifiedTemplateReturnsTemplateWithChangesIfModifiable()
     {
         $this->setUpConfig('
@@ -176,7 +189,12 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $helloElement = new HelloPageElementImpl();
         $nullElement = new NullPageElementImpl();
         $expectedString = 'prepend ' . $helloElement->getContent() . ' something ' . $nullElement->getContent() . ' something else ';
-        $this->assertTrue(strpos($modTemplate, $expectedString) !== FALSE);
+        $this->assertStringContainsWithNoRespectOnSpaces($modTemplate, $expectedString);
+    }
+
+    private function stripSpaces($string)
+    {
+        return preg_replace("/\s/", "", $string);
     }
 
     public function testGetModifiedTemplateReturnsTemplateWithEntryNotFoundStillThere()
@@ -189,37 +207,44 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         </config>');
 
         $this->template->setTemplateFromString("
-        <html xmlns='http://www.w3.org/1999/xhtml'>
+        <html xmlns='http://www.w3.org/1999/xhtml' xmlns:cb='http://christianbud.de/template'>
         <head></head>
         <body>
-        prepend <!-- pageElement:main --> something <!-- pageElement:main2 --> something else
+        prepend <cb:page-element name='main' /> something <cb:page-element name='main2' /> something else
         </body>
         </html>");
         $modTemplate = $this->template->getModifiedTemplate();
         $helloElement = new HelloPageElementImpl();
-        $expectedString = 'prepend ' . $helloElement->getContent() . ' something <!-- pageElement:main2 --> something else ';
-        $this->assertEquals($expectedString, $modTemplate, 'Did not return expected template.');
+        $expectedString = 'prepend ' . $helloElement->getContent() . ' something  something else ';
+        $this->assertStringContainsWithNoRespectOnSpaces($modTemplate, $expectedString);
     }
 
-    public function testGetModifiedTemplateWithAbsoluteExtension(){
+    public function assertStringContainsWithNoRespectOnSpaces($haystack, $needle)
+    {
+        $this->assertTrue(strpos($this->stripSpaces($haystack), $this->stripSpaces($needle)) !== false);
+    }
+
+    public function testGetModifiedTemplateWithAbsoluteExtension()
+    {
         $this->setUpConfig();
-        $templateFile = dirname(__FILE__).'/_stub/templateStub.xml';
+        $templateFile = dirname(__FILE__) . '/_stub/templateStub.xml';
         $this->template->setTemplateFromString("
         <extend-template xmlns='http://christianbud.de/template' url='$templateFile'/>");
         $modTemplate = $this->template->getModifiedTemplate();
-        $f = new FileImpl(dirname(__FILE__).'/_stub/templateStub.xml');
+        $f = new FileImpl(dirname(__FILE__) . '/_stub/templateStub.xml');
         $this->assertEquals($f->getContents(), $modTemplate, 'Did not return expected template.');
 
     }
 
-    public function testGetModifiedTemplateWithExtraElementsInExtension(){
+    public function testGetModifiedTemplateWithExtraElementsInExtension()
+    {
         $this->setUpConfig('
         <config>
             <pageElements>
                 <class name="main" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
             </pageElements>
         </config>');
-        $templateFile = dirname(__FILE__).'/_stub/templateStub2.xml';
+        $templateFile = dirname(__FILE__) . '/_stub/templateStub2.xml';
         $this->template->setTemplateFromString("
          <extend-template xmlns='http://christianbud.de/template' url='$templateFile'>
             <replace-page-element name='someElement'>
@@ -227,29 +252,31 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
             </replace-page-element>
          </extend-template>");
         $modTemplate = $this->template->getModifiedTemplate();
-        $this->assertEquals("Hello World",$modTemplate,'Did not return expected template');
+        $this->assertStringContainsWithNoRespectOnSpaces($modTemplate, "Hello World");
     }
 
-    public function testGetModifiedTemplateWithExtendAndExtendedReplace(){
+    public function testGetModifiedTemplateWithExtendAndExtendedReplace()
+    {
         $this->setUpConfig('
         <config>
             <pageElements>
                 <class name="main" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
             </pageElements>
         </config>');
-        $templateFile = dirname(__FILE__).'/_stub/templateStub2.xml';
+        $templateFile = dirname(__FILE__) . '/_stub/templateStub2.xml';
         $this->template->setTemplateFromString("
         <extend-template xmlns='http://christianbud.de/template' url='$templateFile'>
             <replace-page-element name='someElement'>
-            Hello DEAD Fellow
+            Hello DEAD Fellow<page-element name='main' />
             </replace-page-element>
          </extend-template>");
         $modTemplate = $this->template->getModifiedTemplate();
-        $this->assertEquals("Hello DEAD FellowHello World",$modTemplate,'Did not return expected template');
+        $this->assertStringContainsWithNoRespectOnSpaces($modTemplate, "Hello DEAD FellowHello World");
     }
 
 
-    public function testGetModifiedTemplateHasReversedOrderOfExecutionOfElements(){
+    public function testGetModifiedTemplateHasReversedOrderOfExecutionOfElements()
+    {
         $this->setUpConfig('
         <config >
             <pageElements>
@@ -262,18 +289,20 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
             <cb:page-element name='main' />:<cb:page-element name='main' />
         </html>");
         $result = $this->template->getModifiedTemplate();
-        $result = explode(':',$result);
+        $result = explode(':', $result);
 
-        $this->assertGreaterThan($result[1],$result[0],'Wrong order of execution');
+        $this->assertGreaterThan($result[1], $result[0], 'Wrong order of execution');
     }
-    public function testGetModifiedTemplateHasReversedOrderOfExecutionOfElementsWithReplace(){
+
+    public function testGetModifiedTemplateHasReversedOrderOfExecutionOfElementsWithReplace()
+    {
         $this->setUpConfig('
         <config >
             <pageElements>
                 <class name="main2" link="_stub/ReturnIncrementPageElementImpl.php">ReturnIncrementPageElementImpl</class>
             </pageElements>
         </config>');
-        $templateFile = dirname(__FILE__).'/_stub/templateStub3.xml';
+        $templateFile = dirname(__FILE__) . '/_stub/templateStub3.xml';
         $this->template->setTemplateFromString("
         <extend-template xmlns='http://christianbud.de/template' url='$templateFile'>
             <replace-page-element name='main'>
@@ -281,12 +310,13 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
             </replace-page-element>
          </extend-template>");
         $result = $this->template->getModifiedTemplate();
-        $result = explode(':',$result);
+        $result = explode(':', $result);
 
-        $this->assertGreaterThan($result[1],$result[0],'Wrong order of execution');
+        $this->assertGreaterThan($result[1], $result[0], 'Wrong order of execution');
     }
 
-    public function testWillInitializeOnSet(){
+    public function testWillInitializeOnSet()
+    {
         $this->setUpConfig('
         <config >
             <pageElements>
@@ -300,10 +330,11 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         </html>");
         $newVal = $_SESSION['initialized'];
 
-        $this->assertGreaterThan($origVal,$newVal,'Did not initialize');
+        $this->assertGreaterThan($origVal, $newVal, 'Did not initialize');
     }
 
-    public function testWillNotCallGetContentOnSet(){
+    public function testWillNotCallGetContentOnSet()
+    {
         $this->setUpConfig('
         <config >
             <pageElements>
@@ -315,6 +346,152 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
             <cb:page-element name='main' />
         </html>");
         $newVal = $_SESSION['inc'];
-        $this->assertEquals($orgVal,$newVal);
+        $this->assertEquals($orgVal, $newVal);
     }
+
+
+    public function testPageElementWillNotBeShownIfExpressionEvaluatesToFalse()
+    {
+        $this->setUpConfig('
+        <config>
+            <pageElements>
+                <class name="main" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
+            </pageElements>
+        </config>');
+
+        $this->template->setTemplateFromString("<html xmlns='http://www.w3.org/1999/xhtml' xmlns:cb='http://christianbud.de/template'>
+            <head></head>
+            <body>
+                <cb:page-element name='main' condition='1 == 2'/>
+            </body>
+        </html>");
+        $this->assertFalse(strpos($this->template->getModifiedTemplate(), "Hello World"));
+
+    }
+
+    public function testPageElementWillBeShownIfExpressionEvaluatesToTrue()
+    {
+        $this->setUpConfig('
+        <config>
+            <pageElements>
+                <class name="main" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
+            </pageElements>
+        </config>');
+
+        $this->template->setTemplateFromString("<html xmlns='http://www.w3.org/1999/xhtml' xmlns:cb='http://christianbud.de/template'>
+            <head></head>
+            <body>
+                <cb:page-element name='main' condition='1 == 1'/>
+            </body>
+        </html>");
+        $this->assertTrue(strpos($this->template->getModifiedTemplate(), "Hello World") !== false);
+
+    }
+
+    public function testPageElementWillHaveVariablesAvailableInCondition()
+    {
+        $this->setUpConfig('
+        <config>
+            <pageElements>
+                <class name="main" link="_stub/HelloPageElementImpl.php">HelloPageElementImpl</class>
+            </pageElements>
+        </config>');
+
+        $this->template->setTemplateFromString("<html xmlns='http://www.w3.org/1999/xhtml' xmlns:cb='http://christianbud.de/template'>
+            <head></head>
+            <body>
+                <cb:page-element name='main' condition='\$backendContainer != null'/>
+            </body>
+        </html>");
+        $this->assertTrue(strpos($this->template->getModifiedTemplate(), "Hello World") !== false);
+
+    }
+
+    public function testConditionWillBeRemovedIfFalse()
+    {
+        $this->setUpConfig();
+
+        $this->template->setTemplateFromString("<html xmlns='http://www.w3.org/1999/xhtml' xmlns:cb='http://christianbud.de/template'>
+            <head></head>
+            <body>
+            <cb:condition expression='1 == 2'>
+                Hello World
+            </cb:condition>
+            </body>
+        </html>");
+        $this->assertFalse(strpos($this->template->getModifiedTemplate(), "Hello World") !== false);
+    }
+
+    public function testConditionWillNotBeRemovedIfTrue()
+    {
+        $this->setUpConfig();
+
+        $this->template->setTemplateFromString("<html xmlns='http://www.w3.org/1999/xhtml' xmlns:cb='http://christianbud.de/template'>
+            <head></head>
+            <body>
+            <cb:condition expression='1 == 1'>
+                Hello World
+            </cb:condition>
+            </body>
+        </html>");
+        $template = $this->template->getModifiedTemplate();
+        $this->assertTrue(strpos($template, "Hello World") !== false);
+    }
+
+    public function testPageContentWillAddContentWithIDNull()
+    {
+        $this->setUpConfig();
+
+        $this->currentPage->getContent()->addContent("Hello World");
+
+        $this->template->setTemplateFromString("<html xmlns='http://www.w3.org/1999/xhtml' xmlns:cb='http://christianbud.de/template'>
+            <head></head>
+            <body>
+            <cb:page-content />
+            </body>
+        </html>");
+        $template = $this->template->getModifiedTemplate();
+        $this->assertTrue(strpos($template, "Hello World") !== false);
+    }
+
+    public function testPageContentWillAddContentWithIDNotNull()
+    {
+        $this->setUpConfig();
+
+        $this->currentPage->getContent('some_id')->addContent("Hello World");
+
+        $this->template->setTemplateFromString("<html xmlns='http://www.w3.org/1999/xhtml' xmlns:cb='http://christianbud.de/template'>
+            <head></head>
+            <body>
+            <cb:page-content id='some_id' />
+            </body>
+        </html>");
+        $template = $this->template->getModifiedTemplate();
+        $this->assertTrue(strpos($template, "Hello World") !== false);
+    }
+
+
+
+    public function testPageContentWillNotAddContentWithNonExistingID()
+    {
+        $this->setUpConfig();
+
+        $this->currentPage->getContent('some_id')->addContent("Hello World");
+
+        $this->template->setTemplateFromString("<html xmlns='http://www.w3.org/1999/xhtml' xmlns:cb='http://christianbud.de/template'>
+            <head></head>
+            <body>
+            <cb:page-content />
+            </body>
+        </html>");
+        $template = $this->template->getModifiedTemplate();
+        $this->assertFalse(strpos($template, "Hello World") !== false);
+    }
+
+
+
+
+
+
+
 }

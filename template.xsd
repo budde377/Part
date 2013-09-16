@@ -13,25 +13,25 @@
     <xs:element name="page-element">
         <xs:complexType>
             <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="condition" type="expression" use="optional"/>
         </xs:complexType>
     </xs:element>
 
-    <xs:element name="extend-template" >
+    <xs:element name="extend-template">
         <xs:complexType>
             <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:element ref="replace-page-element" />
-                <xs:element ref="header" />
+                <xs:element ref="replace-page-element"/>
+                <xs:element ref="header"/>
             </xs:choice>
             <xs:attribute name="url" type="xs:anyURI" use="required"/>
         </xs:complexType>
     </xs:element>
-    
-    <xs:element name="replace-page-element" >
+
+    <xs:element name="replace-page-element">
         <xs:complexType>
-            <xs:group ref="mixed-content" maxOccurs="unbounded" minOccurs="0" />
+            <xs:group ref="mixed-content" maxOccurs="unbounded" minOccurs="0"/>
             <xs:attribute name="name" type="xs:string" use="required"/>
         </xs:complexType>
-
     </xs:element>
 
     <xs:simpleType name="expression">
@@ -42,8 +42,8 @@
 
     <xs:element name="header">
         <xs:complexType>
-            <xs:attribute name="status-code" type="xs:int" />
-            <xs:attribute name="location" type="xs:string" />
+            <xs:attribute name="status-code" type="xs:int"/>
+            <xs:attribute name="location" type="xs:string"/>
         </xs:complexType>
     </xs:element>
 
@@ -55,9 +55,9 @@
 
     <xs:element name="condition">
         <xs:complexType>
-            <xs:group ref="mixed-content" maxOccurs="unbounded" minOccurs="0" />
+            <xs:group ref="mixed-content" maxOccurs="unbounded" minOccurs="0"/>
             <xs:attribute name="expression" type="expression" use="required"/>
         </xs:complexType>
     </xs:element>
-    
+
 </xs:schema>

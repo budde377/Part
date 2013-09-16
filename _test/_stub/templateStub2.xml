@@ -1,6 +1,6 @@
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:cb="http://christianbud.de/template">
 <head></head>
     <body>
-        <!--pageElement:someElement-->
+        <cb:page-element name="someElement"/>
     </body>
 </html>
