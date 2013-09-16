@@ -89,7 +89,16 @@ class TemplateImpl implements Template
 
         $result = $this->template->saveXML();
         // Remove xmlns
-        $result = preg_replace('/(<[^>]+)xmlns(:[a-z]*)?\s*=\s*"[^"]*template\s*"([^>]*>)/','$1 $3', $result);
+        $pattern = '/(<[^>]+)[\s]*xmlns(:?[a-z]*)\s*=\s*"[^"]*"[\s]*([^>]*>)/';
+        while(preg_match($pattern, $result)){
+            $result = preg_replace($pattern,'$1 $3', $result);
+        }
+
+        // Remove prefix
+        $result = preg_replace("/(<\/?)[^:>\s]+:([^>]+>)/", "$1$2", $result);
+
+        // Remove xml declaration
+        $result = preg_replace("/^<\?[^>]+>\s*/", "", $result);
 
         // Remove CDATA blocks
         preg_match_all('/<!\[CDATA\[([^>]*)\]\]>/', $result, $matches, PREG_OFFSET_CAPTURE);
