@@ -149,13 +149,13 @@ class PageContentAtTimeJSONFunction extends PageContentJSONFunction{
 
 //User privileges functions
 
-class AddUserPagePrivilegeJSONFunction extends UserJSONFunction {
+class AddUserPagePrivilegeJSONFunction extends UserPrivilegesJSONFunction {
   AddUserPagePrivilegeJSONFunction(String username, String page_id):super('addUserPagePrivilege'){
     this.arguments['username'] = username;
     this.arguments['page_id'] = page_id;
   }
 }
-class RevokeUserPagePrivilegeJSONFunction extends UserJSONFunction {
+class RevokeUserPagePrivilegeJSONFunction extends UserPrivilegesJSONFunction{
   RevokeUserPagePrivilegeJSONFunction(String username, String page_id):super('revokeUserPagePrivilege') {
     this.arguments['username'] = username;
     this.arguments['page_id'] = page_id;

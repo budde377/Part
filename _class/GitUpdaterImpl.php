@@ -65,13 +65,12 @@ class GitUpdaterImpl implements Updater{
         if(!$this->checkForUpdates()){
             return;
         }
-
-
         $this->exec('git pull');
         foreach($this->updaters as $updater){
             /** @var $updater Updater */
             $updater->update();
         }
+        $this->canBeUpdated = false;
     }
 
     /**

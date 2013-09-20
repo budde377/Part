@@ -603,7 +603,7 @@ class ImageEditor {
 
   int _rotate = 0;
 
-  double _zoom = 1;
+  double _zoom = 1.0;
 
   bool _mirrorVertical = false, _mirrorHorizontal = false;
 
