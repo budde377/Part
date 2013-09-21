@@ -1,4 +1,4 @@
-part of core;
+part of elements;
 
 class DialogBox {
   final Element element;

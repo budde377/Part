@@ -1,4 +1,4 @@
-part of core;
+part of elements;
 
 abstract class FloatingBox{
   final DivElement element =  new DivElement();

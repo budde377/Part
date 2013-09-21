@@ -1,4 +1,4 @@
-part of core;
+part of elements;
 
 class Color {
   final int r, g, b, a ;

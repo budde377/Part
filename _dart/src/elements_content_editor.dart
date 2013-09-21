@@ -1,16 +1,4 @@
-part of core;
-
-/*abstract class SaveStrategy {
-  void save(ContentEditor editor);
-}*/
-
-String sizeToString(int bytes) {
-  var s = (bytes <= 102 ? "${bytes} B" : (bytes < 1024 * 1024 / 10 ? "${bytes / 1024} KB" : "${bytes / (1024 * 1024)} MB"));
-  var r = new RegExp("([0-9]+\.?[0-9]?[0-9]?)[^ ]*(.+)");
-  var m = r.firstMatch(s);
-  return m[1] + m[2];
-}
-
+part of elements;
 
 class EditorCommandExecutor {
   static final Map<Element, EditorCommandExecutor> _cache = new Map<Element, EditorCommandExecutor>();
@@ -380,93 +368,6 @@ class EditorFileContainer {
 
 }
 
-class Calendar {
-  DateTime _showDate, _now = new DateTime.now();
-
-  final DivElement element = new DivElement(), nav = new DivElement(), leftNav = new DivElement(), rightNav = new DivElement();
-
-  final SpanElement navText = new SpanElement();
-
-  TableElement _table = new TableElement();
-
-  Map<int, TableCellElement> _cellMap = new Map<int, TableCellElement>();
-
-  Calendar() {
-    date = _now;
-    leftNav.classes..add('nav')..add('left_nav');
-    leftNav.append(new DivElement());
-    rightNav.classes..add('nav')..add('right_nav');
-    rightNav.append(new DivElement());
-
-    rightNav.onClick.listen((_) => showNextMonth());
-    leftNav.onClick.listen((_) => showPrevMonth());
-
-    nav..append(leftNav)..append(rightNav)..append(navText)..classes.add('calendar_nav');
-
-    element..append(nav)..append(_table)..classes.add('calendar');
-  }
-
-  bool get showNav => nav.hidden;
-
-  set showNav(bool b) => nav.hidden = b;
-
-  Element markDate(DateTime date) {
-    var cell = _createCell(date);
-    cell.classes.add('marked');
-    return cell;
-  }
-
-  String _dateToString(DateTime dt) {
-    var m = ["", "Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
-    return "${m[dt.month]} ${dt.year.toString()}";
-  }
-
-  void showNextMonth() {
-    date = new DateTime(_showDate.year, _showDate.month + 1);
-  }
-
-  void showPrevMonth() {
-    date = new DateTime(_showDate.year, _showDate.month - 1);
-  }
-
-  DateTime get date => _showDate;
-
-  set date(DateTime dt) {
-    _showDate = dt;
-    navText.text = _dateToString(_showDate);
-    _table.children.clear();
-    var d = dt.subtract(new Duration(days:dt.day + ((dt.weekday - dt.day) % 7) - 1));
-    while (_table.children.length < 6) {
-      var row = new TableRowElement();
-      for (var i = 0;i < 7;i++) {
-        row.append(_createCell(d));
-        d = d.add(new Duration(days:1));
-      }
-
-      _table.append(row);
-    }
-
-  }
-
-  TableCellElement _createCell(DateTime dt) {
-    var cell = _cellMap.putIfAbsent(dt.year * 10000 + dt.month * 100 + dt.day, () => new TableCellElement());
-    if (cell.text.length == 0) {
-      cell.text = "${dt.day}";
-      if (dt.day == _now.day && dt.month == _now.month && dt.year == _now.year) {
-        cell.classes.add('today');
-      }
-
-    }
-    if (dt.month != _showDate.month) {
-      cell.classes.add('another_month');
-    } else {
-      cell.classes.remove('another_month');
-    }
-    return cell;
-  }
-}
-
-
 class LinkImageHandler {
   final Element element;
 
@@ -592,430 +493,17 @@ class EditorAction {
 
 
 
-class ImageEditor {
-  static final Map<ImageElement, ImageEditor> _cache = new Map<ImageElement, ImageEditor>();
 
-  final CanvasElement canvas = new CanvasElement();
-
-  final ImageElement image;
-
-  int _height, _width, _canvasWidth, _canvasHeight, _originalWidth, _originalHeight;
-
-  int _rotate = 0;
-
-  double _zoom = 1.0;
-
-  bool _mirrorVertical = false, _mirrorHorizontal = false;
-
-  CanvasRenderingContext2D _context;
-
-  factory ImageEditor(ImageElement img) => _cache.putIfAbsent(img, () => new ImageEditor._internal(img));
-
-  ImageEditor._internal(this.image){
-    _originalHeight = _height = _canvasHeight = canvas.height = image.clientHeight;
-    _originalWidth = _width = _canvasWidth = canvas.width = image.clientWidth;
-    _context = canvas.context2D;
-    _draw();
-  }
-
-  void _draw() {
-    _clear();
-    _context.save();
-    _context.translate(_canvasWidth / 2, _canvasHeight / 2);
-    if (_isRotated) {
-      _context.scale(_mirrorHorizontal ? -1 : 1, _mirrorVertical ? -1 : 1);
-    } else {
-      _context.scale(_mirrorVertical ? -1 : 1, _mirrorHorizontal ? -1 : 1);
-
-    }
-    _context.rotate(_degToRad(_rotate * 90));
-    _context.translate(-_canvasWidth / 2, -_canvasHeight / 2);
-    _context.drawImageScaled(image, (_canvasWidth - _width) / 2, (_canvasHeight - _height) / 2, _width, _height);
-    _context.restore();
-  }
-
-  void _updateCanvasDimensions() {
-    canvas.height = _canvasHeight;
-    canvas.width = _canvasWidth;
-
-  }
-
-  num _abs(num n) => Math.sqrt(Math.pow(n, 2));
-
-  void _clear() {
-    var m = Math.max(_canvasWidth, _canvasHeight);
-    _context.clearRect(0, 0, m, m);
-
-  }
-
-
-  int get rotate => _rotate;
-
-  bool get _isRotated => _rotate % 2 == 1;
-
-  set rotate(int r) {
-    r = r % 4;
-    if (r == _rotate) {
-      return;
-    }
-    if (r % 2 != _rotate % 2) {
-      var w = _canvasWidth;
-      _canvasWidth = _canvasHeight;
-      _canvasHeight = w;
-      _updateCanvasDimensions();
-    }
-    _rotate = r;
-    _draw();
-  }
-
-  double get ratio => _width / _height;
-
-  bool get mirrorVertical => _mirrorVertical;
-
-  set mirrorVertical(bool b) {
-    _mirror(b, _mirrorHorizontal);
-    _draw();
-  }
-
-  bool get mirrorHorizontal => _mirrorHorizontal;
-
-  set mirrorHorizontal(bool b) {
-    _mirror(_mirrorVertical, b);
-    _draw();
-
-  }
-
-
-  void _mirror(bool vertical, bool horizontal) {
-    if (vertical && horizontal) {
-      _mirrorVertical = false;
-      _mirrorHorizontal = false;
-      rotate += 2;
-      return;
-    }
-    _mirrorVertical = vertical;
-    _mirrorHorizontal = horizontal;
-
-  }
-
-
-  double get zoom => _zoom;
-
-
-  set zoom(double z) {
-    _zoom = z;
-    if (_isRotated) {
-      _width = _canvasHeight = (_originalWidth * z).toInt();
-      _height = _canvasWidth = (_originalHeight * z).toInt();
-    } else {
-      _height = _canvasHeight = (_originalHeight * z).toInt();
-      _width = _canvasWidth = (_originalWidth * z).toInt();
-    }
-    _updateCanvasDimensions();
-    _draw();
-  }
-
-  int get height => _canvasHeight;
-
-  set height(int h) => zoom = Math.max(h, 1) / (_isRotated ? _originalWidth : _originalHeight);
-
-  int get width => _canvasWidth;
-
-  set width(int w) => zoom = Math.max(1, w) / (_isRotated ? _originalHeight : _originalWidth);
-
-  num _degToRad(num deg) => deg * Math.PI / 180;
-
-}
-
-
-/*
-
-class ImageEditor {
-  static ImageEditor _cache = new ImageEditor._internal();
-
-  factory ImageEditor() => _cache;
-
-  ImageElement _currentImage;
-
-  ImageElement _originalImage = new ImageElement();
-
-  int _x, _y, _width, _height, _cropHeight, _cropWidth, _rotate = 0;
-
-  int _maxHeight, _maxWidth;
-
-  DivElement _background = new DivElement(), _cropBox = new DivElement(), _container = new DivElement(), _editorContainer = new DivElement();
-
-  UListElement _toolBar = new UListElement();
-
-  ImageEditor._internal(){
-    _background.classes..add('full_background')..add('edit_image_popup');
-    _container.classes.add('container');
-    _cropBox.classes.add('crop_box');
-    _editorContainer.classes.add('cell');
-    _toolBar.classes.add('tool_bar');
-    _originalImage.draggable = false;
-  }
-
-  int get rotate => _rotate;
-  set rotate(int r){
-    _rotate = r%4;
-    _updatePos();
-  }
-
-
-  int get width => _width;
-
-      set width(int w){
-        _width = w;
-        _updatePos();
-      }
-
-
-  int get height => _height;
-
-      set height(int w){
-        _height = w;
-        _updatePos();
-      }
-
-  int get cropWidth => _cropWidth == null?_originalImage.clientWidth:_cropWidth;
-
-      set cropWidth(int w){
-        _cropWidth = w;
-        _updatePos();
-      }
-
-
-  int get cropHeight => _cropHeight == null?_originalImage.clientHeight:_cropHeight;
-
-      set cropHeight(int w){
-        _cropHeight = w;
-        _updatePos();
-      }
-
-  int get x => _x == null?0:_x;
-
-      set x(int x){
-        print(x);
-        _x = x;
-        _updatePos();
-      }
-
-  int get y => _y == null?0:_y;
-
-      set y(int y){
-        print(y);
-        _y = y;
-        _updatePos();
-      }
-
-  void open(ImageElement image, {int maxWidth:null, int maxHeight:null}) {
-    if (_currentImage != null || image == null) {
-      return;
-    }
-    var matches = new RegExp(r"(/_files/[^/]+/[^-]+)(-[S]_([0-9]+)_([0-9]+))?(-[C]_([0-9]+)_([0-9]+)_([0-9]+)_([0-9]+))?(-[R]_([0-9]))?(\.[a-zA-Z]+)").allMatches(image.src);
-    if (matches.length != 1) {
-      return;
-    }
-
-    var match = matches.first;
-
-    _originalImage.src = match.group(1) + match.group(match.groupCount);
-    if (match.group(2) != null) {
-      _width = int.parse(match.group(3));
-      _height = int.parse(match.group(4));
-
-    } else {
-      _height= _originalImage.clientHeight;
-      _width = _originalImage.clientWidth;
-    }
-    if (match.group(5) != null) {
-      _x = int.parse(match.group(6));
-      _y = int.parse(match.group(7));
-      _cropWidth = int.parse(match.group(8));
-      _cropHeight = int.parse(match.group(9));
-    } else {
-      _x = _y = _cropHeight = _cropWidth = null;
-    }
-    if (match.group(10) != null) {
-      _rotate = int.parse(match.group(11)) % 4;
-    } else {
-      _rotate = 0;
-    }
-    _currentImage = image;
-    _maxHeight = maxHeight;
-    _maxWidth = maxWidth;
-
-    escQueue.add(() {
-      if (_currentImage == null) {
-        return false;
-      }
-      close();
-      return true;
-    });
-
-
-    _showImage();
-
-  }
-
-  void _showImage() {
-    if (_background.parent == null) {
-      query('body')..append(_background);
-      enableNoScrollBody();
-    }
-
-    _background.append(_container);
-    _container.append(_editorContainer);
-    _editorContainer.append(_cropBox);
-    _cropBox.append(_originalImage);
-    _cropBox.append(_toolBar);
-    var x = _originalImage.offsetLeft, y = _originalImage.offsetTop;
-    var resizing = false, moving = false;
-    _cropBox.onMouseMove.listen((MouseEvent ev){
-
-      if(resizing){
-        return;
-      }
-      var w = _originalImage.clientWidth, h = _originalImage.clientHeight;
-
-      if(x+5 >= ev.offsetX){
-        _cropBox.classes.add('res_left');
-      } else {
-        _cropBox.classes.remove('res_left');
-
-      }
-
-      if(x+w-5< ev.offsetX){
-        _cropBox.classes.add('res_right');
-      } else {
-        _cropBox.classes.remove('res_right');
-      }
-
-      if(y>= ev.offsetY){
-        _cropBox.classes.add('res_top');
-      } else {
-        _cropBox.classes.remove('res_top');
-      }
-
-      if(y+h < ev.offsetY){
-        _cropBox.classes.add('res_bottom');
-      } else {
-        _cropBox.classes.remove('res_bottom');
-      }
-    });
-
-    _cropBox.onMouseDown.listen((MouseEvent ev){
-      moving = ev.toElement != _cropBox;
-
-      var movSub = document.onMouseMove.listen((MouseEvent ev){
-        if(moving){
-          this.x += ev.movementX;
-          this.y += ev.movementY;
-
-        } else {
-          resizing = true;
-          if(_cropBox.classes.contains('res_left')){
-            cropWidth -= ev.movementX*2;
-          } else if(_cropBox.classes.contains('res_right')){
-            cropWidth += ev.movementX*2;
-          }
-
-
-          if(_cropBox.classes.contains('res_top')){
-            cropHeight -= ev.movementY*2;
-          } else if(_cropBox.classes.contains('res_bottom')){
-            cropHeight += ev.movementY*2;
-          }
-
-        }
-
-
-      }), mouseUpSub = null;
-      mouseUpSub = document.onMouseUp.listen((_){
-        movSub.cancel();
-        resizing = false;
-        mouseUpSub.cancel();
-      });
-
-    });
-
-    _updatePos();
-
-  }
-
-  void _updatePos() {
-    _originalImage.style.height = _height == null ? "" : "${_height}px";
-    _originalImage.style.width = _width == null ? "" : "${_width}px";
-    var x = _x == null? 0:_x;
-    var y = _y == null? 0:_y;
-    _originalImage.classes.removeWhere((String c)=>c.startsWith('rotate'));
-    switch(_rotate){
-      case 1:
-        _originalImage.classes.add('rotate90');
-        x += _height;
-
-        break;
-      case 2:
-        _originalImage.classes.add('rotate180');
-        x += _width;
-        y += _height;
-        break;
-      case 3:
-        _originalImage.classes.add('rotate270');
-      y += _width;
-        break;
-    }
-    if(y!=0){
-      _originalImage.style.top = "${y}px";
-
-    } else {
-      _originalImage.style.removeProperty('top');
-    }
-    if(x!=0){
-      _originalImage.style.left = "${x}px";
-
-    } else {
-      _originalImage.style.removeProperty('left');
-
-    }
-    var w = _cropWidth == null?_width:_cropWidth, h = _cropHeight == null?_height:_cropHeight;
-
-    var i =  _rotate%2 == 1?h:w;
-    _cropBox.style.width = "${_maxWidth == null?i:Math.min(i,_maxWidth)}px";
-    i =  _rotate%2 == 1?w:h;
-    _cropBox.style.height = "${_maxHeight== null?i:Math.min(i, _maxHeight)}px";
-
-  }
-
-  void close() {
-    if (_currentImage == null) {
-      return;
-    }
-    _currentImage = null;
-    _background.remove();
-    disableNoScrollBody();
-    _originalImage.remove();
-
-  }
-
-  void save() {
-
-  }
-
-}
-
-*/
 class ContentEditor {
 
   static Map<Element, ContentEditor> _cache = new Map<Element, ContentEditor>();
 
-  factory ContentEditor(Element element, SiteClasses.PageOrder pageOrder) => _cache.putIfAbsent(element, () => new ContentEditor._internal(element, pageOrder));
+  factory ContentEditor(Element element, PageOrder pageOrder) => _cache.putIfAbsent(element, () => new ContentEditor._internal(element, pageOrder));
 
 
   final Element element;
 
-  final SiteClasses.PageOrder pageOrder;
+  final PageOrder pageOrder;
 
   final EditorCommandExecutor executor;
 
@@ -1023,11 +511,11 @@ class ContentEditor {
 
   Map<Element, Element> _elementToSubMenu = new Map<Element, Element>();
 
-  SiteClasses.PageContent _currentContent;
+  PageContent _currentContent;
 
-  SiteClasses.Revision _currentRevision;
+  Revision _currentRevision;
 
-  SiteClasses.Revision _lastSavedRevision;
+  Revision _lastSavedRevision;
 
   PropertyAnimation _previewAnimation;
 
@@ -1053,7 +541,7 @@ class ContentEditor {
     _wrapper.classes.add('tool_bar_wrapper');
     _preview.classes.add('preview');
     _preview.hidden = true;
-    _lastSavedRevision = new SiteClasses.Revision(null, element.innerHtml);
+    _lastSavedRevision = new Revision(null, element.innerHtml);
     element.onDoubleClick.listen((Event event) {
       if (!_closed) {
         return;
@@ -1080,7 +568,7 @@ class ContentEditor {
     });
   }
 
-  Future<bool> _useRevision(SiteClasses.Revision rev) {
+  Future<bool> _useRevision(Revision rev) {
     var completer = new Completer<bool>();
 
     if (changed && _inputSinceSave) {
@@ -1103,14 +591,14 @@ class ContentEditor {
   }
 
 
-  void _loadRevision(SiteClasses.Revision rev) {
+  void _loadRevision(Revision rev) {
     element.innerHtml = rev.content;
     _currentRevision = rev;
     _notifyChange();
 
   }
 
-  void _showPreview(SiteClasses.Revision rev) {
+  void _showPreview(Revision rev) {
     _animatePreview(rev);
 
   }
@@ -1120,7 +608,7 @@ class ContentEditor {
 
   }
 
-  void _animatePreview([SiteClasses.Revision content]) {
+  void _animatePreview([Revision content]) {
     if (_previewAnimation == null) {
       _previewAnimation = new HeightPropertyAnimation(_contentWrapper);
       _previewAnimation.removePropertyOnComplete = true;
@@ -1266,7 +754,7 @@ class ContentEditor {
     var savingBar = new SavingBar();
     var jobId = savingBar.startJob();
     _inputSinceSave = false;
-    _currentContent.addContent(element.innerHtml).then((SiteClasses.Revision rev) {
+    _currentContent.addContent(element.innerHtml).then((Revision rev) {
       _saveCurrentHash();
       savingBar.endJob(jobId);
       _lastSavedRevision = rev;
@@ -1441,7 +929,7 @@ class ContentEditor {
 
       });
       var currentCell;
-      var createLi = (SiteClasses.Revision revision, [UListElement historyList]) {
+      var createLi = (Revision revision, [UListElement historyList]) {
         var li = new LIElement(), dt = revision.time;
         li.text = "${dt.hour < 10 ? "0" + dt.hour.toString() : dt.hour}:${dt.minute < 10 ? "0" + dt.minute.toString() : dt.minute}:${dt.second < 10 ? "0" + dt.second.toString() : dt.second}";
         if (historyList != null) {
@@ -1499,10 +987,10 @@ class ContentEditor {
             return;
           }
           historyList.classes.add('loading');
-          _currentContent.listRevisions(from:times.first, to:times.last).then((List<SiteClasses.Revision> revisions) {
+          _currentContent.listRevisions(from:times.first, to:times.last).then((List<Revision> revisions) {
             historyList.classes.remove('loading');
             var l = payloadCache[cell] = new List<LIElement>();
-            revisions.forEach((SiteClasses.Revision revision) {
+            revisions.forEach((Revision revision) {
               var li = createLi(revision, historyList);
               l.add(li);
               if (_currentRevision == null && revision.time == changeTimes.last) {
@@ -1519,7 +1007,7 @@ class ContentEditor {
           cell.click();
         }
       });
-      _currentContent.onAddContent.listen((SiteClasses.Revision r) {
+      _currentContent.onAddContent.listen((Revision r) {
         var c = calendar.markDate(r.time);
         var li = createLi(r, c == currentCell ? historyList : null);
         li.classes.add("current");
