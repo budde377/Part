@@ -24,7 +24,7 @@ class EditorCommandExecutor {
 
 
   void _execCommand(String command, {bool userinterface:false, String value:""}) {
-    print(element.document.execCommand(command, userinterface, value));
+    element.document.execCommand(command, userinterface, value);
   }
 
   void toggleBold() => _execCommand("bold");
@@ -368,6 +368,138 @@ class EditorFileContainer {
 
 }
 
+class ImageEditorHandler {
+  static final Map<ImageEditor, ImageEditorHandler> _cache = new Map<ImageEditor, ImageEditorHandler>();
+
+  ButtonElement _rcw = new ButtonElement(), _rccw = new ButtonElement(), _mirror_v = new ButtonElement(), _mirror_h = new ButtonElement(), _zoom_in = new ButtonElement(), _zoom_out = new ButtonElement(), _crop = new ButtonElement(), _save = new ButtonElement();
+
+  DivElement _toolBar = new DivElement(), _dialogElement = new DivElement();
+
+  DialogBox _dialogBox;
+
+  final ImageEditor editor;
+
+  factory ImageEditorHandler(ImageEditor ie) => _cache.putIfAbsent(ie, () => new ImageEditorHandler._internal(ie));
+
+  factory ImageEditorHandler.fromImage(ImageElement elm) => new ImageEditorHandler(new ImageEditor(elm));
+
+  ImageEditorHandler._internal(this.editor) {
+    var wrapper = new DivElement();
+    _dialogElement.append(editor.canvas);
+    _toolBar.classes.add('image_edit_tool_bar');
+    _toolBar.append(wrapper);
+    _dialogElement.classes.add('edit_image_popup');
+    _rcw.classes.add('rotate_cw');
+    _rccw.classes.add('rotate_ccw');
+    _mirror_v.classes.add('mirror_v');
+    _mirror_h.classes.add('mirror_h');
+    _zoom_in.classes.add('zoom_in');
+    _zoom_out.classes.add('zoom_out');
+    _crop.classes.add('crop');
+    _save.classes.add('save');
+
+    wrapper..append(_rcw)..append(_rccw)..append(_mirror_v)..append(_mirror_h)..append(_zoom_in)..append(_zoom_out)..append(_crop)..append(_save);
+    _setUpListeners();
+  }
+
+  void _setUpListeners() {
+    editor.canvas.onMouseWheel.listen((WheelEvent we) {
+      editor.width += (we.deltaY > 0 ? 1 : -1) * 2;
+      we.cancelBubble = true;
+      we.preventDefault();
+    });
+    var t;
+    _zoom_in.onMouseDown.listen((_) {
+      t = new Timer.periodic(new Duration(milliseconds:1), (_) {
+        editor.width++;
+      });
+      var sub1;
+      sub1 = document.onMouseUp.listen((_) {
+        sub1.cancel();
+        t.cancel();
+      });
+    });
+
+    _zoom_out.onMouseDown.listen((_) {
+      t = new Timer.periodic(new Duration(milliseconds:1), (_) {
+        editor.width--;
+      });
+      var sub1;
+      sub1 = document.onMouseUp.listen((_) {
+        sub1.cancel();
+        t.cancel();
+      });
+
+    });
+
+    _rcw.onClick.listen((_) => editor.rotate++);
+    _rccw.onClick.listen((_) => editor.rotate--);
+    _mirror_v.onClick.listen((_) => editor.mirrorVertical = !editor.mirrorVertical);
+    _mirror_h.onClick.listen((_) => editor.mirrorHorizontal = !editor.mirrorHorizontal);
+    _crop.onClick.listen((_) => editor.hasCrop?editor.removeCrop():editor.setCrop(0.25, 0.25, 0.5, 0.5));
+    var inDot = (int x, int y) => editor.dotNW.inShape(x, y) ? 1 : (editor.dotNE.inShape(x, y) ? 2 : (editor.dotSE.inShape(x, y) ? 3 : (editor.dotSW.inShape(x, y) ? 4 : 0)));
+    editor.canvas.onMouseMove.listen((MouseEvent ev) {
+      if (inDot(ev.offsetX, ev.offsetY) > 0) {
+        editor.canvas.classes.add("hover_dot");
+      } else {
+        editor.canvas.classes.remove("hover_dot");
+      }
+    });
+    editor.canvas.onMouseDown.listen((MouseEvent ev) {
+      var dotN;
+      if ((dotN = inDot(ev.offsetX, ev.offsetY)) == 0) {
+        return ;
+      }
+      var sub1, sub2;
+      sub1 = document.onMouseMove.listen((MouseEvent ev) {
+        switch (dotN) {
+          case 1:
+            editor.setCrop((editor.cropX + ev.movementX) / editor.width, (editor.cropY + ev.movementY) / editor.height, (-ev.movementX + editor.cropW) / editor.width, (-ev.movementY + editor.cropH) / editor.height);
+            break;
+          case 2:
+            editor.setCrop(editor.cropX / editor.width, (editor.cropY + ev.movementY) / editor.height, (ev.movementX + editor.cropW) / editor.width, (-ev.movementY + editor.cropH) / editor.height);
+            break;
+          case 3:
+            editor.setCrop(editor.cropX / editor.width, editor.cropY / editor.height, (ev.movementX + editor.cropW) / editor.width, (ev.movementY + editor.cropH) / editor.height);
+            break;
+          case 4:
+            editor.setCrop((editor.cropX + ev.movementX) / editor.width, editor.cropY / editor.height, (-ev.movementX + editor.cropW) / editor.width, (ev.movementY + editor.cropH) / editor.height);
+            break;
+
+        }
+
+      });
+
+      sub2 = document.onMouseUp.listen((MouseEvent ev) {
+        sub1.cancel();
+        sub2.cancel();
+      });
+
+    });
+  }
+
+  void open() {
+    _dialogBox = dialogContainer.dialog(_dialogElement);
+    _dialogBox.onClose.listen((_) => close());
+    body.append(_toolBar);
+
+    editor.setProperties(new ImageEditProperties.fromImageElement(editor.image));
+
+  }
+
+  void close() {
+    if (_dialogBox == null) {
+      return;
+    }
+    _toolBar.remove();
+
+    _dialogBox = null;
+  }
+
+
+}
+
+
 class LinkImageHandler {
   final Element element;
 
@@ -415,14 +547,11 @@ class LinkImageHandler {
     _editImageButton..classes.add('edit_image')..onClick.listen((MouseEvent mev) {
       mev.cancelBubble = true;
       _infoBox.remove();
-      var i = new ImageEditor(_foundImage);
-      i.canvas.onMouseWheel.listen((WheelEvent we) {
-        i.width += (we.deltaY > 0 ? 1 : -1) * 2;
-        we.cancelBubble = true;
-        we.preventDefault();
-      });
-      _foundImage.insertAdjacentElement("afterEnd",i.canvas);
-      _foundImage.hidden = true;
+
+      var handler = new ImageEditorHandler.fromImage(_foundImage);
+      handler.editor.maxWidth = editor.element.clientWidth;
+      handler.open();
+
     });
 
     _infoBox = new InfoBox.elementContent(_boxElement);
@@ -490,8 +619,6 @@ class EditorAction {
 
   final Function onClickAction, selectionStateChanger;
 }
-
-
 
 
 class ContentEditor {
@@ -748,7 +875,7 @@ class ContentEditor {
 
 
   void save() {
-    if(!changed){
+    if (!changed) {
       return;
     }
     var savingBar = new SavingBar();
@@ -826,10 +953,10 @@ class ContentEditor {
 
       }
 
-      if(element.classes.contains('active')){
-        escQueue.add((){
+      if (element.classes.contains('active')) {
+        escQueue.add(() {
 
-          if(!element.classes.contains('active')){
+          if (!element.classes.contains('active')) {
             return false;
           }
 
@@ -1044,7 +1171,8 @@ class ContentEditor {
 //TODO Fix close fileupload with ESC
     preview.classes.add('preview');
 
-    var uploadStrategy = images ? new AJAXImageURIUploadStrategy( new ImageTransform.atMost(element.clientWidth, 500), new ImageTransform.atMost(70, 70, dataURI:true)) : new AJAXFileURIUploadStrategy();;
+    var uploadStrategy = images ? new AJAXImageURIUploadStrategy(new ImageSizes.atMost(element.clientWidth, 500), new ImageSizes.atMost(70, 70, dataURI:true)) : new AJAXFileURIUploadStrategy();
+    ;
     var uploader = new FileUploader(uploadStrategy);
     var container = new EditorFileContainer(new DivElement(), uploadIcon);
     container.listenOnContentChange(() => _updatePlaceholder());

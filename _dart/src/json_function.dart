@@ -15,35 +15,35 @@ class JSONFunction {
 }
 
 
-class PageJSONFunction extends JSONFunction{
+class PageJSONFunction extends JSONFunction {
   PageJSONFunction(String name): super("Page.${name}");
 }
 
-class UserJSONFunction extends JSONFunction{
+class UserJSONFunction extends JSONFunction {
   UserJSONFunction(String name): super("User.${name}");
 }
 
-class UserPrivilegesJSONFunction extends JSONFunction{
+class UserPrivilegesJSONFunction extends JSONFunction {
   UserPrivilegesJSONFunction(String name): super("UserPrivileges.${name}");
 }
 
-class PageContentJSONFunction extends JSONFunction{
+class PageContentJSONFunction extends JSONFunction {
   PageContentJSONFunction(String name): super("PageContent.${name}");
 }
 
-class PageOrderJSONFunction extends JSONFunction{
+class PageOrderJSONFunction extends JSONFunction {
   PageOrderJSONFunction(String name): super("PageOrder.${name}");
 }
 
-class UsersJSONFunction extends JSONFunction{
+class UsersJSONFunction extends JSONFunction {
   UsersJSONFunction(String name) : super("Users.${name}");
 }
 
-class FileUploadJSONFunction extends JSONFunction{
+class FileUploadJSONFunction extends JSONFunction {
   FileUploadJSONFunction(String name) : super("FileUpload.${name}");
 }
 
-class UpdaterJSONFunction extends JSONFunction{
+class UpdaterJSONFunction extends JSONFunction {
   UpdaterJSONFunction(String name) : super("Updater.${name}");
 }
 
@@ -65,7 +65,6 @@ class ChangeUserPasswordJSONFunction extends UserJSONFunction {
     this.arguments['new_password'] = newPassword;
   }
 }
-
 
 
 class DeleteUserJSONFunction extends UserJSONFunction {
@@ -121,16 +120,17 @@ class DeactivatePageJSONFunction extends PageJSONFunction {
 }
 
 // Page content functions
-class AddPageContentJSONFunction extends PageContentJSONFunction{
-  AddPageContentJSONFunction(String page_id, String id, String content): super('addPageContent'){
+
+class AddPageContentJSONFunction extends PageContentJSONFunction {
+  AddPageContentJSONFunction(String page_id, String id, String content): super('addPageContent') {
     this.arguments['page_id'] = page_id;
     this.arguments['id'] = id;
     this.arguments['content'] = content;
   }
 }
 
-class ListPageContentRevisionsJSONFunction extends PageContentJSONFunction{
-  ListPageContentRevisionsJSONFunction(String page_id, String id, {int from:0, int to:-1, bool includeContent:false}) : super('listPageContentRevisions'){
+class ListPageContentRevisionsJSONFunction extends PageContentJSONFunction {
+  ListPageContentRevisionsJSONFunction(String page_id, String id, {int from:0, int to:-1, bool includeContent:false}) : super('listPageContentRevisions') {
     this.arguments['page_id'] = page_id;
     this.arguments['id'] = id;
     this.arguments['from'] = from;
@@ -139,8 +139,8 @@ class ListPageContentRevisionsJSONFunction extends PageContentJSONFunction{
   }
 }
 
-class PageContentAtTimeJSONFunction extends PageContentJSONFunction{
-  PageContentAtTimeJSONFunction(String page_id, String id, int time) : super('pageContentAtTime'){
+class PageContentAtTimeJSONFunction extends PageContentJSONFunction {
+  PageContentAtTimeJSONFunction(String page_id, String id, int time) : super('pageContentAtTime') {
     this.arguments['page_id'] = page_id;
     this.arguments['id'] = id;
     this.arguments['time'] = time;
@@ -150,12 +150,13 @@ class PageContentAtTimeJSONFunction extends PageContentJSONFunction{
 //User privileges functions
 
 class AddUserPagePrivilegeJSONFunction extends UserPrivilegesJSONFunction {
-  AddUserPagePrivilegeJSONFunction(String username, String page_id):super('addUserPagePrivilege'){
+  AddUserPagePrivilegeJSONFunction(String username, String page_id):super('addUserPagePrivilege') {
     this.arguments['username'] = username;
     this.arguments['page_id'] = page_id;
   }
 }
-class RevokeUserPagePrivilegeJSONFunction extends UserPrivilegesJSONFunction{
+
+class RevokeUserPagePrivilegeJSONFunction extends UserPrivilegesJSONFunction {
   RevokeUserPagePrivilegeJSONFunction(String username, String page_id):super('revokeUserPagePrivilege') {
     this.arguments['username'] = username;
     this.arguments['page_id'] = page_id;
@@ -188,17 +189,33 @@ class ListUsersJSONFunction extends UsersJSONFunction {
 
 //File upload functions
 
-class UploadImageURIJSONFunction extends FileUploadJSONFunction{
-  UploadImageURIJSONFunction(String fileName, String data, [List<ImageTransform> sizes = null]): super('uploadImageURI'){
+class UploadImageURIJSONFunction extends FileUploadJSONFunction {
+  UploadImageURIJSONFunction(String fileName, String data, [List<ImageSizes> sizes = null]): super('uploadImageURI') {
     this.arguments['data'] = data;
     this.arguments['fileName'] = fileName;
     this.arguments['sizes'] = sizes;
   }
 }
 
+class EditImageJSONFunction extends FileUploadJSONFunction {
+  EditImageJSONFunction(String url, {bool mirrorVertical:false, mirrorHorizontal:false, cropW:null, cropH:null, cropX:null, cropY:null, int rotate:0, width:null, height:null}) : super('editImage'){
+    this.arguments['url'] = url;
+    this.arguments['mirrorVertical'] = mirrorVertical;
+    this.arguments['mirrorHorizontal'] = mirrorHorizontal;
+    this.arguments['cropX'] = cropX;
+    this.arguments['cropY'] = cropY;
+    this.arguments['cropW'] = cropW;
+    this.arguments['cropH'] = cropH;
+    this.arguments['rotate'] = rotate;
+    this.arguments['width'] = width;
+    this.arguments['height'] = height;
 
-class UploadFileURIJSONFunction extends FileUploadJSONFunction{
-  UploadFileURIJSONFunction(String fileName, String data): super('uploadFileURI'){
+  }
+}
+
+
+class UploadFileURIJSONFunction extends FileUploadJSONFunction {
+  UploadFileURIJSONFunction(String fileName, String data): super('uploadFileURI') {
     this.arguments['data'] = data;
     this.arguments['fileName'] = fileName;
   }
@@ -208,10 +225,10 @@ class UploadFileURIJSONFunction extends FileUploadJSONFunction{
 
 // Updater functions
 
-class CheckForSiteUpdatesJSONFunction extends UpdaterJSONFunction{
+class CheckForSiteUpdatesJSONFunction extends UpdaterJSONFunction {
   CheckForSiteUpdatesJSONFunction() : super('checkForUpdates');
 }
 
-class UpdateSiteJSONFunction extends UpdaterJSONFunction{
+class UpdateSiteJSONFunction extends UpdaterJSONFunction {
   UpdateSiteJSONFunction() : super('update');
 }

@@ -1,13 +1,13 @@
 part of core;
 
-class ImageTransform{
+class ImageSizes{
   final int maxHeight, maxWidth, minWidth, minHeight;
   final bool dataURI;
-  ImageTransform.atLeast(this.minWidth, this.minHeight, {bool dataURI:false}): maxWidth = -1, maxHeight = -1, this.dataURI = dataURI;
-  ImageTransform.atMost(this.maxWidth, this.maxHeight, {bool dataURI:false}): minWidth =-1,  minHeight = -1, this.dataURI = dataURI;
-  ImageTransform.exactHeight(int height, {bool dataURI:false}): maxHeight = height, minHeight = height, maxWidth = -1, minWidth = -1, this.dataURI = dataURI;
-  ImageTransform.exactWidth(int width, {bool dataURI:false}) : maxWidth = width, minWidth = width, maxHeight = minHeight = -1, this.dataURI = dataURI;
-  ImageTransform.exact(int width, int height, {bool dataURI:false}) : maxWidth = width, minWidth = width, maxHeight = height, minHeight = height, this.dataURI = dataURI;
+  ImageSizes.atLeast(this.minWidth, this.minHeight, {bool dataURI:false}): maxWidth = -1, maxHeight = -1, this.dataURI = dataURI;
+  ImageSizes.atMost(this.maxWidth, this.maxHeight, {bool dataURI:false}): minWidth =-1,  minHeight = -1, this.dataURI = dataURI;
+  ImageSizes.exactHeight(int height, {bool dataURI:false}): maxHeight = height, minHeight = height, maxWidth = -1, minWidth = -1, this.dataURI = dataURI;
+  ImageSizes.exactWidth(int width, {bool dataURI:false}) : maxWidth = width, minWidth = width, maxHeight = minHeight = -1, this.dataURI = dataURI;
+  ImageSizes.exact(int width, int height, {bool dataURI:false}) : maxWidth = width, minWidth = width, maxHeight = height, minHeight = height, this.dataURI = dataURI;
   Map<String, int> toJson() => {"maxHeight":maxHeight, "minHeight":minHeight, "maxWidth":maxWidth, "minWidth":minWidth, "dataURI":dataURI};
 }
 // TODO Replace all usage of this with Streams!
@@ -100,14 +100,14 @@ abstract class UploadStrategy{
 class AJAXImageURIUploadStrategy extends UploadStrategy{
 
   JSON.JSONClient _client;
-  List<ImageTransform> _sizes;
-  ImageTransform _size, _preview;
+  List<ImageSizes> _sizes;
+  ImageSizes _size, _preview;
 
-  AJAXImageURIUploadStrategy([ImageTransform size = null, ImageTransform preview = null]){
+  AJAXImageURIUploadStrategy([ImageSizes size = null, ImageSizes preview = null]){
     _size = size;
     _preview = preview;
     _sizes = [size, preview];
-    _sizes.removeWhere((ImageTransform s)=>s==null);
+    _sizes.removeWhere((ImageSizes s)=>s==null);
     filter = FILTER_IMAGE;
     _client = new JSON.AJAXJSONClient();
 

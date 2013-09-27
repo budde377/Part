@@ -63,3 +63,6 @@ class ESCQueue{
 
 
 ESCQueue get escQueue => new ESCQueue();
+
+
+BodyElement get body => query('body');

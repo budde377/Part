@@ -37,15 +37,16 @@ class CanvasHandler {
   void drawShape(CanvasShape shape) {
     doWithoutUpdate(() => shape.beforeDraw(this));
     var draw = () => shape.draw(_context);
-    var b1 = shape.rotation > 0, b2 = 0 ;
-    if (b1 || (b2 = shape.mirror) > 0) {
+    var b1 = shape.rotation != 0, b2 = shape.mirror;
+    if (b1 || b2 > 0) {
       _context.save();
       _context.translate(shape.rotateX, shape.rotateY);
+      if (b2 > 0) {
+        _context.scale(b2 == CanvasShape.MIRROR_VERTICAL || b2 == CanvasShape.MIRROR_BOTH ? -1 : 1, b2 == CanvasShape.MIRROR_HORIZONTAL || b2 == CanvasShape.MIRROR_BOTH ? -1 : 1);
+      }
+
       if (b1) {
         _context.rotate(shape.rotation);
-      }
-      if (b2 > 0) {
-        _context.scale(b2 == CanvasShape.MIRROR_VERTICAL ? -1 : 1, b2 == CanvasShape.MIRROR_HORIZONTAL ? -1 : 1);
       }
       _context.translate(-shape.rotateX, -shape.rotateY);
       draw();
@@ -151,6 +152,7 @@ class CanvasLayer {
       return;
     }
     _handler.removeLayer(this);
+    _handler = null;
   }
 
   CanvasShape shapeAt(num x, num y) => _shapes.reversed.firstWhere((CanvasShape sh) => sh.inShape(x, y), orElse:() => null);
@@ -165,6 +167,8 @@ abstract class CanvasShape {
   static const MIRROR_VERTICAL = 1;
 
   static const MIRROR_HORIZONTAL = 2;
+
+  static const MIRROR_BOTH = 3;
 
   num _x = 0, _y = 0, _mirror = 0, _rotate = 0, _rotateX = 0, _rotateY = 0;
 
@@ -214,7 +218,7 @@ abstract class CanvasShape {
 
   int get mirror => _mirror;
 
-  set mirror(int m) => doUpdate(() => _mirror = m % 3);
+  set mirror(int m) => doUpdate(() => _mirror = m % 4);
 
   void erase() {
     if (_layer == null) {
@@ -386,16 +390,27 @@ class ImageCanvasShape extends StrokeFillCanvasShape {
 
 
 class ImageCropCanvasShape extends StrokeFillCanvasShape {
+
+  final ImageCanvasShape image;
+
   RectCanvasShape _rect1, _rect2, _rect3, _rect4;
 
   CircleCanvasShape _dot1, _dot2, _dot3, _dot4;
 
-  int _width, _height, _oHeight, _oWidth;
+  int _width, _height, _cropX, _cropY, _cropW, _cropH;
 
   double _cx, _cy, _cw, _ch;
 
 
-  ImageCropCanvasShape() {
+  int get cropX => _cropX;
+  int get cropY => _cropY;
+  int get cropW => _cropW;
+  int get cropH => _cropH;
+
+
+  ImageCropCanvasShape(this.image) {
+    _width = image.width;
+    _height = image.height;
     _rect1 = new RectCanvasShape();
     _rect2 = new RectCanvasShape();
     _rect3 = new RectCanvasShape();
@@ -413,48 +428,61 @@ class ImageCropCanvasShape extends StrokeFillCanvasShape {
     _ch = height;
     _cy = y;
     _cx = x;
+    _layer.doWithoutUpdate(_updateCrop);
+    _layer.updateLayer();
   }
 
   void _updateCrop() {
-    var cropX = _cx * _width, cropWidth = _cw * _width, cropHeight = _ch * _height, cropY = _cy * _height;
+
+
+
+    var cx = (_cx * _width).toInt(),
+    cw = (_cw * _width).toInt(),
+    ch = (_ch * _height).toInt(),
+    cy = (_cy * _height).toInt();
+
+    if(cx < 0 || cy <0 || cw < 10 || ch < 10 || cw+cx > _width|| cy+ch > _height){
+      return;
+    }
+
+    _cropX = cx;
+    _cropY = cy;
+    _cropW = cw;
+    _cropH = ch;
+
     _rect1.x = x;
     _rect1.y = y;
-    _rect1.width = cropX;
+    _rect1.width = _cropX;
     _rect1.height = _height;
-    _rect2.x = x+ cropX;
-    _rect2.y = y+ 0;
-    _rect2.width = cropWidth;
-    _rect2.height = cropY;
-    _rect3.x = x+cropX + cropWidth;
+    _rect2.x = x + _cropX;
+    _rect2.y = y + 0;
+    _rect2.width = _cropW;
+    _rect2.height = _cropY;
+    _rect3.x = x + _cropX + _cropW;
     _rect3.y = y;
-    _rect3.width = _width - cropWidth;
+    _rect3.width = _width - (_cropW + _cropX);
     _rect3.height = _height;
-    _rect4.x = x+cropX;
-    _rect4.y = y+cropY + cropHeight;
-    _rect4.width = cropWidth;
-    _rect4.height = _height - cropY - cropHeight;
-    _dot1.x = x+cropX;
-    _dot1.y = y+cropY;
-    _dot2.x = x+cropX + cropWidth;
-    _dot2.y = y+cropY;
-    _dot3.x = x+cropX;
-    _dot3.y = y+cropY + cropHeight;
-    _dot4.x = x+cropX + cropWidth;
-    _dot4.y = y+cropY + cropHeight;
+    _rect4.x = x + _cropX;
+    _rect4.y = y + _cropY + _cropH;
+    _rect4.width = _cropW;
+    _rect4.height = _height - _cropY - _cropH;
+    _dot1.x = x + _cropX;
+    _dot1.y = y + _cropY;
+    _dot2.x = x + _cropX + _cropW;
+    _dot2.y = y + _cropY;
+    _dot3.x = x + _cropX;
+    _dot3.y = y + _cropY + _cropH;
+    _dot4.x = x + _cropX + _cropW;
+    _dot4.y = y + _cropY + _cropH;
   }
 
   void beforeDraw(CanvasHandler h) {
-    if(_height == null){
-      _height = h.height;
-      _width = h.width;
-
-    }
-
+    _height = image.height;
+    _width = image.width;
     rotateX = h.width / 2;
     rotateY = h.height / 2;
     y = (h.height - _height) / 2;
     x = (h.width - _width) / 2;
-
     _updateCrop();
   }
 
@@ -470,9 +498,12 @@ class ImageCropCanvasShape extends StrokeFillCanvasShape {
   }
 
   CanvasShape get dotNW => _dot1;
+
   CanvasShape get dotNE => _dot2;
-  CanvasShape get dotSE => _dot3;
-  CanvasShape get dotSW => _dot4;
+
+  CanvasShape get dotSW => _dot3;
+
+  CanvasShape get dotSE => _dot4;
 
   bool inShape(num x, num y) => _rect1.inShape(x, y) || _rect2.inShape(x, y) || _rect3.inShape(x, y) || _rect4.inShape(x, y) || _dot1.inShape(x, y) || _dot2.inShape(x, y) || _dot3.inShape(x, y) || _dot4.inShape(x, y);
 

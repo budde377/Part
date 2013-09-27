@@ -118,6 +118,7 @@ class LoadingDialog extends DialogBox{
 
 }
 
+
 class DialogContainer {
   static final _cache = new DialogContainer._internal();
 
@@ -137,6 +138,12 @@ class DialogContainer {
     _container.classes.add('container');
 
 
+  }
+
+  DialogBox dialog(Element element){
+    var dialog = new DialogBox(element);
+    addDialogBox(dialog);
+    return dialog;
   }
 
   ConfirmDialogBox confirm(String text) {

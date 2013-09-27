@@ -15,9 +15,12 @@ trait DateTimeTrait
     }
 
     protected function dayNumberToName($number){
-
+        $mod = $number-1%7;
+        while($mod< 0){
+            $mod +=7;
+        }
         $monthArray = array('mandag','tirsdag','onsdag','torsdag','fredag','lørdag','søndag');
-        return $monthArray[($number-1)%7];
+        return $monthArray[$mod];
     }
 
 
