@@ -31,6 +31,7 @@ interface JSONResponse extends JSONElement
     const ERROR_CODE_NOT_IMPLEMENTED = 17;
     const ERROR_CODE_CANT_EDIT_PAGE = 18;
     const ERROR_CODE_INVALID_FILE = 19;
+    const ERROR_CODE_FILE_NOT_FOUND = 20;
     /**
      * @return String
      */

@@ -245,6 +245,20 @@ abstract class CanvasShape {
   void beforeDraw(CanvasHandler h) {
   }
 
+  Position transformedCoordinates(num x, num y,  {num r, num rx, num ry}){
+
+
+    r = r == null? _rotate: r;
+    rx = rx == null? _rotateX : rx;
+    ry = ry == null? _rotateY : ry;
+
+    x -= rx;
+    y -= ry;
+
+    var xm = rx+(x*Math.cos(r) - y*Math.sin(r));
+    var ym = ry + (x*Math.sin(r) + y*Math.cos(r));
+    return new Position(x:xm, y:ym);
+  }
 
 }
 
@@ -310,7 +324,7 @@ class CircleCanvasShape extends StrokeFillCanvasShape {
     }
   }
 
-  bool inShape(num x, num y) => Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2)) <= _radius;
+  bool inShape(num x, num y)=> Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2)) <= _radius;
 
 }
 
@@ -358,9 +372,9 @@ class ImageCanvasShape extends StrokeFillCanvasShape {
 
   num _width, _height;
 
-  ImageCanvasShape(this.image) {
-    _width = image.clientWidth;
-    _height = image.clientHeight;
+  ImageCanvasShape(this.image,{int width, int height}) {
+    _width = width == null ? image.clientWidth:width;
+    _height = height == null ? image.clientHeight: height;
 
   }
 
@@ -428,13 +442,15 @@ class ImageCropCanvasShape extends StrokeFillCanvasShape {
     _ch = height;
     _cy = y;
     _cx = x;
-    _layer.doWithoutUpdate(_updateCrop);
-    _layer.updateLayer();
+    if(_layer == null){
+      _updateCrop();
+    } else {
+      _layer.doWithoutUpdate(_updateCrop);
+      _layer.updateLayer();
+    }
   }
 
   void _updateCrop() {
-
-
 
     var cx = (_cx * _width).toInt(),
     cw = (_cw * _width).toInt(),

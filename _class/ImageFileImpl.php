@@ -212,4 +212,50 @@ class ImageFileImpl extends FileImpl implements ImageFile
         $this->scaleToOuterBox($width, $height);
 
     }
+
+    /**
+     * @param $degree Double Number to rotate the image
+     * @return void
+     */
+    public function rotate($degree)
+    {
+        $this->updateInfo();
+        if($this->imagick == null){
+            return;
+        }
+        $this->imagick->rotateimage("#000000", $degree);
+        $this->imagick->writeimage($this->getAbsoluteFilePath());
+        $this->imagick = null;
+
+    }
+
+    /**
+     * Mirrors the image vertically
+     * @return void
+     */
+    public function mirrorVertical()
+    {
+        $this->updateInfo();
+        if($this->imagick == null){
+            return;
+        }
+        $this->imagick->flopimage();
+        $this->imagick->writeimage($this->getAbsoluteFilePath());
+        $this->imagick = null;
+    }
+
+    /**
+     * Mirrors the image
+     * @return void
+     */
+    public function mirrorHorizontal()
+    {
+        $this->updateInfo();
+        if($this->imagick == null){
+            return;
+        }
+        $this->imagick->flipimage();
+        $this->imagick->writeimage($this->getAbsoluteFilePath());
+        $this->imagick = null;
+    }
 }

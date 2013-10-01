@@ -368,6 +368,11 @@ class EditorFileContainer {
 
 }
 
+
+class ImagePropertiesEditImageContentJSONFunction extends EditImageJSONFunction {
+  ImagePropertiesEditImageContentJSONFunction(ImageEditProperties properties) : super(properties.url, mirrorHorizontal:properties.mirrorHorizontal, mirrorVertical:properties.mirrorVertical, cropW:properties.cropW, cropH:properties.cropH, cropX:properties.cropX, cropY:properties.cropY, rotate:properties.rotate, width:properties.width, height:properties.height);
+}
+
 class ImageEditorHandler {
   static final Map<ImageEditor, ImageEditorHandler> _cache = new Map<ImageEditor, ImageEditorHandler>();
 
@@ -432,12 +437,29 @@ class ImageEditorHandler {
 
     });
 
+    _save.onClick.listen((_) {
+      ajaxClient.callFunction(new ImagePropertiesEditImageContentJSONFunction(editor.properties)).then((JSONResponse response){
+        if(response.type != RESPONSE_TYPE_SUCCESS){
+          return;
+        }
+        editor.image.src = response.payload;
+
+      });
+
+    });
+
     _rcw.onClick.listen((_) => editor.rotate++);
     _rccw.onClick.listen((_) => editor.rotate--);
     _mirror_v.onClick.listen((_) => editor.mirrorVertical = !editor.mirrorVertical);
     _mirror_h.onClick.listen((_) => editor.mirrorHorizontal = !editor.mirrorHorizontal);
-    _crop.onClick.listen((_) => editor.hasCrop?editor.removeCrop():editor.setCrop(0.25, 0.25, 0.5, 0.5));
-    var inDot = (int x, int y) => editor.dotNW.inShape(x, y) ? 1 : (editor.dotNE.inShape(x, y) ? 2 : (editor.dotSE.inShape(x, y) ? 3 : (editor.dotSW.inShape(x, y) ? 4 : 0)));
+    _crop.onClick.listen((_) => editor.hasCrop ? editor.removeCrop() : editor.setCrop(0.25, 0.25, 0.5, 0.5));
+
+    var inDot = (num x, num y) {
+      var p = transformXY(x, y);
+      x = p.x;
+      y = p.y;
+      return editor.dotNW.inShape(x, y) ? 1 : (editor.dotNE.inShape(x, y) ? 2 : (editor.dotSE.inShape(x, y) ? 3 : (editor.dotSW.inShape(x, y) ? 4 : 0)));
+    };
     editor.canvas.onMouseMove.listen((MouseEvent ev) {
       if (inDot(ev.offsetX, ev.offsetY) > 0) {
         editor.canvas.classes.add("hover_dot");
@@ -452,18 +474,40 @@ class ImageEditorHandler {
       }
       var sub1, sub2;
       sub1 = document.onMouseMove.listen((MouseEvent ev) {
-        switch (dotN) {
+        var mx = ev.movementX, my = ev.movementY, w = editor.width, h = editor.height;
+
+
+        switch (editor.rotate) {
           case 1:
-            editor.setCrop((editor.cropX + ev.movementX) / editor.width, (editor.cropY + ev.movementY) / editor.height, (-ev.movementX + editor.cropW) / editor.width, (-ev.movementY + editor.cropH) / editor.height);
+            h = editor.width;
+            w = editor.height;
+            mx = ev.movementY;
+            my = -ev.movementX;
             break;
           case 2:
-            editor.setCrop(editor.cropX / editor.width, (editor.cropY + ev.movementY) / editor.height, (ev.movementX + editor.cropW) / editor.width, (-ev.movementY + editor.cropH) / editor.height);
+            mx = -ev.movementX;
+            my = -ev.movementY;
             break;
           case 3:
-            editor.setCrop(editor.cropX / editor.width, editor.cropY / editor.height, (ev.movementX + editor.cropW) / editor.width, (ev.movementY + editor.cropH) / editor.height);
+            h = editor.width;
+            w = editor.height;
+            mx = -ev.movementY;
+            my = ev.movementX;
+
+            break;
+        }
+        switch (dotN) {
+          case 1:
+            editor.setCrop((editor.cropX + mx) / w, (editor.cropY + my) / h, (-mx + editor.cropW) / w, (-my + editor.cropH) / h);
+            break;
+          case 2:
+            editor.setCrop(editor.cropX / w, (editor.cropY + my) / h, (mx + editor.cropW) / w, (-my + editor.cropH) / h);
+            break;
+          case 3:
+            editor.setCrop(editor.cropX / w, editor.cropY / h, (mx + editor.cropW) / w, (my + editor.cropH) / h);
             break;
           case 4:
-            editor.setCrop((editor.cropX + ev.movementX) / editor.width, editor.cropY / editor.height, (-ev.movementX + editor.cropW) / editor.width, (ev.movementY + editor.cropH) / editor.height);
+            editor.setCrop((editor.cropX + mx) / w, editor.cropY / h, (-mx + editor.cropW) / w, (my + editor.cropH) / h);
             break;
 
         }
@@ -478,12 +522,40 @@ class ImageEditorHandler {
     });
   }
 
+  Position transformXY(int x, int y) {
+    switch (editor.rotate) {
+      case 1:
+        var ym = y;
+        y = editor.width - x ;
+        x = ym ;
+        break;
+      case 2:
+
+        y = editor.height - y;
+        x = editor.width - x;
+        break;
+      case 3:
+        var ym = y;
+        y = x;
+        x = editor.height- ym;
+        break;
+    }
+    return new Position(x:x, y:y);
+  }
+
   void open() {
     _dialogBox = dialogContainer.dialog(_dialogElement);
     _dialogBox.onClose.listen((_) => close());
     body.append(_toolBar);
 
-    editor.setProperties(new ImageEditProperties.fromImageElement(editor.image));
+    if(editor.isReady){
+      editor.properties = new ImageEditProperties.fromImageElement(editor.image);
+    } else {
+      editor.onLoad.listen((_){
+        editor.properties = new ImageEditProperties.fromImageElement(editor.image);
+      });
+    }
+
 
   }
 
@@ -719,7 +791,7 @@ class ContentEditor {
 
 
   void _loadRevision(Revision rev) {
-    element.innerHtml = rev.content;
+    element.setInnerHtml(rev.content, treeSanitizer:nullNodeTreeSanitizer);
     _currentRevision = rev;
     _notifyChange();
 
@@ -744,7 +816,7 @@ class ContentEditor {
     _previewAnimation.stop();
     var hidePreview = true;
     if (content != null) {
-      _preview.innerHtml = content.content;
+      _preview.setInnerHtml(content.content, treeSanitizer:nullNodeTreeSanitizer);
       hidePreview = false;
     }
 

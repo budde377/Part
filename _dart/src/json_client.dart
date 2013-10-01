@@ -9,7 +9,11 @@ abstract class JSONClient {
 
 class AJAXJSONClient extends JSONClient {
 
-  AJAXJSONClient();
+  static final AJAXJSONClient _cached = new AJAXJSONClient._internal();
+
+  factory AJAXJSONClient() => _cached;
+
+  AJAXJSONClient._internal();
 
   Future<JSONResponse> _setUpRequest(HttpRequest request) {
     var completer = new Completer();
@@ -45,3 +49,8 @@ class AJAXJSONClient extends JSONClient {
   }
 
 }
+
+
+
+
+AJAXJSONClient get ajaxClient => new AJAXJSONClient();

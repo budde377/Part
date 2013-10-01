@@ -109,4 +109,24 @@ interface ImageFile extends File{
      * @return void
      */
     public function crop($x, $y, $width, $height);
+
+
+    /**
+     * @param $degree Double Number to rotate the image
+     * @return void
+     */
+    public function rotate($degree);
+
+    /**
+     * Mirrors the image vertically
+     * @return void
+     */
+    public function mirrorVertical();
+
+    /**
+     * Mirrors the image
+     * @return void
+     */
+    public function mirrorHorizontal();
+
 }

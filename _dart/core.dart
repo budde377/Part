@@ -22,7 +22,6 @@ int parsePx(String pxString) => int.parse(pxString.replaceAll(new RegExp("[^0-9]
 num linearAnimationFunction(double pct, num from, num to) => from + (to - from) * pct;
 
 
-
 String sizeToString(int bytes) {
   var s = (bytes <= 102 ? "${bytes} B" : (bytes < 1024 * 1024 / 10 ? "${bytes / 1024} KB" : "${bytes / (1024 * 1024)} MB"));
   var r = new RegExp("([0-9]+\.?[0-9]?[0-9]?)[^ ]*(.+)");
@@ -30,13 +29,12 @@ String sizeToString(int bytes) {
   return m[1] + m[2];
 }
 
-bool validMail(String string) => new RegExp(r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$',caseSensitive:false).hasMatch(string);
-bool nonEmpty(String string) => string.trim().length >0;
+bool validMail(String string) => new RegExp(r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$', caseSensitive:false).hasMatch(string);
+
+bool nonEmpty(String string) => string.trim().length > 0;
 
 
-
-
-class ESCQueue{
+class ESCQueue {
   static ESCQueue _cache = new ESCQueue._internal();
 
   List<Function> _queue = new List<Function>();
@@ -47,12 +45,12 @@ class ESCQueue{
 
 
   ESCQueue._internal(){
-    document.onKeyUp.listen((KeyboardEvent kev){
-      if(kev.keyCode != 27 || _queue.length == 0 || !enabled){
+    document.onKeyUp.listen((KeyboardEvent kev) {
+      if (kev.keyCode != 27 || _queue.length == 0 || !enabled) {
         return;
       }
 
-      while(_queue.length > 0 && !_queue.removeLast()()){
+      while (_queue.length > 0 && !_queue.removeLast()()) {
 
       }
     });
@@ -66,3 +64,35 @@ ESCQueue get escQueue => new ESCQueue();
 
 
 BodyElement get body => query('body');
+
+class NullTreeSanitizer implements NodeTreeSanitizer {
+  void sanitizeTree(Node node) {
+  }
+}
+
+
+NodeTreeSanitizer get nullNodeTreeSanitizer => new NullTreeSanitizer();
+
+
+class Position{
+
+  num _x, _y, _z;
+
+  Position({num x, num y, num z}){
+    _x = x;
+    _y = y;
+    _z = z;
+  }
+
+
+  num get x => _x;
+
+  num get y => _y;
+
+  num get z => _z;
+
+  String toString(){
+    return {"x":_x, "y":_y, "z":_z}.toString();
+  }
+
+}

@@ -48,7 +48,7 @@ class JSONServerImpl implements JSONServer
         $missingArguments = false;
         $endArgs = array();
         foreach($function->getArgs() as $key=>$arg){
-            $missingArguments = $missingArguments || !isset($args[$arg]);
+            $missingArguments = $missingArguments || !array_key_exists($arg, $args);
             if(!$missingArguments){
                 $endArgs[$key] = $args[$arg];
             }

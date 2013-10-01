@@ -241,6 +241,18 @@ class ImageFileImplTest extends PHPUnit_Framework_TestCase
     }
 
 
+    public function testRotateImageWillRotateImage(){
+        $this->imageFile->rotate(90);
+        $this->assertEquals(200, $this->imageFile->getWidth());
+        $this->assertEquals(300, $this->imageFile->getHeight());
+    }
+
+    public function testMirrorImage(){
+        $this->imageFile->mirrorHorizontal();
+        $this->imageFile->mirrorVertical();
+    }
+
+
     public function tearDown(){
         $this->imageFile->delete();
         $this->notImageFile->delete();
