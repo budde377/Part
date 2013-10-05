@@ -453,6 +453,9 @@ class ImageEditorHandler {
       if(editor == null){
         return;
       }
+      if(editor.dotNW == null){
+        return 0;
+      }
       return editor.dotNW.inShape(x, y) ? 1 : (editor.dotNE.inShape(x, y) ? 2 : (editor.dotSE.inShape(x, y) ? 3 : (editor.dotSW.inShape(x, y) ? 4 : 0)));
     };
     editor.canvas.onMouseMove.listen((MouseEvent ev) {
