@@ -118,3 +118,6 @@ class SavingBar{
     _progressBar.percentage = pct;
   }
 }
+
+
+SavingBar get savingBar => new SavingBar();
