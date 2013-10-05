@@ -84,6 +84,17 @@ class ImageEditProperties {
       "url":url, "cropW": cropW, "cropH":cropH, "cropX":cropX, "cropY":cropY, "rotate":rotate, "width":width, "height":height, "mirrorVertical":mirrorVertical, "mirrorHorizontal": mirrorHorizontal
   }.toString();
 
+  bool operator==(ImageEditProperties p) => p.url == url &&
+                                            p.cropW == cropW &&
+                                            p.cropH == cropH &&
+                                            p.cropX == cropX &&
+                                            p.cropY == cropY &&
+                                            p.rotate == rotate &&
+                                            p.width == width &&
+                                            p.height == height &&
+                                            p.mirrorHorizontal == mirrorHorizontal &&
+                                            p.mirrorVertical == mirrorVertical;
+
 }
 
 
@@ -303,23 +314,23 @@ class ImageEditor {
   }
 
 
-  int get cropX => _cropShape.cropX;
+  int get cropX => _cropShape == null?null:_cropShape.cropX;
 
-  int get cropY => _cropShape.cropY;
+  int get cropY => _cropShape == null?null:_cropShape.cropY;
 
-  int get cropW => _cropShape.cropW;
+  int get cropW => _cropShape == null?null:_cropShape.cropW;
 
-  int get cropH => _cropShape.cropH;
+  int get cropH => _cropShape == null?null:_cropShape.cropH;
 
   num _interval(num n, num min, num max) => Math.max(min, Math.min(max, n));
 
-  CanvasShape get dotNE => _cropShape.dotNE;
+  CanvasShape get dotNE => _cropShape == null?null:_cropShape.dotNE;
 
-  CanvasShape get dotNW => _cropShape.dotNW;
+  CanvasShape get dotNW => _cropShape == null?null:_cropShape.dotNW;
 
-  CanvasShape get dotSE => _cropShape.dotSE;
+  CanvasShape get dotSE => _cropShape == null?null:_cropShape.dotSE;
 
-  CanvasShape get dotSW => _cropShape.dotSW;
+  CanvasShape get dotSW => _cropShape == null?null:_cropShape.dotSW;
 
 /*  CanvasShape get dotNE => rotate == 0? _cropShape.dotNE:(rotate==1?_cropShape.dotNW:(rotate==2?_cropShape.dotSW:_cropShape.dotSE));
   CanvasShape get dotNW => rotate == 0? _cropShape.dotNW:(rotate==1?_cropShape.dotSW:(rotate==2?_cropShape.dotSE:_cropShape.dotNE));

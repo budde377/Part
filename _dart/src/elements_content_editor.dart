@@ -378,19 +378,28 @@ class ImageEditorHandler {
 
   ButtonElement _rcw = new ButtonElement(), _rccw = new ButtonElement(), _mirror_v = new ButtonElement(), _mirror_h = new ButtonElement(), _zoom_in = new ButtonElement(), _zoom_out = new ButtonElement(), _crop = new ButtonElement(), _save = new ButtonElement();
 
-  DivElement _toolBar = new DivElement(), _dialogElement = new DivElement();
+  DivElement _toolBar = new DivElement(), _dialogElement = new DivElement(), _savingBar = new DivElement();
 
   DialogBox _dialogBox;
 
   final ImageEditor editor;
 
+  bool _saving = false;
+
+  StreamController<ImageEditProperties> _editStreamController = new StreamController<ImageEditProperties>();
+  Stream<ImageEditProperties> _stream;
+
   factory ImageEditorHandler(ImageEditor ie) => _cache.putIfAbsent(ie, () => new ImageEditorHandler._internal(ie));
 
   factory ImageEditorHandler.fromImage(ImageElement elm) => new ImageEditorHandler(new ImageEditor(elm));
 
+  ImageEditProperties _properties;
+
   ImageEditorHandler._internal(this.editor) {
     var wrapper = new DivElement();
+    _savingBar.classes.add("saving_bar");
     _dialogElement.append(editor.canvas);
+    _dialogElement.append(_savingBar);
     _toolBar.classes.add('image_edit_tool_bar');
     _toolBar.append(wrapper);
     _dialogElement.classes.add('edit_image_popup');
@@ -406,6 +415,9 @@ class ImageEditorHandler {
     wrapper..append(_rcw)..append(_rccw)..append(_mirror_v)..append(_mirror_h)..append(_zoom_in)..append(_zoom_out)..append(_crop)..append(_save);
     _setUpListeners();
   }
+
+
+  Stream<ImageEditProperties> get onEdit => _stream == null?_stream = _editStreamController.stream.asBroadcastStream():_stream;
 
   void _setUpListeners() {
     editor.canvas.onMouseWheel.listen((WheelEvent we) {
@@ -438,12 +450,25 @@ class ImageEditorHandler {
     });
 
     _save.onClick.listen((_) {
-      ajaxClient.callFunction(new ImagePropertiesEditImageContentJSONFunction(editor.properties)).then((JSONResponse response){
+      var p = editor.properties;
+
+      if(_properties == null || p == _properties || _saving){
+        return;
+      }
+      var pb = new ProgressBar();
+      pb.percentage = 0;
+      _savingBar.append(pb.bar);
+      _saving = true;
+      ajaxClient.callFunction(new ImagePropertiesEditImageContentJSONFunction(p)).then((JSONResponse response){
         if(response.type != RESPONSE_TYPE_SUCCESS){
           return;
         }
+        pb.percentage = 1;
+        var t = new Timer(new Duration(milliseconds:500), ()=>pb.bar.remove());
         editor.image.src = response.payload;
-
+        _properties = p;
+        _saving = false;
+        _editStreamController.add(p);
       });
 
     });
@@ -458,6 +483,9 @@ class ImageEditorHandler {
       var p = transformXY(x, y);
       x = p.x;
       y = p.y;
+      if(editor == null){
+        return;
+      }
       return editor.dotNW.inShape(x, y) ? 1 : (editor.dotNE.inShape(x, y) ? 2 : (editor.dotSE.inShape(x, y) ? 3 : (editor.dotSW.inShape(x, y) ? 4 : 0)));
     };
     editor.canvas.onMouseMove.listen((MouseEvent ev) {
@@ -498,7 +526,10 @@ class ImageEditorHandler {
         }
         switch (dotN) {
           case 1:
-            editor.setCrop((editor.cropX + mx) / w, (editor.cropY + my) / h, (-mx + editor.cropW) / w, (-my + editor.cropH) / h);
+            editor.setCrop((editor.cropX + mx) / w,
+                           (editor.cropY + my) / h,
+                           (-mx + editor.cropW) / w,
+                           (-my + editor.cropH) / h);
             break;
           case 2:
             editor.setCrop(editor.cropX / w, (editor.cropY + my) / h, (mx + editor.cropW) / w, (-my + editor.cropH) / h);
@@ -549,10 +580,10 @@ class ImageEditorHandler {
     body.append(_toolBar);
 
     if(editor.isReady){
-      editor.properties = new ImageEditProperties.fromImageElement(editor.image);
+      _properties = editor.properties = new ImageEditProperties.fromImageElement(editor.image);
     } else {
       editor.onLoad.listen((_){
-        editor.properties = new ImageEditProperties.fromImageElement(editor.image);
+        _properties = editor.properties = new ImageEditProperties.fromImageElement(editor.image);
       });
     }
 
@@ -623,6 +654,9 @@ class LinkImageHandler {
       var handler = new ImageEditorHandler.fromImage(_foundImage);
       handler.editor.maxWidth = editor.element.clientWidth;
       handler.open();
+      handler.onEdit.listen((ImageEditProperties p){
+        editor.element.dispatchEvent(new Event("input"));
+      });
 
     });
 
