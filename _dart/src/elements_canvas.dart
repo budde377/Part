@@ -452,12 +452,14 @@ class ImageCropCanvasShape extends StrokeFillCanvasShape {
 
   void _updateCrop() {
 
-    var cx = (_cx * _width).toInt(),
-    cw = (_cw * _width).toInt(),
-    ch = (_ch * _height).toInt(),
-    cy = (_cy * _height).toInt();
+    var cx = (_cx * _width).floor(),
+    cy = (_cy * _height).floor();
+    var cw = Math.min((_cw * _width).floor(), _width-cx),
+    ch = Math.min((_ch * _height).floor(), _height-cy);
 
-    if(cx < 0 || cy <0 || cw < 10 || ch < 10 || cw+cx > _width|| cy+ch > _height){
+
+
+    if(cx < 0 || cy <0 || cw < 10 || ch < 10 || cx >= _width-10 || cy>= _height-10){
       return;
     }
 
