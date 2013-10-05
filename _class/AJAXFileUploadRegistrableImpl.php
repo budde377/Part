@@ -98,7 +98,7 @@ class AJAXFileUploadRegistrableImpl implements Registrable
             $file->write($rd);
 
             $response = new JSONResponseImpl();
-            $response->setPayload(array('path' => "/_files/" . $file->getBaseName()));
+            $response->setPayload(array('path' => "/_files/" . $file->getRelativeFilePathTo($folder->getParentFolder()->getAbsolutePath())));
             return $response;
         }, array('fileName', 'data')));
 
