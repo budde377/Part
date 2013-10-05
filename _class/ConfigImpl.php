@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../_interface/Config.php';
-require_once dirname(__FILE__) . '/../_class/FileImpl.php';
+require_once dirname(__FILE__) . '/FileImpl.php';
 require_once dirname(__FILE__) . '/../_exception/InvalidXMLException.php';
 
 /**

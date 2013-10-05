@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__).'/../_interface/JSONObjectTranslator.php';
-require_once dirname(__FILE__).'/../_class/PageJSONObjectImpl.php';
+require_once dirname(__FILE__).'/PageJSONObjectImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

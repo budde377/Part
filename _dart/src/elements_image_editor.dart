@@ -28,20 +28,20 @@ class ImageEditProperties {
       var vars = m[2].split("_");
       vars.removeWhere((String s) => s.isEmpty);
       switch (m[1]) {
-        case "S":
+        case 'S':
           _width = int.parse(vars[0]);
           _height = int.parse(vars[1]);
           break;
-        case "C":
+        case 'C':
           _cropX = int.parse(vars[0]);
           _cropY = int.parse(vars[1]);
           _cropW = int.parse(vars[2]);
           _cropH = int.parse(vars[3]);
           break;
-        case "R":
+        case 'R':
           _rotate = int.parse(vars[0]);
           break;
-        case "M":
+        case 'M':
           _mirrorHorizontal = int.parse(vars[0]) > 0;
           _mirrorVertical = int.parse(vars[1]) > 0;
           break;
@@ -84,7 +84,7 @@ class ImageEditProperties {
       "url":url, "cropW": cropW, "cropH":cropH, "cropX":cropX, "cropY":cropY, "rotate":rotate, "width":width, "height":height, "mirrorVertical":mirrorVertical, "mirrorHorizontal": mirrorHorizontal
   }.toString();
 
-  bool operator==(ImageEditProperties p) => p.url == url &&
+  bool operator==(ImageEditProperties p) => (p.url.length < url.length? url.endsWith(p.url): p.url.endsWith(url)) &&
                                             p.cropW == cropW &&
                                             p.cropH == cropH &&
                                             p.cropX == cropX &&
@@ -332,11 +332,239 @@ class ImageEditor {
 
   CanvasShape get dotSW => _cropShape == null?null:_cropShape.dotSW;
 
-/*  CanvasShape get dotNE => rotate == 0? _cropShape.dotNE:(rotate==1?_cropShape.dotNW:(rotate==2?_cropShape.dotSW:_cropShape.dotSE));
-  CanvasShape get dotNW => rotate == 0? _cropShape.dotNW:(rotate==1?_cropShape.dotSW:(rotate==2?_cropShape.dotSE:_cropShape.dotNE));
-  CanvasShape get dotSE => rotate == 0? _cropShape.dotSE:(rotate==1?_cropShape.dotNE:(rotate==2?_cropShape.dotNW:_cropShape.dotSW));
-  CanvasShape get dotSW => rotate == 0? _cropShape.dotSW:(rotate==1?_cropShape.dotSE:(rotate==2?_cropShape.dotNE:_cropShape.dotNW));
-*/
+}
+
+
+
+class ImageEditorHandler {
+  static final Map<ImageEditor, ImageEditorHandler> _cache = new Map<ImageEditor, ImageEditorHandler>();
+
+  ButtonElement _rcw = new ButtonElement(), _rccw = new ButtonElement(), _mirror_v = new ButtonElement(), _mirror_h = new ButtonElement(), _zoom_in = new ButtonElement(), _zoom_out = new ButtonElement(), _crop = new ButtonElement(), _save = new ButtonElement();
+
+  DivElement _toolBar = new DivElement(), _dialogElement = new DivElement(), _savingBar = new DivElement();
+
+  DialogBox _dialogBox;
+
+  final ImageEditor editor;
+
+  bool _saving = false;
+
+  StreamController<ImageEditProperties> _editStreamController = new StreamController<ImageEditProperties>();
+  Stream<ImageEditProperties> _stream;
+
+  factory ImageEditorHandler(ImageEditor ie) => _cache.putIfAbsent(ie, () => new ImageEditorHandler._internal(ie));
+
+  factory ImageEditorHandler.fromImage(ImageElement elm) => new ImageEditorHandler(new ImageEditor(elm));
+
+  ImageEditProperties _properties;
+
+  ImageEditorHandler._internal(this.editor) {
+    var wrapper = new DivElement();
+    _savingBar.classes.add("saving_bar");
+    _dialogElement.append(editor.canvas);
+    _dialogElement.append(_savingBar);
+    _toolBar.classes.add('image_edit_tool_bar');
+    _toolBar.append(wrapper);
+    _dialogElement.classes.add('edit_image_popup');
+    _rcw.classes.add('rotate_cw');
+    _rccw.classes.add('rotate_ccw');
+    _mirror_v.classes.add('mirror_v');
+    _mirror_h.classes.add('mirror_h');
+    _zoom_in.classes.add('zoom_in');
+    _zoom_out.classes.add('zoom_out');
+    _crop.classes.add('crop');
+    _save.classes.add('save');
+
+    wrapper..append(_rcw)..append(_rccw)..append(_mirror_v)..append(_mirror_h)..append(_zoom_in)..append(_zoom_out)..append(_crop)..append(_save);
+    _setUpListeners();
+  }
+
+
+  Stream<ImageEditProperties> get onEdit => _stream == null?_stream = _editStreamController.stream.asBroadcastStream():_stream;
+
+  void _setUpListeners() {
+    editor.canvas.onMouseWheel.listen((WheelEvent we) {
+      editor.width += (we.deltaY > 0 ? 1 : -1) * 2;
+      we.cancelBubble = true;
+      we.preventDefault();
+    });
+    var t;
+    _zoom_in.onMouseDown.listen((_) {
+      t = new Timer.periodic(new Duration(milliseconds:1), (_) {
+        editor.width++;
+      });
+      var sub1;
+      sub1 = document.onMouseUp.listen((_) {
+        sub1.cancel();
+        t.cancel();
+      });
+    });
+
+    _zoom_out.onMouseDown.listen((_) {
+      t = new Timer.periodic(new Duration(milliseconds:1), (_) {
+        editor.width--;
+      });
+      var sub1;
+      sub1 = document.onMouseUp.listen((_) {
+        sub1.cancel();
+        t.cancel();
+      });
+
+    });
+
+    _save.onClick.listen((_) {
+      var p = editor.properties;
+
+      if(_properties == null || p == _properties || _saving){
+        return;
+      }
+      var pb = new ProgressBar();
+      pb.percentage = 0;
+      _savingBar.append(pb.bar);
+      _savingBar.classes.add("saving");
+      _saving = true;
+      ajaxClient.callFunction(new ImagePropertiesEditImageContentJSONFunction(p)).then((JSONResponse response){
+        if(response.type != RESPONSE_TYPE_SUCCESS){
+          return;
+        }
+        pb.percentage = 1;
+        var t = new Timer(new Duration(milliseconds:500), (){
+          _savingBar.classes.remove("saving");
+          pb.bar.remove();
+        });
+        editor.image.src = response.payload;
+        _properties = p;
+        _saving = false;
+        _editStreamController.add(p);
+      });
+
+    });
+
+    _rcw.onClick.listen((_) => editor.rotate++);
+    _rccw.onClick.listen((_) => editor.rotate--);
+    _mirror_v.onClick.listen((_) => editor.mirrorVertical = !editor.mirrorVertical);
+    _mirror_h.onClick.listen((_) => editor.mirrorHorizontal = !editor.mirrorHorizontal);
+    _crop.onClick.listen((_) => editor.hasCrop ? editor.removeCrop() : editor.setCrop(0.25, 0.25, 0.5, 0.5));
+
+    var inDot = (num x, num y) {
+      var p = transformXY(x, y);
+      x = p.x;
+      y = p.y;
+      if(editor == null){
+        return;
+      }
+      return editor.dotNW.inShape(x, y) ? 1 : (editor.dotNE.inShape(x, y) ? 2 : (editor.dotSE.inShape(x, y) ? 3 : (editor.dotSW.inShape(x, y) ? 4 : 0)));
+    };
+    editor.canvas.onMouseMove.listen((MouseEvent ev) {
+      if (inDot(ev.offsetX, ev.offsetY) > 0) {
+        editor.canvas.classes.add("hover_dot");
+      } else {
+        editor.canvas.classes.remove("hover_dot");
+      }
+    });
+    editor.canvas.onMouseDown.listen((MouseEvent ev) {
+      var dotN;
+      if ((dotN = inDot(ev.offsetX, ev.offsetY)) == 0) {
+        return ;
+      }
+      var sub1, sub2;
+      sub1 = document.onMouseMove.listen((MouseEvent ev) {
+        var mx = ev.movementX, my = ev.movementY, w = editor.width, h = editor.height;
+
+
+        switch (editor.rotate) {
+          case 1:
+            h = editor.width;
+            w = editor.height;
+            mx = ev.movementY;
+            my = -ev.movementX;
+            break;
+          case 2:
+            mx = -ev.movementX;
+            my = -ev.movementY;
+            break;
+          case 3:
+            h = editor.width;
+            w = editor.height;
+            mx = -ev.movementY;
+            my = ev.movementX;
+
+            break;
+        }
+        switch (dotN) {
+          case 1:
+            editor.setCrop((editor.cropX + mx) / w,
+            (editor.cropY + my) / h,
+            (-mx + editor.cropW) / w,
+            (-my + editor.cropH) / h);
+            break;
+          case 2:
+            editor.setCrop(editor.cropX / w, (editor.cropY + my) / h, (mx + editor.cropW) / w, (-my + editor.cropH) / h);
+            break;
+          case 3:
+            editor.setCrop(editor.cropX / w, editor.cropY / h, (mx + editor.cropW) / w, (my + editor.cropH) / h);
+            break;
+          case 4:
+            editor.setCrop((editor.cropX + mx) / w, editor.cropY / h, (-mx + editor.cropW) / w, (my + editor.cropH) / h);
+            break;
+
+        }
+
+      });
+
+      sub2 = document.onMouseUp.listen((MouseEvent ev) {
+        sub1.cancel();
+        sub2.cancel();
+      });
+
+    });
+  }
+
+  Position transformXY(int x, int y) {
+    switch (editor.rotate) {
+      case 1:
+        var ym = y;
+        y = editor.width - x ;
+        x = ym ;
+        break;
+      case 2:
+
+        y = editor.height - y;
+        x = editor.width - x;
+        break;
+      case 3:
+        var ym = y;
+        y = x;
+        x = editor.height- ym;
+        break;
+    }
+    return new Position(x:x, y:y);
+  }
+
+  void open() {
+    _dialogBox = dialogContainer.dialog(_dialogElement);
+    _dialogBox.onClose.listen((_) => close());
+    body.append(_toolBar);
+
+    if(editor.isReady){
+      _properties = editor.properties = new ImageEditProperties.fromImageElement(editor.image);
+    } else {
+      editor.onLoad.listen((_){
+        _properties = editor.properties = new ImageEditProperties.fromImageElement(editor.image);
+      });
+    }
+
+
+  }
+
+  void close() {
+    if (_dialogBox == null) {
+      return;
+    }
+    _toolBar.remove();
+
+    _dialogBox = null;
+  }
 
 
 }

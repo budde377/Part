@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__).'/../_interface/JSONServer.php';
-require_once dirname(__FILE__).'/../_class/JSONResponseImpl.php';
+require_once dirname(__FILE__).'/JSONResponseImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

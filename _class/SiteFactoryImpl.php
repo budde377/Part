@@ -1,6 +1,6 @@
 <?php
-require_once dirname(__FILE__) . '/../_class/ScriptChainImpl.php';
-require_once dirname(__FILE__) . '/../_class/BackendSingletonContainerImpl.php';
+require_once dirname(__FILE__) . '/ScriptChainImpl.php';
+require_once dirname(__FILE__) . '/BackendSingletonContainerImpl.php';
 require_once dirname(__FILE__) . '/../_interface/SiteFactory.php';
 require_once dirname(__FILE__) . '/../_exception/FileNotFoundException.php';
 require_once dirname(__FILE__) . '/../_exception/ClassNotDefinedException.php';

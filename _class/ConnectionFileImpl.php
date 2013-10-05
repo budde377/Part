@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) .'/../_class/ConnectionFolderImpl.php';
+require_once dirname(__FILE__) .'/ConnectionFolderImpl.php';
 require_once dirname(__FILE__) . '/../_interface/File.php';
 require_once dirname(__FILE__) . '/../_trait/FileTrait.php';
 /**

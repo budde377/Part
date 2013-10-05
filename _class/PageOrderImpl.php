@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../_interface/PageOrder.php';
 require_once dirname(__FILE__) . '/../_interface/Observer.php';
-require_once dirname(__FILE__) . '/../_class/PageImpl.php';
+require_once dirname(__FILE__) . '/PageImpl.php';
 require_once dirname(__FILE__) . '/../_exception/MalformedParameterException.php';
 
 /**
