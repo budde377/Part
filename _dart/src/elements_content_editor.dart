@@ -558,6 +558,7 @@ class ContentEditor {
 
   }
 
+
   Stream<bool> get onChange => _onContentChangeStream == null ? _onContentChangeStream = _onContentChangeStreamController.stream.asBroadcastStream() : _onContentChangeStream;
 
   Stream<bool> get onOpenChange => _onOpenChangeStream == null ? _onOpenChangeStream = _onOpenChangeStreamController.stream.asBroadcastStream() : _onOpenChangeStream;
@@ -1226,8 +1227,21 @@ class ContentEditor {
         }, "insert_link":{
             "title":"Indsæt link", "selChange":null, "func":dialogLink
         }, "no_format":{
-            "title":"Fjern formatering", "selChange":null, "func":() => executor.removeFormat()
-        }
+            "title":"Fjern formatering", "selChange":null, "func":() {
+              var selection = window.getSelection();
+              var range = selection.getRangeAt(0);
+              var commonAncestor = range.commonAncestorContainer;
+              if(!(commonAncestor is Element)){
+                return;
+              }
+              commonAncestor.queryAll("*").forEach((Element elm){
+                if(!selection.containsNode(elm, false)){
+                  return;
+                }
+                elm.attributes.remove("style");
+              });
+              executor.removeFormat();
+        }}
     };
 
     textIconMap.forEach((String k, Map<String, dynamic> v) {
