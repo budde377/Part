@@ -328,6 +328,7 @@ class CircleCanvasShape extends StrokeFillCanvasShape {
 
 }
 
+
 class RectCanvasShape extends StrokeFillCanvasShape {
 
 
