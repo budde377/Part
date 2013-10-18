@@ -125,6 +125,20 @@ class AJAXUserRegistrableImpl implements Registrable{
                 } else if ($privileges == 'site') {
                     $p->addSitePrivileges();
                 }
+                // SEND MAIL TO USER
+                $m = new MailImpl();
+                $m->addReceiver($user);
+                $m->setMailType(Mail::MAIL_TYPE_PLAIN);
+                $m->setSubject("Du er blevet oprettet som bruger på {$_SERVER['HTTP_HOST']}");
+                $m->setMessage("Hej,
+                Du er blevet oprettet som bruger på {$_SERVER['HTTP_HOST']}.
+                Du kan logge ind med følgende oplysninger:
+
+                    Brugernavn: {$user->getUsername()}
+                    Kodeord:    $password
+
+                Vh
+                Admin Jensen");
                 $response = new JSONResponseImpl();
                 $response->setPayload($userTranslator->encode($user));
                 return $response;
