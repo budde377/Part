@@ -59,7 +59,6 @@ class UserSettingsPageElementImpl implements PageElement
         $this->editUserPageElement = new UserSettingsEditUserPageElementImpl($this->container);
         $this->editUsersPageElement = new UserSettingsEditUsersPageElementImpl($this->container);
         $this->updateWebsitePageElement = new UserSettingsUpdateWebsitePageElementImpl($this->container);
-
         $cssRegister = $this->container->getCSSRegisterInstance();
         $cssRegister->registerCSSFile(new CSSFileImpl(dirname(__FILE__) . '/../_css/userSettingsStyle.css'));
     }

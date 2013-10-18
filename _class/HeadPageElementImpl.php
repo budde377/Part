@@ -32,20 +32,20 @@ class HeadPageElementImpl implements PageElement
         $cssFiles = $this->cssRegister->getRegisteredFiles();
         foreach($cssFiles as $file){
             /** @var $file CSSFile */
-            $path = $file->getRelativeFilePathTo(dirname(__FILE__)."/../");
+            $path = $file->getRelativeFilePathTo(dirname(__FILE__)."/../../");
             $output .= "<link href='/$path' rel='stylesheet' type='text/css' /> \r\n";
         }
         $jsFiles = $this->jsRegister->getRegisteredFiles();
         foreach($jsFiles as $file){
             /** @var $file JSFile */
-            $path = $file->getRelativeFilePathTo(dirname(__FILE__)."/../");
+            $path = $file->getRelativeFilePathTo(dirname(__FILE__)."/../../");
             $output .= "<script type='text/javascript' src='/$path'></script> \r\n";
 
         }
         $dartFiles = $this->dartRegister->getRegisteredFiles();
         foreach($dartFiles as $file){
             /** @var $file DartFile */
-           $path = $file->getRelativeFilePathTo(dirname(__FILE__).'/../');
+           $path = $file->getRelativeFilePathTo(dirname(__FILE__).'/../../');
            $output .= "<script type='application/dart' src='/$path'></script>\r\n";
         }
         return $output;

@@ -1,0 +1,464 @@
+#UserSettingsContainer {
+    position: relative;
+    top: 0;
+    z-index: 101;
+    height: 0;
+    border-bottom: 5px solid #656565;
+    background: #CECECE;
+    overflow: hidden;
+    color: #000;
+
+}
+
+#UserSettingsContainer.expanded {
+    height: auto;
+}
+
+#UserSettingsContainer h2 {
+    font-family: BebasNeueRegular, Impact, Charcoal, sans-serif;
+    font-size: 30px;
+    float: left;
+    width: 860px;
+    border-bottom: 1px solid #aaa;
+    padding-left: 10px;
+
+}
+
+#UserSettingsContainer h3 {
+    font-family: BebasNeueRegular, Impact, Charcoal, sans-serif;
+    font-size: 20px;
+    padding: 10px 0 5px 0;
+    float: left;
+    width: 100%;
+}
+
+#UserSettingsContent {
+    width: 880px;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+
+}
+
+#UserSettingsContent > ul > li > *:not(h2) {
+    margin-left: 10px;
+}
+
+#UserSettingsContent > ul > li.inactive{
+    position: relative;
+}
+
+#UserSettingsContent > ul > li.inactive > *:not(.inactiveFilter){
+    opacity: 0.2;
+}
+#UserSettingsContent > ul > li.inactive > .inactiveFilter{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 110;
+    cursor: default;
+}
+
+
+#UserSettingsContent >  ul {
+    width: 5280px;
+    list-style-type: none;
+    float: left;
+
+}
+
+#UserSettingsContent input:not([type=submit]):not([type=radio]) {
+    width: 250px;
+}
+
+#UserSettingsContent .better_select_select {
+    width: 262px;
+}
+
+#UserSettingsContent > ul > li {
+    width: 880px;
+    float: left;
+    padding-bottom: 20px;
+}
+
+#UserSettingsContent > ul > li span.hidden {
+    display: none;
+}
+
+#UserSettingsContent > ul {
+    list-style-type: none;
+}
+
+#UserSettingsContent ul.colorList {
+    width: 550px;
+    margin-right: 330px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+}
+
+#UserSettingsContent ul.colorList li > .activate {
+    color: #2f5377;
+}
+
+#UserSettingsContent p.text{
+    float: left;
+    margin-top: 20px;
+    width: 600px;
+}
+
+#UserSettingsContent div.update_site_container{
+    float: left;
+    width: 870px;
+}
+
+
+#ActiveListPath {
+    float: left;
+    width: 550px;
+    background: rgb(219, 219, 219);
+    padding: 0;
+    font-size: 8pt;
+    margin-bottom: 5px;
+    color: rgb(0, 88, 138);
+}
+
+#ActiveListPath > .dot {
+    cursor: pointer;
+    width: 4px;
+    height: 4px;
+    display: block;
+    float: left;
+    padding: 0;
+    margin: 7px 8px 7px 8px;
+    border-radius: 3px;
+    border: 1px solid rgb(7, 51, 117);
+    background: transparent;
+}
+
+#ActiveListPath > .arrow {
+    border: 4px solid #000;
+    float: left;
+    width: 0;
+    height: 0;
+    border-color: transparent transparent transparent rgb(119, 119, 119);
+    margin: 6px 4px 6px 8px;
+}
+
+#ActiveListPath > .file {
+    color: rgb(10, 14, 114);
+    text-decoration: none;
+    padding: 0 5px;
+    font-style: normal;
+    cursor: pointer;
+}
+
+#UserSettingsContent .desc {
+    float: left;
+    width: 550px;
+    color: #333;
+    padding: 0 330px 10px 0;
+}
+
+#UserSettingsContent form {
+    float: left;
+    padding-bottom: 20px;
+}
+
+#UserSettingsContent .desc > .help {
+    display: none;
+}
+
+#UserSettingsContractLink {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    background: #BC4040 url(/_img/close_x_icon.png) scroll no-repeat center center;
+    border-left: 1px solid rgb(163, 163, 163);
+    cursor: pointer;
+}
+
+#UserSettingsContractLink:hover {
+    background-color: #d84343;;
+}
+
+#UserSettingsMenu {
+    height: 40px;
+    width: 100%;
+    background: #8e8e8e;
+    margin-bottom: 12px;
+}
+
+#UserSettingsMenu ul {
+    list-style-type: none;
+
+}
+
+#UserSettingsMenu li {
+    float: left;
+    width: 100px;
+    height: 40px;
+    overflow: hidden;
+    background: #656565 url(/_img/login_user_menu_icons_vertical.png) no-repeat scroll center -275px;
+    border-right: 1px solid #a9a9a9;
+    cursor: pointer;
+    -webkit-transition:background-color 0.1s;
+    transition:background-color 0.1s;
+}
+
+#UserSettingsMenu li.active, #UserSettingsMenu li:hover {
+    background-color: rgb(63, 63, 63);
+}
+
+#UserSettingsMenu li.pages {
+    background-position: center -235px;
+}
+
+#UserSettingsMenu li.users {
+    background-position: center -315px;
+}
+
+#UserSettingsMenu li.user {
+    background-position: center -355px;
+}
+
+#UserSettingsMenu li.update_site{
+    background-position: center -395px;
+}
+
+#UserSettingsMenu li.mail{
+    background-position: center -435px;
+}
+
+#UserSettingsMenu li.page.active {
+    background-position: center -35px;
+}
+
+#UserSettingsMenu li.pages.active {
+    background-position: center 5px;
+}
+
+#UserSettingsMenu li.users.active {
+    background-position: center -75px;
+}
+
+#UserSettingsMenu li.user.active {
+    background-position: center -115px;
+}
+
+#UserSettingsMenu li.update_site.active{
+    background-position: center -155px;
+}
+
+#UserSettingsMenu li.mail.active{
+    background-position: center -195px;
+}
+
+form.verticalAlignForm, form.justDistribution {
+    width: 550px;
+}
+
+form.verticalAlignForm > div, form.justDistribution > div {
+    float: left;
+}
+
+form.verticalAlignForm > div:nth-of-type(n+2) {
+    float: right;
+}
+
+form.verticalAlignForm > div:last-child, form.justDistribution > div:last-child {
+    float: left;
+    width: 100%;
+}
+
+form.justDistribution > div:nth-of-type(2n+2) {
+    float: right;
+}
+
+#UserSettingsExpandLink {
+    background: #253977 url("/_img/settings_arrow.png") scroll no-repeat bottom center;
+    width: 46px;
+    height: 60px;
+    position: absolute;
+    top: 0;
+    left: 40px;
+    cursor: pointer;
+    z-index: 100;
+}
+
+#LoginUserMessage {
+    text-align: right;
+    position: absolute;
+    z-index: 99;
+    right: 20px;
+    line-height: 30px;
+}
+
+form.oneLineForm {
+    min-width: 550px;
+
+}
+
+form.oneLineForm > div {
+    float: left;
+}
+
+form.oneLineForm > div.submit > input {
+    margin: 25px 0 0 4px;
+}
+
+form > span.notion {
+    width: 100%;
+}
+
+#UserSettingsContent .blur > .filter {
+    background: rgba(206, 206, 206, 0.7) url(/_img/ajax-loader_light.gif) scroll no-repeat center center;
+}
+
+#UserSettingsContent .colorList > li.blur {
+    background-color: #EEE;
+}
+
+#UserSettingsContent .colorList > li.blur > .filter {
+    background-image: none;
+}
+
+#UserSettingsContent button.saveList {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+form.initial input.invalid {
+    border: 1px solid #aaa;
+    background-color: #fff;
+}
+
+#AddSubPageForm > div:not(.submit):not(.radio) {
+    padding: 5px 0 10px 25px;
+    width: 525px;
+    margin-bottom: 10px;
+    background: rgb(223, 223, 223);
+}
+
+#ActivePageList ul{
+    display: none;
+}
+#UserSettingsContent .showSubList {
+    padding: 0 !important;
+    margin:0 !important;
+    width: auto !important;
+}
+#UserSettingsContent .showSubList > li:not(.hasSubList) {
+    display: none;
+}
+#UserSettingsContent .showSubList > .hasSubList {
+    background: transparent !important;
+    padding: 0;
+}
+#UserSettingsContent .showSubList > .hasSubList > *:not(ul) {
+    display: none !important;
+}
+#UserSettingsContent .showSubList > .hasSubList > ul {
+    display: block !important;
+    margin-left: 10px;
+}
+
+#ActivePageList .link, #InactivePageList .link, #PageUserList .delete, #UserList .delete{
+    margin:0;
+    width: 20px;
+    background: transparent none scroll no-repeat center center;
+}
+
+#ActivePageList .subpages{
+    background-image: url(/_img/subpages.png) ;
+}
+
+#ActivePageList .delete, #InactivePageList .delete, #PageUserList .delete, #UserList .delete{
+    background-image: url(/_img/redx.png) ;
+}
+
+#ActivePageList .activate{
+    background-image: url(/_img/archive.png) ;
+}
+
+#InactivePageList .activate{
+    background-image: url(/_img/arrowup.png) ;
+}
+
+#ActivePageList .showhide{
+    background-image: url(/_img/eyeslash.png);
+}
+
+#ActivePageList li.ishidden:not(.hasSubList){
+    opacity: 0.4;
+    text-decoration: line-through;
+}
+
+
+#ActivePageList li.ishidden .showhide{
+    background-image: url(/_img/eye.png);
+}
+
+#InactivePageList li:not(.emptyListInfo){
+    padding-right: 30px;
+    padding-left: 0;
+}
+
+#ActivePageList li:not(.emptyListInfo){
+    padding-left: 0;
+}
+
+#InactivePageList .padding, #ActivePageList .padding{
+    border: 4px solid transparent;
+    width: 0;
+    height: 0;
+    float: left;
+    margin: 11px 4px 11px 9px;
+    background: transparent;
+}
+
+#ActivePageList li.current > .link.delete, #InactivePageList li.current > .link.delete,
+#ActivePageList.levelPage .link:not(.subpages), #InactivePageList.levelPage  .link:not(.subpages),
+#ActivePageList.levelPage .handle, #InactivePageList.levelPage  .handle{
+    display: none;
+}
+
+#ActivePageList li.current > .padding, #InactivePageList li.current > .padding{
+    border-color: transparent transparent transparent #253977;
+}
+
+
+#ActivePageList li.loading > .padding, #InactivePageList li.loading > .padding{
+    background: transparent url(/_img/smallloader.gif) scroll no-repeat center center;
+    margin: 0;
+    padding: 0;
+    width: 21px;
+    height: 30px;
+    border: 0;
+    opacity: 0.6;
+}
+
+#ActiveListPath .up {
+    cursor: pointer;
+    float: right;
+    background: #fff;
+    color: rgb(80, 80, 80);
+    padding: 0 15px;
+}
+
+#ActiveListPath .up:hover {
+    text-decoration: underline;
+}
+
+#UserSettingsContent span.version{
+    background: #FFF;
+    padding: 0 5px;
+    margin: 0 5px;
+    font-style: italic;
+    font-size: 14px;
+    line-height: 20px;
+    color: #3C3C3C;
+}
