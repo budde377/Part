@@ -286,7 +286,7 @@ form.justDistribution > div:nth-of-type(2n+2) {
 }
 
 #UserSettingsExpandLink {
-    background: #253977 url("/_common/_img/settings_arrow.png") scroll no-repeat bottom center;
+    background: transparent url("/_common/_img/settings_arrow_3-01.png") scroll no-repeat bottom center;
     width: 46px;
     height: 60px;
     position: absolute;
