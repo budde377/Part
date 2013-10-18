@@ -21,10 +21,15 @@
     width: 860px;
     border-bottom: 1px solid #aaa;
     padding-left: 10px;
+    font-weight: 100;
+    color: #000;
+    line-height: 30px;
 
 }
 
 #UserSettingsContainer h3 {
+    line-height: 25px;
+    font-weight: 100;
     font-family: BebasNeueRegular, Impact, Charcoal, sans-serif;
     font-size: 20px;
     padding: 10px 0 5px 0;
