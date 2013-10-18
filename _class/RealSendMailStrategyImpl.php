@@ -29,6 +29,6 @@ class RealSendMailStrategyImpl implements SendMailStrategy
         $headers .= "Cc: $cc" . "\r\n";
         $headers .= "Bcc: $bcc" . "\r\n";
 
-        return mail($to,$subject,$message,$headers);
+        return @mail($to,$subject,$message,$headers);
     }
 }
