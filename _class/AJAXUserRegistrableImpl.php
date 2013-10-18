@@ -139,6 +139,7 @@ class AJAXUserRegistrableImpl implements Registrable{
 
                 Vh
                 Admin Jensen");
+                $m->sendMail();
                 $response = new JSONResponseImpl();
                 $response->setPayload($userTranslator->encode($user));
                 return $response;
