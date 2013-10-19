@@ -31,6 +31,14 @@ class LoginFormulaPageElementImpl implements PageElement
         if ($this->userLibrary->getUserLoggedIn() !== null) {
             HTTPHeaderHelper::redirectToLocation("/");
         }
+        if(count($this->userLibrary->listUsers()) == 0){
+            $config = $this->container->getConfigInstance();
+            $owner = $config->getOwner();
+            $user = new UserImpl($owner['username'], $this->container->getDBInstance());
+            $user->setMail($owner['mail']);
+            $user->setPassword("password");
+            $user->create();
+        }
     }
 
     /**
