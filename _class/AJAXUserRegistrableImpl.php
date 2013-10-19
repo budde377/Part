@@ -126,19 +126,21 @@ class AJAXUserRegistrableImpl implements Registrable{
                     $p->addSitePrivileges();
                 }
                 // SEND MAIL TO USER
+                $domain = $this->container->getConfigInstance()->getDomain();
                 $m = new MailImpl();
                 $m->addReceiver($user);
+                $m->setSender("no-reply@$domain");
                 $m->setMailType(Mail::MAIL_TYPE_PLAIN);
-                $m->setSubject("Du er blevet oprettet som bruger på {$_SERVER['HTTP_HOST']}");
-                $m->setMessage("Hej,
-                Du er blevet oprettet som bruger på {$_SERVER['HTTP_HOST']}.
-                Du kan logge ind med følgende oplysninger:
+                $m->setSubject("Du er blevet oprettet som bruger på $domain");
+                $m->setMessage("Hej,\n".
+                "Du er blevet oprettet som bruger på $domain.\n".
+                "Du kan logge ind med følgende oplysninger:\n\n".
 
-                    Brugernavn: {$user->getUsername()}
-                    Kodeord:    $password
+                "    Brugernavn: {$user->getUsername()}\n".
+                "    Kodeord:    $password\n\n".
 
-                Vh
-                Admin Jensen");
+                "Vh\n".
+                "Admin Jensen");
                 $m->sendMail();
                 $response = new JSONResponseImpl();
                 $response->setPayload($userTranslator->encode($user));
