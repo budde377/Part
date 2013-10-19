@@ -37,6 +37,7 @@ class LoginFormulaPageElementImpl implements PageElement
             $user = new UserImpl($owner['username'], $this->container->getDBInstance());
             $user->setMail($owner['mail']);
             $user->setPassword("password");
+            $user->getUserPrivileges()->addRootPrivileges();
             $user->create();
         }
     }
