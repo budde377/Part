@@ -10,6 +10,8 @@ require_once dirname(__FILE__) . '/../_class/ConfigImpl.php';
 class ConfigImplTest extends PHPUnit_Framework_TestCase
 {
 
+    public $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
+
     public function testSimpleXMLInputMustBeValidElseException()
     {
         $invalidConfigXML = simplexml_load_string("
@@ -21,7 +23,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
             new ConfigImpl($invalidConfigXML, $rootPath);
         } catch (InvalidXMLException $exception) {
             $exceptionWasThrown = true;
-            $this->assertEquals("SiteConfig", $exception->getExpectedSchema(), "Did expect the wrong Schema");
+            $this->assertEquals("site-config", $exception->getExpectedSchema(), "Did expect the wrong Schema");
             $this->assertEquals("ConfigXML", $exception->getXmlDesc(), "Did validate the wrong XML");
         }
 
@@ -31,13 +33,13 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testRootPathWillReturnRootPath(){
         $p = dirname(__FILE__);
-        $config = new ConfigImpl(simplexml_load_string("<config></config>"), $p);
+        $config = new ConfigImpl(simplexml_load_string("<config>{$this->defaultOwner}</config>"), $p);
         $this->assertEquals($p, $config->getRootPath());
     }
 
     public function testGetTemplateReturnNullWithEmptyConfigXML()
     {
-        $emptyConfigXML = simplexml_load_string('<config></config>');
+        $emptyConfigXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
         $rootPath = dirname(__FILE__) . '/';
         $config = new ConfigImpl($emptyConfigXML, $rootPath);
         $template = $config->getTemplate('main');
@@ -47,7 +49,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetTemplateReturnNullWithTemplateNIL()
     {
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <templates>
         <template link='some_link'>main</template>
         </templates>
@@ -61,7 +63,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetTemplateReturnLinkWithTemplateInList()
     {
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <templates>
         <template link='some_link'>main</template>
         </templates>
@@ -74,7 +76,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetPageElementReturnNullWithEmptyConfigXML()
     {
-        $emptyConfigXML = simplexml_load_string('<config></config>');
+        $emptyConfigXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
         $rootPath = dirname(__FILE__) . '/';
         $config = new ConfigImpl($emptyConfigXML, $rootPath);
         $template = $config->getPageElement('main');
@@ -84,7 +86,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetPageElementReturnNullWithTemplateElementNIL()
     {
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <pageElements>
             <class name='someName' link='someLink'>SomeClassName</class>
         </pageElements>
@@ -98,7 +100,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetPageElementReturnArrayWithElementInList()
     {
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <pageElements>
             <class name='someName' link='someLink'>SomeClassName</class>
         </pageElements>
@@ -119,7 +121,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetOptimizerReturnNullWithEmptyConfigXML()
     {
         /** @var $emptyConfigXML SimpleXMLElement */
-        $emptyConfigXML = simplexml_load_string('<config></config>');
+        $emptyConfigXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
         $rootPath = dirname(__FILE__) . '/';
         $config = new ConfigImpl($emptyConfigXML, $rootPath);
         $template = $config->getOptimizer('main');
@@ -129,12 +131,12 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetOptimizerReturnNullWithTemplateElementNIL()
     {
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string('
-        <config>
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
             <optimizers>
-                <class name="someName" link="someLink">SomeClass</class>
+                <class name='someName' link='someLink'>SomeClass</class>
             </optimizers>
-        </config>');
+        </config>");
         $rootPath = dirname(__FILE__) . '/';
         $config = new ConfigImpl($configXML, $rootPath);
         $template = $config->getOptimizer('nil');
@@ -143,12 +145,12 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetOptimizerReturnArrayWithOptimizerInList()
     {
-        $configXML = simplexml_load_string('
-        <config>
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
         <optimizers>
-        <class name="someName" link="someLink">SomeClassName</class>
+        <class name='someName' link='someLink'>SomeClassName</class>
         </optimizers>
-        </config>');
+        </config>");
         $rootPath = dirname(__FILE__) . '/';
         $config = new ConfigImpl($configXML, $rootPath);
         $element = $config->getOptimizer('someName');
@@ -163,7 +165,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetPreScriptReturnEmptyArrayWithEmptyConfig()
     {
-        $emptyConfigXML = simplexml_load_string('<config></config>');
+        $emptyConfigXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
         $rootPath = dirname(__FILE__) . '/';
         $config = new ConfigImpl($emptyConfigXML, $rootPath);
         $preScript = $config->getPreScripts();
@@ -175,7 +177,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetPreScriptHasEntrySpecifiedInConfigWithLinkAsVal()
     {
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <preScripts>
         <class link='some_link'>main</class>
         </preScripts>
@@ -190,7 +192,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetPostScriptReturnEmptyArrayWithEmptyConfig()
     {
-        $emptyConfigXML = simplexml_load_string('<config></config>');
+        $emptyConfigXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
         $rootPath = dirname(__FILE__) . '/';
         $config = new ConfigImpl($emptyConfigXML, $rootPath);
         $preScript = $config->getPostScripts();
@@ -201,7 +203,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetPostScriptHasEntrySpecifiedInConfig()
     {
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <postScripts>
         <class link=''>main</class>
         <class link=''>main2</class>
@@ -217,7 +219,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetPostScriptHasEntrySpecifiedInConfigWithLinkAsValAndRootPrepended()
     {
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <postScripts>
         <class link='some_link'>main</class>
         </postScripts>
@@ -232,7 +234,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testOrderOfPostScriptIsTheSameInFileAsOutput()
     {
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <postScripts>
         <class link='some_link2'>main2</class>
         <class link='some_link'>main</class>
@@ -251,7 +253,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testOrderOfPreScriptIsTheSameInFileAsOutput()
     {
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <preScripts>
         <class link='some_link2'>main2</class>
         <class link='some_link'>main</class>
@@ -270,7 +272,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetAJAXRegistrableReturnEmptyArrayWithEmptyConfig()
     {
-        $emptyConfigXML = simplexml_load_string('<config></config>');
+        $emptyConfigXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
         $rootPath = dirname(__FILE__) . '/';
         $config = new ConfigImpl($emptyConfigXML, $rootPath);
         $registrable = $config->getAJAXRegistrable();
@@ -285,7 +287,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $id1 = "id1";
         $id2 = "id2";
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <AJAXRegistrable>
         <class link='$path1' ajax_id='$id1'>main</class>
         <class link='$path2' ajax_id='$id2'>main2</class>
@@ -317,7 +319,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testOrderOfAJAXRegistrableIsTheSameInFileAsOutput()
     {
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <AJAXRegistrable>
         <class ajax_id='id2' link='some_link2'>main2</class>
         <class ajax_id='id' link='some_link'>main</class>
@@ -335,7 +337,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetDefaultPagesWillReturnArrayOnEmptyConfig()
     {
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         </config>");
 
         $rootPath = dirname(__FILE__) . '/';
@@ -348,7 +350,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetDefaultPagesWillReturnArraySimilarToConfig()
     {
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <defaultPages>
             <page alias='' id='t1' template='someTemplate'>someTitle</page>
             <page alias='/alias/' id='t2' template='someTemplate2' >someTitle2</page>
@@ -381,7 +383,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testListTemplateNamesWillReturnEmptyArrayOnEmptyConfig()
     {
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         </config>");
 
         $rootPath = dirname(__FILE__) . '/';
@@ -394,7 +396,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testListTemplateNamesWillReturnArraySimilarToConfig()
     {
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <templates>
             <template link='some_link'>main</template>
             <template link='some_link2'>main2</template>
@@ -415,15 +417,15 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetMySQLConnectionWillReturnArrayWithInfoAsInConfigXML()
     {
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string('
-        <config>
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
             <MySQLConnection>
                 <host>someHost</host>
                 <database>someDatabase</database>
                 <username>someUser</username>
                 <password>somePassword</password>
             </MySQLConnection>
-        </config>');
+        </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $connArray = $config->getMySQLConnection();
         $this->assertArrayHasKey('user', $connArray, 'Did not have user entry');
@@ -441,7 +443,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testWillReturnNullIfNotSpecifiedInConfig()
     {
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string('<config></config>');
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
 
         $connArray = $config->getMySQLConnection();
@@ -450,7 +452,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testIsDebugModeWillReturnFalseOnEmpty(){
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string('<config></config>');
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $this->assertFalse($config->isDebugMode());
 
@@ -458,9 +460,9 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testIsDebugModeWillReturnFalseOnFalse(){
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string('<config>
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}
         <debugMode>false</debugMode>
-        </config>');
+        </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $this->assertFalse($config->isDebugMode());
 
@@ -468,9 +470,9 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testIsDebugModeWillReturnTrueOnTrue(){
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string('<config>
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}
         <debugMode>true</debugMode>
-        </config>');
+        </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $this->assertTrue($config->isDebugMode());
 
@@ -478,7 +480,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testIsUpdaterEnabledWillReturnTrueOnEmpty(){
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string('<config></config>');
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $this->assertTrue($config->isUpdaterEnabled());
 
@@ -486,9 +488,9 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testIsUpdaterEnabledWillReturnFalseOnFalse(){
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string('<config>
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}
         <enableUpdater>false</enableUpdater>
-        </config>');
+        </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $this->assertFalse($config->isUpdaterEnabled());
 
@@ -496,12 +498,47 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testIsUpdaterEnabledWillReturnTrueOnTrue(){
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string('<config>
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}
         <enableUpdater>true</enableUpdater>
-        </config>');
+        </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $this->assertTrue($config->isUpdaterEnabled());
 
     }
+
+    public function testGetDomainWillReturnDomainOnExist(){
+        $configXML = simplexml_load_string("<config>
+        <siteInfo>
+            <domain name='test' extension='com' />
+            <owner name='Test Testesen' mail='test@test.dk' username='test' />
+        </siteInfo>
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertEquals($config->getDomain(), "test.com");
+
+    }
+
+    public function testGetOwnerWillReturnArrayOfRightFormat(){
+        $configXML = simplexml_load_string("<config>
+        <siteInfo>
+            <domain name='test' extension='com' />
+            <owner name='test' mail='test@test.dk' username='test' />
+        </siteInfo>
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $array = $config->getOwner();
+        $this->assertTrue(is_array($array));
+        $this->assertEquals(3, count($array));
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('mail', $array);
+        $this->assertArrayHasKey('username', $array);
+        $this->assertEquals($array['name'], 'test');
+        $this->assertEquals($array['mail'], 'test@test.dk');
+        $this->assertEquals($array['username'], 'test');
+        $this->assertEquals($config->getDomain(), "test.com");
+
+    }
+
+
 
 }

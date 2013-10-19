@@ -181,4 +181,20 @@ class StubConfigImpl implements Config
     {
         return true;
     }
+
+    /**
+     * @return string String containing the domain (name.ext)
+     */
+    public function getDomain()
+    {
+        return "";
+    }
+
+    /**
+     * @return Array containing owner information
+     */
+    public function getOwner()
+    {
+        return array();
+    }
 }

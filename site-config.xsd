@@ -7,6 +7,25 @@
     <xs:element name="config">
         <xs:complexType>
             <xs:all>
+                <xs:element name="siteInfo" minOccurs="1" >
+                    <xs:complexType>
+                        <xs:all minOccurs="1">
+                            <xs:element name="domain">
+                                <xs:complexType>
+                                    <xs:attribute name="name" type="xs:string" use="required"/>
+                                    <xs:attribute name="extension" type="xs:string" use="required" />
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="owner">
+                                <xs:complexType>
+                                    <xs:attribute name="name" use="required" type="xs:string"/>
+                                    <xs:attribute name="mail" use="required" type="xs:string"/>
+                                    <xs:attribute name="username" use="required" type="xs:string"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:all>
+                    </xs:complexType>
+                </xs:element>
                 <xs:element name="defaultPages" type="pages" minOccurs="0">
                     <xs:unique name="pageTitle">
                         <xs:selector xpath="page"/>

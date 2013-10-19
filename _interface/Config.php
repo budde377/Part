@@ -91,4 +91,14 @@ interface Config
      */
     public function getRootPath();
 
+    /**
+     * @return string String containing the domain (name.ext)
+     */
+    public function getDomain();
+
+    /**
+     * @return Array containing owner information
+     */
+    public function getOwner();
+
 }

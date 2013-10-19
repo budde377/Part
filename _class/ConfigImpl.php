@@ -11,6 +11,8 @@ require_once dirname(__FILE__) . '/../_exception/InvalidXMLException.php';
  */
 class ConfigImpl implements Config
 {
+    private $owner;
+    private $domain;
     private $configFile;
     private $rootPath;
 
@@ -284,5 +286,32 @@ class ConfigImpl implements Config
 
         return $this->enableUpdater = (string)$this->configFile->enableUpdater == "true";
 
+    }
+
+    /**
+     * @return string String containing the domain (name.ext)
+     */
+    public function getDomain()
+    {
+        if($this->domain !== null){
+            return $this->domain;
+        }
+        return $this->domain = (string)$this->configFile->siteInfo->domain['name'].".".(string)$this->configFile->siteInfo->domain['extension'];
+    }
+
+    /**
+     * @return Array containing owner information
+     */
+    public function getOwner()
+    {
+        if($this->owner !== null){
+            return $this->owner;
+        }
+
+        return $this->owner = array(
+            'name'=>(string)$this->configFile->siteInfo->owner['name'],
+            'mail'=>(string)$this->configFile->siteInfo->owner['mail'],
+            'username'=>(string)$this->configFile->siteInfo->owner['username']
+        );
     }
 }
