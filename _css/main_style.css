@@ -125,7 +125,7 @@ label {
     padding-top: 5px;
 }
 
-form > span.notion {
+form > .notion {
     overflow: hidden;
     text-align: center;
     font-weight: bold;
@@ -138,11 +138,11 @@ form > span.notion {
 
 }
 
-form > span.notion.success {
+form > .notion.success {
     background: rgb(58, 150, 58);
 }
 
-form > span.notion.error {
+form > .notion.error {
     background: rgb(150, 32, 32);
 }
 
