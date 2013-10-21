@@ -11,6 +11,7 @@ require_once dirname(__FILE__) . '/_stub/NullBackendSingletonContainerImpl.php';
  */
 class PageElementFactoryTest extends PHPUnit_Framework_TestCase
 {
+    private $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
 
     /** @var $backFactory BackendSingletonContainer */
     private $backFactory;
@@ -22,7 +23,7 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testWillReturnNullIfPageElementIsNil()
     {
-        $configXML = simplexml_load_string('<config></config>');
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
         $element = $pageElementFactory->getPageElement('NilElement');
@@ -31,12 +32,13 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testWillReturnPageElementIfElementInList()
     {
-        $configXML = simplexml_load_string('
+        $configXML = simplexml_load_string("
         <config>
+        {$this->defaultOwner}
         <pageElements>
-            <class name="someElement" link="_stub/NullPageElementImpl.php">NullPageElementImpl</class>
+            <class name='someElement' link='_stub/NullPageElementImpl.php'>NullPageElementImpl</class>
         </pageElements>
-        </config>');
+        </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
         $element = $pageElementFactory->getPageElement('someElement');
@@ -48,12 +50,13 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
     public function testWillReturnThrowExceptionIfElementNotInstanceOfPageElement()
     {
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string('
+        $configXML = simplexml_load_string("
         <config>
+        {$this->defaultOwner}
         <pageElements>
-            <class name="someElement" link="_stub/StubScriptImpl.php">StubScriptImpl</class>
+            <class name='someElement' link='_stub/StubScriptImpl.php'>StubScriptImpl</class>
         </pageElements>
-        </config>');
+        </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
         $exceptionWasThrown = false;
@@ -75,12 +78,13 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testWillThrowExceptionIfInvalidLink()
     {
-        $configXML = simplexml_load_string('
+        $configXML = simplexml_load_string("
         <config>
+        {$this->defaultOwner}
         <pageElements>
-            <class name="someElement" link="notAValidLink">PageElementNullImpl</class>
+            <class name='someElement' link='notAValidLink'>PageElementNullImpl</class>
         </pageElements>
-        </config>');
+        </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
         $this->setExpectedException('FileNotFoundException');
@@ -90,12 +94,13 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testWillThrowExceptionIfClassNotDefined()
     {
-        $configXML = simplexml_load_string('
+        $configXML = simplexml_load_string("
         <config>
+        {$this->defaultOwner}
         <pageElements>
-            <class name="someElement" link="_stub/NullPageElementImpl.php">NotAValidClassName</class>
+            <class name='someElement' link='_stub/NullPageElementImpl.php'>NotAValidClassName</class>
         </pageElements>
-        </config>');
+        </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
         $this->setExpectedException('ClassNotDefinedException');

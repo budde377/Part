@@ -131,7 +131,6 @@ class UserSettingsPageLi {
       _anchor.classes.add('val');
       li.append(_anchor);
     }
-    _anchor.onClick.listen((e)=>expandSettingsOnNextPage());
     _handle = _returnNewDivIfNecessary(li.query('.handle'), ['handle'], _active);
     _delete = _returnNewDivIfNecessary(li.query('.delete'), ['link', 'delete'], true, title:'Slet');
     _activate = _returnNewDivIfNecessary(li.query('.activate'), ['link', 'activate'], true, title:_pageOrder.isActive(page.id) ? 'Deaktiver' : 'Aktiver');

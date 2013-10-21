@@ -99,24 +99,13 @@ class UserSettingsPageElementImpl implements PageElement
 
     private function generateLoginUserMenuContainer()
     {
-        $expanded = array('', '', '', '', '','', '');
-        $marginLeft = "";
-        if (isset($_COOKIE['expandSetting']) && ($i = intval($_COOKIE['expandSetting'])) < 5 && $i >= 0) {
-            $expanded[0] = 'class="expanded"';
-            $expanded[$i + 1] = 'active';
-            setcookie('expandSetting', '-1', time()-3600, '/');
-            $m = $i * -880;
-            $marginLeft = "margin-left:{$m}px;";
-        } else {
-            $expanded[1] = 'active';
-        }
         $currentPage = $this->container->getCurrentPageStrategyInstance()->getCurrentPage();
         $inactive = !$currentPage->isEditable() || !$this->currentUserPrivileges->hasPagePrivileges($currentPage);
         $inactiveClass = $inactive ? 'class="inactive"' : '';
         $inactiveFilter = $inactive ? "<div class='inactiveFilter' title='Du kan ikke redigere denne side'>&nbsp;</div>" : "";
         $updateElement = $updateLink = "";
         if($this->config->isUpdaterEnabled() && $this->currentUser->getUserPrivileges()->hasSitePrivileges()){
-            $updateLink = "<li class='update_site {$expanded[5]}' title='Opdater website'>&nbsp;</li>";
+            $updateLink = "<li class='update_site' title='Opdater website'>&nbsp;</li>";
             $updateElement = "
                     <li>
                         <h2>Opdater Website</h2>
@@ -126,20 +115,20 @@ class UserSettingsPageElementImpl implements PageElement
 
         }
         $ret = "
-        <div id='UserSettingsContainer' {$expanded[0]}>
+        <div id='UserSettingsContainer'>
             <div id='UserSettingsMenu'>
                 <ul>
-                    <li class='page {$expanded[1]}' title='Rediger side'>&nbsp;</li>
-                    <li class='pages {$expanded[2]}' title='Administrer sider'>&nbsp;</li>
-                    <li class='user {$expanded[3]}' title='Rediger oplysninger'>&nbsp;</li>
-                    <li class='users {$expanded[4]}' title='Administrer brugere'>&nbsp;</li>
+                    <li class='page active' title='Rediger side'>&nbsp;</li>
+                    <li class='pages' title='Administrer sider'>&nbsp;</li>
+                    <li class='user ' title='Rediger oplysninger'>&nbsp;</li>
+                    <li class='users' title='Administrer brugere'>&nbsp;</li>
                     $updateLink
-<!--                    <li class='mail {$expanded[6]}' title='Administrer mailkonti'>&nbsp;</li>-->
+<!--                    <li class='mail ' title='Administrer mailkonti'>&nbsp;</li>-->
                 </ul>
             </div>
             <div id='UserSettingsContractLink'>&nbsp;</div>
             <div id='UserSettingsContent'>
-                <ul style='$marginLeft'>
+                <ul >
                     <li $inactiveClass>
                         $inactiveFilter
                         <h2>Rediger Side</h2>

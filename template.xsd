@@ -60,4 +60,22 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:element name="choice">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="if">
+                    <xs:complexType>
+                        <xs:group ref="mixed-content" maxOccurs="unbounded" minOccurs="0"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="else">
+                    <xs:complexType>
+                        <xs:group ref="mixed-content" maxOccurs="unbounded" minOccurs="0"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="expression" type="expression" use="required" />
+        </xs:complexType>
+    </xs:element>
+
 </xs:schema>

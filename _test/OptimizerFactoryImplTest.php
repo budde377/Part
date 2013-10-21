@@ -1,5 +1,9 @@
 <?php
 require_once dirname(__FILE__) . '/../_class/OptimizerFactoryImpl.php';
+require_once dirname(__FILE__) . '/../_class/ConfigImpl.php';
+require_once dirname(__FILE__) . '/../_exception/ClassNotInstanceOfException.php';
+require_once dirname(__FILE__) . '/../_exception/FileNotFoundException.php';
+require_once dirname(__FILE__) . '/../_exception/ClassNotDefinedException.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -10,11 +14,11 @@ require_once dirname(__FILE__) . '/../_class/OptimizerFactoryImpl.php';
  */
 class OptimizerFactoryImplTest extends PHPUnit_Framework_TestCase
 {
-
+    private $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
 
     public function testWillReturnNullIfOptimizerIsNil()
     {
-        $configXML = simplexml_load_string('<config></config>');
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $optimizerFactory = new OptimizerFactoryImpl($config);
         $element = $optimizerFactory->getOptimizer('NilElement');
@@ -24,12 +28,13 @@ class OptimizerFactoryImplTest extends PHPUnit_Framework_TestCase
     public function testWillReturnOptimizerIfElementInList()
     {
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string('
+        $configXML = simplexml_load_string("
         <config>
+        {$this->defaultOwner}
         <optimizers>
-            <class name="someElement" link="_stub/NullOptimizerImpl.php">NullOptimizerImpl</class>
+            <class name='someElement' link='_stub/NullOptimizerImpl.php'>NullOptimizerImpl</class>
         </optimizers>
-        </config>');
+        </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $optimizerFactory = new OptimizerFactoryImpl($config);
         $element = $optimizerFactory->getOptimizer('someElement');
@@ -41,12 +46,13 @@ class OptimizerFactoryImplTest extends PHPUnit_Framework_TestCase
     public function testWillReturnThrowExceptionIfElementNotInstanceOfOptimizer()
     {
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string('
+        $configXML = simplexml_load_string("
         <config>
+        {$this->defaultOwner}
         <optimizers>
-            <class name="someElement" link="_stub/StubScriptImpl.php">StubScriptImpl</class>
+            <class name='someElement' link='_stub/StubScriptImpl.php'>StubScriptImpl</class>
         </optimizers>
-        </config>');
+        </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $optimizerFactory = new OptimizerFactoryImpl($config);
         $exceptionWasThrown = false;
@@ -68,12 +74,13 @@ class OptimizerFactoryImplTest extends PHPUnit_Framework_TestCase
 
     public function testWillThrowExceptionIfInvalidLink()
     {
-        $configXML = simplexml_load_string('
+        $configXML = simplexml_load_string("
         <config>
+        {$this->defaultOwner}
         <optimizers>
-            <class name="someElement" link="notAValidLink">OptimizerNullImpl</class>
+            <class name='someElement' link='notAValidLink'>OptimizerNullImpl</class>
         </optimizers>
-        </config>');
+        </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $optimizerFactory = new OptimizerFactoryImpl($config);
         $this->setExpectedException('FileNotFoundException');
@@ -83,12 +90,13 @@ class OptimizerFactoryImplTest extends PHPUnit_Framework_TestCase
 
     public function testWillThrowExceptionIfClassNotDefined()
     {
-        $configXML = simplexml_load_string('
+        $configXML = simplexml_load_string("
         <config>
+        {$this->defaultOwner}
         <optimizers>
-            <class name="someElement" link="_stub/NullOptimizerImpl.php">NotAValidClassName</class>
+            <class name='someElement' link='_stub/NullOptimizerImpl.php'>NotAValidClassName</class>
         </optimizers>
-        </config>');
+        </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $optimizerFactory = new OptimizerFactoryImpl($config);
         $this->setExpectedException('ClassNotDefinedException');

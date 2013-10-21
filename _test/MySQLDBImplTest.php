@@ -17,12 +17,14 @@ class MySQLDBImplTest extends PHPUnit_Framework_TestCase
     private $user = MySQLConstants::MYSQL_USERNAME;
     private $pass = MySQLConstants::MYSQL_PASSWORD;
     private $database = MySQLConstants::MYSQL_DATABASE;
+    private $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
 
     public function testConnectionUsesConfigInfo()
     {
         /** @var $configXML SimpleXMLElement */
         $configXML = simplexml_load_string("
         <config>
+            {$this->defaultOwner}
             <MySQLConnection>
             <host>{$this->host}</host>
             <database>{$this->database}</database>
@@ -42,10 +44,11 @@ class MySQLDBImplTest extends PHPUnit_Framework_TestCase
     public function testConnectionWillThrowExceptionWithWrongInfo()
     {
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string('
+        $configXML = simplexml_load_string("
         <config>
+            {$this->defaultOwner}
             <MySQLConnection><host>10.8.0.1</host><database>thisIsNotAValidDB</database><username>nosSchUser</username><password>password</password></MySQLConnection>
-        </config>');
+        </config>");
 
         $config = new ConfigImpl($configXML, dirname(__FILE__));
 
@@ -71,6 +74,7 @@ class MySQLDBImplTest extends PHPUnit_Framework_TestCase
         /** @var $configXML SimpleXMLElement */
         $configXML = simplexml_load_string("
         <config>
+            {$this->defaultOwner}
             <MySQLConnection>
             <host>{$this->host}</host>
             <database>{$this->database}</database>

@@ -16,6 +16,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
 {
     /** @var $backFactory BackendSingletonContainer */
     private $backFactory;
+    private $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
 
     protected function setUp()
     {
@@ -24,7 +25,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
 
     public function testBuildPreAndPostScriptWillReturnScriptChainOnEmptyConfig()
     {
-        $configXML = simplexml_load_string("<config></config>");
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $factory = new SiteFactoryImpl($config);
 
@@ -37,7 +38,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     {
 
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <preScripts>
         <class link='_stub/ExceptionStubScriptImpl.php'>ExceptionStubScriptImpl</class>
         </preScripts>
@@ -66,7 +67,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     {
         /** @var $configXML SimpleXMLElement */
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <preScripts>
         <class link='_stub/NullPageElementImpl.php'>NullPageElementImpl</class>
         </preScripts>
@@ -94,7 +95,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     {
         /** @var $configXML SimpleXMLElement */
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <postScripts>
         <class link='_stub/NullPageElementImpl.php'>NullPageElementImpl</class>
         </postScripts>
@@ -121,7 +122,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     {
 
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <postScripts>
         <class link='_stub/ExceptionStubScriptImpl.php'>ExceptionStubScriptImpl</class>
         </postScripts>
@@ -140,7 +141,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     {
 
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <preScripts>
         <class link='_stub/ThisFileIsNotFound.php'>ScriptExceptionStubImpl</class>
         </preScripts>
@@ -157,7 +158,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     public function testBuildPreScriptWillThrowExceptionIfScriptClassIsNotDefined()
     {
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <preScripts>
         <class link='_stub/ExceptionStubScriptImpl.php'>WrongClassName</class>
         </preScripts>
@@ -175,7 +176,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     {
 
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <postScripts>
         <class link='_stub/ThisFileIsNotFound.php'>ScriptExceptionStubImpl</class>
         </postScripts>
@@ -192,7 +193,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     public function testBuildPostScriptWillThrowExceptionIfScriptClassIsNotDefined()
     {
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         <postScripts>
         <class link='_stub/ExceptionStubScriptImpl.php'>WrongClassName</class>
         </postScripts>
@@ -210,7 +211,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     {
         /** @var $configXML SimpleXMLElement */
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         </config>");
 
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
@@ -223,7 +224,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     {
         /** @var $configXML SimpleXMLElement */
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         </config>");
 
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
@@ -238,7 +239,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     {
         /** @var $configXML SimpleXMLElement */
         $configXML = simplexml_load_string("
-        <config>
+        <config>{$this->defaultOwner}
         </config>");
 
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');

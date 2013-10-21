@@ -1,14 +1,5 @@
 part of user_settings;
 
-void expandSettingsOnNextPage(){
-  var e = new UserSettingsExpandDecoration();
-  if(!e.expanded){
-    return;
-  }
-  var s = new UserSettingsSlideDecoration();
-  new UserSettingsActiveForNextPage().nextActive = s.currentIndex;
-}
-
 
 class UserSettingsSlideDecoration extends SlideDecoration {
 
@@ -158,30 +149,3 @@ class UserSettingsExpandLinkExpandDecoration extends ExpandDecoration {
 
 }
 
-class UserSettingsActiveForNextPage {
-  int _nextActive = -1;
-
-  static UserSettingsActiveForNextPage _cached;
-
-  factory UserSettingsActiveForNextPage(){
-    if (_cached == null) {
-      _cached = new UserSettingsActiveForNextPage._internal();
-    }
-    return _cached;
-  }
-
-  UserSettingsActiveForNextPage._internal();
-
-  int get nextActive => _nextActive;
-
-  set nextActive(int i) {
-    if (i == _nextActive || i < 0) {
-      return;
-    }
-    _nextActive = i;
-    document.cookie = "expandSetting=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;";
-    document.cookie = "expandSetting=$i;path=/;";
-
-  }
-
-}

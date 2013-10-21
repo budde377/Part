@@ -35,7 +35,8 @@ class TemplateImpl implements Template
         $this->backendContainer = $container;
     }
 
-    private function cleanUp($string){
+    private function cleanUp($string)
+    {
 
 
         return $string;
@@ -53,45 +54,47 @@ class TemplateImpl implements Template
         // Building output
         $query = $this->xPathOnTemplate("//cb:page-element");
         /** @var $pageElement DOMElement */
+        $s = $this->template->saveXML();
         foreach ($query as $pageElement) {
             $newNode = $this->template->createDocumentFragment();
             /** @var PageElement $pe */
             $pe = $this->pageElements[$pageElement->getAttribute('name')];
-            if($pe == null){
+            if ($pe == null) {
                 continue;
             }
-            $newNode->appendXML("<![CDATA[".str_replace('>','&gt;', str_replace('<','&lt;',$pe->getContent()))."]]>");
+            $newNode->appendXML("<![CDATA[" . str_replace('>', '&gt;', str_replace('<', '&lt;', $pe->getContent())) . "]]>");
             $pageElement->parentNode->replaceChild($newNode, $pageElement);
         }
+        $s = $this->template->saveXML();
 
         // Getting content
         $contentQuery = $this->xPathOnTemplate("//cb:page-content");
-        if($contentQuery->length > 0){
+        if ($contentQuery->length > 0) {
             $currentPage = $this->backendContainer->getCurrentPageStrategyInstance()->getCurrentPage();
             /** @var $pageContent DOMElement */
-            foreach($contentQuery as $pageContent){
-                $content = $currentPage->getContent($pageContent->hasAttribute('id')?$pageContent->getAttribute('id'):null);
+            foreach ($contentQuery as $pageContent) {
+                $content = $currentPage->getContent($pageContent->hasAttribute('id') ? $pageContent->getAttribute('id') : null);
                 $fragment = $this->template->createDocumentFragment();
-                $fragment->appendXML("<![CDATA[".str_replace('>','&gt;', str_replace('<','&lt;',$content->latestContent()))."]]>");
-                if($fragment->childNodes->length == 0){
+                $fragment->appendXML("<![CDATA[" . str_replace('>', '&gt;', str_replace('<', '&lt;', $content->latestContent())) . "]]>");
+                if ($fragment->childNodes->length == 0) {
                     continue;
                 }
-                $pageContent->parentNode->insertBefore($fragment,$pageContent);
+                $pageContent->parentNode->insertBefore($fragment, $pageContent);
                 $pageContent->parentNode->removeChild($pageContent);
 
             }
 
         }
         /** @var $pe DOMElement */
-        foreach($this->xPathOnTemplate('//cb:*') as $pe){
+        foreach ($this->xPathOnTemplate('//cb:*') as $pe) {
             $pe->parentNode->removeChild($pe);
         }
 
         $result = $this->template->saveXML();
         // Remove xmlns
         $pattern = '/(<[^>]+)[\s]*xmlns(:?[a-z]*)\s*=\s*"[^"]*"[\s]*([^>]*>)/';
-        while(preg_match($pattern, $result)){
-            $result = preg_replace($pattern,'$1 $3', $result);
+        while (preg_match($pattern, $result)) {
+            $result = preg_replace($pattern, '$1 $3', $result);
         }
 
         // Remove prefix
@@ -102,10 +105,10 @@ class TemplateImpl implements Template
 
         // Remove CDATA blocks
         preg_match_all('/<!\[CDATA\[([^>]*)\]\]>/', $result, $matches, PREG_OFFSET_CAPTURE);
-        for($i = count($matches[0])-1; $i >= 0; $i--){
+        for ($i = count($matches[0]) - 1; $i >= 0; $i--) {
 
             $match = $matches[0][$i];
-            $result = substr($result, 0, $match[1]).str_replace("&lt;", "<", str_replace("&gt;", ">", $matches[1][$i][0])).substr($result, $match[1]+strlen($match[0]));
+            $result = substr($result, 0, $match[1]) . str_replace("&lt;", "<", str_replace("&gt;", ">", $matches[1][$i][0])) . substr($result, $match[1] + strlen($match[0]));
         }
 
         return $result;
@@ -135,7 +138,7 @@ class TemplateImpl implements Template
         $this->setTemplateFromString($templateString);
     }
 
-    private function evaluateCondition($expression)
+    private function evaluateExpression($expression)
     {
         $backendContainer = $this->backendContainer;
         $result = eval("return $expression;");
@@ -151,8 +154,6 @@ class TemplateImpl implements Template
     {
         //Cleaning up and building template
         try {
-
-            $string = html_entity_decode($string);
             $this->template = new DOMDocument();
             $this->template->loadXML($string);
 
@@ -162,12 +163,12 @@ class TemplateImpl implements Template
 
         // Manage condition elements
         $conditions = $this->xPathOnTemplate('//cb:condition');
-        /** @var DOMElement $condition */
+        /** @var DOMElement $condition*/
         foreach ($conditions as $condition) {
             $parent = $condition->parentNode;
-            if ($this->evaluateCondition($condition->getAttribute('expression'))) {
+            if ($this->evaluateExpression($condition->getAttribute('expression'))) {
                 $fragment = $this->template->createDocumentFragment();
-                while($condition->childNodes->length){
+                while ($condition->childNodes->length) {
                     $fragment->appendChild($condition->childNodes->item(0));
                 }
                 $condition->parentNode->insertBefore($fragment, $condition);
@@ -176,11 +177,28 @@ class TemplateImpl implements Template
             $parent->removeChild($condition);
         }
 
+        // Manage choice elements
+        $choices = $this->xPathOnTemplate('//cb:choice');
+        /** @var DOMElement $choice */
+        foreach ($choices as $choice) {
+            $parent = $choice->parentNode;
+            $fragment = $this->template->createDocumentFragment();
+            $xPath = new DOMXPath($this->template);
+            $element = $xPath->query($this->evaluateExpression($choice->getAttribute('expression'))?"cb:if":"cb:else",$choice)->item(0);
+            while ($element->childNodes->length) {
+                $fragment->appendChild($element->childNodes->item(0));
+            }
+            $choice->parentNode->insertBefore($fragment, $choice);
+
+            $parent->removeChild($choice);
+        }
+
+
         // Remove page-element tags with false condition
         $conditionPageElements = $this->xPathOnTemplate("//cb:page-element[@condition]");
         /** @var DOMElement $conditionalPE */
         foreach ($conditionPageElements as $conditionalPE) {
-            if ($this->evaluateCondition($conditionalPE->getAttribute('condition'))) {
+            if ($this->evaluateExpression($conditionalPE->getAttribute('condition'))) {
                 continue;
             }
             $conditionalPE->parentNode->removeChild($conditionalPE);
