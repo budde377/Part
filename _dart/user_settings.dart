@@ -446,7 +446,12 @@ class UserSettingsUserListInitializer extends Initializer {
       if (changeType == USER_LIBRARY_CHANGE_CREATE) {
         var li = new LIElement();
         var privilege = userPrivilegeString(user);
-        li.innerHtml = "<a href='mailto:${user.mail}' class='val'>${user.username}</a>, <span class='privileges'>($privilege Administrator)</span> <span class='parent hidden'>${user.parent}</span> <div class='delete link' title='Slet'>&nbsp;</div>";
+        var a = new AnchorElement();
+        a..text = user.username
+         ..classes.add("val")
+         ..href = "mailto:${user.mail}";
+        li.append(a);
+        li.appendHtml(", <span class='privileges'>($privilege Administrator)</span> <span class='parent hidden'>${user.parent}</span> <div class='delete link' title='Slet'>&nbsp;</div>");
         _userList.append(li);
         userLis = _userList.queryAll('li');
         addListener(li);
