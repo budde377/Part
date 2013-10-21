@@ -651,6 +651,7 @@ ul.better_select_options > li:last-child {
     border-top-color: #fff;
     width: 0;
     margin: 0 auto;
+    position: relative;
 }
 
 .info_box.reversed .arrow {
