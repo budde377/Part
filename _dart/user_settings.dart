@@ -659,12 +659,17 @@ class UserSettingsEditPageFormInitializer extends Initializer {
         return false;
       }
       formDecoration.blur();
+      var template = _order.currentPage.template;
       _order.currentPage.changeInfo(title:data['title'], id:data['id'], template:data['template'], alias:data['alias'], callback:(String status, [int error_code, dynamic payload]) {
         if (status == CALLBACK_STATUS_SUCCESS) {
           formDecoration.changeNotion("Ændringerne er gemt", FormHandler.NOTION_TYPE_SUCCESS);
           editTitleField.blur();
           editIdField.blur();
           editAliasField.blur();
+          if(template != _order.currentPage.template){
+            dialogContainer.alert("Du har redigeret sidens type og skal derfor genindlæse siden.").onClose.listen((_) => window.location.reload());
+          }
+
         } else {
           formDecoration.changeNotion(_errorMessage(error_code), FormHandler.NOTION_TYPE_ERROR);
         }
