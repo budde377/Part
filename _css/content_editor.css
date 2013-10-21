@@ -1,0 +1,841 @@
+.edit_content_wrapper {
+    position: relative;
+    overflow: hidden;
+
+}
+
+.edit_content_wrapper .tool_bar_wrapper {
+    height: 29px;
+    overflow: hidden;
+    transition-property: height, box-shadow;
+    transition-duration: 0.1s;
+    background-color: rgb(221, 221, 221);
+}
+
+.edit_content_wrapper .tool_bar_wrapper > div {
+    z-index: 1;
+    position: relative;
+
+}
+
+.edit_content_wrapper .tool_bar_wrapper.floating, .edit_content_wrapper .tool_bar_wrapper.fixed {
+    z-index: 200;
+    top: 0;
+}
+
+.edit_content_wrapper .tool_bar_wrapper.floating {
+    box-shadow: 0 1px 5px #aaa;
+    position: fixed;
+}
+
+.edit_content_wrapper .tool_bar_wrapper.fixed {
+    position: absolute;
+}
+
+.edit_content_wrapper .tool_bar_placeholder {
+    transition: height 0.1s;
+    height: 29px;
+}
+
+.edit_content_wrapper .tool_bar {
+    height: 25px;
+    overflow: hidden;
+    top: 0;
+    right: 0;
+    background-color: #F3F3F3;
+    padding: 2px;
+}
+
+.edit_content_wrapper .tool_bar > button {
+    width: 27px;
+    margin: 0 10px 0 0;
+    height: 25px;
+    background: transparent url(/_img/toolbar_icons.png?new=123) scroll no-repeat 4px -26px;
+    float: left;
+    cursor: pointer;
+    border-radius: 2px;
+    border: 0;
+    padding: 0;
+
+}
+
+.edit_content_wrapper .tool_bar > button:hover {
+    background-color: #d9d9d9;
+    box-shadow: 0 1px 1px #aaa;
+    background-position: -36px -26px;
+
+}
+
+.edit_content_wrapper .tool_bar > button.active {
+    background-color: #FFFFFF;
+    background-position: -116px -26px;
+    box-shadow: inset 0 1px 3px #BBB;
+}
+
+.edit_content_wrapper .tool_bar > .image {
+    background-position: 4px -56px;
+}
+
+.edit_content_wrapper .tool_bar > .image:not(.enabled):hover {
+    background-position: -36px -56px;
+}
+
+.edit_content_wrapper .tool_bar > .image.active {
+    background-position: -116px -56px !important;
+}
+
+.edit_content_wrapper .tool_bar > .file {
+    background-position: 4px -116px;
+}
+
+.edit_content_wrapper .tool_bar > .file:not(.enabled):hover {
+    background-position: -36px -116px;
+}
+
+.edit_content_wrapper .tool_bar > .file.active {
+    background-position: -116px -116px !important;
+}
+
+.edit_content_wrapper .tool_bar > .history {
+    background-position: 4px 4px;
+}
+
+.edit_content_wrapper .tool_bar > .history:not(.enabled):hover {
+    background-position: -36px 4px;
+}
+
+.edit_content_wrapper .tool_bar > .history.active {
+    background-position: -116px 4px !important;
+}
+
+.edit_content_wrapper .tool_bar > .close {
+    background-position: 4px -146px;
+    float: right;
+    margin: 0;
+}
+
+.edit_content_wrapper .tool_bar > .close:not(.enabled):hover {
+    background-position: -36px -146px;
+}
+
+.edit_content_wrapper .tool_bar > .save {
+    background-position: -156px -86px;
+}
+
+.edit_content_wrapper .tool_bar > .save.active {
+    background-position: -116px -86px !important;
+}
+
+.edit_content_wrapper .tool_bar > .save:not(.enabled):hover {
+    border-color: transparent;
+    background-color: transparent;
+    cursor: default;
+    box-shadow: 0 0 0;
+    background-position: -156px -86px;
+}
+
+.edit_content_wrapper .tool_bar > .save.enabled {
+    background-position: 4px -86px;
+}
+
+.edit_content_wrapper .tool_bar > .save.enabled:hover {
+    background-position: -36px -86px;
+}
+
+.edit_content_wrapper .menu {
+    height: 25px;
+    background: #ddd;
+    padding: 2px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    overflow: hidden;
+    position: relative;
+}
+
+.edit_content_wrapper .topBarWrapper {
+    position: relative;
+}
+
+.edit_content_wrapper .menu.text_menu > .drop_down.color {
+    width: auto;
+}
+
+.edit_content_wrapper .menu.text_menu > .drop_down.color .text {
+    width: 9px;
+}
+
+.edit_content_wrapper .menu.text_menu > button, .edit_content_wrapper .menu.text_menu > .color, .drop_down_box > .submenu > li > button {
+    border-radius: 2px;
+    padding: 0;
+    height: 25px;
+    background: transparent url(/_img/text_edit.png) scroll no-repeat 1px 3px;
+    width: 27px;
+    margin: 0;
+    cursor: pointer;
+    border: 0;
+
+}
+
+.drop_down_box > .submenu > li {
+    padding: 3px;
+    height: 25px;
+}
+
+.edit_content_wrapper .menu.text_menu > button {
+    float: left;
+}
+
+.edit_content_wrapper .menu.text_menu > .divider {
+    margin: 0 5px;
+    height: 25px;
+    border-left: 1px solid transparent;
+    float: left;
+}
+
+.edit_content_wrapper .menu.text_menu > .overflow_container + .divider, .edit_content_wrapper .menu.text_menu > .divider:last-of-type {
+    display: none;
+}
+
+.edit_content_wrapper .menu.text_menu > .underline + div,
+.edit_content_wrapper .menu.text_menu > .o_list + div,
+.edit_content_wrapper .menu.text_menu > .a_just + div,
+.edit_content_wrapper .menu.text_menu > .m_indent+ div {
+    border-color: #aaa;
+}
+
+.edit_content_wrapper .menu.text_menu > .bold, .drop_down_box > .submenu > li > .bold {
+    background-position: 1px -32px;
+}
+
+.edit_content_wrapper .menu.text_menu > .bold.active, .drop_down_box > .submenu > li > .bold.active {
+    background-position: -199px -32px;
+}
+
+.edit_content_wrapper .menu.text_menu > .bold:hover:not(.active), .drop_down_box > .submenu > li > .bold:hover:not(.active) {
+    background-position: -39px -32px;
+}
+
+.edit_content_wrapper .menu.text_menu > .insert_link, .drop_down_box > .submenu > li > .insert_link {
+    background-position: 1px -606px;
+}
+
+.edit_content_wrapper .menu.text_menu > .insert_link.active, .drop_down_box > .submenu > li > .insert_link.active {
+    background-position: -199px -606px;
+}
+
+.edit_content_wrapper .menu.text_menu > .insert_link:hover:not(.active), .drop_down_box > .submenu > li > .insert_link:hover:not(.active) {
+    background-position: -39px -606px;
+}
+
+.edit_content_wrapper .menu.text_menu > .superscript, .drop_down_box > .submenu > li > .superscript {
+    background-position: 1px -570px;
+}
+
+.edit_content_wrapper .menu.text_menu > .superscript.active, .drop_down_box > .submenu > li > .superscript.active {
+    background-position: -199px -570px;
+}
+
+.edit_content_wrapper .menu.text_menu > .superscript:hover:not(.active), .drop_down_box > .submenu > li > .superscript:hover:not(.active) {
+    background-position: -39px -570px;
+}
+
+.edit_content_wrapper .menu.text_menu > .subscript, .drop_down_box > .submenu > li > .subscript {
+    background-position: 1px -531px;
+}
+
+.edit_content_wrapper .menu.text_menu > .subscript.active, .drop_down_box > .submenu > li > .subscript.active {
+    background-position: -199px -531px;
+}
+
+.edit_content_wrapper .menu.text_menu > .subscript:hover:not(.active), .drop_down_box > .submenu > li > .subscript:hover:not(.active) {
+    background-position: -39px -531px;
+}
+
+.edit_content_wrapper .menu.text_menu > .strikethrough, .drop_down_box > .submenu > li > .strikethrough {
+    background-position: 1px -497px;
+}
+
+.edit_content_wrapper .menu.text_menu > .strikethrough.active, .drop_down_box > .submenu > li > .strikethrough.active {
+    background-position: -199px -497px;
+}
+
+.edit_content_wrapper .menu.text_menu > .strikethrough:hover:not(.active), .drop_down_box > .submenu > li > .strikethrough:hover:not(.active) {
+    background-position: -39px -497px;
+}
+
+.edit_content_wrapper .menu.text_menu > .italic, .drop_down_box > .submenu > li > .italic {
+    background-position: 1px -104px;
+}
+
+.edit_content_wrapper .menu.text_menu > .italic.active, .drop_down_box > .submenu > li > .italic.active {
+    background-position: -199px -104px;
+}
+
+.edit_content_wrapper .menu.text_menu > .italic:hover:not(.active), .drop_down_box > .submenu > li > .italic:hover:not(.active) {
+    background-position: -39px -104px;
+}
+
+.edit_content_wrapper .menu.text_menu > .underline, .drop_down_box > .submenu > li > .underline {
+    background-position: 1px -67px;
+}
+
+.edit_content_wrapper .menu.text_menu > .underline.active, .drop_down_box > .submenu > li > .underline.active {
+    background-position: -199px -67px;
+}
+
+.edit_content_wrapper .menu.text_menu > .underline:hover:not(.active), .drop_down_box > .submenu > li > .underline:hover:not(.active) {
+    background-position: -39px -67px;
+}
+
+.edit_content_wrapper .menu.text_menu > .color, .drop_down_box > .submenu > li > .color {
+    background-position: 1px -175px;
+}
+
+.edit_content_wrapper .menu.text_menu > .color.active, .drop_down_box > .submenu > li > .color.active {
+    background-position: -199px -175px;
+}
+
+.edit_content_wrapper .menu.text_menu > .color:hover:not(.active), .drop_down_box > .submenu > li > .color:hover:not(.active) {
+    background-position: -39px -175px;
+}
+
+.edit_content_wrapper .menu.text_menu > .o_list, .drop_down_box > .submenu > li > .o_list {
+    background-position: 1px -390px;
+}
+
+.edit_content_wrapper .menu.text_menu > .o_list.active, .drop_down_box > .submenu > li > .o_list.active {
+    background-position: -199px -390px;
+}
+
+.edit_content_wrapper .menu.text_menu > .o_list:hover:not(.active), .drop_down_box > .submenu > li > .o_list:hover:not(.active) {
+    background-position: -39px -390px;
+}
+
+.edit_content_wrapper .menu.text_menu > .u_list, .drop_down_box > .submenu > li > .u_list {
+    background-position: 1px -354px;
+}
+
+.edit_content_wrapper .menu.text_menu > .u_list.active, .drop_down_box > .submenu > li > .u_list.active {
+    background-position: -199px -354px;
+}
+
+.edit_content_wrapper .menu.text_menu > .u_list:hover:not(.active), .drop_down_box > .submenu > li > .u_list:hover:not(.active) {
+    background-position: -39px -354px;
+}
+
+.edit_content_wrapper .menu.text_menu > .a_left, .drop_down_box > .submenu > li > .a_left {
+    background-position: 1px -247px;
+}
+
+.edit_content_wrapper .menu.text_menu > .a_left.active, .drop_down_box > .submenu > li > .a_left.active {
+    background-position: -199px -247px;
+}
+
+.edit_content_wrapper .menu.text_menu > .a_left:hover:not(.active), .drop_down_box > .submenu > li > .a_left:hover:not(.active) {
+    background-position: -39px -247px;
+}
+
+.edit_content_wrapper .menu.text_menu > .a_center, .drop_down_box > .submenu > li > .a_center {
+    background-position: 1px -211px;
+}
+
+.edit_content_wrapper .menu.text_menu > .a_center.active, .drop_down_box > .submenu > li > .a_center.active {
+    background-position: -199px -211px;
+}
+
+.edit_content_wrapper .menu.text_menu > .a_center:hover:not(.active), .drop_down_box > .submenu > li > .a_center:hover:not(.active) {
+    background-position: -39px -211px;
+}
+
+.edit_content_wrapper .menu.text_menu > .a_right, .drop_down_box > .submenu > li > .a_right {
+    background-position: 1px -283px;
+}
+
+.edit_content_wrapper .menu.text_menu > .a_right.active, .drop_down_box > .submenu > li > .a_right.active {
+    background-position: -199px -283px;
+}
+
+.edit_content_wrapper .menu.text_menu > .a_right:hover:not(.active), .drop_down_box > .submenu > li > .a_right:hover:not(.active) {
+    background-position: -39px -283px;
+}
+
+.edit_content_wrapper .menu.text_menu > .a_just, .drop_down_box > .submenu > li > .a_just {
+    background-position: 1px -319px;
+}
+
+.edit_content_wrapper .menu.text_menu > .a_just.active, .drop_down_box > .submenu > li > .a_just.active {
+    background-position: -199px -319px;
+}
+
+.edit_content_wrapper .menu.text_menu > .a_just:hover:not(.active), .drop_down_box > .submenu > li > .a_just:hover:not(.active) {
+    background-position: -39px -319px;
+}
+
+.edit_content_wrapper .menu.text_menu > .p_indent, .drop_down_box > .submenu > li > .p_indent {
+    background-position: 1px -426px;
+}
+
+.edit_content_wrapper .menu.text_menu > .p_indent.active, .drop_down_box > .submenu > li > .p_indent.active {
+    background-position: -199px -426px;
+}
+
+.edit_content_wrapper .menu.text_menu > .p_indent:hover:not(.active), .drop_down_box > .submenu > li > .p_indent:hover:not(.active) {
+    background-position: -39px -426px;
+}
+
+.edit_content_wrapper .menu.text_menu > .m_indent, .drop_down_box > .submenu > li > .m_indent {
+    background-position: 1px -462px;
+}
+
+.edit_content_wrapper .menu.text_menu > .m_indent.active, .drop_down_box > .submenu > li > .m_indent.active {
+    background-position: -199px -462px;
+}
+
+.edit_content_wrapper .menu.text_menu > .m_indent:hover:not(.active), .drop_down_box > .submenu > li > .m_indent:hover:not(.active) {
+    background-position: -39px -462px;
+}
+
+.edit_content_wrapper .menu.text_menu > .no_format, .drop_down_box > .submenu > li > .no_format {
+    background-position: 1px -139px;
+}
+
+.edit_content_wrapper .menu.text_menu > .no_format.active, .drop_down_box > .submenu > li > .no_format.active {
+    background-position: -199px -139px;
+}
+
+.edit_content_wrapper .menu.text_menu > .no_format:hover:not(.active), .drop_down_box > .submenu > li > .no_format:hover:not(.active) {
+    background-position: -39px -139px;
+}
+
+.edit_content_wrapper .menu.text_menu > :not(.divider):not(.active):hover, .drop_down_box > .submenu > li > :not(.divider):not(.active):hover {
+    box-shadow: 0 1px 3px #838383;
+}
+
+.edit_content_wrapper .menu.text_menu > .active, .drop_down_box > .submenu > li > .active {
+    background-color: #fff;
+    box-shadow: inset 0 1px 3px #979797;
+}
+
+.edit_content_wrapper .menu.text_menu > div.drop_down {
+    float: left;
+    padding: 0 3px;
+    height: 25px;
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+    /*    border: 1px solid #aaa;
+        background: #F0F0F0;*/
+}
+
+.edit_content_wrapper .menu.text_menu > div.drop_down > div.text {
+    padding: 0 22px 0 7px;
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 25px;
+    color: #5d5d5d;
+
+}
+
+.edit_content_wrapper .menu.text_menu > div.drop_down.active > div.text {
+    color: #1065A8;
+}
+
+.edit_content_wrapper .menu.text_menu > div.drop_down:hover:not(.active) > div.text {
+    color: #3f3f3f;
+}
+
+.edit_content_wrapper .menu.text_menu > div.text_type > div.text {
+    width: 80px;
+}
+
+.edit_content_wrapper .menu.text_menu > div.text_size> div.text {
+    width: 40px;
+}
+
+.edit_content_wrapper .menu.text_menu .arrow_down {
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #666;
+    position: absolute;
+    top: 11px;
+    right: 8px;
+}
+
+.edit_content_wrapper .menu.text_menu .overflow_container.drop_down {
+    float: right;
+    margin-right: 0;
+    padding: 0 7px;
+    background-color: #ECECEC;
+}
+
+.edit_content_wrapper .menu.text_menu .overflow_container.drop_down .arrow_down {
+    border-top-color: #777;
+    right: 3px;
+}
+
+.edit_content_wrapper .menu.text_menu .overflow_container.drop_down.active {
+    background-color: #fff;
+}
+
+.edit_content_wrapper .menu.history_menu {
+    height: auto;
+    padding: 20px 10px;
+    min-height: 148px;
+}
+
+.edit_content_wrapper .menu.history_menu.loading {
+    background: url(/_common/_img/ajax-loader.gif) scroll no-repeat center center;
+}
+
+.edit_content_wrapper .menu.history_menu .calendar {
+    float: left;
+}
+
+.edit_content_wrapper .menu.history_menu ul.history_list.loading {
+    background: url(/_common/_img/ajax-loader.gif) scroll no-repeat center center;
+    min-height: 148px;
+}
+
+.edit_content_wrapper .menu.history_menu ul.history_list {
+    overflow: hidden;
+    list-style-type: none;
+    padding: 0 0 0 20px !important;
+}
+
+.edit_content_wrapper .menu.history_menu ul.history_list > li {
+    height: 50px;
+    width: 50px;
+    line-height: 50px;
+    margin: 0 10px 10px 0;
+    background-color: #fff;
+    float: left;
+    color: #494949;
+    transition: background, box-shadow, color 0.1s, 0.1s, 0.1s;
+    -webkit-transition: background, box-shadow, color 0.1s, 0.1s, 0.1s;
+    text-align: center;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.edit_content_wrapper .menu.history_menu ul.history_list > li:hover, .edit_content_wrapper .menu.history_menu ul.history_list > li.current {
+    background-color: #cfecff;
+    box-shadow: 0 1px 3px #acacac;
+    color: #2f7e9a;
+    transition-duration: 0.2s, 0.2s, 0.2s;
+    -webkit-transition-duration: 0.2s, 0.2s, 0.2s;
+}
+
+.edit_content_wrapper .menu.upload_menu {
+    padding: 0;
+    height: auto;
+    position: relative;
+    min-height: 100px;
+}
+
+.edit_content_wrapper .menu.upload_menu .upload_icon_wrapper {
+    float: left;
+    width: 100%;
+}
+
+.edit_content_wrapper .menu.upload_menu .upload_icon {
+    width: 40px;
+    height: 66px;
+    background: transparent url(/_img/upload.png) scroll no-repeat 0 10px;
+    margin: 0 auto 17px;
+    cursor: pointer;
+    transition: background-position-y 0.1s;
+}
+
+.edit_content_wrapper .menu.upload_menu .upload_icon.trash_can {
+    background-image: url(/_img/trashcan3.png);
+}
+
+.edit_content_wrapper .menu.upload_menu .upload_icon.trash_can.hover {
+    background-position: -60px 5px;
+}
+
+.edit_content_wrapper .menu.upload_menu .upload_icon:not(.no_hover):hover {
+    background-position: -60px 5px;
+}
+
+.edit_content_wrapper .menu.upload_menu .progress_wrapper {
+    position: absolute;
+    bottom: 0;
+    height: 83px;
+    background-color: rgba(221, 221, 221, 0.7);
+    left: 0;
+    right: 0;
+}
+
+.edit_content_wrapper .menu.file_menu .uploading .progress_bar {
+    width: 100%;
+    top: 0;
+    margin: 0;
+    position: absolute;
+    height: 20px;
+    background-color: transparent;
+}
+
+.edit_content_wrapper .menu.file_menu .uploading .progress_bar .indicator {
+    border-radius: 0;
+
+}
+
+.edit_content_wrapper .menu.image_menu .uploading .progress_bar {
+    margin: 30px 2px 0;
+    width: 66px;
+    position: absolute;
+    top: 0;
+}
+
+.edit_content_wrapper .upload_menu.menu .preview {
+    margin: 17px auto 0;
+}
+
+.edit_content_wrapper .upload_menu.menu .preview > div {
+    float: left;
+
+}
+
+.edit_content_wrapper .upload_menu.menu .preview > div > div {
+    float: left;
+    margin: 5px;
+    position: relative;
+}
+
+.edit_content_wrapper .upload_menu.menu .preview .standin {
+    cursor: move;
+    overflow: hidden;
+    background: #fff no-repeat center center;
+    transition: opacity 0.1s;
+}
+
+.edit_content_wrapper .upload_menu.menu .file_preview .standin {
+    width: auto;
+    height: 20px;
+    box-shadow: 0 1px 4px #aaa;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 0 10px;
+    color: #255A8B;
+}
+
+.edit_content_wrapper .upload_menu.menu .file_preview .standin > span {
+    float: right;
+    padding: 0 0 0 10px;
+    font-size: 10px;
+    color: #9E3434;
+}
+
+.edit_content_wrapper .image_menu.menu .image_preview  .standin {
+    height: 70px;
+    width: 70px;
+    box-shadow: 0 1px 4px #aaa;
+    text-align: center;
+    background-size: contain;
+}
+
+.edit_content_wrapper .upload_menu.menu .preview  .uploading > .standin,
+.edit_content_wrapper .upload_menu.menu .preview  .dragging {
+    box-shadow: 0 0;
+    opacity: 0.3;
+    cursor: default;
+}
+
+.edit_content_wrapper .image_menu.menu .image_preview  .image_count {
+    position: absolute;
+    height: 15px;
+    width: 15px;
+    background: #379DB1;
+    line-height: 15px;
+    text-align: center;
+    color: #fff;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 2px 0 0 0;
+    bottom: -4px;
+    right: -4px;
+}
+
+.edit_content_wrapper .image_menu.menu .image_preview .gallery {
+    margin: 1px 9px 9px 1px;
+    height: 70px;
+    width: 70px;
+    background-color: #fff;
+    box-shadow: 0 1px 4px #aaa;
+
+}
+
+.edit_content_wrapper .image_menu.menu .image_preview .gallery .standin {
+    position: relative;
+    top: 4px;
+    left: 4px;
+}
+
+.edit_link_image_popup.floating_box {
+    z-index: 199;
+}
+
+.edit_link_image_popup button {
+    outline: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    height: 25px;
+    width: 27px;
+    border-radius: 2px;
+    cursor: pointer;
+    margin: 0 10px 0 0;
+    padding: 0;
+    border: 0;
+    background: transparent url(/_img/text_edit.png?v=1234) scroll no-repeat 1px -642px;
+}
+
+.edit_link_image_popup button:hover {
+    background: #d9d9d9 url(/_img/text_edit.png?v=1234) scroll no-repeat -39px -642px;
+
+}
+
+.edit_link_image_popup button.open {
+    background-position: 1px -711px;
+
+}
+
+.edit_link_image_popup button.open:hover {
+    background-position: -39px -711px;
+}
+
+.edit_link_image_popup button.edit_image {
+    background-position: 1px -675px;
+}
+
+.edit_link_image_popup button.edit_image:hover {
+    background-position: -39px -675px;
+}
+
+.edit_link_image_popup button:last-of-type {
+    margin: 0;
+}
+
+.edit_link_image_popup .text {
+    height: 25px;
+    padding: 3px 10px !important;
+}
+
+.image_edit_tool_bar {
+    position: fixed;
+    bottom: 30px;
+    width: 100%;
+    height: 30px;
+    z-index: 550;
+}
+
+.edit_image_popup {
+    box-shadow: 0 0 5px #000;
+    background: #fff url("/_common/_img/ajax-loader.gif") scroll no-repeat center center;
+    position: relative;
+}
+
+.edit_image_popup canvas {
+    margin: 0 auto;
+    display: block;
+}
+
+.edit_image_popup canvas.hover_dot{
+    cursor: pointer;
+}
+
+
+.image_edit_tool_bar  button {
+    padding: 0;
+    float: left;
+    width: 30px;
+    height: 30px;
+    border-radius: 0;
+    border: 0;
+    margin: 0 5px;
+    background: transparent url(/_img/image_edit.png) scroll no-repeat center 3px;
+    cursor: pointer;
+    transition: opacity 0.1s;
+    -webkit-transition: opacity 0.1s;
+    opacity: 1;
+
+}
+
+.image_edit_tool_bar button:hover{
+    background-color: transparent;
+    background-image: url(/_img/image_edit.png);
+    opacity: 0.7;
+}
+
+.image_edit_tool_bar button:focus{
+    box-shadow: 0 0 0;
+    border: 0;
+    outline: 0;
+}
+
+.image_edit_tool_bar  button:last-of-type{
+    float: right;
+}
+
+.image_edit_tool_bar > div {
+    box-shadow: 0 0 2px #000;
+    margin: 0 auto;
+    background-color: rgba(7, 39, 73, 0.67);
+    width: 600px;
+    height: inherit;
+    border-radius: 2px;
+
+}
+
+
+.image_edit_tool_bar .rotate_ccw{
+    background-position: center -37px;
+}
+
+.image_edit_tool_bar .zoom_in{
+    background-position: center -77px;
+}
+
+.image_edit_tool_bar .zoom_out{
+    background-position: center -117px;
+}
+
+.image_edit_tool_bar .mirror_h{
+    background-position: center -157px;
+}
+
+.image_edit_tool_bar .mirror_v{
+    background-position: center -197px;
+}
+
+.image_edit_tool_bar .crop{
+    background-position: center -277px;
+
+}
+.image_edit_tool_bar .save{
+    background-position: center -237px;
+
+}
+
+.edit_image_popup .saving_bar .progress_bar{
+    margin: 0;
+    height: 5px;
+    width: 100%;
+}
+
+.edit_image_popup .saving_bar{
+    overflow: hidden;
+    background-color: rgb(141, 141, 141);
+    transition: height 0.1s;
+    -webkit-transition: height 0.1s;
+    height: 0;
+}
+
+.edit_image_popup .saving_bar.saving{
+    height: 5px;
+}
