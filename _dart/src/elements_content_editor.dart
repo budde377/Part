@@ -426,7 +426,7 @@ class LinkImageHandler {
       handler.editor.maxWidth = editor.element.clientWidth;
       handler.editor.minWidth = 50;
       handler.open();
-      handler.onEdit.listen((ImageEditProperties p){
+      handler.onEdit.listen((ImageEditProperties p) {
         editor.element.dispatchEvent(new Event("input"));
       });
 
@@ -862,22 +862,31 @@ class ContentEditor {
     textEdit.classes.add('text');
     _setUpSubMenu(textEdit, bar, textMenu, (Element e) => _fillTextMenu(e));
     _addTitleToElement("Formater tekst", textEdit);
+    bar.append(textEdit);
 
-    addImage.classes.add('image');
-    _setUpSubMenu(addImage, bar, imageMenu, (Element e) => _fillUploadMenu(e, true));
-    _addTitleToElement("Indsæt billede", addImage);
+    if (!element.classes.contains("simple_editor")) {
 
-    addFile.classes.add('file');
-    _setUpSubMenu(addFile, bar, fileMenu, (Element e) => _fillUploadMenu(e));
-    _addTitleToElement("Indsæt fil", addFile);
+      addImage.classes.add('image');
+      _setUpSubMenu(addImage, bar, imageMenu, (Element e) => _fillUploadMenu(e, true));
+      _addTitleToElement("Indsæt billede", addImage);
+      bar.append(addImage);
+
+      addFile.classes.add('file');
+      _setUpSubMenu(addFile, bar, fileMenu, (Element e) => _fillUploadMenu(e));
+      _addTitleToElement("Indsæt fil", addFile);
+      bar.append(addFile);
+
+    }
 
     history.classes.add('history');
     _setUpSubMenu(history, bar, historyMenu, (Element e) => _fillHistoryMenu(e));
     _addTitleToElement("Se historik", history);
+    bar.append(history);
 
     closeElement.classes.add('close');
     _addTitleToElement("Afslut redigering", closeElement);
     closeElement.onClick.listen((_) => close());
+    bar.append(closeElement);
 
     saveElement.classes.add('save');
     var saveBox = new InfoBox("Gem ændringer");
@@ -892,6 +901,7 @@ class ContentEditor {
       }
       saveBox.remove();
     });
+    bar.append(saveElement);
 
     _currentContent.onAddContent.listen((_) => _notifyChange());
 
@@ -907,7 +917,6 @@ class ContentEditor {
 
     bar.classes.add('tool_bar');
 
-    bar..append(textEdit)..append(addImage)..append(addFile)..append(history)..append(closeElement)..append(saveElement);
 
     wrapper.append(bar);
 
@@ -1102,66 +1111,72 @@ class ContentEditor {
 
     };
 
-    var actions = [new EditorAction.liElementWithInnerHtml("<h2>Overskift</h2>", () => executor.formatBlockH2(), (String s) => s == "h2"), new EditorAction.liElementWithInnerHtml("<h3>Underoverskrift</h3>", () => executor.formatBlockH3(), (String s) => s == "h3"), new EditorAction.liElementWithInnerHtml("<p>Normal tekst</p>", () => executor.formatBlockP(), (String s) => s == "p"), new EditorAction.liElementWithInnerHtml("<blockquote>Citat</blockquote>", () => executor.formatBlockBlockquote(), (String s) => s == "blockquote"), new EditorAction.liElementWithInnerHtml("<pre>Kode</pre>", () => executor.formatBlockPre(), (String s) => s == "pre")];
+    var simple = element.classes.contains("simple_editor");
 
-    var textType = new DropDown.fromLIList(actions.map((EditorAction a) => a.element).toList());
+    if (!simple) {
 
 
-    actionsSetup(executor, actions, textType, () => executor.blockState);
+      var actions = [new EditorAction.liElementWithInnerHtml("<h2>Overskift</h2>", () => executor.formatBlockH2(), (String s) => s == "h2"), new EditorAction.liElementWithInnerHtml("<h3>Underoverskrift</h3>", () => executor.formatBlockH3(), (String s) => s == "h3"), new EditorAction.liElementWithInnerHtml("<p>Normal tekst</p>", () => executor.formatBlockP(), (String s) => s == "p"), new EditorAction.liElementWithInnerHtml("<blockquote>Citat</blockquote>", () => executor.formatBlockBlockquote(), (String s) => s == "blockquote"), new EditorAction.liElementWithInnerHtml("<pre>Kode</pre>", () => executor.formatBlockPre(), (String s) => s == "pre")];
 
-    textType.element.classes.add('text_type');
-    textType.text = "Normal tekst";
-    menuHandler.addToMenu(textType.element);
+      var textType = new DropDown.fromLIList(actions.map((EditorAction a) => a.element).toList());
 
-    var sizeActions = [new EditorAction.liElementWithInnerHtml("<font size='1'>Lille</font>", () => executor.setFontSize(1), (int s) => s == 1), new EditorAction.liElementWithInnerHtml("Normal", () {
-      executor.setFontSize(3);
-      var fonts = element.queryAll("font");
-      fonts.forEach((Element e) => e.attributes['size'] == '3' ? (() {
-        e.attributes.remove("size");
-      })() : () {
+
+      actionsSetup(executor, actions, textType, () => executor.blockState);
+
+      textType.element.classes.add('text_type');
+      textType.text = "Normal tekst";
+      menuHandler.addToMenu(textType.element);
+
+      var sizeActions = [new EditorAction.liElementWithInnerHtml("<font size='1'>Lille</font>", () => executor.setFontSize(1), (int s) => s == 1), new EditorAction.liElementWithInnerHtml("Normal", () {
+        executor.setFontSize(3);
+        var fonts = element.queryAll("font");
+        fonts.forEach((Element e) => e.attributes['size'] == '3' ? (() {
+          e.attributes.remove("size");
+        })() : () {
+        });
+      }, (i) => ![1, 5, 7].contains(i)), new EditorAction.liElementWithInnerHtml("<font size='5'>Stor</font>", () => executor.setFontSize(5), (int s) => s == 5), new EditorAction.liElementWithInnerHtml("<font size='7'>Størst</font>", () => executor.setFontSize(7), (int s) => s == 7)];
+
+      var textSize = new DropDown.fromLIList(sizeActions.map((EditorAction e) => e.element).toList());
+      textSize.element.classes.add('text_size');
+
+      actionsSetup(executor, sizeActions, textSize, () => executor.blockState == "p" ? executor.fontSize : -1);
+
+      menuHandler.addToMenu(textSize.element);
+      textSize.text = "Normal";
+
+
+      var colorContent = new DivElement(), colorSelect = new DropDown(colorContent), textColorPalette = new ColorPalette(), backgroundColorPalette = new ColorPalette(), colorLabel1 = new DivElement(), colorLabel2 = new DivElement();
+
+      colorLabel1..classes.add('color_label')..text = "Tekstfarve";
+      colorLabel2..classes.add('color_label')..text = "Baggrundsfarve";
+
+      colorSelect.element.classes.add('color');
+      colorSelect.preventDefaultOnClick = true;
+      colorSelect.text = " ";
+      colorContent..append(colorLabel1)..append(colorLabel2)..append(textColorPalette.element)..append(backgroundColorPalette.element);
+      colorSelect.dropDownBox.element.classes.add('color_select');
+
+      executor.listenQueryCommandStateChange(() {
+        textColorPalette.selected = executor.foreColor;
+        backgroundColorPalette.selected = executor.backColor;
       });
-    }, (i) => ![1, 5, 7].contains(i)), new EditorAction.liElementWithInnerHtml("<font size='5'>Stor</font>", () => executor.setFontSize(5), (int s) => s == 5), new EditorAction.liElementWithInnerHtml("<font size='7'>Størst</font>", () => executor.setFontSize(7), (int s) => s == 7)];
 
-    var textSize = new DropDown.fromLIList(sizeActions.map((EditorAction e) => e.element).toList());
-    textSize.element.classes.add('text_size');
+      textColorPalette.element.onChange.listen((_) {
+        if (textColorPalette.selected != null) {
+          executor.setForeColor(textColorPalette.selected);
+          colorSelect.close();
+        }
+      });
 
-    actionsSetup(executor, sizeActions, textSize, () => executor.blockState == "p" ? executor.fontSize : -1);
+      backgroundColorPalette.element.onChange.listen((_) {
+        if (backgroundColorPalette.selected != null) {
+          executor.setBackColor(backgroundColorPalette.selected);
+          colorSelect.close();
+        }
+      });
+      menuHandler.addToMenu(colorSelect.element);
 
-    menuHandler.addToMenu(textSize.element);
-    textSize.text = "Normal";
-
-    var colorContent = new DivElement(), colorSelect = new DropDown(colorContent), textColorPalette = new ColorPalette(), backgroundColorPalette = new ColorPalette(), colorLabel1 = new DivElement(), colorLabel2 = new DivElement();
-
-    colorLabel1..classes.add('color_label')..text = "Tekstfarve";
-    colorLabel2..classes.add('color_label')..text = "Baggrundsfarve";
-
-    colorSelect.element.classes.add('color');
-    colorSelect.preventDefaultOnClick = true;
-    colorSelect.text = " ";
-    colorContent..append(colorLabel1)..append(colorLabel2)..append(textColorPalette.element)..append(backgroundColorPalette.element);
-    colorSelect.dropDownBox.element.classes.add('color_select');
-
-    executor.listenQueryCommandStateChange(() {
-      textColorPalette.selected = executor.foreColor;
-      backgroundColorPalette.selected = executor.backColor;
-    });
-
-    textColorPalette.element.onChange.listen((_) {
-      if (textColorPalette.selected != null) {
-        executor.setForeColor(textColorPalette.selected);
-        colorSelect.close();
-      }
-    });
-
-    backgroundColorPalette.element.onChange.listen((_) {
-      if (backgroundColorPalette.selected != null) {
-        executor.setBackColor(backgroundColorPalette.selected);
-        colorSelect.close();
-      }
-    });
-
-
-    menuHandler.addToMenu(colorSelect.element);
+    }
     var dialog = new DialogContainer();
 
     dialog.dialogBg.onMouseDown.listen((MouseEvent evt) {
@@ -1231,17 +1246,18 @@ class ContentEditor {
               var selection = window.getSelection();
               var range = selection.getRangeAt(0);
               var commonAncestor = range.commonAncestorContainer;
-              if(!(commonAncestor is Element)){
+              if (!(commonAncestor is Element)) {
                 return;
               }
-              commonAncestor.queryAll("*").forEach((Element elm){
-                if(!selection.containsNode(elm, false)){
+              commonAncestor.queryAll("*").forEach((Element elm) {
+                if (!selection.containsNode(elm, false)) {
                   return;
                 }
                 elm.attributes.remove("style");
               });
               executor.removeFormat();
-        }}
+            }
+        }
     };
 
     textIconMap.forEach((String k, Map<String, dynamic> v) {
