@@ -357,6 +357,18 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertGreaterThan(0, $this->testPage->lastModified());
     }
 
+    public function testGetVariablesWillReturnInstanceOfVariables(){
+        $var = $this->testPage->getPageVariables();
+        $this-> assertInstanceOf("PageVariablesImpl", $var);
+    }
+
+    public function testGetVariablesWillReturnSameInstance(){
+        $this->assertTrue($this->testPage->getPageVariables() === $this->testPage->getPageVariables());
+    }
+
+
+
+
     public function getSetUpOperation()
     {
         $cascadeTruncates = true;

@@ -23,7 +23,7 @@ class PageContentImpl implements PageContent
     private $preparedAddStatement;
 
 
-    public function __construct(DB $database, Page $page, $id = null)
+    public function __construct(DB $database, Page $page, $id = "")
     {
         $this->db = $database;
         $this->page = $page;
@@ -71,15 +71,10 @@ class PageContentImpl implements PageContent
         if ($this->history != null) {
             return;
         }
-        if ($this->id == null) {
-            $prep = $this->db->getConnection()->prepare("SELECT content, UNIX_TIMESTAMP(time) AS time FROM PageContent WHERE id IS NULL AND page_id = ? ORDER BY time ASC");
-            $prep->execute(array($this->page->getID()));
-        } else {
-            $prep = $this->db->getConnection()->prepare("SELECT content, UNIX_TIMESTAMP(time) AS time FROM PageContent WHERE id=? AND page_id = ? ORDER BY time ASC");
-            $prep->execute(array($this->id, $this->page->getID()));
-        }
-        $this->history = $prep->fetchAll(PDO::FETCH_ASSOC);
 
+        $prep = $this->db->getConnection()->prepare("SELECT content, UNIX_TIMESTAMP(time) AS time FROM PageContent WHERE id=? AND page_id = ? ORDER BY time ASC");
+        $prep->execute(array($this->id, $this->page->getID()));
+        $this->history = $prep->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
@@ -134,12 +129,12 @@ class PageContentImpl implements PageContent
         $h = $this->history;
         $found = false;
         $e = null;
-        while(count($h) > 0 && !$found){
+        while (count($h) > 0 && !$found) {
             $e = array_pop($h);
             $found = $e['time'] <= $time;
         }
 
-        return $found?$e:null;
+        return $found ? $e : null;
 
     }
 }

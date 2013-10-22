@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/../_interface/Page.php';
 require_once dirname(__FILE__) . '/../_interface/Observable.php';
 require_once dirname(__FILE__) . '/../_exception/MalformedParameterException.php';
 require_once dirname(__FILE__) . '/PageContentImpl.php';
+require_once dirname(__FILE__) . '/PageVariablesImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -26,6 +27,7 @@ class PageImpl implements Page, Observable
     private $connection;
 
     private $content = array();
+    private $variables;
 
     /** @var $existsStatement PDOStatement | null */
     private $existsStatement = null;
@@ -425,5 +427,13 @@ class PageImpl implements Page, Observable
         $this->updateLastModifiedStatement->execute();
         return $this->lastModified;
 
+    }
+
+    /**
+     * @return Variables Will return and reuse instance of variables
+     */
+    public function getPageVariables()
+    {
+        return $this->variables == null? $this->variables = new PageVariablesImpl($this->database, $this):$this->variables;
     }
 }

@@ -213,4 +213,12 @@ class DefaultPageImpl implements Page
     public function modify()
     {
     }
+
+    /**
+     * @return Variables Will return and reuse instance of variables
+     */
+    public function getPageVariables()
+    {
+        return null;
+    }
 }

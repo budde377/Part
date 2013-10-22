@@ -218,4 +218,12 @@ class StubPageImpl implements Page
     {
         return $this->lastModified = time();
     }
+
+    /**
+     * @return Variables Will return and reuse instance of variables
+     */
+    public function getPageVariables()
+    {
+        return null;
+    }
 }

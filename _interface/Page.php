@@ -161,4 +161,9 @@ interface Page
      */
     public function lastModified();
 
+    /**
+     * @return Variables Will return and reuse instance of variables
+     */
+    public function getPageVariables();
+
 }
