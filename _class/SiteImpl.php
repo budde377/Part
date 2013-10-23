@@ -14,7 +14,7 @@ class SiteImpl implements Site
     private $contentMap = array();
     private $variables;
     private $db;
-    private $lastMod;
+    private $lastMod = 0 ;
 
     function __construct(DB $db)
     {
@@ -29,7 +29,7 @@ class SiteImpl implements Site
      */
     public function getContent($id = "")
     {
-        return isset($this->contentMap[$id])? $this->contentMap[$id]:$this->contentMap[$id] = new SiteContentImpl($this->db, $id);
+        return isset($this->contentMap[$id])? $this->contentMap[$id]:$this->contentMap[$id] = new SiteContentImpl($this->db, $this, $id);
     }
 
     /**
@@ -42,12 +42,12 @@ class SiteImpl implements Site
     }
 
     /**
-     * Returns last modified timestamp, NULL if site hasn't been modified
-     * @return int | null
+     * Returns last modified timestamp, 0 if site hasnot been modified
+     * @return int 0
      */
     public function lastModified()
     {
-        return $this->lastMod == null?$this->lastMod = $this->getVariables()->getValue("last_modified"):$this->lastMod;
+        return $this->lastMod == 0?$this->lastMod = $this->getVariables()->getValue("last_modified"):$this->lastMod;
     }
 
 

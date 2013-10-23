@@ -18,9 +18,12 @@ class CacheControlImpl implements CacheControl{
     private $hasBeenSetUp = false;
     /** @var  Page */
     private $page;
+    /** @var  Site */
+    private $site;
 
-    public function __construct(CurrentPageStrategy $currentPageStrategy){
+    public function __construct(Site $site, CurrentPageStrategy $currentPageStrategy){
         $this->page = $currentPageStrategy->getCurrentPage();
+        $this->site = $site;
     }
 
     /**
@@ -49,7 +52,7 @@ class CacheControlImpl implements CacheControl{
         if(!$this->enabledCacheControl){
             return false;
         }
-        $t = $this->page->lastModified();
+        $t = max($this->page->lastModified(), $this->site->lastModified());
         $this->hasBeenSetUp = true;
         header("Cache-Control: must-revalidate");
         header_remove('Pragma');

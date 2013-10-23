@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__FILE__).'/_stub/StubCurrentPageStrategyImpl.php';
 require_once dirname(__FILE__).'/_stub/StubPageImpl.php';
+require_once dirname(__FILE__).'/_stub/StubSiteImpl.php';
 require_once dirname(__FILE__).'/../_class/CacheControlImpl.php';
 
 /**
@@ -17,13 +18,15 @@ class CacheControlImplTest extends  PHPUnit_Framework_TestCase{
     private $cacheControl;
     private $stubStrat;
     private $stubPage;
+    private $stubSite;
 
     public function setUp(){
         $this->stubPage = new StubPageImpl();
         $this->stubStrat = new StubCurrentPageStrategyImpl();
         $this->stubStrat->setCurrentPagePath(array($this->stubPage));
         $this->stubStrat->setCurrentPage($this->stubPage);
-        $this->cacheControl = new CacheControlImpl($this->stubStrat);
+        $this->stubSite = new StubSiteImpl();
+        $this->cacheControl = new CacheControlImpl($this->stubSite, $this->stubStrat);
     }
 
 

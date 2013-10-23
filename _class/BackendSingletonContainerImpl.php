@@ -182,7 +182,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getCacheControlInstance()
     {
         if($this->cacheControl == null){
-            $this->cacheControl = new CacheControlImpl($this->getCurrentPageStrategyInstance());
+            $this->cacheControl = new CacheControlImpl($this->getSiteInstance(), $this->getCurrentPageStrategyInstance());
         }
         return $this->cacheControl;
     }

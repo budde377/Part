@@ -27,8 +27,8 @@ interface Site
     public function getVariables();
 
     /**
-     * Returns last modified timestamp, NULL if site hasn't been modified
-     * @return int | null
+     * Returns last modified timestamp, 0 if site has not been modified
+     * @return int
      */
     public function lastModified();
 
