@@ -8,7 +8,9 @@ require_once dirname(__FILE__) . '/_stub/NullPageElementImpl.php';
 require_once dirname(__FILE__) . '/_stub/StubUserLibraryImpl.php';
 require_once dirname(__FILE__) . '/_stub/StubBackendSingletonContainerImpl.php';
 require_once dirname(__FILE__) . '/_stub/StubCurrentPageStrategyImpl.php';
+require_once dirname(__FILE__) . '/_stub/StubContentImpl.php';
 require_once dirname(__FILE__) . '/_stub/StubPageImpl.php';
+require_once dirname(__FILE__) . '/_stub/StubSiteImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -27,25 +29,35 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     private $rootPath;
     /** @var  StubPageImpl */
     private $currentPage;
+    /** @var  Site */
+    private $site;
 
     private $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
 
     protected function setUp()
     {
-
+        $this->backFactory = $this->template = $this->rootPath = $this->currentPage = null;
         @session_start();
 
     }
 
     protected function tearDown()
     {
+        unset($this->template);
         @session_destroy();
     }
 
     private function setUpConfig($config = null)
     {
         if($config == null){
-            $config = "<config>{$this->defaultOwner}</config>";
+            $config = "
+            <config>{$this->defaultOwner}
+            <pageElements>
+                <class name='someElement' link='_stub/HelloPageElementImpl.php'>HelloPageElementImpl</class>
+                <class name='initElement' link='_stub/CheckInitializedPageElementImpl.php'>CheckInitializedPageElementImpl</class>
+            </pageElements>
+
+            </config>";
         }
 
         /** @var $configXML SimpleXMLElement */
@@ -60,6 +72,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->backFactory->setCurrentPageStrategyInstance($currentPageStrategy);
         $this->backFactory->setConfigInstance($config);
         $this->backFactory->setUserLibraryInstance(new StubUserLibraryImpl());
+        $this->site = new StubSiteImpl();
+        $this->backFactory->setSiteInstance($this->site);
         $this->template = new TemplateImpl($nullPageElementFactory, $this->backFactory);
     }
 
@@ -210,6 +224,95 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $v = $this->template->render();
         $this->assertTrue(strpos($v, "js_register") !== false);
     }
+
+    public function testTemplateSupportsPageElementTag(){
+        $this->setUpConfig();
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{%page_element someElement%}");
+        $v = $this->template->render();
+        $this->assertEquals( "Hello World", $v);
+    }
+
+    public function testTemplateBreakIfNoPageElement(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%page_element nonExistingElement%}");
+        $exception = false;
+        try{
+            $this->template->render();
+        } catch(Twig_Error $error){
+            $exception = true;
+            $this->assertEquals(1, $error->getTemplateLine());
+        }
+        $this->assertTrue($exception);
+    }
+
+    public function testTemplateInitializePageElementIsSupported(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%init_page_element someElement%}");
+        $this->assertEquals("", $this->template->render());
+    }
+
+    public function testTemplateInitializePageElementDoesJustThat(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%init_page_element initElement%}");
+        $_SESSION['initialized'] = 0;
+        $this->template->render();
+        $this->assertEquals(1, $_SESSION['initialized']);
+    }
+
+    public function testTemplateInitializePageElementBreaksOnElementNotFound(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%init_page_element nonExistingElement%}");
+        $exception = false;
+        try{
+            $this->template->render();
+        } catch(Twig_Error $error){
+            $exception = true;
+            $this->assertEquals(1, $error->getTemplateLine());
+        }
+        $this->assertTrue($exception);
+    }
+
+    public function testTemplateWillSupportPageContent(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%page_content someElement %}");
+        $this->assertEquals("", $this->template->render());
+    }
+    public function testTemplateWillSupportPageContentWithNoId(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%page_content asd%}");
+        $this->assertEquals("", $this->template->render());
+    }
+
+    public function testTemplateWillAddPageContent(){
+        $this->setUpConfig();
+        $this->currentPage->getContent()->addContent("Hello World");
+        $this->template->setTemplateFromString("{%page_content%}");
+        $this->assertEquals("Hello World", $this->template->render());
+    }
+
+
+    public function testTemplateWillSupportSiteContent(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%site_content someElement %}");
+        $this->assertEquals("", $this->template->render());
+    }
+
+    public function testTemplateWillAddSiteContent(){
+        $this->setUpConfig();
+        $this->site->getContent("")->addContent("Hello World");
+        $this->template->setTemplateFromString("{%site_content%}");
+        $this->assertEquals("Hello World", $this->template->render());
+    }
+
+
+    public function testTemplateWillAddSiteContentWithId(){
+        $this->setUpConfig();
+        $this->site->getContent("someid")->addContent("Hello World");
+        $this->template->setTemplateFromString("{%site_content someid%}");
+        $this->assertEquals("Hello World", $this->template->render());
+    }
+
 
 
 }

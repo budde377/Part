@@ -15,23 +15,15 @@ class StubSiteImpl implements Site{
         $this->variables = $variables;
     }
 
-    /**
-     * @param string $id
-     * @param Content $content
-     */
-    public function setContent($id, $content)
-    {
-        $this->content[$id] = $content;
-    }
 
     /**
      * Returns and reuses instance of site scoped Content
      * @param string $id
      * @return Content
      */
-    public function getContent($id)
+    public function getContent($id = "")
     {
-        return $this->content[$id];
+        return isset($this->content[$id])?$this->content[$id]:$this->content[$id] = new StubContentImpl();
     }
 
     /**

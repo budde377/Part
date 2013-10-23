@@ -18,7 +18,7 @@ interface Site
      * @param string $id
      * @return Content
      */
-    public function getContent($id);
+    public function getContent($id = "");
 
     /**
      * Returns and reuses instance of site scoped variables

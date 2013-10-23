@@ -22,6 +22,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     private $defaultPageLibraryInstance;
     private $cacheControlInstance;
     private $updater;
+    private $siteInstance;
 
     /**
      * @param mixed $CSSRegisterInstance
@@ -228,6 +229,16 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
      */
     public function getSiteInstance()
     {
-        return null;
+        return $this->siteInstance;
     }
+
+    /**
+     * @param mixed $siteInstance
+     */
+    public function setSiteInstance($siteInstance)
+    {
+        $this->siteInstance = $siteInstance;
+    }
+
+
 }

@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../_vendor/autoload.php';
 require_once dirname(__FILE__) . '/FileImpl.php';
+require_once dirname(__FILE__) . '/CBTwigExtensionImpl.php';
 require_once dirname(__FILE__) . '/../_interface/Template.php';
 require_once dirname(__FILE__) . '/../_exception/FileNotFoundException.php';
 require_once dirname(__FILE__) . '/../_exception/EntryNotFoundException.php';
@@ -84,11 +85,13 @@ class TemplateImpl implements Template
 
 
     private function setUpTwig(Twig_LoaderInterface $loader, $renderTarget){
-        $this->twig = new Twig_Environment($loader, array('debug'=>$this->twigDebug));
+        $this->twig = new Twig_Environment($loader, array('debug'=>$this->twigDebug)); //TODO Add some tmp
         if($this->twigDebug){
             $this->twig->addExtension(new Twig_Extension_Debug());
         }
+        $this->twig->addExtension(new CBTwigExtensionImpl($this->backendContainer, $this->pageElementFactory));
         $this->renderTarget = $renderTarget;
+
     }
 
 
