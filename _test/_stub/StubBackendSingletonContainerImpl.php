@@ -18,9 +18,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     private $pageOrderInstance;
     private $currentPageStrategyInstance;
     private $configInstance;
-    private $siteLibraryInstance;
     private $userLibraryInstance;
-    private $multiSiteUserPrivilegesLibraryInstance;
     private $defaultPageLibraryInstance;
     private $cacheControlInstance;
     private $updater;
@@ -137,21 +135,6 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
         return $this->defaultPageLibraryInstance;
     }
 
-    /**
-     * @param mixed $multiSiteUserPrivilegesLibraryInstance
-     */
-    public function setMultiSiteUserPrivilegesLibraryInstance(MultiSiteUserPrivilegesLibrary $multiSiteUserPrivilegesLibraryInstance)
-    {
-        $this->multiSiteUserPrivilegesLibraryInstance = $multiSiteUserPrivilegesLibraryInstance;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getMultiSiteUserPrivilegesLibraryInstance()
-    {
-        return $this->multiSiteUserPrivilegesLibraryInstance;
-    }
 
     /**
      * @param mixed $pageOrderInstance
@@ -167,22 +150,6 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     public function getPageOrderInstance()
     {
         return $this->pageOrderInstance;
-    }
-
-    /**
-     * @param mixed $siteLibraryInstance
-     */
-    public function setSiteLibraryInstance(SiteLibrary $siteLibraryInstance)
-    {
-        $this->siteLibraryInstance = $siteLibraryInstance;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getSiteLibraryInstance()
-    {
-        return $this->siteLibraryInstance;
     }
 
     /**

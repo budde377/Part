@@ -66,12 +66,6 @@ interface BackendSingletonContainer
      */
     public function getConfigInstance();
 
-    /**
-     * @abstract
-     * Will create and reuse an instance of SiteLibrary
-     * @return SiteLibrary
-     */
-    public function getSiteLibraryInstance();
 
     /**
      * @abstract
@@ -80,13 +74,6 @@ interface BackendSingletonContainer
      */
     public function getUserLibraryInstance();
 
-
-    /**
-     * @abstract
-     * Will create and reuse an instance of UserPrivilegesLibrary
-     * @return MultiSiteUserPrivilegesLibrary
-     */
-    public function getMultiSiteUserPrivilegesLibraryInstance();
 
     /**
      * Will create and reuse an instance of DefaultPageLibrary

@@ -75,14 +75,6 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
         return null;
     }
 
-    /**
-     * Will create and reuse an instance of SiteLibrary
-     * @return SiteLibrary
-     */
-    public function getSiteLibraryInstance()
-    {
-        return null;
-    }
 
     /**
      * Will create and reuse an instance of UserLibrary
@@ -93,14 +85,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
         return null;
     }
 
-    /**
-     * Will create and reuse an instance of UserPrivilegesLibrary
-     * @return MultiSiteUserPrivilegesLibrary
-     */
-    public function getMultiSiteUserPrivilegesLibraryInstance()
-    {
-        return null;
-    }
+
 
     /**
      * Will create and reuse an instance of DefaultPageLibrary

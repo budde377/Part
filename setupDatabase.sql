@@ -22,20 +22,6 @@ SET time_zone = "+00:00";
 
 -- --------------------------------------------------------
 
---
--- Struktur-dump for tabellen `MultiSiteUserPrivilege`
---
-
-CREATE TABLE IF NOT EXISTS `MultiSiteUserPrivilege` (
-  `username` varchar(255) NOT NULL,
-  `type` varchar(10) NOT NULL,
-  `site` varchar(255) DEFAULT '',
-  `page` varchar(255) DEFAULT '',
-  UNIQUE KEY `username_2` (`username`,`type`,`site`,`page`),
-  KEY `site` (`site`),
-  KEY `username` (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
 -- --------------------------------------------------------
 
 --
@@ -109,27 +95,6 @@ CREATE TABLE IF NOT EXISTS `SiteContent` (
   UNIQUE KEY `id` (`id`,`time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- --------------------------------------------------------
-
---
--- Struktur-dump for tabellen `Sites`
---
-
-CREATE TABLE IF NOT EXISTS `Sites` (
-  `title` varchar(255) NOT NULL,
-  `address` varchar(255) DEFAULT NULL,
-  `db_host` varchar(255) DEFAULT NULL,
-  `db_db` varchar(255) DEFAULT NULL,
-  `db_user` varchar(255) DEFAULT NULL,
-  `db_password` varchar(255) DEFAULT NULL,
-  `ft_user` varchar(255) DEFAULT NULL,
-  `ft_password` varchar(255) DEFAULT NULL,
-  `ft_host` varchar(255) DEFAULT NULL,
-  `ft_port` int(11) DEFAULT NULL,
-  `ft_path` varchar(255) DEFAULT NULL,
-  `ft_type` int(1) DEFAULT NULL,
-  PRIMARY KEY (`title`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -194,13 +159,6 @@ CREATE TABLE IF NOT EXISTS `UserVariables` (
 --
 -- Begrænsninger for dumpede tabeller
 --
-
---
--- Begrænsninger for tabel `MultiSiteUserPrivilege`
---
-ALTER TABLE `MultiSiteUserPrivilege`
-ADD CONSTRAINT `MultiSiteUserPrivilege_ibfk_1` FOREIGN KEY (`username`) REFERENCES `User` (`username`) ON DELETE CASCADE ON UPDATE CASCADE,
-ADD CONSTRAINT `MultiSiteUserPrivilege_ibfk_2` FOREIGN KEY (`site`) REFERENCES `Sites` (`title`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Begrænsninger for tabel `PageContent`

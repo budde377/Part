@@ -7,9 +7,7 @@ require_once dirname(__FILE__) . '/AJAXRegisterImpl.php';
 require_once dirname(__FILE__) . '/DartRegisterImpl.php';
 require_once dirname(__FILE__) . '/PageOrderImpl.php';
 require_once dirname(__FILE__) . '/CurrentPageStrategyImpl.php';
-require_once dirname(__FILE__) . '/SiteLibraryImpl.php';
 require_once dirname(__FILE__) . '/UserLibraryImpl.php';
-require_once dirname(__FILE__) . '/MultiSiteUserPrivilegesLibraryImpl.php';
 require_once dirname(__FILE__) . '/DefaultPageLibraryImpl.php';
 require_once dirname(__FILE__) . '/CacheControlImpl.php';
 require_once dirname(__FILE__) . '/GitUpdaterImpl.php';
@@ -37,12 +35,8 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $pageOrder;
     /** @var $pageOrder null | CurrentPageStrategy */
     private $currentPageStrategy;
-    /** @var $pageOrder null | SiteLibrary */
-    private $siteLibrary;
     /** @var $userLibrary null | UserLibrary */
     private $userLibrary;
-    /** @var $userPrivilegesLibrary null | MultiSiteUserPrivilegesLibrary */
-    private $multiSiteUserPrivilegesLibrary;
     /** @var DefaultPageLibrary */
     private $defaultPageLibrary;
     /** @var DartRegister */
@@ -139,17 +133,6 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
         return $this->config;
     }
 
-    /**
-     * Will create and reuse an instance of SiteLibrary
-     * @return SiteLibrary
-     */
-    public function getSiteLibraryInstance()
-    {
-        if ($this->siteLibrary === null) {
-            $this->siteLibrary = new SiteLibraryImpl($this->getDBInstance());
-        }
-        return $this->siteLibrary;
-    }
 
     /**
      * Will create and reuse an instance of UserLibrary
@@ -163,18 +146,6 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
         return $this->userLibrary;
     }
 
-    /**
-     * Will create and reuse an instance of UserPrivilegesLibrary
-     * @return MultiSiteUserPrivilegesLibrary
-     */
-    public function getMultiSiteUserPrivilegesLibraryInstance()
-    {
-        if($this->multiSiteUserPrivilegesLibrary === null){
-            $this->multiSiteUserPrivilegesLibrary = new MultiSiteUserPrivilegesLibraryImpl($this->getDBInstance(),$this->getSiteLibraryInstance());
-        }
-
-        return $this->multiSiteUserPrivilegesLibrary;
-    }
 
     /**
      * Will create and reuse an instance of DefaultPageLibrary
