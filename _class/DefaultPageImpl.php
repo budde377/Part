@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__).'/../_interface/Page.php';
-require_once dirname(__FILE__).'/NullPageContentImpl.php';
+require_once dirname(__FILE__) . '/NullContentImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -190,11 +190,11 @@ class DefaultPageImpl implements Page
     /**
      * This will return an object used to retrieve the content.
      * @param null | string $id Optional parameter specifying an id for the content.
-     * @return PageContent
+     * @return Content
      */
-    public function getContent($id = null)
+    public function getContent($id = "")
     {
-        return new NullPageContentImpl();
+        return new NullContentImpl();
     }
 
     /**

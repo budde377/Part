@@ -60,9 +60,9 @@ interface Page
     /**
      * This will return an object used to retrieve the content.
      * @param null | string $id Optional parameter specifying an id for the content.
-     * @return PageContent
+     * @return Content
      */
-    public function getContent($id = null);
+    public function getContent($id = "");
     /**
      * @abstract
      * Set the id of the page. The ID should be of type [a-zA-Z0-9-_]+

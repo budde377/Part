@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__). '/../../_interface/PageContent.php';
+require_once dirname(__FILE__) . '/../../_interface/Content.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -8,7 +8,7 @@ require_once dirname(__FILE__). '/../../_interface/PageContent.php';
  * To change this template use File | Settings | File Templates.
  */
 
-class StubPageContentImpl implements PageContent{
+class StubContentImpl implements Content{
 
     private $content = array();
 

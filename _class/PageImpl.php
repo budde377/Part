@@ -391,9 +391,9 @@ class PageImpl implements Page, Observable
     /**
      * This will return an object used to retrieve the content.
      * @param null | string $id Optional parameter specifying an id for the content.
-     * @return PageContent
+     * @return Content
      */
-    public function getContent($id = null)
+    public function getContent($id = "")
     {
         if(!isset($this->content[$id])){
             $this->content[$id] = new PageContentImpl($this->database,$this,$id);

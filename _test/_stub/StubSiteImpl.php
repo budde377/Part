@@ -1,154 +1,64 @@
 <?php
-require_once dirname(__FILE__) . '/../../_interface/Site.php';
-/**
- * Created by JetBrains PhpStorm.
- * User: budde
- * Date: 7/18/12
- * Time: 1:17 AM
- */
-class StubSiteImpl implements Site
-{
+require_once dirname(__FILE__).'/../../_interface/Site.php';
 
-    private $pageOrder;
-    private $tile;
-    public $host;
-    public $database;
-    public $user;
-    public $password;
+class StubSiteImpl implements Site{
+
+    private $content = array();
+    private $variables;
+    private $lastMod;
 
     /**
-     * @return PageOrder | bool Will return PageOrder on success, else false if connection is not valid
+     * @param mixed $variables
      */
-    public function getPageOrder()
+    public function setVariables($variables)
     {
-        return $this->pageOrder;
+        $this->variables = $variables;
     }
 
     /**
-     * Will return the title of the site.
-     * The title must be unique in a way which conforms to the implementation
-     * @return string
+     * @param string $id
+     * @param Content $content
      */
-    public function getTitle()
+    public function setContent($id, $content)
     {
-        return $this->tile;
+        $this->content[$id] = $content;
     }
 
     /**
-     * Will set the title and will return false if the title is not unique.
-     * @param string $title
-     * @return bool
+     * Returns and reuses instance of site scoped Content
+     * @param string $id
+     * @return Content
      */
-    public function setTitle($title)
+    public function getContent($id)
     {
-        $this->tile = $title;
+        return $this->content[$id];
     }
 
     /**
-     * Will set the host of the site
-     * @param string $host
-     * @return void
+     * Returns and reuses instance of site scoped variables
+     * @return Variables
      */
-    public function setDBHost($host)
+    public function getVariables()
     {
-        $this->host = $host;
+        return $this->variables;
     }
 
     /**
-     * Will set the database of the site
-     * @param string $database
-     * @return void
+     * Returns last modified timestamp, NULL if site hasn't been modified
+     * @return int | null
      */
-    public function setDBDatabase($database)
+    public function lastModified()
     {
-        $this->database = $database;
+        return $this->lastMod;
     }
 
     /**
-     * Will set the user of the site
-     * @param string $user
-     * @return void
+     * "Modifies" the site by changing the last modified timestamp to now
+     * @return int The new timestamp
      */
-    public function setDBUser($user)
+    public function modify()
     {
-        $this->user = $user;
-    }
-
-    /**
-     * Will set the password of the site
-     * @param string $password
-     * @return void
-     */
-    public function setDBPassword($password)
-    {
-        $this->password = $password;
-    }
-
-    /**
-     * Will return the host of the site
-     * @return string
-     */
-    public function getDBHost()
-    {
-        return $this->host;
-    }
-
-    /**
-     * Will return the database of the site
-     * @return string
-     */
-    public function getDBDatabase()
-    {
-        return $this->database;
-    }
-
-    /**
-     * Will return the user of the site
-     * @return string
-     */
-    public function getDBUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * Will return the password of the site
-     * @return string
-     */
-    public function getDBPassword()
-    {
-        return $this->password;
-    }
-
-    /**
-     * Create the site on persistent storage
-     * @return bool Will return TRUE if site has been created on persistent storage, else FALSE
-     */
-    public function create()
-    {
-        return false;
-    }
-
-    /**
-     * Checks if the site has been created on persistent storage.
-     * @return bool Will return FALSE if site does not exists on persistent storage, else TRUE
-     */
-    public function exists()
-    {
-        return true;
-    }
-
-    /**
-     * Will delete site from persistent storage
-     * @return bool Will return FALSE on failure, else TRUE
-     */
-    public function delete()
-    {
-        return false;
-    }
-
-    public function setPageOrder($pageOrder)
-    {
-        $this->pageOrder = $pageOrder;
+        return $this->lastMod = time();
     }
 }
+

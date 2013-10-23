@@ -60,7 +60,7 @@ class DefaultPageImplTest extends PHPUnit_Framework_TestCase{
     }
 
     public function testContentIsNullPageContent(){
-        $this->assertInstanceOf('NullPageContentImpl',$this->defaultPage->getContent());
+        $this->assertInstanceOf('NullContentImpl',$this->defaultPage->getContent());
     }
 
 }

@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../_interface/Page.php';
 require_once dirname(__FILE__) . '/../_helper/HTTPHeaderHelper.php';
-require_once dirname(__FILE__).'/NullPageContentImpl.php';
+require_once dirname(__FILE__) . '/NullContentImpl.php';
 
 
 /**
@@ -191,11 +191,11 @@ class NotFoundPageImpl implements Page
     /**
      * This will return an object used to retrieve the content.
      * @param null | string $id Optional parameter specifying an id for the content.
-     * @return PageContent
+     * @return Content
      */
-    public function getContent($id = null)
+    public function getContent($id = "")
     {
-        return new NullPageContentImpl();
+        return new NullContentImpl();
     }
 
     /**

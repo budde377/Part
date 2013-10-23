@@ -226,7 +226,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
      * These should reflect the site scoped variables.
      * @return Variables
      */
-    public function getSiteVariablesInstance()
+    public function getSiteInstance()
     {
         return null;
     }

@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/../../_interface/Page.php';
-require_once dirname(__FILE__) . '/StubPageContentImpl.php';
+require_once dirname(__FILE__) . '/StubContentImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -193,11 +193,11 @@ class StubPageImpl implements Page
     /**
      * This will return an object used to retrieve the content.
      * @param null | string $id Optional parameter specifying an id for the content.
-     * @return PageContent
+     * @return Content
      */
-    public function getContent($id = null)
+    public function getContent($id = "")
     {
-        return isset($this->pageContent[$id])?$this->pageContent[$id]:$this->pageContent[$id] = new StubPageContentImpl();
+        return isset($this->pageContent[$id])?$this->pageContent[$id]:$this->pageContent[$id] = new StubContentImpl();
     }
 
 

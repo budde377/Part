@@ -1,19 +1,17 @@
 <?php
-require_once dirname(__FILE__) . '/../_interface/Content.php';
+require_once dirname(__FILE__).'/../_interface/Content.php';
 /**
- * Created by JetBrains PhpStorm.
+ * Created by PhpStorm.
  * User: budde
- * Date: 25/05/13
- * Time: 22:45
- * To change this template use File | Settings | File Templates.
+ * Date: 10/23/13
+ * Time: 12:54 PM
  */
 
-class PageContentImpl implements Content
-{
+class SiteContentImpl implements Content{
 
     private $db;
-    private $page;
     private $id;
+    private $site;
 
     private $content;
     private $time;
@@ -23,11 +21,11 @@ class PageContentImpl implements Content
     private $preparedAddStatement;
 
 
-    public function __construct(DB $database, Page $page, $id = "")
+    public function __construct(DB $database, Site $site, $id = "")
     {
         $this->db = $database;
-        $this->page = $page;
         $this->id = $id;
+        $this->site = $site;
     }
 
 
@@ -50,17 +48,14 @@ class PageContentImpl implements Content
      */
     public function addContent($content)
     {
-        if (!$this->page->exists()) {
-            return null;
-        }
         $this->initializeHistory();
         if ($this->preparedAddStatement == null) {
             $this->preparedAddStatement = $this->db->getConnection()->prepare("
-            INSERT INTO PageContent (id,page_id,time, content)
-            VALUES (?, ?, ?, ?)");
+            INSERT INTO SiteContent (id, `time`, content)
+            VALUES (?, ?, ?)");
         }
-        $t = $this->page->modify();
-        $this->preparedAddStatement->execute(array($this->id, $this->page->getID(), date("Y-m-d H:i:s", $t), $content));
+        $t = $this->site->modify();
+        $this->preparedAddStatement->execute(array($this->id, date("Y-m-d H:i:s", $t), $content));
         $this->content = $content;
         $this->history[] = array('content' => $content, 'time' => $t);
         return $t;
@@ -72,8 +67,8 @@ class PageContentImpl implements Content
             return;
         }
 
-        $prep = $this->db->getConnection()->prepare("SELECT content, UNIX_TIMESTAMP(time) AS time FROM PageContent WHERE id=? AND page_id = ? ORDER BY time ASC");
-        $prep->execute(array($this->id, $this->page->getID()));
+        $prep = $this->db->getConnection()->prepare("SELECT content, UNIX_TIMESTAMP(time) AS time FROM SiteContent WHERE id=? ORDER BY time ASC");
+        $prep->execute(array($this->id));
         $this->history = $prep->fetchAll(PDO::FETCH_ASSOC);
     }
 

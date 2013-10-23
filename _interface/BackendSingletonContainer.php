@@ -97,9 +97,9 @@ interface BackendSingletonContainer
     /**
      * Will create and reuse an instance of Variables.
      * These should reflect the site scoped variables.
-     * @return Variables
+     * @return Site
      */
-    public function getSiteVariablesInstance();
+    public function getSiteInstance();
 
 
 

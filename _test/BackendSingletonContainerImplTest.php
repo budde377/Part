@@ -150,9 +150,9 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
     }
 
     public function testGetSiteVariablesWillReturnSameInstanceOfUpdater(){
-        $ret1 = $this->backContainer->getSiteVariablesInstance();
-        $this->assertInstanceOf('Variables',$ret1);
-        $ret2 =$this->backContainer->getSiteVariablesInstance();
+        $ret1 = $this->backContainer->getSiteInstance();
+        $this->assertInstanceOf('Site',$ret1);
+        $ret2 =$this->backContainer->getSiteInstance();
         $this->assertTrue($ret1 === $ret2);
     }
 
