@@ -153,4 +153,10 @@ interface User
      */
     public function isValidPassword($password);
 
+
+    /**
+     * @return Variables
+     */
+    public function getUserVariables();
+
 }

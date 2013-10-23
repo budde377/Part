@@ -4,6 +4,7 @@ require_once dirname(__FILE__) . '/../_trait/ValidationTrait.php';
 require_once dirname(__FILE__) . '/../_interface/User.php';
 require_once dirname(__FILE__) . '/../_interface/Observable.php';
 require_once dirname(__FILE__) . '/UserPrivilegesImpl.php';
+require_once dirname(__FILE__) . '/UserVariablesImpl.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -27,6 +28,7 @@ class UserImpl implements User, Observable
     private $id;
 
     private $userPrivileges;
+    private $userVariables;
 
 
     /** @var $existsStatement PDOStatement | null */
@@ -464,5 +466,13 @@ class UserImpl implements User, Observable
     {
         $this->setInitialValues();
         return $this->id;
+    }
+
+    /**
+     * @return Variables
+     */
+    public function getUserVariables()
+    {
+        return $this->userVariables == null?$this->userVariables = new UserVariablesImpl($this->database, $this): $this->userVariables;
     }
 }

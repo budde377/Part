@@ -207,4 +207,12 @@ class StubUserImpl implements User
     {
         return $this->id== null?$this->id = uniqid():$this->id;
     }
+
+    /**
+     * @return Variables
+     */
+    public function getUserVariables()
+    {
+        return null;
+    }
 }

@@ -586,6 +586,14 @@ class UserImplTest extends PHPUnit_Extensions_Database_TestCase
     }
 
 
+    public function testGetUserVariablesReturnsRightInstance(){
+        $this->assertInstanceOf("Variables", $this->user->getUserVariables());
+    }
+
+    public function testGetUserVariablesReturnsSameInstance(){
+        $this->assertTrue($this->user->getUserVariables() === $this->user->getUserVariables());
+    }
+
 
     public function getSetUpOperation()
     {

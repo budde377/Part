@@ -2,8 +2,8 @@
 require_once dirname(__FILE__).'/TruncateOperation.php';
 require_once dirname(__FILE__).'/MySQLConstants.php';
 require_once dirname(__FILE__).'/_stub/StubDBImpl.php';
-require_once dirname(__FILE__).'/../_class/PageVariablesImpl.php';
-require_once dirname(__FILE__).'/../_class/PageImpl.php';
+require_once dirname(__FILE__).'/../_class/UserVariablesImpl.php';
+require_once dirname(__FILE__).'/../_class/UserImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -12,20 +12,20 @@ require_once dirname(__FILE__).'/../_class/PageImpl.php';
  * To change this template use File | Settings | File Templates.
  */
 
-class PageVariablesImplTest extends PHPUnit_Extensions_Database_TestCase{
+class UserVariablesImplTest extends PHPUnit_Extensions_Database_TestCase{
 
     private $db;
-    /** @var  PageVariablesImpl */
+    /** @var  UserVariablesImpl */
     private $existingVariables;
-    /** @var  PageVariablesImpl */
+    /** @var  UserVariablesImpl */
     private $nonExistingVariables;
-    /** @var  PageVariablesImpl */
-    private $nonExistingVariablesNonExistingPage;
-    /** @var  Page */
+    /** @var  UserVariablesImpl */
+    private $nonExistingVariablesNonExistingUser;
+    /** @var  User */
     private $existingUser;
-    /** @var  Page */
+    /** @var  User */
     private $existingUser2;
-    /** @var  Page */
+    /** @var  User */
     private $nonExistingUser;
 
     public function setUp(){
@@ -33,12 +33,12 @@ class PageVariablesImplTest extends PHPUnit_Extensions_Database_TestCase{
         $this->db = new StubDBImpl();
         $pdo = new PDO('mysql:dbname=' . MySQLConstants::MYSQL_DATABASE. ';host=' . MySQLConstants::MYSQL_HOST, MySQLConstants::MYSQL_USERNAME, MySQLConstants::MYSQL_PASSWORD, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
         $this->db->setConnection($pdo);
-        $this->existingUser = new PageImpl('testpage', $this->db);
-        $this->existingVariables = new PageVariablesImpl($this->db, $this->existingUser);
-        $this->existingUser2 = new PageImpl('testpage2', $this->db);
-        $this->nonExistingUser = new PageImpl('nosuchpage', $this->db);
-        $this->nonExistingVariables = new PageVariablesImpl($this->db, $this->existingUser2);
-        $this->nonExistingVariablesNonExistingPage = new PageVariablesImpl($this->db, $this->nonExistingUser);
+        $this->existingUser = new UserImpl('testuser', $this->db);
+        $this->existingVariables = new UserVariablesImpl($this->db, $this->existingUser);
+        $this->existingUser2 = new UserImpl('testuser2', $this->db);
+        $this->nonExistingUser = new UserImpl('nosuchuser', $this->db);
+        $this->nonExistingVariables = new UserVariablesImpl($this->db, $this->existingUser2);
+        $this->nonExistingVariablesNonExistingUser = new UserVariablesImpl($this->db, $this->nonExistingUser);
 
     }
 
@@ -60,8 +60,8 @@ class PageVariablesImplTest extends PHPUnit_Extensions_Database_TestCase{
         $this->assertEquals(0, count($ar));
     }
 
-    public function testGetListOfNonExistingPageReturnsArray(){
-        $var = new PageVariablesImpl($this->db, $this->nonExistingUser);
+    public function testGetListOfNonExistingUserReturnsArray(){
+        $var = new UserVariablesImpl($this->db, $this->nonExistingUser);
         $this->assertTrue(is_array($var->listKeys()));
         $this->assertEquals(0, count($var->listKeys()));
     }
@@ -96,7 +96,7 @@ class PageVariablesImplTest extends PHPUnit_Extensions_Database_TestCase{
 
     public function testRemoveIsPersistent(){
         $this->existingVariables->removeKey("test1");
-        $var = new PageVariablesImpl($this->db, $this->existingUser);
+        $var = new UserVariablesImpl($this->db, $this->existingUser);
         $this->assertEquals(1, count($var->listKeys()));
         $this->assertFalse($var->hasKey("test1"));
     }
@@ -110,7 +110,7 @@ class PageVariablesImplTest extends PHPUnit_Extensions_Database_TestCase{
 
     public function testSetValueWilLBePersistent(){
         $this->existingVariables->setValue("test3", "val3");
-        $var = new PageVariablesImpl($this->db, $this->existingUser);
+        $var = new UserVariablesImpl($this->db, $this->existingUser);
         $this->assertEquals(3, count($var->listKeys()));
         $this->assertTrue($var->hasKey("test3"));
         $this->assertEquals("val3", $var->getValue("test3"));
@@ -123,9 +123,9 @@ class PageVariablesImplTest extends PHPUnit_Extensions_Database_TestCase{
         $this->assertEquals("val2000", $this->existingVariables->getValue("test2"));
     }
 
-    public function testSetValueOfNonExistingPageWillNotWork(){
-        $this->nonExistingVariablesNonExistingPage->setValue("test", "lol");
-        $this->assertFalse($this->nonExistingVariablesNonExistingPage->hasKey("test"));
+    public function testSetValueOfNonExistingUserWillNotWork(){
+        $this->nonExistingVariablesNonExistingUser->setValue("test", "lol");
+        $this->assertFalse($this->nonExistingVariablesNonExistingUser->hasKey("test"));
     }
 
     public function testForeachWillTraverse(){
@@ -160,7 +160,7 @@ class PageVariablesImplTest extends PHPUnit_Extensions_Database_TestCase{
      */
     protected function getDataSet()
     {
-        return $this->createMySQLXMLDataSet(dirname(__FILE__) . '/_mysqlXML/PageVariablesImplTest.xml');
+        return $this->createMySQLXMLDataSet(dirname(__FILE__) . '/_mysqlXML/UserVariablesImplTest.xml');
     }
 
     public function getSetUpOperation()

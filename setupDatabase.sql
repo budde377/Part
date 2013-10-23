@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS `UserPrivileges` (
 
 CREATE TABLE IF NOT EXISTS `UserVariables` (
   `key` varchar(255) NOT NULL,
-  `val` varchar(255) NOT NULL,
+  `value` varchar(255) NOT NULL,
   `username` varchar(255) NOT NULL,
   UNIQUE KEY `key` (`key`,`username`),
   KEY `username` (`username`)
