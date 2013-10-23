@@ -25,7 +25,7 @@ class FrontPageTextPageElementImpl implements PageElement
      * The format can be xml, xhtml, html etc. but return type must be string
      * @return string
      */
-    public function getContent()
+    public function generateContent()
     {
         $latest= null;
         $pageContent = new PageContentImpl($this->container->getDBInstance(), $this->container->getCurrentPageStrategyInstance()->getCurrentPage(), "mainContent");

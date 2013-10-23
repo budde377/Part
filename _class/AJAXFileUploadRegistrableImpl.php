@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__FILE__) . "/JSONFunctionImpl.php";
 require_once dirname(__FILE__) . '/../_interface/Registrable.php';
 require_once dirname(__FILE__) . '/JSONServerImpl.php';
 require_once dirname(__FILE__) . '/FileImpl.php';

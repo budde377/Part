@@ -17,6 +17,7 @@ class ConfigImpl implements Config
     private $rootPath;
 
     private $templates = null;
+    private $templatePath;
     private $pageElements = null;
     private $preScripts = null;
     private $postScripts = null;
@@ -210,108 +211,130 @@ class ConfigImpl implements Config
 
     private function setUpTemplate()
     {
-        if ($this->templates === null) {
-            $this->templates = array();
-            if ($this->configFile->templates->getName()) {
-                $templates = $this->configFile->templates->template;
-                foreach ($templates as $template) {
-                    $this->templates[(string)$template] = $this->rootPath . (string)$template['link'];
-                }
-            }
+        if ($this->templates !== null) {
+            return;
+        }
+        $this->templates = array();
+        $templates = $this->configFile->templates;
 
+        if (! (string) $templates) {
+            return;
+        }
+
+        $this->templatePath = (string)$templates['path'];
+        foreach ($templates->template as $template) {
+            $this->templates[(string)$template] = (string)$template['filename'];
         }
     }
 
-    /**
-     * Will return AJAXRegistrable as an array, with the num key and an array containing "class_name", "path" and "ajaxId" as value.
-     * The link should be relative to a root path provided.
-     * @return array
-     */
-    public function getAJAXRegistrable()
-    {
 
-        if ($this->ajaxRegistrable != null) {
-            return $this->ajaxRegistrable;
-        }
+/**
+ * Will return AJAXRegistrable as an array, with the num key and an array containing "class_name", "path" and "ajaxId" as value.
+ * The link should be relative to a root path provided.
+ * @return array
+ */
+public
+function getAJAXRegistrable()
+{
 
-        $this->ajaxRegistrable = array();
-
-        if (!$this->configFile->AJAXRegistrable->getName()) {
-            return $this->ajaxRegistrable;
-        }
-
-
-        foreach ($this->configFile->AJAXRegistrable->class as $registrable) {
-            $this->ajaxRegistrable[] = array("class_name" => (string)$registrable, "path" => $this->rootPath . $registrable['link'],
-                "ajax_id" => (string)$registrable['ajax_id']);
-        }
+    if ($this->ajaxRegistrable != null) {
         return $this->ajaxRegistrable;
     }
 
-    /**
-     * @return bool
-     */
-    public function isDebugMode()
-    {
-        if($this->debugMode != null){
-            return $this->debugMode;
-        }
+    $this->ajaxRegistrable = array();
 
-        if(!$this->configFile->debugMode->getName()){
-            return $this->debugMode = false;
-        }
-
-        return $this->debugMode = (string)$this->configFile->debugMode == "true";
+    if (!$this->configFile->AJAXRegistrable->getName()) {
+        return $this->ajaxRegistrable;
     }
 
-    /**
-     * @return string Root path
-     */
-    public function getRootPath()
-    {
-        return $this->rootPath;
+
+    foreach ($this->configFile->AJAXRegistrable->class as $registrable) {
+        $this->ajaxRegistrable[] = array("class_name" => (string)$registrable, "path" => $this->rootPath . $registrable['link'],
+            "ajax_id" => (string)$registrable['ajax_id']);
+    }
+    return $this->ajaxRegistrable;
+}
+
+/**
+ * @return bool
+ */
+public
+function isDebugMode()
+{
+    if ($this->debugMode != null) {
+        return $this->debugMode;
     }
 
-    /**
-     * @return bool
-     */
-    public function isUpdaterEnabled()
-    {
-        if($this->enableUpdater !== null){
-            return $this->enableUpdater;
-        }
-        if(!$this->configFile->enableUpdater->getName()){
-            return $this->enableUpdater = true;
-        }
-
-        return $this->enableUpdater = (string)$this->configFile->enableUpdater == "true";
-
+    if (!$this->configFile->debugMode->getName()) {
+        return $this->debugMode = false;
     }
 
-    /**
-     * @return string String containing the domain (name.ext)
-     */
-    public function getDomain()
-    {
-        if($this->domain !== null){
-            return $this->domain;
-        }
-        return $this->domain = (string)$this->configFile->siteInfo->domain['name'].".".(string)$this->configFile->siteInfo->domain['extension'];
+    return $this->debugMode = (string)$this->configFile->debugMode == "true";
+}
+
+/**
+ * @return string Root path
+ */
+public
+function getRootPath()
+{
+    return $this->rootPath;
+}
+
+/**
+ * @return bool
+ */
+public
+function isUpdaterEnabled()
+{
+    if ($this->enableUpdater !== null) {
+        return $this->enableUpdater;
+    }
+    if (!$this->configFile->enableUpdater->getName()) {
+        return $this->enableUpdater = true;
     }
 
-    /**
-     * @return Array containing owner information
-     */
-    public function getOwner()
-    {
-        if($this->owner !== null){
-            return $this->owner;
-        }
+    return $this->enableUpdater = (string)$this->configFile->enableUpdater == "true";
 
-        return $this->owner = array(
-            'name'=>(string)$this->configFile->siteInfo->owner['name'],
-            'mail'=>(string)$this->configFile->siteInfo->owner['mail'],
-            'username'=>(string)$this->configFile->siteInfo->owner['username']
-        );
+}
+
+/**
+ * @return string String containing the domain (name.ext)
+ */
+public
+function getDomain()
+{
+    if ($this->domain !== null) {
+        return $this->domain;
     }
+    return $this->domain = (string)$this->configFile->siteInfo->domain['name'] . "." . (string)$this->configFile->siteInfo->domain['extension'];
+}
+
+/**
+ * @return Array containing owner information
+ */
+public
+function getOwner()
+{
+    if ($this->owner !== null) {
+        return $this->owner;
+    }
+
+    return $this->owner = array(
+        'name' => (string)$this->configFile->siteInfo->owner['name'],
+        'mail' => (string)$this->configFile->siteInfo->owner['mail'],
+        'username' => (string)$this->configFile->siteInfo->owner['username']
+    );
+}
+
+/**
+ * Will path relative to project root to templates.
+ * @return string | null Null if template not defined
+ */
+public
+function getTemplateFolderPath()
+{
+    $this->setUpTemplate();
+    return $this->templatePath == null?null:"{$this->rootPath}/{$this->templatePath}";
+}
 }

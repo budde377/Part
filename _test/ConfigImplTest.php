@@ -50,8 +50,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     {
         $configXML = simplexml_load_string("
         <config>{$this->defaultOwner}
-        <templates>
-        <template link='some_link'>main</template>
+        <templates path='folder'>
+            <template filename='some_link'>main</template>
         </templates>
         </config>");
         $rootPath = dirname(__FILE__) . '/';
@@ -60,18 +60,40 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $this->assertNull($template, 'The template was not null with template NIL');
     }
 
+    public function testGetTemplateFolderPathReturnsRightPath()
+    {
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        <templates path='folder'>
+            <template filename='some_link'>main</template>
+        </templates>
+        </config>");
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $this->assertEquals($config->getTemplateFolderPath(), "$rootPath/folder");
+    }
+
+    public function testGetTemplateFolderPathReturnsNullIfNotDefined()
+    {
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}</config>");
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $this->assertNull($config->getTemplateFolderPath());
+    }
+
     public function testGetTemplateReturnLinkWithTemplateInList()
     {
         $configXML = simplexml_load_string("
         <config>{$this->defaultOwner}
-        <templates>
-        <template link='some_link'>main</template>
+        <templates path='folder'>
+            <template filename='some_link'>main</template>
         </templates>
         </config>");
         $rootPath = dirname(__FILE__) . '/';
         $config = new ConfigImpl($configXML, $rootPath);
         $template = $config->getTemplate('main');
-        $this->assertEquals($rootPath . 'some_link', $template, 'The config did not return the right link.');
+        $this->assertEquals('some_link', $template, 'The config did not return the right link.');
     }
 
     public function testGetPageElementReturnNullWithEmptyConfigXML()
@@ -397,9 +419,9 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     {
         $configXML = simplexml_load_string("
         <config>{$this->defaultOwner}
-        <templates>
-            <template link='some_link'>main</template>
-            <template link='some_link2'>main2</template>
+        <templates path='folder'>
+            <template filename='some_link'>main</template>
+            <template filename='some_link2'>main2</template>
         </templates>
         </config>");
         $rootPath = dirname(__FILE__) . '/';

@@ -8,11 +8,12 @@
  */
 interface PageElement
 {
+
     /**
      * @abstract
      * This will return content from page element as a string.
      * The format can be xml, xhtml, html etc. but return type must be string
      * @return string
      */
-    public function getContent();
+    public function generateContent();
 }

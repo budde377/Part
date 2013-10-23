@@ -197,4 +197,13 @@ class StubConfigImpl implements Config
     {
         return array();
     }
+
+    /**
+     * Will path relative to project root to templates.
+     * @return string | null Null if template not defined
+     */
+    public function getTemplateFolderPath()
+    {
+        return "";
+    }
 }

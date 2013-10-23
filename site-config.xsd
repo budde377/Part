@@ -101,8 +101,17 @@
 
     <xs:complexType name="templates">
         <xs:sequence>
-            <xs:element name="template" type="linkedVal" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element name="template" maxOccurs="unbounded" minOccurs="0">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:string">
+                            <xs:attribute name="filename" type="xs:string" />
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
         </xs:sequence>
+        <xs:attribute name="path" type="xs:anyURI" use="required"/>
     </xs:complexType>
 
     <xs:complexType name="scripts">

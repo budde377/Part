@@ -31,7 +31,7 @@ class UserSettingsEditPagePageElementImpl implements PageElement
      * The format can be xml, xhtml, html etc. but return type must be string
      * @return string
      */
-    public function getContent()
+    public function generateContent()
     {
         $output = "
         <h3>Rediger side egenskaber</h3>

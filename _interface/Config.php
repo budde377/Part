@@ -10,13 +10,19 @@ interface Config
 {
     /**
      * @abstract
-     * Will return the link to the template file as a string.
-     * This should be relative to a root path provided.
+     * Will return the filename of a template file as a string.
+     * This should only be a filename.
      * If the link is not in list, this will return null.
      * @param $name string
      * @return string | null
      */
     public function getTemplate($name);
+
+    /**
+     * Will path relative to project root to templates.
+     * @return string | null Null if template not defined
+     */
+    public function getTemplateFolderPath();
 
     /**
      * Will return a array containing all possible templates by name.

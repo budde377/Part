@@ -68,7 +68,7 @@ class UserSettingsPageElementImpl implements PageElement
      * The format can be xml, xhtml, html etc. but return type must be string
      * @return string
      */
-    public function getContent()
+    public function generateContent()
     {
         if ($this->currentUser == null) {
             return "";
@@ -109,7 +109,7 @@ class UserSettingsPageElementImpl implements PageElement
             $updateElement = "
                     <li>
                         <h2>Opdater Website</h2>
-                        {$this->updateWebsitePageElement->getContent()}
+                        {$this->updateWebsitePageElement->generateContent()}
                     </li>
             ";
 
@@ -132,19 +132,19 @@ class UserSettingsPageElementImpl implements PageElement
                     <li $inactiveClass>
                         $inactiveFilter
                         <h2>Rediger Side</h2>
-                        {$this->editPagePageElement->getContent()}
+                        {$this->editPagePageElement->generateContent()}
                     </li>
                     <li>
                         <h2>Administrer Sider</h2>
-                        {$this->editPagesPageElement->getContent()}
+                        {$this->editPagesPageElement->generateContent()}
                     </li>
                     <li>
                         <h2>Rediger Oplysninger</h2>
-                        {$this->editUserPageElement->getContent()}
+                        {$this->editUserPageElement->generateContent()}
                     </li>
                     <li>
                         <h2>Administrer Brugere</h2>
-                        {$this->editUsersPageElement->getContent()}
+                        {$this->editUsersPageElement->generateContent()}
                     </li>
                     $updateElement
 

@@ -41,6 +41,7 @@ class WebsiteImpl implements Website
         $elementFactory = new PageElementFactoryImpl($this->config, $this->backendContainer);
         $template = new TemplateImpl($elementFactory, $this->backendContainer);
         $pageStrategy = $this->backendContainer->getCurrentPageStrategyInstance();
+
         $currentPage = $pageStrategy->getCurrentPage();
         $template->setTemplateFromConfig($currentPage->getTemplate());
 
@@ -48,6 +49,7 @@ class WebsiteImpl implements Website
         if (($id = $this->GETValueOfIndexIfSetElseDefault('ajax', null)) !== null) {
             $ajaxRegister->registerAJAXFromConfig($this->config);
         }
+
         $cacheControl = $this->backendContainer->getCacheControlInstance();
         if($this->config->isDebugMode()){
             $cacheControl->disableCache();
@@ -57,7 +59,7 @@ class WebsiteImpl implements Website
         if ($id !== null && ($ajax = $ajaxRegister->getAJAXFromRegisteredFromFunctionName($id)) !== null) {
             echo $ajax;
         } else if(!$cacheControl->setUpCache()){
-            echo $template->getModifiedTemplate();
+            echo $template->render();
         }
 
     }

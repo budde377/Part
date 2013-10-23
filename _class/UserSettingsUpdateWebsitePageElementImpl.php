@@ -52,7 +52,7 @@ class UserSettingsUpdateWebsitePageElementImpl implements PageElement
      * The format can be xml, xhtml, html etc. but return type must be string
      * @return string
      */
-    public function getContent()
+    public function generateContent()
     {
 
         $return = "
