@@ -11,6 +11,7 @@ require_once dirname(__FILE__) . '/UserLibraryImpl.php';
 require_once dirname(__FILE__) . '/DefaultPageLibraryImpl.php';
 require_once dirname(__FILE__) . '/CacheControlImpl.php';
 require_once dirname(__FILE__) . '/GitUpdaterImpl.php';
+require_once dirname(__FILE__) . '/SiteVariablesImpl.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -45,6 +46,8 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $cacheControl;
     /** @var  Updater */
     private $updater;
+    /** @var  Variables */
+    private $siteVariables;
 
     public function __construct(Config $config)
     {
@@ -194,5 +197,15 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
             $this->updater = new GitUpdaterImpl($this->getConfigInstance()->getRootPath());
         }
         return $this->updater;
+    }
+
+    /**
+     * Will create and reuse an instance of Variables.
+     * These should reflect the site scoped variables.
+     * @return Variables
+     */
+    public function getSiteVariablesInstance()
+    {
+        return $this->siteVariables == null? $this->siteVariables = new SiteVariablesImpl($this->getDBInstance()):$this->siteVariables;
     }
 }

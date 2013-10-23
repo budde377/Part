@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <database name="cms2012testdb">
+        <table_data name="SiteVariables">
+            <row>
+                <field name="key">test1</field>
+                <field name="value">val1</field>
+            </row>
+            <row>
+                <field name="key">test2</field>
+                <field name="value">val2</field>
+            </row>
+        </table_data>
+
+    </database>
+</mysqldump>
