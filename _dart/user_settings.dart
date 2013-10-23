@@ -20,90 +20,90 @@ bool get pageOrderAvailable => query("#ActivePageList") != null && query("#Inact
 
 bool get userLibraryAvailable => query('#UserList') != null;
 
-String dayNumberToName(int weekday){
+String dayNumberToName(int weekday) {
   var ret;
-  switch(weekday){
+  switch (weekday) {
     case 1:
       ret = "mandag";
-  break;
+      break;
     case 2:
       ret = "tirsdag";
-  break;
+      break;
     case 3:
       ret = "onsdag";
-  break;
+      break;
     case 4:
       ret = "torsdag";
-  break;
+      break;
     case 5:
       ret = "fredag";
-  break;
+      break;
     case 6:
       ret = "lørdag";
-  break;
+      break;
     case 7:
       ret = "søndag";
-  break;
+      break;
   }
   return ret;
 }
 
-String monthNumberToName(int monthNumber){
+String monthNumberToName(int monthNumber) {
   var ret;
-  switch(monthNumber){
+  switch (monthNumber) {
     case 1:
-    ret = "januar";
-  break;
+      ret = "januar";
+      break;
     case 2:
-    ret = "februar";
-  break;
+      ret = "februar";
+      break;
     case 3:
-    ret = "marts";
-  break;
+      ret = "marts";
+      break;
     case 4:
-    ret = "april";
-  break;
+      ret = "april";
+      break;
     case 5:
-    ret = "maj";
-  break;
+      ret = "maj";
+      break;
     case 6:
-    ret = "juni";
-  break;
+      ret = "juni";
+      break;
     case 7:
-    ret = "juli";
-  break;
+      ret = "juli";
+      break;
     case 8:
-    ret = "august";
-  break;
+      ret = "august";
+      break;
     case 9:
-    ret = "september";
-  break;
+      ret = "september";
+      break;
     case 10:
-    ret = "oktober";
-  break;
+      ret = "oktober";
+      break;
     case 11:
-    ret = "november";
-  break;
+      ret = "november";
+      break;
     case 12:
-    ret = "december";
-  break;
+      ret = "december";
+      break;
   }
   return ret;
 }
 
-String addLeadingZero(int i) => i<10?"0$i":"$i";
+String addLeadingZero(int i) => i < 10 ? "0$i" : "$i";
 
-String dateString(DateTime dt){
+String dateString(DateTime dt) {
   var now = new DateTime.now();
 
   var returnString = "";
-  if(now.day != dt.day || now.month != dt.month || now.year != dt.year ){
+  if (now.day != dt.day || now.month != dt.month || now.year != dt.year) {
     returnString = "${dayNumberToName(dt.weekday)} ";
-  }else{
+  } else {
     returnString = "i dag ";
   }
 
-  if(dt.difference(now).inDays > 7){
+  if (dt.difference(now).inDays > 7) {
     returnString += "d. ${dt.day}. ${monthNumberToName(dt.month)} ${dt.year} ";
   }
 
@@ -112,9 +112,9 @@ String dateString(DateTime dt){
   return returnString.trim();
 }
 
-PageOrder get pageOrder => pageOrderAvailable ? new UserSettingsJSONPageOrder.initializeFromMenu( query("#ActivePageList"), query("#InactivePageList")) : null;
+PageOrder get pageOrder => pageOrderAvailable ? new UserSettingsJSONPageOrder.initializeFromMenu(query("#ActivePageList"), query("#InactivePageList")) : null;
 
-UserLibrary get userLibrary => userLibraryAvailable && pageOrderAvailable? new UserSettingsJSONUserLibrary.initializeFromMenu(query('#UserList')) : null;
+UserLibrary get userLibrary => userLibraryAvailable && pageOrderAvailable ? new UserSettingsJSONUserLibrary.initializeFromMenu(query('#UserList')) : null;
 
 String _errorMessage(int error_code) {
   switch (error_code) {
@@ -194,28 +194,30 @@ class UserSettingsInitializer extends Initializer {
 }
 
 
-class UserSettingsUpdateSiteInitializer extends Initializer{
+class UserSettingsUpdateSiteInitializer extends Initializer {
   ButtonElement _checkButton = query("#UserSettingsContent button.update_check");
+
   SpanElement _checkTime = query("#UserSettingsContent .update_site span.check_time");
+
   JSONClient _client = new AJAXJSONClient();
 
   bool get canBeSetUp => _checkButton != null && _checkTime != null;
 
   void setUp() {
     var s = _checkButton.text;
-    _checkButton.onClick.listen((_){
+    _checkButton.onClick.listen((_) {
       _checkButton.disabled = true;
       _checkButton.text = "Undersøger";
-      _client.callFunction(new CheckForSiteUpdatesJSONFunction()).then((JSONResponse response){
+      _client.callFunction(new CheckForSiteUpdatesJSONFunction()).then((JSONResponse response) {
         _checkButton.text = s;
         _checkButton.disabled = false;
         _checkTime.text = dateString(new DateTime.now());
-        if(response.type != RESPONSE_TYPE_SUCCESS){
+        if (response.type != RESPONSE_TYPE_SUCCESS) {
           return;
         }
-        if(response.payload){
-          dialogContainer.confirm("<b>Websitet kan opdateres! </b><br /> Hvis du opdaterer nu, skal siden genstartes, og det er derfor vigtigt at du gemmer alle ændringer du må have foretaget. <br /> Ønsker du at opdatere det nu?").result.then((bool b){
-            if (!b){
+        if (response.payload) {
+          dialogContainer.confirm("<b>Websitet kan opdateres! </b><br /> Hvis du opdaterer nu, skal siden genstartes, og det er derfor vigtigt at du gemmer alle ændringer du må have foretaget. <br /> Ønsker du at opdatere det nu?").result.then((bool b) {
+            if (!b) {
               return;
             }
             var updateDone = false;
@@ -227,14 +229,14 @@ class UserSettingsUpdateSiteInitializer extends Initializer{
             });
 
             var loader = dialogContainer.loading("Opdaterer websitet.<br />Luk ikke din browser!");
-            _client.callFunction(new UpdateSiteJSONFunction()).then((JSONResponse response){
-              if(response.type == RESPONSE_TYPE_ERROR){
+            _client.callFunction(new UpdateSiteJSONFunction()).then((JSONResponse response) {
+              if (response.type == RESPONSE_TYPE_ERROR) {
                 loader.close();
               }
               loader.element..innerHtml = "Siden er opdateret.<br /> Hjemmesiden genindlæses."..classes.remove('loading');
               updateDone = true;
 
-              var t = new Timer(new Duration(seconds:1), (){
+              var t = new Timer(new Duration(seconds:1), () {
                 window.location.reload();
               });
             });
@@ -283,8 +285,8 @@ class UserSettingsPageUserListFormInitializer extends Initializer {
       }
       delete.onClick.listen((MouseEvent e) {
         var dialogResult = new DialogContainer().confirm("Er du sikker på at du vil fjerne privilegierne?").result;
-        dialogResult.then((bool b){
-          if(!b){
+        dialogResult.then((bool b) {
+          if (!b) {
             return;
           }
           var i = bar.startJob();
@@ -431,8 +433,8 @@ class UserSettingsUserListInitializer extends Initializer {
       }
       delete.onClick.listen((MouseEvent e) {
         var dialog = new DialogContainer();
-        dialog.confirm("Er du sikker på at du vil slette denne bruger?").result.then((bool b){
-          if(!b){
+        dialog.confirm("Er du sikker på at du vil slette denne bruger?").result.then((bool b) {
+          if (!b) {
             return;
           }
           var i = bar.startJob();
@@ -447,9 +449,7 @@ class UserSettingsUserListInitializer extends Initializer {
         var li = new LIElement();
         var privilege = userPrivilegeString(user);
         var a = new AnchorElement();
-        a..text = user.username
-         ..classes.add("val")
-         ..href = "mailto:${user.mail}";
+        a..text = user.username..classes.add("val")..href = "mailto:${user.mail}";
         li.append(a);
         li.appendHtml(", <span class='privileges'>($privilege Administrator)</span> <span class='parent hidden'>${user.parent}</span> <div class='delete link' title='Slet'>&nbsp;</div>");
         _userList.append(li);
@@ -666,7 +666,7 @@ class UserSettingsEditPageFormInitializer extends Initializer {
           editTitleField.blur();
           editIdField.blur();
           editAliasField.blur();
-          if(template != _order.currentPage.template){
+          if (template != _order.currentPage.template) {
             dialogContainer.alert("Du har redigeret sidens type og skal derfor genindlæse siden.").onClose.listen((_) => window.location.reload());
           }
 
@@ -741,8 +741,7 @@ class UserSettingsPageListsInitializer extends Initializer {
           updateListInfo(_inactiveList, false);
 
           break;
-        case PAGE_ORDER_CHANGE_DELETE_PAGE:
-        case PAGE_ORDER_CHANGE_DEACTIVATE:
+        case PAGE_ORDER_CHANGE_DELETE_PAGE:case PAGE_ORDER_CHANGE_DEACTIVATE:
           if (changeType == PAGE_ORDER_CHANGE_DELETE_PAGE) {
             var pageLi = new UserSettingsPageLi.fromPage(page);
             var parent = pageLi.li.parent;
@@ -822,8 +821,8 @@ class UserSettingsDecorationInitializer extends Initializer {
     var expander = new UserSettingsExpandDecoration();
     _expandLink.onClick.listen((_) {
       expander.expand();
-      escQueue.add((){
-        if(!expander._expanded){
+      escQueue.add(() {
+        if (!expander._expanded) {
           return false;
         }
         var f = _container.query(':focus');

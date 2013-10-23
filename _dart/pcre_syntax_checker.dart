@@ -29,16 +29,16 @@ bool checkPCRE(String exp) => _checkDelimiters(exp);
 
 bool _checkDelimiters(String exp) {
   var re = new RegExp(r'^([^a-zA-Z\\ \s])(.*[^\\])([^a-zA-Z\\ \s])([imsxeADSUXJu])*$');
-  if(!re.hasMatch(exp)){
+  if (!re.hasMatch(exp)) {
     return false;
   }
   var match = (re.allMatches(exp)).toList()[0];
   var notEqual;
-  if((notEqual = match.group(1) != match.group(3)) && (match.group(1) != "{" || match.group(3) != "}")){
+  if ((notEqual = match.group(1) != match.group(3)) && (match.group(1) != "{" || match.group(3) != "}")) {
     return false;
   }
 
-  return (notEqual || _delimiterFreeContent(exp,exp[0])) && _checkRE(match.group(2));
+  return (notEqual || _delimiterFreeContent(exp, exp[0])) && _checkRE(match.group(2));
 }
 
 bool _delimiterFreeContent(String exp, String delimiter) => new RegExp('[^\]$delimiter', caseSensitive:false).allMatches(exp).length == 1;
@@ -84,7 +84,7 @@ bool _checkOneOrMore(String exp) => exp.endsWith("?") && _checkElementaryRE(exp.
 
 bool _checkElementaryRE(String exp) => _checkGroup(exp) || _checkAny(exp) || _checkEOS(exp) || _checkChar(exp) || _checkSet(exp) || _checkSOS(exp) || _checkInternalOptionSetting(exp) || _checkNonCapturedGroup(exp);
 
-bool _checkInternalOptionSetting(String exp) => new RegExp(r'^\(\?[imsxj]+-?[imsxj]*\)$',caseSensitive:false).hasMatch(exp);
+bool _checkInternalOptionSetting(String exp) => new RegExp(r'^\(\?[imsxj]+-?[imsxj]*\)$', caseSensitive:false).hasMatch(exp);
 
 bool _checkChar(String exp) => (exp.length == 1 && !metaChar.contains(exp)) || (exp.length == 2 && exp.startsWith('\\'));
 
@@ -120,10 +120,7 @@ bool _checkSetItems(String exp) {
 
 bool _checkSetItem(String exp) => _checkChar(exp) || _checkRange(exp);
 
-bool _checkRange(String exp) =>
-(exp.length == 5 && _checkChar(exp.substring(0, 2)) && exp[2] == "-" && _checkChar(exp.substring(3, 2))) ||
-(exp.length == 3 && _checkChar(exp[0]) && exp[1] == "-" && _checkChar(exp[2])) ||
-(exp.length == 4 && ((_checkChar(exp.substring(0, 1)) && exp[1] == "-" && _checkChar(exp.substring(2))) || (_checkChar(exp.substring(0, 2)) && exp[2] == "-" && _checkChar(exp.substring(3)))));
+bool _checkRange(String exp) => (exp.length == 5 && _checkChar(exp.substring(0, 2)) && exp[2] == "-" && _checkChar(exp.substring(3, 2))) || (exp.length == 3 && _checkChar(exp[0]) && exp[1] == "-" && _checkChar(exp[2])) || (exp.length == 4 && ((_checkChar(exp.substring(0, 1)) && exp[1] == "-" && _checkChar(exp.substring(2))) || (_checkChar(exp.substring(0, 2)) && exp[2] == "-" && _checkChar(exp.substring(3)))));
 
 
 main() {

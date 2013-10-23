@@ -11,9 +11,9 @@ class Animation {
   Function _animationFunction, _callbackFunction;
 
   Animation(Duration duration, void animationFunction(double pct), [void callback(bool success)]) {
-    this._animationFunction = animationFunction;
-    this._duration = duration.inMilliseconds;
-    this._callbackFunction = callback;
+    _animationFunction = animationFunction;
+    _duration = duration.inMilliseconds;
+    _callbackFunction = callback;
   }
 
 
