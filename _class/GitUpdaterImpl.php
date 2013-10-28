@@ -155,7 +155,9 @@ class GitUpdaterImpl implements Updater{
      */
     public function checkForUpdates()
     {
-        $this->site->getVariables()->setValue("last_checked", time());
+        if(!$this->subModuleUpdater){
+            $this->site->getVariables()->setValue("last_checked", time());
+        }
         if($this->canBeUpdated === null){
             $this->canBeUpdated = $this->site->getVariables()->getValue("can_be_updated") == 1;
         }
@@ -182,7 +184,9 @@ class GitUpdaterImpl implements Updater{
         if(!$this->checkForUpdates()){
             return;
         }
-        $this->site->getVariables()->setValue("last_updated", time());
+        if(!$this->subModuleUpdater){
+            $this->site->getVariables()->setValue("last_updated", time());
+        }
         $this->exec("git pull");
         /** @var $updater Updater */
         foreach($this->subUpdaters as $updater){
