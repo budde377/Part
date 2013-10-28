@@ -194,7 +194,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getUpdater()
     {
         if($this->updater == null){
-            $this->updater = new GitUpdaterImpl($this->getConfigInstance()->getRootPath());
+            $this->updater = new GitUpdaterImpl($this->getConfigInstance()->getRootPath(), $this->getSiteInstance());
         }
         return $this->updater;
     }
