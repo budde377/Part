@@ -95,6 +95,9 @@ class ImageEditProperties {
                                             p.mirrorHorizontal == mirrorHorizontal &&
                                             p.mirrorVertical == mirrorVertical;
 
+  int get hashCode => "${cropW}${cropH}${cropX}${cropY}${rotate}${width}${height}${mirrorHorizontal}${mirrorVertical}".hashCode;
+
+  //TODO write better get hashcode
 }
 
 
@@ -444,7 +447,13 @@ class ImageEditorHandler {
     _rccw.onClick.listen((_) => editor.rotate--);
     _mirror_v.onClick.listen((_) => editor.mirrorVertical = !editor.mirrorVertical);
     _mirror_h.onClick.listen((_) => editor.mirrorHorizontal = !editor.mirrorHorizontal);
-    _crop.onClick.listen((_) => editor.hasCrop ? editor.removeCrop() : editor.setCrop(0.25, 0.25, 0.5, 0.5));
+    _crop.onClick.listen((_){
+      if(editor.hasCrop){
+        editor.removeCrop();
+      } else {
+        editor.setCrop(0.25, 0.25, 0.5, 0.5);
+      }
+    });
 
     var inDot = (num x, num y) {
       var p = transformXY(x, y);

@@ -202,7 +202,9 @@ class EditorFileHandler implements EditorHandler {
   FileProgress _fileProgress;
 
 
-  EditorFileHandler(AnchorElement dataElement) : this.dataElement = dataElement => _setUp();
+  EditorFileHandler(AnchorElement dataElement) : this.dataElement = dataElement{
+    _setUp();
+  }
 
   EditorFileHandler.fileProgress(this.dataElement, FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
     var size = new SpanElement();
@@ -239,7 +241,9 @@ class EditorImageHandler implements EditorHandler {
   FileProgress _fileProgress;
 
 
-  EditorImageHandler(ImageElement dataElement) : this.dataElement = dataElement => _setUp();
+  EditorImageHandler(ImageElement dataElement) : this.dataElement = dataElement{
+    _setUp();
+  }
 
   EditorImageHandler.fileProgress(this.dataElement, FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
     _fileProgress.listenOnProgress(() => progressBar.percentage = _fileProgress.progress);
@@ -338,6 +342,7 @@ class EditorFileContainer {
         gallery = new EditorGalleryHandler(handler);
         _handlerMap[handler.element] = gallery;
       }
+
       gallery.addHandlerToGallery(_handlerMap[_dragging]);
       _dragging.remove();
       _notifyContentChange();

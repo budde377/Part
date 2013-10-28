@@ -11,7 +11,6 @@ require_once(dirname(__FILE__) . '/_helper/HTTPHeaderHelper.php');
  * Time: 11:26 AM
  * To change this template use File | Settings | File Templates.
  */
-ob_start();
 session_start();
 date_default_timezone_set("Europe/Copenhagen");
 /** @var $siteConfig SimpleXMLElement */
@@ -71,7 +70,5 @@ if($config->isDebugMode()){
 
     }
 }
-
-ob_end_flush();
 
 unset($website);
