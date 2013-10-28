@@ -42,6 +42,14 @@ class WebsiteImpl implements Website
         $template = new TemplateImpl($elementFactory, $this->backendContainer);
         $pageStrategy = $this->backendContainer->getCurrentPageStrategyInstance();
 
+
+        $cacheControl = $this->backendContainer->getCacheControlInstance();
+        if($this->config->isDebugMode()){
+            $cacheControl->disableCache();
+            $template->setTwigDebug(true);
+        }
+
+
         $currentPage = $pageStrategy->getCurrentPage();
         $template->setTemplateFromConfig($currentPage->getTemplate());
 
@@ -49,11 +57,6 @@ class WebsiteImpl implements Website
         if (($id = $this->GETValueOfIndexIfSetElseDefault('ajax', null)) !== null) {
             $template->onlyInitialize();
             $ajaxRegister->registerAJAXFromConfig($this->config);
-        }
-
-        $cacheControl = $this->backendContainer->getCacheControlInstance();
-        if($this->config->isDebugMode()){
-            $cacheControl->disableCache();
         }
 
         //Decide output mode
