@@ -16,4 +16,19 @@ interface PageElement
      * @return string
      */
     public function generateContent();
+
+
+    /**
+     * Will set up the page element.
+     * If you want to ensure that you register some files, this would be the place to do this.
+     * This should always be called before generateContent, at the latest right before.
+     * @return void
+     */
+    public function setUpElement();
+
+    /**
+     * Indicates whether the element has been set up before generate.
+     * @return bool
+     */
+    public function hasBeenSetUp();
 }

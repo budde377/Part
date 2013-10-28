@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../_interface/PageElement.php';
+require_once dirname(__FILE__) . '/../_class/PageElementImpl.php';
 require_once dirname(__FILE__) . '/../_interface/Registrable.php';
 require_once dirname(__FILE__) . '/HTMLFormElementImpl.php';
 /**
@@ -8,7 +8,7 @@ require_once dirname(__FILE__) . '/HTMLFormElementImpl.php';
  * Date: 20/01/13
  * Time: 02:54
  */
-class UserSettingsEditPagesPageElementImpl implements PageElement
+class UserSettingsEditPagesPageElementImpl extends PageElementImpl
 {
 
     private $container;
@@ -34,6 +34,7 @@ class UserSettingsEditPagesPageElementImpl implements PageElement
      */
     public function generateContent()
     {
+        parent::generateContent();
         $this->evaluateForm();
         $this->evaluateDeletePage();
         $this->evaluateActivatePage();

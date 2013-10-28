@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . "/../_interface/PageElement.php";
+require_once dirname(__FILE__) . "/../_class/PageElementImpl.php";
 require_once dirname(__FILE__) . "/../_interface/Registrable.php";
 require_once dirname(__FILE__) . "/UserImpl.php";
 require_once dirname(__FILE__) . "/HTMLFormElementImpl.php";
@@ -9,7 +9,7 @@ require_once dirname(__FILE__) . "/HTMLFormElementImpl.php";
  * Date: 20/01/13
  * Time: 20:12
  */
-class UserSettingsEditUsersPageElementImpl implements PageElement
+class UserSettingsEditUsersPageElementImpl extends PageElementImpl
 {
     private $container;
     private $userLibrary;
@@ -35,6 +35,7 @@ class UserSettingsEditUsersPageElementImpl implements PageElement
      */
     public function generateContent()
     {
+        parent::generateContent();
         $this->evaluateDeleteUser($status);
         $output = "
         <h3>Brugere</h3>";
@@ -180,9 +181,5 @@ class UserSettingsEditUsersPageElementImpl implements PageElement
         $privileges = $user->getUserPrivileges();
         return ($privileges->hasRootPrivileges() ? "Root" : ($privileges->hasSitePrivileges() ? "Website" : "Side")) . " Administrator";
     }
-
-
-
-
 
 }

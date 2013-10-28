@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../_interface/PageElement.php';
+require_once dirname(__FILE__) . '/../_class/PageElementImpl.php';
 require_once dirname(__FILE__) . '/HTMLFormElementImpl.php';
 require_once dirname(__FILE__) . '/../_interface/Registrable.php';
 /**
@@ -8,7 +8,7 @@ require_once dirname(__FILE__) . '/../_interface/Registrable.php';
  * Date: 19/01/13
  * Time: 16:11
  */
-class UserSettingsEditPagePageElementImpl implements PageElement
+class UserSettingsEditPagePageElementImpl extends PageElementImpl
 {
     private $container;
     private $currentPage;
@@ -33,6 +33,7 @@ class UserSettingsEditPagePageElementImpl implements PageElement
      */
     public function generateContent()
     {
+        parent::generateContent();
         $output = "
         <h3>Rediger side egenskaber</h3>
         ";
@@ -219,6 +220,5 @@ class UserSettingsEditPagePageElementImpl implements PageElement
         }
         return false;
     }
-
 
 }

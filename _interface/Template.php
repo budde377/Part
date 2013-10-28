@@ -37,4 +37,11 @@ interface Template
 
 
     public function render();
+
+    /**
+     * This function will set the initialize flag in the template and not
+     * return the result of render.
+     * @return void
+     */
+    public function onlyInitialize();
 }

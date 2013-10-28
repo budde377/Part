@@ -432,7 +432,7 @@ class PageImpl implements Page, Observable
     /**
      * @return Variables Will return and reuse instance of variables
      */
-    public function getPageVariables()
+    public function getVariables()
     {
         return $this->variables == null? $this->variables = new PageVariablesImpl($this->database, $this):$this->variables;
     }

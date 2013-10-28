@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../_interface/PageElement.php';
+require_once dirname(__FILE__) . '/../_class/PageElementImpl.php';
 require_once dirname(__FILE__) . '/GitUpdaterImpl.php';
 require_once dirname(__FILE__) . '/../_trait/DateTimeTrait.php';
 
@@ -11,7 +11,7 @@ require_once dirname(__FILE__) . '/../_trait/DateTimeTrait.php';
  * To change this template use File | Settings | File Templates.
  */
 
-class UserSettingsUpdateWebsitePageElementImpl implements PageElement
+class UserSettingsUpdateWebsitePageElementImpl extends PageElementImpl
 {
 
     use DateTimeTrait;
@@ -54,7 +54,7 @@ class UserSettingsUpdateWebsitePageElementImpl implements PageElement
      */
     public function generateContent()
     {
-
+        parent::generateContent();
         $return = "
 
         <p class='text update_site'>
@@ -70,4 +70,5 @@ class UserSettingsUpdateWebsitePageElementImpl implements PageElement
 
         return $return;
     }
+
 }

@@ -358,12 +358,12 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
     }
 
     public function testGetVariablesWillReturnInstanceOfVariables(){
-        $var = $this->testPage->getPageVariables();
+        $var = $this->testPage->getVariables();
         $this-> assertInstanceOf("PageVariablesImpl", $var);
     }
 
     public function testGetVariablesWillReturnSameInstance(){
-        $this->assertTrue($this->testPage->getPageVariables() === $this->testPage->getPageVariables());
+        $this->assertTrue($this->testPage->getVariables() === $this->testPage->getVariables());
     }
 
 

@@ -47,6 +47,73 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
 
     }
 
+    public function testPageElementWillBeCached()
+    {
+        $configXML = simplexml_load_string("
+        <config>
+        {$this->defaultOwner}
+        <pageElements>
+            <class name='someElement' link='_stub/NullPageElementImpl.php'>NullPageElementImpl</class>
+        </pageElements>
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
+        $element = $pageElementFactory->getPageElement('someElement');
+        $element2 = $pageElementFactory->getPageElement('someElement');
+        $this->assertTrue($element === $element2);
+
+    }
+    public function testPageElementClearCacheWillClearCache()
+    {
+        $configXML = simplexml_load_string("
+        <config>
+        {$this->defaultOwner}
+        <pageElements>
+            <class name='someElement' link='_stub/NullPageElementImpl.php'>NullPageElementImpl</class>
+        </pageElements>
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
+        $element = $pageElementFactory->getPageElement('someElement');
+        $pageElementFactory->clearCache();
+        $element2 = $pageElementFactory->getPageElement('someElement');
+        $this->assertFalse($element === $element2);
+
+    }
+    public function testPageElementCacheCanBeDisabled()
+    {
+        $configXML = simplexml_load_string("
+        <config>
+        {$this->defaultOwner}
+        <pageElements>
+            <class name='someElement' link='_stub/NullPageElementImpl.php'>NullPageElementImpl</class>
+        </pageElements>
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
+        $element = $pageElementFactory->getPageElement('someElement');
+        $element2 = $pageElementFactory->getPageElement('someElement', false);
+        $this->assertFalse($element === $element2);
+    }
+
+    public function testPageElementCacheWillBeUpdated()
+    {
+        $configXML = simplexml_load_string("
+        <config>
+        {$this->defaultOwner}
+        <pageElements>
+            <class name='someElement' link='_stub/NullPageElementImpl.php'>NullPageElementImpl</class>
+        </pageElements>
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
+        $element = $pageElementFactory->getPageElement('someElement');
+        $element2 = $pageElementFactory->getPageElement('someElement', false);
+        $element3 = $pageElementFactory->getPageElement('someElement');
+        $this->assertFalse($element === $element2);
+        $this->assertTrue($element2 === $element3);
+    }
+
     public function testWillReturnThrowExceptionIfElementNotInstanceOfPageElement()
     {
         /** @var $configXML SimpleXMLElement */
@@ -107,4 +174,6 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         $pageElementFactory->getPageElement('someElement');
 
     }
+
+
 }

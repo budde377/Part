@@ -15,6 +15,7 @@ class PageElementFactoryImpl implements PageElementFactory
 {
 
     private $config;
+    private $cache = array();
     private $backendSingletonFactory;
 
     public function __construct(Config $config, BackendSingletonContainer $backendSingletonFactory)
@@ -24,14 +25,13 @@ class PageElementFactoryImpl implements PageElementFactory
     }
 
     /**
-     * @param string $name The name of the PageElement
-     * @throws ClassNotDefinedException
-     * @throws FileNotFoundException
-     * @throws ClassNotInstanceOfException
-     * @return null|\PageElement Will return null if the page element is not in list, else PageElement
+     * {@inheritdoc}
      */
-    public function getPageElement($name)
+    public function getPageElement($name, $cached = true)
     {
+        if($cached && isset($this->cache[$name])){
+            return $this->cache[$name];
+        }
 
         $element = $this->config->getPageElement($name);
         if ($element === null) {
@@ -53,8 +53,17 @@ class PageElementFactoryImpl implements PageElementFactory
             throw new ClassNotInstanceOfException($element['className'], 'PageElement');
         }
 
-        return $elementObject;
+        return $this->cache[$name] = $elementObject;
 
 
+    }
+
+    /**
+     * Will clear cache
+     * @return void
+     */
+    public function clearCache()
+    {
+        $this->cache = array();
     }
 }

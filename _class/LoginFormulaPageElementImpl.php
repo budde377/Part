@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__) . '/HTMLFormElementImpl.php';
-require_once dirname(__FILE__) . '/../_interface/PageElement.php';
+require_once dirname(__FILE__) . '/../_class/PageElementImpl.php';
 require_once dirname(__FILE__) . '/../_interface/Registrable.php';
 require_once dirname(__FILE__) . '/JSONServerImpl.php';
 require_once dirname(__FILE__) . '/JSONFunctionImpl.php';
@@ -11,35 +11,17 @@ require_once dirname(__FILE__) . '/JSONResponseImpl.php';
  * Date: 18/01/13
  * Time: 15:30
  */
-class LoginFormulaPageElementImpl implements PageElement
+class LoginFormulaPageElementImpl extends PageElementImpl
 {
 
     private $container;
-    private $AJAXRegister;
     private $userLibrary;
 
     function __construct(BackendSingletonContainer $container)
     {
         $this->container = $container;
-        $this->AJAXRegister = $container->getAJAXRegisterInstance();
         $this->userLibrary = $container->getUserLibraryInstance();
-        $this->initialize();
-    }
 
-    private function initialize()
-    {
-        if ($this->userLibrary->getUserLoggedIn() !== null) {
-            HTTPHeaderHelper::redirectToLocation("/");
-        }
-        if(count($this->userLibrary->listUsers()) == 0){
-            $config = $this->container->getConfigInstance();
-            $owner = $config->getOwner();
-            $user = new UserImpl($owner['username'], $this->container->getDBInstance());
-            $user->setMail($owner['mail']);
-            $user->setPassword("password");
-            $user->create();
-            $user->getUserPrivileges()->addRootPrivileges();
-        }
     }
 
     /**
@@ -49,6 +31,7 @@ class LoginFormulaPageElementImpl implements PageElement
      */
     public function generateContent()
     {
+        parent::generateContent();
         if ($this->evaluate($message, $status)) {
             return "<div class='notion $status'>$message</div>";
         }
@@ -97,4 +80,26 @@ class LoginFormulaPageElementImpl implements PageElement
         return true;
     }
 
+    /**
+     * Will set up the page element.
+     * If you want to ensure that you register some files, this would be the place to do this.
+     * This should always be called before generateContent, at the latest right before.
+     * @return void
+     */
+    public function setUpElement()
+    {
+        parent::setUpElement();
+        if ($this->userLibrary->getUserLoggedIn() !== null) {
+            HTTPHeaderHelper::redirectToLocation("/");
+        }
+        if(count($this->userLibrary->listUsers()) == 0){
+            $config = $this->container->getConfigInstance();
+            $owner = $config->getOwner();
+            $user = new UserImpl($owner['username'], $this->container->getDBInstance());
+            $user->setMail($owner['mail']);
+            $user->setPassword("password");
+            $user->create();
+            $user->getUserPrivileges()->addRootPrivileges();
+        }
+    }
 }

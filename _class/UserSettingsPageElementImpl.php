@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../_interface/PageElement.php';
+require_once dirname(__FILE__) . '/../_class/PageElementImpl.php';
 require_once dirname(__FILE__) . '/../_interface/Registrable.php';
 require_once dirname(__FILE__) . '/DartFileImpl.php';
 require_once dirname(__FILE__) . '/CSSFileImpl.php';
@@ -18,7 +18,7 @@ require_once dirname(__FILE__) . '/UserSettingsUpdateWebsitePageElementImpl.php'
  * Date: 18/01/13
  * Time: 19:03
  */
-class UserSettingsPageElementImpl implements PageElement
+class UserSettingsPageElementImpl extends PageElementImpl
 {
     /** @var  Config */
     private $config;
@@ -59,8 +59,6 @@ class UserSettingsPageElementImpl implements PageElement
         $this->editUserPageElement = new UserSettingsEditUserPageElementImpl($this->container);
         $this->editUsersPageElement = new UserSettingsEditUsersPageElementImpl($this->container);
         $this->updateWebsitePageElement = new UserSettingsUpdateWebsitePageElementImpl($this->container);
-        $cssRegister = $this->container->getCSSRegisterInstance();
-        $cssRegister->registerCSSFile(new CSSFileImpl(dirname(__FILE__) . '/../_css/user_settings_style.css'));
     }
 
     /**
@@ -70,6 +68,7 @@ class UserSettingsPageElementImpl implements PageElement
      */
     public function generateContent()
     {
+        parent::generateContent();
         if ($this->currentUser == null) {
             return "";
         }
@@ -158,4 +157,20 @@ class UserSettingsPageElementImpl implements PageElement
     }
 
 
+    /**
+     * Will set up the page element.
+     * If you want to ensure that you register some files, this would be the place to do this.
+     * This should always be called before generateContent, at the latest right before.
+     * @return void
+     */
+    public function setUpElement()
+    {
+        parent::setUpElement();
+        if($this->currentUser == null){
+            return;
+        }
+        $cssRegister = $this->container->getCSSRegisterInstance();
+        $cssRegister->registerCSSFile(new CSSFileImpl(dirname(__FILE__) . '/../_css/user_settings_style.css'));
+
+    }
 }

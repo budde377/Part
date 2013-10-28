@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__).'/../../_interface/PageElement.php';
+require_once dirname(__FILE__).'/../../_class/PageElementImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -7,7 +7,7 @@ require_once dirname(__FILE__).'/../../_interface/PageElement.php';
  * Time: 10:48 AM
  * To change this template use File | Settings | File Templates.
  */
-class ReturnIncrementPageElementImpl implements PageElement
+class ReturnIncrementPageElementImpl extends PageElementImpl
 {
 
     /**
@@ -17,6 +17,7 @@ class ReturnIncrementPageElementImpl implements PageElement
      */
     public function generateContent()
     {
+        parent::generateContent();
         if(!isset($_SESSION['inc'])){
             $_SESSION['inc'] = 0;
         }
@@ -24,4 +25,5 @@ class ReturnIncrementPageElementImpl implements PageElement
         return $_SESSION['inc'];
 
     }
+
 }

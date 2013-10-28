@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . "/../_interface/PageElement.php";
+require_once dirname(__FILE__) . "/../_class/PageElementImpl.php";
 require_once dirname(__FILE__) . "/../_interface/Registrable.php";
 require_once dirname(__FILE__) . "/../_trait/ValidationTrait.php";
 
@@ -9,7 +9,7 @@ require_once dirname(__FILE__) . "/../_trait/ValidationTrait.php";
  * Date: 20/01/13
  * Time: 17:24
  */
-class UserSettingsEditUserPageElementImpl implements PageElement
+class UserSettingsEditUserPageElementImpl extends PageElementImpl
 {
     private $container;
     private $currentUser;
@@ -28,7 +28,7 @@ class UserSettingsEditUserPageElementImpl implements PageElement
      */
     public function generateContent()
     {
-
+        parent::generateContent();
         $output = "
         <h3>Rediger brugernavn og e-mail</h3>";
         $userNameMailForm = new HTMLFormElementImpl(HTMLFormElement::FORM_METHOD_POST);
@@ -118,8 +118,5 @@ class UserSettingsEditUserPageElementImpl implements PageElement
 
         return false;
     }
-
-
-
 
 }

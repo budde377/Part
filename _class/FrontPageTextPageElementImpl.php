@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../_interface/PageElement.php';
+require_once dirname(__FILE__) . '/../_class/PageElementImpl.php';
 require_once dirname(__FILE__) . '/../_interface/Registrable.php';
 /**
  * Created by JetBrains PhpStorm.
@@ -9,7 +9,7 @@ require_once dirname(__FILE__) . '/../_interface/Registrable.php';
  * To change this template use File | Settings | File Templates.
  */
 
-class FrontPageTextPageElementImpl implements PageElement
+class FrontPageTextPageElementImpl extends PageElementImpl
 {
 
     private $container;
@@ -27,6 +27,7 @@ class FrontPageTextPageElementImpl implements PageElement
      */
     public function generateContent()
     {
+        parent::generateContent();
         $latest= null;
         $pageContent = new PageContentImpl($this->container->getDBInstance(), $this->container->getCurrentPageStrategyInstance()->getCurrentPage(), "mainContent");
         if(($latest = $pageContent->latestContent()) != null){

@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../../_interface/PageElement.php';
+require_once dirname(__FILE__) . '/../../_class/PageElementImpl.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -8,7 +8,7 @@ require_once dirname(__FILE__) . '/../../_interface/PageElement.php';
  * Time: 11:21 AM
  * To change this template use File | Settings | File Templates.
  */
-class HTMLPageElementImpl implements PageElement
+class HTMLPageElementImpl extends PageElementImpl
 {
 
     /**
@@ -18,6 +18,8 @@ class HTMLPageElementImpl implements PageElement
      */
     public function generateContent()
     {
+        parent::generateContent();
         return "<b>Hello World</b>";
     }
+
 }

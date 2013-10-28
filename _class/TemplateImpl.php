@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../_vendor/autoload.php';
 require_once dirname(__FILE__) . '/FileImpl.php';
-require_once dirname(__FILE__) . '/CBTwigExtensionImpl.php';
+require_once dirname(__FILE__) . '/TemplateTwigExtensionImpl.php';
 require_once dirname(__FILE__) . '/../_interface/Template.php';
 require_once dirname(__FILE__) . '/../_exception/FileNotFoundException.php';
 require_once dirname(__FILE__) . '/../_exception/EntryNotFoundException.php';
@@ -85,11 +85,12 @@ class TemplateImpl implements Template
 
 
     private function setUpTwig(Twig_LoaderInterface $loader, $renderTarget){
-        $this->twig = new Twig_Environment($loader, array('debug'=>$this->twigDebug)); //TODO Add some tmp
+        $loaderChain = new Twig_Loader_Chain(array($loader, new Twig_Loader_Filesystem(dirname(__FILE__).'/../_template/')));
+        $this->twig = new Twig_Environment($loaderChain, array('debug'=>$this->twigDebug));
         if($this->twigDebug){
             $this->twig->addExtension(new Twig_Extension_Debug());
         }
-        $this->twig->addExtension(new CBTwigExtensionImpl($this->backendContainer, $this->pageElementFactory));
+        $this->twig->addExtension(new TemplateTwigExtensionImpl());
         $this->renderTarget = $renderTarget;
 
     }
@@ -114,10 +115,23 @@ class TemplateImpl implements Template
 
     public function render()
     {
+        return $this->privateRender();
+    }
 
+    /**
+     * This function will set the initialize flag in the template and not
+     * return the result of render.
+     * @return void
+     */
+    public function onlyInitialize()
+    {
+        $this->privateRender(true);
+    }
+
+    private function privateRender($initialize = false){
         $userLib = $this->backendContainer->getUserLibraryInstance();
         $currentPageStrat = $this->backendContainer->getCurrentPageStrategyInstance();
-
+        $this->pageElementFactory->clearCache();
         return $this->twig->render($this->renderTarget, array(
             'current_user' => $userLib->getUserLoggedIn(),
             'user_lib' => $userLib,
@@ -125,7 +139,12 @@ class TemplateImpl implements Template
             'current_page_path' => $currentPageStrat->getCurrentPagePath(),
             'page_order' => $this->backendContainer->getPageOrderInstance(),
             'css_register' => $this->backendContainer->getCSSRegisterInstance(),
-            'js_register' => $this->backendContainer->getJSRegisterInstance()
+            'page_element_factory' => $this->pageElementFactory,
+            'js_register' => $this->backendContainer->getJSRegisterInstance(),
+            'site' => $this->backendContainer->getSiteInstance(),
+            'debug_mode' => $this->config->isDebugMode(),
+            'initialize' => $initialize
         ));
+
     }
 }

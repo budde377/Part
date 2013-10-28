@@ -1,12 +1,12 @@
 <?php
-require_once dirname(__FILE__) . '/../_interface/PageElement.php';
+require_once dirname(__FILE__) . '/../_class/PageElementImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 26/07/12
  * Time: 11:44
  */
-class HeadPageElementImpl implements PageElement
+class HeadPageElementImpl extends PageElementImpl
 {
 
     private $cssRegister;
@@ -28,6 +28,7 @@ class HeadPageElementImpl implements PageElement
      */
     public function generateContent()
     {
+        parent::generateContent();
         $output = '';
         $cssFiles = $this->cssRegister->getRegisteredFiles();
         foreach($cssFiles as $file){
@@ -50,4 +51,5 @@ class HeadPageElementImpl implements PageElement
         }
         return $output;
     }
+
 }

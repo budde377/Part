@@ -1,12 +1,12 @@
 <?php
-require_once dirname(__FILE__) . '/../_interface/PageElement.php';
+require_once dirname(__FILE__) . '/../_class/PageElementImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 7/15/12
  * Time: 6:22 PM
  */
-class TitlePageElementImpl implements PageElement
+class TitlePageElementImpl extends PageElementImpl
 {
     private $backendSingletonContainer;
     private $pageOrder;
@@ -27,6 +27,7 @@ class TitlePageElementImpl implements PageElement
      */
     public function generateContent()
     {
+        parent::generateContent();
         $pathArray = $this->currentPageStrategy->getCurrentPagePath();
         $titleString = '';
         foreach ($pathArray as $page) {
@@ -37,4 +38,5 @@ class TitlePageElementImpl implements PageElement
 
         return $titleString;
     }
+
 }

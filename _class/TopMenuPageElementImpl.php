@@ -1,12 +1,12 @@
 <?php
-require_once dirname(__FILE__) . '/../_interface/PageElement.php';
+require_once dirname(__FILE__) . '/../_class/PageElementImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 18/01/13
  * Time: 19:54
  */
-class TopMenuPageElementImpl implements PageElement
+class TopMenuPageElementImpl extends PageElementImpl
 {
     private $pageOrder;
     /** @var Page */
@@ -24,6 +24,7 @@ class TopMenuPageElementImpl implements PageElement
      */
     public function generateContent()
     {
+        parent::generateContent();
         $out = "";
         $pageOrder = $this->pageOrder->getPageOrder();
 
@@ -40,4 +41,5 @@ class TopMenuPageElementImpl implements PageElement
         }
         return "<ul>$out</ul>";
     }
+
 }

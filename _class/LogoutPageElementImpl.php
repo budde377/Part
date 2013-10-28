@@ -1,30 +1,31 @@
 <?php
-require_once dirname(__FILE__) . '/../_interface/PageElement.php';
+require_once dirname(__FILE__) . '/../_class/PageElementImpl.php';
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 18/01/13
  * Time: 19:20
  */
-class LogoutPageElementImpl implements PageElement
+class LogoutPageElementImpl extends PageElementImpl
 {
+    private $currentUser;
     function __construct(BackendSingletonContainer $container)
     {
-        $user = $container->getUserLibraryInstance()->getUserLoggedIn();
-        if($user != null){
-            $user->logout();
-        }
-        HTTPHeaderHelper::redirectToLocation("/");
+        $this->currentUser = $container->getUserLibraryInstance()->getUserLoggedIn();
+
     }
 
-
     /**
-     * This will return content from page element as a string.
-     * The format can be xml, xhtml, html etc. but return type must be string
-     * @return string
+     * Will set up the page element.
+     * If you want to ensure that you register some files, this would be the place to do this.
+     * This should always be called before generateContent, at the latest right before.
+     * @return void
      */
-    public function generateContent()
+    public function setUpElement()
     {
-        return "";
-     }
+        parent::setUpElement();
+        if($this->currentUser != null){
+            $this->currentUser->logout();
+        }
+        HTTPHeaderHelper::redirectToLocation("/");    }
 }

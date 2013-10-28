@@ -218,7 +218,7 @@ class NotFoundPageImpl implements Page
     /**
      * @return Variables Will return and reuse instance of variables
      */
-    public function getPageVariables()
+    public function getVariables()
     {
         return null;
     }

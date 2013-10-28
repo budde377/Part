@@ -217,12 +217,45 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $v = $this->template->render();
         $this->assertTrue(strpos($v, "css_register") !== false);
     }
+
     public function testTemplateAddsJSRegister(){
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
         $v = $this->template->render();
         $this->assertTrue(strpos($v, "js_register") !== false);
+    }
+
+    public function testTemplateAddsPageElementFacoty(){
+        $this->setUpConfig();
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{{ dump() }}");
+        $v = $this->template->render();
+        $this->assertTrue(strpos($v, "page_element_factory") !== false);
+    }
+
+    public function testTemplateAddsSite(){
+        $this->setUpConfig();
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{{ dump() }}");
+        $v = $this->template->render();
+        $this->assertTrue(strpos($v, "'site'") !== false);
+    }
+
+    public function testTemplateAddsInitialize(){
+        $this->setUpConfig();
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{{ dump() }}");
+        $v = $this->template->render();
+        $this->assertTrue(strpos($v, "'initialize'") !== false);
+    }
+
+    public function testTemplateAddsDebug(){
+        $this->setUpConfig();
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{{ dump() }}");
+        $v = $this->template->render();
+        $this->assertTrue(strpos($v, "'debug_mode'") !== false);
     }
 
     public function testTemplateSupportsPageElementTag(){
@@ -260,6 +293,47 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $_SESSION['initialized']);
     }
 
+    public function testTemplateInitializePageElementCanBeCalledMultipleTimes(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%init_page_element initElement%}{%init_page_element initElement%}");
+        $_SESSION['initialized'] = 0;
+        $this->template->render();
+        $this->assertEquals(1, $_SESSION['initialized']);
+    }
+
+    public function testTemplateInitializePageElementAndPageElementCanBothBeDone(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%init_page_element initElement%}{%page_element initElement%}");
+        $_SESSION['initialized'] = 0;
+        $this->template->render();
+        $this->assertEquals(1, $_SESSION['initialized']);
+    }
+
+    public function testTemplateInitializeWillBeDoneOnPageElement(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%page_element initElement%}");
+        $_SESSION['initialized'] = 0;
+        $this->template->render();
+        $this->assertEquals(1, $_SESSION['initialized']);
+    }
+
+    public function testTemplateInitializePageElementWillOnlyBeInitializedOnceOnOneInitAndOneUsage(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%init_page_element initElement%}{%page_element initElement%}");
+        $_SESSION['initialized'] = 0;
+        $this->template->render();
+        $this->assertEquals(1, $_SESSION['initialized']);
+    }
+
+    public function testInitPageElementWillBeDoneTwiceOnTwiceRender(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%init_page_element initElement%}");
+        $_SESSION['initialized'] = 0;
+        $this->template->render();
+        $this->template->render();
+        $this->assertEquals(2, $_SESSION['initialized']);
+    }
+
     public function testTemplateInitializePageElementBreaksOnElementNotFound(){
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%init_page_element nonExistingElement%}");
@@ -292,6 +366,16 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     }
 
 
+    public function testTemplateWillUpdatePageContent(){
+        $this->setUpConfig();
+        $this->currentPage->getContent()->addContent("Hello World");
+        $this->template->setTemplateFromString("{%page_content%}");
+        $this->template->render();
+        $this->currentPage->getContent()->addContent("Hello World2");
+        $this->assertEquals("Hello World2", $this->template->render());
+    }
+
+
     public function testTemplateWillSupportSiteContent(){
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%site_content someElement %}");
@@ -306,6 +390,16 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     }
 
 
+    public function testTemplateWillUpdateSiteContent(){
+        $this->setUpConfig();
+        $this->site->getContent("")->addContent("Hello World");
+        $this->template->setTemplateFromString("{%site_content%}");
+        $this->template->render();
+        $this->site->getContent("")->addContent("Hello World2");
+        $this->assertEquals("Hello World2", $this->template->render());
+    }
+
+
     public function testTemplateWillAddSiteContentWithId(){
         $this->setUpConfig();
         $this->site->getContent("someid")->addContent("Hello World");
@@ -313,6 +407,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("Hello World", $this->template->render());
     }
 
-
+    //TODO test for initialize
 
 }
+
