@@ -13,9 +13,7 @@ class Revision {
 abstract class Content {
   final String id;
 
-  final Page page;
-
-  Content(this.page, this.id);
+  Content(this.id);
 
   Future<List<DateTime>> get changeTimes;
 
@@ -28,10 +26,35 @@ abstract class Content {
   Stream<Revision> get onAddContent;
 }
 
-class JSONPageContent extends Content {
-  JSONClient _client;
 
-  JSONPageContent(Page page, String id, this._client) :super(page, id);
+abstract class JSONContentFunctionGenerator{
+
+  JSONFunction generateListContentFunction({int from:0, int to: -1, bool includeContent:false});
+  JSONFunction generateContentAtTimeFunction(num time);
+  JSONFunction generateAddContentFunction(String content);
+  String get id;
+}
+
+
+class JSONContentPageFunctionGenerator implements JSONContentFunctionGenerator{
+  final Page page;
+  final String _id;
+  JSONContentPageFunctionGenerator (this.page, this._id);
+
+  JSONFunction generateListContentFunction({int from:0, int to: -1, bool includeContent:false}) => new ListPageContentRevisionsJSONFunction(page.id, id , from:from, to:to, includeContent:includeContent);
+  JSONFunction generateContentAtTimeFunction(num time) => new PageContentAtTimeJSONFunction(page.id, id, time);
+  JSONFunction generateAddContentFunction(String content) => new AddPageContentJSONFunction(page.id, id, content);
+
+  String get id => _id;
+}
+
+class JSONContent extends Content {
+  JSONClient _client;
+  final JSONContentFunctionGenerator contentStrategy;
+
+  JSONContent(JSONContentFunctionGenerator contentStrategy, this._client): super(contentStrategy.id), this.contentStrategy = contentStrategy;
+
+  JSONContent.page(Page page, String id, JSONClient client) : this(new JSONContentPageFunctionGenerator(page, id), client);
 
   Map<DateTime, Revision> _revisions = new Map<DateTime, Revision>();
 
@@ -40,7 +63,7 @@ class JSONPageContent extends Content {
 
   Future<List<DateTime>> get changeTimes {
     var completer = new Completer<List<DateTime>>();
-    _client.callFunction(new ListPageContentRevisionsJSONFunction(page.id, id)).then((JSONResponse response) {
+    _client.callFunction(contentStrategy.generateListContentFunction()).then((JSONResponse response) {
       if (response.type == RESPONSE_TYPE_SUCCESS) {
         List<int> payload = response.payload== null? []:response.payload;
         completer.complete(payload.map((int) => new DateTime.fromMillisecondsSinceEpoch(int * 1000)).toList(growable:false));
@@ -54,7 +77,7 @@ class JSONPageContent extends Content {
   Future<Revision> operator [](DateTime time){
     var completer = new Completer<Revision>();
 
-      _client.callFunction(new PageContentAtTimeJSONFunction(page.id, id, time.millisecondsSinceEpoch ~/ 1000)).then((JSONResponse response) {
+      _client.callFunction(contentStrategy.generateContentAtTimeFunction(time.millisecond~/1000)).then((JSONResponse response) {
         if (response.type != RESPONSE_TYPE_SUCCESS) {
           completer.completeError(new Exception("Could not get content at time"));
           return;
@@ -71,7 +94,7 @@ class JSONPageContent extends Content {
 
   Future<Revision> addContent(String content) {
     var completer = new Completer<Revision>();
-    _client.callFunction(new AddPageContentJSONFunction(page.id, id, content)).then((JSONResponse response) {
+    _client.callFunction(contentStrategy.generateAddContentFunction(content)).then((JSONResponse response) {
       if (response.type != RESPONSE_TYPE_SUCCESS) {
         completer.completeError(new Exception("Could not add content"));
         return;
@@ -89,7 +112,7 @@ class JSONPageContent extends Content {
     to = to == null ? new DateTime.now() : to;
 
       var fromm = from.millisecondsSinceEpoch ~/ 1000, too = to.millisecondsSinceEpoch ~/ 1000;
-      _client.callFunction(new ListPageContentRevisionsJSONFunction(page.id, id, includeContent:true, to:too, from:fromm)).then((JSONResponse response) {
+      _client.callFunction(contentStrategy.generateListContentFunction(from:fromm, to:too, includeContent:true)).then((JSONResponse response) {
         if (response.type == RESPONSE_TYPE_SUCCESS) {
           List<Map<String, dynamic>> payload = response.payload == null? []:response.payload;
           completer.complete(payload.map((Map<String, dynamic> m) => _generateRevision(new DateTime.fromMillisecondsSinceEpoch(m['time'] * 1000), m['content'])).toList(growable:false));
@@ -197,6 +220,6 @@ class JSONPage extends Page {
   }
 
 
-  Content operator [](String id) => _content.putIfAbsent(id, () => new JSONPageContent(this, id, _client));
+  Content operator [](String id) => _content.putIfAbsent(id, () => new JSONContent(this, id, _client));
 
 }
