@@ -388,7 +388,6 @@ class ImageEditorHandler {
   void _setUpListeners() {
     editor.canvas.onMouseWheel.listen((WheelEvent we) {
       editor.width += (we.deltaY > 0 ? 1 : -1) * 2;
-      we.cancelBubble = true;
       we.preventDefault();
     });
     var t;
@@ -460,7 +459,7 @@ class ImageEditorHandler {
       x = p.x;
       y = p.y;
       if(editor == null){
-        return;
+        return null;
       }
       if(editor.dotNW == null){
         return 0;
@@ -468,7 +467,7 @@ class ImageEditorHandler {
       return editor.dotNW.inShape(x, y) ? 1 : (editor.dotNE.inShape(x, y) ? 2 : (editor.dotSE.inShape(x, y) ? 3 : (editor.dotSW.inShape(x, y) ? 4 : 0)));
     };
     editor.canvas.onMouseMove.listen((MouseEvent ev) {
-      if (inDot(ev.offsetX, ev.offsetY) > 0) {
+      if (inDot(ev.offset.x, ev.offset.y) > 0) {
         editor.canvas.classes.add("hover_dot");
       } else {
         editor.canvas.classes.remove("hover_dot");
@@ -476,30 +475,30 @@ class ImageEditorHandler {
     });
     editor.canvas.onMouseDown.listen((MouseEvent ev) {
       var dotN;
-      if ((dotN = inDot(ev.offsetX, ev.offsetY)) == 0) {
+      if ((dotN = inDot(ev.offset.x, ev.offset.y)) == 0) {
         return ;
       }
       var sub1, sub2;
       sub1 = document.onMouseMove.listen((MouseEvent ev) {
-        var mx = ev.movementX, my = ev.movementY, w = editor.width, h = editor.height;
+        var mx = ev.movement.x, my = ev.movement.y, w = editor.width, h = editor.height;
 
 
         switch (editor.rotate) {
           case 1:
             h = editor.width;
             w = editor.height;
-            mx = ev.movementY;
-            my = -ev.movementX;
+            mx = ev.movement.y;
+            my = -ev.movement.x;
             break;
           case 2:
-            mx = -ev.movementX;
-            my = -ev.movementY;
+            mx = -ev.movement.x;
+            my = -ev.movement.y;
             break;
           case 3:
             h = editor.width;
             w = editor.height;
-            mx = -ev.movementY;
-            my = ev.movementX;
+            mx = -ev.movement.y;
+            my = ev.movement.x;
 
             break;
         }

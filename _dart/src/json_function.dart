@@ -9,7 +9,7 @@ class JSONFunction {
 
   JSONFunction(String name):this.name = name;
 
-  String get jsonString => JSON.stringify({
+  String get jsonString => JSON.encode({
       "type":"function", "name":name, "id":id, "args":arguments
   });
 }

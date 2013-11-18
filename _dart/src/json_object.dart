@@ -6,7 +6,7 @@ class JSONObject {
 
   JSONObject(String name) : this.name = name;
 
-  String get jsonString => JSON.stringify({"type":"object", "name":name, "variables":variables});
+  String get jsonString => JSON.encode({"type":"object", "name":name, "variables":variables});
 
 }
 

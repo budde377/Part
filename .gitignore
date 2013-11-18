@@ -1,2 +1,4 @@
 _vendor/
 composer.lock
+packages/
+pubspec.lock

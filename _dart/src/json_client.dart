@@ -22,7 +22,7 @@ class AJAXJSONClient extends JSONClient {
         return;
       }
       print(request.responseText);
-      Map responseObject = JSON.parse(request.responseText);
+      Map responseObject = JSON.decode(request.responseText);
       var response;
       if ((response = parseResponse(responseObject)) == null) {
         completer.completeError(new Exception("Couldn't parse response"));

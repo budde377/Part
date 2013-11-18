@@ -87,7 +87,7 @@ class UserSettingsPageLi {
 
   bool _active;
 
-  Element _handle, _activate, _hide, _delete, _template, _alias, _subPagesButton;
+  Element _activate, _hide, _delete, _template, _alias, _subPagesButton;
 
 
   AnchorElement _anchor;
@@ -131,7 +131,7 @@ class UserSettingsPageLi {
       _anchor.classes.add('val');
       li.append(_anchor);
     }
-    _handle = _returnNewDivIfNecessary(li.query('.handle'), ['handle'], _active);
+    //_handle = _returnNewDivIfNecessary(li.query('.handle'), ['handle'], _active);
     _delete = _returnNewDivIfNecessary(li.query('.delete'), ['link', 'delete'], true, title:'Slet');
     _activate = _returnNewDivIfNecessary(li.query('.activate'), ['link', 'activate'], true, title:_pageOrder.isActive(page.id) ? 'Deaktiver' : 'Aktiver');
     _hide = _returnNewDivIfNecessary(li.query('.showhide'), ['link', 'showhide'], _active, title:page.hidden ? "Vis" : "Skjul");
@@ -225,7 +225,7 @@ class UserSettingsPageLi {
       _activate.title = "Aktiver";
       _hide.remove();
       _subPagesButton.remove();
-      _handle.remove();
+      //_handle.remove();
       var ul;
       if ((ul = li.query('ul')) != null) {
         ul.remove();
@@ -234,7 +234,7 @@ class UserSettingsPageLi {
     } else if (!_active && a) {
       _anchor.href = _pageListAsAddressString();
       _activate.title = "Deaktiver";
-      li.insertBefore(_handle, _delete);
+      li.insertBefore(_delete, _activate);
       li.append(_hide);
       li.append(_subPagesButton);
 

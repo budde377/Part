@@ -396,7 +396,7 @@ class TitleURLUpdateInitializer extends Initializer {
     _order.currentPage.registerListener((Page page) {
       updateAddress();
     });
-    _order.registerListener((int changeType, [ Page page]) {
+    _order.onUpdate.listen((_){
       updateAddress();
     });
 
@@ -732,17 +732,18 @@ class UserSettingsPageListsInitializer extends Initializer {
     _activeList.onChange.listen(ULChangeListener(_activeList, null));
     _activeList.queryAll('ul').forEach((UListElement ul) => ul.onChange.listen(ULChangeListener(ul, new UserSettingsPageLi(ul.parent).page.id)));
 
-    _order.registerListener((int changeType, [Page page]) {
+    _order.onUpdate.listen((PageOrderChange change){
+      var page = change.page, changeType = change.type;
       switch (changeType) {
-        case PAGE_ORDER_CHANGE_CREATE_PAGE:
+        case PageOrderChange.PAGE_ORDER_CHANGE_CREATE_PAGE:
           var pageLi = new UserSettingsPageLi.fromPage(page);
           pageLi.updateActive();
           _inactiveList.append(pageLi.li);
           updateListInfo(_inactiveList, false);
 
           break;
-        case PAGE_ORDER_CHANGE_DELETE_PAGE:case PAGE_ORDER_CHANGE_DEACTIVATE:
-          if (changeType == PAGE_ORDER_CHANGE_DELETE_PAGE) {
+        case PageOrderChange.PAGE_ORDER_CHANGE_DELETE_PAGE:case PageOrderChange.PAGE_ORDER_CHANGE_DEACTIVATE:
+          if (changeType == PageOrderChange.PAGE_ORDER_CHANGE_DELETE_PAGE) {
             var pageLi = new UserSettingsPageLi.fromPage(page);
             var parent = pageLi.li.parent;
             if (parent == _inactiveList) {
@@ -750,9 +751,7 @@ class UserSettingsPageListsInitializer extends Initializer {
               updateListInfo(_inactiveList, false);
               break;
             }
-            var l = new ChangeableList.unorderedList(pageLi.li.parent);
-            pageLi.li.remove();
-            l.refreshLIs();
+            new ChangeableList(pageLi.li.parent);
             updateListInfo(parent);
           }
 
@@ -768,11 +767,11 @@ class UserSettingsPageListsInitializer extends Initializer {
             _inactiveList.append(pageLi.li);
           });
           var ulToUpdate = path.currentlyShowing == null ? _activeList : new UserSettingsPageLi.fromPage(path.currentlyShowing).li.query('ul');
-          new ChangeableList.unorderedList(ulToUpdate).refreshLIs();
+
           updateListInfo(_inactiveList);
           updateListInfo(ulToUpdate);
           break;
-        case PAGE_ORDER_CHANGE_ACTIVATE:
+        case PageOrderChange.PAGE_ORDER_CHANGE_ACTIVATE:
           var path = new UserSettingsActivePagesPath();
           var showingPage = path.currentlyShowing;
           path.reset();
@@ -791,7 +790,7 @@ class UserSettingsPageListsInitializer extends Initializer {
               });
 
               pageLi.li.append(ul);
-              new ChangeableList.unorderedList(parentUl).appendLi(pageLi.li);
+              parentUl.append(pageLi.li);
               recursiveBuilder(p.id, ul);
             });
             updateListInfo(parentUl);

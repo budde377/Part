@@ -61,7 +61,7 @@ class UserSettingsEditPagesPageElementImpl extends PageElementImpl
                 <div class='padding'> &nbsp;</div>
                 <a href='/{$page->getID()}' class='val'>{$page->getTitle()}</a>
                 <span class='template hidden'>{$page->getTemplate()}</span>
-                <span class='alias hidden'>{$page->getAlias()}</span>
+                <span class='alias hidden' hidden>{$page->getAlias()}</span>
                 <div class='link delete' title='Slet'> &nbsp; </div>
                 <div class='link activate' title='Aktiver'> &nbsp; </div>
             </li>
@@ -106,9 +106,8 @@ class UserSettingsEditPagesPageElementImpl extends PageElementImpl
             <li class='$current'>
                 <div class='padding'> &nbsp;</div>
                 <a href='$path$pageId' class='val'>{$page->getTitle()}</a>
-                <span class='template hidden'>{$page->getTemplate()}</span>
-                <span class='alias hidden'>{$page->getAlias()}</span>
-                <div class='handle'>&nbsp;</div>
+                <span class='template hidden' hidden>{$page->getTemplate()}</span>
+                <span class='alias hidden' hidden>{$page->getAlias()}</span>
                 <div class='link delete' title='Slet'>&nbsp;</div>
                 <div class='link activate' title='Deaktiver'>&nbsp;</div>
                 <div class='link showhide' title='$t'> &nbsp;</div>

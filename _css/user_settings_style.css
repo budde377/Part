@@ -400,6 +400,30 @@ form.initial input.invalid {
     background-image: url(/_common/_img/eyeslash.png);
 }
 
+#ActivePageList li{
+
+}
+
+#ActivePageList li.dragging{
+    cursor: hand;
+}
+
+#ActivePageList li.dragging > .link {
+    display: none;
+}
+
+#ActivePageList li.dragging_over{
+    border: 0 solid #CECECE;
+}
+
+#ActivePageList li.dragging_over.above{
+    border-top-width: 20px;
+}
+
+#ActivePageList li.dragging_over.below{
+    border-bottom-width: 20px;
+}
+
 #ActivePageList li.ishidden:not(.hasSubList){
     opacity: 0.4;
     text-decoration: line-through;
@@ -432,6 +456,10 @@ form.initial input.invalid {
 #ActivePageList.levelPage .link:not(.subpages), #InactivePageList.levelPage  .link:not(.subpages),
 #ActivePageList.levelPage .handle, #InactivePageList.levelPage  .handle{
     display: none;
+}
+
+#ActivePageList li.current {
+    padding-right: 30px;
 }
 
 #ActivePageList li.current > .padding, #InactivePageList li.current > .padding{

@@ -1,0 +1,3 @@
+name: cb_common
+dependencies:
+  browser: any

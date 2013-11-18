@@ -19,12 +19,12 @@ class EditorCommandExecutor {
       _inElement = element.contains(window.getSelection().baseNode);
       _listenerChain();
     };
-    element.document.onSelectionChange.listen(_listenerFunction);
+    element.ownerDocument.onSelectionChange.listen(_listenerFunction);
   }
 
 
-  void _execCommand(String command, {bool userinterface:false, String value:""}) {
-    element.document.execCommand(command, userinterface, value);
+  void _execCommand(String command, {bool user_interface:false, String value:""}) {
+    element.ownerDocument.execCommand(command, user_interface, value);
   }
 
   void toggleBold() => _execCommand("bold");
@@ -91,9 +91,9 @@ class EditorCommandExecutor {
 
   void formatBlockPre() => _formatBlock('pre');
 
-  bool _commandState(String command) => _inElement && element.document.queryCommandState(command);
+  bool _commandState(String command) => _inElement && element.ownerDocument.queryCommandState(command);
 
-  String _commandValue(String command) => _inElement ? element.document.queryCommandValue(command) : "";
+  String _commandValue(String command) => _inElement ? element.ownerDocument.queryCommandValue(command) : "";
 
   bool get bold => _commandState("bold");
 
@@ -150,6 +150,8 @@ abstract class EditorHandler {
   final DivElement element;
 
   final Element dataElement;
+
+  EditorHandler(this.element, this.dataElement);
 
 }
 
@@ -412,19 +414,19 @@ class LinkImageHandler {
     }
 
     _unlinkButton..classes.add('unlink')..onClick.listen((MouseEvent mev) {
-      mev.cancelBubble = true;
+      mev.preventDefault();
       _foundLink.insertAdjacentHtml("afterEnd", _foundLink.innerHtml);
       _foundLink.remove();
       _infoBox.remove();
       editor.executor.triggerCommandStateChangeListener();
     });
     _openButton..classes.add('open')..onClick.listen((MouseEvent mev) {
-      mev.cancelBubble = true;
+      mev.preventDefault();
       _infoBox.remove();
       window.open(_foundLink.href, "_blank");
     });
     _editImageButton..classes.add('edit_image')..onClick.listen((MouseEvent mev) {
-      mev.cancelBubble = true;
+      mev.preventDefault();
       _infoBox.remove();
 
       var handler = new ImageEditorHandler.fromImage(_foundImage);
@@ -700,7 +702,6 @@ class ContentEditor {
         return;
       }
       kev.preventDefault();
-      kev.cancelBubble = true;
       save();
     });
 
@@ -964,7 +965,7 @@ class ContentEditor {
           _showPreview(revision);
         });
         li.onMouseOut.listen((MouseEvent ev) {
-          ev.cancelBubble = true;
+          ev.preventDefault();
         });
         li.onClick.listen((_) {
           if (revision == _currentRevision && !changed) {
@@ -1185,7 +1186,7 @@ class ContentEditor {
     var dialog = new DialogContainer();
 
     dialog.dialogBg.onMouseDown.listen((MouseEvent evt) {
-      evt.cancelBubble = true;
+      evt.preventDefault();
 //      evt.preventDefault();
     });
 

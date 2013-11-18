@@ -1,16 +1,26 @@
 part of core;
 
-class ImageSizes{
+class ImageSizes {
   final int maxHeight, maxWidth, minWidth, minHeight;
+
   final bool dataURI;
+
   ImageSizes.atLeast(this.minWidth, this.minHeight, {bool dataURI:false}): maxWidth = -1, maxHeight = -1, this.dataURI = dataURI;
-  ImageSizes.atMost(this.maxWidth, this.maxHeight, {bool dataURI:false}): minWidth =-1,  minHeight = -1, this.dataURI = dataURI;
+
+  ImageSizes.atMost(this.maxWidth, this.maxHeight, {bool dataURI:false}): minWidth =-1, minHeight = -1, this.dataURI = dataURI;
+
   ImageSizes.exactHeight(int height, {bool dataURI:false}): maxHeight = height, minHeight = height, maxWidth = -1, minWidth = -1, this.dataURI = dataURI;
-  ImageSizes.exactWidth(int width, {bool dataURI:false}) : maxWidth = width, minWidth = width, maxHeight = minHeight = -1, this.dataURI = dataURI;
+
+  ImageSizes.exactWidth(int width, {bool dataURI:false}) : maxWidth = width, minWidth = width, maxHeight = -1, minHeight = -1, this.dataURI = dataURI;
+
   ImageSizes.exact(int width, int height, {bool dataURI:false}) : maxWidth = width, minWidth = width, maxHeight = height, minHeight = height, this.dataURI = dataURI;
-  Map<String, int> toJson() => {"maxHeight":maxHeight, "minHeight":minHeight, "maxWidth":maxWidth, "minWidth":minWidth, "dataURI":dataURI};
+
+  Map<String, int> toJson() => {
+      "maxHeight":maxHeight, "minHeight":minHeight, "maxWidth":maxWidth, "minWidth":minWidth, "dataURI":dataURI
+  };
 }
 // TODO Replace all usage of this with Streams!
+
 class ListenerRegister {
   Map<String, Function> _listeners = new Map<String, Function>();
 
@@ -46,21 +56,21 @@ class FileProgress {
 
   String get path => _path;
 
-         set path(String p){
-           if(_path != null){
-             return;
-           }
-           progress = 1.0;
-           _path = p;
-           _notifyPath();
-         }
+  set path(String p) {
+    if (_path != null) {
+      return;
+    }
+    progress = 1.0;
+    _path = p;
+    _notifyPath();
+  }
 
   String get previewPath => _previewPath;
 
-         set previewPath(String p){
-           _previewPath = p;
-           _notifyPreviewPath();
-         }
+  set previewPath(String p) {
+    _previewPath = p;
+    _notifyPreviewPath();
+  }
 
   double get progress => _progress;
 
@@ -75,60 +85,68 @@ class FileProgress {
 
 
   void listenOnPreviewPathAvailable(void callback()) => _listeners.registerListener('preview', callback);
+
   void listenOnProgress(void callback()) => _listeners.registerListener('progress', callback);
+
   void listenOnPathAvailable(void callback()) => _listeners.registerListener('uploaded', callback);
 
   void _notifyProgress() => _listeners.callListeners('progress');
+
   void _notifyPath() => _listeners.callListeners('uploaded');
+
   void _notifyPreviewPath() => _listeners.callListeners('preview');
 
 
-
 }
 
-abstract class UploadStrategy{
+abstract class UploadStrategy {
   Pattern filter;
+
   void upload(FileProgress fileProgress, String data, {void callback(String path):null, void progress(double pct):null});
 
-  void read(FileReader reader,File file);
+  void read(FileReader reader, File file);
 
-  const Pattern FILTER_IMAGE = "image/";
-  const Pattern FILTER_VIDEO = "video/";
+  static const Pattern FILTER_IMAGE = "image/";
+
+  static const Pattern FILTER_VIDEO = "video/";
 
 }
 
-class AJAXImageURIUploadStrategy extends UploadStrategy{
+class AJAXImageURIUploadStrategy extends UploadStrategy {
 
   JSON.JSONClient _client;
+
   List<ImageSizes> _sizes;
+
   ImageSizes _size, _preview;
 
-  AJAXImageURIUploadStrategy([ImageSizes size = null, ImageSizes preview = null]){
+  AJAXImageURIUploadStrategy([ImageSizes size = null, ImageSizes preview = null]) {
     _size = size;
     _preview = preview;
     _sizes = [size, preview];
-    _sizes.removeWhere((ImageSizes s)=>s==null);
-    filter = FILTER_IMAGE;
+    _sizes.removeWhere((ImageSizes s) => s == null);
+    filter = UploadStrategy.FILTER_IMAGE;
     _client = new JSON.AJAXJSONClient();
 
   }
 
-  void upload(FileProgress fileProgress, String data, {void callback(String path):null, void progress(double pct):null}){
+  void upload(FileProgress fileProgress, String data, {void callback(String path):null, void progress(num pct):null}) {
     fileProgress.previewPath = data;
-    if(progress == null){
-      progress = (_){};
+    if (progress == null) {
+      progress = (_) {
+      };
     }
-    _client.callFunction(new JSON.UploadImageURIJSONFunction(fileProgress.file.name, data, _sizes), progress).then((JSON.JSONResponse response){
+    _client.callFunction(new JSON.UploadImageURIJSONFunction(fileProgress.file.name, data, _sizes), progress).then((JSON.JSONResponse response) {
       progress(1);
-      var c = (String path){
+      var c = (String path) {
         fileProgress.path = path;
-        if(callback != null){
+        if (callback != null) {
           callback(path);
         }
       };
-      if(response.type == JSON.RESPONSE_TYPE_SUCCESS){
-        c(_size == null?response.payload['path']:response.payload['thumbs'][0]);
-        if(_preview != null){
+      if (response.type == JSON.RESPONSE_TYPE_SUCCESS) {
+        c(_size == null ? response.payload['path'] : response.payload['thumbs'][0]);
+        if (_preview != null) {
           fileProgress.previewPath = response.payload['thumbs'][1];
         }
       } else {
@@ -137,34 +155,35 @@ class AJAXImageURIUploadStrategy extends UploadStrategy{
     });
   }
 
-  void read(FileReader reader,File file) => reader.readAsDataUrl(file);
+  void read(FileReader reader, File file) => reader.readAsDataUrl(file);
 
 }
 
-class AJAXFileURIUploadStrategy extends UploadStrategy{
+class AJAXFileURIUploadStrategy extends UploadStrategy {
 
   JSON.JSONClient _client;
 
-  AJAXFileURIUploadStrategy(){
+  AJAXFileURIUploadStrategy() {
     _client = new JSON.AJAXJSONClient();
 
   }
 
-  void upload(FileProgress fileProgress, String data, {void callback(String path):null, void progress(double pct):null}){
-    _client.callFunction(new JSON.UploadFileURIJSONFunction(fileProgress.file.name, data)).then((JSON.JSONResponse response){
-      if(progress != null){
+  void upload(FileProgress fileProgress, String data, {void callback(String path):null, void progress(num pct):null}) {
+    _client.callFunction(new JSON.UploadFileURIJSONFunction(fileProgress.file.name, data)).then((JSON.JSONResponse response) {
+      if (progress != null) {
         progress(1);
       }
-      var c = (String path){
+      var c = (String path) {
         fileProgress.path = path;
-        if(callback != null){
+        if (callback != null) {
           callback(path);
         }
       };
-      c(response.type == JSON.RESPONSE_TYPE_SUCCESS?response.payload['path']:null);
+      c(response.type == JSON.RESPONSE_TYPE_SUCCESS ? response.payload['path'] : null);
     });
   }
-  void read(FileReader reader,File file) => reader.readAsDataUrl(file);
+
+  void read(FileReader reader, File file) => reader.readAsDataUrl(file);
 
 }
 
@@ -189,12 +208,12 @@ class FileUploader {
     _reader.onProgress.listen((ProgressEvent pe) => _currentFileProcess.progress = pe.loaded / (pe.total * 2));
     _reader.onLoadEnd.listen((_) {
       var fp = _currentFileProcess;
-      uploadStrategy.upload(_currentFileProcess, _reader.result,progress:(double pct)=>fp.progress = 0.5 + pct / 2);
+      uploadStrategy.upload(_currentFileProcess, _reader.result, progress:(double pct) => fp.progress = 0.5 + pct / 2);
       _startUpload();
     });
   }
 
-  double get progress => (_uploaded+_currentlyUploading)/_size;
+  double get progress => (_uploaded + _currentlyUploading) / _size;
 
   void uploadFiles(List<File> files) {
     files = files.toList();
@@ -205,12 +224,12 @@ class FileUploader {
     files.forEach((File f) {
       _size += f.size;
       var fp = new FileProgress(f);
-      fp.listenOnProgress((){
-        var i = fp.progress*f.size;
-        _currentlyUploading = i.isNaN || i.isInfinite? 0:i.toInt();
+      fp.listenOnProgress(() {
+        var i = fp.progress * f.size;
+        _currentlyUploading = i.isNaN || i.isInfinite ? 0 : i.toInt();
         _notifyProgress();
       });
-      fp.listenOnPathAvailable((){
+      fp.listenOnPathAvailable(() {
         _currentlyUploading = 0;
         _uploaded += f.size;
         _notifyProgress();
@@ -225,8 +244,8 @@ class FileUploader {
     _startUpload();
   }
 
-  void _startUpload(){
-    if(_queue.length == 0){
+  void _startUpload() {
+    if (_queue.length == 0) {
       _notifyUploadDone();
       return;
     }

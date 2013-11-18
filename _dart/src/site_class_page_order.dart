@@ -1,11 +1,17 @@
 part of site_classes;
 
-const PAGE_ORDER_CHANGE_DEACTIVATE = 1;
-const PAGE_ORDER_CHANGE_ACTIVATE = 2;
-const PAGE_ORDER_CHANGE_DELETE_PAGE = 3;
-const PAGE_ORDER_CHANGE_CREATE_PAGE = 4;
+class PageOrderChange{
+  static const PAGE_ORDER_CHANGE_DEACTIVATE = 1;
+  static const PAGE_ORDER_CHANGE_ACTIVATE = 2;
+  static const PAGE_ORDER_CHANGE_DELETE_PAGE = 3;
+  static const PAGE_ORDER_CHANGE_CREATE_PAGE = 4;
 
-typedef void PageOrderChangeListener(int changeType, [ Page page]);
+  final int type;
+  final Page page;
+
+  PageOrderChange(this.type, this.page);
+
+}
 
 abstract class PageOrder {
 
@@ -33,7 +39,7 @@ abstract class PageOrder {
 
   void changePageOrder(List<String> page_id_list , {ChangeCallback callback:null,String parent_id:null});
 
-  void registerListener(PageOrderChangeListener listener);
+  Stream<PageOrderChange> get onUpdate;
 
   void createPage(String title, [ChangeCallback callback = null]);
 
@@ -43,31 +49,26 @@ abstract class PageOrder {
 
 class JSONPageOrder extends PageOrder {
 
-
   JSONClient _client;
-
   bool _hasBeenSetUp = false;
 
-  final Map<String, Page> _pages = <String, Page>{
-  };
+  final Map<String, Page> _pages = new Map<String, Page>();
 
-  Map<String, List<String>> _pageOrder = {};
+  Map<String, List<String>> _pageOrder = new Map<String, List<String>>();
 
-  final List<PageOrderChangeListener> _listeners = <PageOrderChangeListener>[];
-
+  StreamController<PageOrderChange> _streamController = new StreamController<PageOrderChange>();
+  Stream<PageOrderChange> _stream;
 
   static JSONPageOrder _cache = new JSONPageOrder._internal();
 
   String _currentPageId;
 
   factory JSONPageOrder(){
-
     _cache._setup();
     return _cache;
   }
 
   factory JSONPageOrder.initializeFromLists(Map<String,List<Page>> pageOrderMap, List<Page> inactivePages, String current_page_id){
-
     _cache._setUpFromLists(pageOrderMap, inactivePages, current_page_id);
     return _cache;
   }
@@ -78,6 +79,7 @@ class JSONPageOrder extends PageOrder {
     if (_hasBeenSetUp) {
       return;
     }
+
     _hasBeenSetUp = true;
     _client = new AJAXJSONClient();
     var listFunction = new ListPagesJSONFunction();
@@ -89,7 +91,7 @@ class JSONPageOrder extends PageOrder {
           _addPageFromObject(o);
         });
         _pageOrderBuilder(response.payload['page_order']);
-        _callListeners(PAGE_ORDER_CHANGE_ACTIVATE);
+        _callListeners(PageOrderChange.PAGE_ORDER_CHANGE_ACTIVATE);
       } else {
         throw "Could not load PageOrder. Returned response of type ${response.type}";
       }
@@ -175,7 +177,7 @@ class JSONPageOrder extends PageOrder {
       }
       if (response.type == RESPONSE_TYPE_SUCCESS) {
         _removeFromPageOrder(page_id);
-        _callListeners(PAGE_ORDER_CHANGE_DEACTIVATE, _pages[page_id]);
+        _callListeners(PageOrderChange.PAGE_ORDER_CHANGE_DEACTIVATE, _pages[page_id]);
       }
     });
   }
@@ -203,7 +205,7 @@ class JSONPageOrder extends PageOrder {
       if (response.type == RESPONSE_TYPE_SUCCESS) {
         var p,parent = (p = response.payload['parent']).length<=0?null:p;
         _pageOrder[parent] = response.payload['order'];
-        _callListeners(PAGE_ORDER_CHANGE_ACTIVATE);
+        _callListeners(PageOrderChange.PAGE_ORDER_CHANGE_ACTIVATE);
       }
     };
     _client.callFunction(function).then(functionCallback);
@@ -275,18 +277,8 @@ class JSONPageOrder extends PageOrder {
 
   Page get currentPage => _pages[_currentPageId];
 
-  void registerListener(PageOrderChangeListener listener) {
-    _listeners.add(listener);
-  }
-
   void _callListeners(int changeType, [Page page = null]) {
-    _listeners.forEach((PageOrderChangeListener listener) {
-      if (page == null) {
-        listener(changeType);
-      } else {
-        listener(changeType, page);
-      }
-    });
+    _streamController.add(new PageOrderChange(changeType, page));
   }
 
   void createPage(String title, [ChangeCallback callback = null]) {
@@ -294,7 +286,7 @@ class JSONPageOrder extends PageOrder {
     var functionCallback = (JSONResponse response) {
       if (response.type == RESPONSE_TYPE_SUCCESS) {
         String id = _addPageFromObject(response.payload);
-        _callListeners(PAGE_ORDER_CHANGE_CREATE_PAGE, _pages[id]);
+        _callListeners(PageOrderChange.PAGE_ORDER_CHANGE_CREATE_PAGE, _pages[id]);
       }
       if (callback != null) {
         callback(response.type, response.error_code);
@@ -310,7 +302,7 @@ class JSONPageOrder extends PageOrder {
         var page = _pages[id];
         _pages.remove(id);
         _removeFromPageOrder(id);
-        _callListeners(PAGE_ORDER_CHANGE_DELETE_PAGE, page);
+        _callListeners(PageOrderChange.PAGE_ORDER_CHANGE_DELETE_PAGE, page);
       }
 
       if (callback != null) {
@@ -321,5 +313,7 @@ class JSONPageOrder extends PageOrder {
   }
 
   bool pageExists(String page_id) => _pages[page_id] != null;
+
+  Stream<PageOrderChange> get onUpdate => _stream == null? _stream = _streamController.stream.asBroadcastStream():_stream;
 
 }

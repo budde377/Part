@@ -75,9 +75,9 @@ class UserSettingsJSONPageOrder implements PageOrder {
 
   void changePageOrder(List<String> page_id_list, {ChangeCallback callback:null, String parent_id:null}) => _pageOrder.changePageOrder(page_id_list, callback:callback, parent_id:parent_id);
 
-  void registerListener(PageOrderChangeListener listener) => _pageOrder.registerListener(listener);
-
   void createPage(String title, [ChangeCallback callback]) => _pageOrder.createPage(title, callback);
+
+  Stream<PageOrderChange> get onUpdate => _pageOrder.onUpdate;
 
   void deletePage(String id, [ChangeCallback callback]) => _pageOrder.deletePage(id, callback);
 

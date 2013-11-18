@@ -1,7 +1,6 @@
 library core;
 
 import "dart:html";
-import "dart:json";
 import "dart:math" as Math;
 import "dart:isolate";
 import "dart:async";
