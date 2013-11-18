@@ -510,8 +510,7 @@ class ContentEditor {
 
   static Map<Element, ContentEditor> _cache = new Map<Element, ContentEditor>();
 
-  factory ContentEditor(Element element, PageOrder pageOrder) => _cache.putIfAbsent(element, () => new ContentEditor._internal(element, pageOrder));
-
+  factory ContentEditor(Element element, Content content) => _cache.putIfAbsent(element, () => new ContentEditor._internal(element, content));
 
   final Element element;
 
@@ -544,10 +543,9 @@ class ContentEditor {
 
   int _hash;
 
-  ContentEditor._internal(Element element, this.pageOrder) : this.element = element, executor = new EditorCommandExecutor(element){
+  ContentEditor._internal(Element element, this._currentContent) : this.element = element, executor = new EditorCommandExecutor(element){
 
     _setUpStream();
-    _currentContent = pageOrder.currentPage[id];
     _toolBarPlaceholder.classes.add('tool_bar_placeholder');
     _contentWrapper.classes.add('edit_content_wrapper');
     _wrapper.classes.add('tool_bar_wrapper');

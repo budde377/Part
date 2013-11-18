@@ -8,7 +8,7 @@ import "site_classes.dart";
 import "json.dart";
 import "core.dart";
 import "elements.dart";
-import "json.dart" as Json;
+import "json.dart" ;
 import "pcre_syntax_checker.dart" as PCRE;
 
 part 'src/user_settings_page_order.dart';
@@ -118,37 +118,21 @@ UserLibrary get userLibrary => userLibraryAvailable && pageOrderAvailable ? new 
 
 String _errorMessage(int error_code) {
   switch (error_code) {
-    case Json
-  .
-  ERROR_CODE_PAGE_NOT_FOUND:
+    case JSONResponse.ERROR_CODE_PAGE_NOT_FOUND:
       return "Siden blev ikke fundet";
-    case Json
-  .
-  ERROR_CODE_INVALID_PAGE_ID:
+    case JSONResponse.ERROR_CODE_INVALID_PAGE_ID:
       return "Ugyldigt side id";
-    case Json
-  .
-  ERROR_CODE_INVALID_PAGE_ALIAS:
+    case JSONResponse.ERROR_CODE_INVALID_PAGE_ALIAS:
       return "Ugyldigt side alias";
-    case Json
-  .
-  ERROR_CODE_UNAUTHORIZED:
+    case JSONResponse.ERROR_CODE_UNAUTHORIZED:
       return "Du har ikke de nødvendige rettigheder";
-    case Json
-  .
-  ERROR_CODE_INVALID_USER_MAIL:
+    case JSONResponse.ERROR_CODE_INVALID_USER_MAIL:
       return "Ugyldig mail-adresse";
-    case Json
-  .
-  ERROR_CODE_INVALID_USER_NAME:
+    case JSONResponse.ERROR_CODE_INVALID_USER_NAME:
       return "Ugyldig brugernavn";
-    case Json
-  .
-  ERROR_CODE_WRONG_PASSWORD:
+    case JSONResponse.ERROR_CODE_WRONG_PASSWORD:
       return "Forkert kodeord";
-    case Json
-  .
-  ERROR_CODE_INVALID_PASSWORD:
+    case JSONResponse.ERROR_CODE_INVALID_PASSWORD:
       return "Ugyldigt kodeord";
     default:
       return null;
@@ -168,7 +152,7 @@ class UserSettingsInitializer extends Initializer {
 
     new KeepAlive().start();
 
-    var client = new Json.AJAXJSONClient();
+    var client = new AJAXJSONClient();
     var order = pageOrder, userLib = userLibrary;
 
     _initLib.registerInitializer(new TitleURLUpdateInitializer(order, client));
@@ -212,7 +196,7 @@ class UserSettingsUpdateSiteInitializer extends Initializer {
         _checkButton.text = s;
         _checkButton.disabled = false;
         _checkTime.text = dateString(new DateTime.now());
-        if (response.type != RESPONSE_TYPE_SUCCESS) {
+        if (response.type != JSONResponse.RESPONSE_TYPE_SUCCESS) {
           return;
         }
         if (response.payload) {
@@ -230,7 +214,7 @@ class UserSettingsUpdateSiteInitializer extends Initializer {
 
             var loader = dialogContainer.loading("Opdaterer websitet.<br />Luk ikke din browser!");
             _client.callFunction(new UpdateSiteJSONFunction()).then((JSONResponse response) {
-              if (response.type == RESPONSE_TYPE_ERROR) {
+              if (response.type == JSONResponse.RESPONSE_TYPE_ERROR) {
                 loader.close();
               }
               loader.element..innerHtml = "Siden er opdateret.<br /> Hjemmesiden genindlæses."..classes.remove('loading');
@@ -309,7 +293,7 @@ class UserSettingsPageUserListFormInitializer extends Initializer {
     };
     _userLib.registerListener((int changeType, User user) {
       if (changeType == USER_LIBRARY_CHANGE_CREATE) {
-        if (user.privilege != User.PRIVILEGE_PAGE) {
+        if (user.privileges != User.PRIVILEGE_PAGE) {
           var li = new LIElement();
           li.text = user.username;
           addListener(li);
@@ -393,7 +377,7 @@ class TitleURLUpdateInitializer extends Initializer {
       window.history.replaceState(null, currentPageTitle, "/" + currentPageAddress);
     };
     updateAddress();
-    _order.currentPage.registerListener((Page page) {
+    _order.currentPage.onChange.listen((_) {
       updateAddress();
     });
     _order.onUpdate.listen((_){
@@ -415,7 +399,7 @@ class UserSettingsUserListInitializer extends Initializer {
 
   void setUp() {
     var bar = new SavingBar();
-    var userPrivilegeString = (User u) => u.privilege == User.PRIVILEGE_ROOT ? "Root" : (u.privilege == User.PRIVILEGE_SITE ? "Website" : "Side");
+    var userPrivilegeString = (User u) => u.privileges == User.PRIVILEGE_ROOT ? "Root" : (u.privileges == User.PRIVILEGE_SITE ? "Website" : "Side");
     var addListener = (LIElement li) {
       var val = li.query('.val'), privileges = li.query('.privileges'), parent = li.query('.parent');
       var username = val.text.trim();

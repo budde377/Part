@@ -7,7 +7,7 @@ import "dart:async";
 
 import "pcre_syntax_checker.dart";
 
-import "json.dart" as JSON;
+import "json.dart";
 import "site_classes.dart" as SiteClasses;
 
 part "src/core_animation.dart";

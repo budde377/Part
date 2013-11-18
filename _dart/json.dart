@@ -40,7 +40,7 @@ JSONResponse parseResponse(Map map) {
   }
   var type;
   if ((type = map['response_type']) == null ||
-  (type != RESPONSE_TYPE_ERROR && type != RESPONSE_TYPE_SUCCESS)) {
+  (type != JSONResponse.RESPONSE_TYPE_ERROR && type != JSONResponse.RESPONSE_TYPE_SUCCESS)) {
     return null;
   }
 

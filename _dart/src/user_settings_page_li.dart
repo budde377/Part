@@ -144,7 +144,7 @@ class UserSettingsPageLi {
 
   void _setUpListeners() {
     var bar = new SavingBar();
-    page.registerListener((p) {
+    page.onChange.listen((_) {
       updateInfo();
     });
     _hide.onClick.listen((MouseEvent event) {

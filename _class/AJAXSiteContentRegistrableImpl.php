@@ -39,7 +39,7 @@ class AJAXSiteContentRegistrableImpl implements Registrable{
             $response = new JSONResponseImpl();
             $response->setPayload($c->addContent($content));
             return $response;
-        }, array('page_id', 'id', 'content')));
+        }, array('id', 'content')));
 
 
         $jsonServer->registerJSONFunction(new JSONFunctionImpl('listSiteContentRevisions', function($id, $from, $to, $includeContent) use ($site){
@@ -59,14 +59,14 @@ class AJAXSiteContentRegistrableImpl implements Registrable{
             $response = new JSONResponseImpl();
             $response->setPayload($contentList);
             return $response;
-        }, array('page_id', 'id', 'from', 'to', 'content')));
+        }, array('id', 'from', 'to', 'content')));
 
         $jsonServer->registerJSONFunction(new JSONFunctionImpl('siteContentAtTime', function($id, $time) use ($site){
             $content = $site->getContent($id);
             $response = new JSONResponseImpl();
             $response->setPayload($content->getContentAt($time));
             return $response;
-        }, array('page_id', 'id', 'time')));
+        }, array('id', 'time')));
         return $jsonServer->evaluatePostInput()->getAsJSONString();
     }
 }

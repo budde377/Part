@@ -426,7 +426,7 @@ class ImageEditorHandler {
       _savingBar.classes.add("saving");
       _saving = true;
       ajaxClient.callFunction(new ImagePropertiesEditImageContentJSONFunction(p)).then((JSONResponse response){
-        if(response.type != RESPONSE_TYPE_SUCCESS){
+        if(response.type != JSONResponse.RESPONSE_TYPE_SUCCESS){
           return;
         }
         pb.percentage = 1;

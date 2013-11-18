@@ -80,7 +80,7 @@ class JSONUserLibrary extends UserLibrary {
     _client = new AJAXJSONClient();
     var function = new ListUsersJSONFunction();
     var functionCallback = (JSONResponse response) {
-      if (response.type != RESPONSE_TYPE_SUCCESS) {
+      if (response.type != JSONResponse.RESPONSE_TYPE_SUCCESS) {
         return;
       }
       _userLoggedInId = response.payload['user_logged_in'];
@@ -125,7 +125,7 @@ class JSONUserLibrary extends UserLibrary {
     var function = new CreateUserJSONFunction(mail, privileges);
     var functionCallback = (JSONResponse response) {
 
-      if (response.type == RESPONSE_TYPE_SUCCESS) {
+      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
         var o = response.payload;
         var username = _addUserFromObjectToUsers(o, []);
         _callListeners(USER_LIBRARY_CHANGE_CREATE, _users[username]);
@@ -142,7 +142,7 @@ class JSONUserLibrary extends UserLibrary {
     var function = new DeleteUserJSONFunction(username);
     var functionCallback = (JSONResponse response) {
 
-      if (response.type == RESPONSE_TYPE_SUCCESS) {
+      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
         var user = _users[username];
         _users.remove(username);
         _callListeners(USER_LIBRARY_CHANGE_DELETE, user);
@@ -179,7 +179,7 @@ class JSONUserLibrary extends UserLibrary {
   Map<String, User> _generateUserList(int privilege){
     var retMap = new Map<String,User>();
     _users.forEach((String k, User val){
-      if(val.privilege == privilege){
+      if(val.privileges == privilege){
         retMap[k] = val;
       }
     });

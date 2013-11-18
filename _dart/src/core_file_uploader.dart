@@ -114,7 +114,7 @@ abstract class UploadStrategy {
 
 class AJAXImageURIUploadStrategy extends UploadStrategy {
 
-  JSON.JSONClient _client;
+  JSONClient _client;
 
   List<ImageSizes> _sizes;
 
@@ -126,7 +126,7 @@ class AJAXImageURIUploadStrategy extends UploadStrategy {
     _sizes = [size, preview];
     _sizes.removeWhere((ImageSizes s) => s == null);
     filter = UploadStrategy.FILTER_IMAGE;
-    _client = new JSON.AJAXJSONClient();
+    _client = new AJAXJSONClient();
 
   }
 
@@ -136,7 +136,7 @@ class AJAXImageURIUploadStrategy extends UploadStrategy {
       progress = (_) {
       };
     }
-    _client.callFunction(new JSON.UploadImageURIJSONFunction(fileProgress.file.name, data, _sizes), progress).then((JSON.JSONResponse response) {
+    _client.callFunction(new UploadImageURIJSONFunction(fileProgress.file.name, data, _sizes), progress).then((JSONResponse response) {
       progress(1);
       var c = (String path) {
         fileProgress.path = path;
@@ -144,7 +144,7 @@ class AJAXImageURIUploadStrategy extends UploadStrategy {
           callback(path);
         }
       };
-      if (response.type == JSON.RESPONSE_TYPE_SUCCESS) {
+      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
         c(_size == null ? response.payload['path'] : response.payload['thumbs'][0]);
         if (_preview != null) {
           fileProgress.previewPath = response.payload['thumbs'][1];
@@ -161,15 +161,15 @@ class AJAXImageURIUploadStrategy extends UploadStrategy {
 
 class AJAXFileURIUploadStrategy extends UploadStrategy {
 
-  JSON.JSONClient _client;
+  JSONClient _client;
 
   AJAXFileURIUploadStrategy() {
-    _client = new JSON.AJAXJSONClient();
+    _client = new AJAXJSONClient();
 
   }
 
   void upload(FileProgress fileProgress, String data, {void callback(String path):null, void progress(num pct):null}) {
-    _client.callFunction(new JSON.UploadFileURIJSONFunction(fileProgress.file.name, data)).then((JSON.JSONResponse response) {
+    _client.callFunction(new UploadFileURIJSONFunction(fileProgress.file.name, data)).then((JSONResponse response) {
       if (progress != null) {
         progress(1);
       }
@@ -179,7 +179,7 @@ class AJAXFileURIUploadStrategy extends UploadStrategy {
           callback(path);
         }
       };
-      c(response.type == JSON.RESPONSE_TYPE_SUCCESS ? response.payload['path'] : null);
+      c(response.type == JSONResponse.RESPONSE_TYPE_SUCCESS ? response.payload['path'] : null);
     });
   }
 

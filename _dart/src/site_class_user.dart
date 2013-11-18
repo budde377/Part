@@ -16,7 +16,7 @@ abstract class User {
 
   String get parent;
 
-  int get privilege;
+  int get privileges;
 
   List<Page> get pages;
 
@@ -31,6 +31,7 @@ abstract class User {
   bool canModifyPage(Page page);
 
   void registerListener(UserInfoChangeListener listener);
+
 }
 
 
@@ -67,7 +68,7 @@ class JSONUser extends User {
     };
     var jsonFunction = new ChangeUserInfoJSONFunction(_username, username, mail);
     _client.callFunction(jsonFunction).then( (JSONResponse response) {
-      if (response.type == RESPONSE_TYPE_SUCCESS) {
+      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
         _username = username;
         _mail = mail;
         callback(CALLBACK_STATUS_SUCCESS);
@@ -82,11 +83,11 @@ class JSONUser extends User {
     var jsonFunction = new ChangeUserPasswordJSONFunction(_username, currentPassword, newPassword);
     _client.callFunction(jsonFunction).then((JSONResponse response) {
       switch (response.type) {
-        case RESPONSE_TYPE_SUCCESS:
+        case JSONResponse.RESPONSE_TYPE_SUCCESS:
           callback(response.type);
           break;
         default:
-          callback(RESPONSE_TYPE_ERROR, response.error_code);
+          callback(JSONResponse.RESPONSE_TYPE_ERROR, response.error_code);
       }
     });
   }
@@ -101,7 +102,7 @@ class JSONUser extends User {
     });
   }
 
-  int get privilege => _privileges;
+  int get privileges => _privileges;
 
 
   List<Page> get pages => new List<Page>.from(_pages);
@@ -110,12 +111,12 @@ class JSONUser extends User {
   void addPagePrivilege(Page page, [ChangeCallback callback]) {
     var function = new AddUserPagePrivilegeJSONFunction(_username, page.id);
     _client.callFunction(function).then( (JSONResponse response) {
-      if (response.type == RESPONSE_TYPE_SUCCESS) {
+      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
         _pages.add(page);
         callback(response.type);
         _callListeners();
       } else {
-        callback(RESPONSE_TYPE_ERROR, response.error_code);
+        callback(JSONResponse.RESPONSE_TYPE_ERROR, response.error_code);
       }
     });
   }
@@ -123,12 +124,12 @@ class JSONUser extends User {
   void revokePagePrivilege(Page page, [ChangeCallback callback]) {
     var function = new RevokeUserPagePrivilegeJSONFunction(_username, page.id);
     _client.callFunction(function).then((JSONResponse response) {
-      if (response.type == RESPONSE_TYPE_SUCCESS) {
+      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
         _pages.remove(page);
         callback(response.type);
         _callListeners();
       } else {
-        callback(RESPONSE_TYPE_ERROR, response.error_code);
+        callback(JSONResponse.RESPONSE_TYPE_ERROR, response.error_code);
       }
     });
   }

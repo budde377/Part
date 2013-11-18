@@ -84,7 +84,7 @@ class JSONPageOrder extends PageOrder {
     _client = new AJAXJSONClient();
     var listFunction = new ListPagesJSONFunction();
     _client.callFunction(listFunction).then((JSONResponse response) {
-      if (response.type == RESPONSE_TYPE_SUCCESS) {
+      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
         _currentPageId = response.payload['current_page_id'];
 
         response.payload['inactive_pages'].forEach((JSONObject o) {
@@ -143,7 +143,7 @@ class JSONPageOrder extends PageOrder {
   }
 
   void _addPageListener(Page page){
-    page.registerListener((Page p){
+    page.onChange.listen((Page p){
       if(_pages.containsKey(p.id)){
         return;
       }
@@ -175,7 +175,7 @@ class JSONPageOrder extends PageOrder {
       if (callback != null) {
         callback(response.type, response.error_code);
       }
-      if (response.type == RESPONSE_TYPE_SUCCESS) {
+      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
         _removeFromPageOrder(page_id);
         _callListeners(PageOrderChange.PAGE_ORDER_CHANGE_DEACTIVATE, _pages[page_id]);
       }
@@ -202,7 +202,7 @@ class JSONPageOrder extends PageOrder {
       if (callback != null) {
         callback(response.type, response.error_code);
       }
-      if (response.type == RESPONSE_TYPE_SUCCESS) {
+      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
         var p,parent = (p = response.payload['parent']).length<=0?null:p;
         _pageOrder[parent] = response.payload['order'];
         _callListeners(PageOrderChange.PAGE_ORDER_CHANGE_ACTIVATE);
@@ -284,7 +284,7 @@ class JSONPageOrder extends PageOrder {
   void createPage(String title, [ChangeCallback callback = null]) {
     var function = new CreatePageJSONFunction(title);
     var functionCallback = (JSONResponse response) {
-      if (response.type == RESPONSE_TYPE_SUCCESS) {
+      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
         String id = _addPageFromObject(response.payload);
         _callListeners(PageOrderChange.PAGE_ORDER_CHANGE_CREATE_PAGE, _pages[id]);
       }
@@ -298,7 +298,7 @@ class JSONPageOrder extends PageOrder {
   void deletePage(String id, [ChangeCallback callback = null]) {
     var function = new DeletePageJSONFunction(id);
     var functionCallback = (JSONResponse response) {
-      if (response.type == RESPONSE_TYPE_SUCCESS) {
+      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
         var page = _pages[id];
         _pages.remove(id);
         _removeFromPageOrder(id);
