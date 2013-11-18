@@ -31,6 +31,10 @@ class PageContentJSONFunction extends JSONFunction {
   PageContentJSONFunction(String name): super("PageContent.${name}");
 }
 
+class SiteContentJSONFunction extends JSONFunction {
+  SiteContentJSONFunction(String name): super("SiteContent.${name}");
+}
+
 class PageOrderJSONFunction extends JSONFunction {
   PageOrderJSONFunction(String name): super("PageOrder.${name}");
 }
@@ -142,6 +146,31 @@ class ListPageContentRevisionsJSONFunction extends PageContentJSONFunction {
 class PageContentAtTimeJSONFunction extends PageContentJSONFunction {
   PageContentAtTimeJSONFunction(String page_id, String id, int time) : super('pageContentAtTime') {
     this.arguments['page_id'] = page_id;
+    this.arguments['id'] = id;
+    this.arguments['time'] = time;
+  }
+}
+
+// Site content functions
+
+class AddSiteContentJSONFunction extends SiteContentJSONFunction {
+  AddSiteContentJSONFunction(String id, String content): super('addSiteContent') {
+    this.arguments['id'] = id;
+    this.arguments['content'] = content;
+  }
+}
+
+class ListSiteContentRevisionsJSONFunction extends SiteContentJSONFunction {
+  ListSiteContentRevisionsJSONFunction(String id, {int from:0, int to:-1, bool includeContent:false}) : super('listSiteContentRevisions') {
+    this.arguments['id'] = id;
+    this.arguments['from'] = from;
+    this.arguments['to'] = to;
+    this.arguments['content'] = includeContent;
+  }
+}
+
+class SiteContentAtTimeJSONFunction extends SiteContentJSONFunction {
+  SiteContentAtTimeJSONFunction(String id, int time) : super('siteContentAtTime') {
     this.arguments['id'] = id;
     this.arguments['time'] = time;
   }

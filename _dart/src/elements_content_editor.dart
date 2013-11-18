@@ -523,7 +523,7 @@ class ContentEditor {
 
   Map<Element, Element> _elementToSubMenu = new Map<Element, Element>();
 
-  PageContent _currentContent;
+  Content _currentContent;
 
   Revision _currentRevision;
 
