@@ -192,6 +192,8 @@ class FileUploader {
   Stream<FileUploader> _progress_stream, _upload_done_stream;
 
 
+  FileUploader.ajaxImages([ImageSizes size = null, ImageSizes preview = null]):this(new AJAXImageURIUploadStrategy(size, preview));
+  FileUploader.ajaxFiles():this(new AJAXFileURIUploadStrategy());
 
 
   FileUploader(this.uploadStrategy) {
