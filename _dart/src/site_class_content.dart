@@ -104,7 +104,7 @@ class JSONContent extends Content {
         return;
       }
       var r;
-      completer.complete(r = _generateRevision(new DateTime.fromMillisecondsSinceEpoch(response.payload * 1000), content));
+      completer.complete(r = _generateRevision(new DateTime.fromMillisecondsSinceEpoch((response.payload is String?int.parse(response.payload):response.payload) * 1000), content));
       _streamController.add(r);
     });
     return completer.future;
