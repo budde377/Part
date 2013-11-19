@@ -214,8 +214,8 @@ class EditorFileHandler implements EditorHandler {
 
     _fileStandIn..text = fileProgress.file.name..append(size);
 
-    _fileProgress.listenOnProgress(() => progressBar.percentage = _fileProgress.progress);
-    _fileProgress.listenOnPathAvailable(() {
+    _fileProgress.onProgress.listen((_) => progressBar.percentage = _fileProgress.progress);
+    _fileProgress.onPathAvailable.listen((_) {
       dataElement..href = _fileProgress.path..text = fileProgress.file.name;
       progressBar.bar.remove();
       element.classes.remove('uploading');
@@ -248,14 +248,16 @@ class EditorImageHandler implements EditorHandler {
   }
 
   EditorImageHandler.fileProgress(this.dataElement, FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
-    _fileProgress.listenOnProgress(() => progressBar.percentage = _fileProgress.progress);
-    _fileProgress.listenOnPathAvailable(() {
+    _fileProgress.onProgress.listen((_) => progressBar.percentage = _fileProgress.progress);
+    _fileProgress.onPathAvailable.listen((_) {
       dataElement.src = _fileProgress.path;
       progressBar.bar.remove();
       element.classes.remove('uploading');
       ready();
     });
-    _fileProgress.listenOnPreviewPathAvailable(() => _imageStandIn.style.backgroundImage = "url(\'${_fileProgress.previewPath}\')");
+    _fileProgress.onPreviewPathAvailable.listen((_){
+      _imageStandIn.style.backgroundImage = "url(\'${_fileProgress.previewPath}\')";
+    });
     element..classes.add('uploading')..append(progressBar.bar);
     _setUp();
   }
@@ -275,7 +277,8 @@ class EditorFileContainer {
 
   Element _dragging;
 
-  ListenerRegister _listeners = new ListenerRegister();
+  StreamController<EditorFileContainer> _change_controller = new StreamController<EditorFileContainer>();
+  Stream<EditorFileContainer> _change_stream;
 
 
   factory EditorFileContainer(Element element, Element trashCan) => _cache.putIfAbsent(element, () => new EditorFileContainer._internal(element, trashCan));
@@ -285,6 +288,8 @@ class EditorFileContainer {
 
   EditorFileContainer._internal(this.element, this.trashcan){
     element.hidden = true;
+    _change_stream = _change_controller.stream.asBroadcastStream();
+
     trashcan..onDragOver.listen((MouseEvent ev) => ev.preventDefault())..onDrop.listen((MouseEvent ev) {
       if (_dragging == null) {
         return;
@@ -368,10 +373,9 @@ class EditorFileContainer {
 
   }
 
+  Stream<EditorFileContainer> get onChange => _change_stream;
 
-  void listenOnContentChange(void callback()) => _listeners.registerListener("change", callback);
-
-  void _notifyContentChange() => _listeners.callListeners("change");
+  void _notifyContentChange() => _change_controller.add(this);
 
 }
 
@@ -513,8 +517,6 @@ class ContentEditor {
   factory ContentEditor(Element element, Content content) => _cache.putIfAbsent(element, () => new ContentEditor._internal(element, content));
 
   final Element element;
-
-  final PageOrder pageOrder;
 
   final EditorCommandExecutor executor;
 
@@ -1067,16 +1069,18 @@ class ContentEditor {
     ;
     var uploader = new FileUploader(uploadStrategy);
     var container = new EditorFileContainer(new DivElement(), uploadIcon);
-    container.listenOnContentChange(() => _updatePlaceholder());
+    container.onContentChange((_){
+      _updatePlaceholder();
+    });
 
     if (images) {
       menu.classes.add('image_menu');
       preview..classes.add('image_preview')..append(container.element);
-      uploader.listenFileAddedToQueue((FileProgress fp) => container.addImage(new ImageElement(), fp));
+      uploader.onFileAddedToQueue((FileProgress fp) => container.addImage(new ImageElement(), fp));
     } else {
       menu.classes.add('file_menu');
       preview..classes.add('file_preview')..append(container.element);
-      uploader.listenFileAddedToQueue((FileProgress fp) => container.addFile(new AnchorElement(), fp));
+      uploader.onFileAddedToQueue((FileProgress fp) => container.addFile(new AnchorElement(), fp));
     }
 
 

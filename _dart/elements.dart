@@ -2,6 +2,7 @@ library elements;
 
 import "dart:async";
 import "dart:html";
+import "dart:convert";
 import "dart:math" as Math;
 
 import "core.dart";

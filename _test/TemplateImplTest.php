@@ -177,6 +177,30 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(strpos($v, "current_user") !== false);
     }
 
+    public function testTemplateAddsHasSitePrivileges(){
+        $this->setUpConfig();
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{{ dump() }}");
+        $v = $this->template->render();
+        $this->assertTrue(strpos($v, "has_site_privileges") !== false);
+    }
+
+    public function testTemplateAddsHasPagePrivileges(){
+        $this->setUpConfig();
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{{ dump() }}");
+        $v = $this->template->render();
+        $this->assertTrue(strpos($v, "has_page_privileges") !== false);
+    }
+
+    public function testTemplateAddsHasRootPrivileges(){
+        $this->setUpConfig();
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{{ dump() }}");
+        $v = $this->template->render();
+        $this->assertTrue(strpos($v, "has_root_privileges") !== false);
+    }
+
     public function testTemplateAddsUserLibrary(){
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
@@ -406,6 +430,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->template->setTemplateFromString("{%site_content someid%}");
         $this->assertEquals("Hello World", $this->template->render());
     }
+
+
 
     //TODO test for initialize
 

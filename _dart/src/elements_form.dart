@@ -59,7 +59,7 @@ class FormHandler {
       if (req.readyState == 4) {
         unBlur();
         try {
-          Map responseData = parse(req.responseText);
+          Map responseData = JSON.decode(req.responseText);
           callbackSuccess(responseData);
 
         } catch(e) {
@@ -70,7 +70,7 @@ class FormHandler {
     form.onSubmit.listen((Event event) {
       blur();
       List<Element> elements = queryAll("textarea, input:not([type=submit]), select");
-      req.open(form.method.toUpperCase(), "?ajax=${Uri.encodeUriComponent(AJAXId)}");
+      req.open(form.method.toUpperCase(), "?ajax=${Uri.encodeComponent(AJAXId)}");
       req.send(new FormData(form));
       event.preventDefault();
     });

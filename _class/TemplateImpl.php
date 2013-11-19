@@ -132,10 +132,15 @@ class TemplateImpl implements Template
         $userLib = $this->backendContainer->getUserLibraryInstance();
         $currentPageStrat = $this->backendContainer->getCurrentPageStrategyInstance();
         $this->pageElementFactory->clearCache();
+        $currentUser = $userLib->getUserLoggedIn();
+        $currentPage = $currentPageStrat->getCurrentPage();
         return $this->twig->render($this->renderTarget, array(
-            'current_user' => $userLib->getUserLoggedIn(),
+            'current_user' => $currentUser,
+            'has_root_privileges' => $currentUser != null && $currentUser->getUserPrivileges()->hasRootPrivileges(),
+            'has_site_privileges' => $currentUser != null && $currentUser->getUserPrivileges()->hasSitePrivileges(),
+            'has_page_privileges' => $currentUser != null && $currentUser->getUserPrivileges()->hasPagePrivileges($currentPage),
             'user_lib' => $userLib,
-            'current_page' => $currentPageStrat->getCurrentPage(),
+            'current_page' => $currentPage,
             'current_page_path' => $currentPageStrat->getCurrentPagePath(),
             'page_order' => $this->backendContainer->getPageOrderInstance(),
             'css_register' => $this->backendContainer->getCSSRegisterInstance(),

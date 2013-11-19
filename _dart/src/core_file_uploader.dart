@@ -19,24 +19,6 @@ class ImageSizes {
       "maxHeight":maxHeight, "minHeight":minHeight, "maxWidth":maxWidth, "minWidth":minWidth, "dataURI":dataURI
   };
 }
-// TODO Replace all usage of this with Streams!
-
-class ListenerRegister {
-  Map<String, Function> _listeners = new Map<String, Function>();
-
-  void registerListener(String action, Function func) {
-    var f = _listeners.putIfAbsent(action, () => (_) {
-    });
-    _listeners[action] = (List arguments) {
-      f(arguments);
-      Function.apply(func, arguments);
-    };
-  }
-
-  void callListeners(String action, [List arguments = null]) => (_listeners.putIfAbsent(action, () => (_) {
-  }))(arguments == null ? [] : arguments);
-
-}
 
 
 class FileProgress {
@@ -48,7 +30,11 @@ class FileProgress {
 
   String _path, _previewPath;
 
-  ListenerRegister _listeners = new ListenerRegister();
+  StreamController<FileProgress> _progress_controller = new StreamController<FileProgress>(),
+                                 _path_available_controller = new StreamController<FileProgress>(),
+                                 _prev_path_available_controller = new StreamController<FileProgress>();
+
+  Stream<FileProgress> _progress_stream, _path_available_stream, _prev_path_available_stream;
 
   factory FileProgress(File file) => _cache.putIfAbsent(file, () => new FileProgress._internal(file));
 
@@ -79,22 +65,19 @@ class FileProgress {
       return;
     }
     _progress = Math.max(0, Math.min(1, progress));
-
     _notifyProgress();
   }
 
 
-  void listenOnPreviewPathAvailable(void callback()) => _listeners.registerListener('preview', callback);
+  Stream<FileProgress> get onProgress => _progress_stream == null?_progress_stream = _progress_controller.stream.asBroadcastStream():_progress_stream;
+  Stream<FileProgress> get onPathAvailable => _path_available_stream == null?_path_available_stream = _path_available_controller.stream.asBroadcastStream():_path_available_stream;
+  Stream<FileProgress> get onPreviewPathAvailable => _prev_path_available_stream == null?_prev_path_available_stream = _prev_path_available_controller.stream.asBroadcastStream():_prev_path_available_stream;
 
-  void listenOnProgress(void callback()) => _listeners.registerListener('progress', callback);
+  void _notifyProgress() => _progress_controller.add(this);
 
-  void listenOnPathAvailable(void callback()) => _listeners.registerListener('uploaded', callback);
+  void _notifyPath() => _path_available_controller.add(this);
 
-  void _notifyProgress() => _listeners.callListeners('progress');
-
-  void _notifyPath() => _listeners.callListeners('uploaded');
-
-  void _notifyPreviewPath() => _listeners.callListeners('preview');
+  void _notifyPreviewPath() => _prev_path_available_controller.add(this);
 
 
 }
@@ -201,10 +184,22 @@ class FileUploader {
 
   int _size = 0, _uploaded = 0, _currentlyUploading = 0;
 
-  ListenerRegister _listeners = new ListenerRegister();
+  StreamController<FileProgress> _file_added_to_queue_controller = new StreamController<FileProgress>();
+
+  StreamController<FileUploader> _upload_done_controller = new StreamController<FileUploader>(),
+                                 _progress_controller = new StreamController<FileUploader>();
+  Stream<FileProgress> _file_added_to_queue_stream;
+  Stream<FileUploader> _progress_stream, _upload_done_stream;
+
+
 
 
   FileUploader(this.uploadStrategy) {
+
+    _progress_stream = _progress_controller.stream.asBroadcastStream();
+    _upload_done_stream = _upload_done_controller.stream.asBroadcastStream();
+    _file_added_to_queue_stream = _file_added_to_queue_controller.stream.asBroadcastStream();
+
     _reader.onProgress.listen((ProgressEvent pe) => _currentFileProcess.progress = pe.loaded / (pe.total * 2));
     _reader.onLoadEnd.listen((_) {
       var fp = _currentFileProcess;
@@ -224,12 +219,12 @@ class FileUploader {
     files.forEach((File f) {
       _size += f.size;
       var fp = new FileProgress(f);
-      fp.listenOnProgress(() {
+      fp.onProgress.listen((_) {
         var i = fp.progress * f.size;
         _currentlyUploading = i.isNaN || i.isInfinite ? 0 : i.toInt();
         _notifyProgress();
       });
-      fp.listenOnPathAvailable(() {
+      fp.onPathAvailable.listen((_) {
         _currentlyUploading = 0;
         _uploaded += f.size;
         _notifyProgress();
@@ -255,17 +250,14 @@ class FileUploader {
 
   }
 
+  Stream<FileUploader> get onProgress => _progress_stream;
+  Stream<FileUploader> get onUploadDone => _upload_done_stream;
+  Stream<FileProgress> get onFileAddedToQueue => _file_added_to_queue_stream;
 
-  void listenProgress(void callback()) => _listeners.registerListener("progress", callback);
+  void _notifyProgress() => _progress_controller.add(this);
 
-  void listenUploadDone(void callback()) => _listeners.registerListener("upload_done", callback);
+  void _notifyUploadDone() => _upload_done_controller.add(this);
 
-  void listenFileAddedToQueue(void callback(FileProgress)) => _listeners.registerListener("file_added_to_queue", callback);
-
-  void _notifyProgress() => _listeners.callListeners("progress");
-
-  void _notifyUploadDone() => _listeners.callListeners("upload_done");
-
-  void _notifyFileAddedToQueue(FileProgress progress) => _listeners.callListeners("file_added_to_queue", [progress]);
+  void _notifyFileAddedToQueue(FileProgress progress) => _file_added_to_queue_controller.add(progress);
 
 }
