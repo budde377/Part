@@ -410,11 +410,11 @@ select.better_select_select {
     background: transparent;
 }
 
-.colorList > li:nth-child(odd) {
+.colorList > li {
     background: #fff;
 }
 
-.colorList > li:nth-child(even) {
+.colorList:not(.incl_dividers) > li:nth-child(even) , .colorList.incl_dividers > li:nth-child(4n+4){
     background: #dedede;
 }
 

@@ -405,23 +405,22 @@ form.initial input.invalid {
 }
 
 #ActivePageList li.dragging{
-    cursor: hand;
+    cursor: move;
 }
+
 
 #ActivePageList li.dragging > .link {
     display: none;
 }
 
-#ActivePageList li.dragging_over{
-    border: 0 solid #CECECE;
+#ActivePageList li.divider{
+    height: 0;
+    background: transparent;
+    transition: height 0.2s;
 }
 
-#ActivePageList li.dragging_over.above{
-    border-top-width: 20px;
-}
-
-#ActivePageList li.dragging_over.below{
-    border-bottom-width: 20px;
+#ActivePageList li.divider.expanded{
+    height: 30px;
 }
 
 #ActivePageList li.ishidden:not(.hasSubList){

@@ -736,6 +736,7 @@ class UserSettingsPageListsInitializer extends Initializer {
               break;
             }
             new ChangeableList(pageLi.li.parent);
+            pageLi.li.remove();
             updateListInfo(parent);
           }
 
@@ -774,7 +775,7 @@ class UserSettingsPageListsInitializer extends Initializer {
               });
 
               pageLi.li.append(ul);
-              parentUl.append(pageLi.li);
+              new ChangeableList(parentUl).append(pageLi.li);
               recursiveBuilder(p.id, ul);
             });
             updateListInfo(parentUl);

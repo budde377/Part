@@ -4,7 +4,9 @@ class ChangeableList {
 
   final Element list;
 
-  LIElement dragging_li, dragging_over_li;
+  LIElement _dragging_li, _currently_expanded;
+
+  List<LIElement> _dividers = new List<LIElement>();
 
   static Map<Element, ChangeableList> _cache = new Map<Element, ChangeableList>();
 
@@ -19,9 +21,6 @@ class ChangeableList {
       li.draggable = true;
     });
 
-    list.onDragOver.listen((_){
-
-    });
 
     list.onDragStart.listen((MouseEvent ev){
       var target = ev.target;
@@ -32,8 +31,9 @@ class ChangeableList {
       ev.dataTransfer..setData("Text", li.hashCode.toString())
                      ..effectAllowed = "move";
 
-      dragging_li = li;
+      _dragging_li = li;
       li.classes.add("dragging");
+      _setUpDividers();
     });
 
     list.onDragEnd.listen((MouseEvent ev){
@@ -42,11 +42,9 @@ class ChangeableList {
         return;
       }
       LIElement li = target;
-      dragging_li = null;
+      _dragging_li = null;
       li.classes.remove("dragging");
-      dragging_over_li.classes..remove("above")
-                              ..remove("below")
-                              ..remove("dragging_over");
+      _clearDividers();
     });
 
     list.onDragOver.listen((MouseEvent ev){
@@ -55,49 +53,40 @@ class ChangeableList {
         return;
       }
 
-      LIElement li = target;
+      LIElement li = target.classes.contains('divider')?target:
+        (target.marginEdge.top+target.marginEdge.height~/2 >= ev.page.y?target.previousElementSibling:target.nextElementSibling);
       ev.preventDefault();
-      var above = li.marginEdge.top+li.marginEdge.height~/2 >= ev.page.y;
 
-      if(above && !li.classes.contains("above")){
-        li.classes..add("above")
-                  ..remove("below");
-      } else if(!above && !li.classes.contains("below")){
-        li.classes..add("below")
-                  ..remove("above");
-      }
-
-      if(dragging_over_li == li){
+      if(_currently_expanded != null && _currently_expanded != li){
+        _currently_expanded.classes.remove("expanded");
+      } else if(_currently_expanded == li){
         return;
       }
-      li.classes..add("dragging_over");
-      if(dragging_over_li != null ){
-        dragging_over_li.classes.remove("dragging_over");
-      }
-      dragging_over_li = li;
+
+      li.classes.add('expanded');
+      _currently_expanded = li;
+
+
     });
 
 
     list.onDrop.listen((MouseEvent ev){
       var target = ev.target;
-      if(!list.children.contains(target) || !(target is LIElement)){
+
+      if(!list.children.contains(target) || !(target is LIElement) || _currently_expanded == null){
         return;
       }
+
       LIElement li = target;
-      if(li == dragging_li || (li == dragging_li.nextElementSibling && li.classes.contains("above"))
-                           || (li == dragging_li.previousElementSibling && li.classes.contains("below"))){
+      if(li == _dragging_li || _dragging_li.nextElementSibling == li || _dragging_li.previousElementSibling == li){
         return;
       }
 
 
-
-      if(li.classes.contains("above")){
-        list.insertBefore(dragging_li, li);
-      } else{
-        li.insertAdjacentElement("afterEnd", dragging_li);
-      }
-
+      list.insertBefore(_dragging_li, _currently_expanded);
       ev.preventDefault();
+
+      _clearDividers();
       list.dispatchEvent(new Event("change", canBubble: true, cancelable:false));
 
 
@@ -106,6 +95,33 @@ class ChangeableList {
 
   }
 
+  void _setUpDividers(){
+    _dividers = new List<LIElement>();
+    list.children.toList().forEach((LIElement li){
+      var divider = new LIElement();
+      _dividers.add(divider);
+      list.insertBefore(divider, li);
+      divider.classes.add('divider');
+    });
+    var li = new LIElement();
+    _dividers.add(li);
+    li.classes.add('divider');
+    list.append(li);
+    list.classes.add("incl_dividers");
+  }
+
+  void _clearDividers(){
+    list.classes.remove("incl_dividers");
+    _dividers.toList().forEach((LIElement li){
+      li.remove();
+      _dividers.remove(li);
+    });
+  }
+
+  void append(LIElement li){
+    list.append(li);
+    li.draggable = true;
+  }
 
 }
 
