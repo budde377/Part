@@ -28,6 +28,9 @@ abstract class User {
 
   void revokePagePrivilege(Page page, [ChangeCallback callback]);
 
+  bool get hasRootPrivileges;
+  bool get hasSitePrivileges;
+
   bool canModifyPage(Page page);
 
   void registerListener(UserInfoChangeListener listener);
@@ -133,6 +136,10 @@ class JSONUser extends User {
       }
     });
   }
+
+  bool get hasRootPrivileges => privileges == User.PRIVILEGE_ROOT;
+
+  bool get hasSitePrivileges => privileges == User.PRIVILEGE_ROOT || privileges == User.PRIVILEGE_SITE;
 
   bool canModifyPage(Page page) => _privileges == User.PRIVILEGE_ROOT || _privileges == User.PRIVILEGE_SITE ||  _pages.map((Page p) => p.id).contains(page.id);
 

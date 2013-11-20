@@ -58,8 +58,34 @@ class ESCQueue {
   void add(bool action()) => _queue.add(action);
 }
 
-
 ESCQueue get escQueue => new ESCQueue();
+
+class BodySelectManager{
+  static final BodySelectManager _cache = new BodySelectManager._internal();
+
+  factory BodySelectManager() => _cache;
+
+  int _count = 0;
+
+  BodySelectManager._internal();
+
+  void enableSelect(){
+
+    _count = Math.max(0, _count-1);
+    if(_count == 0){
+      body.classes.remove('no_select');
+    }
+  }
+
+  void disableSelect(){
+    _count++;
+    body.classes.add("no_select");
+  }
+
+}
+
+
+BodySelectManager get bodySelectManager => new BodySelectManager();
 
 
 BodyElement get body => query('body');

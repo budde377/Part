@@ -22,6 +22,8 @@ part "src/elements_floating_box.dart";
 part "src/elements_form.dart";
 part "src/elements_image_editor.dart";
 part "src/elements_progressbar.dart";
+part "src/elements_move_background_handler.dart";
+part "src/elements_file_drop_area_handler.dart";
 
 
 int maxChildrenHeight(Element element) {
