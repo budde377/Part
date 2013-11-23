@@ -1069,18 +1069,18 @@ class ContentEditor {
     ;
     var uploader = new FileUploader(uploadStrategy);
     var container = new EditorFileContainer(new DivElement(), uploadIcon);
-    container.onContentChange((_){
+    container.onChange.listen((_){
       _updatePlaceholder();
     });
 
     if (images) {
       menu.classes.add('image_menu');
       preview..classes.add('image_preview')..append(container.element);
-      uploader.onFileAddedToQueue((FileProgress fp) => container.addImage(new ImageElement(), fp));
+      uploader.onFileAddedToQueue.listen((FileProgress fp) => container.addImage(new ImageElement(), fp));
     } else {
       menu.classes.add('file_menu');
       preview..classes.add('file_preview')..append(container.element);
-      uploader.onFileAddedToQueue((FileProgress fp) => container.addFile(new AnchorElement(), fp));
+      uploader.onFileAddedToQueue.listen((FileProgress fp) => container.addFile(new AnchorElement(), fp));
     }
 
 

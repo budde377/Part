@@ -9,7 +9,7 @@ class MoveBackgroundHandler {
 
   static const int MOVE_BACKGROUND_BOTH = 3;
 
-  static final Map<Element, MoveBacgroundHandler> _cache = new Map<Element, MoveBackgroundHandler>();
+  static final Map<Element, MoveBackgroundHandler> _cache = new Map<Element, MoveBackgroundHandler>();
 
   final Element element;
 
