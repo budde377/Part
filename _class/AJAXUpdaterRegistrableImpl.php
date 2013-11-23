@@ -49,6 +49,7 @@ class AJAXUpdaterRegistrableImpl implements Registrable{
         $jsonServer->registerJSONFunction(new JSONFunctionImpl('update',function() use ($updater, $pageOrder){
             $version = $updater->getVersion();
             $updater->update();
+            exec("make setup");
             if($version != $updater->getVersion()){
                 foreach($pageOrder->listPages() as $page){
                     /** @var $page Page */
