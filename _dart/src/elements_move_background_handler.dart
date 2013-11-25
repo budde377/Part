@@ -54,7 +54,6 @@ class MoveBackgroundHandler {
     move_button.onClick.listen((_) => _enableMove());
     save_button.onClick.listen((_) => _disableMove());
     var mouseMoveListener;
-
     background.onMouseDown.listen((_) {
       if(mouseMoveListener != null){
         mouseMoveListener.cancel();
@@ -94,7 +93,6 @@ class MoveBackgroundHandler {
       mouseMoveListener = null;
     });
 
-
   }
 
   void _enableMove() {
@@ -103,13 +101,21 @@ class MoveBackgroundHandler {
     background.style.background = computedStyle.background;
     background.classes.add('active');
     _orig_position = computedStyle.backgroundPosition;
+    escQueue.add((){
+      _disableMove(true);
+      return true;
+    });
+
   }
 
-  void _disableMove() {
+  void _disableMove([cancel = false]) {
     save_button.hidden = !(move_button.hidden = false);
     background.classes.remove('active');
-    if(element.getComputedStyle().backgroundPosition != _orig_position){
+    var new_pos = element.getComputedStyle().backgroundPosition != _orig_position;
+    if(new_pos && !cancel){
       _change_stream_controller.add(this);
+    } else if(new_pos){
+      element.style.backgroundPosition = _orig_position;
     }
 
   }
