@@ -59,7 +59,7 @@ class UserSettingsUpdateWebsitePageElementImpl extends PageElementImpl
 
         <p class='text update_site'>
         Hjemmesiden er version <span class='version'>{$this->updater->getVersion()}</span> fra <span class='update_time'>{$this->dateString($this->updater->lastUpdated())}</span>.<br />
-        Da din hjemmeside understøtter opdateringer, vil du modtage opdateringer i takt med at de bliver udgivet. Denne service er en del af din hosting aftale, og du kan checke efter opdateringer ved at klikke på kanppen herunder.<br />
+        Da din hjemmeside understøtter opdateringer, vil du modtage opdateringer i takt med at de bliver udgivet. Denne service er en del af din hosting aftale, og du kan checke efter opdateringer ved at klikke på knappen herunder.<br />
         Der er sidst checket efter opdateringer <span class='check_time'>{$this->dateString($this->updater->lastChecked())}</span>.
         </p>
         <div class='update_site_container'>
