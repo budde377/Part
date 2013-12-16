@@ -5,9 +5,9 @@ import "dart:html";
 import "dart:convert";
 import "dart:math" as Math;
 
-import "core.dart";
-import "site_classes.dart";
-import "json.dart";
+import 'core.dart';
+import 'site_classes.dart';
+import 'json.dart';
 
 part "src/elements_animation.dart";
 part "src/elements_better_select.dart";

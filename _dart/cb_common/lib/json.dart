@@ -2,7 +2,7 @@ library json;
 import "dart:convert";
 import "dart:html";
 import "dart:async";
-import "core.dart";
+import 'core.dart';
 
 part "src/json_client.dart";
 part "src/json_function.dart";

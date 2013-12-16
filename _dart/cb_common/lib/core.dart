@@ -5,10 +5,10 @@ import "dart:math" as Math;
 import "dart:isolate";
 import "dart:async";
 
-import "pcre_syntax_checker.dart";
+import 'pcre_syntax_checker.dart';
 
-import "json.dart";
-import "site_classes.dart" as SiteClasses;
+import 'json.dart';
+import 'site_classes.dart' as SiteClasses;
 
 part "src/core_animation.dart";
 part "src/core_keep_alive.dart";

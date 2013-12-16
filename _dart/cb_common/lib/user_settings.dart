@@ -4,12 +4,12 @@ import "dart:html";
 import "dart:math" as Math;
 import "dart:async";
 
-import "site_classes.dart";
-import "json.dart";
-import "core.dart";
-import "elements.dart";
-import "json.dart" ;
-import "pcre_syntax_checker.dart" as PCRE;
+import 'site_classes.dart';
+import 'json.dart';
+import 'core.dart';
+import 'elements.dart';
+import 'json.dart' ;
+import 'pcre_syntax_checker.dart' as PCRE;
 
 part 'src/user_settings_page_order.dart';
 part 'src/user_settings_user_library.dart';
