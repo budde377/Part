@@ -527,6 +527,23 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     }
 
+    public function testGetTmpPathReturnsRightPath(){
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}
+                <tmpFolder path='/some/path' />
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertEquals("/some/path", $config->getTmpFolderPath());
+    }
+
+    public function testGetTmpPathReturnsReturnsEmptyWhenNotDefined(){
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertEquals("", $config->getTmpFolderPath());
+    }
+
     public function testGetDomainWillReturnDomainOnExist(){
         $configXML = simplexml_load_string("<config>
         <siteInfo>

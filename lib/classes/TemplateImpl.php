@@ -79,7 +79,13 @@ class TemplateImpl implements Template
     private function setUpTwig(Twig_LoaderInterface $loader, $renderTarget)
     {
         $loaderChain = new Twig_Loader_Chain(array($loader, new Twig_Loader_Filesystem(dirname(__FILE__) . '/../../templates/')));
-        $this->twig = new Twig_Environment($loaderChain, array('debug' => $this->twigDebug));
+        $configArray = array('debug' => $this->twigDebug);
+        if($this->config->getTmpFolderPath() != null){
+            $tmpFolder = new FolderImpl($this->config->getTmpFolderPath().'/twig/');
+            $tmpFolder->create(true);
+            $configArray['cache'] = $tmpFolder->getAbsolutePath();
+        }
+        $this->twig = new Twig_Environment($loaderChain, $configArray);
         if ($this->twigDebug) {
             $this->twig->addExtension(new Twig_Extension_Debug());
         }

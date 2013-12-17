@@ -66,6 +66,7 @@
                         <xs:field xpath="@name"/>
                     </xs:unique>
                 </xs:element>
+                <xs:element name="tmpFolder" type="temp_dir" minOccurs="0"/>
             </xs:all>
         </xs:complexType>
     </xs:element>
@@ -112,6 +113,10 @@
             </xs:element>
         </xs:sequence>
         <xs:attribute name="path" type="xs:anyURI" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="temp_dir">
+        <xs:attribute name="path"/>
     </xs:complexType>
 
     <xs:complexType name="scripts">

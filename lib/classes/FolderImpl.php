@@ -119,11 +119,12 @@ class FolderImpl implements Folder
     }
 
     /**
+     * @param bool $recursive
      * @return bool Return TRUE on success else FALSE
      */
-    public function create()
+    public function create($recursive=false)
     {
-        return @mkdir($this->folderPath);
+        return @mkdir($this->folderPath,0777, $recursive);
     }
 
     /**
@@ -246,19 +247,30 @@ class FolderImpl implements Folder
      * @param null $newName The new name of the folder, if Null then new folder will preserve name
      * @return bool Return TRUE on success and FALSE on failure
      */
+    /*
     public function putFolder(Folder $folder, $newName = null)
     {
-        // TODO: Implement putFolder() method.
+        if(($f = $folder->copy($this->folderPath)) == null){
+            return false;
+        }
+        if($newName == null){
+            return true;
+        }
+        return $newName == null || $f->move($newName);
     }
-
+    */
     /**
      * Will put a folder to the folder (copy the folder into current folder)
      * @param File $file
      * @param null $newName The new name of the file, if Null then new file will preserve name
      * @return bool Return TRUE on success and FALSE on failure
      */
-    public function putFile(File $file, $newName = null)
+/*    public function putFile(File $file, $newName = null)
     {
-        // TODO: Implement putFile() method.
-    }
+        if(($f = $file->copy($this->folderPath)) == null){
+            return false;
+        }
+
+        return $newName == null || $f->move($newName);
+    }*/
 }

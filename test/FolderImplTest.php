@@ -82,6 +82,15 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($f->exists(),'Folder was not created');
     }
 
+    public function testCreateRecursiveWillCreateFolderRecursive(){
+        $folder = dirname(__FILE__).'/stubs/testFolder';
+        @$this->rrmdir($folder);
+        $f = new FolderImpl($folder.'/test');
+        $this->assertFalse($f->exists(),'Folder did exist');
+        $this->assertTrue($f->create(true),'Did not return TRUE on create');
+        $this->assertTrue($f->exists(),'Folder was not created');
+    }
+
     public function testCreateWillReturnFalseIfFolderExist(){
         $folder = dirname(__FILE__).'/stubs/testFolder';
         @mkdir($folder);
@@ -98,6 +107,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testDeleteWillDeleteFolder(){
         $folder = dirname(__FILE__).'/stubs/testFolder';
+        $this->rrmdir($folder);
         $f = new FolderImpl($folder);
         $f->create();
         $this->assertTrue($f->delete(),'Did not return true on deletion');

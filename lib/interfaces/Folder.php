@@ -27,9 +27,10 @@ interface Folder extends Iterator
     public function exists();
 
     /**
+     * @param bool $recursive
      * @return bool Return TRUE on success else FALSE
      */
-    public function create();
+    public function create($recursive=false);
 
     /**
      * @param string $path The path to the new file
@@ -71,7 +72,7 @@ interface Folder extends Iterator
      * @param null $newName The new name of the folder, if Null then new folder will preserve name
      * @return null | Folder Return new folder in folder on success and Null on failure
      */
-    public function putFolder(Folder $folder,$newName = null);
+  //  public function putFolder(Folder $folder,$newName = null);
 
     /**
      * Will put a folder to the folder (copy the folder into current folder)
@@ -80,5 +81,5 @@ interface Folder extends Iterator
      * @return null | File Return new file in folder on success and Null on failure
      */
 
-    public function putFile(File $file, $newName = null);
+//    public function putFile(File $file, $newName = null);
 }

@@ -107,4 +107,9 @@ interface Config
      */
     public function getOwner();
 
+    /**
+     * @return string Path to the tmp folder
+     */
+    public function getTmpFolderPath();
+
 }
