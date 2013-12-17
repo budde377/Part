@@ -156,8 +156,6 @@ class UserSettingsPageElementImpl extends PageElementImpl
         if($this->currentUser == null){
             return;
         }
-        $cssRegister = $this->container->getCSSRegisterInstance();
-        $cssRegister->registerCSSFile(new CSSFileImpl(dirname(__FILE__) . '/../_css/user_settings_style.css'));
 
     }
 }
