@@ -9,6 +9,7 @@
 class AutoLoader {
 
     static private $classNames = array();
+    static private $registered = false;
 
     /**
      * Store the filename (sans extension) & full path of all ".php" files found
@@ -40,7 +41,11 @@ class AutoLoader {
 
 
     public static function registerAutoloader(){
+        if(AutoLoader::$registered){
+            return;
+        }
         spl_autoload_register(array('AutoLoader', 'loadClass'));
+        AutoLoader::$registered = true;
     }
 
 }
