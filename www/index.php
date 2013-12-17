@@ -13,13 +13,8 @@ session_start();
 
 require dirname(__FILE__)."/../AutoLoader.php";
 
-$dir = dirname(__FILE__)."/../../";
-AutoLoader::registerDirectory($dir."common/lib/classes");
-AutoLoader::registerDirectory($dir."common/lib/interfaces");
-AutoLoader::registerDirectory($dir."common/lib/traits");
-AutoLoader::registerDirectory($dir."common/lib/helpers");
-AutoLoader::registerDirectory($dir."common/lib/exceptions");
-
+AutoLoader::registerAutoloader();
+AutoLoader::registerDirectory(dirname(__FILE__)."/../../common/lib");
 // LOAD COMPOSER
 require dirname(__FILE__).'/../vendor/autoload.php';
 
