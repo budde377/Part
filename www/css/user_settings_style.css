@@ -184,7 +184,7 @@
     right: 0;
     width: 40px;
     height: 40px;
-    background: #BC4040 url(/_common/_img/close_x_icon.png) scroll no-repeat center center;
+    background: #BC4040 url(/_common/img/close_x_icon.png) scroll no-repeat center center;
     border-left: 1px solid rgb(163, 163, 163);
     cursor: pointer;
 }
@@ -210,7 +210,7 @@
     width: 100px;
     height: 40px;
     overflow: hidden;
-    background: #656565 url(/_common/_img/login_user_menu_icons_vertical.png) no-repeat scroll center -275px;
+    background: #656565 url(/_common/img/login_user_menu_icons_vertical.png) no-repeat scroll center -275px;
     border-right: 1px solid #a9a9a9;
     cursor: pointer;
     -webkit-transition:background-color 0.1s;
@@ -287,7 +287,7 @@ form.justDistribution > div:nth-of-type(2n+2) {
 }
 
 #UserSettingsExpandLink {
-    background: transparent url("/_common/_img/settings_arrow_3-01.png") scroll no-repeat bottom center;
+    background: transparent url("/_common/img/settings_arrow_3-01.png") scroll no-repeat bottom center;
     width: 46px;
     height: 60px;
     position: absolute;
@@ -323,7 +323,7 @@ form > span.notion {
 }
 
 #UserSettingsContent .blur > .filter {
-    background: rgba(206, 206, 206, 0.7) url(/_common/_img/ajax-loader_light.gif) scroll no-repeat center center;
+    background: rgba(206, 206, 206, 0.7) url(/_common/img/ajax-loader_light.gif) scroll no-repeat center center;
 }
 
 #UserSettingsContent .colorList > li.blur {
@@ -381,23 +381,23 @@ form.initial input.invalid {
 }
 
 #ActivePageList .subpages{
-    background-image: url(/_common/_img/subpages.png) ;
+    background-image: url(/_common/img/subpages.png) ;
 }
 
 #ActivePageList .delete, #InactivePageList .delete, #PageUserList .delete, #UserList .delete{
-    background-image: url(/_common/_img/redx.png) ;
+    background-image: url(/_common/img/redx.png) ;
 }
 
 #ActivePageList .activate{
-    background-image: url(/_common/_img/archive.png) ;
+    background-image: url(/_common/img/archive.png) ;
 }
 
 #InactivePageList .activate{
-    background-image: url(/_common/_img/arrowup.png) ;
+    background-image: url(/_common/img/arrowup.png) ;
 }
 
 #ActivePageList .showhide{
-    background-image: url(/_common/_img/eyeslash.png);
+    background-image: url(/_common/img/eyeslash.png);
 }
 
 #ActivePageList li{
@@ -430,7 +430,7 @@ form.initial input.invalid {
 
 
 #ActivePageList li.ishidden .showhide{
-    background-image: url(/_common/_img/eye.png);
+    background-image: url(/_common/img/eye.png);
 }
 
 #InactivePageList li:not(.emptyListInfo){
@@ -467,7 +467,7 @@ form.initial input.invalid {
 
 
 #ActivePageList li.loading > .padding, #InactivePageList li.loading > .padding{
-    background: transparent url(/_common/_img/smallloader.gif) scroll no-repeat center center;
+    background: transparent url(/_common/img/smallloader.gif) scroll no-repeat center center;
     margin: 0;
     padding: 0;
     width: 21px;
