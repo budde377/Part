@@ -1,8 +1,12 @@
 {
+    "name": "cbweb/common",
     "require": {
         "twig/twig": "1.*"
     },
-    "config":{
-        "vendor-dir": "_vendor"
-    }
+    "authors": [
+        {
+            "name": "Christian Budde",
+            "email": "christi@n-bud.de"
+        }
+    ]
 }

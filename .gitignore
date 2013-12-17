@@ -1,4 +1,4 @@
-_vendor/
+vendor/
 composer.lock
 packages/
 pubspec.lock
