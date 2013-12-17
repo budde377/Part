@@ -406,7 +406,7 @@ select.better_select_select {
     left: 0;
     right: 0;
     bottom: 0;
-    background: url(/_common/_img/ajax-loader.gif) scroll no-repeat center center;
+    background: url(/_common/img/ajax-loader.gif) scroll no-repeat center center;
 }
 
 .colorList > li {
@@ -454,7 +454,7 @@ select.better_select_select {
     float: right;
     width: 30px;
     height: 30px;
-    background: transparent url(/_common/_img/drag_icon.png) scroll no-repeat center center;
+    background: transparent url(/_common/img/drag_icon.png) scroll no-repeat center center;
     cursor: move;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -534,7 +534,7 @@ ul.better_select_options > li:last-child {
 }
 
 .dialog_bg .dialog.loading{
-    background:#fff url(/_common/_img/ajax-loader.gif) scroll no-repeat center 80px;
+    background:#fff url(/_common/img/ajax-loader.gif) scroll no-repeat center 80px;
     padding-bottom: 90px;
 }
 
@@ -754,7 +754,7 @@ ul.better_select_options > li:last-child {
 
 body > .trash_can{
     position: fixed;
-    background: transparent url(/_common/_img/trashcan2.png) scroll no-repeat center center;
+    background: transparent url(/_common/img/trashcan2.png) scroll no-repeat center center;
     height: 75px;
     width: 75px;
     bottom: 50px;
@@ -821,12 +821,12 @@ body > .trash_can.hover{
 }
 
 .movable_background > .move_button_container > .move_button{
-    background-image: url(/_common/_img/move.png);
+    background-image: url(/_common/img/move.png);
     background-position: center center;
 }
 
 .movable_background > .move_button_container > .save_move{
-    background-image: url(/_common/_img/toolbar_icons.png);
+    background-image: url(/_common/img/toolbar_icons.png);
     background-position: 4px -84px;
 
 }

@@ -50,7 +50,7 @@
     width: 27px;
     margin: 0 10px 0 0;
     height: 25px;
-    background: transparent url(/_common/_img/toolbar_icons.png?new=123) scroll no-repeat 4px -26px;
+    background: transparent url(/_common/img/toolbar_icons.png?new=123) scroll no-repeat 4px -26px;
     float: left;
     cursor: pointer;
     border-radius: 2px;
@@ -169,7 +169,7 @@
     border-radius: 2px;
     padding: 0;
     height: 25px;
-    background: transparent url(/_common/_img/text_edit.png) scroll no-repeat 1px 3px;
+    background: transparent url(/_common/img/text_edit.png) scroll no-repeat 1px 3px;
     width: 27px;
     margin: 0;
     cursor: pointer;
@@ -487,7 +487,7 @@
 }
 
 .edit_content_wrapper .menu.history_menu.loading {
-    background: url(/_common/_img/ajax-loader.gif) scroll no-repeat center center;
+    background: url(/_common/img/ajax-loader.gif) scroll no-repeat center center;
 }
 
 .edit_content_wrapper .menu.history_menu .calendar {
@@ -495,7 +495,7 @@
 }
 
 .edit_content_wrapper .menu.history_menu ul.history_list.loading {
-    background: url(/_common/_img/ajax-loader.gif) scroll no-repeat center center;
+    background: url(/_common/img/ajax-loader.gif) scroll no-repeat center center;
     min-height: 148px;
 }
 
@@ -544,14 +544,14 @@
 .edit_content_wrapper .menu.upload_menu .upload_icon {
     width: 40px;
     height: 66px;
-    background: transparent url(/_common/_img/upload.png) scroll no-repeat 0 10px;
+    background: transparent url(/_common/img/upload.png) scroll no-repeat 0 10px;
     margin: 0 auto 17px;
     cursor: pointer;
     transition: background-position-y 0.1s;
 }
 
 .edit_content_wrapper .menu.upload_menu .upload_icon.trash_can {
-    background-image: url(/_common/_img/trashcan3.png);
+    background-image: url(/_common/img/trashcan3.png);
 }
 
 .edit_content_wrapper .menu.upload_menu .upload_icon.trash_can.hover {
@@ -692,11 +692,11 @@
     margin: 0 10px 0 0;
     padding: 0;
     border: 0;
-    background: transparent url(/_common/_img/text_edit.png?v=1234) scroll no-repeat 1px -642px;
+    background: transparent url(/_common/img/text_edit.png?v=1234) scroll no-repeat 1px -642px;
 }
 
 .edit_link_image_popup button:hover {
-    background: #d9d9d9 url(/_common/_img/text_edit.png?v=1234) scroll no-repeat -39px -642px;
+    background: #d9d9d9 url(/_common/img/text_edit.png?v=1234) scroll no-repeat -39px -642px;
 
 }
 
@@ -736,7 +736,7 @@
 
 .edit_image_popup {
     box-shadow: 0 0 5px #000;
-    background: #fff url("/_common/_img/ajax-loader.gif") scroll no-repeat center center;
+    background: #fff url("/_common/img/ajax-loader.gif") scroll no-repeat center center;
     position: relative;
 }
 
@@ -758,7 +758,7 @@
     border-radius: 0;
     border: 0;
     margin: 0 5px;
-    background: transparent url(/_common/_img/image_edit.png) scroll no-repeat center 3px;
+    background: transparent url(/_common/img/image_edit.png) scroll no-repeat center 3px;
     cursor: pointer;
     transition: opacity 0.1s;
     -webkit-transition: opacity 0.1s;
@@ -768,7 +768,7 @@
 
 .image_edit_tool_bar button:hover{
     background-color: transparent;
-    background-image: url(/_common/_img/image_edit.png);
+    background-image: url(/_common/img/image_edit.png);
     opacity: 0.7;
 }
 
