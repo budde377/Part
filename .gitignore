@@ -2,3 +2,4 @@ vendor/
 composer.lock
 packages/
 pubspec.lock
+composer.phar
