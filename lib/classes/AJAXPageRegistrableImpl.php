@@ -121,7 +121,7 @@ class AJAXPageRegistrableImpl implements Registrable{
                     $i++;
                 }
                 $p->setTitle($title);
-                $p->setTemplate('main');
+                $p->setTemplate('_main');
                 $response = new JSONResponseImpl();
                 $response->setPayload($pageTranslator->encode($p));
                 return $response;
