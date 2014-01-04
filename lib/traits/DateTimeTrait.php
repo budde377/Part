@@ -10,7 +10,7 @@ trait DateTimeTrait
 {
 
     protected function monthNumberToName($number){
-        $monthArray = array('januar','februar','marts','april','maj','juni','juli','august','september','november','december');
+        $monthArray = array('januar','februar','marts','april','maj','juni','juli','august','september','oktober', 'november','december');
         return $monthArray[($number-1)%12];
     }
 
