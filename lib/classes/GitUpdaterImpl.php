@@ -73,7 +73,8 @@ class GitUpdaterImpl implements Updater{
         if(!$this->subModuleUpdater){
             $this->site->getVariables()->setValue("last_updated", time());
         }
-        $this->exec("git pull");
+        $this->exec("git fetch origin");
+        $this->exec("git reset --hard origin/{$this->currentBranch()}");
         /** @var $updater Updater */
         foreach($this->subUpdaters as $updater){
             $updater->update();
