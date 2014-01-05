@@ -144,10 +144,12 @@ class ConnectionFolderImpl implements Folder
     }
 
     /**
+     * @param bool $recursive
      * @return bool Return TRUE on success else FALSE
      */
-    public function create()
+    public function create($recursive = false)
     {
+        //TODO implement the recursive creation
         $this->setUpIterator();
         return $this->connection->createDirectory($this->path);
     }

@@ -46,7 +46,7 @@ class WebsiteImpl implements Website
 
 
         $currentPage = $pageStrategy->getCurrentPage();
-        $template->setTemplateFromConfig($currentPage->getTemplate());
+        $template->setTemplateFromConfig($currentPage->getTemplate(),"_main");
 
         $ajaxRegister = $this->backendContainer->getAJAXRegisterInstance();
         if (($id = $this->GETValueOfIndexIfSetElseDefault('ajax', null)) !== null) {

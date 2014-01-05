@@ -62,12 +62,16 @@ class TemplateImpl implements Template
 
     /**
      * @param string $name The name of the template as defined in the config
+     * @param string $defaultIfNotFound
      * @throws EntryNotFoundException
      * @return void
      */
-    public function setTemplateFromConfig($name)
+    public function setTemplateFromConfig($name, $defaultIfNotFound=null)
     {
         $filename = $this->config->getTemplate($name);
+        if($filename == null && $defaultIfNotFound != null){
+            $filename = $this->config->getTemplate($defaultIfNotFound);
+        }
         if ($filename === null) {
             throw new EntryNotFoundException($name, 'Config');
         }

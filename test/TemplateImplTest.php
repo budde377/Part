@@ -96,9 +96,10 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         </config>");
 
         $this->template->setTemplateFromConfig('main');
-        $this->template->render();
+        $this->assertContains("Hello World", $this->template->render());
 
     }
+
 
     public function testWillThrowExceptionIfTemplateFileIsNotFoundFromConfig()
     {
@@ -123,6 +124,18 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($exceptionWasThrown, 'Exception was not thrown');
 
+    }
+    public function testCanAddFallbackConfigOnEntryNotFoundInConfigWithoutExceptions(){
+        $this->setUpConfig("
+        <config>
+            {$this->defaultOwner}
+            <templates path='test/stubs/'>
+                <template filename='templateStub.twig'>main</template>
+            </templates>
+        </config>");
+
+        $this->template->setTemplateFromConfig('lololol', "main");
+        $this->assertContains("Hello World", $this->template->render());
     }
 
     public function testWillThrowExceptionIfTemplateNotInConfig()
@@ -252,7 +265,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
         $v = $this->template->render();
-        $this->assertTrue(strpos($v, "'site'") !== false);
+        $this->assertContains("site", $v);
     }
 
     public function testTemplateAddsInitialize(){
@@ -260,7 +273,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
         $v = $this->template->render();
-        $this->assertTrue(strpos($v, "'initialize'") !== false);
+        $this->assertContains("initialize", $v);
     }
 
     public function testTemplateAddsDebug(){
@@ -268,7 +281,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
         $v = $this->template->render();
-        $this->assertTrue(strpos($v, "'debug_mode'") !== false);
+        $this->assertContains("debug_mode", $v);
+
     }
 
     public function testTemplateSupportsPageElementTag(){

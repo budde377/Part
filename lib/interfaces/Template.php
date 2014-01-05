@@ -13,9 +13,10 @@ interface Template
      * @abstract
      * Will set the template to a name provided in config given in constructor
      * @param string $name The name of the template as defined in the config
+     * @param string $defaultIfNotFound
      * @return void
      */
-    public function setTemplateFromConfig($name);
+    public function setTemplateFromConfig($name, $defaultIfNotFound=null);
 
     /**
      * @abstract

@@ -205,4 +205,12 @@ class StubConfigImpl implements Config
     {
         return "";
     }
+
+    /**
+     * @return string Path to the tmp folder
+     */
+    public function getTmpFolderPath()
+    {
+        // TODO: Implement getTmpFolderPath() method.
+    }
 }
