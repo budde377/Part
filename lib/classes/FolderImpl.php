@@ -273,4 +273,18 @@ class FolderImpl implements Folder
 
         return $newName == null || $f->move($newName);
     }*/
+    /**
+     * Cleans the folder for all content, folders as files.
+     * @return void
+     */
+    public function clean()
+    {
+        foreach($this->listFolder() as $f){
+            if($f instanceof Folder){
+                $f->delete(Folder::DELETE_FOLDER_RECURSIVE);
+            } else if($f instanceof File){
+                $f->delete();
+            }
+        }
+    }
 }

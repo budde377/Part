@@ -301,6 +301,17 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
     }
 
 
+    public function testCleanWillCleanFolder(){
+        $folder = dirname(__FILE__).'/stubs/testFolder';
+        @$this->rrmdir($folder);
+        $f = $this->setUpNonEmptyFolder($folder);
+        $this->assertGreaterThan(0, count($f->listFolder()));
+        $f->clean();
+        $this->assertEquals(0, count($f->listFolder()));
+
+    }
+
+
     private function setUpNonEmptyFolder($folder)
     {
         $f = new FolderImpl($folder);

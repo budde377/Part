@@ -67,6 +67,12 @@ interface Folder extends Iterator
     public function getParentFolder();
 
     /**
+     * Cleans the folder for all content, folders as files.
+     * @return void
+     */
+    public function clean();
+
+    /**
      * Will put a folder to the folder (copy the folder into current folder)
      * @param Folder $folder
      * @param null $newName The new name of the folder, if Null then new folder will preserve name

@@ -278,4 +278,13 @@ class ConnectionFolderImpl implements Folder
 
         return null;
     }
+
+    /**
+     * Cleans the folder for all content, folders as files.
+     * @return void
+     */
+    public function clean()
+    {
+        throw new FunctionNotImplementedException("clean", "ConnectionFolderImpl"); //TODO implement on need
+    }
 }
