@@ -46,8 +46,14 @@ class AJAXUpdaterRegistrableImpl implements Registrable{
 
 
         $jsonServer->registerJSONFunction(new JSONFunctionImpl('update',function() use ($updater, $pageOrder){
+            //Updating
             $version = $updater->getVersion();
             $updater->update();
+            //Cleaning tmp folder
+            $f = new FolderImpl($this->config->getTmpFolderPath());
+            $f->clean();
+            
+            //Making
             exec("cd {$this->config->getRootPath()} && make update");
             if($version != $updater->getVersion()){
                 foreach($pageOrder->listPages() as $page){
