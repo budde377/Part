@@ -138,10 +138,10 @@ class ImageEditor {
     if (properties.url == null) {
       return;
     }
-    print(properties.url);
     _handler = new CanvasHandler(canvas);
-    _originalWidth = _handler.width = properties.width;
-    _originalHeight = _handler.height = properties.height;
+    var rotated = properties.rotate % 2 == 1;
+    _originalWidth = _handler.width = rotated?properties.width:properties.height;
+    _originalHeight = _handler.height = rotated?properties.height:properties.width;
     _handler.addLayer(_imageLayer);
     _fullImage = new ImageElement(src:"/"+properties.url);
     _fullImage.onLoad.listen((_) {
