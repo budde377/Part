@@ -137,7 +137,7 @@ class UserSettingsPageLi {
     _hide = _returnNewDivIfNecessary(li.query('.showhide'), ['link', 'showhide'], _active, title:page.hidden ? "Vis" : "Skjul");
     _subPagesButton = _returnNewDivIfNecessary(li.query('.subpages.link'), ['link', 'subpages'], _active, title:'Undersider');
     _template = _returnNewDivIfNecessary(li.query('.template'), ['template', 'hidden'], true, text:page.template);
-    _alias = _returnNewDivIfNecessary(li.query('.template'), ['alias', 'hidden'], true, text:page.alias);
+    _alias = _returnNewDivIfNecessary(li.query('.alias'), ['alias', 'hidden'], true, text:page.alias);
 
     _setUpListeners();
   }
