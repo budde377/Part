@@ -138,12 +138,12 @@ class ImageEditor {
     if (properties.url == null) {
       return;
     }
-
+    print(properties.url);
     _handler = new CanvasHandler(canvas);
     _originalWidth = _handler.width = properties.width;
     _originalHeight = _handler.height = properties.height;
     _handler.addLayer(_imageLayer);
-    _fullImage = new ImageElement(src:properties.url);
+    _fullImage = new ImageElement(src:"/"+properties.url);
     _fullImage.onLoad.listen((_) {
       _image = new ImageCanvasShape(_fullImage, width:_originalWidth, height:_originalHeight);
       _imageLayer.addShape(_image);
