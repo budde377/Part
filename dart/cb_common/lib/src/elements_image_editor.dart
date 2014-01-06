@@ -116,6 +116,8 @@ class ImageEditor {
 
   int maxWidth, minWidth, maxHeight, minHeight;
 
+  int _cropW, _cropH;
+
   CanvasHandler _handler;
 
   CanvasLayer _cropLayer = new CanvasLayer(), _imageLayer = new CanvasLayer();
@@ -138,10 +140,13 @@ class ImageEditor {
     if (properties.url == null) {
       return;
     }
+
     _handler = new CanvasHandler(canvas);
     var rotated = properties.rotate % 2 == 1;
-    _originalWidth = _handler.width = rotated?properties.width:properties.height;
-    _originalHeight = _handler.height = rotated?properties.height:properties.width;
+    _originalWidth = properties.width;
+    _originalHeight = properties.height;
+    _handler.width = rotated?_originalHeight:_originalWidth;
+    _handler.height = rotated?_originalWidth:_originalHeight;
     _handler.addLayer(_imageLayer);
     _fullImage = new ImageElement(src:"/"+properties.url);
     _fullImage.onLoad.listen((_) {
@@ -172,13 +177,12 @@ class ImageEditor {
       }
 
       if (properties.width != null) {
-        width = properties.width;
+        if(_isRotated){
+          _updateSize(properties.height, properties.width);
+        } else {
+          _updateSize(properties.width, properties.height);
+        }
       }
-
-      if (properties.height != null) {
-        height = properties.height;
-      }
-
       if (properties.cropX != null) {
         setCrop(properties.cropX / _handler.width, properties.cropY / _handler.height, properties.cropW / _handler.width, properties.cropH / _handler.height);
       } else {
@@ -202,7 +206,6 @@ class ImageEditor {
     if (r == _rotate) {
       return;
     }
-
     _rotate = r;
     _image.rotationDeg = _cropShape.rotationDeg = 90 * r;
     var w = _handler.width;
@@ -283,7 +286,8 @@ class ImageEditor {
 
   void setCrop(double x, double y, double width, double height) {
     _cropShape.setCrop(x, y, width, height);
-
+    _cropW = width;
+    _cropH = height;
     if (!_cropLayer.handlerSet) {
       _handler.addLayer(_cropLayer);
 
