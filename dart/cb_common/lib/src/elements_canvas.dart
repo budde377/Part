@@ -1,5 +1,9 @@
 part of elements;
 
+Position rotatePoint(num x, num y, num ox, num oy, num r) =>  new Position(x:(x-ox)*Math.cos(r) + (y-oy)*Math.sin(r)+ox,
+y:-(x-ox)*Math.sin(r) + (y-oy)*Math.cos(r)+oy);
+
+
 class CanvasHandler {
 
   static Map<CanvasElement, CanvasHandler> _cache = new Map<CanvasElement, CanvasHandler>();
@@ -245,19 +249,14 @@ abstract class CanvasShape {
   void beforeDraw(CanvasHandler h) {
   }
 
-  Position transformedCoordinates(num x, num y,  {num r, num rx, num ry}){
+  Position rotatePosition(num x, num y,  {num r, num rx, num ry}){
 
 
     r = r == null? _rotate: r;
     rx = rx == null? _rotateX : rx;
     ry = ry == null? _rotateY : ry;
 
-    x -= rx;
-    y -= ry;
-
-    var xm = rx+(x*Math.cos(r) - y*Math.sin(r));
-    var ym = ry + (x*Math.sin(r) + y*Math.cos(r));
-    return new Position(x:xm, y:ym);
+    return rotatePoint(x,y,rx,ry,r);
   }
 
 }
@@ -324,8 +323,10 @@ class CircleCanvasShape extends StrokeFillCanvasShape {
     }
   }
 
-  bool inShape(num x, num y)=> Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2)) <= _radius;
-
+  bool inShape(num x, num y){
+    var p = rotatePosition(x,y);
+    return Math.sqrt(Math.pow(p.x - this.x, 2) + Math.pow(p.y - this.y, 2)) <= _radius;
+  }
 }
 
 
@@ -361,8 +362,10 @@ class RectCanvasShape extends StrokeFillCanvasShape {
     context.fillRect(x, y, _width, _height);
   }
 
-  bool inShape(num x, num y) => x >= this.x && y >= this.y && x <= this.x + width && y <= this.y + height;
-
+  bool inShape(num x, num y){
+    var p = rotatePosition(x,y);
+    return p.x >= this.x && p.y >= this.y && p.x <= this.x + width && p.y <= this.y + height;
+  }
 }
 
 
@@ -398,8 +401,13 @@ class ImageCanvasShape extends StrokeFillCanvasShape {
 
   set height(num h) => _height = h;
 
-  bool inShape(num x, num y) => x >= this.x && y >= this.y && x <= this.x + width && y <= this.y + height;
 
+
+  bool inShape(num x, num y){
+
+    var p = rotatePosition(x,y);
+    return p.x >= this.x && p.y >= this.y && p.x <= this.x + width && p.y <= this.y + height;
+  }
 
 }
 
@@ -414,13 +422,13 @@ class ImageCropCanvasShape extends StrokeFillCanvasShape {
 
   int _width, _height, _cropX, _cropY, _cropW, _cropH;
 
-  double _cx, _cy, _cw, _ch;
+  num _cx, _cy, _cw, _ch;
 
 
-  int get cropX => _cropX;
-  int get cropY => _cropY;
-  int get cropW => _cropW;
-  int get cropH => _cropH;
+  num get cropX => _cropX;
+  num get cropY => _cropY;
+  num get cropW => _cropW;
+  num get cropH => _cropH;
 
 
   ImageCropCanvasShape(this.image) {
@@ -438,7 +446,7 @@ class ImageCropCanvasShape extends StrokeFillCanvasShape {
     _dot1.fillStyle = _dot2.fillStyle = _dot3.fillStyle = _dot4.fillStyle = "rgba(0,0,0,0.7)";
   }
 
-  void setCrop(double x, double y, double width, double height) {
+  void setCrop(num x, num y, num width, num height) {
     _cw = width;
     _ch = height;
     _cy = y;
@@ -453,21 +461,19 @@ class ImageCropCanvasShape extends StrokeFillCanvasShape {
 
   void _updateCrop() {
 
-    var cx = (_cx * _width).floor(),
-    cy = (_cy * _height).floor();
-    var cw = Math.min((_cw * _width).floor(), _width-cx),
-    ch = Math.min((_ch * _height).floor(), _height-cy);
+    var _cw = Math.min(this._cw, _width-_cx),
+    _ch = Math.min(this._ch, _height-_cy);
 
 
 
-    if(cx < 0 || cy <0 || cw < 10 || ch < 10 || cx >= _width-10 || cy>= _height-10){
+    if(_cx < 0 || _cy <0 || _cw < 10 || _ch < 10 || _cx >= _width-10 || _cy>= _height-10 ){
       return;
     }
 
-    _cropX = cx;
-    _cropY = cy;
-    _cropW = cw;
-    _cropH = ch;
+    _cropX = _cx;
+    _cropY = _cy;
+    _cropW = _cw;
+    _cropH = _ch;
 
     _rect1.x = x;
     _rect1.y = y;
@@ -495,6 +501,19 @@ class ImageCropCanvasShape extends StrokeFillCanvasShape {
     _dot4.y = y + _cropY + _cropH;
   }
 
+  set layer(CanvasLayer l){
+      l..addShape(_rect1)
+       ..addShape(_rect2)
+       ..addShape(_rect3)
+       ..addShape(_rect4)
+       ..addShape(_dot1)
+       ..addShape(_dot2)
+       ..addShape(_dot3)
+       ..addShape(_dot4);
+    super.layer = l;
+  }
+
+
   void beforeDraw(CanvasHandler h) {
     _height = image.height;
     _width = image.width;
@@ -502,18 +521,19 @@ class ImageCropCanvasShape extends StrokeFillCanvasShape {
     rotateY = h.height / 2;
     y = (h.height - _height) / 2;
     x = (h.width - _width) / 2;
+    _rect1.rotation = _rect2.rotation = _rect3.rotation = _rect4.rotation =
+    _dot1.rotation = _dot2.rotation = _dot3.rotation = _dot4.rotation = rotation;
+    _rect1.rotateX = _rect2.rotateX = _rect3.rotateX = _rect4.rotateX =
+    _dot1.rotateX = _dot2.rotateX = _dot3.rotateX = _dot4.rotateX = rotateX;
+    _rect1.rotateY = _rect2.rotateY = _rect3.rotateY = _rect4.rotateY =
+    _dot1.rotateY = _dot2.rotateY = _dot3.rotateY = _dot4.rotateY = rotateY;
+    _rect1.mirror = _rect2.mirror = _rect3.mirror = _rect4.mirror =
+    _dot1.mirror = _dot2.mirror = _dot3.mirror = _dot4.mirror = mirror;
     _updateCrop();
   }
 
   void draw(CanvasRenderingContext2D context) {
-    _rect1.draw(context);
-    _rect2.draw(context);
-    _rect3.draw(context);
-    _rect4.draw(context);
-    _dot1.draw(context);
-    _dot2.draw(context);
-    _dot3.draw(context);
-    _dot4.draw(context);
+
   }
 
   CanvasShape get dotNW => _dot1;

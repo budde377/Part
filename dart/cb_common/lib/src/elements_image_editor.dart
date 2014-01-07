@@ -2,7 +2,7 @@ part of elements;
 
 class ImageEditProperties {
 
-  ImageEditProperties(String url, {bool mirrorVertical:false, mirrorHorizontal:false, cropW:null, cropH:null, cropX:null, cropY:null, int rotate:0, width:null, height:null}) {
+  ImageEditProperties(String url, {bool mirrorVertical:false, bool mirrorHorizontal:false, int cropW:null, int cropH:null, int cropX:null, int cropY:null, int rotate:0, width:null, height:null}) {
     this._url = url;
     this._mirrorHorizontal = mirrorHorizontal;
     this._mirrorVertical = mirrorVertical;
@@ -42,8 +42,8 @@ class ImageEditProperties {
           _rotate = int.parse(vars[0]);
           break;
         case 'M':
-          _mirrorHorizontal = int.parse(vars[0]) > 0;
-          _mirrorVertical = int.parse(vars[1]) > 0;
+          _mirrorVertical = int.parse(vars[0]) > 0;
+          _mirrorHorizontal = int.parse(vars[1]) > 0;
           break;
       }
 
@@ -171,20 +171,21 @@ class ImageEditor {
     if (_handler == null) {
       return;
     }
+    print(properties);
     _handler.doWithoutUpdate(() {
       if (properties.rotate != null) {
         rotate = properties.rotate;
       }
 
       if (properties.width != null) {
-        if(_isRotated){
+        if(isRotated){
           _updateSize(properties.height, properties.width);
         } else {
           _updateSize(properties.width, properties.height);
         }
       }
       if (properties.cropX != null) {
-        setCrop(properties.cropX / _handler.width, properties.cropY / _handler.height, properties.cropW / _handler.width, properties.cropH / _handler.height);
+        setCrop(properties.cropX, properties.cropY , properties.cropW , properties.cropH );
       } else {
         removeCrop();
       }
@@ -194,12 +195,21 @@ class ImageEditor {
     _handler.updateCanvas();
   }
 
-  ImageEditProperties get properties => new ImageEditProperties(_fullImage.src, mirrorHorizontal:this.mirrorHorizontal, mirrorVertical:this.mirrorVertical, cropW:hasCrop ? _cropShape.cropW : null, cropH:hasCrop ? _cropShape.cropH : null, cropX:hasCrop ? _cropShape.cropX : null, cropY:hasCrop ? _cropShape.cropY : null, rotate:this.rotate, width:_image.width.toInt(), height:_image.height.toInt());
+  ImageEditProperties get properties => new ImageEditProperties(_fullImage.src,
+                                                                mirrorHorizontal:this.mirrorHorizontal,
+                                                                mirrorVertical:this.mirrorVertical,
+                                                                cropW:hasCrop ? _cropShape.cropW.floor() : null,
+                                                                cropH:hasCrop ? _cropShape.cropH.floor() : null,
+                                                                cropX:hasCrop ? _cropShape.cropX.floor() : null,
+                                                                cropY:hasCrop ? _cropShape.cropY.floor() : null,
+                                                                rotate:this.rotate,
+                                                                width:_image.width.toInt(),
+                                                                height:_image.height.toInt());
 
 
   int get rotate => _rotate;
 
-  bool get _isRotated => _rotate % 2 == 1;
+  bool get isRotated => _rotate % 2 == 1;
 
   set rotate(int r) {
     r = r % 4;
@@ -248,7 +258,6 @@ class ImageEditor {
 
   void _mirror(bool vertical, bool horizontal) {
 
-
     if (vertical && horizontal) {
       _image.mirror = _cropShape.mirror = CanvasShape.MIRROR_BOTH;
       return;
@@ -272,19 +281,19 @@ class ImageEditor {
 
   set height(int h) {
 
-    var w = (_isRotated ? _originalHeight / _originalWidth : ratio ) * h;
+    var w = (isRotated ? _originalHeight / _originalWidth : ratio ) * h;
     _updateSize(w.toInt(), h);
   }
 
   int get width => _handler.width;
 
   set width(int w) {
-    var h = (_isRotated ? ratio : _originalHeight / _originalWidth) * w;
+    var h = (isRotated ? ratio : _originalHeight / _originalWidth) * w;
     _updateSize(w, h.toInt());
   }
 
 
-  void setCrop(double x, double y, double width, double height) {
+  void setCrop(int x, int y, int width, int height) {
     _cropShape.setCrop(x, y, width, height);
     _cropW = width;
     _cropH = height;
@@ -300,13 +309,23 @@ class ImageEditor {
 
   void _updateSize(int w, int h) {
     if ((maxHeight != null && h > maxHeight) || (minHeight != null && h < minHeight) || (maxWidth != null && maxWidth < w) || (minWidth != null && minWidth > w)) {
+
       return;
     }
     _handler.doWithoutUpdate(() {
-      _image.width = _isRotated ? h : w;
-      _image.height = _isRotated ? w : h;
+      var ratioW = w/_handler.width, ratioH = h/_handler.height;
+      if(hasCrop){
+        var cw = _cropShape.cropW*ratioW, ch = _cropShape.cropH*ratioH;
+        if(cw < 10 || ch < 10){
+          return;
+        }
+        _cropShape.setCrop(_cropShape.cropX*ratioW, _cropShape.cropY*ratioH, cw, ch);
+      }
+      _image.width = isRotated ? h : w;
+      _image.height = isRotated ? w : h;
       _handler.width = w;
       _handler.height = h;
+
     });
     _handler.updateCanvas();
   }
@@ -389,6 +408,14 @@ class ImageEditorHandler {
 
   Stream<ImageEditProperties> get onEdit => _stream == null?_stream = _editStreamController.stream.asBroadcastStream():_stream;
 
+  int _inDot (num x, num y) {
+    var p = transformMirror(x, y);
+    x = p.x;
+    y = p.y;
+
+    return editor.dotNW.inShape(x, y) ? 1 : (editor.dotNE.inShape(x, y) ? 2 : (editor.dotSE.inShape(x, y) ? 3 : (editor.dotSW.inShape(x, y) ? 4 : 0)));
+  }
+
   void _setUpListeners() {
     editor.canvas.onMouseWheel.listen((WheelEvent we) {
       editor.width += (we.deltaY > 0 ? 1 : -1) * 2;
@@ -454,24 +481,20 @@ class ImageEditorHandler {
       if(editor.hasCrop){
         editor.removeCrop();
       } else {
-        editor.setCrop(0.25, 0.25, 0.5, 0.5);
+        var w = editor.isRotated?editor.height:editor.width,
+            h = editor.isRotated?editor.width:editor.height;
+        editor.setCrop((0.25*w).floor(), (0.25*h).floor(), (0.5*w).floor(), (0.5*h).floor());
       }
     });
 
-    var inDot = (num x, num y) {
-      var p = transformXY(x, y);
-      x = p.x;
-      y = p.y;
-      if(editor == null){
-        return null;
-      }
-      if(editor.dotNW == null){
-        return 0;
-      }
-      return editor.dotNW.inShape(x, y) ? 1 : (editor.dotNE.inShape(x, y) ? 2 : (editor.dotSE.inShape(x, y) ? 3 : (editor.dotSW.inShape(x, y) ? 4 : 0)));
-    };
+
+
+
     editor.canvas.onMouseMove.listen((MouseEvent ev) {
-      if (inDot(ev.offset.x, ev.offset.y) > 0) {
+      if(editor == null || !editor.hasCrop){
+        return;
+      }
+      if (_inDot(ev.offset.x, ev.offset.y) > 0) {
         editor.canvas.classes.add("hover_dot");
       } else {
         editor.canvas.classes.remove("hover_dot");
@@ -479,48 +502,37 @@ class ImageEditorHandler {
     });
     editor.canvas.onMouseDown.listen((MouseEvent ev) {
       var dotN;
-      if ((dotN = inDot(ev.offset.x, ev.offset.y)) == 0) {
+      if ((dotN = _inDot(ev.offset.x, ev.offset.y)) == 0) {
         return ;
       }
       var sub1, sub2;
       sub1 = document.onMouseMove.listen((MouseEvent ev) {
-        var mx = ev.movement.x, my = ev.movement.y, w = editor.width, h = editor.height;
-
-
-        switch (editor.rotate) {
-          case 1:
-            h = editor.width;
-            w = editor.height;
-            mx = ev.movement.y;
-            my = -ev.movement.x;
-            break;
-          case 2:
-            mx = -ev.movement.x;
-            my = -ev.movement.y;
-            break;
-          case 3:
-            h = editor.width;
-            w = editor.height;
-            mx = -ev.movement.y;
-            my = ev.movement.x;
-
-            break;
+        var mx = ev.movement.x, my = ev.movement.y;
+        if(editor.mirrorHorizontal){
+          my = -my;
         }
+
+        if(editor.mirrorVertical){
+          mx = -mx;
+        }
+
+        var p = rotatePoint(mx,my,0, 0, editor.rotate*Math.PI/2);
+        mx = p.x;
+        my = p.y;
+
+
         switch (dotN) {
           case 1:
-            editor.setCrop((editor.cropX + mx) / w,
-            (editor.cropY + my) / h,
-            (-mx + editor.cropW) / w,
-            (-my + editor.cropH) / h);
+            editor.setCrop(editor.cropX + mx, editor.cropY + my, -mx + editor.cropW, -my + editor.cropH);
             break;
           case 2:
-            editor.setCrop(editor.cropX / w, (editor.cropY + my) / h, (mx + editor.cropW) / w, (-my + editor.cropH) / h);
+            editor.setCrop(editor.cropX, editor.cropY + my, mx + editor.cropW, -my + editor.cropH);
             break;
           case 3:
-            editor.setCrop(editor.cropX / w, editor.cropY / h, (mx + editor.cropW) / w, (my + editor.cropH) / h);
+            editor.setCrop(editor.cropX , editor.cropY , mx + editor.cropW, my + editor.cropH);
             break;
           case 4:
-            editor.setCrop((editor.cropX + mx) / w, editor.cropY / h, (-mx + editor.cropW) / w, (my + editor.cropH) / h);
+            editor.setCrop(editor.cropX + mx, editor.cropY , -mx + editor.cropW, my + editor.cropH);
             break;
 
         }
@@ -535,24 +547,17 @@ class ImageEditorHandler {
     });
   }
 
-  Position transformXY(int x, int y) {
-    switch (editor.rotate) {
-      case 1:
-        var ym = y;
-        y = editor.width - x ;
-        x = ym ;
-        break;
-      case 2:
+  Position transformMirror(int x, int y) {
 
-        y = editor.height - y;
-        x = editor.width - x;
-        break;
-      case 3:
-        var ym = y;
-        y = x;
-        x = editor.height- ym;
-        break;
+
+    if(editor.mirrorHorizontal){
+      y = editor.height-y;
     }
+
+    if(editor.mirrorVertical){
+      x = editor.width-x;
+    }
+
     return new Position(x:x, y:y);
   }
 
