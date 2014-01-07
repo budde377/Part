@@ -121,3 +121,27 @@ class Position{
   }
 
 }
+
+
+class Debugger{
+  static Debugger _instance;
+
+  bool enabled = true;
+
+  factory Debugger() => _instance == null?_instance = new Debugger._internal():_instance;
+
+  Debugger._internal();
+
+  void debug(Object o){
+    if(!enabled){
+      return;
+    }
+    print(o);
+
+  }
+
+}
+
+Debugger get debugger => new Debugger();
+
+void debug(Object o) => debugger.debug(o);

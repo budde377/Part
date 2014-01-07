@@ -121,9 +121,3 @@ bool _checkSetItems(String exp) {
 bool _checkSetItem(String exp) => _checkChar(exp) || _checkRange(exp);
 
 bool _checkRange(String exp) => (exp.length == 5 && _checkChar(exp.substring(0, 2)) && exp[2] == "-" && _checkChar(exp.substring(3, 2))) || (exp.length == 3 && _checkChar(exp[0]) && exp[1] == "-" && _checkChar(exp[2])) || (exp.length == 4 && ((_checkChar(exp.substring(0, 1)) && exp[1] == "-" && _checkChar(exp.substring(2))) || (_checkChar(exp.substring(0, 2)) && exp[2] == "-" && _checkChar(exp.substring(3)))));
-
-
-main() {
-  var exp = r"asd(?:i*)ddd";
-  print(_checkRE(exp));
-}

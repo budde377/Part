@@ -21,7 +21,7 @@ class AJAXJSONClient extends JSONClient {
       if (request.readyState != 4) {
         return;
       }
-      print(request.responseText);
+      debug(request.responseText);
       Map responseObject = JSON.decode(request.responseText);
       var response;
       if ((response = parseResponse(responseObject)) == null) {
@@ -35,7 +35,7 @@ class AJAXJSONClient extends JSONClient {
   }
 
   Future<JSONResponse> callFunction(JSONFunction function, [void progress(double pct)]) {
-    print(function.jsonString);
+    debug(function.jsonString);
     var request = new HttpRequest();
     var future = _setUpRequest(request);
     if (progress != null) {
@@ -43,7 +43,7 @@ class AJAXJSONClient extends JSONClient {
     }
 
     request.open("POST", urlPrefix + "?ajax=${function.name}");
-    print(urlPrefix + "?ajax=${function.name}");
+    debug(urlPrefix + "?ajax=${function.name}");
     request.send(function.jsonString);
     return future;
   }
