@@ -116,8 +116,6 @@ class ImageEditor {
 
   int maxWidth, minWidth, maxHeight, minHeight;
 
-  int _cropW, _cropH;
-
   CanvasHandler _handler;
 
   CanvasLayer _cropLayer = new CanvasLayer(), _imageLayer = new CanvasLayer();
@@ -145,8 +143,12 @@ class ImageEditor {
     var rotated = properties.rotate % 2 == 1;
     _originalWidth = properties.width;
     _originalHeight = properties.height;
+
     _handler.width = rotated?_originalHeight:_originalWidth;
     _handler.height = rotated?_originalWidth:_originalHeight;
+
+
+
     _handler.addLayer(_imageLayer);
     _fullImage = new ImageElement(src:"/"+properties.url);
     _fullImage.onLoad.listen((_) {
@@ -171,10 +173,15 @@ class ImageEditor {
     if (_handler == null) {
       return;
     }
-    print(properties);
+
     _handler.doWithoutUpdate(() {
       if (properties.rotate != null) {
         rotate = properties.rotate;
+      }
+      if (properties.cropX != null) {
+        setCrop(properties.cropX, properties.cropY , properties.cropW , properties.cropH );
+      } else {
+        removeCrop();
       }
 
       if (properties.width != null) {
@@ -183,11 +190,6 @@ class ImageEditor {
         } else {
           _updateSize(properties.width, properties.height);
         }
-      }
-      if (properties.cropX != null) {
-        setCrop(properties.cropX, properties.cropY , properties.cropW , properties.cropH );
-      } else {
-        removeCrop();
       }
       mirrorHorizontal = properties.mirrorHorizontal;
       mirrorVertical = properties.mirrorVertical;
@@ -205,8 +207,6 @@ class ImageEditor {
                                                                 rotate:this.rotate,
                                                                 width:_image.width.toInt(),
                                                                 height:_image.height.toInt());
-
-
   int get rotate => _rotate;
 
   bool get isRotated => _rotate % 2 == 1;
@@ -294,9 +294,16 @@ class ImageEditor {
 
 
   void setCrop(int x, int y, int width, int height) {
+    var mw = isRotated?maxHeight:maxWidth;
+    var mh = !isRotated?maxHeight:maxWidth;
+    if(mw != null && width > mw){
+      width = mw;
+    }
+    if(mh != null && height > mh){
+      height = mh;
+    }
     _cropShape.setCrop(x, y, width, height);
-    _cropW = width;
-    _cropH = height;
+
     if (!_cropLayer.handlerSet) {
       _handler.addLayer(_cropLayer);
 
@@ -307,19 +314,29 @@ class ImageEditor {
 
   bool get hasCrop => _cropLayer.handlerSet;
 
-  void _updateSize(int w, int h) {
-    if ((maxHeight != null && h > maxHeight) || (minHeight != null && h < minHeight) || (maxWidth != null && maxWidth < w) || (minWidth != null && minWidth > w)) {
+  void _updateSize(int w, int h, [bool force = false]) {
 
+
+    var sizeCheck = (int h, int w) => (maxHeight != null && h > maxHeight) || (minHeight != null && h < minHeight) || (maxWidth != null && maxWidth < w) || (minWidth != null && minWidth > w);
+    var ratioW = w/_handler.width, ratioH = h/_handler.height;
+    var cw = 0, ch = 0;
+    if(hasCrop){
+      cw = _cropShape.cropW*ratioW;
+      ch = _cropShape.cropH*ratioH;
+    }
+    if (!force && ((!hasCrop && sizeCheck(h,w)) || (hasCrop && ((!isRotated && sizeCheck(ch, cw)) || (isRotated && sizeCheck(cw, ch)))))) {
       return;
     }
+
     _handler.doWithoutUpdate(() {
-      var ratioW = w/_handler.width, ratioH = h/_handler.height;
       if(hasCrop){
-        var cw = _cropShape.cropW*ratioW, ch = _cropShape.cropH*ratioH;
         if(cw < 10 || ch < 10){
           return;
         }
         _cropShape.setCrop(_cropShape.cropX*ratioW, _cropShape.cropY*ratioH, cw, ch);
+      }
+      if(image != null){
+
       }
       _image.width = isRotated ? h : w;
       _image.height = isRotated ? w : h;
@@ -332,10 +349,25 @@ class ImageEditor {
 
 
   void removeCrop() {
-    if (_cropLayer == null) {
+    if (_cropLayer == null || !hasCrop) {
       return;
     }
+
+    var w = _handler.width,
+        h = _handler.height;
+
+
+    var rh = maxHeight == null? 0: h/ maxHeight,
+        rw = maxWidth == null ? 0:w / maxWidth;
+
+    if(Math.max(rh, rw) > 1 && rh > rw){
+      height = maxHeight;
+    } else if(rw > 1){
+      width = maxWidth;
+    }
+
     _cropLayer.remove();
+
 
   }
 
