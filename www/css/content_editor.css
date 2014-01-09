@@ -734,6 +734,10 @@
     z-index: 550;
 }
 
+.floating_box.info_box.image_editor_title{
+    z-index: 550;
+}
+
 .edit_image_popup {
     box-shadow: 0 0 5px #000;
     background: #fff url("/_common/img/ajax-loader.gif") scroll no-repeat center center;
@@ -758,7 +762,7 @@
     border-radius: 0;
     border: 0;
     margin: 0 5px;
-    background: transparent url(/_common/img/image_edit.png) scroll no-repeat center 3px;
+    background: transparent url(/_common/img/image_edit.png) scroll no-repeat center 5px;
     cursor: pointer;
     transition: opacity 0.1s;
     -webkit-transition: opacity 0.1s;
@@ -778,7 +782,7 @@
     outline: 0;
 }
 
-.image_edit_tool_bar  button:last-of-type{
+.image_edit_tool_bar  button:nth-last-child(-n+2){
     float: right;
 }
 
@@ -794,32 +798,35 @@
 
 
 .image_edit_tool_bar .rotate_ccw{
-    background-position: center -37px;
+    background-position: center -35px;
 }
 
 .image_edit_tool_bar .zoom_in{
-    background-position: center -77px;
+    background-position: center -75px;
 }
 
 .image_edit_tool_bar .zoom_out{
-    background-position: center -117px;
+    background-position: center -115px;
 }
 
 .image_edit_tool_bar .mirror_h{
-    background-position: center -157px;
+    background-position: center -155px;
 }
 
 .image_edit_tool_bar .mirror_v{
-    background-position: center -197px;
+    background-position: center -195px;
 }
 
 .image_edit_tool_bar .crop{
-    background-position: center -277px;
+    background-position: center -275px;
 
 }
 .image_edit_tool_bar .save{
-    background-position: center -237px;
+    background-position: center -235px;
+}
 
+.image_edit_tool_bar .close{
+    background-position: center -315px;
 }
 
 .edit_image_popup .saving_bar .progress_bar{

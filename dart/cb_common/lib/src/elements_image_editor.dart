@@ -397,7 +397,15 @@ class ImageEditor {
 class ImageEditorHandler {
   static final Map<ImageEditor, ImageEditorHandler> _cache = new Map<ImageEditor, ImageEditorHandler>();
 
-  ButtonElement _rcw = new ButtonElement(), _rccw = new ButtonElement(), _mirror_v = new ButtonElement(), _mirror_h = new ButtonElement(), _zoom_in = new ButtonElement(), _zoom_out = new ButtonElement(), _crop = new ButtonElement(), _save = new ButtonElement();
+  ButtonElement _rcw = new ButtonElement(),
+                _rccw = new ButtonElement(),
+  _mirror_v = new ButtonElement(),
+  _mirror_h = new ButtonElement(),
+  _zoom_in = new ButtonElement(),
+  _zoom_out = new ButtonElement(),
+  _crop = new ButtonElement(),
+  _save = new ButtonElement(),
+  _close = new ButtonElement();
 
   DivElement _toolBar = new DivElement(), _dialogElement = new DivElement(), _savingBar = new DivElement();
 
@@ -432,8 +440,10 @@ class ImageEditorHandler {
     _zoom_out.classes.add('zoom_out');
     _crop.classes.add('crop');
     _save.classes.add('save');
+    _close.classes.add('close');
 
-    wrapper..append(_rcw)..append(_rccw)..append(_mirror_v)..append(_mirror_h)..append(_zoom_in)..append(_zoom_out)..append(_crop)..append(_save);
+    wrapper..append(_rcw)..append(_rccw)..append(_mirror_v)..append(_mirror_h)..append(_zoom_in)..append(_zoom_out)..append(_crop)
+      ..append(_close)..append(_save);
     _setUpListeners();
   }
 
@@ -446,6 +456,14 @@ class ImageEditorHandler {
     y = p.y;
 
     return editor.dotNW.inShape(x, y) ? 1 : (editor.dotNE.inShape(x, y) ? 2 : (editor.dotSE.inShape(x, y) ? 3 : (editor.dotSW.inShape(x, y) ? 4 : 0)));
+  }
+
+  InfoBox _addTitleToElement(String title, Element e) {
+    var i = new InfoBox(title);
+    i..backgroundColor = InfoBox.COLOR_BLACK;
+    e..onMouseOver.listen((_) => i.showAboveCenterOfElement(e))..onMouseOut.listen((_) => i.remove())..onClick.listen((_) => i.remove());
+    i.element.classes.add("image_editor_title");
+    return i;
   }
 
   void _setUpListeners() {
@@ -505,6 +523,8 @@ class ImageEditorHandler {
 
     });
 
+    _close.onClick.listen((_) =>_dialogBox.close());
+
     _rcw.onClick.listen((_) => editor.rotate++);
     _rccw.onClick.listen((_) => editor.rotate--);
     _mirror_v.onClick.listen((_) => editor.mirrorVertical = !editor.mirrorVertical);
@@ -519,7 +539,15 @@ class ImageEditorHandler {
       }
     });
 
-
+    _addTitleToElement("Roter med uret", _rcw);
+    _addTitleToElement("Roter mod uret", _rccw);
+    _addTitleToElement("Spejl vertikalt", _mirror_v);
+    _addTitleToElement("Spejl horisontalt", _mirror_h);
+    _addTitleToElement("Zoom ind", _zoom_in);
+    _addTitleToElement("Zoom ud", _zoom_out);
+    _addTitleToElement("Crop", _crop);
+    _addTitleToElement("Gem billede", _save);
+    _addTitleToElement("Luk", _close);
 
 
     editor.canvas.onMouseMove.listen((MouseEvent ev) {
