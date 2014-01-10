@@ -545,7 +545,7 @@ class ImageEditorHandler {
     _addTitleToElement("Spejl horisontalt", _mirror_h);
     _addTitleToElement("Zoom ind", _zoom_in);
     _addTitleToElement("Zoom ud", _zoom_out);
-    _addTitleToElement("Crop", _crop);
+    _addTitleToElement("Beskær", _crop);
     _addTitleToElement("Gem billede", _save);
     _addTitleToElement("Luk", _close);
 
