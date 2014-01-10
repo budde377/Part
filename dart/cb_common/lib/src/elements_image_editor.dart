@@ -443,7 +443,7 @@ class ImageEditorHandler {
     _close.classes.add('close');
 
     wrapper..append(_rcw)..append(_rccw)..append(_mirror_v)..append(_mirror_h)..append(_zoom_in)..append(_zoom_out)..append(_crop)
-      ..append(_close)..append(_save);
+      ..append(_save)..append(_close);
     _setUpListeners();
   }
 
