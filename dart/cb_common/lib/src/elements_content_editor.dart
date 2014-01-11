@@ -830,7 +830,24 @@ class ContentEditor {
     var savingBar = new SavingBar();
     var jobId = savingBar.startJob();
     _inputSinceSave = false;
-    _currentContent.addContent(element.innerHtml).then((Revision rev) {
+    var l = element.queryAll("h2, h1, h3");
+
+    l.forEach((Element h){
+      h.id= "";
+    });
+
+    l.forEach((Element h){
+      var id = h.text.replaceAll(new RegExp(r"[^a-zA-Z0-9]+"),"_");
+      var base = id;
+      var i = 1;
+      while(query("#$id") != null){
+        id = "${base}_$i";
+        i++;
+      }
+      h.id = id;
+    });
+    var html = element.innerHtml;
+    _currentContent.addContent(html).then((Revision rev) {
       _saveCurrentHash();
       savingBar.endJob(jobId);
       _lastSavedRevision = rev;
