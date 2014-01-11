@@ -782,7 +782,7 @@
     outline: 0;
 }
 
-.image_edit_tool_bar  button:nth-last-child(-n+2){
+.image_edit_tool_bar  button:last-of-type{
     float: right;
 }
 
