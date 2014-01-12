@@ -8,7 +8,8 @@ class UserSettingsJSONPageOrder implements PageOrder {
 
   UserSettingsJSONPageOrder.initializeFromMenu(UListElement activePageList, UListElement inactivePageList) : _pageOrder = new JSONPageOrder.initializeFromLists( _listToPageOrder(activePageList), _listToPages(inactivePageList), (() {
     var v;
-    return (v = activePageList.query('li.current a.val')) == null ? ((v = inactivePageList.query('li.current a.val')) == null ? null : idFromAnchor(v)) : idFromAnchor(v);
+    return (v = activePageList.query('li.current')) == null ?
+          ((v = inactivePageList.query('li.current')) == null ? null : v.dataset["id"]) : v.dataset["id"];
   })());
 
   UserSettingsJSONPageOrder() : _pageOrder = new JSONPageOrder();
@@ -23,10 +24,9 @@ class UserSettingsJSONPageOrder implements PageOrder {
         return;
       }
       returnMap[parent] = l;
-      list.children.forEach((Element e) {
-        var a;
-        if ((a = e.query('a.val')) != null) {
-          recursiveMapBuilder(e.query('ul'), idFromAnchor(a));
+      list.children.forEach((LIElement e) {
+        if (e.dataset.containsKey("id")) {
+          recursiveMapBuilder(e.query('ul'), e.dataset["id"]);
         }
       });
     };
@@ -39,12 +39,11 @@ class UserSettingsJSONPageOrder implements PageOrder {
     var lis = list.children.where((Element e) => !e.classes.contains('emptyListInfo'));
     var returnList = <Page>[];
     lis.forEach((LIElement li) {
-      var a = li.query('a.val'), templateElement = li.query('.template'), aliasElement = li.query('.alias');
-      var id = idFromAnchor(a);
-      var title = a.text.trim();
-      var template = templateElement.text.trim();
-      var alias = aliasElement.text.trim();
-      var hidden = li.classes.contains('ishidden');
+      var id = li.dataset["id"];
+      var title = li.dataset["title"];
+      var template = li.dataset["template"];
+      var alias = li.dataset["alias"];
+      var hidden = li.dataset["hidden"] == "true";
       var page = new JSONPage(id, title, template, alias, hidden, new AJAXJSONClient());
 
       returnList.add(page);

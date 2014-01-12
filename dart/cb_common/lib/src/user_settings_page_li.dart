@@ -87,14 +87,14 @@ class UserSettingsPageLi {
 
   bool _active;
 
-  Element _activate, _hide, _delete, _template, _alias, _subPagesButton;
+  Element _activate, _hide, _delete, _subPagesButton;
 
 
   AnchorElement _anchor;
 
 
   factory UserSettingsPageLi(LIElement li){
-    var id = idFromAnchor(li.query('a.val'));
+    var id = li.dataset["id"];
     var pageOrder = new UserSettingsJSONPageOrder();
     return _resolveInstance(id, () => new UserSettingsPageLi._internal(li, pageOrder, pageOrder.pages[id]));
   }
@@ -136,8 +136,8 @@ class UserSettingsPageLi {
     _activate = _returnNewDivIfNecessary(li.query('.activate'), ['link', 'activate'], true, title:_pageOrder.isActive(page.id) ? 'Deaktiver' : 'Aktiver');
     _hide = _returnNewDivIfNecessary(li.query('.showhide'), ['link', 'showhide'], _active, title:page.hidden ? "Vis" : "Skjul");
     _subPagesButton = _returnNewDivIfNecessary(li.query('.subpages.link'), ['link', 'subpages'], _active, title:'Undersider');
-    _template = _returnNewDivIfNecessary(li.query('.template'), ['template', 'hidden'], true, text:page.template);
-    _alias = _returnNewDivIfNecessary(li.query('.alias'), ['alias', 'hidden'], true, text:page.alias);
+
+    updateInfo();
 
     _setUpListeners();
   }
@@ -206,8 +206,12 @@ class UserSettingsPageLi {
 
   void updateInfo() {
     _anchor.href = _pageListAsAddressString();
-    _template.text = page.template;
-    _alias.text = page.alias;
+    li.dataset["template"] = page.template;
+    li.dataset["alias"]= page.alias;
+    li.dataset['hidden'] = page.hidden?"true":"false";
+    li.dataset['title'] = page.title;
+    li.dataset['id'] = page.id;
+
     _anchor.text = page.title;
     if (page.hidden) {
       _hide.title = "Vis";
@@ -242,9 +246,7 @@ class UserSettingsPageLi {
     _active = a;
   }
 
-  Element _returnNewDivIfNecessary(Element element, List<String> classes, bool add, {
-  String title:"", String text:"&nbsp;"
-  }) {
+  Element _returnNewDivIfNecessary(Element element, List<String> classes, bool add, {String title:"", String text:"&nbsp;"}) {
     if (element == null) {
       element = new DivElement();
       classes.forEach((String c) {

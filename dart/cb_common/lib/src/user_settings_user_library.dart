@@ -1,6 +1,5 @@
 part of user_settings;
 
-String _valToMail(AnchorElement val) => val.href.substring(val.href.lastIndexOf(":") + 1);
 
 
 class UserSettingsJSONUserLibrary implements UserLibrary {
@@ -14,15 +13,27 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
     var users = <User>[], currentUser = "";
 
     lis.forEach((LIElement li) {
-      var parentElement = li.query('.parent'), aElement = li.query('.val'), privileges = li.query('.privileges'), pages = li.query('.pages');
+      var aElement = li.query('.val'), privileges = li.query('.privileges');
       var username, mail, parent, t;
-      parent = (t = parentElement.text.trim()).length == 0 ? null : t;
-      username = aElement.text.trim();
-      mail = _valToMail(aElement);
+      parent = li.dataset["parent"];
+      username = li.dataset["username"];
+      mail = li.dataset["mail"];
       var client = new AJAXJSONClient();
-      var privilege = new RegExp('root', caseSensitive:false).hasMatch(privileges.text) ? User.PRIVILEGE_ROOT : (new RegExp('website', caseSensitive:false).hasMatch(privileges.text) ? User.PRIVILEGE_SITE : User.PRIVILEGE_PAGE);
+      var p = li.dataset["privileges"], privilege;
+      switch(p){
+        case "root":
+        privilege = User.PRIVILEGE_ROOT;
+      break;
+        case "site":
+        privilege = User.PRIVILEGE_SITE;
+      break;
+        default:
+        privilege = User.PRIVILEGE_PAGE;
+      break;
+      }
 
-      var pageStringList = privilege == User.PRIVILEGE_PAGE && pages != null ? pages.text.trim().split(" ") : [];
+      var pagesString = li.dataset["pages"];
+      var pageStringList = privilege == User.PRIVILEGE_PAGE && pagesString != null? pagesString.trim().split(" ") : [];
       var pageList = pageStringList.map((String id) => pageOrder.pages[id]).toList();
       var user = new JSONUser(username, mail, parent, privilege, pageList, client);
       users.add(user);
@@ -41,7 +52,7 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
 
   void deleteUser(String username, [ChangeCallback callback = null]) => _userLibrary.deleteUser(username, callback);
 
-  void registerListener(UserLibraryChangeListener listener) => _userLibrary.registerListener(listener);
+  Stream<UserLibraryChangeEvent> get onChange => _userLibrary.onChange;
 
   Map<String, User> get users => _userLibrary.users;
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -9,7 +10,7 @@ class UserSettingsEditUsersPageElementImpl extends PageElementImpl
 {
     private $container;
     private $userLibrary;
-    /** @var null|\User  */
+    /** @var null|\User */
     private $currentUser;
     private $currentUserPrivileges;
     private $pageOrder;
@@ -24,6 +25,24 @@ class UserSettingsEditUsersPageElementImpl extends PageElementImpl
     }
 
 
+    private function userToLi(User $user)
+    {
+        $privileges = $user->getUserPrivileges();
+        $pages = "";
+        if (!$privileges->hasRootPrivileges() && !$privileges->hasSitePrivileges()) {
+            /** @var $page Page */
+            foreach ($this->pageOrder->listPages() as $page) {
+                $pages .= $privileges->hasPagePrivileges($page) ? $page->getID() . " " : "";
+            }
+        }
+        $current = $user->isLoggedIn()?"current" : "";
+        return "
+            <li class='$current' data-parent='{$user->getParent()}' data-mail='{$user->getMail()}' data-username='{$user->getUsername()}' data-privileges='{$this->userPrivilegeString($user, true)}' data-pages='$pages'>
+                <a href='mailto:{$user->getMail()}' class='val'>{$user->getUsername()}</a>, <span class='privileges'>({$this->userPrivilegeString($user)})</span>
+                <div class='delete link' title='Slet'>&nbsp;</div>
+            </li>";
+    }
+
     /**
      * This will return content from page element as a string.
      * The format can be xml, xhtml, html etc. but return type must be string
@@ -36,37 +55,14 @@ class UserSettingsEditUsersPageElementImpl extends PageElementImpl
         $output = "
         <h3>Brugere</h3>";
 
-        $mail = $this->currentUser->getMail();
-        $list = "
-        <li class='current'>
-            <a href='mailto:$mail' class='val'>{$this->currentUser->getUsername()}</a>, <span class='privileges'>({$this->userPrivilegeString($this->currentUser)})</span>
-            <span class='parent'>{$this->currentUser->getParent()}</span>
-        </li>
-        ";
+        $list = $this->userToLi($this->currentUser);
         $addUserForm = new HTMLFormElementImpl(HTMLFormElement::FORM_METHOD_POST);
         if ($this->evaluateAddUserForm($status, $message)) {
             $addUserForm->setNotion($message, $status);
         }
         foreach ($this->userLibrary->getChildren($this->currentUser) as $user) {
             /** @var $user User */
-            $privileges = $user->getUserPrivileges();
-            $pages = "";
-            if(!$privileges->hasRootPrivileges() && !$privileges->hasSitePrivileges()){
-                /** @var $page Page */
-                foreach($this->pageOrder->listPages() as $page){
-                    $pages .= $privileges->hasPagePrivileges($page)?$page->getID()." ":"";
-                }
-                $pages = "<span class='pages hidden'>{$pages}</span>";
-
-            }
-
-            $list .= "
-            <li>
-                <a href='mailto:{$user->getMail()}' class='val'>{$user->getUsername()}</a>, <span class='privileges'>({$this->userPrivilegeString($user)})</span>
-                <span class='parent hidden'>{$user->getParent()}</span>
-                <div class='delete link' title='Slet'>&nbsp;</div>
-                $pages
-            </li>";
+            $list .= $this->userToLi($user);
         }
 
         $output .= "
@@ -75,7 +71,7 @@ class UserSettingsEditUsersPageElementImpl extends PageElementImpl
         </ul>
         ";
 
-        if($this->currentUserPrivileges->hasRootPrivileges() || $this->currentUserPrivileges->hasSitePrivileges()){
+        if ($this->currentUserPrivileges->hasRootPrivileges() || $this->currentUserPrivileges->hasSitePrivileges()) {
             $output .= "
             <h3>Tilføj bruger</h3>";
             $addUserForm->setAttributes("id", "EditUsersAddUserForm");
@@ -85,7 +81,7 @@ class UserSettingsEditUsersPageElementImpl extends PageElementImpl
             /** @var $select HTMLSelectElement */
             $select->insertOption("Side", "page");
             $select->insertOption("Website", "site");
-            if($this->currentUserPrivileges->hasRootPrivileges()){
+            if ($this->currentUserPrivileges->hasRootPrivileges()) {
                 $select->insertOption("Root", "root");
             }
             $addUserForm->insertInputSubmit("Opret bruger");
@@ -172,10 +168,10 @@ class UserSettingsEditUsersPageElementImpl extends PageElementImpl
         return $root ? 3 : ($site ? 2 : 1);
     }
 
-    private function userPrivilegeString(User $user)
+    private function userPrivilegeString(User $user, $simple = false)
     {
         $privileges = $user->getUserPrivileges();
-        return ($privileges->hasRootPrivileges() ? "Root" : ($privileges->hasSitePrivileges() ? "Website" : "Side")) . " Administrator";
+        return ($privileges->hasRootPrivileges() ? ($simple ? "root" : "Root") : ($privileges->hasSitePrivileges() ? ($simple ? "site" : "Website") : ($simple ? "page" : "Side"))) . ($simple ? "" : " Administrator");
     }
 
 }

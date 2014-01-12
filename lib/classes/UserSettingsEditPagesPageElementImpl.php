@@ -54,11 +54,9 @@ class UserSettingsEditPagesPageElementImpl extends PageElementImpl
             /** @var $page Page */
             $current = $page->getID() == $this->currentPage->getID()?'current':'';
             $list .= "
-            <li class='$current'>
+            <li class='$current' {$this->pageDataSetGenerator($page)}>
                 <div class='padding'> &nbsp;</div>
                 <a href='/{$page->getID()}' class='val'>{$page->getTitle()}</a>
-                <span class='template hidden'>{$page->getTemplate()}</span>
-                <span class='alias hidden' hidden>{$page->getAlias()}</span>
                 <div class='link delete' title='Slet'> &nbsp; </div>
                 <div class='link activate' title='Aktiver'> &nbsp; </div>
             </li>
@@ -90,6 +88,11 @@ class UserSettingsEditPagesPageElementImpl extends PageElementImpl
         return $output;
     }
 
+    public function pageDataSetGenerator(Page $page)
+    {
+        $hidden = $page->isHidden()?"true":"false";
+        return "data-id='{$page->getId()}' data-template='{$page->getTemplate()}' data-alias='{$page->getAlias()}' data-title='{$page->getTitle()}' data-hidden='$hidden'";
+    }
 
     private function recursivePageListGenerator($parentPage= null, $attr="", $class = "",$path="/"){
         $list = "";
@@ -100,11 +103,9 @@ class UserSettingsEditPagesPageElementImpl extends PageElementImpl
             $current .= $page->isHidden()?" ishidden":"";
             $t = $page->isHidden()?"Vis":"Skjul";
             $list .= "
-            <li class='$current'>
+            <li class='$current' {$this->pageDataSetGenerator($page)}>
                 <div class='padding'> &nbsp;</div>
                 <a href='$path$pageId' class='val'>{$page->getTitle()}</a>
-                <span class='template hidden' hidden>{$page->getTemplate()}</span>
-                <span class='alias hidden' hidden>{$page->getAlias()}</span>
                 <div class='link delete' title='Slet'>&nbsp;</div>
                 <div class='link activate' title='Deaktiver'>&nbsp;</div>
                 <div class='link showhide' title='$t'> &nbsp;</div>
