@@ -6,13 +6,25 @@ const USER_LIBRARY_CHANGE_CREATE = 2;
 
 typedef void UserLibraryChangeListener(int changeType, User user);
 
+class UserLibraryChangeEvent{
+  static const CHANGE_DELETE = 1;
+  static const CHANGE_CREATE = 2;
+
+  final User user;
+  final int type;
+  UserLibraryChangeEvent(this.user, this.type);
+
+}
+
 abstract class UserLibrary {
 
   void createUser(String mail, String privileges, [ChangeCallback callback = null]);
 
   void deleteUser(String username, [ChangeCallback callback = null]);
 
-  void registerListener(UserLibraryChangeListener listener);
+
+  Stream<UserLibraryChangeEvent> get onChange;
+
 
   Map<String, User> get users;
 
@@ -30,8 +42,9 @@ class JSONUserLibrary extends UserLibrary {
   JSONClient _client;
   String _userLoggedInId;
   Map<String, User> _users = <String, User>{};
-  final List<UserLibraryChangeListener> _listeners = <UserLibraryChangeListener>[];
   bool _hasBeenSetUp = false;
+  Stream<UserLibraryChangeEvent> _changeStream;
+  StreamController<UserLibraryChangeEvent> _changeController = new StreamController<UserLibraryChangeEvent>();
 
   static JSONUserLibrary _cache;
 
@@ -53,8 +66,7 @@ class JSONUserLibrary extends UserLibrary {
 
   static JSONUserLibrary _retrieveInstance(PageOrder pageOrder) => _cache == null?_cache = new JSONUserLibrary._internal(pageOrder):_cache;
 
-  void _setUpFromLists(List<User> users,
-                       String current_username) {
+  void _setUpFromLists(List<User> users, String current_username) {
     if (_hasBeenSetUp) {
       return;
     }
@@ -103,7 +115,7 @@ class JSONUserLibrary extends UserLibrary {
 
 
   void _addUserListener(User user){
-    user.registerListener((User u){
+    user.onChange.listen((User u){
       if(_users.containsKey(u.username)){
         return;
       }
@@ -128,7 +140,7 @@ class JSONUserLibrary extends UserLibrary {
       if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
         var o = response.payload;
         var username = _addUserFromObjectToUsers(o, []);
-        _callListeners(USER_LIBRARY_CHANGE_CREATE, _users[username]);
+        _callListeners(UserLibraryChangeEvent.CHANGE_CREATE, _users[username]);
       }
       if (callback != null) {
         callback(response.type, response.error_code);
@@ -155,15 +167,11 @@ class JSONUserLibrary extends UserLibrary {
 
   }
 
-
-  void registerListener(UserLibraryChangeListener listener) {
-    _listeners.add(listener);
-  }
+  Stream<UserLibraryChangeEvent> get onChange => _changeStream == null?_changeStream = _changeController.stream.asBroadcastStream():_changeStream;
 
   void _callListeners(int changeType, User user) {
-    _listeners.forEach((UserLibraryChangeListener listener) {
-      listener(changeType, user);
-    });
+    _changeController.add(new UserLibraryChangeEvent(user, changeType));
+
   }
 
   Map<String, User> get users => new Map.from(_users);
