@@ -1,7 +1,5 @@
 part of site_classes;
 
-typedef void UserInfoChangeListener(User user);
-
 abstract class User {
 
   static const PRIVILEGE_ROOT = 1;
@@ -33,7 +31,8 @@ abstract class User {
 
   bool canModifyPage(Page page);
 
-  void registerListener(UserInfoChangeListener listener);
+
+  Stream<User> get onChange;
 
 }
 
@@ -41,9 +40,10 @@ abstract class User {
 class JSONUser extends User {
   String _username, _mail, _parent;
 
-  final JSONClient _client;
+  StreamController<User> _changeController = new StreamController<User>();
+  Stream<User> _changeStream;
 
-  final List<UserInfoChangeListener> _listeners = [];
+  final JSONClient _client;
 
   int _privileges;
 
@@ -95,14 +95,10 @@ class JSONUser extends User {
     });
   }
 
-  void registerListener(UserInfoChangeListener listener) {
-    _listeners.add(listener);
-  }
+  Stream<User> get onChange => _changeStream == null? _changeStream = _changeController.stream.asBroadcastStream():_changeStream;
 
   void _callListeners() {
-    _listeners.forEach((UserInfoChangeListener listener) {
-      listener(this);
-    });
+    _changeController.add(this);
   }
 
   int get privileges => _privileges;

@@ -705,6 +705,70 @@ class ContentEditor {
       save();
     });
 
+    element.onKeyDown.listen((KeyboardEvent kev){
+
+
+      if(kev.keyCode != 32){
+        return;
+      }
+      var selection = window.getSelection();
+      if(selection.rangeCount == 0){
+        return;
+      }
+      var range = selection.getRangeAt(0);
+      var endOffset = range.startOffset, startOffset = range.endOffset;
+      if(endOffset != startOffset){
+        return;
+      }
+      var parentNode = range.commonAncestorContainer;
+
+      var q = parentNode.parent;
+      while(q != null){
+        if(q is AnchorElement){
+          return;
+        }
+        q = q.parent;
+      }
+
+      var regex = new RegExp(r"\s([^\s]+)$");
+      var value = parentNode.nodeValue;
+      if(value == null){
+        return;
+      }
+
+      var match = regex.firstMatch(" "+ value.substring(0,startOffset));
+
+      if(match == null){
+        return;
+      }
+
+      var m = match.group(1);
+
+      if(m.trim() != m){
+        return;
+      }
+      m = m.trim();
+
+      if(!validUrl(m) && !validMail(m)){
+        return;
+      }
+
+      var start = startOffset - m.length;
+      var t1 = new Text(value.substring(0,start)), t2 = new Text(" "+value.substring(startOffset));
+      var p = parentNode.parent;
+      p.insertBefore(t1, parentNode);
+      var anchor = new AnchorElement();
+      anchor.text = m;
+      anchor.href = (validMail(m)?"mailto:":"") + m;
+      p.insertBefore(anchor, parentNode);
+      p.insertBefore(t2, parentNode);
+      kev.preventDefault();
+      parentNode.remove();
+      selection.setPosition(t2,1);
+
+
+    });
+
     _contentWrapper.append(_wrapper);
     _wrapper.style.height = "0";
     _wrapper.append(_topBar == null ? _topBar = _generateToolBar() : _topBar);
@@ -766,7 +830,24 @@ class ContentEditor {
     var savingBar = new SavingBar();
     var jobId = savingBar.startJob();
     _inputSinceSave = false;
-    _currentContent.addContent(element.innerHtml).then((Revision rev) {
+    var l = element.queryAll("h2, h1, h3");
+
+    l.forEach((Element h){
+      h.id= "";
+    });
+
+    l.forEach((Element h){
+      var id = h.text.replaceAll(new RegExp(r"[^a-zA-Z0-9]+"),"_");
+      var base = id;
+      var i = 1;
+      while(query("#$id") != null){
+        id = "${base}_$i";
+        i++;
+      }
+      h.id = id;
+    });
+    var html = element.innerHtml;
+    _currentContent.addContent(html).then((Revision rev) {
       _saveCurrentHash();
       savingBar.endJob(jobId);
       _lastSavedRevision = rev;

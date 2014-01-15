@@ -169,7 +169,7 @@ class UserSettingsInitializer extends Initializer {
 /* SET UP LOGIN USER MESSAGE*/
     var loginUserMessage = query('#LoginUserMessage');
     var i = loginUserMessage.query('i');
-    userLibrary.userLoggedIn.registerListener((User u) {
+    userLibrary.userLoggedIn.onChange.listen((User u) {
       i.text = u.username;
     });
 
@@ -257,7 +257,7 @@ class UserSettingsPageUserListFormInitializer extends Initializer {
       var delete = li.query('.delete');
       var username = val == null ? li.text : val.text;
       var user = _userLib.users[username];
-      user.registerListener((User u) {
+      user.onChange.listen((User u) {
         if (val == null) {
           li.text = u.username;
         } else {
@@ -291,8 +291,9 @@ class UserSettingsPageUserListFormInitializer extends Initializer {
       li.innerHtml = "<span class='val'>${user.username}</span><div class='delete link' title='Slet'>&nbsp;</div>";
       return li;
     };
-    _userLib.registerListener((int changeType, User user) {
-      if (changeType == USER_LIBRARY_CHANGE_CREATE) {
+    _userLib.onChange.listen((UserLibraryChangeEvent evt) {
+      var changeType = evt.type, user = evt.user;
+      if (changeType == UserLibraryChangeEvent.CHANGE_CREATE) {
         if (user.privileges != User.PRIVILEGE_PAGE) {
           var li = new LIElement();
           li.text = user.username;
@@ -396,20 +397,21 @@ class UserSettingsUserListInitializer extends Initializer {
   UserSettingsUserListInitializer(UserLibrary this._userLib);
 
   bool get canBeSetUp => _userList != null;
+  String _userPrivilegeString (User u, [bool simple=false]) => u.privileges == User.PRIVILEGE_ROOT ? (simple?"root":"Root") : (u.privileges == User.PRIVILEGE_SITE ? (simple?"site":"Website") : (simple?"page":"Side"));
 
   void setUp() {
     var bar = new SavingBar();
-    var userPrivilegeString = (User u) => u.privileges == User.PRIVILEGE_ROOT ? "Root" : (u.privileges == User.PRIVILEGE_SITE ? "Website" : "Side");
     var addListener = (LIElement li) {
-      var val = li.query('.val'), privileges = li.query('.privileges'), parent = li.query('.parent');
-      var username = val.text.trim();
-      _userLib.users[username].registerListener((User u) {
+      var val = li.query('.val'), privileges = li.query('.privileges');
+      var username = li.dataset['username'];
+      _userLib.users[username].onChange.listen((User u) {
         val.text = u.username;
         val.href = "mailto:${u.mail}";
-        var p = userPrivilegeString(u);
-        privileges.text = "(${p} Administrator)";
-        parent.text = u.parent == null ? "" : u.parent;
-
+        privileges.text = "(${_userPrivilegeString(u)} Administrator)";
+        li.dataset["username"] = u.username;
+        li.dataset["privileges"] = _userPrivilegeString(u,true);
+        li.dataset["mail"] = u.mail;
+        li.dataset["pages"] = u.pages.map((Page p)=>p.id).join(" ");
       });
       var delete = li.query('.delete');
       if (delete == null) {
@@ -428,10 +430,11 @@ class UserSettingsUserListInitializer extends Initializer {
     };
     var userLis = _userList.queryAll('li');
     userLis.forEach(addListener);
-    _userLib.registerListener((int changeType, User user) {
-      if (changeType == USER_LIBRARY_CHANGE_CREATE) {
+    _userLib.onChange.listen((UserLibraryChangeEvent evt) {
+      var changeType = evt.type, user = evt.user;
+      if (changeType == UserLibraryChangeEvent.CHANGE_CREATE) {
         var li = new LIElement();
-        var privilege = userPrivilegeString(user);
+        var privilege = _userPrivilegeString(user);
         var a = new AnchorElement();
         a..text = user.username..classes.add("val")..href = "mailto:${user.mail}";
         li.append(a);

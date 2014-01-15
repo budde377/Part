@@ -29,6 +29,7 @@ String sizeToString(int bytes) {
 }
 
 bool validMail(String string) => new RegExp(r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$', caseSensitive:false).hasMatch(string);
+bool validUrl(String string) => new RegExp(r"^http(s)?://[a-z\-0-9\.æøå]+\.[a-z]{2,3}(/[.]*)?", caseSensitive:false).hasMatch(string);
 
 bool nonEmpty(String string) => string.trim().length > 0;
 

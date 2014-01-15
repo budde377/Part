@@ -420,7 +420,7 @@ class ImageCropCanvasShape extends StrokeFillCanvasShape {
 
   CircleCanvasShape _dot1, _dot2, _dot3, _dot4;
 
-  int _width, _height, _cropX, _cropY, _cropW, _cropH;
+  int _width, _height, _cropX = 0, _cropY = 0 , _cropW = 0, _cropH = 0;
 
   num _cx, _cy, _cw, _ch;
 
