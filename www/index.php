@@ -14,10 +14,11 @@ session_start();
 require dirname(__FILE__)."/../AutoLoader.php";
 
 AutoLoader::registerAutoloader();
-AutoLoader::registerDirectory(dirname(__FILE__)."/../../common/lib");
+AutoLoader::registerDirectory(dirname(__FILE__)."/../lib");
+AutoLoader::registerDirectory(dirname(__FILE__)."/../../lib");
 // LOAD COMPOSER
 require dirname(__FILE__).'/../vendor/autoload.php';
-
+@require dirname(__FILE__).'/../../vendor/autoload.php';
 
 date_default_timezone_set("Europe/Copenhagen");
 /** @var $siteConfig SimpleXMLElement */
