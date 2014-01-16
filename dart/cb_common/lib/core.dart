@@ -29,7 +29,24 @@ String sizeToString(int bytes) {
 }
 
 bool validMail(String string) => new RegExp(r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$', caseSensitive:false).hasMatch(string);
+
 bool validUrl(String string) => new RegExp(r"^http(s)?://[a-z\-0-9\.æøå]+\.[a-z]{2,3}(/[.]*)?", caseSensitive:false).hasMatch(string);
+
+bool youtubeVideoIdFromUrl(String string) {
+  var firstMatch = new RegExp(r"^http(s)?:\/\/www.youtube.com\/watch\?v=([^&#]+)", caseSensitive:false).firstMatch(string);
+  if (firstMatch == null) {
+    return null;
+  }
+  return firstMatch[2];
+}
+
+bool vimeoVideoIdFromUrl(String string) {
+  var firstMatch = new RegExp(r"^http(s)?:\/\/vimeo.com/([^&#]+)", caseSensitive:false).firstMatch(string);
+  if (firstMatch == null) {
+    return null;
+  }
+  return firstMatch[2];
+}
 
 bool nonEmpty(String string) => string.trim().length > 0;
 
@@ -61,7 +78,7 @@ class ESCQueue {
 
 ESCQueue get escQueue => new ESCQueue();
 
-class BodySelectManager{
+class BodySelectManager {
   static final BodySelectManager _cache = new BodySelectManager._internal();
 
   factory BodySelectManager() => _cache;
@@ -70,15 +87,15 @@ class BodySelectManager{
 
   BodySelectManager._internal();
 
-  void enableSelect(){
+  void enableSelect() {
 
-    _count = Math.max(0, _count-1);
-    if(_count == 0){
+    _count = Math.max(0, _count - 1);
+    if (_count == 0) {
       body.classes.remove('no_select');
     }
   }
 
-  void disableSelect(){
+  void disableSelect() {
     _count++;
     body.classes.add("no_select");
   }
@@ -100,11 +117,11 @@ class NullTreeSanitizer implements NodeTreeSanitizer {
 NodeTreeSanitizer get nullNodeTreeSanitizer => new NullTreeSanitizer();
 
 
-class Position{
+class Position {
 
   num _x, _y, _z;
 
-  Position({num x, num y, num z}){
+  Position({num x, num y, num z}) {
     _x = x;
     _y = y;
     _z = z;
@@ -117,24 +134,26 @@ class Position{
 
   num get z => _z;
 
-  String toString(){
-    return {"x":_x, "y":_y, "z":_z}.toString();
+  String toString() {
+    return {
+        "x":_x, "y":_y, "z":_z
+    }.toString();
   }
 
 }
 
 
-class Debugger{
+class Debugger {
   static Debugger _instance;
 
   bool enabled = true;
 
-  factory Debugger() => _instance == null?_instance = new Debugger._internal():_instance;
+  factory Debugger() => _instance == null ? _instance = new Debugger._internal() : _instance;
 
   Debugger._internal();
 
-  void debug(Object o){
-    if(!enabled){
+  void debug(Object o) {
+    if (!enabled) {
       return;
     }
     print(o);
@@ -146,3 +165,6 @@ class Debugger{
 Debugger get debugger => new Debugger();
 
 void debug(Object o) => debugger.debug(o);
+
+
+final double GOLDEN_RATIO = ((Math.sqrt(5)+1)/2);

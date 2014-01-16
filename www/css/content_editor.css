@@ -169,7 +169,7 @@
     border-radius: 2px;
     padding: 0;
     height: 25px;
-    background: transparent url(/_common/img/text_edit.png) scroll no-repeat 1px 3px;
+    background: transparent url(/_common/img/text_edit2.png) scroll no-repeat 1px 3px;
     width: 27px;
     margin: 0;
     cursor: pointer;
@@ -205,207 +205,207 @@
 }
 
 .edit_content_wrapper .menu.text_menu > .bold, .drop_down_box > .submenu > li > .bold {
-    background-position: 1px -32px;
+    background-position: 1px -25px;
 }
 
 .edit_content_wrapper .menu.text_menu > .bold.active, .drop_down_box > .submenu > li > .bold.active {
-    background-position: -199px -32px;
+    background-position: -199px -25px;
 }
 
 .edit_content_wrapper .menu.text_menu > .bold:hover:not(.active), .drop_down_box > .submenu > li > .bold:hover:not(.active) {
-    background-position: -39px -32px;
+    background-position: -39px -25px;
 }
 
 .edit_content_wrapper .menu.text_menu > .insert_link, .drop_down_box > .submenu > li > .insert_link {
-    background-position: 1px -606px;
+    background-position: 1px -505px;
 }
 
 .edit_content_wrapper .menu.text_menu > .insert_link.active, .drop_down_box > .submenu > li > .insert_link.active {
-    background-position: -199px -606px;
+    background-position: -199px -505px;
 }
 
 .edit_content_wrapper .menu.text_menu > .insert_link:hover:not(.active), .drop_down_box > .submenu > li > .insert_link:hover:not(.active) {
-    background-position: -39px -606px;
+    background-position: -39px -505px;
 }
 
 .edit_content_wrapper .menu.text_menu > .superscript, .drop_down_box > .submenu > li > .superscript {
-    background-position: 1px -570px;
+    background-position: 1px -475px;
 }
 
 .edit_content_wrapper .menu.text_menu > .superscript.active, .drop_down_box > .submenu > li > .superscript.active {
-    background-position: -199px -570px;
+    background-position: -199px -475px;
 }
 
 .edit_content_wrapper .menu.text_menu > .superscript:hover:not(.active), .drop_down_box > .submenu > li > .superscript:hover:not(.active) {
-    background-position: -39px -570px;
+    background-position: -39px -475px;
 }
 
 .edit_content_wrapper .menu.text_menu > .subscript, .drop_down_box > .submenu > li > .subscript {
-    background-position: 1px -531px;
+    background-position: 1px -445px;
 }
 
 .edit_content_wrapper .menu.text_menu > .subscript.active, .drop_down_box > .submenu > li > .subscript.active {
-    background-position: -199px -531px;
+    background-position: -199px -445px;
 }
 
 .edit_content_wrapper .menu.text_menu > .subscript:hover:not(.active), .drop_down_box > .submenu > li > .subscript:hover:not(.active) {
-    background-position: -39px -531px;
+    background-position: -39px -445px;
 }
 
 .edit_content_wrapper .menu.text_menu > .strikethrough, .drop_down_box > .submenu > li > .strikethrough {
-    background-position: 1px -497px;
+    background-position: 1px -415px;
 }
 
 .edit_content_wrapper .menu.text_menu > .strikethrough.active, .drop_down_box > .submenu > li > .strikethrough.active {
-    background-position: -199px -497px;
+    background-position: -199px -415px;
 }
 
 .edit_content_wrapper .menu.text_menu > .strikethrough:hover:not(.active), .drop_down_box > .submenu > li > .strikethrough:hover:not(.active) {
-    background-position: -39px -497px;
+    background-position: -39px -415px;
 }
 
 .edit_content_wrapper .menu.text_menu > .italic, .drop_down_box > .submenu > li > .italic {
-    background-position: 1px -104px;
+    background-position: 1px -85px;
 }
 
 .edit_content_wrapper .menu.text_menu > .italic.active, .drop_down_box > .submenu > li > .italic.active {
-    background-position: -199px -104px;
+    background-position: -199px -85px;
 }
 
 .edit_content_wrapper .menu.text_menu > .italic:hover:not(.active), .drop_down_box > .submenu > li > .italic:hover:not(.active) {
-    background-position: -39px -104px;
+    background-position: -39px -85px;
 }
 
 .edit_content_wrapper .menu.text_menu > .underline, .drop_down_box > .submenu > li > .underline {
-    background-position: 1px -67px;
+    background-position: 1px -55px;
 }
 
 .edit_content_wrapper .menu.text_menu > .underline.active, .drop_down_box > .submenu > li > .underline.active {
-    background-position: -199px -67px;
+    background-position: -199px -55px;
 }
 
 .edit_content_wrapper .menu.text_menu > .underline:hover:not(.active), .drop_down_box > .submenu > li > .underline:hover:not(.active) {
-    background-position: -39px -67px;
+    background-position: -39px -55px;
 }
 
 .edit_content_wrapper .menu.text_menu > .color, .drop_down_box > .submenu > li > .color {
-    background-position: 1px -175px;
+    background-position: 1px -145px;
 }
 
 .edit_content_wrapper .menu.text_menu > .color.active, .drop_down_box > .submenu > li > .color.active {
-    background-position: -199px -175px;
+    background-position: -199px -145px;
 }
 
 .edit_content_wrapper .menu.text_menu > .color:hover:not(.active), .drop_down_box > .submenu > li > .color:hover:not(.active) {
-    background-position: -39px -175px;
+    background-position: -39px -145px;
 }
 
 .edit_content_wrapper .menu.text_menu > .o_list, .drop_down_box > .submenu > li > .o_list {
-    background-position: 1px -390px;
+    background-position: 1px -325px;
 }
 
 .edit_content_wrapper .menu.text_menu > .o_list.active, .drop_down_box > .submenu > li > .o_list.active {
-    background-position: -199px -390px;
+    background-position: -199px -325px;
 }
 
 .edit_content_wrapper .menu.text_menu > .o_list:hover:not(.active), .drop_down_box > .submenu > li > .o_list:hover:not(.active) {
-    background-position: -39px -390px;
+    background-position: -39px -325px;
 }
 
 .edit_content_wrapper .menu.text_menu > .u_list, .drop_down_box > .submenu > li > .u_list {
-    background-position: 1px -354px;
+    background-position: 1px -295px;
 }
 
 .edit_content_wrapper .menu.text_menu > .u_list.active, .drop_down_box > .submenu > li > .u_list.active {
-    background-position: -199px -354px;
+    background-position: -199px -295px;
 }
 
 .edit_content_wrapper .menu.text_menu > .u_list:hover:not(.active), .drop_down_box > .submenu > li > .u_list:hover:not(.active) {
-    background-position: -39px -354px;
+    background-position: -39px -295px;
 }
 
 .edit_content_wrapper .menu.text_menu > .a_left, .drop_down_box > .submenu > li > .a_left {
-    background-position: 1px -247px;
+    background-position: 1px -205px;
 }
 
 .edit_content_wrapper .menu.text_menu > .a_left.active, .drop_down_box > .submenu > li > .a_left.active {
-    background-position: -199px -247px;
+    background-position: -199px -205px;
 }
 
 .edit_content_wrapper .menu.text_menu > .a_left:hover:not(.active), .drop_down_box > .submenu > li > .a_left:hover:not(.active) {
-    background-position: -39px -247px;
+    background-position: -39px -205px;
 }
 
 .edit_content_wrapper .menu.text_menu > .a_center, .drop_down_box > .submenu > li > .a_center {
-    background-position: 1px -211px;
+    background-position: 1px -175px;
 }
 
 .edit_content_wrapper .menu.text_menu > .a_center.active, .drop_down_box > .submenu > li > .a_center.active {
-    background-position: -199px -211px;
+    background-position: -199px -175px;
 }
 
 .edit_content_wrapper .menu.text_menu > .a_center:hover:not(.active), .drop_down_box > .submenu > li > .a_center:hover:not(.active) {
-    background-position: -39px -211px;
+    background-position: -39px -175px;
 }
 
 .edit_content_wrapper .menu.text_menu > .a_right, .drop_down_box > .submenu > li > .a_right {
-    background-position: 1px -283px;
+    background-position: 1px -235px;
 }
 
 .edit_content_wrapper .menu.text_menu > .a_right.active, .drop_down_box > .submenu > li > .a_right.active {
-    background-position: -199px -283px;
+    background-position: -199px -235px;
 }
 
 .edit_content_wrapper .menu.text_menu > .a_right:hover:not(.active), .drop_down_box > .submenu > li > .a_right:hover:not(.active) {
-    background-position: -39px -283px;
+    background-position: -39px -235px;
 }
 
 .edit_content_wrapper .menu.text_menu > .a_just, .drop_down_box > .submenu > li > .a_just {
-    background-position: 1px -319px;
+    background-position: 1px -265px;
 }
 
 .edit_content_wrapper .menu.text_menu > .a_just.active, .drop_down_box > .submenu > li > .a_just.active {
-    background-position: -199px -319px;
+    background-position: -199px -265px;
 }
 
 .edit_content_wrapper .menu.text_menu > .a_just:hover:not(.active), .drop_down_box > .submenu > li > .a_just:hover:not(.active) {
-    background-position: -39px -319px;
+    background-position: -39px -265px;
 }
 
 .edit_content_wrapper .menu.text_menu > .p_indent, .drop_down_box > .submenu > li > .p_indent {
-    background-position: 1px -426px;
+    background-position: 1px -355px;
 }
 
 .edit_content_wrapper .menu.text_menu > .p_indent.active, .drop_down_box > .submenu > li > .p_indent.active {
-    background-position: -199px -426px;
+    background-position: -199px -355px;
 }
 
 .edit_content_wrapper .menu.text_menu > .p_indent:hover:not(.active), .drop_down_box > .submenu > li > .p_indent:hover:not(.active) {
-    background-position: -39px -426px;
+    background-position: -39px -355px;
 }
 
 .edit_content_wrapper .menu.text_menu > .m_indent, .drop_down_box > .submenu > li > .m_indent {
-    background-position: 1px -462px;
+    background-position: 1px -385px;
 }
 
 .edit_content_wrapper .menu.text_menu > .m_indent.active, .drop_down_box > .submenu > li > .m_indent.active {
-    background-position: -199px -462px;
+    background-position: -199px -385px;
 }
 
 .edit_content_wrapper .menu.text_menu > .m_indent:hover:not(.active), .drop_down_box > .submenu > li > .m_indent:hover:not(.active) {
-    background-position: -39px -462px;
+    background-position: -39px -385px;
 }
 
 .edit_content_wrapper .menu.text_menu > .no_format, .drop_down_box > .submenu > li > .no_format {
-    background-position: 1px -139px;
+    background-position: 1px -115px;
 }
 
 .edit_content_wrapper .menu.text_menu > .no_format.active, .drop_down_box > .submenu > li > .no_format.active {
-    background-position: -199px -139px;
+    background-position: -199px -115px;
 }
 
 .edit_content_wrapper .menu.text_menu > .no_format:hover:not(.active), .drop_down_box > .submenu > li > .no_format:hover:not(.active) {
-    background-position: -39px -139px;
+    background-position: -39px -115px;
 }
 
 .edit_content_wrapper .menu.text_menu > :not(.divider):not(.active):hover, .drop_down_box > .submenu > li > :not(.divider):not(.active):hover {
@@ -692,29 +692,47 @@
     margin: 0 10px 0 0;
     padding: 0;
     border: 0;
-    background: transparent url(/_common/img/text_edit.png?v=1234) scroll no-repeat 1px -642px;
+    background: transparent url(/_common/img/text_edit2.png) scroll no-repeat 1px -535px;
 }
 
 .edit_link_image_popup button:hover {
-    background: #d9d9d9 url(/_common/img/text_edit.png?v=1234) scroll no-repeat -39px -642px;
+    background: #d9d9d9 url(/_common/img/text_edit2.png) scroll no-repeat -39px -535px;
 
 }
 
 .edit_link_image_popup button.open {
-    background-position: 1px -711px;
+    background-position: 1px -595px;
 
 }
 
 .edit_link_image_popup button.open:hover {
-    background-position: -39px -711px;
+    background-position: -39px -595px;
 }
 
 .edit_link_image_popup button.edit_image {
-    background-position: 1px -675px;
+    background-position: 1px -565px;
 }
 
 .edit_link_image_popup button.edit_image:hover {
-    background-position: -39px -675px;
+    background-position: -39px -565px;
+}
+
+
+.edit_link_image_popup button.youtube {
+    background-position: 1px -625px;
+}
+
+.edit_link_image_popup button.youtube:hover {
+    background-position: -39px -625px;
+}
+
+
+.edit_link_image_popup button.vimeo {
+    background-position: 1px -655px;
+}
+
+.edit_link_image_popup button.vimeo:hover {
+    background-position: -39px -655px;
 }
 
 .edit_link_image_popup button:last-of-type {

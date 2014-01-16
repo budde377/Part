@@ -396,7 +396,11 @@ class LinkImageHandler {
 
   DivElement _boxElement = new DivElement();
 
-  ButtonElement _unlinkButton = new ButtonElement(), _openButton = new ButtonElement(), _editImageButton = new ButtonElement();
+  ButtonElement _unlinkButton = new ButtonElement(),
+                _openButton = new ButtonElement(),
+                _editImageButton = new ButtonElement(),
+                _youtubeButton = new ButtonElement(),
+                _vimeoButton = new ButtonElement();
 
   AnchorElement _foundLink;
 
@@ -420,6 +424,28 @@ class LinkImageHandler {
     _unlinkButton..classes.add('unlink')..onClick.listen((MouseEvent mev) {
       mev.preventDefault();
       _foundLink.insertAdjacentHtml("afterEnd", _foundLink.innerHtml);
+      _foundLink.remove();
+      _infoBox.remove();
+      editor.executor.triggerCommandStateChangeListener();
+    });
+
+    _youtubeButton..classes.add('youtube')..onClick.listen((MouseEvent mev) {
+      mev.preventDefault();
+      var id = youtubeVideoIdFromUrl(_foundLink.href);
+      var width  = element.clientWidth;
+      var height = (width/GOLDEN_RATIO).ceil();
+      _foundLink.insertAdjacentHtml("afterEnd", '<iframe width="$width" height="$height" src="//www.youtube.com/embed/$id?badge=0&amp;modestbranding=1&amp;controls=1&amp;autohide=1&amp;showinfo=0&amp;rel=0&amp;fs=0" frameborder="0" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe>');
+      _foundLink.remove();
+      _infoBox.remove();
+      editor.executor.triggerCommandStateChangeListener();
+    });
+
+    _vimeoButton..classes.add('vimeo')..onClick.listen((MouseEvent mev) {
+      mev.preventDefault();
+      var id = vimeoVideoIdFromUrl(_foundLink.href);
+      var width  = element.clientWidth;
+      var height = (width/GOLDEN_RATIO).ceil();
+      _foundLink.insertAdjacentHtml("afterEnd", '<iframe width="$width" height="$height" src="//player.vimeo.com/video/$id?badge=0&amp;modestbranding=1&amp;controls=1&amp;autohide=1&amp;showinfo=0&amp;rel=0&amp;fs=0" frameborder="0" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe>');
       _foundLink.remove();
       _infoBox.remove();
       editor.executor.triggerCommandStateChangeListener();
@@ -485,6 +511,12 @@ class LinkImageHandler {
 
     if (_foundLink != null) {
       _boxElement.append(_unlinkButton);
+      if(youtubeVideoIdFromUrl(_foundLink.href) != null){
+        _boxElement.append(_youtubeButton);
+      }
+      if(vimeoVideoIdFromUrl(_foundLink.href) != null){
+        _boxElement.append(_vimeoButton);
+      }
       _boxElement.append(_openButton);
     }
     _infoBox.showAboveCenterOfElement(_foundLink == null ? _foundImage : _foundLink);
