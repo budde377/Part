@@ -15,6 +15,9 @@ class AutoLoader {
      * Store the filename (sans extension) & full path of all ".php" files found
      */
     public static function registerDirectory($dirName) {
+        if(!file_exists($dirName)){
+            return;
+        }
         $di = new DirectoryIterator($dirName);
         foreach ($di as $file) {
             /** @var $file DirectoryIterator */
