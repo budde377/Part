@@ -433,7 +433,7 @@ class LinkImageHandler {
       mev.preventDefault();
       var id = youtubeVideoIdFromUrl(_foundLink.href);
       var width  = element.clientWidth;
-      var height = (width/GOLDEN_RATIO).ceil();
+      var height = (width*9/16).ceil();
       _foundLink.insertAdjacentHtml("afterEnd", '<iframe width="$width" height="$height" src="//www.youtube.com/embed/$id?badge=0&amp;modestbranding=1&amp;controls=1&amp;autohide=1&amp;showinfo=0&amp;rel=0&amp;fs=0" frameborder="0" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe>');
       _foundLink.remove();
       _infoBox.remove();
@@ -444,7 +444,7 @@ class LinkImageHandler {
       mev.preventDefault();
       var id = vimeoVideoIdFromUrl(_foundLink.href);
       var width  = element.clientWidth;
-      var height = (width/GOLDEN_RATIO).ceil();
+      var height = (width*9/16).ceil();
       _foundLink.insertAdjacentHtml("afterEnd", '<iframe width="$width" height="$height" src="//player.vimeo.com/video/$id?badge=0&amp;modestbranding=1&amp;controls=1&amp;autohide=1&amp;showinfo=0&amp;rel=0&amp;fs=0" frameborder="0" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe>');
       _foundLink.remove();
       _infoBox.remove();
