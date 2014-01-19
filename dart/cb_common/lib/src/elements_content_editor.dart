@@ -738,8 +738,6 @@ class ContentEditor {
     });
 
     element.onKeyDown.listen((KeyboardEvent kev){
-
-
       if(kev.keyCode != 32){
         return;
       }
@@ -792,6 +790,7 @@ class ContentEditor {
       var anchor = new AnchorElement();
       anchor.text = m;
       anchor.href = (validMail(m)?"mailto:":"") + m;
+      anchor.target = "_blank";
       p.insertBefore(anchor, parentNode);
       p.insertBefore(t2, parentNode);
       kev.preventDefault();
@@ -1326,8 +1325,26 @@ class ContentEditor {
         if (s.length <= 0 || s == "http://") {
           return;
         }
+        var r = ranges.first;
+        var commonAncestorContainer = r.commonAncestorContainer;
+        var parent = commonAncestorContainer;
+
+        while(parent != null && parent.nodeType != Node.ELEMENT_NODE){
+          parent = parent.parentNode;
+        }
+
+        var linksBefore = parent.queryAll("a");
+
         ranges.first.selectNode(element);
         executor.createLink(s);
+
+        var linksAfter = parent.queryAll("a");
+
+        linksAfter.forEach((AnchorElement a){
+          if(!linksBefore.contains(a)){
+            a.target = "_blank";
+          }
+        });
       });
     };
 
