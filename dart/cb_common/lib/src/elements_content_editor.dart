@@ -548,6 +548,8 @@ class ContentEditor {
 
   factory ContentEditor(Element element, Content content) => _cache.putIfAbsent(element, () => new ContentEditor._internal(element, content));
 
+  factory ContentEditor.getCached(Element elm) => _cache[elm];
+
   final Element element;
 
   final EditorCommandExecutor executor;
@@ -571,6 +573,10 @@ class ContentEditor {
   StreamController<bool> _onOpenChangeStreamController = new StreamController<bool>();
 
   Stream<bool> _onOpenChangeStream;
+
+  StreamController<Element> _onSaveStreamController = new StreamController<Element>();
+
+  Stream<Element> _onSaveStream;
 
 
   bool _inputSinceSave = false, _closed = true;
@@ -601,6 +607,8 @@ class ContentEditor {
   Stream<bool> get onChange => _onContentChangeStream == null ? _onContentChangeStream = _onContentChangeStreamController.stream.asBroadcastStream() : _onContentChangeStream;
 
   Stream<bool> get onOpenChange => _onOpenChangeStream == null ? _onOpenChangeStream = _onOpenChangeStreamController.stream.asBroadcastStream() : _onOpenChangeStream;
+
+  Stream<Element> get onSave => _onSaveStream == null? _onSaveStream = _onSaveStreamController.stream.asBroadcastStream() : _onSaveStream;
 
   bool get isOpen => !_closed;
 
@@ -858,6 +866,7 @@ class ContentEditor {
     if (!changed) {
       return;
     }
+
     var savingBar = new SavingBar();
     var jobId = savingBar.startJob();
     _inputSinceSave = false;
@@ -877,6 +886,7 @@ class ContentEditor {
       }
       h.id = id;
     });
+    _onSaveStreamController.add(element);
     var html = element.innerHtml;
     _currentContent.addContent(html).then((Revision rev) {
       _saveCurrentHash();

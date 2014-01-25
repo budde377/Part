@@ -32,3 +32,37 @@ int maxChildrenHeight(Element element) {
   element.children.forEach((Element elm) => largestSeen = Math.max(largestSeen, elm.offsetTop + elm.offsetHeight));
   return largestSeen;
 }
+
+
+class FloatingElementHandler{
+  static final Map<Element,FloatingElementHandler> _cache = new Map<Element, FloatingElementHandler>();
+  final Element element;
+  var _initPosition;
+
+  factory FloatingElementHandler(element) => _cache.putIfAbsent(element, ()=> new FloatingElementHandler._internal(element));
+
+
+  FloatingElementHandler._internal(this.element){
+    window.onScroll.listen((_)=>_update());
+    window.onResize.listen((_)=>_update());
+  }
+
+
+  void _update(){
+
+    if(element.offsetHeight > window.innerHeight){
+      element.classes.remove("floating");
+      return;
+    }
+
+    _initPosition = element.parent.documentOffset.y;
+
+    var position = window.scrollY-_initPosition;
+    if(position < 0){
+      element.classes.remove("floating");
+      return;
+    }
+    element.classes.add("floating");
+  }
+
+}
