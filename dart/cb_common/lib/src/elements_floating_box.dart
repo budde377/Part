@@ -154,6 +154,7 @@ abstract class FloatingBox{
 
 
 
+
   Stream<Event> get onRemove => _removeController.stream;
 
 

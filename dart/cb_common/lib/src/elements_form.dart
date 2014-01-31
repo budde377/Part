@@ -13,16 +13,7 @@ class FormHandler {
 
   static final Map<FormElement, FormHandler> _cache = new Map<FormElement, FormHandler>();
 
-  factory FormHandler(FormElement form){
-    if (_cache.containsKey(form)) {
-      return _cache[form];
-    }
-    var betterForm = new FormHandler._internal(form);
-    _cache[form] = betterForm;
-    return betterForm;
-
-
-  }
+  factory FormHandler(FormElement form) => _cache.putIfAbsent(form, ()=>new FormHandler._internal(form));
 
   FormHandler._internal(FormElement form):this.form = form{
     filter.classes.add('filter');
@@ -112,33 +103,129 @@ class FormHandler {
 
 
 class Validator<E extends Element> {
-  final E _element;
+  final E element;
   String errorMessage = "";
   static final Map<Element, Validator> _cache = new Map<Element, Validator>();
   Function _validator = (e){return true;};
 
+  factory Validator(E element) => _cache.putIfAbsent(element, ()=> new Validator._internal(element));
 
+  Validator._internal(this.element){
+    if(element.dataset.containsKey("error-message")){
+      errorMessage = element.dataset["error-message"];
+    }
 
-  factory Validator(E element){
-    if (_cache.containsKey(element)) {
-      return _cache[element];
-    } else {
-      var elem = new Validator._internal(element);
-      _cache[element] = elem;
-      return elem;
+    if(!element.dataset.containsKey("validator-method") || !(element is InputElement || element is SelectElement || element is TextAreaElement)){
+      return;
+    }
+    switch(element.dataset["validator-method"]){
+      case "pattern":
+        if(!element.dataset.containsKey("pattern")){
+          break;
+        }
+        var regexp = new RegExp(element.dataset["pattern"]);
+        _validator = (InputElement elm) => regexp.hasMatch(elm.value);
+    break;
+      case "mail":
+        _validator = (InputElement elm) => validMail(elm.value);
+    break;
+      case "url":
+        _validator = (InputElement elm) => validUrl(elm.value);
+    break;
+      case "non-empty":
+        _validator = (InputElement elm) => nonEmpty(elm.value);
+    break;
     }
 
   }
 
-  Validator._internal(this._element);
-
-  Element get element => _element;
-
-  bool get valid =>_validator(_element);
+  bool get valid =>_validator(element);
 
   void set validator(bool f(E element)) {
     _validator = f;
   }
+}
+
+
+class FormValidator{
+  static final Map<FormElement, FormValidator> _cache = new Map<FormElement, FormValidator>();
+
+  Map<Element, InfoBox> _elementToInfoMap = new Map<Element, InfoBox>();
+
+  final FormElement element;
+
+  EventListener _eventListener = (_){};
+
+  factory FormValidator(FormElement element) => _cache.putIfAbsent(element, ()=>new FormValidator._internal(element));
+
+  FormValidator._internal(this.element){
+    validators.forEach((Validator v){
+      v.element.onInput.listen((_){
+        if(v.valid){
+          _validElement(v);
+        } else {
+          _invalidElement(v);
+        }
+
+        if(_candidates.every((Element elm)=>elm.classes.contains("valid"))){
+          element.classes.add("valid");
+        } else {
+          element.classes.remove("valid");
+        }
+      });
+    });
+    element.addEventListener("focus", (Event evt)=>_eventListener(evt), true);
+  }
+
+  void _validElement(Validator v) {
+    if(v.element.classes.contains("valid")){
+      return;
+    }
+    v.element.classes.add("valid");
+    if(!_elementToInfoMap.containsKey(v.element)){
+      return;
+    }
+    _elementToInfoMap[v.element].remove();
+
+  }
+
+  void _invalidElement(Validator v) {
+    var valid = v.element.classes.contains("valid");
+    v.element.classes.remove("valid");
+    if(v.errorMessage.trim() == ""){
+      return;
+    }
+    if(!_elementToInfoMap.containsKey(v.element)){
+      InfoBox b = _elementToInfoMap[v.element] = new InfoBox(v.errorMessage);
+      b.backgroundColor = InfoBox.COLOR_RED;
+      b.removeOnESC = b.removeOnMouseDownOutsideOfBox = true;
+
+
+    }
+    InfoBox i = _elementToInfoMap[v.element];
+    i.infoHtml = v.errorMessage;
+    i.showAboveCenterOfElement(v.element);
+    _eventListener = (Event evt){
+      _elementToInfoMap.forEach((Element k, InfoBox i){
+        if(k == evt.target){
+          if(k.classes.contains("valid")){
+            return;
+          }
+          i.showAboveCenterOfElement(k);
+          return;
+        }
+        i.remove();
+      });
+    };
+
+  }
+
+  List<Validator> get validators => _candidates.map((Element elm) => new Validator(elm));
+
+  List<Element> get _candidates => element.queryAll("input:not([type=submit]), textarea, select");
+
+  bool get valid => element.classes.contains("valid");
+
 }
 
 class ValidatingForm {
