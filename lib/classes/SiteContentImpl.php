@@ -131,4 +131,12 @@ class SiteContentImpl implements Content{
         return $found ? $e : null;
 
     }
+
+    /**
+     * @return String the latest content
+     */
+    public function __toString()
+    {
+        return ($c = $this->latestContent()) == null?"": $c;
+    }
 }

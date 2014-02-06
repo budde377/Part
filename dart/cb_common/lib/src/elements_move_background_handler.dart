@@ -71,11 +71,11 @@ class MoveBackgroundHandler {
             break;
           case MOVE_BACKGROUND_Y:
             var currentX = computedStyle.backgroundPositionX;
-            var currentY = int.parse(computedStyle.backgroundPositionY.replaceAll("px",""));
+            var currentY = int.parse(computedStyle.backgroundPositionY.replaceAll("px","").replaceAll("%",""));
             element.style.backgroundPosition = background.style.backgroundPosition = "${currentX} ${currentY + y}px";
             break;
           case MOVE_BACKGROUND_X:
-            var currentX = int.parse(computedStyle.backgroundPositionX.replaceAll("px",""));
+            var currentX = int.parse(computedStyle.backgroundPositionX.replaceAll("px","").replaceAll("%",""));
             var currentY = computedStyle.backgroundPositionY;
             element.style.backgroundPosition = background.style.backgroundPosition = "${currentX+x}px ${currentY}";
 

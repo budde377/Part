@@ -66,4 +66,13 @@ class StubContentImpl implements Content{
         }
         return $content;
     }
+
+    /**
+     * @return String the latest content
+     */
+    public function __toString()
+    {
+        return ($c = $this->latestContent()) == null?"": $c;
+
+    }
 }

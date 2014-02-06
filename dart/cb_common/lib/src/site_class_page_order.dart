@@ -45,6 +45,8 @@ abstract class PageOrder {
 
   void deletePage(String id, [ChangeCallback callback = null]);
 
+  Page operator [](String id);
+
 }
 
 class JSONPageOrder extends PageOrder {
@@ -315,5 +317,8 @@ class JSONPageOrder extends PageOrder {
   bool pageExists(String page_id) => _pages[page_id] != null;
 
   Stream<PageOrderChange> get onUpdate => _stream == null? _stream = _streamController.stream.asBroadcastStream():_stream;
+
+  Page operator [](String id) => pages[id];
+
 
 }
