@@ -20,7 +20,7 @@ class ChangeableList {
     var target = ev.target;
 
     if(!(target is Element)){
-      return;
+      return null;
     }
 
     while(!(target is LIElement) && target != null){
@@ -28,7 +28,7 @@ class ChangeableList {
     }
 
     if(!list.children.contains(target)){
-      return;
+      return null;
     }
     return target;
   }
