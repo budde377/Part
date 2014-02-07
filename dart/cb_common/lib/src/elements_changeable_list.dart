@@ -16,6 +16,23 @@ class ChangeableList {
     _setUp();
   }
 
+  LIElement _getTargetFromEvent(Event ev){
+    var target = ev.target;
+
+    if(!(target is Element)){
+      return;
+    }
+
+    while(!(target is LIElement) && target != null){
+      target = target.parent;
+    }
+
+    if(!list.children.contains(target)){
+      return;
+    }
+    return target;
+  }
+
   void _setUp(){
     list.queryAll("li").forEach((LIElement li){
       li.draggable = true;
@@ -23,10 +40,11 @@ class ChangeableList {
 
 
     list.onDragStart.listen((MouseEvent ev){
-      var target = ev.target;
-      if(!list.children.contains(target) || !(target is LIElement)){
+      var target = _getTargetFromEvent(ev);
+      if(target == null){
         return;
       }
+
       LIElement li = target;
       ev.dataTransfer..setData("Text", li.hashCode.toString())
                      ..effectAllowed = "move";
@@ -37,10 +55,11 @@ class ChangeableList {
     });
 
     list.onDragEnd.listen((MouseEvent ev){
-      var target = ev.target;
-      if(!list.children.contains(target) || !(target is LIElement)){
+      var target = _getTargetFromEvent(ev);
+      if(target == null){
         return;
       }
+
       LIElement li = target;
       _dragging_li = null;
       li.classes.remove("dragging");
@@ -48,8 +67,8 @@ class ChangeableList {
     });
 
     list.onDragOver.listen((MouseEvent ev){
-      var target = ev.target;
-      if(!list.children.contains(target) || !(target is LIElement)){
+      var target = _getTargetFromEvent(ev);
+      if(target == null){
         return;
       }
 
@@ -71,13 +90,11 @@ class ChangeableList {
 
 
     list.onDrop.listen((MouseEvent ev){
-      var target = ev.target;
-
-      if(!list.children.contains(target) || !(target is LIElement) || _currently_expanded == null){
+      var li = _getTargetFromEvent(ev);
+      if(li == null ||  _currently_expanded == null){
         return;
       }
 
-      LIElement li = target;
       if(li == _dragging_li || _dragging_li.nextElementSibling == li || _dragging_li.previousElementSibling == li){
         return;
       }
