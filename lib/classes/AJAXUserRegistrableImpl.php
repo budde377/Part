@@ -62,7 +62,7 @@ class AJAXUserRegistrableImpl implements Registrable{
                     return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_USER_NAME);
                 }
                 if (!$this->currentUser->isValidMail($mail)) {
-                    return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_USER_MAIL);
+                    return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_MAIL);
                 }
                 $this->currentUser->setUsername($newUsername);
                 $this->currentUser->setMail($mail);
@@ -102,7 +102,7 @@ class AJAXUserRegistrableImpl implements Registrable{
                     return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_PRIVILEGES);
                 }
                 if (!$this->currentUser->isValidMail($mail)) {
-                    return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_USER_MAIL);
+                    return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_MAIL);
                 }
                 $username = explode('@', $mail);
                 $username = $baseUsername = strtolower($username[0]);

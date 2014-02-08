@@ -126,7 +126,7 @@ String _errorMessage(int error_code) {
       return "Ugyldigt side alias";
     case JSONResponse.ERROR_CODE_UNAUTHORIZED:
       return "Du har ikke de nødvendige rettigheder";
-    case JSONResponse.ERROR_CODE_INVALID_USER_MAIL:
+    case JSONResponse.ERROR_CODE_INVALID_MAIL:
       return "Ugyldig mail-adresse";
     case JSONResponse.ERROR_CODE_INVALID_USER_NAME:
       return "Ugyldig brugernavn";

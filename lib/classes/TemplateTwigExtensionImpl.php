@@ -25,7 +25,9 @@ class TemplateTwigExtensionImpl extends  Twig_Extension{
         return array(new TemplatePageElementTwigTokenParserImpl(),
                      new TemplateInitPageElementTwigTokenParserImpl(),
                      new TemplatePageContentTwigTokenParserImpl(),
-                     new TemplateSiteContentTwigTokenParserImpl());
+                     new TemplateSiteContentTwigTokenParserImpl(),
+                     new TemplateSiteVariableTwigTokenParserImpl(),
+                     new TemplatePageVariableTwigTokenParserImpl());
     }
 
 

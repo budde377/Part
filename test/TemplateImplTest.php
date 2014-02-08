@@ -62,6 +62,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->backFactory->setConfigInstance($config);
         $this->backFactory->setUserLibraryInstance(new StubUserLibraryImpl());
         $this->site = new StubSiteImpl();
+        $this->site->setVariables(new StubVariablesImpl());
         $this->backFactory->setSiteInstance($this->site);
         $this->template = new TemplateImpl($nullPageElementFactory, $this->backFactory);
     }
@@ -379,6 +380,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->template->setTemplateFromString("{%page_content someElement %}");
         $this->assertEquals("", $this->template->render());
     }
+
     public function testTemplateWillSupportPageContentWithNoId(){
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%page_content asd%}");
@@ -432,6 +434,60 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->site->getContent("someid")->addContent("Hello World");
         $this->template->setTemplateFromString("{%site_content someid%}");
         $this->assertEquals("Hello World", $this->template->render());
+    }
+
+
+    public function testTemplateWillSupportPageVariables(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%page_variable someElement %}");
+        $this->assertEquals("", $this->template->render());
+    }
+
+    public function testTemplateWillSupportPageVariableWithNoId(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%page_variable asd %}");
+        $this->assertEquals("", $this->template->render());
+    }
+
+    public function testTemplateWillAddPageVariable(){
+        $this->setUpConfig();
+        $this->currentPage->getVariables()->setValue("asd", "Hello World");
+        $this->template->setTemplateFromString("{%page_variable asd%}");
+        $this->assertEquals("Hello World", $this->template->render());
+    }
+
+
+    public function testTemplateWillUpdatePageVariable(){
+        $this->setUpConfig();
+        $this->currentPage->getVariables()->setValue("foo", "Hello World");
+        $this->template->setTemplateFromString("{%page_variable foo%}");
+        $this->template->render();
+        $this->currentPage->getVariables()->setValue("foo", "Hello World2");
+        $this->assertEquals("Hello World2", $this->template->render());
+    }
+
+
+    public function testTemplateWillSupportSiteVariable(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%site_variable someElement %}");
+        $this->assertEquals("", $this->template->render());
+    }
+
+    public function testTemplateWillAddSiteVariable(){
+        $this->setUpConfig();
+        $this->site->getVariables()->setValue("foo", "Hello World");
+        $this->template->setTemplateFromString("{%site_variable foo%}");
+        $this->assertEquals("Hello World", $this->template->render());
+    }
+
+
+    public function testTemplateWillUpdateSiteVariable(){
+        $this->setUpConfig();
+        $this->site->getVariables()->setValue("foo", "Hello World");
+        $this->template->setTemplateFromString("{%site_variable foo%}");
+        $this->template->render();
+        $this->site->getVariables()->setValue("foo", "Hello World2");
+        $this->assertEquals("Hello World2", $this->template->render());
     }
 
 

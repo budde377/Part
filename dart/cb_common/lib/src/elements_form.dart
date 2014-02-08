@@ -226,6 +226,8 @@ class FormValidator{
 
   bool get valid => element.classes.contains("valid");
 
+  FormHandler get formHandler => new FormHandler(element);
+
 }
 
 class ValidatingForm {

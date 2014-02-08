@@ -18,7 +18,7 @@ class JSONResponse {
   static const ERROR_CODE_INVALID_USER_NAME = 10;
   static const ERROR_CODE_USER_NOT_FOUND = 11;
   static const ERROR_CODE_INVALID_PRIVILEGES = 12;
-  static const ERROR_CODE_INVALID_USER_MAIL = 13;
+  static const ERROR_CODE_INVALID_MAIL = 13;
   static const ERROR_CODE_WRONG_PASSWORD = 14;
   static const ERROR_CODE_INVALID_PASSWORD = 15;
   static const ERROR_CODE_CANT_DELETE_CURRENT_PAGE = 16;

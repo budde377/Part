@@ -16,6 +16,7 @@ class StubPageImpl implements Page
     private $hidden = false;
     private $lastModified = -1;
     private $pageContent  = array();
+    private $variables ;
 
 
     /**
@@ -222,6 +223,6 @@ class StubPageImpl implements Page
      */
     public function getVariables()
     {
-        return null;
+        return $this->variables == null?$this->variables = new StubVariablesImpl(): $this->variables;
     }
 }
