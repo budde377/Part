@@ -39,4 +39,10 @@ interface Content {
      */
     public function getContentAt($time);
 
+
+    /**
+     * @return String the latest content
+     */
+    public function __toString();
+
 }

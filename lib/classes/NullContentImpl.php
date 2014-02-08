@@ -53,4 +53,12 @@ class NullContentImpl implements Content{
     {
         return null;
     }
+
+    /**
+     * @return String the latest content
+     */
+    public function __toString()
+    {
+        return "";
+    }
 }

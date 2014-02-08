@@ -80,4 +80,6 @@ class UserSettingsJSONPageOrder implements PageOrder {
 
   void deletePage(String id, [ChangeCallback callback]) => _pageOrder.deletePage(id, callback);
 
+  Page operator [](String id) => _pageOrder[id];
+
 }
