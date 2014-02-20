@@ -112,7 +112,7 @@ class GitUpdaterImpl implements Updater{
     }
 
     private function listSubModules(){
-        exec("cd $this->path && grep path .gitmodules | sed 's/.*= //'", $modulesList);
+        exec("cd $this->path && grep -s path .gitmodules | sed 's/.*= //'", $modulesList);
         return $modulesList;
     }
 
