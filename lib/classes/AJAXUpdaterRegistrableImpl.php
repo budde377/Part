@@ -54,7 +54,8 @@ class AJAXUpdaterRegistrableImpl implements Registrable{
             $f->clean();
             
             //Making
-            exec("cd {$this->config->getRootPath()} && make update");
+            exec("cd {$this->config->getRootPath()} && make update", $out);
+            file_put_contents($this->config->getTmpFolderPath()."/".time().".log", print_r($out, true));
             if($version != $updater->getVersion()){
                 foreach($pageOrder->listPages() as $page){
                     /** @var $page Page */
