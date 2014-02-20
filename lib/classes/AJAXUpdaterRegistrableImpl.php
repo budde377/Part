@@ -60,6 +60,7 @@ class AJAXUpdaterRegistrableImpl implements Registrable{
                     /** @var $page Page */
                     $page->modify();
                 }
+                
             }
 
             return new JSONResponseImpl();
