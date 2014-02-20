@@ -31,8 +31,6 @@ class AJAXUpdaterRegistrableImpl implements Registrable{
             return null;
         }
 
-        $v = 1;
-
         if($this->currentUser==null || !$this->currentUser->getUserPrivileges()->hasSitePrivileges()){
             return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_UNAUTHORIZED);
         }
