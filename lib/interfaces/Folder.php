@@ -10,10 +10,16 @@ interface Folder extends Iterator
 
     const DELETE_FOLDER_RECURSIVE = 1;
     const DELETE_FOLDER_NOT_RECURSIVE = 0;
+
+    const LIST_FOLDER_ALL = 0;
+    const LIST_FOLDER_FILES = 1;
+    const LIST_FOLDER_FOLDERS = 2;
+
     /**
+     * @param int $listType
      * @return array | bool Will return an array containing Folders and Files or FALSE on failure
      */
-    public function listFolder();
+    public function listFolder($listType = Folder::LIST_FOLDER_ALL);
 
     /**
      * @param int $mode Sets the mode, if recursive non empty folders can be deleted
@@ -87,5 +93,5 @@ interface Folder extends Iterator
      * @return null | File Return new file in folder on success and Null on failure
      */
 
-//    public function putFile(File $file, $newName = null);
+    public function putFile(File $file, $newName = null);
 }

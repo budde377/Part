@@ -80,17 +80,18 @@ class ConnectionFolderImpl implements Folder
     }
 
     /**
+     * @param int $listType
      * @return array | bool Will return an array containing Folders and Files or FALSE on failure
      */
-    public function listFolder()
+    public function listFolder($listType = Folder::LIST_FOLDER_ALL)
     {
         if ($this->connection->isDirectory($this->path)) {
             $res = array();
             foreach ($this->connection->listDirectory($this->path) as $element) {
                 $path = $this->relativeToAbsolute($this->path . '/' . $element);
-                if ($this->connection->isDirectory($path)) {
+                if ($this->connection->isDirectory($path) && $listType != Folder::LIST_FOLDER_FILES) {
                     $res[] = new ConnectionFolderImpl($path, $this->connection);
-                } else if ($this->connection->isFile($path)) {
+                } else if ($this->connection->isFile($path)  && $listType != Folder::LIST_FOLDER_FOLDERS) {
                     $res[] = new ConnectionFileImpl($path, $this->connection);
                 }
 

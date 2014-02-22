@@ -14,7 +14,10 @@ AutoLoader::registerAutoloader();
 AutoLoader::registerDirectory(dirname(__FILE__)."/../lib");
 AutoLoader::registerDirectory(dirname(__FILE__)."/");
 
-require dirname(__FILE__) . "/../vendor/autoload.php";
+$f = dirname(__FILE__) . "/../vendor/autoload.php";
+if(file_exists($f)){
+    require $f;
+}
 
 
 

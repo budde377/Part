@@ -230,8 +230,22 @@ class ConnectionFolderImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($fileB, 'File was not found');
         $this->assertTrue($folderB, 'Folder was not found');
 
+        $l = $this->folder->listFolder(Folder::LIST_FOLDER_FILES);
+        $this->assertGreaterThan(0, count($l));
+        foreach($l as $f){
+            $this->assertInstanceOf("File", $f);
+        }
+
+
+        $l = $this->folder->listFolder(Folder::LIST_FOLDER_FOLDERS);
+        $this->assertGreaterThan(0, count($l));
+        foreach($l as $f){
+            $this->assertInstanceOf("Folder", $f);
+        }
+
 
     }
+
 
     public function testDeleteWillReturnFalseIfNotExists()
     {

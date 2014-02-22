@@ -87,9 +87,10 @@ class FolderImpl implements Folder
     }
 
     /**
+     * @param int $listType
      * @return array | bool Will return an array containing Folders and Files or FALSE on failure
      */
-    public function listFolder()
+    public function listFolder($listType = Folder::LIST_FOLDER_ALL)
     {
         $dir = @scandir($this->folderPath);
         if ($dir === false) {
@@ -98,9 +99,9 @@ class FolderImpl implements Folder
         $resultArray = array();
         foreach ($dir as $e) {
             if ($e != '.' && $e != '..') {
-                if (is_dir($this->folderPath . '/' . $e)) {
+                if (is_dir($this->folderPath . '/' . $e) && $listType != Folder::LIST_FOLDER_FILES) {
                     $resultArray[] = new FolderImpl($this->folderPath . '/' . $e);
-                } else {
+                } else if ($listType != Folder::LIST_FOLDER_FOLDERS){
                     $resultArray[] = new FileImpl($this->folderPath . '/' . $e);
                 }
             }
@@ -286,5 +287,27 @@ class FolderImpl implements Folder
                 $f->delete();
             }
         }
+    }
+
+    /**
+     * Will put a folder to the folder (copy the folder into current folder)
+     * @param File $file
+     * @param null $newName The new name of the file, if Null then new file will preserve name
+     * @return null | File Return new file in folder on success and Null on failure
+     */
+    public function putFile(File $file, $newName = null)
+    {
+        if($file == null){
+            return null;
+        }
+        $name = $newName == null?$file->getBaseName():$newName;
+
+        if(($f = $file->copy($this->folderPath."/".$name)) == null){
+            return null;
+        }
+
+
+        return $f;
+
     }
 }

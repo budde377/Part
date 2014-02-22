@@ -169,6 +169,13 @@ class StubUserImpl implements User
     }
 
     /**
+     * @param int $id
+     */
+    public function setId($id){
+        $this->id = $id;
+    }
+
+    /**
      * Will return TRUE if valid mail else FALSE
      * @param string $mail
      * @return bool
