@@ -11,9 +11,6 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
     /** @var  Folder */
     private $testDir;
 
-    /** @var  File */
-    private $testFile;
-
     private $testString = "testString";
 
     private $config;
@@ -114,6 +111,27 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
 
     }
 
+
+    public function testRemoveFromWhitelistWillReturnFalseIfNotInList(){
+        $f = $this->setupExistingFiles();
+        $this->assertFalse($this->lib->removeFromWhitelist($f));
+    }
+
+    public function testRemoveFromWhitelistWillRemove(){
+        $f = $this->setupExistingFiles();
+        $this->lib->addToWhitelist($f);
+        $this->assertTrue($this->lib->removeFromWhitelist($f));
+        $this->assertFalse($this->lib->whitelistContainsFile($f));
+    }
+
+    public function testRemoveFromWhitelistIsPersistent(){
+        $f = $this->setupExistingFiles();
+        $this->lib->addToWhitelist($f);
+        $this->lib->removeFromWhitelist($f);
+        $lib = new FileLibraryImpl($this->testDir);
+        $this->assertFalse($lib->whitelistContainsFile($f));
+    }
+
     public function createFile($name, $content){
         $f = new FileImpl($this->testDir->getAbsolutePath()."/".$name);
         $f->write($content);
@@ -122,6 +140,7 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
 
 
     public function tearDown(){
+        @unlink($this->testDir->getAbsolutePath()."/.whitelist");
         $this->testDir->delete(Folder::DELETE_FOLDER_RECURSIVE);
     }
 

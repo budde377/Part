@@ -86,19 +86,31 @@ class FileLibraryImpl implements FileLibrary{
             return false;
         }
 
-        $this->whiteList[] = $file->getRelativeFilePathTo($this->filesDir->getAbsolutePath());
+        $this->whiteList[] = $this->filePath($file);
         $this->writeWhitelist();
         return true;
     }
 
     /**
-     * Adds a file to the whitelist
+     * Remove a file from the whitelist
      * @param File $file
      * @return boolean TRUE on success else FALSE
      */
     public function removeFromWhitelist(File $file)
     {
-        // TODO: Implement removeFromWhitelist() method.
+        if(!$this->whitelistContainsFile($file)){
+            return false;
+        }
+
+        if(($key = array_search($this->filePath($file), $this->whiteList)) !== false) {
+            unset($this->whiteList[$key]);
+        }
+        $this->writeWhitelist();
+        return true;
+    }
+
+    private function filePath(File $file){
+        return $file->getRelativeFilePathTo($this->filesDir->getAbsolutePath());
     }
 
     /**
@@ -129,17 +141,15 @@ class FileLibraryImpl implements FileLibrary{
     }
 
     private function writeWhitelist(){
-        if($this->whitelistFile->exists()){
-            $this->whitelistFile->delete();
-        }
+        $this->whitelistFile->delete();
         $this->whitelistFile->setAccessMode(File::FILE_MODE_RW_POINTER_AT_END);
         foreach($this->whiteList as $path){
-            $this->whitelistFile->write("$path\n");
+            $this->whitelistFile->write($path."\n");
         }
 
     }
 
     private function loadWhitelist(){
-        $this->whiteList = explode("\n", $this->whitelistFile->getContents());
+        $this->whiteList = array_filter(explode("\n", $this->whitelistFile->getContents()));
     }
 }
