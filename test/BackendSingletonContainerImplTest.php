@@ -153,4 +153,11 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($ret1 === $ret2);
     }
 
+    public function testGetFileLibraryWillReturnSameInstance(){
+        $ret1 = $this->backContainer->getFileLibraryInstance();
+        $this->assertInstanceOf('FileLibrary',$ret1);
+        $ret2 =$this->backContainer->getFileLibraryInstance();
+        $this->assertTrue($ret1 === $ret2);
+    }
+
 }

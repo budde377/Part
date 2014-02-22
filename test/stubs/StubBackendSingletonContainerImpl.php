@@ -22,6 +22,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     private $cacheControlInstance;
     private $updater;
     private $siteInstance;
+    private $fileLibraryInstance;
 
     /**
      * @param mixed $CSSRegisterInstance
@@ -237,6 +238,24 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     public function setSiteInstance($siteInstance)
     {
         $this->siteInstance = $siteInstance;
+    }
+
+
+    /**
+     * Will create and reuse an instance of FileLibrary.
+     * @return FileLibrary
+     */
+    public function getFileLibraryInstance()
+    {
+        return $this->fileLibraryInstance;
+    }
+
+    /**
+     * @param mixed $fileLibraryInstance
+     */
+    public function setFileLibraryInstance($fileLibraryInstance)
+    {
+        $this->fileLibraryInstance = $fileLibraryInstance;
     }
 
 

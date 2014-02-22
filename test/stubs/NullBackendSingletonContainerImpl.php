@@ -132,4 +132,13 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
     {
         return null;
     }
+
+    /**
+     * Will create and reuse an instance of FileLibrary.
+     * @return FileLibrary
+     */
+    public function getFileLibraryInstance()
+    {
+        return null;
+    }
 }
