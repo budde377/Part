@@ -35,6 +35,8 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $updater;
     /** @var  Variables */
     private $site;
+    /** @var  FileLibrary */
+    private $fileLibrary;
 
     public function __construct(Config $config)
     {
@@ -194,5 +196,14 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getSiteInstance()
     {
         return $this->site == null? $this->site = new SiteImpl($this->getDBInstance()):$this->site;
+    }
+
+    /**
+     * Will create and reuse an instance of FileLibrary.
+     * @return FileLibrary
+     */
+    public function getFileLibraryInstance()
+    {
+        return $this->fileLibrary == null? $this->fileLibrary = new FileLibraryImpl(new FolderImpl($this->getConfigInstance()->getRootPath()."/files/")):$this->fileLibrary;
     }
 }

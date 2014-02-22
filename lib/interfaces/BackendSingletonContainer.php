@@ -102,6 +102,10 @@ interface BackendSingletonContainer
     public function getSiteInstance();
 
 
-
+    /**
+     * Will create and reuse an instance of FileLibrary.
+     * @return FileLibrary
+     */
+    public function getFileLibraryInstance();
 
 }

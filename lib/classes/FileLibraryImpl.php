@@ -19,6 +19,7 @@ class FileLibraryImpl implements FileLibrary{
         $this->filesDir = $filesDir;
         $this->whitelistFile = new FileImpl($filesDir->getAbsolutePath()."/.whitelist");
         $this->loadWhitelist();
+
     }
 
 
@@ -29,7 +30,9 @@ class FileLibraryImpl implements FileLibrary{
      */
     public function containsFile(File $file)
     {
-
+        if(!$file->exists()){
+            return false;
+        }
         $p1 = $this->filesDir->getAbsolutePath();
         $p2 = $file->getParentFolder()->getParentFolder()->getAbsolutePath();
         return $p1 == $p2;
@@ -121,6 +124,9 @@ class FileLibraryImpl implements FileLibrary{
      */
     public function addToLibrary(User $user, File $file)
     {
+        if(!$this->filesDir->exists()){
+            $this->filesDir->create();
+        }
         $folder = new FolderImpl($this->filesDir->getAbsolutePath()."/".$user->getUniqueId());
         $folder->create();
         return $folder->putFile($file);
@@ -137,10 +143,19 @@ class FileLibraryImpl implements FileLibrary{
      */
     public function cleanLibrary(User $user = null)
     {
-        // TODO: Implement cleanLibrary() method.
+        foreach($this->getFileList($user) as $file){
+            /** @var $file File */
+            if(!$this->whitelistContainsFile($file)){
+                $file->delete();
+            }
+        }
     }
 
     private function writeWhitelist(){
+        if(!$this->filesDir->exists()){
+            $this->filesDir->create();
+        }
+
         $this->whitelistFile->delete();
         $this->whitelistFile->setAccessMode(File::FILE_MODE_RW_POINTER_AT_END);
         foreach($this->whiteList as $path){

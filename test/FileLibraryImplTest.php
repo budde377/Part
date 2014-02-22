@@ -54,6 +54,12 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
         $this->assertTrue($this->lib->containsFile($f));
     }
 
+    public function testContainsFileReturnsFalseIfFileDoesntExist(){
+        $f = $this->setupExistingFiles();
+        $f->delete();
+        $this->assertFalse($this->lib->containsFile($f));
+    }
+
     public function testContainsFileReturnsFalseIfNotContainsFile(){
         $f = new FileImpl(__FILE__);
         $this->assertFalse($this->lib->containsFile($f));
@@ -130,6 +136,35 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
         $this->lib->removeFromWhitelist($f);
         $lib = new FileLibraryImpl($this->testDir);
         $this->assertFalse($lib->whitelistContainsFile($f));
+    }
+
+    public function testCleanLibraryWillCleanLibrary(){
+        $f = $this->setupExistingFiles();
+        $this->lib->addToWhitelist($f);
+        $f2 = $this->createFile(time(), time());
+        $f3 = $this->lib->addToLibrary($this->user, $f2);
+        $this->assertTrue($this->lib->containsFile($f3));
+        $this->lib->cleanLibrary();
+        $this->assertFalse($this->lib->containsFile($f3));
+        $this->assertTrue($this->lib->containsFile($f));
+    }
+
+    public function testCleanLibraryWithUserWillOnlyDeleteFilesForUser(){
+        $f = $this->setupExistingFiles();
+        $f2 = $this->createFile(time(), time());
+        $f3 = $this->lib->addToLibrary($this->user2, $f2);
+        $this->lib->cleanLibrary($this->user);
+        $this->assertFalse($this->lib->containsFile($f));
+        $this->assertTrue($this->lib->containsFile($f3));
+    }
+
+    public function testLibraryWillCreateLibFolderIfNotExists(){
+        $this->testDir->delete(Folder::DELETE_FOLDER_RECURSIVE);
+        $lib = new FileLibraryImpl($this->testDir);
+        $this->assertFalse($this->testDir->exists());
+        $f = new FileImpl(dirname(__FILE__)."/stubs/fileStub");
+        $lib->addToLibrary($this->user, $f);
+        $this->assertTrue($this->testDir->exists());
     }
 
     public function createFile($name, $content){
