@@ -45,7 +45,7 @@ class TemplateImpl implements Template
         if (!$file->exists()) {
             throw new FileNotFoundException($file->getAbsoluteFilePath(), 'template file');
         }
-        $this->setUpTwig(new Twig_Loader_Filesystem($file->getParentFolder()->getAbsolutePath()), $file->getBaseName());
+        $this->setUpTwig(new Twig_Loader_Filesystem($file->getParentFolder()->getAbsolutePath()), $file->getFilename());
 
     }
 

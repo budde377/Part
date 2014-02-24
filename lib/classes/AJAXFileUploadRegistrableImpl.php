@@ -33,13 +33,22 @@ class AJAXFileUploadRegistrableImpl implements Registrable
         }
 
         $jsonServer = new JSONServerImpl();
-        $jsonServer->registerJSONFunction(new JSONFunctionImpl('uploadImageURI', function ($fileName, $data, $sizes) use ($user) {
+
+        $fileLibrary = $this->container->getFileLibraryInstance();
+
+        $config = $this->container->getConfigInstance();
+
+        $jsonServer->registerJSONFunction(new JSONFunctionImpl('uploadImageURI', function ($fileName, $data, $sizes) use ($user, $fileLibrary, $config) {
+
+
             $path = "/_files/{$user->getUniqueId()}/";
             $folder = new FolderImpl($_SERVER['DOCUMENT_ROOT'] . $path);
             if (!$folder->exists()) {
                 $folder->create();
             }
+
             $file = new ImageFileImpl($this->newFileFromName($folder->getAbsolutePath(), $fileName, true)->getAbsoluteFilePath());
+            //$file = new ImageFileImpl($config->getTmpFolderPath()."/".uniqid("tmpimage"));
             $rd = @file_get_contents($data);
             if ($rd === false) {
                 return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_FILE);
@@ -70,18 +79,19 @@ class AJAXFileUploadRegistrableImpl implements Registrable
                 if ($dataURI) {
                     $thumbPaths[] = $f->getDataURI();
                 } else {
-                    $nf = $f->copy($file->getParentFolder()->getAbsolutePath() . '/' . $file->getFileName() . '-S_' . $f->getWidth() . '_' . $f->getHeight() . '.' . $file->getExtension());
-                    $thumbPaths[] = $path . $nf->getBaseName();
+                    $nf = $f->copy($file->getParentFolder()->getAbsolutePath() . '/' . $file->getBasename() . '-S_' . $f->getWidth() . '_' . $f->getHeight() . '.' . $file->getExtension());
+                    $thumbPaths[] = $path . $nf->getFilename();
                 }
                 $f->delete();
             }
             $response = new JSONResponseImpl();
-            $response->setPayload(array('path' => $path . $file->getBaseName(), 'thumbs' => $thumbPaths));
+            $response->setPayload(array('path' => $path . $file->getFilename(), 'thumbs' => $thumbPaths));
             return $response;
         }, array('fileName', 'data', 'sizes')));
 
         $jsonServer->registerJSONFunction(new JSONFunctionImpl('uploadFileURI', function ($fileName, $data) use ($user) {
             $folder = new FolderImpl($_SERVER['DOCUMENT_ROOT'] . "/_files/{$user->getUniqueId()}/");
+
             if (!$folder->exists()) {
                 $folder->create();
             }
@@ -106,7 +116,7 @@ class AJAXFileUploadRegistrableImpl implements Registrable
             if(!$file->exists()){
                 return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_FILE_NOT_FOUND);
             }
-            $newUrl = $file->getFileName();
+            $newUrl = $file->getBasename();
 
             if($cropH != null){
                 $newUrl .= "-C_{$cropX}_{$cropY}_{$cropW}_{$cropH}";
@@ -130,7 +140,7 @@ class AJAXFileUploadRegistrableImpl implements Registrable
             $folderName = $file->getParentFolder()->getName();
             if($newFile->exists()){
                 $result = new JSONResponseImpl();
-                $result->setPayload("/_files/$folderName/{$newFile->getBaseName()}");
+                $result->setPayload("/_files/$folderName/{$newFile->getFilename()}");
                 return $result;
             }
             $newFile = $file->copy($newFile->getAbsoluteFilePath());
@@ -156,7 +166,7 @@ class AJAXFileUploadRegistrableImpl implements Registrable
             }
 
             $result = new JSONResponseImpl();
-            $result->setPayload("/_files/$folderName/{$newFile->getBaseName()}");
+            $result->setPayload("/_files/$folderName/{$newFile->getFilename()}");
 
             return $result;
         }, array("url","mirrorVertical","mirrorHorizontal","cropX","cropY","cropW","cropH","rotate","width","height")));

@@ -197,11 +197,11 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
         /** @var $e File */
         $e = $l[0];
         $this->assertInstanceOf('File', $e);
-        $this->assertEquals('1', $e->getBaseName());
+        $this->assertEquals('1', $e->getFilename());
         /** @var $e File */
         $e = $l[1];
         $this->assertInstanceOf('File', $e);
-        $this->assertEquals('2', $e->getBaseName());
+        $this->assertEquals('2', $e->getFilename());
         /** @var $e Folder */
         $e = $l[2];
         $this->assertInstanceOf('Folder', $e);
@@ -383,7 +383,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
         $newFile = $folder->putFile($file);
         $this->assertEquals(0, strpos($folder->getAbsolutePath(), $newFile->getAbsoluteFilePath()));
         $this->assertTrue($newFile->exists());
-        $this->assertEquals($file->getBaseName(), $newFile->getBaseName());
+        $this->assertEquals($file->getFilename(), $newFile->getFilename());
     }
 
     public function testPutFileWillChangeName()
@@ -394,7 +394,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
         $newFile = $folder->putFile($file, $newName);
         $this->assertEquals(0, strpos($folder->getAbsolutePath(), $newFile->getAbsoluteFilePath()));
         $this->assertTrue($newFile->exists());
-        $this->assertEquals($newName, $newFile->getBaseName());
+        $this->assertEquals($newName, $newFile->getFilename());
 
     }
 
@@ -404,7 +404,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
         $newName = "1";
         $newFile = $folder->putFile($file, $newName);
         $this->assertTrue($newFile->exists());
-        $this->assertEquals($newName, $newFile->getBaseName());
+        $this->assertEquals($newName, $newFile->getFilename());
         $this->assertNotEquals("1", $newFile->getContents());
     }
 

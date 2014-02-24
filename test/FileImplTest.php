@@ -66,7 +66,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
         $file = 'someFile';
         $path = dirname(__FILE__) . '/' . $file;
         $f = new FileImpl($path);
-        $this->assertEquals($file, $f->getBaseName(), 'Did not return expected BaseName');
+        $this->assertEquals($file, $f->getFilename(), 'Did not return expected BaseName');
     }
 
     public function testGetBaseNameReturnsBaseNameIfFileIsDir()
@@ -74,21 +74,21 @@ class FileImplTest extends PHPUnit_Framework_TestCase
         $file = 'someFile';
         $path = dirname(__FILE__) . '/' . $file . '/';
         $f = new FileImpl($path);
-        $this->assertEquals($file, $f->getBaseName(), 'Did not return expected BaseName');
+        $this->assertEquals($file, $f->getFilename(), 'Did not return expected BaseName');
     }
 
-    public function testGetExtensionReturnsFileName(){
+    public function testGetFilenameReturnsFileName(){
         $file = 'someFile.test';
         $path = dirname(__FILE__) . '/' . $file;
         $f = new FileImpl($path);
-        $this->assertEquals('someFile', $f->getFileName(), 'Did not return expected FileName');
+        $this->assertEquals('someFile', $f->getBasename(), 'Did not return expected FileName');
 
     }
     public function testGetFileNameReturnsFileNameIfFileIsDir(){
         $file = 'someFile.test';
         $path = dirname(__FILE__) . '/' . $file . '/';
         $f = new FileImpl($path);
-        $this->assertEquals('someFile', $f->getFileName(), 'Did not return expected FileName');
+        $this->assertEquals('someFile', $f->getBasename(), 'Did not return expected FileName');
 
     }
 
