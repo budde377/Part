@@ -98,4 +98,43 @@ interface FileLibrary {
      */
     public function findOriginalFileToVersion(File $file);
 
+
+    /**
+     * Will list the versions of a given file.
+     * @param File $file
+     * @return array
+     */
+    public function listVersionsToOriginal(File $file);
+
+
+    /**
+     * @param File $file
+     * @return bool Returns TRUE if is version else FALSE
+     */
+    public function isVersion(File $file);
+
+
+    /**
+     * Returns in which folder the files are located.
+     * @return Folder
+     */
+    public function getFilesFolder();
+
+    /**
+     * Will check if a version of the given file already exists.
+     * @param File $file
+     * @param string $version
+     * @return bool
+     */
+    public function containsVersionOfFile($file, $version);
+
+
+    /**
+     * This will return the desired version of the file, if it exists, else null.
+     * @param File $file
+     * @param string $version
+     * @return File
+     */
+    public function findVersionOfFile($file, $version);
+
 }

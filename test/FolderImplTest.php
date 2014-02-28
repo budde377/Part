@@ -326,6 +326,9 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     }
 
+    private function nop(){
+
+    }
 
     public function testIteratingWillMatchList()
     {
@@ -333,9 +336,14 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
         @$this->rrmdir($folder);
         $f = $this->setUpNonEmptyFolder($folder);
         $count = 0;
-        foreach ($f as $key => $val) {
+        foreach ($f as  $val) {
+            $this->nop($val);
+
             $count++;
         }
+
+
+
         $this->assertEquals(3, $count, 'Was not of right size');
         $f->rewind();
         foreach ($f->listFolder() as $k => $v) {
@@ -405,7 +413,8 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
         $newFile = $folder->putFile($file, $newName);
         $this->assertTrue($newFile->exists());
         $this->assertEquals($newName, $newFile->getFilename());
-        $this->assertNotEquals("1", $newFile->getContents());
+        $c = $newFile->getContents();
+        $this->assertNotEquals("1", $c);
     }
 
     public function testPutFileWillReturnNullIfGivenFileDoesNotExist(){
@@ -424,6 +433,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($f->exists(), 'Folder does not exist');
         $file1 = new FileImpl($folder . '/1');
         $file1->write('1');
+        $file1->setAccessMode(File::FILE_MODE_RW_POINTER_AT_END);
         $file2 = new FileImpl($folder . '/2');
         $file2->write('2');
         $folder1 = new FolderImpl($folder . '/3');

@@ -6,24 +6,29 @@
  * Time: 9:18 PM
  * To change this template use File | Settings | File Templates.
  */
-class PageImplTest extends PHPUnit_Extensions_Database_TestCase
+class PageImplTest extends CustomDatabaseTestCase
 {
 
     /** @var $db StubDBImpl */
     private $db;
-    /** @var $pdo PDO */
-    private $pdo;
     /** @var PageImpl */
     private $testPage;
     /** @var PageImpl */
     private $testPage2;
 
+
+    function __construct()
+    {
+        parent::__construct(dirname(__FILE__) . '/mysqlXML/PageImplTest.xml');
+    }
+
+
+
     public function setUp()
     {
         parent::setUp();
-        $this->pdo = new PDO('mysql:dbname=' . self::database . ';host=' . self::host, self::username, self::password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
         $this->db = new StubDBImpl();
-        $this->db->setConnection($this->pdo);
+        $this->db->setConnection(self::$pdo);
         $this->testPage = new PageImpl('testpage',$this->db);
         $this->testPage2 = new PageImpl('testpage2',$this->db);
     }
@@ -172,7 +177,7 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
         $exceptionWasThrown = false;
 
         try {
-            $page = new PageImpl('illegalID**"""', $this->db);
+            new PageImpl('illegalID**"""', $this->db);
 
         } catch (Exception $e) {
             $exceptionWasThrown = true;
@@ -363,39 +368,6 @@ class PageImplTest extends PHPUnit_Extensions_Database_TestCase
 
 
 
-
-    public function getSetUpOperation()
-    {
-        $cascadeTruncates = true;
-        return new PHPUnit_Extensions_Database_Operation_Composite(array(new TruncateOperation($cascadeTruncates), PHPUnit_Extensions_Database_Operation_Factory::INSERT()));
-    }
-
-    /**
-     * Returns the test database connection.
-     *
-     * @return PHPUnit_Extensions_Database_DB_IDatabaseConnection
-     */
-    protected function getConnection()
-    {
-        $pdo = new PDO('mysql:dbname=' . self::database . ';host=' . self::host, self::username, self::password);
-        return $this->createDefaultDBConnection($pdo);
-    }
-
-    /**
-     * Returns the test dataset.
-     *
-     * @return PHPUnit_Extensions_Database_DataSet_IDataSet
-     */
-    protected function getDataSet()
-    {
-        return $this->createMySQLXMLDataSet(dirname(__FILE__) . '/mysqlXML/PageImplTest.xml');
-    }
-
-
-    const database = MySQLConstants::MYSQL_DATABASE;
-    const password = MySQLConstants::MYSQL_PASSWORD;
-    const username = MySQLConstants::MYSQL_USERNAME;
-    const host = MySQLConstants::MYSQL_HOST;
 
 
 }

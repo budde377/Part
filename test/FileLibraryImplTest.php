@@ -1,12 +1,13 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: budde
  * Date: 2/22/14
  * Time: 3:15 PM
  */
-
-class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
+class FileLibraryImplTest extends PHPUnit_Framework_TestCase
+{
 
     /** @var  Folder */
     private $testDir;
@@ -23,25 +24,28 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
     /** @var  User */
     private $user2;
 
-    public function setUp(){
+    public function setUp()
+    {
         $this->user = new StubUserImpl();
         $this->user2 = new StubUserImpl();
 
-        $this->testDir = new FolderImpl(dirname(__FILE__)."/stubs/testFolderFileLibrary");
+        $this->testDir = new FolderImpl(dirname(__FILE__) . "/stubs/testFolderFileLibrary");
         $this->testDir->create();
         $this->config = new StubConfigImpl();
 
         $this->lib = new FileLibraryImpl($this->testDir);
     }
 
-    public function setupExistingFiles(){
-        $f = new FileImpl($this->testDir->getAbsolutePath()."/test1.txt");
+    public function setupExistingFiles()
+    {
+        $f = new FileImpl($this->testDir->getAbsolutePath() . "/test1.txt");
         $f->write($this->testString);
         return $this->lib->addToLibrary($this->user, $f);
     }
 
 
-    public function testAddFileAddsFile(){
+    public function testAddFileAddsFile()
+    {
         $this->assertEquals(0, count($this->lib->getFileList()));
         $this->setupExistingFiles();
         $this->assertEquals(1, count($this->lib->getFileList()));
@@ -49,7 +53,8 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals(0, count($this->lib->getFileList($this->user2)));
     }
 
-    public function testAddFileAddsUniqueName(){
+    public function testAddFileAddsUniqueName()
+    {
         $f = $this->setupExistingFiles();
         $f2 = $this->lib->addToLibrary($this->user, $f);
         $this->assertNotEquals($f->getFilename(), $f2->getFilename());
@@ -57,30 +62,49 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
         $this->assertTrue($f2->exists());
     }
 
+    public function testAddFileDoesPreserveExtension()
+    {
+        $f = $this->createFile();
+        $f2 = $this->lib->addToLibrary($this->user, $f);
+        $this->assertEquals($f->getExtension(), $f2->getExtension());
+    }
 
-    public function testPreservesFilename(){
+
+    public function testPreservesFilename()
+    {
         $f = $this->createFile("test.txt", time());
         $f2 = $this->lib->addToLibrary($this->user, $f);
         $this->assertEquals($f->getExtension(), $f2->getExtension());
     }
 
-    public function testContainsFileReturnsTrueIfContainsFile(){
+    public function testContainsFileReturnsTrueIfContainsFile()
+    {
         $f = $this->setupExistingFiles();
         $this->assertTrue($this->lib->containsFile($f));
     }
 
-    public function testContainsFileReturnsFalseIfFileDoesntExist(){
+    public function testContainsFileReturnsTrueIfContainedVersion()
+    {
+        $f = $this->setupExistingFiles();
+        $f2 = $this->lib->addVersionOfFile($f, $f);
+        $this->assertTrue($this->lib->containsFile($f2));
+    }
+
+    public function testContainsFileReturnsFalseIfFileDoesntExist()
+    {
         $f = $this->setupExistingFiles();
         $f->delete();
         $this->assertFalse($this->lib->containsFile($f));
     }
 
-    public function testContainsFileReturnsFalseIfNotContainsFile(){
+    public function testContainsFileReturnsFalseIfNotContainsFile()
+    {
         $f = new FileImpl(__FILE__);
         $this->assertFalse($this->lib->containsFile($f));
     }
 
-    public function testFileListWillReturnArrayContainingFile(){
+    public function testFileListWillReturnArrayContainingFile()
+    {
         $this->setupExistingFiles();
         $ar = $this->lib->getFileList();
         $this->assertEquals(1, count($ar));
@@ -91,19 +115,32 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals(2, count($ar));
     }
 
-    public function testFileListWillReturnEmptyArrayOnUserWithNoFiles(){
+
+    public function testFileListWillNotListVersions()
+    {
+        $f = $this->setupExistingFiles();
+        $this->lib->addVersionOfFile($f, $f);
+        $this->lib->addVersionOfFile($f, $f);
+        $this->lib->addVersionOfFile($f, $f);
+        $this->assertEquals(1, count($this->lib->getFileList()));
+    }
+
+    public function testFileListWillReturnEmptyArrayOnUserWithNoFiles()
+    {
         $ar = $this->lib->getFileList($this->user);
         $this->assertTrue(is_array($ar));
         $this->assertEquals(0, count($ar));
     }
 
 
-    public function testAddToWhitelistWillReturnFalseIfFileNotInLibrary(){
+    public function testAddToWhitelistWillReturnFalseIfFileNotInLibrary()
+    {
         $f = $this->createFile(time(), time());
         $this->assertFalse($this->lib->addToWhitelist($f));
     }
 
-    public function testAddToWhielistWillReturnTrueOnSuccess(){
+    public function testAddToWhielistWillReturnTrueOnSuccess()
+    {
         $f = $this->setupExistingFiles();
         $this->assertFalse($this->lib->whitelistContainsFile($f));
         $this->assertTrue($this->lib->addToWhitelist($f));
@@ -111,7 +148,8 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
     }
 
 
-    public function testGetWhitelistReturnsWhitelist(){
+    public function testGetWhitelistReturnsWhitelist()
+    {
         $f = $this->setupExistingFiles();
         $this->assertTrue($this->lib->addToWhitelist($f));
         $whitelist = $this->lib->getWhitelist();
@@ -122,7 +160,8 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
     }
 
 
-    public function testWhitelistIsPersistent(){
+    public function testWhitelistIsPersistent()
+    {
         $f = $this->setupExistingFiles();
         $this->lib->addToWhitelist($f);
         $whitelist = $this->lib->getWhitelist();
@@ -133,19 +172,22 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
     }
 
 
-    public function testRemoveFromWhitelistWillReturnFalseIfNotInList(){
+    public function testRemoveFromWhitelistWillReturnFalseIfNotInList()
+    {
         $f = $this->setupExistingFiles();
         $this->assertFalse($this->lib->removeFromWhitelist($f));
     }
 
-    public function testRemoveFromWhitelistWillRemove(){
+    public function testRemoveFromWhitelistWillRemove()
+    {
         $f = $this->setupExistingFiles();
         $this->lib->addToWhitelist($f);
         $this->assertTrue($this->lib->removeFromWhitelist($f));
         $this->assertFalse($this->lib->whitelistContainsFile($f));
     }
 
-    public function testRemoveFromWhitelistIsPersistent(){
+    public function testRemoveFromWhitelistIsPersistent()
+    {
         $f = $this->setupExistingFiles();
         $this->lib->addToWhitelist($f);
         $this->lib->removeFromWhitelist($f);
@@ -153,7 +195,8 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
         $this->assertFalse($lib->whitelistContainsFile($f));
     }
 
-    public function testCleanLibraryWillCleanLibrary(){
+    public function testCleanLibraryWillCleanLibrary()
+    {
         $f = $this->setupExistingFiles();
         $this->lib->addToWhitelist($f);
         $f2 = $this->createFile(time(), time());
@@ -164,7 +207,8 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
         $this->assertTrue($this->lib->containsFile($f));
     }
 
-    public function testCleanLibraryWithUserWillOnlyDeleteFilesForUser(){
+    public function testCleanLibraryWithUserWillOnlyDeleteFilesForUser()
+    {
         $f = $this->setupExistingFiles();
         $f2 = $this->createFile(time(), time());
         $f3 = $this->lib->addToLibrary($this->user2, $f2);
@@ -173,17 +217,19 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
         $this->assertTrue($this->lib->containsFile($f3));
     }
 
-    public function testLibraryWillCreateLibFolderIfNotExists(){
+    public function testLibraryWillCreateLibFolderIfNotExists()
+    {
         $this->testDir->delete(Folder::DELETE_FOLDER_RECURSIVE);
         $lib = new FileLibraryImpl($this->testDir);
         $this->assertFalse($this->testDir->exists());
-        $f = new FileImpl(dirname(__FILE__)."/stubs/fileStub");
+        $f = new FileImpl(dirname(__FILE__) . "/stubs/fileStub");
         $lib->addToLibrary($this->user, $f);
         $this->assertTrue($this->testDir->exists());
     }
 
 
-    public function testRemoveFileWillReturnFalseOnFileNotInLib(){
+    public function testRemoveFileWillReturnFalseOnFileNotInLib()
+    {
         $this->setupExistingFiles();
         $f = $this->createFile(time(), time());
         $this->assertFalse($this->lib->removeFromLibrary($f));
@@ -191,14 +237,16 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
     }
 
 
-    public function testRemoveFileWillRemove(){
+    public function testRemoveFileWillRemove()
+    {
         $f = $this->setupExistingFiles();
         $this->assertTrue($this->lib->containsFile($f));
         $this->assertTrue($this->lib->removeFromLibrary($f));
         $this->assertFalse($this->lib->containsFile($f));
     }
 
-    public function testRemoveFileWillRemoveFromWhitelist(){
+    public function testRemoveFileWillRemoveFromWhitelist()
+    {
         $f = $this->setupExistingFiles();
         $this->lib->addToWhitelist($f);
         $this->assertTrue($this->lib->whitelistContainsFile($f));
@@ -207,48 +255,155 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase{
     }
 
 
-    public function testAddVersionWillAddVersion(){
+    public function testAddVersionWillAddVersion()
+    {
         $f = $this->setupExistingFiles();
         $f2 = $this->createFile();
         $version = "1.0";
         $f3 = $this->lib->addVersionOfFile($f, $f2, $version);
         $this->assertTrue($this->lib->containsFile($f3));
-        $this->assertEquals($f->getBasename()."-".$version.".".$f->getExtension(), $f3->getFilename());
+        $this->assertEquals($f->getBasename() . "-" . $version . "." . $f->getExtension(), $f3->getFilename());
     }
 
-    public function testAddVersionWillReturnNullIfOrigFileNotInLib(){
+
+    public function testAddVersionWillNotOverwrite()
+    {
+        $f = $this->setupExistingFiles();
+        $content1 = "content1";
+        $f2 = $this->createFile(uniqid(), $content1);
+        $content2 = "content2";
+        $f3 = $this->createFile(uniqid(), $content2);
+        $f4 = $this->lib->addVersionOfFile($f, $f2, "1");
+        $f5 = $this->lib->addVersionOfFile($f, $f3, "1");
+        $this->assertEquals($f4->getAbsoluteFilePath(), $f5->getAbsoluteFilePath());
+        $this->assertEquals($content1, $f5->getContents());
+    }
+
+    public function testAddVersionManagesExtension()
+    {
+        $f = $this->createFile();
+        $this->assertEquals("", $f->getExtension());
+        $f2 = $this->lib->addToLibrary($this->user, $f);
+        $this->assertEquals("", $f2->getExtension());
+        $v = time();
+        $f3 = $this->lib->addVersionOfFile($f2, $f, $v);
+        $this->assertEquals($f3->getFilename(), $f2->getBasename() . "-" . $v);
+
+    }
+
+    public function testAddVersionWillReturnNullIfOrigFileNotInLib()
+    {
         $f = $this->createFile();
         $this->assertNull($this->lib->addVersionOfFile($f, $f));
 
     }
 
-    public function testCanFindOriginalFromVersion(){
+    public function testFindOriginalReturnsNullOnNotInLibrary()
+    {
+        $f = $this->createFile(time(), time());
+        $this->assertNull($this->lib->findOriginalFileToVersion($f));
+    }
+
+    public function testFindOriginalReturnsSelfIfNotVersionButInLib()
+    {
+        $f = $this->setupExistingFiles();
+        $f2 = $this->lib->findOriginalFileToVersion($f);
+        $this->assertEquals($f->getAbsoluteFilePath(), $f2->getAbsoluteFilePath());
+    }
+
+    public function testCanFindOriginalFromVersion()
+    {
         $f = $this->setupExistingFiles();
         $f2 = $this->createFile();
-        $this->lib->addVersionOfFile($f, $f2);
-        $f3 = $this->lib->findOriginalFileToVersion($f2);
-        $this->assertEquals($f3->getAbsoluteFilePath(), $f->getAbsoluteFilePath());
+        $f3 = $this->lib->addVersionOfFile($f, $f2);
+        $f4 = $this->lib->findOriginalFileToVersion($f3);
+        $this->assertEquals($f->getAbsoluteFilePath(), $f4->getAbsoluteFilePath());
     }
 
 
+    public function testListVersionsWillReturnEmptyArrayIfNotInLib()
+    {
+        $f = $this->createFile();
+        $this->assertTrue(is_array($ar = $this->lib->listVersionsToOriginal($f)));
+        $this->assertEquals(0, count($ar));
+    }
+
+    public function testListVersionsWillReturnEmptyArrayIfNotVersion()
+    {
+        $f = $this->setupExistingFiles();
+        $this->assertTrue(is_array($ar = $this->lib->listVersionsToOriginal($f)));
+        $this->assertEquals(0, count($ar));
+    }
+
+    public function testListVersionsWillListVersions()
+    {
+        $f = $this->setupExistingFiles();
+        $f2 = $this->lib->addVersionOfFile($f, $f);
+        $this->lib->addVersionOfFile($f, $f2);
+        $this->assertTrue(is_array($ar = $this->lib->listVersionsToOriginal($f)));
+        $this->assertEquals(2, count($ar));
+
+    }
 
 
+    public function testIfGetFilesFolderReturnsRightFolder()
+    {
+        $f = $this->lib->getFilesFolder();
+        $this->assertInstanceOf("Folder", $f);
+        $this->assertEquals($f->getAbsolutePath(), $this->testDir->getAbsolutePath());
+        $this->assertFalse($this->testDir === $f);
+    }
 
 
+    public function testContainsVersionReturnFalseOnDoesNotContain()
+    {
+        $f = $this->setupExistingFiles();
+        $this->assertFalse($this->lib->containsVersionOfFile($f, time()));
+    }
 
-    public function createFile($name = null, $content = null){
+    public function testContainsVersionReturnsTrueIfContainsVersion()
+    {
+        $f = $this->setupExistingFiles();
+        $this->lib->addVersionOfFile($f, $f, "1");
+        $this->assertTrue($this->lib->containsVersionOfFile($f, "1"));
+    }
 
-        $name = $name == null?time():$name;
-        $content= $content== null?time():$content;
 
-        $f = new FileImpl($this->testDir->getAbsolutePath()."/".$name);
+    public function testFindVersionOfFileWillReturnFile()
+    {
+        $f = $this->setupExistingFiles();
+        $f2 = $this->lib->addVersionOfFile($f, $f, "1");
+        $f3 = $this->lib->findVersionOfFile($f, "1");
+        $this->assertEquals($f2->getAbsoluteFilePath(), $f3->getAbsoluteFilePath());
+    }
+
+    public function testFindVersionOfFileWillReturnNullIfNoVersion()
+    {
+        $f = $this->setupExistingFiles();
+        $this->assertNull($this->lib->findVersionOfFile($f, time()));
+    }
+
+    public function testFindVersionOfFileWillReturnNullIfNoOrigianl()
+    {
+        $f = $this->createFile();
+        $this->assertNull($this->lib->findVersionOfFile($f, time()));
+    }
+
+    public function createFile($name = null, $content = null)
+    {
+
+        $name = $name == null ? time() : $name;
+        $content = $content == null ? time() : $content;
+
+        $f = new FileImpl($this->testDir->getAbsolutePath() . "/" . $name);
         $f->write($content);
         return $f;
     }
 
 
-    public function tearDown(){
-        @unlink($this->testDir->getAbsolutePath()."/.whitelist");
+    public function tearDown()
+    {
+        @unlink($this->testDir->getAbsolutePath() . "/.whitelist");
         $this->testDir->delete(Folder::DELETE_FOLDER_RECURSIVE);
     }
 
