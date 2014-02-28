@@ -61,4 +61,18 @@ class NullContentImpl implements Content{
     {
         return "";
     }
+
+    /**
+     * Searches content for the the string from a given time ($fromTime).
+     * The time should be present when available as it would cut down
+     * the search time.
+     *
+     * @param String $string
+     * @param int $fromTime Timestamp
+     * @return bool TRUE if found else FALSE
+     */
+    public function containsSubString($string, $fromTime = null)
+    {
+        return false;
+    }
 }

@@ -147,6 +147,28 @@ class PageContentImplTest extends CustomDatabaseTestCase{
         $this->assertGreaterThan($lastTime, $this->existingPage->lastModified());
     }
 
+    public function testContainsSubStringWillReturnFalseIfDoesNotContainContent(){
+        $this->assertFalse($this->nonExistingContent->containsSubString("non existing substring"));
+        $this->assertFalse($this->existingContent->containsSubString("non existing substring"));
+        $this->assertFalse($this->existingContent2->containsSubString("non existing substring"));
+    }
+
+
+    public function testContainsSubStringWillReturnFalseIfDoesNotContainContentButOtherDoes(){
+        $this->assertFalse($this->existingContent2->containsSubString("Some Content"));
+    }
+
+
+    public function testContainsSubStringWillReturnTrueIfContainsString(){
+        $this->assertTrue($this->existingContent->containsSubString("Some"));
+        $this->assertTrue($this->existingContent->containsSubString("Content"));
+        $this->assertTrue($this->existingContent->containsSubString("Some Content"));
+    }
+
+
+    public function testContainsWillRespectTime(){
+        $this->assertFalse($this->existingContent->containsSubString("Some", time()));
+    }
 
 
 
