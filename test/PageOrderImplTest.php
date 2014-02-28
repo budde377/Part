@@ -456,27 +456,6 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         $this->assertFalse($setReturn, 'Did not return false');
     }
 
-    /*
-    public function testSetPageOrderThrowExceptionOnMalformedParentPageInput()
-    {
-        $pageOrder = new PageOrderImpl($this->db);
-        $exceptionWasThrown = false;
-        $topOrder = $pageOrder->getPageOrder();
-        $oldPage = $topOrder[0];
-        try {
-            $pageOrder->setPageOrder($oldPage, 1, "INVALID INPUT");
-        } catch (Exception $e) {
-            $exceptionWasThrown = true;
-            $this->assertInstanceOf('MalformedParameterException', $e, 'Wrong type of exception');
-            $this->assertEquals(3, $e->getParameterNumber(), 'Wrong param number');
-            $this->assertEquals('Page|null', $e->getExpectedType(), 'Wrong expected type');
-
-
-        }
-        $this->assertTrue($exceptionWasThrown, 'Exception was not thrown');
-    }
-
-    */
     public function testSetPageOrderReturnFalseOnLoop()
     {
         $pageOrder = new PageOrderImpl($this->db);
