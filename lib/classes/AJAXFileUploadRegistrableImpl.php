@@ -49,6 +49,9 @@ class AJAXFileUploadRegistrableImpl implements Registrable
             $tmpFile->write($rd);
             $file = $fileLibrary->addToLibrary($user, $tmpFile);
             $tmpFile->delete();
+            if($file == null){
+                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_COULD_NOT_CREATE_FILE);
+            }
             $file = new ImageFileImpl($file->getAbsoluteFilePath());
             $thumbPaths = array();
             $path = '_files/' . $file->getParentFolder()->getName()."/";
