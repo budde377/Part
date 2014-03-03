@@ -22,8 +22,8 @@ class SiteVariablesImplTest extends CustomDatabaseTestCase{
     public function setUp(){
         parent::setUp();
         $this->db = new StubDBImpl();
-        $pdo = new PDO('mysql:dbname=' . MySQLConstants::MYSQL_DATABASE. ';host=' . MySQLConstants::MYSQL_HOST, MySQLConstants::MYSQL_USERNAME, MySQLConstants::MYSQL_PASSWORD, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
-        $this->db->setConnection($pdo);
+
+        $this->db->setConnection(self::$pdo);
         $this->existingVariables = new SiteVariablesImpl($this->db);
 
     }

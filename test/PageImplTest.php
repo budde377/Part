@@ -367,6 +367,14 @@ class PageImplTest extends CustomDatabaseTestCase
     }
 
 
+    public function testGetPageContentWillReturnAndReuseContentLibrary(){
+        $lib1 = $this->testPage->getContentLibrary();
+        $lib2 = $this->testPage->getContentLibrary();
+        $this->assertTrue($lib1 === $lib2);
+        $this->assertInstanceOf("ContentLibrary", $lib1);
+    }
+
+
 
 
 

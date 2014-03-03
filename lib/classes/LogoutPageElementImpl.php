@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -7,11 +8,11 @@
  */
 class LogoutPageElementImpl extends PageElementImpl
 {
-    private $currentUser;
+    private $container;
+
     function __construct(BackendSingletonContainer $container)
     {
-        $this->currentUser = $container->getUserLibraryInstance()->getUserLoggedIn();
-
+        $this->container = $container;
     }
 
     /**
@@ -23,8 +24,46 @@ class LogoutPageElementImpl extends PageElementImpl
     public function setUpElement()
     {
         parent::setUpElement();
-        if($this->currentUser != null){
-            $this->currentUser->logout();
+        $currentUser = $this->container->getUserLibraryInstance()->getUserLoggedIn();
+
+        if ($currentUser != null) {
+            $vars = $this->container->getSiteInstance()->getVariables();
+            $lastRun = $vars->getValue("last-file-lib-cleanup");
+            $lastRun = $lastRun == null ? 0 : $lastRun;
+
+            $fileLib = $this->container->getFileLibraryInstance();
+            $fileList = array();
+            $contentList = array();
+            /** @var Page $page */
+            foreach ($this->container->getPageOrderInstance()->listPages() as $page) {
+                if ($page->lastModified() < $lastRun) {
+                    continue;
+                }
+                $contentList = array_merge($contentList, array_values($page->getContentLibrary()->listContents($lastRun)));
+
+            }
+            $contentList = array_merge($contentList, array_values($this->container->getSiteInstance()->getContentLibrary()->listContents($lastRun)));
+
+
+            /** @var File $file */
+            foreach ($fileLib->getFileList($currentUser) as $file) {
+                if ($fileLib->whitelistContainsFile($file)) {
+                    continue;
+                }
+                /** @var $content Content */
+                foreach($contentList as $content){
+                    if(!$content->containsSubString($file->getFilename(),$lastRun)){
+                        continue;
+                    }
+                    $fileLib->addToWhitelist($file);
+                }
+                $fileList[] = $file;
+            }
+
+            $fileLib->cleanLibrary($currentUser);
+            $vars->setValue("last-file-lib-cleanup", time());
+            $currentUser->logout();
         }
-        HTTPHeaderHelper::redirectToLocation("/");    }
+        HTTPHeaderHelper::redirectToLocation("/");
+    }
 }

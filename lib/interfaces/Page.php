@@ -63,6 +63,14 @@ interface Page
      * @return Content
      */
     public function getContent($id = "");
+
+
+    /**
+     * Will return and reuse a ContentLibrary instance.
+     * @return ContentLibrary
+     */
+    public function getContentLibrary();
+
     /**
      * @abstract
      * Set the id of the page. The ID should be of type [a-zA-Z0-9-_]+

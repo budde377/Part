@@ -51,5 +51,14 @@ class StubSiteImpl implements Site{
     {
         return $this->lastMod = time();
     }
+
+    /**
+     * Will get and reuse instance of content library.
+     * @return ContentLibrary
+     */
+    public function getContentLibrary()
+    {
+        return null;
+    }
 }
 

@@ -225,4 +225,13 @@ class StubPageImpl implements Page
     {
         return $this->variables == null?$this->variables = new StubVariablesImpl(): $this->variables;
     }
+
+    /**
+     * Will return and reuse a ContentLibrary instance.
+     * @return ContentLibrary
+     */
+    public function getContentLibrary()
+    {
+        return null;
+    }
 }

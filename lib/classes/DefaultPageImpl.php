@@ -219,4 +219,13 @@ class DefaultPageImpl implements Page
     {
         return null;
     }
+
+    /**
+     * Will return and reuse a ContentLibrary instance.
+     * @return ContentLibrary
+     */
+    public function getContentLibrary()
+    {
+        return null;
+    }
 }

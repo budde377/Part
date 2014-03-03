@@ -8,7 +8,7 @@
 
 class SiteImpl implements Site
 {
-    private $contentMap = array();
+    private $contentLibrary;
     private $variables;
     private $db;
     private $lastMod = 0 ;
@@ -26,7 +26,7 @@ class SiteImpl implements Site
      */
     public function getContent($id = "")
     {
-        return isset($this->contentMap[$id])? $this->contentMap[$id]:$this->contentMap[$id] = new SiteContentImpl($this->db, $this, $id);
+        return $this->getContentLibrary()->getContent($id);
     }
 
     /**
@@ -56,5 +56,16 @@ class SiteImpl implements Site
     {
         $this->getVariables()->setValue("last_modified", $this->lastMod = time());
         return $this->lastMod;
+    }
+
+    /**
+     * Will get and reuse instance of content library.
+     * @return ContentLibrary
+     */
+    public function getContentLibrary()
+    {
+        return $this->contentLibrary == null?
+            $this->contentLibrary = new SiteContentLibraryImpl($this->db, $this):
+            $this->contentLibrary;
     }
 }
