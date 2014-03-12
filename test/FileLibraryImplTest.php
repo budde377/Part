@@ -207,6 +207,17 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->lib->containsFile($f));
     }
 
+    public function testCleanLibraryWillCleanAllVersions(){
+        $f = $this->setupExistingFiles();
+        $f2 = $this->lib->addVersionOfFile($f, $f);
+        $this->assertTrue($this->lib->containsFile($f));
+        $this->assertTrue($this->lib->containsFile($f2));
+        $this->lib->cleanLibrary();
+        $this->assertFalse($this->lib->containsFile($f));
+        $this->assertFalse($this->lib->containsFile($f2));
+
+    }
+
     public function testCleanLibraryWithUserWillOnlyDeleteFilesForUser()
     {
         $f = $this->setupExistingFiles();
