@@ -32,6 +32,11 @@ interface JSONResponse extends JSONElement
     const ERROR_CODE_INVALID_FILE = 19;
     const ERROR_CODE_FILE_NOT_FOUND = 20;
     const ERROR_CODE_COULD_NOT_CREATE_FILE = 21;
+    const ERROR_CODE_INVALID_NAME = 22;
+    const ERROR_CODE_INVALID_SUBJECT = 23;
+    const ERROR_CODE_INVALID_MESSAGE = 24;
+    const ERROR_CODE_INVALID_INPUT = 25;
+
     /**
      * @return String
      */
