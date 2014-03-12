@@ -49,7 +49,7 @@ class LogoutPageElementImpl extends PageElementImpl
         if($site->lastModified() >= $lastRun){
             $contentLibraries[] = $site->getContentLibrary();
         }
-
+        $fileList = array();
         /** @var File $file */
         foreach ($fileLib->getFileList($currentUser) as $file) {
             if ($fileLib->whitelistContainsFile($file)) {
@@ -57,14 +57,14 @@ class LogoutPageElementImpl extends PageElementImpl
             }
             /** @var $contentLib ContentLibrary */
             foreach ($contentLibraries as $contentLib) {
-                if (!count($contentLib->searchLibrary($file->getFilename(), $lastRun))) {
+                if (!count($contentLib->searchLibrary($file->getBasename(), $lastRun))) {
                     continue;
                 }
                 $fileLib->addToWhitelist($file);
                 break;
             }
+            $fileList[] = $file;
         }
-
         $fileLib->cleanLibrary($currentUser);
         $vars->setValue("last-file-lib-cleanup", time());
         $currentUser->logout();

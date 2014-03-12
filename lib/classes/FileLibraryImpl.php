@@ -156,6 +156,10 @@ class FileLibraryImpl implements FileLibrary{
         foreach($this->getFileList($user) as $file){
             /** @var $file File */
             if(!$this->whitelistContainsFile($file)){
+                /** @var $vf File */
+                foreach($this->listVersionsToOriginal($file) as $vf){
+                    $vf->delete();
+                }
                 $file->delete();
             }
         }
