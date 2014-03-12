@@ -60,7 +60,7 @@ class FormHandler {
       }});
     form.onSubmit.listen((Event event) {
       blur();
-      List<Element> elements = queryAll("textarea, input:not([type=submit]), select");
+      List<Element> elements = form.queryAll("textarea, input:not([type=submit]), select");
       req.open(form.method.toUpperCase(), "?ajax=${Uri.encodeComponent(AJAXId)}");
       req.send(new FormData(form));
       event.preventDefault();
@@ -68,6 +68,7 @@ class FormHandler {
   }
 
   void changeNotion(String message, String notion_type) {
+
     if (notion_type != NOTION_TYPE_SUCCESS && notion_type != NOTION_TYPE_ERROR && notion_type != NOTION_TYPE_INFORMATION) {
       return;
     }
@@ -79,6 +80,19 @@ class FormHandler {
     notion.text = message;
     form.insertAdjacentElement("afterBegin", notion);
 
+  }
+
+  void clearForm(){
+    List<Element> elements = form.queryAll("textarea, input:not([type=submit])");
+    elements.forEach((Element elm){
+      if(elm is InputElement){
+        InputElement elm2 = elm;
+        elm2.value = "";
+      } else if(elm is TextAreaElement){
+        TextAreaElement elm2 = elm;
+        elm2.value = "";
+      }
+    });
   }
 
   void removeNotion() {
