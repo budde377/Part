@@ -29,5 +29,16 @@ interface ContentLibrary {
     public function getContent($id = "");
 
 
+    /**
+     * This will search the content of each content
+     * and return an array containing all contents matching
+     * the search string.
+     *
+     * @param String $string
+     * @param int $time Will limit the search to those contents after given timestamp
+     * @return array
+     */
+    public function searchLibrary($string, $time= null);
+
 
 } 

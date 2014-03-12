@@ -90,7 +90,6 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
 
     }
 
-
     public function testTimestampToListWillFilterList()
     {
         $this->assertEquals(0, count($this->existingContentLibrary->listContents(time())));
@@ -101,5 +100,44 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
         $this->assertEquals(1, count($this->existingContentLibrary->listContents(time()-100)));
     }
 
+
+    public function testSearchLibraryReturnsArray(){
+
+        $this->assertTrue(is_array($this->nonExistingContentLibrary->searchLibrary("some string")));
+        $this->assertTrue(is_array($this->existingContentLibrary->searchLibrary("some string")));
+    }
+
+    public function testSearchLibraryReturnsAnyOnEmptyString(){
+        $ar = $this->existingContentLibrary->searchLibrary("");
+        $this->assertEquals(2, count($ar));
+        $this->assertArrayHasKey("", $ar);
+        $this->assertArrayHasKey("Test", $ar);
+        $this->assertInstanceOf("Content", $ar[""]);
+        $this->assertInstanceOf("Content", $ar["Test"]);
+    }
+
+    public function testSearchLibraryWillReuseInstances(){
+        $ar = $this->existingContentLibrary->searchLibrary("");
+        $ar2 = $this->existingContentLibrary->searchLibrary("");
+        $this->assertTrue($ar[""] === $ar2[""]);
+        $this->assertTrue($ar["Test"] === $ar2["Test"]);
+    }
+
+    public function testSearchLibraryWillSearchString(){
+        $ar = $this->existingContentLibrary->searchLibrary("1");
+        $this->assertEquals(1, count($ar));
+        $this->assertArrayHasKey("Test", $ar);
+        $this->assertTrue($ar["Test"] === $this->existingContentLibrary->getContent("Test"));
+    }
+
+    public function testSearchLibraryWillLimitSearchToTimestamp(){
+        $ar = $this->existingContentLibrary->searchLibrary("", time());
+        $this->assertEquals(0, count($ar));
+    }
+
+    public function testSearchLibraryWillLimitSearchToLaterTimestamp(){
+        $ar  = $this->existingContentLibrary->searchLibrary("", 1110625218);
+        $this->assertEquals(1, count($ar));
+    }
 
 }

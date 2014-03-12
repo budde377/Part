@@ -26,44 +26,49 @@ class LogoutPageElementImpl extends PageElementImpl
         parent::setUpElement();
         $currentUser = $this->container->getUserLibraryInstance()->getUserLoggedIn();
 
-        if ($currentUser != null) {
-            $vars = $this->container->getSiteInstance()->getVariables();
-            $lastRun = $vars->getValue("last-file-lib-cleanup");
-            $lastRun = $lastRun == null ? 0 : $lastRun;
-
-            $fileLib = $this->container->getFileLibraryInstance();
-            $fileList = array();
-            $contentList = array();
-            /** @var Page $page */
-            foreach ($this->container->getPageOrderInstance()->listPages() as $page) {
-                if ($page->lastModified() < $lastRun) {
-                    continue;
-                }
-                $contentList = array_merge($contentList, array_values($page->getContentLibrary()->listContents($lastRun)));
-
-            }
-            $contentList = array_merge($contentList, array_values($this->container->getSiteInstance()->getContentLibrary()->listContents($lastRun)));
-
-
-            /** @var File $file */
-            foreach ($fileLib->getFileList($currentUser) as $file) {
-                if ($fileLib->whitelistContainsFile($file)) {
-                    continue;
-                }
-                /** @var $content Content */
-                foreach($contentList as $content){
-                    if(!$content->containsSubString($file->getFilename(),$lastRun)){
-                        continue;
-                    }
-                    $fileLib->addToWhitelist($file);
-                }
-                $fileList[] = $file;
-            }
-
-            $fileLib->cleanLibrary($currentUser);
-            $vars->setValue("last-file-lib-cleanup", time());
-            $currentUser->logout();
+        if ($currentUser == null) {
+            HTTPHeaderHelper::redirectToLocation("/");
+            return;
         }
+
+        $site = $this->container->getSiteInstance();
+        $vars = $site->getVariables();
+        $lastRun = $vars->getValue("last-file-lib-cleanup");
+        $lastRun = $lastRun == null ? 0 : $lastRun;
+
+        $fileLib = $this->container->getFileLibraryInstance();
+        $contentLibraries = array();
+        /** @var Page $page */
+        foreach ($this->container->getPageOrderInstance()->listPages() as $page) {
+            if ($page->lastModified() < $lastRun) {
+                continue;
+            }
+            $contentLibraries[] = $page->getContentLibrary();
+
+        }
+        if($site->lastModified() >= $lastRun){
+            $contentLibraries[] = $site->getContentLibrary();
+        }
+
+        /** @var File $file */
+        foreach ($fileLib->getFileList($currentUser) as $file) {
+            if ($fileLib->whitelistContainsFile($file)) {
+                continue;
+            }
+            /** @var $contentLib ContentLibrary */
+            foreach ($contentLibraries as $contentLib) {
+                if (!count($contentLib->searchLibrary($file->getFilename(), $lastRun))) {
+                    continue;
+                }
+                $fileLib->addToWhitelist($file);
+                break;
+            }
+        }
+
+        $fileLib->cleanLibrary($currentUser);
+        $vars->setValue("last-file-lib-cleanup", time());
+        $currentUser->logout();
+
         HTTPHeaderHelper::redirectToLocation("/");
     }
 }
