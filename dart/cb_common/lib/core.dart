@@ -146,7 +146,7 @@ class Position {
 class Debugger {
   static Debugger _instance;
 
-  bool enabled = true;
+  bool enabled = false;
 
   factory Debugger() => _instance == null ? _instance = new Debugger._internal() : _instance;
 
