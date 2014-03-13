@@ -3,6 +3,10 @@
     "require": {
         "twig/twig": "1.*"
     },
+    "require-dev":{
+        "phpunit/phpunit": "3.7.*",
+        "phpunit/dbunit": ">=1.2"
+    },
     "authors": [
         {
             "name": "Christian Budde",
