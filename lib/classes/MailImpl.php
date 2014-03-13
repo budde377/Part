@@ -61,13 +61,15 @@ class MailImpl implements Mail
     }
 
     /**
+     * @abstract
      * @param string | User $sender
+     * @param string $name
      * @return bool FALSE if not instance of User or not valid mail else TRUE
      */
-    public function setSender($sender)
+    public function setSender($sender, $name = "")
     {
         if (($s = $this->checkMail($sender)) !== false) {
-            $this->sender = $s;
+            $this->sender = strlen($name)?"$name <$s>":$s;
             return true;
         }
         return false;
@@ -75,12 +77,13 @@ class MailImpl implements Mail
 
     /**
      * @param string | User $receiver
+     * @param string $name
      * @return bool FALSE if not instance of User or not valid mail else TRUE
      */
-    public function addReceiver($receiver)
+    public function addReceiver($receiver, $name = "")
     {
         if (($r = $this->checkMail($receiver))) {
-            $this->receivers .= $r.', ';
+            $this->receivers .= (strlen($name)?"$name <$r>":$r).", ";
             return true;
         }
         return false;
@@ -94,7 +97,7 @@ class MailImpl implements Mail
     public function addCC($cc)
     {
         if (($r = $this->checkMail($cc))) {
-            $this->CCs .= $r.', ';
+            $this->CCs .= "$r, ";
             return true;
         }
         return false;
