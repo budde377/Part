@@ -9,3 +9,5 @@ update-dev:
 	rm -f composer.phar
 	php -r "eval('?>'.file_get_contents('https://getcomposer.org/installer'));"
 	php composer.phar update
+	@echo "### Upgrading Dart dependencies ###"
+	cd dart/cb_common; pub upgrade

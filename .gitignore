@@ -1,6 +1,7 @@
 vendor/
 composer.lock
 packages/
+dart/cb_common/test/packages
 pubspec.lock
 composer.phar
 .idea
