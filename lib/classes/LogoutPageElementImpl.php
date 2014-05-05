@@ -24,6 +24,11 @@ class LogoutPageElementImpl extends PageElementImpl
     public function setUpElement()
     {
         parent::setUpElement();
+        $path = "/";
+        if(isset($_SERVER["HTTP_REFERER"]) && ($url = parse_url($_SERVER["HTTP_REFERER"])) &&
+            $url["host"] == $_SERVER["HTTP_HOST"]){
+            $path = $url["path"];
+        }
         $currentUser = $this->container->getUserLibraryInstance()->getUserLoggedIn();
 
         if ($currentUser == null) {
@@ -69,6 +74,6 @@ class LogoutPageElementImpl extends PageElementImpl
         $vars->setValue("last-file-lib-cleanup", time());
         $currentUser->logout();
 
-        HTTPHeaderHelper::redirectToLocation("/");
+        HTTPHeaderHelper::redirectToLocation($path);
     }
 }
