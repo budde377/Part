@@ -228,7 +228,7 @@ void enableNoScrollBody(){
 void disableNoScrollBody(){
   var body = query('body');
   body.classes.remove('no_scroll');
-  var y = parsePx(body.style.top);
+  var y = parseNumber(body.style.top);
   body.style.removeProperty('top');
   window.scrollTo(window.scrollX,y);
 
