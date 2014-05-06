@@ -73,7 +73,7 @@ interface OrderedList extends Iterator {
      * Deletes an element.
      *
      * @param OrderedListElement $element
-     * @return mixed
+     * @return void
      */
     public function deleteElement(OrderedListElement $element);
 
@@ -91,6 +91,18 @@ interface OrderedList extends Iterator {
      * if no such element; returns null.
      */
     public function getElementAt($place);
+
+    /**
+     * Returns the first element.
+     * @return OrderedListElement
+     */
+    public function firstElement();
+
+    /**
+     * Returns the last element.
+     * @return OrderedListElement
+     */
+    public function lastElement();
 
     /**
      * @return int Size of the list

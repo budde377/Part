@@ -20,6 +20,10 @@ class OrderedListImpl implements OrderedList
     private $list;
     /** @var  PDOStatement */
     private $listPreparedStatement;
+    /** @var  PDOStatement */
+    private $deleteElementPreparedStatement;
+    /** @var  PDOStatement */
+    private $rebalancePreparedStatement;
 
 
     function __construct(DB $db, $id)
@@ -91,7 +95,7 @@ class OrderedListImpl implements OrderedList
      */
     public function getId()
     {
-        // TODO: Implement getId() method.
+        return $this->id;
     }
 
     /**
@@ -153,7 +157,8 @@ class OrderedListImpl implements OrderedList
      */
     public function getElementOrder(OrderedListElement $element)
     {
-        // TODO: Implement getElementOrder() method.
+        $this->setUpList();
+        return array_search($element, $this->list);
     }
 
     /**
@@ -163,24 +168,50 @@ class OrderedListImpl implements OrderedList
      */
     public function createElement()
     {
+        $this->setUpList();
+
         if ($this->createElementPreparedStatement == null) {
             $this->createElementPreparedStatement = $this->db->getConnection()
-                ->prepare("INSERT INTO OrderedList (list_id, element_id, 'order') VALUES (?,?,?)");
+                ->prepare("INSERT INTO OrderedList (list_id, element_id, `order`) VALUES (?,?,?)");
         }
-
         $elm = new OrderedListElementImpl($this->db);
         $this->createElementPreparedStatement->execute(array($this->id, $elm->getId(), $this->size()));
+        $this->list[] = $elm;
+        return $elm;
     }
 
     /**
      * Deletes an element.
      *
      * @param OrderedListElement $element
-     * @return mixed
+     * @return void
      */
     public function deleteElement(OrderedListElement $element)
     {
-        // TODO: Implement deleteElement() method.
+        $this->setUpList();
+
+        if(!$this->isInList($element)){
+            return;
+        }
+
+        if ($this->deleteElementPreparedStatement == null) {
+            $this->deleteElementPreparedStatement = $this->db->getConnection()
+                ->prepare("DELETE FROM OrderedList WHERE element_id = ? AND list_id = ?");
+            $this->rebalancePreparedStatement = $this->db->getConnection()
+                ->prepare("UPDATE OrderedList SET `order`=? WHERE `order`=? AND list_id = ?");
+        }
+        $this->deleteElementPreparedStatement->execute(array($element->getId(), $this->id));
+        $o = $this->getElementOrder($element);
+        $s = $this->size();
+        $l = array();
+        for($i = $o;$i<$s; $i++){
+            $this->rebalancePreparedStatement->execute(array($i, $i+1, $this->id));
+            if(isset($this->list[$i+1])){
+                $l[$i] = $this->list[$i+1];
+            }
+        }
+        $this->list = $l;
+
     }
 
     /**
@@ -191,7 +222,7 @@ class OrderedListImpl implements OrderedList
     public function isInList(OrderedListElement $element)
     {
         $this->setUpList();
-        return array_search($element, $this->list);
+        return in_array($element, $this->list);
     }
 
     /**
@@ -201,7 +232,13 @@ class OrderedListImpl implements OrderedList
      */
     public function getElementAt($place)
     {
-        // TODO: Implement getElementAt() method.
+        if(($s = $this->size()) == 0){
+            return null;
+        }
+
+        $place = max(0, $place);
+        $place = min($s-1, $place);
+        return $this->list[$place];
     }
 
     /**
@@ -220,16 +257,33 @@ class OrderedListImpl implements OrderedList
             return;
         }
         $this->list = array();
-        if ($this->listPreparedStatement != null) {
-            return;
+        if ($this->listPreparedStatement == null) {
+            $this->listPreparedStatement = $this->db->getConnection()
+                ->prepare("SELECT element_id FROM OrderedList WHERE list_id = ? ORDER BY 'order' ASC");
+            $this->listPreparedStatement->bindParam(1, $this->id);
         }
-        $this->listPreparedStatement = $this->db->getConnection()
-            ->prepare("SELECT element_id FROM OrderedList WHERE list_id = ? ORDER BY 'order' ASC");
-        $this->listPreparedStatement->bindParam(1, $this->id);
         $this->listPreparedStatement->execute();
         foreach ($this->listPreparedStatement->fetchAll() as $row) {
             $this->list[] = new OrderedListElementImpl($this->db, $row["element_id"]);
         }
 
+    }
+
+    /**
+     * Returns the first element.
+     * @return OrderedListElement
+     */
+    public function firstElement()
+    {
+        return $this->getElementAt(0);
+    }
+
+    /**
+     * Returns the last element.
+     * @return OrderedListElement
+     */
+    public function lastElement()
+    {
+        return $this->getElementAt($this->size()-1);
     }
 }
