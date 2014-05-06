@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <database name="cms2012testdb">
+        <table_data name="OrderedList">
+            <row>
+                <field name="list_id">someList</field>
+                <field name="element_id">1</field>
+                <field name="order">0</field>
+            </row>
+            <row>
+                <field name="list_id">someList</field>
+                <field name="element_id">2</field>
+                <field name="order">1</field>
+            </row>
+        </table_data>
+        <table_data name="OrderedListElement">
+            <row>
+                <field name="element_id" >1</field>
+                <field name="key">someKey</field>
+                <field name="key">someVal</field>
+            </row>
+            <row>
+                <field name="element_id" >2</field>
+                <field name="key">someKey2</field>
+                <field name="key">someVal2</field>
+            </row>
+        </table_data>
+
+    </database>
+</mysqldump>

@@ -201,3 +201,41 @@ ADD CONSTRAINT `UserVariables_ibfk_1` FOREIGN KEY (`username`) REFERENCES `User`
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur-dump for tabellen `OrderedList`
+--
+
+CREATE TABLE IF NOT EXISTS `OrderedList` (
+  `list_id` varchar(255) NOT NULL,
+  `element_id` varchar(255) NOT NULL,
+  `order` int(11) NOT NULL,
+  UNIQUE KEY `list_id` (`list_id`,`order`),
+  UNIQUE KEY `element_id` (`element_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur-dump for tabellen `OrderedListElement`
+--
+
+CREATE TABLE IF NOT EXISTS `OrderedListElement` (
+  `element_id` varchar(255) NOT NULL,
+  `key` varchar(255) NOT NULL,
+  `val` longtext NOT NULL,
+  UNIQUE KEY `element_id` (`element_id`,`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Begrænsninger for dumpede tabeller
+--
+
+--
+-- Begrænsninger for tabel `OrderedListElement`
+--
+ALTER TABLE `OrderedListElement`
+ADD CONSTRAINT `OrderedListElement_ibfk_1` FOREIGN KEY (`element_id`) REFERENCES `OrderedList` (`element_id`) ON DELETE CASCADE ON UPDATE CASCADE;
