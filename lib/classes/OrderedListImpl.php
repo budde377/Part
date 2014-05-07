@@ -13,8 +13,6 @@ class OrderedListImpl implements OrderedList
     private $db;
     private $id;
     /** @var  PDOStatement */
-    private $inListPreparedStatement;
-    /** @var  PDOStatement */
     private $createElementPreparedStatement;
     /** @var  array */
     private $list;
@@ -23,7 +21,9 @@ class OrderedListImpl implements OrderedList
     /** @var  PDOStatement */
     private $deleteElementPreparedStatement;
     /** @var  PDOStatement */
-    private $rebalancePreparedStatement;
+    private $changeOrderPreparedStatement;
+    /** @var  ArrayIterator */
+    private $arrayIterator;
 
 
     function __construct(DB $db, $id)
@@ -33,6 +33,19 @@ class OrderedListImpl implements OrderedList
     }
 
 
+    private function setUpArrayIterator(){
+        if($this->arrayIterator != null){
+            return $this->arrayIterator;
+        }
+        $this->setUpList();
+        $this->arrayIterator = new ArrayIterator($this->list);
+        return $this->arrayIterator;
+    }
+
+    private function clearArrayIterator(){
+        $this->arrayIterator = null;
+    }
+
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Return the current element
@@ -41,7 +54,8 @@ class OrderedListImpl implements OrderedList
      */
     public function current()
     {
-        // TODO: Implement current() method.
+        return $this->setUpArrayIterator()->current();
+
     }
 
     /**
@@ -52,7 +66,7 @@ class OrderedListImpl implements OrderedList
      */
     public function next()
     {
-        // TODO: Implement next() method.
+        $this->setUpArrayIterator()->next();
     }
 
     /**
@@ -63,7 +77,7 @@ class OrderedListImpl implements OrderedList
      */
     public function key()
     {
-        // TODO: Implement key() method.
+        return $this->setUpArrayIterator()->key();
     }
 
     /**
@@ -75,7 +89,7 @@ class OrderedListImpl implements OrderedList
      */
     public function valid()
     {
-        // TODO: Implement valid() method.
+        return $this->setUpArrayIterator()->valid();
     }
 
     /**
@@ -86,7 +100,7 @@ class OrderedListImpl implements OrderedList
      */
     public function rewind()
     {
-        // TODO: Implement rewind() method.
+        $this->setUpArrayIterator()->rewind();
     }
 
     /**
@@ -103,7 +117,8 @@ class OrderedListImpl implements OrderedList
      */
     public function listElements()
     {
-        // TODO: Implement listElements() method.
+        $this->setUpList();
+        return $this->list;
     }
 
     /**
@@ -116,7 +131,27 @@ class OrderedListImpl implements OrderedList
      */
     public function moveUp(OrderedListElement $element)
     {
-        // TODO: Implement moveUp() method.
+        $c = $this->getElementOrder($element);
+        if($c == $this->size()-1){
+            return;
+        }
+
+        if(!$this->isInList($element)){
+            return;
+        }
+
+        $pstm = $this->setUpChangeOrderPreparedStatement();
+        $con = $this->db->getConnection();
+        $con->beginTransaction();
+        $pstm->execute(array($this->size(), $c, $this->id));
+        $pstm->execute(array($c, $c +1, $this->id));
+        $pstm->execute(array($c+1, $this->size(), $this->id));
+        $con->commit();
+
+        $e = $this->list[$c];
+        $this->list[$c] = $this->list[$c+1];
+        $this->list[$c+1] = $e;
+        $this->clearArrayIterator();
     }
 
     /**
@@ -129,7 +164,27 @@ class OrderedListImpl implements OrderedList
      */
     public function moveDown(OrderedListElement $element)
     {
-        // TODO: Implement moveDown() method.
+        $c = $this->getElementOrder($element);
+        if($c == 0){
+            return;
+        }
+
+        if(!$this->isInList($element)){
+            return;
+        }
+
+        $pstm = $this->setUpChangeOrderPreparedStatement();
+        $con = $this->db->getConnection();
+        $con->beginTransaction();
+        $pstm->execute(array($this->size(), $c, $this->id));
+        $pstm->execute(array($c, $c -1, $this->id));
+        $pstm->execute(array($c-1, $this->size(), $this->id));
+        $con->commit();
+
+        $e = $this->list[$c];
+        $this->list[$c] = $this->list[$c-1];
+        $this->list[$c-1] = $e;
+        $this->clearArrayIterator();
     }
 
     /**
@@ -145,7 +200,31 @@ class OrderedListImpl implements OrderedList
      */
     public function setElementOrder(OrderedListElement $element, $place)
     {
-        // TODO: Implement setElementOrder() method.
+        if(!$this->isInList($element)){
+            return;
+        }
+
+        $place = min($place, $this->size()-1);
+        $place = max(0, $place);
+
+        $currentPos = $this->getElementOrder($element);
+
+        if($place == $currentPos){
+            return;
+        }
+
+        if($currentPos > $place){
+            for($i = $currentPos; $i > $place; $i --){
+                $this->moveDown($element);
+            }
+        } else {
+            for($i = $currentPos; $i < $place; $i ++){
+                $this->moveUp($element);
+            }
+        }
+
+
+
     }
 
     /**
@@ -177,6 +256,7 @@ class OrderedListImpl implements OrderedList
         $elm = new OrderedListElementImpl($this->db);
         $this->createElementPreparedStatement->execute(array($this->id, $elm->getId(), $this->size()));
         $this->list[] = $elm;
+        $this->clearArrayIterator();
         return $elm;
     }
 
@@ -193,25 +273,38 @@ class OrderedListImpl implements OrderedList
         if(!$this->isInList($element)){
             return;
         }
-
+        $con = $this->db->getConnection();
         if ($this->deleteElementPreparedStatement == null) {
-            $this->deleteElementPreparedStatement = $this->db->getConnection()
+            $this->deleteElementPreparedStatement = $con
                 ->prepare("DELETE FROM OrderedList WHERE element_id = ? AND list_id = ?");
-            $this->rebalancePreparedStatement = $this->db->getConnection()
-                ->prepare("UPDATE OrderedList SET `order`=? WHERE `order`=? AND list_id = ?");
         }
+        $pstm = $this->setUpChangeOrderPreparedStatement();
+        $con->beginTransaction();
         $this->deleteElementPreparedStatement->execute(array($element->getId(), $this->id));
         $o = $this->getElementOrder($element);
         $s = $this->size();
         $l = array();
         for($i = $o;$i<$s; $i++){
-            $this->rebalancePreparedStatement->execute(array($i, $i+1, $this->id));
+            $pstm->execute(array($i, $i+1, $this->id));
             if(isset($this->list[$i+1])){
                 $l[$i] = $this->list[$i+1];
             }
         }
+        $con->commit();
         $this->list = $l;
+        $this->clearArrayIterator();
+    }
 
+    /**
+     * @return PDOStatement
+     */
+    private function setUpChangeOrderPreparedStatement(){
+        if($this->changeOrderPreparedStatement != null){
+            return $this->changeOrderPreparedStatement;
+        }
+
+        return $this->changeOrderPreparedStatement= $this->db->getConnection()
+            ->prepare("UPDATE OrderedList SET `order`=? WHERE `order`=? AND list_id = ?");
     }
 
     /**
@@ -232,12 +325,13 @@ class OrderedListImpl implements OrderedList
      */
     public function getElementAt($place)
     {
-        if(($s = $this->size()) == 0){
+
+        if(($s = $this->size()) == 0 ||  $place >= $s|| $place < 0){
             return null;
         }
 
-        $place = max(0, $place);
-        $place = min($s-1, $place);
+
+
         return $this->list[$place];
     }
 

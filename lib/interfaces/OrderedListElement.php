@@ -37,6 +37,20 @@ interface OrderedListElement extends ArrayAccess, Iterator {
     public function getAttribute($key);
 
     /**
+     * Clears an attribute
+     * @param string $key
+     * @return void
+     */
+    public function clearAttribute($key);
+
+    /**
+     * Deletes an node.
+     * The containing list must be updated.
+     * @return void
+     */
+    public function delete();
+
+    /**
      * This will return the list that contains this element.
      * @return OrderedList
      */

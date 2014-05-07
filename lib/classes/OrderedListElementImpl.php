@@ -180,4 +180,24 @@ class OrderedListElementImpl implements OrderedListElement{
     {
         // TODO: Implement getList() method.
     }
+
+    /**
+     * Clears an attribute
+     * @param string $key
+     * @return void
+     */
+    public function clearAttribute($key)
+    {
+        // TODO: Implement clearAttribute() method.
+    }
+
+    /**
+     * Deletes an node.
+     * The containing list must be updated.
+     * @return void
+     */
+    public function delete()
+    {
+        // TODO: Implement delete() method.
+    }
 }
