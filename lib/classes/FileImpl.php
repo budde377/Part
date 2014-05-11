@@ -73,7 +73,7 @@ class FileImpl implements File
      * Will return the file name as a string
      * @return string
      */
-    public function getBaseName()
+    public function getFilename()
     {
         $pathArray = explode('/', $this->filePath);
 
@@ -220,7 +220,7 @@ class FileImpl implements File
     /**
      * @return string
      */
-    public function getFileName()
+    public function getBasename()
     {
         return pathinfo($this->filePath, PATHINFO_FILENAME);
     }

@@ -8,7 +8,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-class SiteContentImplTest extends PHPUnit_Extensions_Database_TestCase{
+class SiteContentImplTest extends CustomDatabaseTestCase{
 
     /** @var  SiteImpl */
     private $site;
@@ -22,12 +22,19 @@ class SiteContentImplTest extends PHPUnit_Extensions_Database_TestCase{
     private $nonExistingContent;
 
 
+
+    function __construct()
+    {
+        parent::__construct(dirname(__FILE__) . '/mysqlXML/SiteContentImplTest.xml');
+    }
+
+
+
     public function setUp(){
         parent::setUp();
         $this->site = new StubSiteImpl();
         $this->db = new StubDBImpl();
-        $pdo = new PDO('mysql:dbname=' . MySQLConstants::MYSQL_DATABASE. ';host=' . MySQLConstants::MYSQL_HOST, MySQLConstants::MYSQL_USERNAME, MySQLConstants::MYSQL_PASSWORD, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
-        $this->db->setConnection($pdo);
+        $this->db->setConnection(self::$pdo);
         $this->existingContent = new SiteContentImpl($this->db, $this->site);
         $this->existingContent2 = new SiteContentImpl($this->db, $this->site, "Test");
         $this->nonExistingContent = new SiteContentImpl($this->db, $this->site, "NoContent");
@@ -120,31 +127,26 @@ class SiteContentImplTest extends PHPUnit_Extensions_Database_TestCase{
     }
 
 
-    /**
-     * Returns the test database connection.
-     *
-     * @return PHPUnit_Extensions_Database_DB_IDatabaseConnection
-     */
-    protected function getConnection()
-    {
-        $pdo = new PDO('mysql:dbname=' . MySQLConstants::MYSQL_DATABASE . ';host=' . MySQLConstants::MYSQL_HOST, MySQLConstants::MYSQL_USERNAME, MySQLConstants::MYSQL_PASSWORD);
-        return $this->createDefaultDBConnection($pdo);
+    public function testContainsSubStringWillReturnFalseIfDoesNotContainContent(){
+        $this->assertFalse($this->nonExistingContent->containsSubString("non existing substring"));
+        $this->assertFalse($this->existingContent->containsSubString("non existing substring"));
+        $this->assertFalse($this->existingContent2->containsSubString("non existing substring"));
     }
 
-    /**
-     * Returns the test dataset.
-     *
-     * @return PHPUnit_Extensions_Database_DataSet_IDataSet
-     */
-    protected function getDataSet()
-    {
-        return $this->createMySQLXMLDataSet(dirname(__FILE__) . '/mysqlXML/SiteContentImplTest.xml');
+
+    public function testContainsSubStringWillReturnFalseIfDoesNotContainContentButOtherDoes(){
+        $this->assertFalse($this->existingContent2->containsSubString("Some Content"));
     }
 
-    public function getSetUpOperation()
-    {
-        $cascadeTruncates = true;
-        return new PHPUnit_Extensions_Database_Operation_Composite(array(new TruncateOperation($cascadeTruncates), PHPUnit_Extensions_Database_Operation_Factory::INSERT()));
+
+    public function testContainsSubStringWillReturnTrueIfContainsString(){
+        $this->assertTrue($this->existingContent->containsSubString("Some"));
+        $this->assertTrue($this->existingContent->containsSubString("Content"));
+        $this->assertTrue($this->existingContent->containsSubString("Some Content"));
     }
 
+
+    public function testContainsWillRespectTime(){
+        $this->assertFalse($this->existingContent->containsSubString("Some", time()));
+    }
 }

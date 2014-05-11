@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://christianbud.de/mysqldump"
+           xmlns="http://christianbud.de/mysqldump">
+
+    <xs:simpleType name="SQLNameToken">
+        <xs:restriction base="xs:NMTOKEN">
+            <xs:pattern value="[a-z][a-z0-9_]+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="SQLBoolean">
+        <xs:restriction base="xs:nonNegativeInteger">
+            <xs:pattern value="0|1"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="MySQLYesNo">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="YES|NO"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="mysqldump">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="database">
+                    <xs:complexType>
+                        <xs:sequence>
+
+                            <xs:element name="table_structure" maxOccurs="unbounded" minOccurs="0">
+                                <xs:complexType>
+                                    <xs:sequence>
+
+                                        <xs:element name="field" maxOccurs="unbounded" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:simpleContent>
+                                                    <xs:extension base="xs:string">
+                                                        <xs:attribute type="SQLNameToken" name="Field" use="required"/>
+                                                        <xs:attribute type="xs:string" name="Type" use="required"/>
+                                                        <xs:attribute type="MySQLYesNo" name="Null"/>
+                                                        <xs:attribute type="xs:string" name="Key"/>
+                                                        <xs:attribute type="xs:string" name="Extra"/>
+                                                        <xs:attribute type="xs:string" name="Comment"/>
+                                                        <xs:attribute type="xs:string" name="Default"/>
+                                                    </xs:extension>
+                                                </xs:simpleContent>
+                                            </xs:complexType>
+                                        </xs:element>
+
+                                        <xs:element name="key" maxOccurs="unbounded" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:simpleContent>
+                                                    <xs:extension base="xs:string">
+                                                        <xs:attribute type="SQLNameToken" name="Table"/>
+                                                        <xs:attribute type="SQLBoolean" name="Non_unique"/>
+                                                        <xs:attribute name="Key_name" use="required">
+                                                            <xs:simpleType>
+                                                                <xs:restriction base="xs:NMTOKEN">
+                                                                    <xs:pattern value="[a-z][a-z0-9_]+|PRIMARY"/>
+                                                                </xs:restriction>
+                                                            </xs:simpleType>
+                                                        </xs:attribute>
+                                                        <xs:attribute type="xs:positiveInteger" name="Seq_in_index"
+                                                                      use="required"/>
+                                                        <xs:attribute type="SQLNameToken" name="Column_name"
+                                                                      use="required"/>
+                                                        <xs:attribute type="xs:string" name="Collation"/>
+                                                        <xs:attribute type="xs:byte" name="Cardinality"/>
+                                                        <xs:attribute type="xs:string" name="Null"/>
+                                                        <xs:attribute type="xs:string" name="Index_type"/>
+                                                        <xs:attribute type="xs:string" name="Comment"/>
+                                                    </xs:extension>
+                                                </xs:simpleContent>
+                                            </xs:complexType>
+                                        </xs:element>
+
+                                        <xs:element name="options">
+                                            <xs:complexType>
+                                                <xs:simpleContent>
+                                                    <xs:extension base="xs:string">
+                                                        <xs:attribute type="xs:string" name="Name"/>
+                                                        <xs:attribute type="xs:string" name="Engine"/>
+                                                        <xs:attribute type="xs:byte" name="Version"/>
+                                                        <xs:attribute type="xs:string" name="Row_format"/>
+                                                        <xs:attribute type="xs:nonNegativeInteger" name="Rows"/>
+                                                        <xs:attribute type="xs:nonNegativeInteger"
+                                                                      name="Avg_row_length"/>
+                                                        <xs:attribute type="xs:nonNegativeInteger" name="Data_length"/>
+                                                        <xs:attribute type="xs:nonNegativeInteger"
+                                                                      name="Max_data_length"/>
+                                                        <xs:attribute type="xs:nonNegativeInteger" name="Index_length"/>
+                                                        <xs:attribute type="xs:nonNegativeInteger" name="Data_free"/>
+                                                        <xs:attribute type="xs:nonNegativeInteger"
+                                                                      name="Auto_increment"/>
+                                                        <xs:attribute type="xs:string" name="Create_time"/>
+                                                        <xs:attribute type="xs:string" name="Update_time"/>
+                                                        <xs:attribute type="xs:string" name="Check_time"/>
+                                                        <xs:attribute type="xs:string" name="Collation"/>
+                                                        <xs:attribute type="xs:string" name="Create_options"/>
+                                                        <xs:attribute type="xs:string" name="Comment"/>
+                                                    </xs:extension>
+                                                </xs:simpleContent>
+                                            </xs:complexType>
+                                        </xs:element>
+
+                                    </xs:sequence>
+                                    <xs:attribute type="SQLNameToken" name="name" use="required"/>
+                                </xs:complexType>
+                            </xs:element>
+
+                            <xs:element name="table_data" maxOccurs="unbounded" minOccurs="0">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="row" maxOccurs="unbounded" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="field" maxOccurs="unbounded" minOccurs="0">
+                                                        <xs:complexType>
+                                                            <xs:simpleContent>
+                                                                <xs:extension base="xs:string">
+                                                                    <xs:attribute type="SQLNameToken" name="name"
+                                                                                  use="required"/>
+                                                                    <!-- xsi:nil="true" -->
+                                                                </xs:extension>
+                                                            </xs:simpleContent>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute type="SQLNameToken" name="name" use="required"/>
+                                </xs:complexType>
+                            </xs:element>
+
+                        </xs:sequence>
+                        <xs:attribute type="xs:NMTOKEN" name="name"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

@@ -363,7 +363,7 @@ class ConnectionFolderImplTest extends PHPUnit_Framework_TestCase
         $this->connection->isDirectoryReturn[] = $this->folder->getAbsolutePath();
         $f = $this->folder->putFile($this->testFile);
         $this->assertInstanceOf('File', $f);
-        $this->assertEquals($this->testFolder->getAbsolutePath() . '/' . $this->testFile->getBaseName(), $f->getAbsoluteFilePath(), 'Path did not match');
+        $this->assertEquals($this->testFolder->getAbsolutePath() . '/' . $this->testFile->getFilename(), $f->getAbsoluteFilePath(), 'Path did not match');
         $f = new FileImpl($f->getAbsoluteFilePath());
         $this->assertTrue($f->exists());
     }
@@ -424,8 +424,8 @@ class ConnectionFolderImplTest extends PHPUnit_Framework_TestCase
         $this->connection->localCreate = true;
         $this->connection->isDirectoryReturn[] = $this->folder->getAbsolutePath();
         $this->connection->isDirectoryReturn[] = $this->folder->getAbsolutePath().'/'.$this->testFolder2->getName();
-        $this->connection->directoryList[] = $this->testFile2->getBaseName();
-        $this->connection->isFileReturn[] = $this->folder->getAbsolutePath().'/'.$this->testFile2->getBaseName();
+        $this->connection->directoryList[] = $this->testFile2->getFilename();
+        $this->connection->isFileReturn[] = $this->folder->getAbsolutePath().'/'.$this->testFile2->getFilename();
         $this->connection->isFileReturn[] = $this->testFile2->getAbsoluteFilePath();
         $f = $this->folder->putFolder($this->testFolder2);
         $this->assertInstanceOf('Folder',$f);
@@ -438,7 +438,7 @@ class ConnectionFolderImplTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('File',$f);
         $f  = new FileImpl($f->getAbsoluteFilePath());
         $this->assertTrue($f->exists());
-        $this->assertEquals($this->folder->getAbsolutePath().'/'.$this->testFolder2->getName().'/'.$this->testFile2->getBaseName(),$f->getAbsoluteFilePath());
+        $this->assertEquals($this->folder->getAbsolutePath().'/'.$this->testFolder2->getName().'/'.$this->testFile2->getFilename(),$f->getAbsoluteFilePath());
     }
 
     public function testPutFolderWillReturnFolderWithNewName(){
@@ -447,8 +447,8 @@ class ConnectionFolderImplTest extends PHPUnit_Framework_TestCase
         $this->connection->localCreate = true;
         $this->connection->isDirectoryReturn[] = $this->folder->getAbsolutePath();
         $this->connection->isDirectoryReturn[] = $this->folder->getAbsolutePath().'/'.$newName;
-        $this->connection->directoryList[] = $this->testFile2->getBaseName();
-        $this->connection->isFileReturn[] = $this->folder->getAbsolutePath().'/'.$this->testFile2->getBaseName();
+        $this->connection->directoryList[] = $this->testFile2->getFilename();
+        $this->connection->isFileReturn[] = $this->folder->getAbsolutePath().'/'.$this->testFile2->getFilename();
         $this->connection->isFileReturn[] = $this->testFile2->getAbsoluteFilePath();
         $f = $this->folder->putFolder($this->testFolder2,$newName);
         $this->assertInstanceOf('Folder',$f);

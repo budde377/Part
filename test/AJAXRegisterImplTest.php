@@ -172,30 +172,5 @@ class AJAXRegisterImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('someId', $registered[0]);
         $this->assertEquals('someId2', $registered[1]);
     }
-    /*
-     * $chain = new ScriptChainImpl();
 
-        $postScriptArray = $this->config->getPostScripts();
-        foreach ($postScriptArray as $className => $location) {
-
-            if (!file_exists($location)) {
-                throw new FileNotFoundException($location);
-            }
-            require_once $location;
-
-            if (!class_exists($className)) {
-                throw new ClassNotDefinedException($className);
-            }
-
-            $preScript = new $className();
-
-            if (!($preScript instanceof Script)) {
-                throw new ClassNotInstanceOfException($className, 'Script');
-            }
-
-            $chain->addScript($preScript);
-        }
-
-        return $chain;
-     */
 }

@@ -53,7 +53,7 @@ interface File
      * Will return the file name as a string
      * @return string
      */
-    public function getBaseName();
+    public function getFilename();
 
 
     /**
@@ -64,7 +64,7 @@ interface File
     /**
      * @return string
      */
-    public function getFileName();
+    public function getBasename();
 
     /**
      * @abstract

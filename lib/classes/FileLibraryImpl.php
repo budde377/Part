@@ -63,20 +63,23 @@ class FileLibraryImpl implements FileLibrary{
      */
     public function getFileList(User $user = null)
     {
+        $returnList = array();
         if($user != null){
             $folder = new FolderImpl($this->filesDir->getAbsolutePath()."/".$user->getUniqueId());
             if(!$folder->exists()){
                 return array();
             }
+            $returnList = $folder->listFolder();
+        } else {
+            foreach($this->filesDir->listFolder(Folder::LIST_FOLDER_FOLDERS) as $folder){
+                /** @var Folder $folder */
+                $returnList = array_merge($returnList, $folder->listFolder());
+            }
 
-            return $folder->listFolder();
         }
-        $returnList = array();
-        foreach($this->filesDir->listFolder(Folder::LIST_FOLDER_FOLDERS) as $folder){
-            /** @var Folder $folder */
-            $returnList = array_merge($returnList, $folder->listFolder());
-        }
-        return $returnList;
+        return array_filter($returnList, function(File $f){
+            return !$this->isVersion($f);
+        });
     }
 
     /**
@@ -91,7 +94,7 @@ class FileLibraryImpl implements FileLibrary{
 
         $this->whiteList[] = $this->filePath($file);
         $this->writeWhitelist();
-        return true;
+        return $this->whitelistContainsFile($file);
     }
 
     /**
@@ -109,7 +112,7 @@ class FileLibraryImpl implements FileLibrary{
             unset($this->whiteList[$key]);
         }
         $this->writeWhitelist();
-        return true;
+        return !$this->whitelistContainsFile($file);
     }
 
     private function filePath(File $file){
@@ -124,14 +127,21 @@ class FileLibraryImpl implements FileLibrary{
      */
     public function addToLibrary(User $user, File $file)
     {
+        $folder = new FolderImpl($this->filesDir->getAbsolutePath()."/".$user->getUniqueId());
+        $ext = $file->getExtension() == ""?"":".".$file->getExtension();
+        $name = str_replace(".", "", uniqid("",true)).$ext;
+        return $this->addToLibraryHelper($folder, $file, $name);
+    }
+
+    private function addToLibraryHelper(Folder $folder, File $file, $newName){
         if(!$this->filesDir->exists()){
             $this->filesDir->create();
         }
-        $folder = new FolderImpl($this->filesDir->getAbsolutePath()."/".$user->getUniqueId());
         $folder->create();
-        return $folder->putFile($file);
-
+        $f = $folder->putFile($file, $newName);
+        return $f;
     }
+
 
     /**
      * This will clean the library from any file not present in the white-list
@@ -146,6 +156,10 @@ class FileLibraryImpl implements FileLibrary{
         foreach($this->getFileList($user) as $file){
             /** @var $file File */
             if(!$this->whitelistContainsFile($file)){
+                /** @var $vf File */
+                foreach($this->listVersionsToOriginal($file) as $vf){
+                    $vf->delete();
+                }
                 $file->delete();
             }
         }
@@ -166,5 +180,146 @@ class FileLibraryImpl implements FileLibrary{
 
     private function loadWhitelist(){
         $this->whiteList = array_filter(explode("\n", $this->whitelistFile->getContents()));
+    }
+
+    /**
+     * Will remove a file from library.
+     * @param File $file
+     * @return bool TRUE on success else FALSE
+     */
+    public function removeFromLibrary(File $file)
+    {
+        if(!$this->containsFile($file)){
+            return false;
+        }
+        if($this->whitelistContainsFile($file)){
+            $this->removeFromWhitelist($file);
+        }
+        $file->delete();
+        return !$this->containsFile($file);
+    }
+
+    /**
+     * A version of a file is a new file that shares the name of the original file plus some
+     * appended version:
+     *    original file:   file.txt
+     *    Version 2    :   file-2.txt
+     *
+     * @param File $origFile
+     * @param File $newFile
+     * @param null|string $version
+     * @return File
+     */
+    public function addVersionOfFile(File $origFile, File $newFile, $version = null)
+    {
+        if(!$this->containsFile($origFile)){
+            return null;
+        }
+
+        $name = $this->versionFileName($origFile, $version);
+
+        $f = new FileImpl($origFile->getParentFolder()->getAbsolutePath()."/".$name);
+        if($f->exists()){
+            return $f;
+        }
+
+        return $this->addToLibraryHelper($origFile->getParentFolder(),$newFile, $name);
+    }
+
+    private function versionFileName(File $f, $version = null){
+        $version = $version == null?uniqid():$version;
+        $ext = $f->getExtension() == ""?"":".".$f->getExtension();
+        $name = $f->getBasename()."-".$version.$ext;
+        return $name;
+    }
+
+
+    /**
+     * Given a version file this will return the original.
+     * If the given file isn't in the library, null will be returned.
+     * If the given file isn't a version of a file, null will be returned.
+     *
+     * @param File $file
+     * @return File
+     */
+    public function findOriginalFileToVersion(File $file)
+    {
+        if(!$this->containsFile($file)){
+            return null;
+        }
+
+        preg_match("/([^-]+)(-.*)?/", $file->getBasename(), $matches);
+        $ext = $file->getExtension() == ""?"":".".$file->getExtension();
+        return new FileImpl($file->getParentFolder()->getAbsolutePath()."/".$matches[1].$ext);
+    }
+
+    /**
+     * Will list the versions of a given file.
+     * @param File $file
+     * @return array
+     */
+    public function listVersionsToOriginal(File $file)
+    {
+        if(!$this->containsFile($file)){
+            return array();
+        }
+
+        if($this->isVersion($file)){
+            return array();
+        }
+
+        return array_filter($file->getParentFolder()->listFolder(Folder::LIST_FOLDER_FILES), function(File $f) use ($file){
+            return $this->isVersion($f) && strpos($f->getBasename(), $file->getBasename()) === 0;
+        });
+    }
+
+
+    /**
+     * @param File $file
+     * @return bool Returns TRUE if is version else FALSE
+     */
+    public function isVersion(File $file)
+    {
+        preg_match("/([^-]+)(-.*)?/", $file->getBasename(), $matches);
+        return isset($matches[2]) && $matches[2] != "";
+
+    }
+
+    /**
+     * Returns in which folder the files are located.
+     * @return Folder
+     */
+    public function getFilesFolder()
+    {
+        return new FolderImpl($this->filesDir->getAbsolutePath());
+    }
+
+    /**
+     * Will check if a version of the given file already exists.
+     * @param File $file
+     * @param string $version
+     * @return bool
+     */
+    public function containsVersionOfFile($file, $version)
+    {
+        $f = $this->findVersionOfFile($file, $version);
+        return  $f != null;
+    }
+
+    /**
+     * This will return the desired version of the file, if it exists, else null.
+     * @param File $file
+     * @param string $version
+     * @return File
+     */
+    public function findVersionOfFile($file, $version)
+    {
+        if($file == null || ($f2 = $this->findOriginalFileToVersion($file)) == null ||
+            $file->getAbsoluteFilePath() != $f2->getAbsoluteFilePath()){
+            return null;
+        }
+        $name = $this->versionFileName($file, $version);
+        $f = new FileImpl($file->getParentFolder()->getAbsolutePath()."/".$name);
+        return $this->containsFile($f)?$f:null;
     }
 }

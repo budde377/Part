@@ -37,4 +37,11 @@ interface Site
      * @return int The new timestamp
      */
     public function modify();
+
+
+    /**
+     * Will get and reuse instance of content library.
+     * @return ContentLibrary
+     */
+    public function getContentLibrary();
 }

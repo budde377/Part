@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-class PageVariablesImplTest extends PHPUnit_Extensions_Database_TestCase{
+class PageVariablesImplTest extends CustomDatabaseTestCase{
 
     private $db;
     /** @var  PageVariablesImpl */
@@ -23,11 +23,17 @@ class PageVariablesImplTest extends PHPUnit_Extensions_Database_TestCase{
     /** @var  Page */
     private $nonExistingUser;
 
+
+    function __construct($dataset = null)
+    {
+        parent::__construct(dirname(__FILE__) . '/mysqlXML/PageVariablesImplTest.xml');
+    }
+
+
     public function setUp(){
         parent::setUp();
         $this->db = new StubDBImpl();
-        $pdo = new PDO('mysql:dbname=' . MySQLConstants::MYSQL_DATABASE. ';host=' . MySQLConstants::MYSQL_HOST, MySQLConstants::MYSQL_USERNAME, MySQLConstants::MYSQL_PASSWORD, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
-        $this->db->setConnection($pdo);
+        $this->db->setConnection(self::$pdo);
         $this->existingUser = new PageImpl('testpage', $this->db);
         $this->existingVariables = new PageVariablesImpl($this->db, $this->existingUser);
         $this->existingUser2 = new PageImpl('testpage2', $this->db);
@@ -136,31 +142,4 @@ class PageVariablesImplTest extends PHPUnit_Extensions_Database_TestCase{
         $this->assertTrue($seen2);
     }
 
-
-    /**
-     * Returns the test database connection.
-     *
-     * @return PHPUnit_Extensions_Database_DB_IDatabaseConnection
-     */
-    protected function getConnection()
-    {
-        $pdo = new PDO('mysql:dbname=' . MySQLConstants::MYSQL_DATABASE . ';host=' . MySQLConstants::MYSQL_HOST, MySQLConstants::MYSQL_USERNAME, MySQLConstants::MYSQL_PASSWORD);
-        return $this->createDefaultDBConnection($pdo);
-    }
-
-    /**
-     * Returns the test dataset.
-     *
-     * @return PHPUnit_Extensions_Database_DataSet_IDataSet
-     */
-    protected function getDataSet()
-    {
-        return $this->createMySQLXMLDataSet(dirname(__FILE__) . '/mysqlXML/PageVariablesImplTest.xml');
-    }
-
-    public function getSetUpOperation()
-    {
-        $cascadeTruncates = true;
-        return new PHPUnit_Extensions_Database_Operation_Composite(array(new TruncateOperation($cascadeTruncates), PHPUnit_Extensions_Database_Operation_Factory::INSERT()));
-    }
 }

@@ -26,6 +26,11 @@ class JSONResponse {
   static const ERROR_CODE_CANT_EDIT_PAGE = 18;
   static const ERROR_CODE_INVALID_FILE = 19;
   static const ERROR_CODE_FILE_NOT_FOUND = 20;
+  static const ERROR_CODE_COULD_NOT_CREATE_FILE = 21;
+  static const ERROR_CODE_INVALID_NAME = 22;
+  static const ERROR_CODE_INVALID_SUBJECT = 23;
+  static const ERROR_CODE_INVALID_MESSAGE = 24;
+  static const ERROR_CODE_INVALID_INPUT = 25;
 
 
   final String type;

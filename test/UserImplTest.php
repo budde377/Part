@@ -6,14 +6,20 @@
  * Date: 22/07/12
  * Time: 14:35
  */
-class UserImplTest extends PHPUnit_Extensions_Database_TestCase
+class UserImplTest extends CustomDatabaseTestCase
 {
     /** @var $db StubDBImpl */
     private $db;
-    /** @var $pdo PDO */
-    private $pdo;
     /** @var $user UserImpl */
     private $user;
+
+
+    function __construct($dataset = null)
+    {
+        parent::__construct(dirname(__FILE__) . '/mysqlXML/UserImplTest.xml');
+    }
+
+
 
     /*
      * Assumes that the UserImpl uses SESSION to handle login
@@ -24,11 +30,8 @@ class UserImplTest extends PHPUnit_Extensions_Database_TestCase
         parent::setUp();
         @session_destroy();
         @session_start();
-        $this->pdo = new PDO('mysql:dbname=' . self::database . ';host=' . self::host, self::username, self::password, array(
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_PERSISTENT=>true));
         $this->db = new StubDBImpl();
-        $this->db->setConnection($this->pdo);
+        $this->db->setConnection(self::$pdo);
         $this->user = new UserImpl('someUser', $this->db);
     }
 

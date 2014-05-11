@@ -261,7 +261,7 @@ class ConnectionFolderImpl implements Folder
     public function putFile(File $file, $newName = null)
     {
         if($this->connection->isDirectory($this->path) && $file->exists()){
-            $newName = $newName == null? $file->getBaseName():$newName;
+            $newName = $newName == null? $file->getFilename():$newName;
             $newFile = new ConnectionFileImpl($this->getAbsolutePath().'/'.$newName,$this->connection);
             $newFile->setAccessMode(File::FILE_MODE_W_TRUNCATE_FILE_TO_ZERO_LENGTH);
             if(($newRes = $newFile->getResource()) !== false && ($oldRes = $file->getResource()) !== false){

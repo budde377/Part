@@ -6,21 +6,26 @@
  * Time: 12:58 PM
  * To change this template use File | Settings | File Templates.
  */
-class PageOrderImplTest extends PHPUnit_Extensions_Database_TestCase
+class PageOrderImplTest extends CustomDatabaseTestCase
 {
 
 
     /** @var $db StubDBImpl */
     private $db;
-    /** @var $pdo PDO */
-    private $pdo;
+
+
+    function __construct()
+    {
+        parent::__construct(dirname(__FILE__) . '/mysqlXML/PageOrderImplTest.xml');
+    }
+
+
 
     public function setUp()
     {
         parent::setUp();
-        $this->pdo = new PDO('mysql:dbname=' . self::database . ';host=' . self::host, self::username, self::password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
         $this->db = new StubDBImpl();
-        $this->db->setConnection($this->pdo);
+        $this->db->setConnection(self::$pdo);
     }
 
 
@@ -451,27 +456,6 @@ class PageOrderImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertFalse($setReturn, 'Did not return false');
     }
 
-    /*
-    public function testSetPageOrderThrowExceptionOnMalformedParentPageInput()
-    {
-        $pageOrder = new PageOrderImpl($this->db);
-        $exceptionWasThrown = false;
-        $topOrder = $pageOrder->getPageOrder();
-        $oldPage = $topOrder[0];
-        try {
-            $pageOrder->setPageOrder($oldPage, 1, "INVALID INPUT");
-        } catch (Exception $e) {
-            $exceptionWasThrown = true;
-            $this->assertInstanceOf('MalformedParameterException', $e, 'Wrong type of exception');
-            $this->assertEquals(3, $e->getParameterNumber(), 'Wrong param number');
-            $this->assertEquals('Page|null', $e->getExpectedType(), 'Wrong expected type');
-
-
-        }
-        $this->assertTrue($exceptionWasThrown, 'Exception was not thrown');
-    }
-
-    */
     public function testSetPageOrderReturnFalseOnLoop()
     {
         $pageOrder = new PageOrderImpl($this->db);
@@ -496,8 +480,18 @@ class PageOrderImplTest extends PHPUnit_Extensions_Database_TestCase
         $newPageOrder = new PageOrderImpl($this->db);
         $newTopOrder = $newPageOrder->getPageOrder();
 
-        $this->assertEquals($topOrder[0]->getID(), $newTopOrder[0]->getID());
-        $this->assertEquals($topOrder[1]->getID(), $newTopOrder[1]->getID());
+        /** @var Page $o1 */
+        $o1 = $topOrder[0];
+        /** @var Page $o2 */
+        $o2 = $topOrder[1];
+
+        /** @var Page $o3 */
+        $o3 = $newTopOrder[0];
+        /** @var Page $o4 */
+        $o4 = $newTopOrder[1];
+
+        $this->assertEquals($o1->getID(), $o3->getID());
+        $this->assertEquals($o2->getID(), $o4->getID());
     }
 
 

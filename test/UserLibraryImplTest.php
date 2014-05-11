@@ -5,15 +5,18 @@
  * Date: 23/07/12
  * Time: 16:49
  */
-class UserLibraryImplTest extends PHPUnit_Extensions_Database_TestCase
+class UserLibraryImplTest extends CustomDatabaseTestCase
 {
 
     /** @var $db StubDBImpl */
     private $db;
-    /** @var $pdo PDO */
-    private $pdo;
     /** @var $user UserLibraryImpl */
     private $library;
+
+    function __construct($dataset = null)
+    {
+        parent::__construct(dirname(__FILE__) . '/mysqlXML/UserLibraryImplTest.xml');
+    }
 
 
     public function setUp()
@@ -21,9 +24,8 @@ class UserLibraryImplTest extends PHPUnit_Extensions_Database_TestCase
         parent::setUp();
         @session_destroy();
         @session_start();
-        $this->pdo = new PDO('mysql:dbname=' . self::database . ';host=' . self::host, self::username, self::password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,PDO::ATTR_PERSISTENT=>true));
         $this->db = new StubDBImpl();
-        $this->db->setConnection($this->pdo);
+        $this->db->setConnection(self::$pdo);
         $this->library = new UserLibraryImpl($this->db);
     }
 
@@ -243,10 +245,12 @@ class UserLibraryImplTest extends PHPUnit_Extensions_Database_TestCase
         $ret = $this->library->getChildren($parent);
         $this->assertTrue(is_array($ret),'Did not return array');
         $this->assertEquals(2,count($ret),'Did not return array of right size');
-        $this->assertInstanceOf('User',$ret[0]);
-        $this->assertInstanceOf('User',$ret[1]);
-        $this->assertTrue($ret[0]->getUsername() == 'user2' || $ret[0]->getUsername() == 'user3');
-        $this->assertTrue($ret[1]->getUsername() == 'user3' || $ret[1]->getUsername() == 'user2');
+        $this->assertInstanceOf('User',$u1 = $ret[0]);
+        $this->assertInstanceOf('User',$u2 = $ret[1]);
+        /** @var User $u1 */
+        /** @var User $u2 */
+        $this->assertTrue($u1->getUsername() == 'user2' || $u1->getUsername() == 'user3');
+        $this->assertTrue($u2->getUsername() == 'user3' || $u2->getUsername() == 'user2');
 
     }
 
@@ -264,36 +268,6 @@ class UserLibraryImplTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals($user1->getUsername(),$user3->getParent(),'Parent did not match');
     }
 
-
-
-
-    public function getSetUpOperation()
-    {
-        $cascadeTruncates = true;
-        return new PHPUnit_Extensions_Database_Operation_Composite(array(new TruncateOperation($cascadeTruncates), PHPUnit_Extensions_Database_Operation_Factory::INSERT()));
-    }
-
-    /**
-     * Returns the test database connection.
-     *
-     * @return PHPUnit_Extensions_Database_DB_IDatabaseConnection
-     */
-    protected function getConnection()
-    {
-        $pdo = new PDO('mysql:dbname=' . self::database . ';host=' . self::host, self::username, self::password);
-        return $this->createDefaultDBConnection($pdo);
-    }
-
-    /**
-     * Returns the test dataset.
-     *
-     * @return PHPUnit_Extensions_Database_DataSet_IDataSet
-     */
-    protected function getDataSet()
-    {
-        return $this->createMySQLXMLDataSet(dirname(__FILE__) . '/mysqlXML/UserLibraryImplTest.xml');
-    }
-
     private function userInList($ret, User $user)
     {
         $success = false;
@@ -303,8 +277,6 @@ class UserLibraryImplTest extends PHPUnit_Extensions_Database_TestCase
         return $success;
     }
 
-    const database = MySQLConstants::MYSQL_DATABASE;
-    const password = MySQLConstants::MYSQL_PASSWORD;
-    const username = MySQLConstants::MYSQL_USERNAME;
-    const host = MySQLConstants::MYSQL_HOST;
+
+
 }

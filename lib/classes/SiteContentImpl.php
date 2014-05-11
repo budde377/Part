@@ -18,6 +18,8 @@ class SiteContentImpl implements Content{
 
     /** @var  PDOStatement */
     private $preparedAddStatement;
+    /** @var  PDOStatement */
+    private $preparedSearchStatement;
 
 
     public function __construct(DB $database, Site $site, $id = "")
@@ -139,4 +141,23 @@ class SiteContentImpl implements Content{
     {
         return ($c = $this->latestContent()) == null?"": $c;
     }
+
+    /**
+     * Searches content for the the string from a given time ($fromTime).
+     * The time should be present when available as it would cut down
+     * the search time.
+     *
+     * @param String $string
+     * @param int $fromTime Timestamp
+     * @return bool TRUE if found else FALSE
+     */
+    public function containsSubString($string, $fromTime = null)
+    {
+        if ($this->preparedSearchStatement == null) {
+            $this->preparedSearchStatement = $this->db->getConnection()->prepare("
+            SELECT time FROM PageContent WHERE content LIKE ? AND id = ? AND time >= ?
+            ");
+        }
+        $this->preparedSearchStatement->execute(array("%".$string."%", $this->id, date("Y-m-d H:i:s", $fromTime == null?0:$fromTime)));
+        return $this->preparedSearchStatement->rowCount() > 0;    }
 }

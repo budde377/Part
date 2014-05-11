@@ -300,7 +300,7 @@ class FolderImpl implements Folder
         if($file == null){
             return null;
         }
-        $name = $newName == null?$file->getBaseName():$newName;
+        $name = $newName == null?$file->getFilename():$newName;
 
         if(($f = $file->copy($this->folderPath."/".$name)) == null){
             return null;

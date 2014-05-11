@@ -75,4 +75,27 @@ class StubContentImpl implements Content{
         return ($c = $this->latestContent()) == null?"": $c;
 
     }
+
+    /**
+     * Searches content for the the string from a given time ($fromTime).
+     * The time should be present when available as it would cut down
+     * the search time.
+     *
+     * @param String $string
+     * @param int $fromTime Timestamp
+     * @return bool TRUE if found else FALSE
+     */
+    public function containsSubString($string, $fromTime = null)
+    {
+        foreach($this->content as $t=>$c){
+            if($t < $fromTime){
+                continue;
+            }
+
+            if(strpos($c, $string) >= 0){
+                return true;
+            }
+        }
+        return false;
+    }
 }

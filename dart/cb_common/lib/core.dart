@@ -16,9 +16,9 @@ part 'src/core_initializer.dart';
 part 'src/core_file_uploader.dart';
 
 
-int parsePx(String pxString) => int.parse(pxString.replaceAll(new RegExp("[^0-9]"), ""), onError:(_) => 0);
+int parseNumber(String pxString) => int.parse(pxString.replaceAll(new RegExp("[^0-9]"), ""), onError:(_) => 0);
 
-num linearAnimationFunction(double pct, num from, num to) => from + (to - from) * pct;
+num linearAnimationFunction(num pct, num from, num to) => from + (to - from) * pct;
 
 
 String sizeToString(int bytes) {
@@ -30,7 +30,7 @@ String sizeToString(int bytes) {
 
 bool validMail(String string) => new RegExp(r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$', caseSensitive:false).hasMatch(string);
 
-bool validUrl(String string) => new RegExp(r"^http(s)?://[a-z\-0-9\.æøå]+\.[a-z]{2,3}(/[.]*)?", caseSensitive:false).hasMatch(string);
+bool validUrl(String string) => new RegExp(r"^http(s)?://.+\.[a-z]{2,3}(/[.]*)?$", caseSensitive:false).hasMatch(string);
 
 bool youtubeVideoIdFromUrl(String string) {
   var firstMatch = new RegExp(r"^http(s)?:\/\/www.youtube.com\/watch\?v=([^&#]+)", caseSensitive:false).firstMatch(string);
@@ -146,7 +146,7 @@ class Position {
 class Debugger {
   static Debugger _instance;
 
-  bool enabled = true;
+  bool enabled = false;
 
   factory Debugger() => _instance == null ? _instance = new Debugger._internal() : _instance;
 

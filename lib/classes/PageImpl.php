@@ -22,6 +22,7 @@ class PageImpl implements Page, Observable
     private $connection;
 
     private $content = array();
+    private $contentLibrary;
     private $variables;
 
     /** @var $existsStatement PDOStatement | null */
@@ -390,11 +391,8 @@ class PageImpl implements Page, Observable
      */
     public function getContent($id = "")
     {
-        if(!isset($this->content[$id])){
-            $this->content[$id] = new PageContentImpl($this->database,$this,$id);
-        }
+        return $this->getContentLibrary()->getContent($id);
 
-        return $this->content[$id];
     }
 
     /**
@@ -430,5 +428,16 @@ class PageImpl implements Page, Observable
     public function getVariables()
     {
         return $this->variables == null? $this->variables = new PageVariablesImpl($this->database, $this):$this->variables;
+    }
+
+    /**
+     * Will return and reuse a ContentLibrary instance.
+     * @return ContentLibrary
+     */
+    public function getContentLibrary()
+    {
+        return $this->contentLibrary == null?
+            $this->contentLibrary = new PageContentLibraryImpl($this->database, $this):
+            $this->contentLibrary;
     }
 }

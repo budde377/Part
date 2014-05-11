@@ -13,6 +13,8 @@ class MailImplTest extends  PHPUnit_Framework_TestCase
     /** @var $mail MailImpl */
     private $mail;
 
+    private $validMail = "test@test.dk";
+
     public function setUp(){
         $this->strategy = new StubSendMailStrategyImpl();
         $this->mail = new MailImpl($this->strategy);
@@ -20,8 +22,7 @@ class MailImplTest extends  PHPUnit_Framework_TestCase
 
 
     public function testValidMailWillReturnTrueOnValidMail (){
-        $validMail = 'test@test.dk';
-        $this->assertTrue($this->validMail($validMail),'Did not return true on valid mail');
+        $this->assertTrue($this->validMail($this->validMail),'Did not return true on valid mail');
     }
 
     public function testWillReturnFalseOnInvalidMail(){
@@ -49,12 +50,12 @@ class MailImplTest extends  PHPUnit_Framework_TestCase
     }
 
     public function testSetFromWithValidMailWillReturnTrue(){
-        $validMail = 'test@test.dk';
-        $ret = $this->mail->setSender($validMail);
+
+        $ret = $this->mail->setSender($this->validMail);
         $this->assertTrue($ret,'Did not return true');
 
         $user = new StubUserImpl();
-        $user->setMail($validMail);
+        $user->setMail($this->validMail);
         $user->setUsername('someUsername');
 
         $ret = $this->mail->setSender($user);
@@ -77,13 +78,22 @@ class MailImplTest extends  PHPUnit_Framework_TestCase
         $this->assertFalse($ret,'Did not return false');
     }
 
+
+    public function testSetSenderNameWillSetName(){
+        $name = "Lars Larsen";
+        $this->strategy->setReturnValue(true);
+        $this->assertTrue($this->mail->setSender($this->validMail, $name));
+        $this->assertTrue($this->mail->sendMail());
+        $this->assertEquals("$name <{$this->validMail}>", $this->strategy->getFrom());
+    }
+
     public function testAddReceiverWillReturnTrueWithValidMail(){
-        $validMail = 'test@test.dk';
-        $ret = $this->mail->addReceiver($validMail);
+
+        $ret = $this->mail->addReceiver($this->validMail);
         $this->assertTrue($ret,'Did not return true');
 
         $user = new StubUserImpl();
-        $user->setMail($validMail);
+        $user->setMail($this->validMail);
         $user->setUsername('someUsername');
 
         $ret = $this->mail->addReceiver($user);
@@ -106,13 +116,21 @@ class MailImplTest extends  PHPUnit_Framework_TestCase
         $this->assertFalse($ret,'Did not return false');
     }
 
+    public function testAddReceiverWillAddName(){
+        $name = "Lars Larsen";
+        $this->strategy->setReturnValue(true);
+        $this->assertTrue($this->mail->addReceiver($this->validMail, $name));
+        $this->assertTrue($this->mail->sendMail());
+        $this->assertEquals("$name <{$this->validMail}>", $this->strategy->getTo());
+    }
+
     public function testAddCCrWillReturnTrueWithValidMail(){
-        $validMail = 'test@test.dk';
-        $ret = $this->mail->addCC($validMail);
+
+        $ret = $this->mail->addCC($this->validMail);
         $this->assertTrue($ret,'Did not return true');
 
         $user = new StubUserImpl();
-        $user->setMail($validMail);
+        $user->setMail($this->validMail);
         $user->setUsername('someUsername');
 
         $ret = $this->mail->addCC($user);
@@ -137,12 +155,12 @@ class MailImplTest extends  PHPUnit_Framework_TestCase
 
 
     public function testAddBCCrWillReturnTrueWithValidMail(){
-        $validMail = 'test@test.dk';
-        $ret = $this->mail->addBCC($validMail);
+
+        $ret = $this->mail->addBCC($this->validMail);
         $this->assertTrue($ret,'Did not return true');
 
         $user = new StubUserImpl();
-        $user->setMail($validMail);
+        $user->setMail($this->validMail);
         $user->setUsername('someUsername');
 
         $ret = $this->mail->addBCC($user);

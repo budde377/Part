@@ -33,8 +33,8 @@ class PxPropertyAnimation extends PropertyAnimation {
     }
     stop();
 
-    _fromm = parsePx(from);
-    _too = parsePx(to);
+    _fromm = parseNumber(from);
+    _too = parseNumber(to);
     running = true;
 
     _animation = new Animation(duration == null ? new Duration(milliseconds:100) : duration, (double pct) {

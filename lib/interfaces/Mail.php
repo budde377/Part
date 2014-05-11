@@ -14,16 +14,18 @@ interface Mail
     /**
      * @abstract
      * @param string | User $sender
+     * @param string $name
      * @return bool FALSE if not instance of User or not valid mail else TRUE
      */
-    public function setSender($sender);
+    public function setSender($sender, $name = "");
 
     /**
      * @abstract
      * @param string | User $receiver
+     * @param string $name
      * @return bool FALSE if not instance of User or not valid mail else TRUE
      */
-    public function addReceiver($receiver);
+    public function addReceiver($receiver, $name = "");
 
     /**
      * @abstract
