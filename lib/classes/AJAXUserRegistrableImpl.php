@@ -9,6 +9,7 @@
 
 class AJAXUserRegistrableImpl implements Registrable{
 
+    use ValidationTrait;
     /** @var \BackendSingletonContainer  */
     private $container;
     /** @var null|\User  */
@@ -38,9 +39,24 @@ class AJAXUserRegistrableImpl implements Registrable{
 
         $loginFunction = new JSONFunctionImpl('userLogin',
             function ($username, $password) use ($userLibrary) {
+                $user = null;
                 if(($user = $userLibrary->getUser($username)) == null){
-                    return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR,
-                        JSONResponse::ERROR_CODE_USER_NOT_FOUND);
+                    if(!$this->validMail($username)){
+                        return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR,
+                            JSONResponse::ERROR_CODE_USER_NOT_FOUND);
+                    }
+
+                    foreach($userLibrary as $u){
+                        /** @var $u User */
+                        if($username == $u->getMail()){
+                            $user = $u;
+                        }
+
+                    }
+                    if($user == null){
+                        return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR,
+                            JSONResponse::ERROR_CODE_USER_NOT_FOUND);
+                    }
                 }
                 if($user->login($password)){
                     return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_SUCCESS);
