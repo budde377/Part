@@ -25,6 +25,7 @@ class ConfigImpl implements Config
     private $defaultPages;
     private $enableUpdater;
     private $tmpFolderPath;
+    private $log;
 
     /**
      * @param SimpleXMLElement $configFile
@@ -341,11 +342,25 @@ class ConfigImpl implements Config
      */
     public function getTmpFolderPath()
     {
-        if($this->tmpFolderPath !== null){
-
+        if ($this->tmpFolderPath !== null) {
+            return $this->tmpFolderPath;
         }
 
         $result = $this->tmpFolderPath = (string)$this->configFile->tmpFolder['path'];
-        return $result === null?$this->tmpFolderPath = "": $result;
+        return $result === null ? $this->tmpFolderPath = "" : $result;
+    }
+
+    /**
+     * @return string Path to the error log.
+     */
+    public function getLogPath()
+    {
+        if ($this->log !== null) {
+            return $this->log;
+        }
+
+        $result = $this->log = (string)$this->configFile->log['path'];
+        return $result === null ? $this->log = "" : $result;
+
     }
 }

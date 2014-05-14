@@ -112,4 +112,9 @@ interface Config
      */
     public function getTmpFolderPath();
 
+    /**
+     * @return string Path to the error log.
+     */
+    public function getLogPath();
+
 }

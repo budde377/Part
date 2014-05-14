@@ -108,9 +108,38 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase{
         $ar = $this->logFile->listLog();
         $ar1 = $ar[0];
         $this->assertArrayHasKey("dumpfile", $ar1);
-        $this->assertEquals($ar1["dumpfile"], $d->getFilename());
+        $this->assertInstanceOf("DumpFile", $d2 = $ar1["dumpfile"]);
+        $this->assertTrue($d === $d2);
         $this->dumpFile = $d;
     }
+
+
+    public function testListLogDumpFileAndReuseInstance(){
+        $d = $this->logFile->log("Some msg", LogFile::LOG_LEVEL_WARNING, true);
+        $ar = $this->logFile->listLog();
+        $ar1 = $ar[0];
+        $this->assertTrue($d === $ar1["dumpfile"]);
+        $ar = $this->logFile->listLog();
+        $ar2 = $ar[0];
+        $this->assertTrue($ar2["dumpfile"] === $ar1["dumpfile"]);
+        $this->dumpFile = $d;
+    }
+
+    public function testListLogWillRespectTime(){
+        $msg1 = uniqid();
+        $msg2 = uniqid();
+
+        $this->logFile->log($msg1, LogFile::LOG_LEVEL_ERROR);
+        sleep(1);
+        $t = time();
+        $this->logFile->log($msg2, LogFile::LOG_LEVEL_ERROR);
+        $ar = $this->logFile->listLog(LogFile::LOG_LEVEL_ALL, $t);
+
+        $this->assertEquals(1, count($ar));
+        $this->assertEquals($msg2, $ar[0]["message"]);
+
+    }
+
 
     public function tearDown(){
         $this->logFile->delete();

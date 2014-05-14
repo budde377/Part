@@ -23,6 +23,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     private $updater;
     private $siteInstance;
     private $fileLibraryInstance;
+    private $logInstance;
 
     /**
      * @param mixed $CSSRegisterInstance
@@ -259,4 +260,21 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     }
 
 
+    /**
+     * Will create and reuse instance of log.
+     * @return LogFile
+     */
+    public function getLogInstance()
+    {
+        return $this->logInstance;
+
+    }
+
+    /**
+     * @param mixed $logInstance
+     */
+    public function setLogInstance($logInstance)
+    {
+        $this->logInstance = $logInstance;
+    }
 }

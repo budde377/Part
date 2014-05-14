@@ -25,7 +25,8 @@ interface LogFile extends File{
 
     /**
      * @param int $level Use bitwise or to show multiple levels.
+     * @param int $time The earliest time to retrieve.
      * @return array Will return an list ordered by log-time containing three indices: level, message and unix-time. Default is all
      */
-    public function listLog($level = LogFile::LOG_LEVEL_ALL);
+    public function listLog($level = LogFile::LOG_LEVEL_ALL, $time = 0);
 } 

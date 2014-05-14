@@ -160,4 +160,18 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($ret1 === $ret2);
     }
 
+    public function testGetLogWillReturnSameInstance(){
+        $p = "/some/path";
+        $this->config->setLogPath($p);
+        $ret1 = $this->backContainer->getLogInstance();
+        $this->assertInstanceOf('LogFile',$ret1);
+        $ret2 =$this->backContainer->getLogInstance();
+        $this->assertTrue($ret1 === $ret2);
+        $this->assertEquals($ret1->getAbsoluteFilePath(), $p);
+    }
+
+    public function testGetLogWillReturnNullIfNoPathInConfig(){
+        $this->assertNull($this->backContainer->getLogInstance());
+    }
+
 }

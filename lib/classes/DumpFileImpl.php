@@ -8,14 +8,23 @@
 
 class DumpFileImpl extends FileImpl implements DumpFile{
 
-    /**
-     * This will dump some var to the file, using print_r.
-     * @param string $name
-     * @param mixed $var
-     */
 
     public function dumpVar($name, $var)
     {
-        // TODO: Implement dumpVar() method.
+
+        $this->write("\n## $name ##\n");
+        $this->write(print_r($var, true)."\n");
+
+    }
+
+    public function create()
+    {
+        if($this->size() > 0){
+            return;
+        }
+        $this->write("# About #\n");
+        $this->write("This dump file was created on ". date("j-n-Y at H:i:s").".\n\n");
+        $this->write("# Dumped variables #\n");
+
     }
 }

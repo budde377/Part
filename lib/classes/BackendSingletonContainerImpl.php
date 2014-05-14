@@ -37,6 +37,8 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $site;
     /** @var  FileLibrary */
     private $fileLibrary;
+    /** @var  LogFile */
+    private $log;
 
     public function __construct(Config $config)
     {
@@ -205,5 +207,14 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getFileLibraryInstance()
     {
         return $this->fileLibrary == null? $this->fileLibrary = new FileLibraryImpl(new FolderImpl($this->getConfigInstance()->getRootPath()."/files/")):$this->fileLibrary;
+    }
+
+    public function getLogInstance()
+    {
+
+        if($this->config->getLogPath() == ""){
+            return null;
+        }
+        return $this->log == null? $this->log = new LogFileImpl($this->getConfigInstance()->getLogPath()):$this->log;
     }
 }

@@ -541,8 +541,26 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $configXML = simplexml_load_string("<config>{$this->defaultOwner}
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertEquals("", $config->getLogPath());
+    }
+
+    public function testGetErrorLogReturnsRightPath(){
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}
+                <log path='/some/path' />
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertEquals("/some/path", $config->getLogPath());
+    }
+
+    public function testGetErrorLogReturnsReturnsEmptyWhenNotDefined(){
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $this->assertEquals("", $config->getTmpFolderPath());
     }
+
 
     public function testGetDomainWillReturnDomainOnExist(){
         $configXML = simplexml_load_string("<config>

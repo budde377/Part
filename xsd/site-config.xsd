@@ -67,6 +67,7 @@
                     </xs:unique>
                 </xs:element>
                 <xs:element name="tmpFolder" type="temp_dir" minOccurs="0"/>
+                <xs:element name="log" type="temp_dir" minOccurs="0" />
             </xs:all>
         </xs:complexType>
     </xs:element>

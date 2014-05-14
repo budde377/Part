@@ -18,6 +18,7 @@ class StubConfigImpl implements Config
     private $optimizer;
     private $mysqlCon;
     private $defaultPages = array();
+    private $logPath;
 
     /**
      * @param array $defaultPages
@@ -211,6 +212,24 @@ class StubConfigImpl implements Config
      */
     public function getTmpFolderPath()
     {
-        // TODO: Implement getTmpFolderPath() method.
+        return "";
+
+    }
+
+    /**
+     * @return string Path to the error log.
+     */
+    public function getLogPath()
+    {
+        return $this->logPath;
+
+    }
+
+    /**
+     * @param mixed $logPath
+     */
+    public function setLogPath($logPath)
+    {
+        $this->logPath = $logPath;
     }
 }

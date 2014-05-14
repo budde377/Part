@@ -42,8 +42,9 @@ if($config->isDebugMode()){
     } catch (Exception $exception) {
         ob_clean();
         $mail = new MailImpl();
+        $backendContainer = $factory->buildBackendSingletonContainer($config);
         /** @var $user User */
-        foreach($factory->buildBackendSingletonContainer($config)->getUserLibraryInstance() as $user){
+        foreach($backendContainer->getUserLibraryInstance() as $user){
             if($user->getUserPrivileges()->hasRootPrivileges()){
                 $mail->addReceiver($user);
             }
@@ -55,14 +56,8 @@ if($config->isDebugMode()){
         };
 
         $message = "Hej<br />
-        Du modtager denne mail fordi der er sket en fejl på en af de sider, som du er <i>root</i> bruger på.<br/>
-        <br />";
-        $message .= $printVars('EXCEPTION', $exception);
-        $message .= $printVars('$_SERVER', $_SERVER);
-        $message .= $printVars('$_POST', $_POST);
-        $message .= $printVars('$_GET', $_GET);
-        $message .= $printVars('$_SESSION', $_SESSION);
-        $message .= $printVars('$_COOKIE', $_COOKIE);
+        Du modtager denne mail fordi der er sket en fejl på en af de sider, som du er <i>root</i> bruger på.";
+
         $mail->setMessage($message);
         $host = $_SERVER['HTTP_HOST'];
 
@@ -70,6 +65,19 @@ if($config->isDebugMode()){
         $mail->setSender("no-reply@$host");
         $mail->setMailType(Mail::MAIL_TYPE_HTML);
         $mail->sendMail();
+
+        if($log = $backendContainer->getLogInstance()){
+            $d = $log->log("PHP Exception", LogFile::LOG_LEVEL_ERROR, true);
+            $d->dumpVar("Exception", $exception);
+            $d->dumpVar('$_SERVER', $_SERVER);
+            $d->dumpVar('$_POST', $_POST);
+            $d->dumpVar('$_GET', $_GET);
+            $d->dumpVar('$_SESSION', $_SESSION);
+            $d->dumpVar('$_COOKIE', $_COOKIE);
+        }
+
+
+
         if(!isset($_SERVER['REQUEST_URI']) || strpos($_SERVER['REQUEST_URI'], '_500') === false){
             HTTPHeaderHelper::redirectToLocation("/_500");
         }
