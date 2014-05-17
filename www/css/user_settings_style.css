@@ -210,7 +210,7 @@
     width: 100px;
     height: 40px;
     overflow: hidden;
-    background: #656565 url(/_common/img/login_user_menu_icons_vertical.png) no-repeat scroll center -275px;
+    background: #656565 url(/_common/img/login_user_menu_icons_vertical.png) no-repeat scroll center -315px;
     border-right: 1px solid #a9a9a9;
     cursor: pointer;
     -webkit-transition:background-color 0.1s;
@@ -222,23 +222,27 @@
 }
 
 #UserSettingsMenu li.pages {
-    background-position: center -235px;
+    background-position: center -275px;
 }
 
 #UserSettingsMenu li.users {
-    background-position: center -315px;
-}
-
-#UserSettingsMenu li.user {
     background-position: center -355px;
 }
 
-#UserSettingsMenu li.update_site{
+#UserSettingsMenu li.user {
     background-position: center -395px;
 }
 
-#UserSettingsMenu li.mail{
+#UserSettingsMenu li.update_site{
     background-position: center -435px;
+}
+
+#UserSettingsMenu li.mail{
+    background-position: center -474px;
+}
+
+#UserSettingsMenu li.log{
+    background-position: center -514px;
 }
 
 #UserSettingsMenu li.page.active {
@@ -262,7 +266,11 @@
 }
 
 #UserSettingsMenu li.mail.active{
-    background-position: center -195px;
+    background-position: center -194px;
+}
+
+#UserSettingsMenu li.log.active{
+    background-position: center -234px;
 }
 
 form.verticalAlignForm, form.justDistribution {

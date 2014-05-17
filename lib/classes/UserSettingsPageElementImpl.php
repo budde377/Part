@@ -109,7 +109,8 @@ class UserSettingsPageElementImpl extends PageElementImpl
                     <li class='user ' title='Rediger oplysninger'>&nbsp;</li>
                     <li class='users' title='Administrer brugere'>&nbsp;</li>
                     $updateLink
-<!--                    <li class='mail ' title='Administrer mailkonti'>&nbsp;</li>-->
+                    <!-- <li class='mail ' title='Administrer mailkonti'>&nbsp;</li>
+                    <li class='log ' title='Administrer Log'>&nbsp;</li>-->
                 </ul>
             </div>
             <div id='UserSettingsContractLink'>&nbsp;</div>
