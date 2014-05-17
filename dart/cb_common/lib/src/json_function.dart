@@ -264,7 +264,13 @@ class UpdateSiteJSONFunction extends UpdaterJSONFunction {
 
 // Log function
 
-class LogJSONFunction extends JSONFunction {
+class LogJSONFunction extends JSONFunction{
+
+  LogJSONFunction (String fn) : super("Log.$fn");
+}
+
+
+class LogLogJSONFunction extends JSONFunction {
 
   const LOG_LEVEL_DEBUG = 1;
   const LOG_LEVEL_NOTICE = 2;
@@ -272,9 +278,14 @@ class LogJSONFunction extends JSONFunction {
   const LOG_LEVEL_ERROR = 8;
   const LOG_LEVEL_ALL = 15;
 
-  LogJSONFunction (String name, String stackTrace, int level): super("Log.log"){
+  LogLogJSONFunction (String name, String stackTrace, int level): super("log"){
     this.arguments["name"] = name;
     this.arguments["stackTrace"] = stackTrace;
     this.arguments["level"] = level;
   }
+}
+
+
+class ClearLogJSONFunction extends JSONFunction{
+  ClearLogJSONFunction () : super("clear");
 }

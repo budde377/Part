@@ -33,6 +33,20 @@ class AJAXLoggingRegistrableImpl implements Registrable
             return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_SUCCESS);
         }, array("name", "stackTrace", "level")));
 
+        $currentUser = $this->container->getUserLibraryInstance()->getUserLoggedIn();
+        $siteUser = $currentUser != null && $currentUser->getUserPrivileges()->hasSitePrivileges();
+
+        $server->registerJSONFunction(new JSONFunctionImpl("clearLog", function() use ($siteUser, $logFile) {
+            if(!$siteUser){
+                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_UNAUTHORIZED);
+            }
+
+            $logFile->clearLog();
+            return new JSONResponseImpl();
+        }));
+
+
+
 
         return $server->evaluatePostInput()->getAsJSONString();
 
