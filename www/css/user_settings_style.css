@@ -505,3 +505,71 @@ form.initial input.invalid {
     line-height: 20px;
     color: #3C3C3C;
 }
+
+#UserSettingsLogTable{
+    width: 550px;
+    margin-right: 330px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    float: left;
+}
+
+#UserSettingsLogTable tr > td.date{
+    width: 140px;
+    text-align: right;
+    padding-right: 10px;
+}
+
+#UserSettingsLogTable td{
+    line-height: 30px;
+    height: 30px;
+    background: #fff;
+}
+
+#UserSettingsLogTable tr:nth-of-type(even) > td{
+    background: #dedede;
+}
+
+#UserSettingsLogTable tr > td.level{
+    width: 30px;
+    background-image: url("/_common/img/log_icons.png");
+    background-repeat: no-repeat;
+}
+
+#UserSettingsLogTable tr.error > td.level{
+    background-position:  7px center;
+}
+
+#UserSettingsLogTable tr.warning > td.level{
+    background-position:  -33px center;
+}
+
+#UserSettingsLogTable tr.notice > td.level{
+    background-position:  -73px center;
+}
+
+
+#UserSettingsLogTable tr.debug > td.level{
+    background-position:  -113px center;
+}
+
+#UserSettingsLogTable tr td:nth-of-type(3){
+    width: 14px;
+}
+
+#UserSettingsLogTable tr a {
+    background: transparent url("/_common/img/log_icons.png") no-repeat -160px center;
+    height: 30px;
+    width: 14px;
+    display: block;
+    text-decoration: none;
+}
+
+#UserSettingsLogTable tr.empty_row td{
+    text-align: center;
+    font-style: italic;
+}
+
+#UserSettingsLogTable:not(.empty) tr.empty_row{
+    display: none;
+}

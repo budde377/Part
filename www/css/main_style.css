@@ -538,6 +538,13 @@ ul.better_select_options > li:last-child {
     padding-bottom: 90px;
 }
 
+
+.dialog_bg .dialog pre.code{
+    text-align: left;
+    overflow: scroll;
+    height: 400px;
+}
+
 .full_background .container{
     height: 100%;
     margin: 0 auto;

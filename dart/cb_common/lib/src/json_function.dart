@@ -270,13 +270,13 @@ class LogJSONFunction extends JSONFunction{
 }
 
 
-class LogLogJSONFunction extends JSONFunction {
+class LogLogJSONFunction extends LogJSONFunction {
 
-  const LOG_LEVEL_DEBUG = 1;
-  const LOG_LEVEL_NOTICE = 2;
-  const LOG_LEVEL_WARNING = 4;
-  const LOG_LEVEL_ERROR = 8;
-  const LOG_LEVEL_ALL = 15;
+  static const LOG_LEVEL_DEBUG = 1;
+  static const LOG_LEVEL_NOTICE = 2;
+  static const LOG_LEVEL_WARNING = 4;
+  static const LOG_LEVEL_ERROR = 8;
+  static const LOG_LEVEL_ALL = 15;
 
   LogLogJSONFunction (String name, String stackTrace, int level): super("log"){
     this.arguments["name"] = name;
@@ -286,6 +286,12 @@ class LogLogJSONFunction extends JSONFunction {
 }
 
 
-class ClearLogJSONFunction extends JSONFunction{
+class ClearLogJSONFunction extends LogJSONFunction{
   ClearLogJSONFunction () : super("clear");
+}
+
+class GetDumpFileLogJSONFunction extends LogJSONFunction{
+  GetDumpFileLogJSONFunction (int id) : super("getDumpFile"){
+    this.arguments["id"] = id;
+  }
 }
