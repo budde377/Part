@@ -491,6 +491,16 @@ ul.better_select_options > li:last-child {
     margin-left: auto;
 }
 
+.img_right{
+    float: right;
+    margin-left: 5px;
+}
+
+.img_left{
+    float: left;
+    margin-right: 5px;
+}
+
 .hidden {
     display: none;
 }

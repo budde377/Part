@@ -399,6 +399,8 @@ class LinkImageHandler {
   ButtonElement _unlinkButton = new ButtonElement(),
                 _openButton = new ButtonElement(),
                 _editImageButton = new ButtonElement(),
+                _floatImageLeftButton = new ButtonElement(),
+                _floatImageRightButton = new ButtonElement(),
                 _youtubeButton = new ButtonElement(),
                 _vimeoButton = new ButtonElement();
 
@@ -407,13 +409,16 @@ class LinkImageHandler {
   ImageElement _foundImage;
 
   LinkImageHandler(this.element, this.editor) {
-//    _imageEditor.open(element.query('img'));
     _enabled = editor.isOpen;
     editor.onOpenChange.listen((bool b) {
       _setUp();
       _infoBox.remove();
       _enabled = b;
     });
+  }
+
+  void _triggerInput(){
+    editor.element.dispatchEvent(new Event("input"));
   }
 
   void _setUp() {
@@ -464,10 +469,25 @@ class LinkImageHandler {
       handler.editor.minWidth = 50;
       handler.open();
       handler.onEdit.listen((ImageEditProperties p) {
-        editor.element.dispatchEvent(new Event("input"));
+        _triggerInput();
       });
 
     });
+    _floatImageLeftButton..classes.add('edit_image')..onClick.listen((MouseEvent mev) {
+      mev.preventDefault();
+      _foundImage.attributes..remove("style")..remove("class");
+      _foundImage.classes.add("img_left");
+      _triggerInput();
+      _updateInfoBox();
+    });
+    _floatImageRightButton..classes.add('edit_image')..onClick.listen((MouseEvent mev) {
+      mev.preventDefault();
+      _foundImage.attributes..remove("style")..remove("class");
+      _foundImage.classes.add("img_right");
+      _triggerInput();
+      _updateInfoBox();
+    });
+
 
     _infoBox = new InfoBox.elementContent(_boxElement);
     _infoBox..backgroundColor = InfoBox.COLOR_GREYSCALE..removeOnESC = true..element.classes.add('edit_link_image_popup');
@@ -476,6 +496,11 @@ class LinkImageHandler {
 
   }
 
+
+  void _updateInfoBox(){
+    _infoBox.showAboveCenterOfElement(_foundLink == null ? _foundImage : _foundLink);
+
+  }
 
   void _clickHandler(MouseEvent event) {
     if (!_enabled) {
@@ -507,6 +532,8 @@ class LinkImageHandler {
     _boxElement.children.clear();
     if (_foundImage != null) {
       _boxElement.append(_editImageButton);
+      _boxElement.append(_floatImageLeftButton);
+      _boxElement.append(_floatImageRightButton);
     }
 
     if (_foundLink != null) {
@@ -519,7 +546,7 @@ class LinkImageHandler {
       }
       _boxElement.append(_openButton);
     }
-    _infoBox.showAboveCenterOfElement(_foundLink == null ? _foundImage : _foundLink);
+    _updateInfoBox();
 
   }
 
@@ -1401,7 +1428,7 @@ class ContentEditor {
                 if (!selection.containsNode(elm, false)) {
                   return;
                 }
-                elm.attributes.remove("style");
+                elm.attributes..remove("style")..remove("class");
               });
               executor.removeFormat();
             }
