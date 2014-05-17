@@ -878,7 +878,7 @@ class ContentEditor {
 
     l.forEach((Element h){
       var id = h.text.replaceAll(new RegExp(r"[^a-zA-Z0-9]+"),"_");
-      if(id.length = 0){
+      if(id.length == 0){
         h.remove();
         return;
       }
