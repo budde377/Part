@@ -23,7 +23,7 @@ class DumpFileImpl extends FileImpl implements DumpFile{
             return;
         }
         $this->write("# About #\n");
-        $this->write("This dump file was created on ". date("j-n-Y at H:i:s").".\n\n");
+        $this->write("This dump file was created on ". date("j-n-Y") . " at " .date("H:i:s").".\n\n");
         $this->write("# Dumped variables #\n");
 
     }

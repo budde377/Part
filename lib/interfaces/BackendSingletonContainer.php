@@ -110,7 +110,7 @@ interface BackendSingletonContainer
 
     /**
      * Will create and reuse instance of log.
-     * @return LogFile
+     * @return LogFile|Null
      */
     public function getLogInstance();
 

@@ -209,12 +209,20 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
         return $this->fileLibrary == null? $this->fileLibrary = new FileLibraryImpl(new FolderImpl($this->getConfigInstance()->getRootPath()."/files/")):$this->fileLibrary;
     }
 
+    /**
+     * @return LogFile
+     */
     public function getLogInstance()
     {
+        if($this->log != null){
+            return $this->log;
+        }
 
         if($this->config->getLogPath() == ""){
-            return null;
+            $this->log = new StubLogFileImpl();
+        } else {
+            $this->log = new LogFileImpl($this->getConfigInstance()->getLogPath());
         }
-        return $this->log == null? $this->log = new LogFileImpl($this->getConfigInstance()->getLogPath()):$this->log;
+        return $this->log;
     }
 }

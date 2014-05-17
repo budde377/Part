@@ -140,6 +140,33 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase{
 
     }
 
+    public function testClearLogWillClearTheLog(){
+        $this->logFile->log("SOME SMG", LogFile::LOG_LEVEL_ERROR);
+        $this->logFile->log("SOME SMG", LogFile::LOG_LEVEL_ERROR);
+        $this->logFile->log("SOME SMG", LogFile::LOG_LEVEL_ERROR);
+        $this->logFile->log("SOME SMG", LogFile::LOG_LEVEL_ERROR);
+
+        $this->assertGreaterThan(0,strlen($this->logFile->getContents()));
+        $this->logFile->clearLog();
+        $this->assertEquals(0, strlen($this->logFile->getContents()));
+        $this->assertEquals(0, count($this->logFile->listLog()));
+    }
+
+    public function testCanWriteAfterClear(){
+        $this->logFile->log("SOME MSG", LogFile::LOG_LEVEL_ERROR);
+        $this->logFile->clearLog();
+        $this->logFile->log("SOME MSG", LogFile::LOG_LEVEL_ERROR);
+        $this->logFile->log("SOME MSG", LogFile::LOG_LEVEL_ERROR);
+        $this->assertEquals(2, count($this->logFile->listLog()));
+    }
+
+    public function testClearWillDeleteDumpFiles(){
+        $this->dumpFile = $f = $this->logFile->log("SOME MSG", LogFile::LOG_LEVEL_ERROR, true);
+        $this->assertTrue($f->exists());
+        $this->logFile->clearLog();
+        $this->assertFalse($f->exists());
+    }
+
 
     public function tearDown(){
         $this->logFile->delete();

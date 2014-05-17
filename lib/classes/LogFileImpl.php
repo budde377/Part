@@ -55,4 +55,21 @@ class LogFileImpl extends FileImpl implements LogFile
         fclose($r);
         return $ar;
     }
+
+    /**
+     * Will clear the log and remove all dump files.
+     * @return void
+     */
+    public function clearLog()
+    {
+        $this->listLog();
+        foreach($this->dumparray as $df){
+            /** @var $df DumpFile */
+            $df->delete();
+        }
+        $this->setAccessMode(File::FILE_MODE_RW_TRUNCATE_FILE_TO_ZERO_LENGTH);
+        $this->write("");
+        $this->setAccessMode(File::FILE_MODE_RW_POINTER_AT_END);
+
+    }
 }

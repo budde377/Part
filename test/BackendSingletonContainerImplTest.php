@@ -171,7 +171,11 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
     }
 
     public function testGetLogWillReturnNullIfNoPathInConfig(){
-        $this->assertNull($this->backContainer->getLogInstance());
+        $ret1 = $this->backContainer->getLogInstance();
+        $this->assertInstanceOf('LogFile',$ret1);
+        $ret2 =$this->backContainer->getLogInstance();
+        $this->assertTrue($ret1 === $ret2);
+
     }
 
 }
