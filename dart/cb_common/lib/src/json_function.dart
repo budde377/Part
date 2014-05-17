@@ -261,3 +261,20 @@ class CheckForSiteUpdatesJSONFunction extends UpdaterJSONFunction {
 class UpdateSiteJSONFunction extends UpdaterJSONFunction {
   UpdateSiteJSONFunction() : super('update');
 }
+
+// Log function
+
+class LogJSONFunction extends JSONFunction {
+
+  const LOG_LEVEL_DEBUG = 1;
+  const LOG_LEVEL_NOTICE = 2;
+  const LOG_LEVEL_WARNING = 4;
+  const LOG_LEVEL_ERROR = 8;
+  const LOG_LEVEL_ALL = 15;
+
+  LogJSONFunction (String name, String stackTrace, int level): super("Log.log"){
+    this.arguments["name"] = name;
+    this.arguments["stackTrace"] = stackTrace;
+    this.arguments["level"] = level;
+  }
+}
