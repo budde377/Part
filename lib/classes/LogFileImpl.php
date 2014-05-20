@@ -46,8 +46,6 @@ class LogFileImpl extends FileImpl implements LogFile
         if(!$this->exists()){
             return array();
         }
-
-
         $ar = array();
 
         $r = $this->getResource();
