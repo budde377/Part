@@ -20,6 +20,8 @@ class LogFileImpl extends FileImpl implements LogFile
      */
     public function log($message, $level, $createDumpFile = false)
     {
+
+        $this->create();
         $array = array($level, time(), $message);
         $ret = null;
         if($createDumpFile){
@@ -71,5 +73,14 @@ class LogFileImpl extends FileImpl implements LogFile
         $this->write("");
         $this->setAccessMode(File::FILE_MODE_RW_POINTER_AT_END);
 
+    }
+
+    private function create()
+    {
+        $f = $this->getParentFolder();
+        if($f->exists()){
+            return;
+        }
+        $f->create(true);
     }
 }

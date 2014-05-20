@@ -11,8 +11,11 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase{
     private $logFile;
     /** @var  DumpFile */
     private $dumpFile;
+    /** @var Folder */
+    private $folder;
 
     public function setUp(){
+        $this->folder = new FolderImpl(dirname(__FILE__)."/stubs/logFolder");
         $this->logFile= new LogFileImpl(dirname(__FILE__)."/stubs/logFile");
         $this->logFile->delete();
 
@@ -167,12 +170,21 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase{
         $this->assertFalse($f->exists());
     }
 
+    public function testLogWillCreateFolderIfNessesary(){
+        $l = new LogFileImpl($this->folder->getAbsolutePath().'/log/log/logFile');
+        $this->assertFalse($this->folder->exists());
+        $l->log("LOL", LogFile::LOG_LEVEL_ERROR);
+        $this->assertTrue($this->folder->exists());
+
+    }
+
 
     public function tearDown(){
         $this->logFile->delete();
         if($this->dumpFile != null){
             $this->dumpFile->delete();
         }
+        @$this->folder->delete(Folder::DELETE_FOLDER_RECURSIVE);
     }
 
 
