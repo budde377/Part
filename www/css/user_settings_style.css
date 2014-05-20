@@ -242,6 +242,7 @@
 }
 
 #UserSettingsMenu li.log{
+    position: relative;
     background-position: center -514px;
 }
 
@@ -271,6 +272,21 @@
 
 #UserSettingsMenu li.log.active{
     background-position: center -234px;
+}
+
+
+
+#UserSettingsMenu li > .num {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    background: #C23535;
+    line-height: 12px;
+    padding: 3px 4px;
+    font-weight: bold;
+    color: rgba(241, 241, 241, 1);
+    font-size: 12px;
+    border-radius: 3px 0 0 0;
 }
 
 form.verticalAlignForm, form.justDistribution {

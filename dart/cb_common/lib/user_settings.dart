@@ -187,9 +187,29 @@ class UserSettingsLoggerInitializer extends Initializer{
 
   ParagraphElement _pElm = query("#LogInfoParagraph");
 
+
+  DivElement _numDiv = new DivElement();
+
+
+  UserSettingsLoggerInitializer() {
+    _numDiv.classes.add("num");
+  }
+
   bool get canBeSetUp => _logTable != null && _logLink != null &&_pElm != null;
 
+  void _updateNum(){
+    if(_logTable.classes.contains("empty")){
+      _numDiv.remove();
+      return;
+    }
+    _numDiv.text = _logTable.queryAll("tr").length.toString();
+    var p = query("#UserSettingsMenu .log");
+    p.append(_numDiv);
+
+  }
+
   void setUp() {
+    _updateNum();
     _logTable.queryAll(".dumpfile a").forEach((AnchorElement a){
       a.onClick.listen((MouseEvent evt){
         var loader = dialogContainer.loading("Henter log filen");
@@ -218,7 +238,7 @@ class UserSettingsLoggerInitializer extends Initializer{
           _logTable.queryAll("tr:not(.empty_row)").forEach((LIElement li)=>li.remove());
           _logTable.classes.add("empty");
           _pElm.queryAll("i").forEach((Element e)=>e.text = "0");
-
+          _updateNum();
         }
       });
     evt.preventDefault();
