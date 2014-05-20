@@ -31,6 +31,7 @@ abstract class User {
 
   bool canModifyPage(Page page);
 
+  bool get canModifySite;
 
   Stream<User> get onChange;
 
@@ -139,5 +140,6 @@ class JSONUser extends User {
 
   bool canModifyPage(Page page) => _privileges == User.PRIVILEGE_ROOT || _privileges == User.PRIVILEGE_SITE ||  _pages.map((Page p) => p.id).contains(page.id);
 
+  bool get canModifySite => _privileges == User.PRIVILEGE_ROOT || _privileges == User.PRIVILEGE_SITE;
 
 }
