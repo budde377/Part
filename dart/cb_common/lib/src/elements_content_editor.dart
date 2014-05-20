@@ -173,7 +173,9 @@ class EditorGalleryHandler implements EditorHandler {
     _children.add(h);
     element.classes.add('gallery');
     element.append(_imageCount);
-    _imageCount..classes.add('image_count')..text = "0";
+    _imageCount
+      ..classes.add('image_count')
+      ..text = "0";
 
   }
 
@@ -204,7 +206,7 @@ class EditorFileHandler implements EditorHandler {
   FileProgress _fileProgress;
 
 
-  EditorFileHandler(AnchorElement dataElement) : this.dataElement = dataElement{
+  EditorFileHandler(AnchorElement dataElement) : this.dataElement = dataElement {
     _setUp();
   }
 
@@ -212,16 +214,22 @@ class EditorFileHandler implements EditorHandler {
     var size = new SpanElement();
     size.text = sizeToString(fileProgress.file.size);
 
-    _fileStandIn..text = fileProgress.file.name..append(size);
+    _fileStandIn
+      ..text = fileProgress.file.name
+      ..append(size);
 
     _fileProgress.onProgress.listen((_) => progressBar.percentage = _fileProgress.progress);
     _fileProgress.onPathAvailable.listen((_) {
-      dataElement..href = _fileProgress.path..text = fileProgress.file.name;
+      dataElement
+        ..href = _fileProgress.path
+        ..text = fileProgress.file.name;
       progressBar.bar.remove();
       element.classes.remove('uploading');
       ready();
     });
-    element..classes.add('uploading')..append(progressBar.bar);
+    element
+      ..classes.add('uploading')
+      ..append(progressBar.bar);
     _setUp();
   }
 
@@ -243,7 +251,7 @@ class EditorImageHandler implements EditorHandler {
   FileProgress _fileProgress;
 
 
-  EditorImageHandler(ImageElement dataElement) : this.dataElement = dataElement{
+  EditorImageHandler(ImageElement dataElement) : this.dataElement = dataElement {
     _setUp();
   }
 
@@ -255,10 +263,12 @@ class EditorImageHandler implements EditorHandler {
       element.classes.remove('uploading');
       ready();
     });
-    _fileProgress.onPreviewPathAvailable.listen((_){
+    _fileProgress.onPreviewPathAvailable.listen((_) {
       _imageStandIn.style.backgroundImage = "url(\'${_fileProgress.previewPath}\')";
     });
-    element..classes.add('uploading')..append(progressBar.bar);
+    element
+      ..classes.add('uploading')
+      ..append(progressBar.bar);
     _setUp();
   }
 
@@ -290,14 +300,18 @@ class EditorFileContainer {
     element.hidden = true;
     _change_stream = _change_controller.stream.asBroadcastStream();
 
-    trashcan..onDragOver.listen((MouseEvent ev) => ev.preventDefault())..onDrop.listen((MouseEvent ev) {
+    trashcan
+      ..onDragOver.listen((MouseEvent ev) => ev.preventDefault())
+      ..onDrop.listen((MouseEvent ev) {
       if (_dragging == null) {
         return;
       }
       _dragging.remove();
       trashcan.classes.remove('hover');
       _notifyContentChange();
-    })..onDragEnter.listen((_) => trashcan.classes.add('hover'))..onDragLeave.listen((_) => trashcan.classes.remove('hover'));
+    })
+      ..onDragEnter.listen((_) => trashcan.classes.add('hover'))
+      ..onDragLeave.listen((_) => trashcan.classes.remove('hover'));
 
   }
 
@@ -396,11 +410,7 @@ class LinkImageHandler {
 
   DivElement _boxElement = new DivElement();
 
-  ButtonElement _unlinkButton = new ButtonElement(),
-                _openButton = new ButtonElement(),
-                _editImageButton = new ButtonElement(),
-                _youtubeButton = new ButtonElement(),
-                _vimeoButton = new ButtonElement();
+  ButtonElement _unlinkButton = new ButtonElement(), _openButton = new ButtonElement(), _editImageButton = new ButtonElement(), _youtubeButton = new ButtonElement(), _vimeoButton = new ButtonElement();
 
   AnchorElement _foundLink;
 
@@ -421,7 +431,9 @@ class LinkImageHandler {
       return;
     }
 
-    _unlinkButton..classes.add('unlink')..onClick.listen((MouseEvent mev) {
+    _unlinkButton
+      ..classes.add('unlink')
+      ..onClick.listen((MouseEvent mev) {
       mev.preventDefault();
       _foundLink.insertAdjacentHtml("afterEnd", _foundLink.innerHtml);
       _foundLink.remove();
@@ -429,33 +441,41 @@ class LinkImageHandler {
       editor.executor.triggerCommandStateChangeListener();
     });
 
-    _youtubeButton..classes.add('youtube')..onClick.listen((MouseEvent mev) {
+    _youtubeButton
+      ..classes.add('youtube')
+      ..onClick.listen((MouseEvent mev) {
       mev.preventDefault();
       var id = youtubeVideoIdFromUrl(_foundLink.href);
-      var width  = element.clientWidth;
-      var height = (width*9/16).ceil();
+      var width = element.clientWidth;
+      var height = (width * 9 / 16).ceil();
       _foundLink.insertAdjacentHtml("afterEnd", '<iframe width="$width" height="$height" src="//www.youtube.com/embed/$id?badge=0&amp;modestbranding=1&amp;controls=1&amp;autohide=1&amp;showinfo=0&amp;rel=0&amp;fs=0" frameborder="0" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe>');
       _foundLink.remove();
       _infoBox.remove();
       editor.executor.triggerCommandStateChangeListener();
     });
 
-    _vimeoButton..classes.add('vimeo')..onClick.listen((MouseEvent mev) {
+    _vimeoButton
+      ..classes.add('vimeo')
+      ..onClick.listen((MouseEvent mev) {
       mev.preventDefault();
       var id = vimeoVideoIdFromUrl(_foundLink.href);
-      var width  = element.clientWidth;
-      var height = (width*9/16).ceil();
+      var width = element.clientWidth;
+      var height = (width * 9 / 16).ceil();
       _foundLink.insertAdjacentHtml("afterEnd", '<iframe width="$width" height="$height" src="//player.vimeo.com/video/$id?badge=0&amp;modestbranding=1&amp;controls=1&amp;autohide=1&amp;showinfo=0&amp;rel=0&amp;fs=0" frameborder="0" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe>');
       _foundLink.remove();
       _infoBox.remove();
       editor.executor.triggerCommandStateChangeListener();
     });
-    _openButton..classes.add('open')..onClick.listen((MouseEvent mev) {
+    _openButton
+      ..classes.add('open')
+      ..onClick.listen((MouseEvent mev) {
       mev.preventDefault();
       _infoBox.remove();
       window.open(_foundLink.href, "_blank");
     });
-    _editImageButton..classes.add('edit_image')..onClick.listen((MouseEvent mev) {
+    _editImageButton
+      ..classes.add('edit_image')
+      ..onClick.listen((MouseEvent mev) {
       mev.preventDefault();
       _infoBox.remove();
 
@@ -470,7 +490,10 @@ class LinkImageHandler {
     });
 
     _infoBox = new InfoBox.elementContent(_boxElement);
-    _infoBox..backgroundColor = InfoBox.COLOR_GREYSCALE..removeOnESC = true..element.classes.add('edit_link_image_popup');
+    _infoBox
+      ..backgroundColor = InfoBox.COLOR_GREYSCALE
+      ..removeOnESC = true
+      ..element.classes.add('edit_link_image_popup');
 
     document.onClick.listen(_clickHandler);
 
@@ -511,10 +534,10 @@ class LinkImageHandler {
 
     if (_foundLink != null) {
       _boxElement.append(_unlinkButton);
-      if(youtubeVideoIdFromUrl(_foundLink.href) != null){
+      if (youtubeVideoIdFromUrl(_foundLink.href) != null) {
         _boxElement.append(_youtubeButton);
       }
-      if(vimeoVideoIdFromUrl(_foundLink.href) != null){
+      if (vimeoVideoIdFromUrl(_foundLink.href) != null) {
         _boxElement.append(_vimeoButton);
       }
       _boxElement.append(_openButton);
@@ -608,7 +631,7 @@ class ContentEditor {
 
   Stream<bool> get onOpenChange => _onOpenChangeStream == null ? _onOpenChangeStream = _onOpenChangeStreamController.stream.asBroadcastStream() : _onOpenChangeStream;
 
-  Stream<Element> get onSave => _onSaveStream == null? _onSaveStream = _onSaveStreamController.stream.asBroadcastStream() : _onSaveStream;
+  Stream<Element> get onSave => _onSaveStream == null ? _onSaveStream = _onSaveStreamController.stream.asBroadcastStream() : _onSaveStream;
 
   bool get isOpen => !_closed;
 
@@ -745,24 +768,24 @@ class ContentEditor {
       save();
     });
 
-    element.onKeyDown.listen((KeyboardEvent kev){
-      if(kev.keyCode != 32){
+    element.onKeyDown.listen((KeyboardEvent kev) {
+      if (kev.keyCode != 32) {
         return;
       }
       var selection = window.getSelection();
-      if(selection.rangeCount == 0){
+      if (selection.rangeCount == 0) {
         return;
       }
       var range = selection.getRangeAt(0);
       var endOffset = range.startOffset, startOffset = range.endOffset;
-      if(endOffset != startOffset){
+      if (endOffset != startOffset) {
         return;
       }
       var parentNode = range.commonAncestorContainer;
 
       var q = parentNode.parent;
-      while(q != null){
-        if(q is AnchorElement){
+      while (q != null) {
+        if (q is AnchorElement) {
           return;
         }
         q = q.parent;
@@ -770,40 +793,40 @@ class ContentEditor {
 
       var regex = new RegExp(r"\s([^\s]+)$");
       var value = parentNode.nodeValue;
-      if(value == null){
+      if (value == null) {
         return;
       }
 
-      var match = regex.firstMatch(" "+ value.substring(0,startOffset));
+      var match = regex.firstMatch(" " + value.substring(0, startOffset));
 
-      if(match == null){
+      if (match == null) {
         return;
       }
 
       var m = match.group(1);
 
-      if(m.trim() != m){
+      if (m.trim() != m) {
         return;
       }
       m = m.trim();
 
-      if(!validUrl(m) && !validMail(m)){
+      if (!validUrl(m) && !validMail(m)) {
         return;
       }
 
       var start = startOffset - m.length;
-      var t1 = new Text(value.substring(0,start)), t2 = new Text(" "+value.substring(startOffset));
+      var t1 = new Text(value.substring(0, start)), t2 = new Text(" " + value.substring(startOffset));
       var p = parentNode.parent;
       p.insertBefore(t1, parentNode);
       var anchor = new AnchorElement();
       anchor.text = m;
-      anchor.href = (validMail(m)?"mailto:":"") + m;
+      anchor.href = (validMail(m) ? "mailto:" : "") + m;
       anchor.target = "_blank";
       p.insertBefore(anchor, parentNode);
       p.insertBefore(t2, parentNode);
       kev.preventDefault();
       parentNode.remove();
-      selection.setPosition(t2,1);
+      selection.setPosition(t2, 1);
 
 
     });
@@ -872,19 +895,19 @@ class ContentEditor {
     _inputSinceSave = false;
     var l = element.queryAll("h2, h1, h3");
 
-    l.forEach((Element h){
-      h.id= "";
+    l.forEach((Element h) {
+      h.id = "";
     });
 
-    l.forEach((Element h){
-      var id = h.text.replaceAll(new RegExp(r"[^a-zA-Z0-9]+"),"_");
-      if(id.length = 0){
+    l.forEach((Element h) {
+      var id = h.text.replaceAll(new RegExp(r"[^a-zA-Z0-9]+"), "_");
+      if (id.length = 0) {
         h.remove();
         return;
       }
       var base = id;
       var i = 1;
-      while(query("#$id") != null){
+      while (query("#$id") != null) {
         id = "${base}_$i";
         i++;
       }
@@ -908,16 +931,23 @@ class ContentEditor {
     _wrapper.style.removeProperty("top");
     if (floatCandidate) {
       _wrapper.style.width = "${_wrapper.clientWidth}px";
-      _wrapper.classes..remove('floating')..add('fixed');
+      _wrapper.classes
+        ..remove('floating')
+        ..add('fixed');
       _wrapper.style.top = "${_contentWrapper.offsetHeight - _topBar.clientHeight}px";
     } else if (!_wrapper.classes.contains('floating') && window.scrollY > _elementOffsetTop(_topBar) && !floatCandidate) {
       _toolBarPlaceholder.style.height = "${_topBar.clientHeight}px";
       _wrapper.insertAdjacentElement("afterEnd", _toolBarPlaceholder);
       _wrapper.style.width = "${_wrapper.clientWidth}px";
-      _wrapper.classes..add('floating')..remove('fixed');
+      _wrapper.classes
+        ..add('floating')
+        ..remove('fixed');
     } else if (window.scrollY <= _elementOffsetTop(_toolBarPlaceholder)) {
       _toolBarPlaceholder.remove();
-      _wrapper..style.removeProperty("width")..classes.remove('floating')..classes.remove('fixed');
+      _wrapper
+        ..style.removeProperty("width")
+        ..classes.remove('floating')
+        ..classes.remove('fixed');
 
     }
     if (_wrapper.classes.contains('floating')) {
@@ -1022,12 +1052,17 @@ class ContentEditor {
 
     saveElement.classes.add('save');
     var saveBox = new InfoBox("Gem ændringer");
-    saveBox..backgroundColor = InfoBox.COLOR_BLACK..reversed = true;
-    saveElement..onMouseOver.listen((_) {
+    saveBox
+      ..backgroundColor = InfoBox.COLOR_BLACK
+      ..reversed = true;
+    saveElement
+      ..onMouseOver.listen((_) {
       if (changed) {
         saveBox.showBelowCenterOfElement(saveElement);
       }
-    })..onMouseOut.listen((_) => saveBox.remove())..onClick.listen((_) {
+    })
+      ..onMouseOut.listen((_) => saveBox.remove())
+      ..onClick.listen((_) {
       if (changed) {
         save();
       }
@@ -1060,12 +1095,17 @@ class ContentEditor {
 
   void _fillHistoryMenu(Element menu) {
     var calendar = new Calendar(), historyList = new UListElement();
-    menu..classes.add('history_menu')..classes.add('loading');
+    menu
+      ..classes.add('history_menu')
+      ..classes.add('loading');
 
     historyList.classes.add("history_list");
 
     _currentContent.changeTimes.then((List<DateTime> changeTimes) {
-      menu..classes.remove('loading')..append(calendar.element)..append(historyList);
+      menu
+        ..classes.remove('loading')
+        ..append(calendar.element)
+        ..append(historyList);
       _updatePlaceholder();
 
       var last = new DateTime.fromMillisecondsSinceEpoch(0);
@@ -1177,11 +1217,15 @@ class ContentEditor {
 
     var uploadIconWrapper = new DivElement(), uploadIcon = new DivElement(), fileUploadElementWrapper = new DivElement(), fileUploadElement = new FileUploadInputElement(), preview = new DivElement();
     uploadIcon.classes.add('upload_icon');
-    uploadIconWrapper..classes.add('upload_icon_wrapper')..append(uploadIcon);
+    uploadIconWrapper
+      ..classes.add('upload_icon_wrapper')
+      ..append(uploadIcon);
 
     var setUpFileUpload = () {
       var fileUploadElement = new FileUploadInputElement();
-      fileUploadElement..hidden = true..multiple = true;
+      fileUploadElement
+        ..hidden = true
+        ..multiple = true;
       fileUploadElementWrapper.append(fileUploadElement);
 
       return fileUploadElement;
@@ -1195,22 +1239,29 @@ class ContentEditor {
     ;
     var uploader = new FileUploader(uploadStrategy);
     var container = new EditorFileContainer(new DivElement(), uploadIcon);
-    container.onChange.listen((_){
+    container.onChange.listen((_) {
       _updatePlaceholder();
     });
 
     if (images) {
       menu.classes.add('image_menu');
-      preview..classes.add('image_preview')..append(container.element);
+      preview
+        ..classes.add('image_preview')
+        ..append(container.element);
       uploader.onFileAddedToQueue.listen((FileProgress fp) => container.addImage(new ImageElement(), fp));
     } else {
       menu.classes.add('file_menu');
-      preview..classes.add('file_preview')..append(container.element);
+      preview
+        ..classes.add('file_preview')
+        ..append(container.element);
       uploader.onFileAddedToQueue.listen((FileProgress fp) => container.addFile(new AnchorElement(), fp));
     }
 
 
-    menu..append(fileUploadElementWrapper)..append(preview)..append(uploadIconWrapper);
+    menu
+      ..append(fileUploadElementWrapper)
+      ..append(preview)
+      ..append(uploadIconWrapper);
     uploadIcon.onClick.listen((_) => fileUploadElementWrapper.query('input').click());
 
     fileUploadElementWrapper.onChange.listen((_) {
@@ -1225,7 +1276,9 @@ class ContentEditor {
     menu.classes.add('text_menu');
 
     var menuHandler = new MenuOverflowHandler(menu);
-    menuHandler.dropDown..preventDefaultOnClick = true..content.classes.add('submenu');
+    menuHandler.dropDown
+      ..preventDefaultOnClick = true
+      ..content.classes.add('submenu');
 
 
     var actionsSetup = (EditorCommandExecutor executor, List<EditorAction> actions, DropDown dropDown, dynamic state()) {
@@ -1281,13 +1334,21 @@ class ContentEditor {
 
       var colorContent = new DivElement(), colorSelect = new DropDown(colorContent), textColorPalette = new ColorPalette(), backgroundColorPalette = new ColorPalette(), colorLabel1 = new DivElement(), colorLabel2 = new DivElement();
 
-      colorLabel1..classes.add('color_label')..text = "Tekstfarve";
-      colorLabel2..classes.add('color_label')..text = "Baggrundsfarve";
+      colorLabel1
+        ..classes.add('color_label')
+        ..text = "Tekstfarve";
+      colorLabel2
+        ..classes.add('color_label')
+        ..text = "Baggrundsfarve";
 
       colorSelect.element.classes.add('color');
       colorSelect.preventDefaultOnClick = true;
       colorSelect.text = " ";
-      colorContent..append(colorLabel1)..append(colorLabel2)..append(textColorPalette.element)..append(backgroundColorPalette.element);
+      colorContent
+        ..append(colorLabel1)
+        ..append(colorLabel2)
+        ..append(textColorPalette.element)
+        ..append(backgroundColorPalette.element);
       colorSelect.dropDownBox.element.classes.add('color_select');
 
       executor.listenQueryCommandStateChange(() {
@@ -1343,7 +1404,7 @@ class ContentEditor {
         var commonAncestorContainer = r.commonAncestorContainer;
         var parent = commonAncestorContainer;
 
-        while(parent != null && parent.nodeType != Node.ELEMENT_NODE){
+        while (parent != null && parent.nodeType != Node.ELEMENT_NODE) {
           parent = parent.parentNode;
         }
 
@@ -1354,8 +1415,8 @@ class ContentEditor {
 
         var linksAfter = parent.queryAll("a");
 
-        linksAfter.forEach((AnchorElement a){
-          if(!linksBefore.contains(a)){
+        linksAfter.forEach((AnchorElement a) {
+          if (!linksBefore.contains(a)) {
             a.target = "_blank";
           }
         });
@@ -1415,7 +1476,8 @@ class ContentEditor {
     textIconMap.forEach((String k, Map<String, dynamic> v) {
       var b = new ButtonElement();
       var i;
-      b..classes.add(k);
+      b
+        ..classes.add(k);
       _addTitleToElement(v['title'], b);
       var f = () {
       };
@@ -1437,14 +1499,19 @@ class ContentEditor {
 
   InfoBox _addTitleToElement(String title, Element e) {
     var i = new InfoBox(title);
-    i..backgroundColor = InfoBox.COLOR_BLACK..reversed = true;
-    e..onMouseOver.listen((_) => i.showBelowCenterOfElement(e))..onMouseOut.listen((_) => i.remove())..onClick.listen((_) => i.remove());
+    i
+      ..backgroundColor = InfoBox.COLOR_BLACK
+      ..reversed = true;
+    e
+      ..onMouseOver.listen((_) => i.showBelowCenterOfElement(e))
+      ..onMouseOut.listen((_) => i.remove())
+      ..onClick.listen((_) => i.remove());
     onChange.listen((_) => i.remove());
     return i;
   }
 
 
-  String get id => element.id;
+//  String get id => element.id;
 
 }
 
@@ -1471,7 +1538,9 @@ class MenuOverflowHandler {
 
     if (dropDown.element.parent == null) {
       var divider = new Element.html("<div class='divider' />");
-      menu..append(element)..append(divider);
+      menu
+        ..append(element)
+        ..append(divider);
 
       if (_smallestOffsetToTop == null) {
         _smallestOffsetToTop = element.offsetTop;
@@ -1500,5 +1569,51 @@ class MenuOverflowHandler {
     }
 
 
+  }
+}
+
+
+/**
+ * Looking for elements with the 'editable' class.
+ * Getting:
+ *    id : from data-id (if not found use id attribute)
+ *    site-content : if data-site-content is true will use site content instead of page content (default: false)
+ *    page-id : From data-page-id, default is current page. If site-content, does nothing.
+ *              If page id not found fallback is current.
+ *
+ */
+
+class EditorInitializer implements Initializer {
+
+  final PageOrder pageOrder;
+
+  final UserLibrary userLibrary;
+
+  final Site site;
+
+  EditorInitializer(this.site, this.pageOrder, this.userLibrary);
+
+
+  bool get canBeSetUp => site != null && pageOrder != null && userLibrary != null && userLibrary.userLoggedIn != null;
+
+  void setUp() {
+    var user = userLibrary.userLoggedIn;
+    var editableElements = queryAll("div.editable");
+
+    editableElements.forEach((DivElement div) {
+      var id = (div.dataset.containsKey("id")?div.dataset["id"]:div.id);
+
+      if (div.dataset["siteContent"] == "true") {
+        if (!user.canModifySite) {
+          return;
+        }
+        new ContentEditor(div, site[id]);
+      } else {
+        var p;
+        var page = div.dataset.containsKey("pageId") && (p = pageOrder[div.dataset["pageId"]]) is Page?p:pageOrder.currentPage;
+        new ContentEditor(div, page[id]);
+
+      }
+    });
   }
 }
