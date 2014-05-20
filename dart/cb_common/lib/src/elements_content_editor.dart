@@ -1578,3 +1578,51 @@ class MenuOverflowHandler {
 
   }
 }
+
+
+/**
+ * Looking for elements with the 'editable' class.
+ * Getting:
+ *    id : from data-id (if not found use id attribute)
+ *    site-content : if data-site-content is true will use site content instead of page content (default: false)
+ *    page-id : From data-page-id, default is current page. If site-content, does nothing.
+ *              If page id not found fallback is current.
+ *    editor-mode: From data-editor-mode, if simple will initialize simple editor else normal editor.
+ *
+ */
+
+class EditorInitializer implements Initializer {
+
+  final PageOrder pageOrder;
+
+  final UserLibrary userLibrary;
+
+  final Site site;
+
+  EditorInitializer(this.site, this.pageOrder, this.userLibrary);
+
+
+  bool get canBeSetUp => site != null && pageOrder != null && userLibrary != null && userLibrary.userLoggedIn != null;
+
+  void setUp() {
+    var user = userLibrary.userLoggedIn;
+    var editableElements = queryAll("div.editable");
+
+    editableElements.forEach((DivElement div) {
+      var id = (div.dataset.containsKey("id")?div.dataset["id"]:div.id);
+      var editorMode = (div.dataset["editorMode"] == "simple" ? ContentEditor.EDITOR_MODE_SIMPLE : ContentEditor.EDITOR_MODE_NORMAL);
+
+      if (div.dataset["siteContent"] == "true") {
+        if (!user.canModifySite) {
+          return;
+        }
+        new ContentEditor(div, site[id], editorMode);
+      } else {
+        var p;
+        var page = div.dataset.containsKey("pageId") && (p = pageOrder[div.dataset["pageId"]]) is Page?p:pageOrder.currentPage;
+        new ContentEditor(div, page[id], editorMode);
+
+      }
+    });
+  }
+}
