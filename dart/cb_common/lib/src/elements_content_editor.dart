@@ -567,15 +567,20 @@ class EditorAction {
 
 class ContentEditor {
 
+  static const int EDITOR_MODE_SIMPLE = 1;
+  static const int EDITOR_MODE_NORMAL = 2;
+
   static Map<Element, ContentEditor> _cache = new Map<Element, ContentEditor>();
 
-  factory ContentEditor(Element element, Content content) => _cache.putIfAbsent(element, () => new ContentEditor._internal(element, content));
+  factory ContentEditor(Element element, Content content, [int editor_mode = ContentEditor.EDITOR_MODE_NORMAL]) => _cache.putIfAbsent(element, () => new ContentEditor._internal(element, content, editor_mode));
 
-  factory ContentEditor.getCached(Element elm) => _cache[elm];
+//  factory ContentEditor.getCached(Element elm) => _cache[elm];
 
   final Element element;
 
   final EditorCommandExecutor executor;
+
+  final int editorMode;
 
   DivElement _contentWrapper = new DivElement(), _topBar, _toolBarPlaceholder = new DivElement(), _wrapper = new DivElement(), _preview = new DivElement();
 
@@ -606,7 +611,7 @@ class ContentEditor {
 
   int _hash;
 
-  ContentEditor._internal(Element element, this._currentContent) : this.element = element, executor = new EditorCommandExecutor(element){
+  ContentEditor._internal(Element element, this._currentContent, this.editorMode) : this.element = element, executor = new EditorCommandExecutor(element){
 
     _setUpStream();
     _toolBarPlaceholder.classes.add('tool_bar_placeholder');
@@ -1026,7 +1031,7 @@ class ContentEditor {
     _addTitleToElement("Formater tekst", textEdit);
     bar.append(textEdit);
 
-    if (!element.classes.contains("simple_editor")) {
+    if (editorMode == ContentEditor.EDITOR_MODE_NORMAL) {
 
       addImage.classes.add('image');
       _setUpSubMenu(addImage, bar, imageMenu, (Element e) => _fillUploadMenu(e, true));
@@ -1298,9 +1303,7 @@ class ContentEditor {
 
     };
 
-    var simple = element.classes.contains("simple_editor");
-
-    if (!simple) {
+    if (editorMode == ContentEditor.EDITOR_MODE_NORMAL) {
 
 
       var actions = [new EditorAction.liElementWithInnerHtml("<h2>Overskift</h2>", () => executor.formatBlockH2(), (String s) => s == "h2"), new EditorAction.liElementWithInnerHtml("<h3>Underoverskrift</h3>", () => executor.formatBlockH3(), (String s) => s == "h3"), new EditorAction.liElementWithInnerHtml("<p>Normal tekst</p>", () => executor.formatBlockP(), (String s) => s == "p"), new EditorAction.liElementWithInnerHtml("<blockquote>Citat</blockquote>", () => executor.formatBlockBlockquote(), (String s) => s == "blockquote"), new EditorAction.liElementWithInnerHtml("<pre>Kode</pre>", () => executor.formatBlockPre(), (String s) => s == "pre")];
@@ -1580,6 +1583,7 @@ class MenuOverflowHandler {
  *    site-content : if data-site-content is true will use site content instead of page content (default: false)
  *    page-id : From data-page-id, default is current page. If site-content, does nothing.
  *              If page id not found fallback is current.
+ *    editor-mode: From data-editor-mode, if simple will initialize simple editor else normal editor.
  *
  */
 
@@ -1602,16 +1606,17 @@ class EditorInitializer implements Initializer {
 
     editableElements.forEach((DivElement div) {
       var id = (div.dataset.containsKey("id")?div.dataset["id"]:div.id);
+      var editorMode = (div.dataset["editorMode"] == "simple" ? ContentEditor.EDITOR_MODE_SIMPLE : ContentEditor.EDITOR_MODE_NORMAL);
 
       if (div.dataset["siteContent"] == "true") {
         if (!user.canModifySite) {
           return;
         }
-        new ContentEditor(div, site[id]);
+        new ContentEditor(div, site[id], editorMode);
       } else {
         var p;
         var page = div.dataset.containsKey("pageId") && (p = pageOrder[div.dataset["pageId"]]) is Page?p:pageOrder.currentPage;
-        new ContentEditor(div, page[id]);
+        new ContentEditor(div, page[id], editorMode);
 
       }
     });
