@@ -32,6 +32,10 @@ class UserLoginUpdateCheckPreScript implements  Script{
             return;
         }
 
+        if(!$user->getUserPrivileges()->hasSitePrivileges()){
+            return;
+        }
+
         $updater = $this->backendContainer->getUpdater();
         $i = $user->getLastLogin();
         if($updater->lastChecked() >= $i){
