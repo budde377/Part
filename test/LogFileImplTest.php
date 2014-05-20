@@ -205,11 +205,21 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     }
 
-   public function testLogWillCreateFolderIfNessesary(){
+    public function testLogWillCreateFolderIfNessesary(){
         $l = new LogFileImpl($this->folder->getAbsolutePath().'/log/log/logFile');
         $this->assertFalse($this->folder->exists());
         $l->log("LOL", LogFile::LOG_LEVEL_ERROR);
         $this->assertTrue($this->folder->exists());
+
+    }
+
+
+    public function testLogWillNotCreateOnReadOfNonExistingFolder(){
+        $l = new LogFileImpl($this->folder->getAbsolutePath().'/log/log/logFile');
+        $this->assertFalse($this->folder->exists());
+        $a = $l->listLog();
+        $this->assertTrue(is_array($a));
+        $this->assertEquals(0, count($a));
 
     }
 

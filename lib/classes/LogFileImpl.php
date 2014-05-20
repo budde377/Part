@@ -43,7 +43,13 @@ class LogFileImpl extends FileImpl implements LogFile
      */
     public function listLog($level = LogFile::LOG_LEVEL_ALL, $time = 0)
     {
+        if(!$this->exists()){
+            return array();
+        }
+
+
         $ar = array();
+
         $r = $this->getResource();
         while($e = fgetcsv($r)){
             if($e[0] & $level && $time <= $e[1]){
