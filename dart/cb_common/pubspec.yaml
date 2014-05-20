@@ -1,6 +1,8 @@
 name: cb_common
 author: Christian Budde Christensen <christi@n-bud.de>
-version: 0.5.0
+version: 0.6.1
 dev_dependencies:
     unittest: any
     browser: any
+dependencies:
+    markdown: any

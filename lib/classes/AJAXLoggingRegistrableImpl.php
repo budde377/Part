@@ -36,7 +36,7 @@ class AJAXLoggingRegistrableImpl implements Registrable
         $currentUser = $this->container->getUserLibraryInstance()->getUserLoggedIn();
         $siteUser = $currentUser != null && $currentUser->getUserPrivileges()->hasSitePrivileges();
 
-        $server->registerJSONFunction(new JSONFunctionImpl("clearLog", function() use ($siteUser, $logFile) {
+        $server->registerJSONFunction(new JSONFunctionImpl("clear", function() use ($siteUser, $logFile) {
             if(!$siteUser){
                 return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_UNAUTHORIZED);
             }
@@ -45,7 +45,20 @@ class AJAXLoggingRegistrableImpl implements Registrable
             return new JSONResponseImpl();
         }));
 
-
+        $server->registerJSONFunction(new JSONFunctionImpl("getDumpFile", function($id) use($siteUser, $logFile){
+            if(!$siteUser){
+                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_UNAUTHORIZED);
+            }
+            $l = $logFile->listLog(LogFile::LOG_LEVEL_ALL, $id);
+            if(!count($l) || !isset($l[0]["dumpfile"])){
+                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_FILE_NOT_FOUND);
+            }
+            /** @var DumpFile $df */
+            $df = $l[0]["dumpfile"];
+            $resp = new JSONResponseImpl();
+            $resp->setPayload($df->getContents());
+            return $resp;
+        }, array("id")));
 
 
         return $server->evaluatePostInput()->getAsJSONString();

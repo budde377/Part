@@ -114,6 +114,14 @@ class LoadingDialog extends DialogBox{
 
   }
 
+  void stopLoading(){
+    element.classes.remove("loading");
+  }
+
+  void startLoading(){
+    element.classes.add("loading");
+  }
+
 
 
 }

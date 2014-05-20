@@ -24,6 +24,8 @@ class UserSettingsPageElementImpl extends PageElementImpl
     /** @var PageElement */
     private $editUsersPageElement;
     /** @var PageElement */
+    private $editLogPageElement;
+    /** @var PageElement */
     private $updateWebsitePageElement;
 
 
@@ -45,7 +47,12 @@ class UserSettingsPageElementImpl extends PageElementImpl
         $this->editPagesPageElement = new UserSettingsEditPagesPageElementImpl($this->container);
         $this->editUserPageElement = new UserSettingsEditUserPageElementImpl($this->container);
         $this->editUsersPageElement = new UserSettingsEditUsersPageElementImpl($this->container);
-        $this->updateWebsitePageElement = new UserSettingsUpdateWebsitePageElementImpl($this->container);
+        if($this->currentUserPrivileges->hasRootPrivileges()){
+            $this->editLogPageElement = new UserSettingsEditLogPageElementImpl($this->container);
+        }
+        if($this->currentUserPrivileges->hasSitePrivileges()){
+            $this->updateWebsitePageElement = new UserSettingsUpdateWebsitePageElementImpl($this->container);
+        }
     }
 
     /**
@@ -100,6 +107,16 @@ class UserSettingsPageElementImpl extends PageElementImpl
             ";
 
         }
+        $logLink = $logElement = "";
+        if($this->currentUser->getUserPrivileges()->hasRootPrivileges()){
+            $logLink = "<li class='log ' title='Administrer log'>&nbsp;</li>";
+            $logElement = "
+                    <li>
+                        <h2>Log</h2>
+                        {$this->editLogPageElement->generateContent()}
+                    </li>
+            ";
+        }
         $ret = "
         <div id='UserSettingsContainer'>
             <div id='UserSettingsMenu'>
@@ -109,7 +126,8 @@ class UserSettingsPageElementImpl extends PageElementImpl
                     <li class='user ' title='Rediger oplysninger'>&nbsp;</li>
                     <li class='users' title='Administrer brugere'>&nbsp;</li>
                     $updateLink
-<!--                    <li class='mail ' title='Administrer mailkonti'>&nbsp;</li>-->
+                    $logLink
+                    <!-- <li class='mail ' title='Administrer mailkonti'>&nbsp;</li>-->
                 </ul>
             </div>
             <div id='UserSettingsContractLink'>&nbsp;</div>
@@ -133,7 +151,7 @@ class UserSettingsPageElementImpl extends PageElementImpl
                         {$this->editUsersPageElement->generateContent()}
                     </li>
                     $updateElement
-
+                    $logElement
                 </ul>
             </div>
         </div>

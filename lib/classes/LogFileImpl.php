@@ -49,7 +49,10 @@ class LogFileImpl extends FileImpl implements LogFile
             if($e[0] & $level && $time <= $e[1]){
                 $a = array("level"=>$e[0], "time"=>$e[1], "message"=>$e[2]);
                 if(isset($e[3])){
-                    $a["dumpfile"] = isset($this->dumparray[$e[3]])?$this->dumparray[$e[3]]:new DumpFileImpl($e[3]);
+                    if(!isset($this->dumparray[$e[3]])){
+                        $this->dumparray[$e[3]] = new DumpFileImpl($this->getParentFolder()->getAbsolutePath()."/".$e[3]);
+                    }
+                    $a["dumpfile"] = $this->dumparray[$e[3]];
                 }
                 $ar[] = $a;
             }

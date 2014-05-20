@@ -11,6 +11,7 @@ import 'elements.dart';
 import 'json.dart' ;
 import 'pcre_syntax_checker.dart' as PCRE;
 
+
 part 'src/user_settings_page_order.dart';
 part 'src/user_settings_user_library.dart';
 part 'src/user_settings_decoration.dart';
@@ -165,6 +166,7 @@ class UserSettingsInitializer extends Initializer {
     _initLib.registerInitializer(new UserSettingsAddUserFormInitializer(userLib));
     _initLib.registerInitializer(new UserSettingsPageUserListFormInitializer(userLib, order));
     _initLib.registerInitializer(new UserSettingsUpdateSiteInitializer());
+    _initLib.registerInitializer(new UserSettingsLoggerInitializer());
 
 /* SET UP LOGIN USER MESSAGE*/
     var loginUserMessage = query('#LoginUserMessage');
@@ -175,6 +177,54 @@ class UserSettingsInitializer extends Initializer {
 
   }
 
+}
+
+class UserSettingsLoggerInitializer extends Initializer{
+
+  TableElement _logTable = query("#UserSettingsLogTable");
+
+  AnchorElement _logLink = query("#ClearLogLink");
+
+  ParagraphElement _pElm = query("#LogInfoParagraph");
+
+  bool get canBeSetUp => _logTable != null && _logLink != null &&_pElm != null;
+
+  void setUp() {
+    _logTable.queryAll(".dumpfile a").forEach((AnchorElement a){
+      a.onClick.listen((MouseEvent evt){
+        var loader = dialogContainer.loading("Henter log filen");
+        ajaxClient.callFunction(new GetDumpFileLogJSONFunction(int.parse(a.dataset["id"]))).then((JSONResponse resp){
+          if(resp.type != JSONResponse.RESPONSE_TYPE_SUCCESS){
+            loader.close();
+            return;
+          }
+          var button = new ButtonElement(), pre = new PreElement();
+          button.text = "Luk";
+          button.onClick.listen((_)=>loader.close());
+          pre.classes.add("code");
+          pre.text = resp.payload;
+          loader.element..children.clear()
+                        ..append(pre)
+                        ..append(button);
+          loader.stopLoading();
+        });
+      });
+    });
+
+
+    _logLink.onClick.listen((MouseEvent evt){
+      ajaxClient.callFunction(new ClearLogJSONFunction()).then((JSONResponse response){
+        if(response.type == JSONResponse.RESPONSE_TYPE_SUCCESS){
+          _logTable.queryAll("tr:not(.empty_row)").forEach((LIElement li)=>li.remove());
+          _logTable.classes.add("empty");
+          _pElm.queryAll("i").forEach((Element e)=>e.text = "0");
+
+        }
+      });
+    evt.preventDefault();
+    });
+
+  }
 }
 
 
@@ -217,7 +267,8 @@ class UserSettingsUpdateSiteInitializer extends Initializer {
               if (response.type == JSONResponse.RESPONSE_TYPE_ERROR) {
                 loader.close();
               }
-              loader.element..innerHtml = "Siden er opdateret.<br /> Hjemmesiden genindlæses."..classes.remove('loading');
+              loader.element..innerHtml = "Siden er opdateret.<br /> Hjemmesiden genindlæses.";
+              loader.stopLoading();
               updateDone = true;
 
               var t = new Timer(new Duration(seconds:1), () {
