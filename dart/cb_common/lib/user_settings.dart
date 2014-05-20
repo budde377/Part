@@ -202,7 +202,7 @@ class UserSettingsLoggerInitializer extends Initializer{
       _numDiv.remove();
       return;
     }
-    _numDiv.text = _logTable.queryAll("tr").length.toString();
+    _numDiv.text = _logTable.queryAll("tr:not(.empty_row)").length.toString();
     var p = query("#UserSettingsMenu .log");
     p.append(_numDiv);
 
@@ -227,6 +227,10 @@ class UserSettingsLoggerInitializer extends Initializer{
                         ..append(pre)
                         ..append(button);
           loader.stopLoading();
+          escQueue.add((){
+            loader.close();
+            return true;
+          });
         });
       });
     });

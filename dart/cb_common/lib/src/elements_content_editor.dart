@@ -578,7 +578,7 @@ class ContentEditor {
 
   factory ContentEditor(Element element, Content content, [int editor_mode = ContentEditor.EDITOR_MODE_NORMAL]) => _cache.putIfAbsent(element, () => new ContentEditor._internal(element, content, editor_mode));
 
-//  factory ContentEditor.getCached(Element elm) => _cache[elm];
+  factory ContentEditor.getCached(Element elm) => _cache[elm];
 
   final Element element;
 
