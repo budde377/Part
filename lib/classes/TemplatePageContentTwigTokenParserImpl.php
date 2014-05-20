@@ -26,7 +26,11 @@ class TemplatePageContentTwigTokenParserImpl extends Twig_TokenParser
             if($stream->getCurrent()->getType() == Twig_Token::PUNCTUATION_TYPE){
                 $page_id = $id;
                 $stream->expect(Twig_Token::PUNCTUATION_TYPE, "[");
-                $id = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
+                if($stream->getCurrent()->getType() == Twig_Token::NAME_TYPE){
+                    $id = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
+                } else {
+                    $id = "";
+                }
                 $stream->expect(Twig_Token::PUNCTUATION_TYPE,"]");
             }
 

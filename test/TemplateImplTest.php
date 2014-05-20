@@ -11,7 +11,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     /** @var $backFactory BackendSingletonContainer */
     private $backFactory;
-
+    /** @var  Page */
+    private $inactivePage;
     /** @var $template TemplateImpl */
     private $template;
     private $rootPath;
@@ -53,17 +54,39 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $rootDir = new FolderImpl(dirname(__FILE__) . '/../');
         $this->rootPath = $rootDir->getAbsolutePath()."/";
         $config = new ConfigImpl($configXML, $this->rootPath);
-        $this->backFactory = new StubBackendSingletonContainerImpl();
-        $nullPageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
-        $currentPageStrategy = new StubCurrentPageStrategyImpl();
+
+        // Setting up pages
         $this->currentPage = new StubPageImpl();
+
+        $this->inactivePage = new StubPageImpl();
+        $this->inactivePage->setID("someid");
+
+        // Setting up current page strategy
+        $currentPageStrategy = new StubCurrentPageStrategyImpl();
         $currentPageStrategy->setCurrentPage($this->currentPage);
+
+
+        // Setting up order
+        $order = new StubPageOrderImpl();
+        $order->setInactiveList(array($this->inactivePage));
+
+
+        // Setting up site
+        $this->site = new StubSiteImpl();
+        $this->site->setVariables(new StubVariablesImpl());
+
+        // Setting up back factory
+        $this->backFactory = new StubBackendSingletonContainerImpl();
         $this->backFactory->setCurrentPageStrategyInstance($currentPageStrategy);
         $this->backFactory->setConfigInstance($config);
         $this->backFactory->setUserLibraryInstance(new StubUserLibraryImpl());
-        $this->site = new StubSiteImpl();
-        $this->site->setVariables(new StubVariablesImpl());
+        $this->backFactory->setPageOrderInstance($order);
         $this->backFactory->setSiteInstance($this->site);
+
+        // Setting up null page element factory
+        $nullPageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
+
+        // Setting up template
         $this->template = new TemplateImpl($nullPageElementFactory, $this->backFactory);
     }
 
@@ -403,6 +426,32 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->currentPage->getContent()->addContent("Hello World2");
         $this->assertEquals("Hello World2", $this->template->render());
     }
+
+    public function testTemplateWillGetPageContentFromOtherSiteThanCurrent(){
+        $this->setUpConfig();
+        $c = "LOLSTRING";
+        $this->inactivePage->getContent("SomeId")->addContent($c);
+        $this->template->setTemplateFromString("{%page_content someid[SomeId] %}");
+        $r = $this->template->render();
+        $this->assertEquals($c, $r);
+    }
+    public function testTemplateCanCallEmptyContentIdOnOtherSite(){
+        $this->setUpConfig();
+        $c = "LOLSTRING";
+        $this->inactivePage->getContent()->addContent($c);
+        $this->template->setTemplateFromString("{%page_content someid[] %}");
+        $r = $this->template->render();
+        $this->assertEquals($c, $r);
+
+    }
+
+    public function testTemplateWillReturnEmptyOnWrongId(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%page_content somenonexitingid[SomeId] %}");
+        $r = $this->template->render();
+        $this->assertEquals("", $r);
+    }
+
 
 
     public function testTemplateWillSupportSiteContent(){
