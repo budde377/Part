@@ -188,6 +188,7 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
     public function testAbsolutePathIsTheSameWithNewInstanceOfLogFile()
     {
         $d = $this->logFile->log("LOL", LogFile::LOG_LEVEL_DEBUG, true);
+        $this->dumpFile = $d;
         $logfile = new LogFileImpl($this->logFile->getAbsoluteFilePath());
         $dl = $logfile->listLog();
         /** @var DumpFile $d2 */
