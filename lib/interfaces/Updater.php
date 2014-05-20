@@ -11,9 +11,10 @@ interface Updater {
     /**
      * Will check if there exists a new update.
      * This must be blocking if using external program such as git.
+     * @param bool $quick If TRUE will do a quick check. May contain false positives.
      * @return bool Return TRUE on existing new update, else FALSE
      */
-    public function checkForUpdates();
+    public function checkForUpdates($quick = false);
 
     /**
      * Will update the system.

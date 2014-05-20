@@ -589,3 +589,17 @@ form.initial input.invalid {
 #UserSettingsLogTable:not(.empty) tr.empty_row{
     display: none;
 }
+
+
+#UpdateInformationMessage{
+    text-align: center;
+    background: #FF7100;
+    color: #fff;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+#UpdateInformationMessage a {
+    color: #fff;
+    text-decoration: underline;
+}

@@ -69,6 +69,7 @@ class UserSettingsPageElementImpl extends PageElementImpl
         $output = "";
         $output .= $this->generateLoginUserMenuContainer();
         $output .= $this->generateLoginUserExpandMenuLink();
+        $output .= $this->generateUpdateInformationMessage();
         $output .= $this->generateLoginUserMessage();
         return $output;
     }
@@ -82,6 +83,12 @@ class UserSettingsPageElementImpl extends PageElementImpl
             </div>";
     }
 
+    private function generateUpdateInformationMessage()
+    {
+        $hidden = $this->container->getUpdater()->checkForUpdates(true)?"":"hidden";
+        return "<div id='UpdateInformationMessage' $hidden>Siden kan opdateres. Klik <a href='#'>her</a> for at starte opdateringen.</div>";
+    }
+
     private function generateLoginUserMessage()
     {
         return "
@@ -89,6 +96,7 @@ class UserSettingsPageElementImpl extends PageElementImpl
                 Du er logget ind som <i>{$this->currentUser->getUsername()}</i>, <a href = '/logout'>log ud</a>.
             </div>";
     }
+
 
     private function generateLoginUserMenuContainer()
     {
@@ -160,7 +168,6 @@ class UserSettingsPageElementImpl extends PageElementImpl
 
         return $ret;
     }
-
 
     /**
      * Will set up the page element.
