@@ -7,8 +7,8 @@
  * Time: 21:51
  * To change this template use File | Settings | File Templates.
  */
-
-class GitUpdaterImpl implements Updater{
+class GitUpdaterImpl implements Updater
+{
 
     private $path;
     private $site;
@@ -28,7 +28,7 @@ class GitUpdaterImpl implements Updater{
         $this->path = $path;
         $this->site = $site;
         $this->subModuleUpdater = $subModule;
-        foreach($this->listSubModules() as $module){
+        foreach ($this->listSubModules() as $module) {
             $this->subUpdaters[$module] = new GitUpdaterImpl("$path/$module", $site, true);
         }
     }
@@ -41,20 +41,22 @@ class GitUpdaterImpl implements Updater{
      */
     public function checkForUpdates()
     {
-        if(!$this->subModuleUpdater){
+        if (!$this->subModuleUpdater) {
             $this->site->getVariables()->setValue("last_checked", time());
         }
-        if($this->canBeUpdated === null){
+        if ($this->canBeUpdated === null) {
             $this->canBeUpdated = $this->site->getVariables()->getValue("can_be_updated") == 1;
         }
-        if($this->canBeUpdated){
+        if ($this->canBeUpdated) {
             return true;
         }
         $this->exec("git fetch");
 
-        $updateAvailable = ($this->getRevision('HEAD') != $this->getRevision("origin/".$this->currentBranch()) ||  array_reduce($this->subUpdaters, function($result, Updater $input){return $result || $input->checkForUpdates();}, false));
-        if($this->canBeUpdated != $updateAvailable){
-            $this->site->getVariables()->setValue("can_be_updated", $updateAvailable?1:0);
+        $updateAvailable = ($this->getRevision('HEAD') != $this->getRevision("origin/" . $this->currentBranch()) || array_reduce($this->subUpdaters, function ($result, Updater $input) {
+                return $result || $input->checkForUpdates();
+            }, false));
+        if ($this->canBeUpdated != $updateAvailable) {
+            $this->site->getVariables()->setValue("can_be_updated", $updateAvailable ? 1 : 0);
         }
 
         return $this->canBeUpdated = $updateAvailable;
@@ -67,19 +69,20 @@ class GitUpdaterImpl implements Updater{
      */
     public function update()
     {
-        if(!$this->checkForUpdates()){
+        if (!$this->checkForUpdates()) {
             return;
         }
-        if(!$this->subModuleUpdater){
+        if (!$this->subModuleUpdater) {
             $this->site->getVariables()->setValue("last_updated", time());
         }
         $this->exec("git fetch origin");
         $this->exec("git reset --hard origin/{$this->currentBranch()}");
         /** @var $updater Updater */
-        foreach($this->subUpdaters as $updater){
+        foreach ($this->subUpdaters as $updater) {
             $updater->update();
         }
-        $this->site->getVariables()->setValue("can_be_updated", $this->canBeUpdated = false);
+        $this->canBeUpdated = false;
+        $this->site->getVariables()->setValue("can_be_updated", 0);
     }
 
     /**
@@ -105,30 +108,37 @@ class GitUpdaterImpl implements Updater{
      */
     public function getVersion()
     {
-        if($this->currentVersion != null){
+        if ($this->currentVersion != null) {
             return $this->currentVersion;
         }
-        return $this->currentVersion = array_reduce($this->subUpdaters, function(&$result, Updater $item){$result.= "-".$item->getVersion(); return $result;}, $this->getRevision('HEAD'));
+        return $this->currentVersion = array_reduce($this->subUpdaters, function (&$result, Updater $item) {
+            $result .= "-" . $item->getVersion();
+            return $result;
+        }, $this->getRevision('HEAD'));
     }
 
-    private function listSubModules(){
+    private function listSubModules()
+    {
         exec("cd $this->path && grep -s path .gitmodules | sed 's/.*= //'", $modulesList);
         return $modulesList;
     }
 
-    private function getRevision($where){
+    private function getRevision($where)
+    {
         return $this->exec("git rev-parse --short $where");
     }
 
-    private function exec($command){
+    private function exec($command)
+    {
         $ret = trim(shell_exec("cd $this->path && $command"));
         return $ret;
     }
 
 
-    private function currentBranch(){
+    private function currentBranch()
+    {
 
-        return $this->branch == null?$this->branch = $this->exec("git branch | sed -n '/\\* /s///p'"):$this->branch;
+        return $this->branch == null ? $this->branch = $this->exec("git branch | sed -n '/\\* /s///p'") : $this->branch;
     }
 
 }
