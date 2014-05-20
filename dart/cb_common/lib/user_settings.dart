@@ -255,55 +255,102 @@ class UserSettingsUpdateSiteInitializer extends Initializer {
 
   JSONClient _client = new AJAXJSONClient();
 
-  bool get canBeSetUp => _checkButton != null && _checkTime != null;
+  DivElement _updateInformationMessage= query("#UpdateInformationMessage");
+
+  bool _canBeUpdated;
+
+  bool get canBeSetUp => _checkButton != null && _checkTime != null && _updateInformationMessage != null;
 
   void setUp() {
-    var s = _checkButton.text;
+    _canBeUpdated = !_updateInformationMessage.hidden;
+
+
     _checkButton.onClick.listen((_) {
-      _checkButton.disabled = true;
-      _checkButton.text = "Undersøger";
-      _client.callFunction(new CheckForSiteUpdatesJSONFunction()).then((JSONResponse response) {
-        _checkButton.text = s;
-        _checkButton.disabled = false;
-        _checkTime.text = dateString(new DateTime.now());
-        if (response.type != JSONResponse.RESPONSE_TYPE_SUCCESS) {
-          return;
-        }
-        if (response.payload) {
-          dialogContainer.confirm("<b>Websitet kan opdateres! </b><br /> Hvis du opdaterer nu, skal siden genstartes, og det er derfor vigtigt at du gemmer alle ændringer du må have foretaget. <br /> Ønsker du at opdatere det nu?").result.then((bool b) {
-            if (!b) {
-              return;
-            }
-            var updateDone = false;
-            window.onBeforeUnload.listen((BeforeUnloadEvent event) {
-              if (updateDone) {
+      _updateCheckButton(true);
+      if(!_canBeUpdated){
+
+        _client.callFunction(new CheckForSiteUpdatesJSONFunction()).then((JSONResponse response) {
+          _checkTime.text = dateString(new DateTime.now());
+          if (response.type != JSONResponse.RESPONSE_TYPE_SUCCESS) {
+            _canBeUpdated = false;
+            _updateCheckButton();
+            return;
+          }
+          if (response.payload) {
+            _canBeUpdated = true;
+            dialogContainer.confirm("<b>Hjemmesiden kan opdateres! </b><br /> Hvis du opdaterer nu, skal siden genstartes, og det er derfor vigtigt at du gemmer alle ændringer du må have foretaget. <br /> Ønsker du at opdatere det nu?").result.then((bool b) {
+              if (!b) {
                 return;
               }
-              event.returnValue = "Websitet er i gang med at opdatere.";
+              _updateSite();
             });
 
-            var loader = dialogContainer.loading("Opdaterer websitet.<br />Luk ikke din browser!");
-            _client.callFunction(new UpdateSiteJSONFunction()).then((JSONResponse response) {
-              if (response.type == JSONResponse.RESPONSE_TYPE_ERROR) {
-                loader.close();
-              }
-              loader.element..innerHtml = "Siden er opdateret.<br /> Hjemmesiden genindlæses.";
-              loader.stopLoading();
-              updateDone = true;
+          } else {
+            _canBeUpdated = false;
+            dialogContainer.alert("Der blev ikke fundet nogen opdatering.<br /> Prøv igen senere.");
+          }
+          _updateCheckButton();
+        });
 
-              var t = new Timer(new Duration(seconds:1), () {
-                window.location.reload();
-              });
-            });
+      } else {
+        _updateSite();
+      }
 
-          });
+    });
+    _updateInformationMessage.query("a").onClick.listen((_)=>_updateSite());
+  }
 
-        } else {
-          dialogContainer.alert("Der blev ikke fundet nogen opdatering.<br /> Prøv igen senere.");
-        }
+  void _updateCheckButton([bool searching = false]){
+    if(searching){
+      _checkButton.disabled = true;
+      if(_canBeUpdated){
+        _checkButton.text = _checkButton.dataset["workUpdateValue"];
+      } else {
+        _checkButton.text = _checkButton.dataset["workCheckValue"];
+      }
+      return;
+    }
+    _checkButton.disabled = false;
+    if(_canBeUpdated){
+      _updateInformationMessage.hidden = false;
+      _checkButton.text = _checkButton.dataset["updateValue"];
+    } else {
+      _updateInformationMessage.hidden = true;
+      _checkButton.text = _checkButton.dataset["checkValue"];
+    }
+
+  }
+
+  void _updateSite() {
+    _updateCheckButton(true);
+    var updateDone = false;
+    window.onBeforeUnload.listen((BeforeUnloadEvent event) {
+      if (updateDone) {
+        return;
+      }
+      event.returnValue = "Websitet er i gang med at opdatere.";
+    });
+
+    var loader = dialogContainer.loading("Opdaterer websitet.<br />Luk ikke din browser!");
+    _client.callFunction(new UpdateSiteJSONFunction()).then((JSONResponse response) {
+      if (response.type == JSONResponse.RESPONSE_TYPE_ERROR) {
+        loader.close();
+        _updateCheckButton();
+        return;
+      }
+      _canBeUpdated = false;
+      loader.element..innerHtml = "Siden er opdateret.<br /> Hjemmesiden genindlæses.";
+      loader.stopLoading();
+      updateDone = true;
+      _updateCheckButton();
+      var t = new Timer(new Duration(seconds:1), () {
+        window.location.reload();
       });
     });
+
   }
+
+
 }
 
 class UserSettingsPageUserListFormInitializer extends Initializer {

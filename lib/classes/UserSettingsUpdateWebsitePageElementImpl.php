@@ -7,7 +7,6 @@
  * Time: 5:44 PM
  * To change this template use File | Settings | File Templates.
  */
-
 class UserSettingsUpdateWebsitePageElementImpl extends PageElementImpl
 {
 
@@ -24,17 +23,18 @@ class UserSettingsUpdateWebsitePageElementImpl extends PageElementImpl
         $this->updater = $container->getUpdater();
     }
 
-    private function dateString($timestamp){
+    private function dateString($timestamp)
+    {
 
         $timeArr = getdate($timestamp);
         $now = getdate(time());
         $returnString = "";
-        if($now['yday'] != $timeArr['yday'] || $timeArr['mday'] != $now['mday']){
+        if ($now['yday'] != $timeArr['yday'] || $timeArr['mday'] != $now['mday']) {
             $returnString = "{$this->dayNumberToName($timeArr['wday'])} ";
         } else {
             $returnString = "i dag ";
         }
-        if(strtotime("{$now['year']}-{$now['month']}-{$now['mday']}")-strtotime("{$timeArr['year']}-{$timeArr['month']}-{$timeArr['mday']}") > 60*24*7){
+        if (strtotime("{$now['year']}-{$now['month']}-{$now['mday']}") - strtotime("{$timeArr['year']}-{$timeArr['month']}-{$timeArr['mday']}") > 60 * 24 * 7) {
             $returnString .= "d. {$timeArr['mday']}. {$this->monthNumberToName($timeArr['mon'])} {$timeArr['year']} ";
         }
 
@@ -52,6 +52,11 @@ class UserSettingsUpdateWebsitePageElementImpl extends PageElementImpl
     public function generateContent()
     {
         parent::generateContent();
+
+        $msg1 = 'Opdater hjemmesiden';
+        $msg2 = 'Check for opdateringer';
+        $msg3 = $this->updater->checkForUpdates(true)?$msg1:$msg2;
+
         $return = "
 
         <p class='text update_site'>
@@ -60,7 +65,11 @@ class UserSettingsUpdateWebsitePageElementImpl extends PageElementImpl
         Der er sidst checket efter opdateringer <span class='check_time'>{$this->dateString($this->updater->lastChecked())}</span>.
         </p>
         <div class='update_site_container'>
-                <button class='update_check'>Check for opdateringer</button>
+                <button class='update_check'
+                    data-work-check-value='Undersøger'
+                    data-work-update-value='Opdaterer'
+                    data-update-value='$msg1'
+                    data-check-value='$msg2'>$msg3</button>
         </div>
         ";
 

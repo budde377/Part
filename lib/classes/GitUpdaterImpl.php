@@ -37,10 +37,12 @@ class GitUpdaterImpl implements Updater
     /**
      * Will check if there exists a new update.
      * This must be blocking if using external program such as git.
+     * @param bool $quick If TRUE will do a quick check. May contain false positives.
      * @return bool Return TRUE on existing new update, else FALSE
      */
-    public function checkForUpdates()
+    public function checkForUpdates($quick = false)
     {
+
         if (!$this->subModuleUpdater) {
             $this->site->getVariables()->setValue("last_checked", time());
         }
@@ -50,6 +52,11 @@ class GitUpdaterImpl implements Updater
         if ($this->canBeUpdated) {
             return true;
         }
+
+        if($quick){
+            return false;
+        }
+
         $this->exec("git fetch");
 
         $updateAvailable = ($this->getRevision('HEAD') != $this->getRevision("origin/" . $this->currentBranch()) || array_reduce($this->subUpdaters, function ($result, Updater $input) {
@@ -128,17 +135,16 @@ class GitUpdaterImpl implements Updater
         return $this->exec("git rev-parse --short $where");
     }
 
+
     private function exec($command)
     {
         $ret = trim(shell_exec("cd $this->path && $command"));
         return $ret;
     }
 
-
     private function currentBranch()
     {
 
         return $this->branch == null ? $this->branch = $this->exec("git branch | sed -n '/\\* /s///p'") : $this->branch;
     }
-
 }
