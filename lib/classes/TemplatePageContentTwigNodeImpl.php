@@ -25,7 +25,8 @@ class TemplatePageContentTwigNodeImpl extends Twig_Node{
     {
 
         if($this->getAttribute("page_id") != ""){
-            $compiler->write("echo (\$p = \$context['page_order']->getPage('{$this->getAttribute('page_id')}')) == null? '':\$p->getContent('{$this->getAttribute('id')}')->latestContent();")->raw("\n");
+            $p = uniqid("variable");
+            $compiler->write("echo (\$$p = \$context['page_order']->getPage('{$this->getAttribute('page_id')}')) == null? '':\${$p}->getContent('{$this->getAttribute('id')}')->latestContent();")->raw("\n");
         } else {
             $compiler->write("echo \$context['current_page']->getContent('{$this->getAttribute('id')}')->latestContent();")->raw("\n");
         }

@@ -20,9 +20,16 @@ class TemplatePageVariableTwigTokenParserImpl extends Twig_TokenParser{
     public function parse(Twig_Token $token)
     {
         $stream = $this->parser->getStream();
-        $name = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
+        $page_id = "";
+        $id = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
+        if($stream->getCurrent()->getType() == Twig_Token::PUNCTUATION_TYPE){
+            $page_id = $id;
+            $stream->expect(Twig_Token::PUNCTUATION_TYPE, "[");
+            $id = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
+            $stream->expect(Twig_Token::PUNCTUATION_TYPE, "]");
+        }
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
-        return new TemplatePageVariableTwigNodeImpl($token->getLine(), $this->getTag(), $name);
+        return new TemplatePageVariableTwigNodeImpl($token->getLine(), $this->getTag(), $id, $page_id);
     }
 
     /**

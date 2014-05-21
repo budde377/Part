@@ -515,6 +515,24 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("Hello World2", $this->template->render());
     }
 
+    public function testTemplateSupportPageVariablesFromOtherPages(){
+        $this->setUpConfig();
+        $k = "Foo";
+        $v = "Bar";
+        $id = $this->inactivePage->getID();
+        $this->inactivePage->getVariables()->setValue($k, $v);
+        $this->template->setTemplateFromString("{% page_variable {$id}[$k] %}");
+        $this->assertEquals($v,$this->template->render());
+    }
+
+    public function testTemplateSupportPageVariablesFromOtherNonExistingPages(){
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{% page_variable somenonexistingid[someid] %}");
+        $this->assertEquals("",$this->template->render());
+
+    }
+
+
 
     public function testTemplateWillSupportSiteVariable(){
         $this->setUpConfig();
