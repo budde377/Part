@@ -239,7 +239,7 @@ class UserSettingsLoggerInitializer extends Initializer{
     _logLink.onClick.listen((MouseEvent evt){
       ajaxClient.callFunction(new ClearLogJSONFunction()).then((JSONResponse response){
         if(response.type == JSONResponse.RESPONSE_TYPE_SUCCESS){
-          _logTable.queryAll("tr:not(.empty_row)").forEach((LIElement li)=>li.remove());
+          _logTable.queryAll("tr:not(.empty_row)").forEach((TableRowElement li)=>li.remove());
           _logTable.classes.add("empty");
           _pElm.queryAll("i").forEach((Element e)=>e.text = "0");
           _updateNum();
