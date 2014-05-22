@@ -114,7 +114,8 @@ class AJAXPageRegistrableImpl implements Registrable{
                     return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_PAGE_TITLE);
                 }
                 $id = strtolower($title);
-                $id = $baseId = preg_replace('/[^a-z0-9\-_]/', '_', $id);
+                $id = $baseId = str_replace(' ', '_', $id);
+                $id = $baseId = preg_replace('/[^a-z0-9\-_]/', '', $id);
                 $i = 2;
                 while (($p = $pageOrder->createPage($id)) === false) {
                     $id = $baseId . "_" . $i;
