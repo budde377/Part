@@ -289,8 +289,10 @@ class JSONPageOrder extends PageOrder {
       if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
         String id = _addPageFromObject(response.payload);
         _callListeners(PageOrderChange.PAGE_ORDER_CHANGE_CREATE_PAGE, _pages[id]);
-      }
-      if (callback != null) {
+        if (callback != null) {
+          callback(response.type, response.error_code, _pages[id]);
+        }
+      } else if (callback != null) {
         callback(response.type, response.error_code);
       }
     };
