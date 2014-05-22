@@ -37,7 +37,7 @@ class AJAXSiteContentRegistrableImpl implements Registrable{
                 return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_CANT_EDIT_PAGE);
             }
             $response = new JSONResponseImpl();
-            $response->setPayload($c->addContent($content));
+            $response->setPayload($c->addContent($content == null?"":$content));
             return $response;
         }, array('id', 'content')));
 
