@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-interface Variables extends IteratorAggregate{
+interface Variables extends IteratorAggregate, ArrayAccess{
 
     /**
      * @param string | null $key
