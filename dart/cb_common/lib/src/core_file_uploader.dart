@@ -1,6 +1,8 @@
 part of core;
 
+/*
 class ImageSizes {
+
   final int maxHeight, maxWidth, minWidth, minHeight;
 
   final bool dataURI;
@@ -18,6 +20,49 @@ class ImageSizes {
   Map<String, int> toJson() => {
       "maxHeight":maxHeight, "minHeight":minHeight, "maxWidth":maxWidth, "minWidth":minWidth, "dataURI":dataURI
   };
+}*/
+class ImageSize {
+
+  static const SCALE_METHOD_EXACT = 0;
+  static const SCALE_METHOD_EXACT_WIDTH = 1;
+  static const SCALE_METHOD_EXACT_HEIGHT = 2;
+  static const SCALE_METHOD_PRECISE_INNER_BOX = 3;
+  static const SCALE_METHOD_PRECISE_OUTER_BOX = 4;
+  static const SCALE_METHOD_LIMIT_TO_INNER_BOX = 5;
+  static const SCALE_METHOD_EXTEND_TO_INNER_BOX = 6;
+  static const SCALE_METHOD_LIMIT_TO_OUTER_BOX = 7;
+  static const SCALE_METHOD_EXTEND_TO_OUTER_BOX = 8;
+
+  final int scaleMethod;
+
+  final int height, width;
+
+  final bool dataURI;
+
+  ImageSize.scaleMethodPreciseInnerBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_PRECISE_INNER_BOX;
+
+  ImageSize.scaleMethodPreciseOuterBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_PRECISE_OUTER_BOX;
+
+  ImageSize.scaleMethodLimitToOuterBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_LIMIT_TO_OUTER_BOX;
+
+  ImageSize.scaleMethodExtendToOuterBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_EXTEND_TO_OUTER_BOX;
+
+  ImageSize.scaleMethodLimitToInnerBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_LIMIT_TO_INNER_BOX;
+
+  ImageSize.scaleMethodExtendToInnerBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_EXTEND_TO_INNER_BOX;
+
+  ImageSize.scaleMethodExact(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_EXACT;
+
+  ImageSize.scaleMethodExactWidth(this.width, {bool dataURI : false}): this.height = -1, this.scaleMethod = ImageSize.SCALE_METHOD_EXACT_WIDTH;
+
+  ImageSize.scaleMethodExactHeight(this.height, {bool dataURI : false}): this.width = -1, this.scaleMethod = ImageSize.SCALE_METHOD_EXACT_HEIGHT;
+
+
+  ImageSize(this.width, this.height, this.scaleMethod, {bool dataURI : false}) : this.dataURI = dataURI;
+
+  Map<String, int> toJson() => {
+      "height":height, "width":width, "scaleMethod" : scaleMethod, "dataURI":dataURI
+  };
 }
 
 
@@ -30,9 +75,7 @@ class FileProgress {
 
   String _path, _previewPath;
 
-  StreamController<FileProgress> _progress_controller = new StreamController<FileProgress>(),
-                                 _path_available_controller = new StreamController<FileProgress>(),
-                                 _prev_path_available_controller = new StreamController<FileProgress>();
+  StreamController<FileProgress> _progress_controller = new StreamController<FileProgress>(), _path_available_controller = new StreamController<FileProgress>(), _prev_path_available_controller = new StreamController<FileProgress>();
 
   Stream<FileProgress> _progress_stream, _path_available_stream, _prev_path_available_stream;
 
@@ -69,9 +112,11 @@ class FileProgress {
   }
 
 
-  Stream<FileProgress> get onProgress => _progress_stream == null?_progress_stream = _progress_controller.stream.asBroadcastStream():_progress_stream;
-  Stream<FileProgress> get onPathAvailable => _path_available_stream == null?_path_available_stream = _path_available_controller.stream.asBroadcastStream():_path_available_stream;
-  Stream<FileProgress> get onPreviewPathAvailable => _prev_path_available_stream == null?_prev_path_available_stream = _prev_path_available_controller.stream.asBroadcastStream():_prev_path_available_stream;
+  Stream<FileProgress> get onProgress => _progress_stream == null ? _progress_stream = _progress_controller.stream.asBroadcastStream() : _progress_stream;
+
+  Stream<FileProgress> get onPathAvailable => _path_available_stream == null ? _path_available_stream = _path_available_controller.stream.asBroadcastStream() : _path_available_stream;
+
+  Stream<FileProgress> get onPreviewPathAvailable => _prev_path_available_stream == null ? _prev_path_available_stream = _prev_path_available_controller.stream.asBroadcastStream() : _prev_path_available_stream;
 
   void _notifyProgress() => _progress_controller.add(this);
 
@@ -99,15 +144,15 @@ class AJAXImageURIUploadStrategy extends UploadStrategy {
 
   JSONClient _client;
 
-  List<ImageSizes> _sizes;
+  List<ImageSize> _sizes;
 
-  ImageSizes _size, _preview;
+  ImageSize _size, _preview;
 
-  AJAXImageURIUploadStrategy([ImageSizes size = null, ImageSizes preview = null]) {
+  AJAXImageURIUploadStrategy([ImageSize size = null, ImageSize preview = null]) {
     _size = size;
     _preview = preview;
     _sizes = [size, preview];
-    _sizes.removeWhere((ImageSizes s) => s == null);
+    _sizes.removeWhere((ImageSize s) => s == null);
     filter = UploadStrategy.FILTER_IMAGE;
     _client = new AJAXJSONClient();
 
@@ -186,13 +231,13 @@ class FileUploader {
 
   StreamController<FileProgress> _file_added_to_queue_controller = new StreamController<FileProgress>();
 
-  StreamController<FileUploader> _upload_done_controller = new StreamController<FileUploader>(),
-                                 _progress_controller = new StreamController<FileUploader>();
+  StreamController<FileUploader> _upload_done_controller = new StreamController<FileUploader>(), _progress_controller = new StreamController<FileUploader>();
   Stream<FileProgress> _file_added_to_queue_stream;
   Stream<FileUploader> _progress_stream, _upload_done_stream;
 
 
-  FileUploader.ajaxImages([ImageSizes size = null, ImageSizes preview = null]):this(new AJAXImageURIUploadStrategy(size, preview));
+  FileUploader.ajaxImages([ImageSize size = null, ImageSize preview = null]):this(new AJAXImageURIUploadStrategy(size, preview));
+
   FileUploader.ajaxFiles():this(new AJAXFileURIUploadStrategy());
 
 
@@ -253,7 +298,9 @@ class FileUploader {
   }
 
   Stream<FileUploader> get onProgress => _progress_stream;
+
   Stream<FileUploader> get onUploadDone => _upload_done_stream;
+
   Stream<FileProgress> get onFileAddedToQueue => _file_added_to_queue_stream;
 
   void _notifyProgress() => _progress_controller.add(this);

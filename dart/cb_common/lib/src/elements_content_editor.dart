@@ -410,11 +410,7 @@ class LinkImageHandler {
 
   DivElement _boxElement = new DivElement();
 
-  ButtonElement _unlinkButton = new ButtonElement(),
-                _openButton = new ButtonElement(),
-                _editImageButton = new ButtonElement(),
-                _youtubeButton = new ButtonElement(),
-                _vimeoButton = new ButtonElement();
+  ButtonElement _unlinkButton = new ButtonElement(), _openButton = new ButtonElement(), _editImageButton = new ButtonElement(), _youtubeButton = new ButtonElement(), _vimeoButton = new ButtonElement();
 
   AnchorElement _foundLink;
 
@@ -908,9 +904,9 @@ class ContentEditor {
       h.id = "";
     });
 
-    l.forEach((Element h){
-      var id = h.text.replaceAll(new RegExp(r"[^a-zA-Z0-9]+"),"_");
-      if(id.length == 0){
+    l.forEach((Element h) {
+      var id = h.text.replaceAll(new RegExp(r"[^a-zA-Z0-9]+"), "_");
+      if (id.length == 0) {
         h.remove();
         return;
       }
@@ -1244,7 +1240,7 @@ class ContentEditor {
 //TODO Fix close fileupload with ESC
     preview.classes.add('preview');
 
-    var uploadStrategy = images ? new AJAXImageURIUploadStrategy(new ImageSizes.atMost(element.clientWidth, 500), new ImageSizes.atMost(70, 70, dataURI:true)) : new AJAXFileURIUploadStrategy();
+    var uploadStrategy = images ? new AJAXImageURIUploadStrategy(new ImageSize.scaleMethodLimitToOuterBox(element.clientWidth, 500), new ImageSize.scaleMethodLimitToOuterBox(70, 70, dataURI:true)) : new AJAXFileURIUploadStrategy();
     ;
     var uploader = new FileUploader(uploadStrategy);
     var container = new EditorFileContainer(new DivElement(), uploadIcon);
@@ -1609,7 +1605,7 @@ class EditorInitializer implements Initializer {
     var editableElements = queryAll("div.editable");
 
     editableElements.forEach((DivElement div) {
-      var id = (div.dataset.containsKey("id")?div.dataset["id"]:div.id);
+      var id = (div.dataset.containsKey("id") ? div.dataset["id"] : div.id);
       var editorMode = (div.dataset["editorMode"] == "simple" ? ContentEditor.EDITOR_MODE_SIMPLE : ContentEditor.EDITOR_MODE_NORMAL);
 
       if (div.dataset["siteContent"] == "true") {
@@ -1619,7 +1615,7 @@ class EditorInitializer implements Initializer {
         new ContentEditor(div, site[id], editorMode);
       } else {
         var p;
-        var page = div.dataset.containsKey("pageId") && (p = pageOrder[div.dataset["pageId"]]) is Page?p:pageOrder.currentPage;
+        var page = div.dataset.containsKey("pageId") && (p = pageOrder[div.dataset["pageId"]]) is Page ? p : pageOrder.currentPage;
         new ContentEditor(div, page[id], editorMode);
 
       }

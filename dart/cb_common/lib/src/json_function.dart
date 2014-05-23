@@ -219,7 +219,7 @@ class ListUsersJSONFunction extends UsersJSONFunction {
 //File upload functions
 
 class UploadImageURIJSONFunction extends FileUploadJSONFunction {
-  UploadImageURIJSONFunction(String fileName, String data, [List<ImageSizes> sizes = null]): super('uploadImageURI') {
+  UploadImageURIJSONFunction(String fileName, String data, [List<ImageSize> sizes = null]): super('uploadImageURI') {
     this.arguments['data'] = data;
     this.arguments['fileName'] = fileName;
     this.arguments['sizes'] = sizes;

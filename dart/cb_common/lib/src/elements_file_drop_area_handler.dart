@@ -12,7 +12,7 @@ class FileDropAreaHandler {
 
   bool multiple = false;
 
-  factory FileDropAreaHandler.ajaxImages(Element element, [ImageSizes size = null, ImageSizes preview = null]) => _cache.putIfAbsent(element, () => new FileDropAreaHandler._internal(element, new FileUploader.ajaxImages(size, preview)));
+  factory FileDropAreaHandler.ajaxImages(Element element, [ImageSize size = null, ImageSize preview = null]) => _cache.putIfAbsent(element, () => new FileDropAreaHandler._internal(element, new FileUploader.ajaxImages(size, preview)));
 
   factory FileDropAreaHandler.ajaxFiles(Element element) => _cache.putIfAbsent(element, () => new FileDropAreaHandler._internal(element, new FileUploader.ajaxFiles()));
 

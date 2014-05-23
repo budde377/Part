@@ -55,17 +55,62 @@ class AJAXFileUploadRegistrableImpl implements Registrable
             $file = new ImageFileImpl($file->getAbsoluteFilePath());
             $thumbPaths = array();
             $path = '_files/' . $file->getParentFolder()->getName()."/";
+/*
+            static const SCALE_METHOD_EXACT = 0;
+            static const SCALE_METHOD_EXACT_WIDTH = 1;
+            static const SCALE_METHOD_EXACT_HEIGHT = 2;
+            static const SCALE_METHOD_PRECISE_INNER_BOX = 3;
+            static const SCALE_METHOD_PRECISE_OUTER_BOX = 4;
+            static const SCALE_METHOD_LIMIT_TO_INNER_BOX = 5;
+            static const SCALE_METHOD_EXTEND_TO_INNER_BOX = 6;
+            static const SCALE_METHOD_LIMIT_TO_OUTER_BOX = 7;
+            static const SCALE_METHOD_EXTEND_TO_OUTER_BOX = 8;*/
+
+
             foreach ($sizes as $size) {
-                $maxHeight = $size['maxHeight'];
-                $maxWidth = $size['maxWidth'];
-                $minHeight = $size['minHeight'];
-                $minWidth = $size['minWidth'];
+
+                $scaleMethod = $size['scaleMethod'];
+                $width = $size['width'];
+                $height = $size['height'];
                 $dataURI = $size['dataURI'];
 
                 $f = $file->copy($this->tmpFilePath());
                 if($f == null){
                     continue;
                 }
+
+                switch($scaleMethod){
+                    case 0;
+                        $f->forceSize($width, $height);
+                        break;
+                    case 1;
+                        $f->scaleToWidth($width);
+                        break;
+                    case 2;
+                        $f->scaleToHeight($height);
+                        break;
+                    case 3;
+                        $f->scaleToInnerBox($width, $height);
+                        break;
+                    case 4;
+                        $f->scaleToOuterBox($width, $height);
+                        break;
+                    case 5;
+                        $f->limitToInnerBox($width, $height);
+                        break;
+                    case 6;
+                        $f->extendToInnerBox($width, $height);
+                        break;
+                    case 7;
+                        $f->limitToOuterBox($width, $height);
+                        break;
+                    case 8;
+                        $f->extendToOuterBox($width, $height);
+                        break;
+
+
+                }
+/*
                 if ($maxHeight >= 0 && $maxWidth >= 0 && $minWidth < 0 && $minHeight < 0) {
                     $f->limitToOuterBox($maxWidth, $maxHeight);
                 } else if ($maxHeight < 0 && $maxWidth < 0 && $minWidth >= 0 && $minHeight >= 0) {
@@ -76,7 +121,7 @@ class AJAXFileUploadRegistrableImpl implements Registrable
                     $f->scaleToWidth($minWidth);
                 } else if ($maxHeight >= 0 && $maxWidth >= 0 && $minWidth == $maxWidth && $minHeight == $maxHeight) {
                     $f->forceSize($maxWidth, $maxHeight);
-                }
+                }*/
                 if ($dataURI) {
                     $thumbPaths[] = $f->getDataURI();
                 } else {
