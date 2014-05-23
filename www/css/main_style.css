@@ -358,6 +358,7 @@ body > .mouseShadow {
     background: #fff;
     padding: 0 5px;
     cursor: pointer;
+    color: #000;
 }
 
 .better_select > .current_selection > .arrow_down {
