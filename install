@@ -1,0 +1,81 @@
+#!/usr/bin/python
+
+import sys
+import re
+import os
+from subprocess import call
+import shutil
+
+__author__ = 'budde'
+
+
+def error(param):
+    print("ERROR: " + param)
+    sys.exit(2)
+
+
+def question(q, options=None, re=None, re_string=""):
+    if options:
+        s = " (" + ("/".join(options)) + ")"
+        r = raw_input(q + s + " ")
+        op_lower = [o.lower() for o in options]
+        r_lower = r.lower()
+        return op_lower.index(r_lower) if r_lower in op_lower else question(q, options, re=re, re_string=re_string)
+
+    if re:
+        s = re_string
+        r = raw_input(q + s + " ")
+        return r if re.match(r) else question(q, options=options, re=re, re_string=re_string)
+
+    return raw_input(q + " ")
+
+
+def insert_var(file, var_name, value):
+    print("Replacing var in "+file+", "+var_name+"="+value)
+    call('sed -i "s/\$'+var_name+'/'+value+'/" '+file, shell=True)
+
+
+
+
+def main():
+    print("Starting creation of new project")
+    print("--------------------------------")
+    name = question("Project name:", re=re.compile(r"^[a-zA-Z0-9]+([-_.][a-zA-Z0-9]+)*$"))
+    print("Going with " + name)
+    try:
+        print("Creating new project dir")
+        os.mkdir(name)
+    except:
+        r = question("Directory already exists. Use dir?", options=["Y", "N"])
+        if r:
+            error("It didn't really work out... Bye.")
+    print("Changing working directory")
+    os.chdir(name)
+    print("Initializing repository")
+    call("git init", shell=True)
+    print("Adding sub-module")
+    p = question("Submodule path:", re=re.compile(r".+"))
+    print("Setting up submodule")
+    call("git submodule add " + p + " common", shell=True)
+    dart_name = re.sub(r'[-_.]', '_', name)
+    print("Setting up dart library")
+    r = question("Name of dart lib ("+dart_name+"):")
+    dart_name = r if len(r) > 0 else dart_name
+    print("Going with "+dart_name)
+    print("Unpacking archive")
+    shutil.copy("common/newsite.tar.gz", ".")
+    call("tar -xvf newsite.tar.gz", shell=True)
+    print("Setting up project")
+    call("mv dart/DART_DIR dart/"+dart_name, shell=True)
+    call("ln -s ../dart/"+dart_name+" www/_dart", shell=True)
+    call("rm newsite.tar.gz", shell=True)
+    insert_var("Makefile", 'DART_DIR', dart_name)
+    insert_var(".gitignore", 'DART_DIR', dart_name)
+    insert_var("dart/"+dart_name+"/pubspec.yaml", 'DART_DIR', dart_name)
+    insert_var("site-config.xml", 'HOST_DIR', name)
+    call("git add *", shell=True)
+    call("git add .gitignore", shell=True)
+    call("git commit -m \"Initial commit\"", shell=True)
+
+if __name__ == "__main__":
+    main()
