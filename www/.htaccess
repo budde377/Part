@@ -1,0 +1,7 @@
+RewriteEngine on
+RewriteRule ^([^/][^.]+)$	index.php?page=$1 [L,QSA]
+RewriteRule .* - [E=HTTP_IF_MODIFIED_SINCE:%{HTTP:If-Modified-Since}]
+RewriteRule .* - [E=HTTP_IF_NONE_MATCH:%{HTTP:If-None-Match}]
+
+ErrorDocument 500 /internal_server_error_500
+ErrorDocument 404 /_404
