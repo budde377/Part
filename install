@@ -1,4 +1,8 @@
 #!/usr/bin/python
+from getpass import getpass
+import string
+import random
+from subprocess import Popen, PIPE
 
 import sys
 import re
@@ -8,33 +12,79 @@ import shutil
 
 __author__ = 'budde'
 
+non_empty_re = re.compile(r".+")
+
 
 def error(param):
     print("ERROR: " + param)
     sys.exit(2)
 
 
-def question(q, options=None, re=None, re_string=""):
+def question(q, options=None, re=None, re_string="", password=False):
     if options:
         s = " (" + ("/".join(options)) + ")"
-        r = raw_input(q + s + " ")
+        r = getpass(q + s + " ") if password else raw_input(q + s + " ")
         op_lower = [o.lower() for o in options]
         r_lower = r.lower()
         return op_lower.index(r_lower) if r_lower in op_lower else question(q, options, re=re, re_string=re_string)
 
     if re:
         s = re_string
-        r = raw_input(q + s + " ")
+        r = getpass(q + s + " ") if password else raw_input(q + s + " ")
         return r if re.match(r) else question(q, options=options, re=re, re_string=re_string)
 
-    return raw_input(q + " ")
+    return getpass(q + " ") if password else raw_input(q + " ")
 
 
 def insert_var(file, var_name, value):
-    print("Replacing var in "+file+", "+var_name+"="+value)
-    call('sed -i "s/\$'+var_name+'/'+value+'/" '+file, shell=True)
+    print("Replacing var in " + file + ", " + var_name + "=" + value)
+    call('sed -i "s/\$' + var_name + '/' + value + '/" ' + file, shell=True)
 
 
+def random_password(length):
+    return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
+
+
+def call_mysql(root_password, host, command):
+    p = Popen(['mysql', '-uroot', '--password=' + root_password, '--host=' + host, '-e', command],
+              stdout=PIPE)
+    p.communicate(b"input data that is passed to subprocess' stdin")
+    return p.returncode
+
+
+def setup_mysql(dart_name):
+    r = question("Do you want to setup MySQL?", options=["Y", "N"])
+    if r == 1:
+        return
+    host = question("MySQL hostname:", re=non_empty_re)
+    root_password = question("MySQL root password:", re=non_empty_re, password=True)
+
+    rc = call_mysql(root_password, host, 'SELECT COUNT(*) FROM information_schema.SCHEMATA')
+    if rc > 0:
+        setup_mysql(dart_name)
+        return
+
+    database = dart_name + "_db"
+    r = question("MySQL database (" + database + "):")
+    database = r if len(r) > 0 else database
+
+    username = dart_name
+    r = question("MySQL username (" + username + "):")
+    username = r if len(r) > 0 else username
+
+    r = question("MySQL password (random):", password=True)
+    password = r if len(r) > 0 else random_password(20)
+
+    print("Writing variables to config")
+    insert_var("site-config.xml", 'MYSQL_HOST', host)
+    insert_var("site-config.xml", 'MYSQL_DB', database)
+    insert_var("site-config.xml", 'MYSQL_USER', username)
+    insert_var("site-config.xml", 'MYSQL_PASS', password)
+
+    call_mysql(root_password, host, 'CREATE DATABASE ' + database)
+    call_mysql(root_password, host, "CREATE USER '" + username + "'@'%' IDENTIFIED BY '" + password + "'")
+    call_mysql(root_password, host, "GRANT ALL PRIVILEGES ON " + database + ".* TO '" + username + "'@'%'")
+    call("mysql -uroot --password='"+root_password+"' --host='"+host+"' "+database+" < common/setupDatabase.sql", shell=True)
 
 
 def main():
@@ -54,28 +104,35 @@ def main():
     print("Initializing repository")
     call("git init", shell=True)
     print("Adding sub-module")
-    p = question("Submodule path:", re=re.compile(r".+"))
+    p = question("Submodule path:", re=non_empty_re)
     print("Setting up submodule")
     call("git submodule add " + p + " common", shell=True)
     dart_name = re.sub(r'[-_.]', '_', name)
     print("Setting up dart library")
-    r = question("Name of dart lib ("+dart_name+"):")
+    r = question("Name of dart lib (" + dart_name + "):")
+    dn = dart_name
     dart_name = r if len(r) > 0 else dart_name
-    print("Going with "+dart_name)
+    print("Going with " + dart_name)
     print("Unpacking archive")
     shutil.copy("common/newsite.tar.gz", ".")
     call("tar -xvf newsite.tar.gz", shell=True)
     print("Setting up project")
-    call("mv dart/DART_DIR dart/"+dart_name, shell=True)
-    call("ln -s ../dart/"+dart_name+" www/_dart", shell=True)
+    call("mv dart/DART_DIR dart/" + dart_name, shell=True)
+    call("ln -s ../dart/" + dart_name + " www/_dart", shell=True)
     call("rm newsite.tar.gz", shell=True)
+    print("Setting up database connection")
+
     insert_var("Makefile", 'DART_DIR', dart_name)
     insert_var(".gitignore", 'DART_DIR', dart_name)
-    insert_var("dart/"+dart_name+"/pubspec.yaml", 'DART_DIR', dart_name)
+    insert_var("dart/" + dart_name + "/pubspec.yaml", 'DART_DIR', dart_name)
     insert_var("site-config.xml", 'HOST_DIR', name)
+
+    setup_mysql(dn)
+
     call("git add *", shell=True)
     call("git add .gitignore", shell=True)
     call("git commit -m \"Initial commit\"", shell=True)
+
 
 if __name__ == "__main__":
     main()
