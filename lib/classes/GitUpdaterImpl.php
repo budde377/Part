@@ -92,6 +92,7 @@ class GitUpdaterImpl implements Updater
         $this->site->getVariables()->setValue("can_be_updated", 0);
         $this->site->modify();
         $this->currentVersion = null;
+
     }
 
     /**
