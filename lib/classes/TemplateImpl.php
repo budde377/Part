@@ -138,6 +138,7 @@ class TemplateImpl implements Template
         $this->pageElementFactory->clearCache();
         $currentUser = $userLib->getUserLoggedIn();
         $currentPage = $currentPageStrat->getCurrentPage();
+        $site = $this->backendContainer->getSiteInstance();
         return $this->twig->render($this->renderTarget, array(
             'current_user' => $currentUser,
             'has_root_privileges' => $currentUser != null && $currentUser->getUserPrivileges()->hasRootPrivileges(),
@@ -150,9 +151,10 @@ class TemplateImpl implements Template
             'css_register' => $this->backendContainer->getCSSRegisterInstance(),
             'page_element_factory' => $this->pageElementFactory,
             'js_register' => $this->backendContainer->getJSRegisterInstance(),
-            'site' => $this->backendContainer->getSiteInstance(),
+            'site' => $site,
             'debug_mode' => $this->config->isDebugMode(),
-            'initialize' => $initialize
+            'initialize' => $initialize,
+            'last_modified' => max($currentPage->lastModified(), $site->lastModified())
         ));
 
     }

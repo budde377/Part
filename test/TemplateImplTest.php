@@ -300,6 +300,15 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertContains("initialize", $v);
     }
 
+    public function testTemplateAddsLastModified(){
+        $this->setUpConfig();
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{{ dump() }}");
+        $v = $this->template->render();
+        $this->assertContains("last_modified", $v);
+
+    }
+
     public function testTemplateAddsDebug(){
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
