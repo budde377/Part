@@ -118,7 +118,7 @@ def main():
     call("tar -xvf newsite.tar.gz", shell=True)
     print("Setting up project")
     call("mv dart/DART_DIR dart/" + dart_name, shell=True)
-    call("ln -s ../dart/" + dart_name + " www/_dart", shell=True)
+    call("ln -s ../dart/" + dart_name + "/web www/_dart", shell=True)
     call("rm newsite.tar.gz", shell=True)
     print("Setting up database connection")
 
