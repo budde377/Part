@@ -560,7 +560,12 @@ class UserSettingsUserListInitializer extends Initializer {
         var a = new AnchorElement();
         a..text = user.username..classes.add("val")..href = "mailto:${user.mail}";
         li.append(a);
-        li.appendHtml(", <span class='privileges'>($privilege Administrator)</span> <span class='parent hidden'>${user.parent}</span> <div class='delete link' title='Slet'>&nbsp;</div>");
+        li.appendHtml(", <span class='privileges'>($privilege Administrator)</span> <div class='delete link' title='Slet'>&nbsp;</div>");
+        li.dataset["username"] = user.username;
+        li.dataset["privileges"] = _userPrivilegeString(user, true);
+        li.dataset["mail"] = user.mail;
+        li.dataset["pages"] = user.pages.map((Page p)=>p.id).join(" ");
+
         _userList.append(li);
         userLis = _userList.queryAll('li');
         addListener(li);
