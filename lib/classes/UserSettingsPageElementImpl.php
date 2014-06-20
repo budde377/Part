@@ -178,9 +178,7 @@ class UserSettingsPageElementImpl extends PageElementImpl
     public function setUpElement()
     {
         parent::setUpElement();
-        if($this->currentUser == null){
-            return;
-        }
+
 
     }
 }
