@@ -70,15 +70,15 @@ class UserSettingsJSONPageOrder implements PageOrder {
 
   bool pageExists(String page_id) => _pageOrder.pageExists(page_id);
 
-  void deactivatePage(String page_id, [ChangeCallback callback = null]) => _pageOrder.deactivatePage(page_id, callback);
+  Future<ChangeResponse<Page>> deactivatePage(String page_id) => _pageOrder.deactivatePage(page_id);
 
-  void changePageOrder(List<String> page_id_list, {ChangeCallback callback:null, String parent_id:null}) => _pageOrder.changePageOrder(page_id_list, callback:callback, parent_id:parent_id);
+  Future<ChangeResponse<PageOrder>> changePageOrder(List<String> page_id_list, {String parent_id:null}) => _pageOrder.changePageOrder(page_id_list, parent_id:parent_id);
 
-  void createPage(String title, [ChangeCallback callback]) => _pageOrder.createPage(title, callback);
+  Future<ChangeResponse<Page>> createPage(String title) => _pageOrder.createPage(title);
 
   Stream<PageOrderChange> get onUpdate => _pageOrder.onUpdate;
 
-  void deletePage(String id, [ChangeCallback callback]) => _pageOrder.deletePage(id, callback);
+  Future<ChangeResponse<Page>> deletePage(String id) => _pageOrder.deletePage(id);
 
   Page operator [](String id) => _pageOrder[id];
 

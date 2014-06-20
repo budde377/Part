@@ -143,24 +143,19 @@ class UserSettingsPageLi {
   }
 
   void _setUpListeners() {
-    var bar = new SavingBar();
     page.onChange.listen((_) {
       updateInfo();
     });
     _hide.onClick.listen((MouseEvent event) {
-      var i = bar.startJob();
-      page.changeInfo(hidden:!page.hidden, callback:(String status, [int error_code, dynamic payload]) {
-        bar.endJob(i);
-      });
+      var i = savingBar.startJob();
+      page.changeInfo(hidden:!page.hidden).then((_)=>savingBar.endJob(i));
     });
     var dialog = new DialogContainer();
     _activate.onClick.listen((MouseEvent event) {
       if (_pageOrder.isActive(page.id)) {
         var deactivate = () {
-          var i = bar.startJob();
-          _pageOrder.deactivatePage(page.id, (String status, [int error_code, dynamic payload]) {
-            bar.endJob(i);
-          });
+          var i = savingBar.startJob();
+          _pageOrder.deactivatePage(page.id).then((_) => savingBar.endJob(i));
         };
         if(_pageOrder.listPageOrder(parent_id:page.id).length > 0){
           dialog.confirm("Denne side har undersider. <br /> Er du sikker på at du vil deaktivere siden og dens undersider?").result.then((bool b){
@@ -174,14 +169,12 @@ class UserSettingsPageLi {
         }
 
       } else {
-        var i = bar.startJob();
+        var i = savingBar.startJob();
         var parent_id = _pagesPath.currentlyShowingPath.length > 0 ? _pagesPath.currentlyShowingPath.last.id : null;
         var newOrder = _pageOrder.listPageOrder(parent_id:parent_id);
-        newOrder = newOrder.map((Page p) => p.id).toList();
-        newOrder.add(page.id);
-        _pageOrder.changePageOrder(newOrder, parent_id:parent_id, callback:(String status, [int error_code, dynamic payload]) {
-          bar.endJob(i);
-        });
+        var newOrderString = newOrder.map((Page p) => p.id).toList();
+        newOrderString .add(page.id);
+        _pageOrder.changePageOrder(newOrderString , parent_id:parent_id).then((_) => savingBar.endJob(i));
       }
     });
     _subPagesButton.onClick.listen((MouseEvent event) {
@@ -193,10 +186,10 @@ class UserSettingsPageLi {
           return;
         }
         li.classes.add('blur');
-        var i = bar.startJob();
-        _pageOrder.deletePage(page.id, (String status, [int error_code, dynamic payload]) {
+        var i = savingBar.startJob();
+        _pageOrder.deletePage(page.id).then((ChangeResponse response) {
           li.classes.remove('blur');
-          bar.endJob(i);
+          savingBar.endJob(i);
         });
       });
     });

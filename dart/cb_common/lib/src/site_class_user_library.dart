@@ -18,9 +18,9 @@ class UserLibraryChangeEvent{
 
 abstract class UserLibrary {
 
-  void createUser(String mail, String privileges, [ChangeCallback callback = null]);
+  Future<ChangeResponse<User>> createUser(String mail, String privileges);
 
-  void deleteUser(String username, [ChangeCallback callback = null]);
+  Future<ChangeResponse<User>> deleteUser(String username);
 
 
   Stream<UserLibraryChangeEvent> get onChange;
@@ -92,7 +92,7 @@ class JSONUserLibrary extends UserLibrary {
     _client = new AJAXJSONClient();
     var function = new ListUsersJSONFunction();
     var functionCallback = (JSONResponse response) {
-      if (response.type != JSONResponse.RESPONSE_TYPE_SUCCESS) {
+      if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         return;
       }
       _userLoggedInId = response.payload['user_logged_in'];
@@ -133,38 +133,43 @@ class JSONUserLibrary extends UserLibrary {
     });
   }
 
-  void createUser(String mail, String privileges, [ChangeCallback callback = null]) {
+  Future<ChangeResponse<User>>createUser(String mail, String privileges) {
+    var completer = new Completer<ChangeResponse<User>>();
     var function = new CreateUserJSONFunction(mail, privileges);
     var functionCallback = (JSONResponse response) {
 
-      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
+      if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         var o = response.payload;
         var username = _addUserFromObjectToUsers(o, []);
-        _callListeners(UserLibraryChangeEvent.CHANGE_CREATE, _users[username]);
+        var user = _users[username];
+        _callListeners(UserLibraryChangeEvent.CHANGE_CREATE, user);
+        completer.complete(new ChangeResponse<User>.success(user));
+      } else {
+        completer.complete(new ChangeResponse<User>.error(response.error_code));
       }
-      if (callback != null) {
-        callback(response.type, response.error_code);
-      }
+
     };
     _client.callFunction(function).then(functionCallback);
-
+    return completer.future;
   }
 
-  void deleteUser(String username, [ChangeCallback callback = null]) {
+  Future<ChangeResponse<User>> deleteUser(String username) {
+    var completer = new Completer<ChangeResponse<User>>();
     var function = new DeleteUserJSONFunction(username);
     var functionCallback = (JSONResponse response) {
 
-      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
+      if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         var user = _users[username];
         _users.remove(username);
         _callListeners(USER_LIBRARY_CHANGE_DELETE, user);
+        completer.complete(new ChangeResponse<User>.success(user));
+      } else {
+        completer.complete(new ChangeResponse<User>.error(response.error_code));
       }
-      if (callback != null) {
-        callback(response.type, response.error_code);
-      }
+
     };
     _client.callFunction(function).then(functionCallback);
-
+    return completer.future;
   }
 
   Stream<UserLibraryChangeEvent> get onChange => _changeStream == null?_changeStream = _changeController.stream.asBroadcastStream():_changeStream;

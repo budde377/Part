@@ -20,13 +20,13 @@ abstract class User {
 
   List<Page> get pages;
 
-  void changeInfo({String username:null, String mail:null, ChangeCallback callback:null});
+  Future<ChangeResponse<User>> changeInfo({String username:null, String mail:null});
 
-  void changePassword(String currentPassword, String newPassword, [ChangeCallback callback]);
+  Future<ChangeResponse<User>> changePassword(String currentPassword, String newPassword);
 
-  void addPagePrivilege(Page page, [ChangeCallback callback]);
+  Future<ChangeResponse<User>> addPagePrivilege(Page page);
 
-  void revokePagePrivilege(Page page, [ChangeCallback callback]);
+  Future<ChangeResponse<User>>revokePagePrivilege(Page page);
 
   bool get hasRootPrivileges;
   bool get hasSitePrivileges;
@@ -72,35 +72,37 @@ class JSONUser extends User {
 
   DateTime get lastLogin => _lastLogin;
 
-  void changeInfo({String username:null, String mail:null, ChangeCallback callback:null}) {
+  Future<ChangeResponse<User>> changeInfo({String username:null, String mail:null}) {
+    var completer = new Completer<ChangeResponse<User>>();
     mail = mail != null ? mail : _mail;
     username = username != null ? username : _username;
-    callback = callback != null ? callback : (e1, [e2, e3]) {
-    };
+
     var jsonFunction = new ChangeUserInfoJSONFunction(_username, username, mail);
     _client.callFunction(jsonFunction).then( (JSONResponse response) {
-      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
+      if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         _username = username;
         _mail = mail;
-        callback(CALLBACK_STATUS_SUCCESS);
         _callListeners();
+        completer.complete(new ChangeResponse<User>.success(this));
       } else {
-        callback(CALLBACK_STATUS_ERROR, response.error_code);
+        completer.complete(new ChangeResponse<User>.error(response.error_code));
       }
     });
+    return completer.future;
   }
 
-  void changePassword(String currentPassword, String newPassword, [ChangeCallback callback]) {
+  Future<ChangeResponse<User>> changePassword(String currentPassword, String newPassword) {
+    var completer = new Completer<ChangeResponse<User>>();
     var jsonFunction = new ChangeUserPasswordJSONFunction(_username, currentPassword, newPassword);
     _client.callFunction(jsonFunction).then((JSONResponse response) {
-      switch (response.type) {
-        case JSONResponse.RESPONSE_TYPE_SUCCESS:
-          callback(response.type);
-          break;
-        default:
-          callback(JSONResponse.RESPONSE_TYPE_ERROR, response.error_code);
+      if(response.type == Response.RESPONSE_TYPE_SUCCESS){
+        completer.complete(new ChangeResponse<User>.success(this));
+      } else {
+        completer.complete(new ChangeResponse<User>.error(response.error_code));
       }
+
     });
+    return completer.future;
   }
 
   Stream<User> get onChange => _changeStream == null? _changeStream = _changeController.stream.asBroadcastStream():_changeStream;
@@ -115,30 +117,34 @@ class JSONUser extends User {
   List<Page> get pages => new List<Page>.from(_pages);
 
 
-  void addPagePrivilege(Page page, [ChangeCallback callback]) {
+  Future<ChangeResponse<User>> addPagePrivilege(Page page) {
+    var completer = new Completer<ChangeResponse<User>>();
     var function = new AddUserPagePrivilegeJSONFunction(_username, page.id);
     _client.callFunction(function).then( (JSONResponse response) {
-      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
+      if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         _pages.add(page);
-        callback(response.type);
+        completer.complete(new ChangeResponse<User>.success(this));
         _callListeners();
       } else {
-        callback(JSONResponse.RESPONSE_TYPE_ERROR, response.error_code);
+        completer.complete(new ChangeResponse<User>.error(response.error_code));
       }
     });
+    return completer.future;
   }
 
-  void revokePagePrivilege(Page page, [ChangeCallback callback]) {
+  Future<ChangeResponse<User>> revokePagePrivilege(Page page) {
+    var completer = new Completer<ChangeResponse<User>>();
     var function = new RevokeUserPagePrivilegeJSONFunction(_username, page.id);
     _client.callFunction(function).then((JSONResponse response) {
-      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
+      if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         _pages.remove(page);
-        callback(response.type);
         _callListeners();
+        completer.complete(new ChangeResponse<User>.success(this));
       } else {
-        callback(JSONResponse.RESPONSE_TYPE_ERROR, response.error_code);
+        completer.complete(new ChangeResponse<User>.error(response.error_code));
       }
     });
+    return completer.future;
   }
 
   bool get hasRootPrivileges => privileges == User.PRIVILEGE_ROOT;

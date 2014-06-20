@@ -49,9 +49,9 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
 
   UserSettingsJSONUserLibrary() : _userLibrary = new JSONUserLibrary(pageOrder);
 
-  void createUser(String mail, String privileges, [ChangeCallback callback = null]) => _userLibrary.createUser(mail, privileges, callback);
+  Future<ChangeResponse<User>> createUser(String mail, String privileges) => _userLibrary.createUser(mail, privileges);
 
-  void deleteUser(String username, [ChangeCallback callback = null]) => _userLibrary.deleteUser(username, callback);
+  Future<ChangeResponse<User>> deleteUser(String username) => _userLibrary.deleteUser(username);
 
   Stream<UserLibraryChangeEvent> get onChange => _userLibrary.onChange;
 

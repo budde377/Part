@@ -68,7 +68,7 @@ class JSONContent extends Content {
   Future<List<DateTime>> get changeTimes {
     var completer = new Completer<List<DateTime>>();
     _client.callFunction(contentStrategy.generateListContentFunction()).then((JSONResponse response) {
-      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
+      if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         List<int> payload = response.payload== null? []:response.payload;
         completer.complete(payload.map((int) => new DateTime.fromMillisecondsSinceEpoch(int * 1000)).toList(growable:false));
       } else {
@@ -82,7 +82,7 @@ class JSONContent extends Content {
     var completer = new Completer<Revision>();
 
     _client.callFunction(contentStrategy.generateContentAtTimeFunction(time.millisecond~/1000)).then((JSONResponse response) {
-      if (response.type != JSONResponse.RESPONSE_TYPE_SUCCESS) {
+      if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         completer.completeError(new Exception("Could not get content at time"));
         return;
       }
@@ -99,7 +99,7 @@ class JSONContent extends Content {
   Future<Revision> addContent(String content) {
     var completer = new Completer<Revision>();
     _client.callFunction(contentStrategy.generateAddContentFunction(content)).then((JSONResponse response) {
-      if (response.type != JSONResponse.RESPONSE_TYPE_SUCCESS) {
+      if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         completer.completeError(new Exception("Could not add content"));
         return;
       }
@@ -117,7 +117,7 @@ class JSONContent extends Content {
 
     var fromm = from.millisecondsSinceEpoch ~/ 1000, too = to.millisecondsSinceEpoch ~/ 1000;
     _client.callFunction(contentStrategy.generateListContentFunction(from:fromm, to:too, includeContent:true)).then((JSONResponse response) {
-      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
+      if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         List<Map<String, dynamic>> payload = response.payload == null? []:response.payload;
         completer.complete(payload.map((Map<String, dynamic> m) => _generateRevision(new DateTime.fromMillisecondsSinceEpoch(m['time'] * 1000), m['content'])).toList(growable:false));
 

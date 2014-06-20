@@ -172,7 +172,7 @@ class AJAXImageURIUploadStrategy extends UploadStrategy {
           callback(path);
         }
       };
-      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
+      if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         c(_size == null ? response.payload['path'] : response.payload['thumbs'][0]);
         if (_preview != null) {
           fileProgress.previewPath = response.payload['thumbs'][1];
@@ -207,7 +207,7 @@ class AJAXFileURIUploadStrategy extends UploadStrategy {
           callback(path);
         }
       };
-      c(response.type == JSONResponse.RESPONSE_TYPE_SUCCESS ? response.payload['path'] : null);
+      c(response.type == Response.RESPONSE_TYPE_SUCCESS ? response.payload['path'] : null);
     });
   }
 

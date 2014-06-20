@@ -29,21 +29,21 @@ UserLibrary get userLibrary => userLibraryAvailable && pageOrderAvailable ? new 
 
 String _errorMessage(int error_code) {
   switch (error_code) {
-    case JSONResponse.ERROR_CODE_PAGE_NOT_FOUND:
+    case core.Response.ERROR_CODE_PAGE_NOT_FOUND:
       return "Siden blev ikke fundet";
-    case JSONResponse.ERROR_CODE_INVALID_PAGE_ID:
+    case core.Response.ERROR_CODE_INVALID_PAGE_ID:
       return "Ugyldigt side id";
-    case JSONResponse.ERROR_CODE_INVALID_PAGE_ALIAS:
+    case core.Response.ERROR_CODE_INVALID_PAGE_ALIAS:
       return "Ugyldigt side alias";
-    case JSONResponse.ERROR_CODE_UNAUTHORIZED:
+    case core.Response.ERROR_CODE_UNAUTHORIZED:
       return "Du har ikke de nødvendige rettigheder";
-    case JSONResponse.ERROR_CODE_INVALID_MAIL:
+    case core.Response.ERROR_CODE_INVALID_MAIL:
       return "Ugyldig mail-adresse";
-    case JSONResponse.ERROR_CODE_INVALID_USER_NAME:
+    case core.Response.ERROR_CODE_INVALID_USER_NAME:
       return "Ugyldig brugernavn";
-    case JSONResponse.ERROR_CODE_WRONG_PASSWORD:
+    case core.Response.ERROR_CODE_WRONG_PASSWORD:
       return "Forkert kodeord";
-    case JSONResponse.ERROR_CODE_INVALID_PASSWORD:
+    case core.Response.ERROR_CODE_INVALID_PASSWORD:
       return "Ugyldigt kodeord";
     default:
       return null;
@@ -124,7 +124,7 @@ class UserSettingsLoggerInitializer extends core.Initializer {
       a.onClick.listen((MouseEvent evt) {
         var loader = dialogContainer.loading("Henter log filen");
         ajaxClient.callFunction(new GetDumpFileLogJSONFunction(int.parse(a.dataset["id"]))).then((JSONResponse resp) {
-          if (resp.type != JSONResponse.RESPONSE_TYPE_SUCCESS) {
+          if (resp.type != core.Response.RESPONSE_TYPE_SUCCESS) {
             loader.close();
             return;
           }
@@ -149,7 +149,7 @@ class UserSettingsLoggerInitializer extends core.Initializer {
 
     _logLink.onClick.listen((MouseEvent evt) {
       ajaxClient.callFunction(new ClearLogJSONFunction()).then((JSONResponse response) {
-        if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
+        if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
           _logTable.querySelectorAll("tr:not(.empty_row)").forEach((TableRowElement li) => li.remove());
           _logTable.classes.add("empty");
           _pElm.querySelectorAll("i").forEach((Element e) => e.text = "0");
@@ -186,7 +186,7 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
 
         _client.callFunction(new CheckForSiteUpdatesJSONFunction()).then((JSONResponse response) {
           _checkTime.text = core.dateString(new DateTime.now());
-          if (response.type != JSONResponse.RESPONSE_TYPE_SUCCESS) {
+          if (response.type != core.Response.RESPONSE_TYPE_SUCCESS) {
             _canBeUpdated = false;
             _updateCheckButton();
             return;
@@ -248,7 +248,7 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
 
     var loader = dialogContainer.loading("Opdaterer websitet.<br />Luk ikke din browser!");
     _client.callFunction(new UpdateSiteJSONFunction()).then((JSONResponse response) {
-      if (response.type == JSONResponse.RESPONSE_TYPE_ERROR) {
+      if (response.type == core.Response.RESPONSE_TYPE_ERROR) {
         loader.close();
         _updateCheckButton();
         return;
@@ -313,8 +313,8 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
           return;
         }
         var i = savingBar.startJob();
-        user.revokePagePrivilege(_order.currentPage, (String status, [a, b]) {
-          if (status == CALLBACK_STATUS_SUCCESS) {
+        user.revokePagePrivilege(_order.currentPage).then((ChangeResponse response) {
+          if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
             li.remove();
             var opt = new OptionElement();
             opt.text = opt.value = username;
@@ -377,8 +377,8 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
       }
       deco.blur();
       var user = _userLib.users[data['username']];
-      user.addPagePrivilege(_order.currentPage, (String status, [a, b]) {
-        if (status == CALLBACK_STATUS_ERROR) {
+      user.addPagePrivilege(_order.currentPage).then((ChangeResponse response) {
+        if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
           deco.unBlur();
           return false;
         }
@@ -445,7 +445,7 @@ class UserSettingsUserListInitializer extends core.Initializer {
           return;
         }
         var i = savingBar.startJob();
-        _userLib.deleteUser(username, (String status, [int error_code, p]) => savingBar.endJob(i));
+        _userLib.deleteUser(username).then((_) => savingBar.endJob(i));
       });
     });
 
@@ -509,8 +509,8 @@ class UserSettingsAddUserFormInitializer extends core.Initializer {
         return false;
       }
       decoration.blur();
-      _userLib.createUser(data['mail'], data['level'], (String status, [int error_code, b]) {
-        if (status == CALLBACK_STATUS_SUCCESS) {
+      _userLib.createUser(data['mail'], data['level']).then( (ChangeResponse response) {
+        if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
           userMailField.value = "";
           validatingForm.validate();
           userMailField.blur();
@@ -545,8 +545,8 @@ class UserSettingsAddPageFormInitializer extends core.Initializer {
       }
 
       decoration.blur();
-      _order.createPage(data['title'], (String status, [int error_code, dynamic payload]) {
-        if (status == CALLBACK_STATUS_SUCCESS) {
+      _order.createPage(data['title']).then((ChangeResponse response) {
+        if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
           input.value = "";
           input.blur();
           validatingForm.validate();
@@ -588,10 +588,10 @@ class UserSettingsChangeUserInfoFormInitializer extends core.Initializer {
         return false;
       }
       decoForm.blur();
-      userLibrary.userLoggedIn.changeInfo(username:data['username'], mail:data['mail'], callback:(String status, [int error_code, b]) {
-        if (status == CALLBACK_STATUS_ERROR) {
+      userLibrary.userLoggedIn.changeInfo(username:data['username'], mail:data['mail']).then((ChangeResponse response) {
+        if (response.type == core.Response.RESPONSE_TYPE_ERROR) {
           var m;
-          decoForm.changeNotion((m = _errorMessage(error_code)) != null ? m : "Ukendt fejl", FormHandler.NOTION_TYPE_ERROR);
+          decoForm.changeNotion((m = _errorMessage(response.error_code)) != null ? m : "Ukendt fejl", FormHandler.NOTION_TYPE_ERROR);
         } else {
           decoForm.changeNotion("Ændringerne er gemt", FormHandler.NOTION_TYPE_SUCCESS);
           userNameInput.blur();
@@ -619,10 +619,10 @@ class UserSettingsChangeUserInfoFormInitializer extends core.Initializer {
         return false;
       }
       decoPassForm.blur();
-      userLibrary.userLoggedIn.changePassword(data['old_password'], data['new_password'], (String status, [int error_code, b]) {
-        if (status == CALLBACK_STATUS_ERROR) {
+      userLibrary.userLoggedIn.changePassword(data['old_password'], data['new_password']).then((ChangeResponse response) {
+        if (response.type == core.Response.RESPONSE_TYPE_ERROR) {
           var m;
-          decoPassForm.changeNotion((m = _errorMessage(error_code)) != null ? m : "Ukendt fejl", FormHandler.NOTION_TYPE_ERROR);
+          decoPassForm.changeNotion((m = _errorMessage(response.error_code)) != null ? m : "Ukendt fejl", FormHandler.NOTION_TYPE_ERROR);
         } else {
           decoPassForm.changeNotion("Dit kodeord er ændret", FormHandler.NOTION_TYPE_SUCCESS);
           userNewPassword.value = userOldPassword.value = userNewPasswordRepeat.value = "";
@@ -680,8 +680,8 @@ class UserSettingsEditPageFormInitializer extends core.Initializer {
       }
       formDecoration.blur();
       var template = _order.currentPage.template;
-      _order.currentPage.changeInfo(title:data['title'], id:data['id'], template:data['template'], alias:data['alias'], callback:(String status, [int error_code, dynamic payload]) {
-        if (status == CALLBACK_STATUS_SUCCESS) {
+      _order.currentPage.changeInfo(title:data['title'], id:data['id'], template:data['template'], alias:data['alias']).then((ChangeResponse<Page> response) {
+        if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
           formDecoration.changeNotion("Ændringerne er gemt", FormHandler.NOTION_TYPE_SUCCESS);
           editTitleField.blur();
           editIdField.blur();
@@ -691,9 +691,10 @@ class UserSettingsEditPageFormInitializer extends core.Initializer {
           }
 
         } else {
-          formDecoration.changeNotion(_errorMessage(error_code), FormHandler.NOTION_TYPE_ERROR);
+          formDecoration.changeNotion(_errorMessage(response.error_code), FormHandler.NOTION_TYPE_ERROR);
         }
         formDecoration.unBlur();
+
       });
       return false;
     };
@@ -745,7 +746,7 @@ class UserSettingsPageListsInitializer extends core.Initializer {
         newOrder.add(pageLi.page.id);
       });
       var i = savingBar.startJob();
-      _order.changePageOrder(newOrder, callback:(String status, [int error_code, dynamic payload]) => savingBar.endJob(i), parent_id:parent);
+      _order.changePageOrder(newOrder, parent_id:parent).then((_) => savingBar.endJob(i));
       e.stopPropagation();
     };
     _activeList.onChange.listen(ULChangeListener(_activeList, null));

@@ -20,7 +20,7 @@ abstract class Page {
 
   bool get hidden;
 
-  void changeInfo({String id, String title, String template, String alias, bool hidden, ChangeCallback callback});
+  Future<ChangeResponse<Page>> changeInfo({String id, String title, String template, String alias, bool hidden});
 
   Stream<Page> get onChange;
 
@@ -59,32 +59,29 @@ class JSONPage extends Page {
     _hidden = hidden;
   }
 
-  void changeInfo({String id:null, String title:null, String template:null, String alias:null, bool hidden:null, ChangeCallback callback:null}) {
+  Future<ChangeResponse<Page>> changeInfo({String id:null, String title:null, String template:null, String alias:null, bool hidden:null}) {
     id = id != null ? id : _id;
     title = title != null ? title : _title;
     template = template != null ? template : _template;
     alias = alias != null ? alias : _alias;
     hidden = hidden != null ? hidden : _hidden;
-    callback = callback != null ? callback : (a1, [a2, a3]) {
-    };
-
+    var completer = new Completer<ChangeResponse<Page>>();
     var function = new ChangePageInfoJSONFunction(_id, id, title, template, alias, hidden);
     var functionCallback = (JSONResponse response) {
-      switch (response.type) {
-        case JSONResponse.RESPONSE_TYPE_SUCCESS:
-          _id = id;
-          _template = template;
-          _title = title;
-          _alias = alias;
-          _hidden = hidden;
-          _callListeners();
-          callback(response.type);
-          break;
-        default:
-          callback(response.type, response.error_code);
+      if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
+        _id = id;
+        _template = template;
+        _title = title;
+        _alias = alias;
+        _hidden = hidden;
+        _callListeners();
+        completer.complete(new ChangeResponse<Page>.success(this));
+      } else {
+        completer.complete(new ChangeResponse<Page>.error(response.error_code));
       }
     };
     _client.callFunction(function).then(functionCallback);
+    return completer.future;
   }
 
   void _callListeners() {
@@ -95,6 +92,6 @@ class JSONPage extends Page {
 
   Content operator [](String id) => _content.putIfAbsent(id, () => new JSONContent.page(this, id, _client));
 
-  Stream<Page> get onChange => _changeStream == null?_changeStream = _changeController.stream.asBroadcastStream():_changeStream;
+  Stream<Page> get onChange => _changeStream == null ? _changeStream = _changeController.stream.asBroadcastStream() : _changeStream;
 
 }

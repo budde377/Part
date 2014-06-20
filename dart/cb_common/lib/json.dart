@@ -40,13 +40,19 @@ JSONResponse parseResponse(Map map) {
   }
   var type;
   if ((type = map['response_type']) == null ||
-  (type != JSONResponse.RESPONSE_TYPE_ERROR && type != JSONResponse.RESPONSE_TYPE_SUCCESS)) {
+  (type != Response.RESPONSE_TYPE_ERROR && type != Response.RESPONSE_TYPE_SUCCESS)) {
     return null;
   }
 
-  var payload = recursiveParsePayload(map['payload']);
-  return new JSONResponse(type, map['id'], payload, map['error_code']);
 
+  if(type == Response.RESPONSE_TYPE_SUCCESS){
+    var payload = recursiveParsePayload(map['payload']);
+    return new JSONResponse.success(map['id'],payload);
+  } else if(type == Response.RESPONSE_TYPE_ERROR){
+    return new JSONResponse.error(map['error_code']);
+  }
+
+  return null;
 }
 
 dynamic recursiveParsePayload(payload){
