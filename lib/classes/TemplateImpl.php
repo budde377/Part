@@ -156,7 +156,8 @@ class TemplateImpl implements Template
             'initialize' => $initialize,
             'last_modified' => max($currentPage->lastModified(), $site->lastModified()),
             'updater' => $this->backendContainer->getUpdater(),
-            'config' => $this->config
+            'config' => $this->config,
+            'backend_container' => $this->backendContainer
         ));
 
     }

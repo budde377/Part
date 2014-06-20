@@ -269,6 +269,14 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(strpos($v, "page_order") !== false);
     }
 
+    public function testTemplateAddsBackendContainer(){
+        $this->setUpConfig();
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{{ dump() }}");
+        $v = $this->template->render();
+        $this->assertTrue(strpos($v, "backend_container") !== false);
+    }
+
     public function testTemplateAddsCSSRegister(){
         $this->setUpConfig();
         $this->template->setTwigDebug(true);

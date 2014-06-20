@@ -19,12 +19,15 @@ AutoLoader::registerDirectory(dirname(__FILE__)."/../../lib");
 // LOAD COMPOSER
 require dirname(__FILE__).'/../vendor/autoload.php';
 @include dirname(__FILE__).'/../../vendor/autoload.php';
+// PROVIDE A WAY TO INITIALIZE SITE FACTORY
+@include dirname(__FILE__).'/../../vendor/local.php';
 
 date_default_timezone_set("Europe/Copenhagen");
 /** @var $siteConfig SimpleXMLElement */
 $siteConfig = simplexml_load_file('../site-config.xml');
 $config = new ConfigImpl($siteConfig, dirname(__FILE__) . '/../../');
-$factory = new SiteFactoryImpl($config);
+
+$factory = isset($factory)?$factory:new SiteFactoryImpl($config);
 
 $setUp = function() use ($factory){
     $website = new WebsiteImpl($factory);
