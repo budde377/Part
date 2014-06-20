@@ -39,23 +39,23 @@ class ImageSize {
 
   final bool dataURI;
 
-  ImageSize.scaleMethodPreciseInnerBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_PRECISE_INNER_BOX;
+  ImageSize.scaleMethodPreciseInnerBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_PRECISE_INNER_BOX, this.dataURI = dataURI;
 
-  ImageSize.scaleMethodPreciseOuterBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_PRECISE_OUTER_BOX;
+  ImageSize.scaleMethodPreciseOuterBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_PRECISE_OUTER_BOX, this.dataURI = dataURI;
 
-  ImageSize.scaleMethodLimitToOuterBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_LIMIT_TO_OUTER_BOX;
+  ImageSize.scaleMethodLimitToOuterBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_LIMIT_TO_OUTER_BOX, this.dataURI = dataURI;
 
-  ImageSize.scaleMethodExtendToOuterBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_EXTEND_TO_OUTER_BOX;
+  ImageSize.scaleMethodExtendToOuterBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_EXTEND_TO_OUTER_BOX, this.dataURI = dataURI;
 
-  ImageSize.scaleMethodLimitToInnerBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_LIMIT_TO_INNER_BOX;
+  ImageSize.scaleMethodLimitToInnerBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_LIMIT_TO_INNER_BOX, this.dataURI = dataURI;
 
-  ImageSize.scaleMethodExtendToInnerBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_EXTEND_TO_INNER_BOX;
+  ImageSize.scaleMethodExtendToInnerBox(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_EXTEND_TO_INNER_BOX, this.dataURI = dataURI;
 
-  ImageSize.scaleMethodExact(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_EXACT;
+  ImageSize.scaleMethodExact(this.width, this.height, {bool dataURI : false}): this.scaleMethod = ImageSize.SCALE_METHOD_EXACT, this.dataURI = dataURI;
 
-  ImageSize.scaleMethodExactWidth(this.width, {bool dataURI : false}): this.height = -1, this.scaleMethod = ImageSize.SCALE_METHOD_EXACT_WIDTH;
+  ImageSize.scaleMethodExactWidth(this.width, {bool dataURI : false}): this.height = -1, this.scaleMethod = ImageSize.SCALE_METHOD_EXACT_WIDTH, this.dataURI = dataURI;
 
-  ImageSize.scaleMethodExactHeight(this.height, {bool dataURI : false}): this.width = -1, this.scaleMethod = ImageSize.SCALE_METHOD_EXACT_HEIGHT;
+  ImageSize.scaleMethodExactHeight(this.height, {bool dataURI : false}): this.width = -1, this.scaleMethod = ImageSize.SCALE_METHOD_EXACT_HEIGHT, this.dataURI = dataURI;
 
 
   ImageSize(this.width, this.height, this.scaleMethod, {bool dataURI : false}) : this.dataURI = dataURI;

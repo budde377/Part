@@ -8,8 +8,8 @@ class UserSettingsJSONPageOrder implements PageOrder {
 
   UserSettingsJSONPageOrder.initializeFromMenu(UListElement activePageList, UListElement inactivePageList) : _pageOrder = new JSONPageOrder.initializeFromLists( _listToPageOrder(activePageList), _listToPages(inactivePageList), (() {
     var v;
-    return (v = activePageList.query('li.current')) == null ?
-          ((v = inactivePageList.query('li.current')) == null ? null : v.dataset["id"]) : v.dataset["id"];
+    return (v = activePageList.querySelector('li.current')) == null ?
+          ((v = inactivePageList.querySelector('li.current')) == null ? null : v.dataset["id"]) : v.dataset["id"];
   })());
 
   UserSettingsJSONPageOrder() : _pageOrder = new JSONPageOrder();
@@ -26,7 +26,7 @@ class UserSettingsJSONPageOrder implements PageOrder {
       returnMap[parent] = l;
       list.children.forEach((LIElement e) {
         if (e.dataset.containsKey("id")) {
-          recursiveMapBuilder(e.query('ul'), e.dataset["id"]);
+          recursiveMapBuilder(e.querySelector('ul'), e.dataset["id"]);
         }
       });
     };

@@ -607,7 +607,7 @@ class ImageEditorHandler {
     });
   }
 
-  Position transformMirror(int x, int y) {
+  core.Position transformMirror(int x, int y) {
 
 
     if(editor.mirrorHorizontal){
@@ -618,13 +618,13 @@ class ImageEditorHandler {
       x = editor.width-x;
     }
 
-    return new Position(x:x, y:y);
+    return new core.Position(x:x, y:y);
   }
 
   void open() {
     _dialogBox = dialogContainer.dialog(_dialogElement);
     _dialogBox.onClose.listen((_) => close());
-    body.append(_toolBar);
+    core.body.append(_toolBar);
 
     if(editor.isReady){
       _properties = editor.properties = new ImageEditProperties.fromImageElement(editor.image);

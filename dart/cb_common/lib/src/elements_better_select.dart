@@ -16,7 +16,7 @@ class BetterSelect {
 
 
 
-  String get selectedString => _element.query("option") != null ? _element.selectedOptions.map((Node n) => n.text).join(", ") : "";
+  String get selectedString => _element.querySelector("option") != null ? _element.selectedOptions.map((Node n) => n.text).join(", ") : "";
 
   BetterSelect._internal(this._element) {
     _container = new DivElement();

@@ -25,7 +25,7 @@ class FormHandler {
       e.preventDefault();
       e.stopImmediatePropagation();
       var data = <String,String>{};
-      form.queryAll('input:not([type=submit]), textarea, select').forEach((Element e){
+      form.querySelectorAll('input:not([type=submit]), textarea, select').forEach((Element e){
         if(e is SelectElement){
           SelectElement ee  = e;
           data[ee.name] = ee.value;
@@ -60,7 +60,7 @@ class FormHandler {
       }});
     form.onSubmit.listen((Event event) {
       blur();
-      List<Element> elements = form.queryAll("textarea, input:not([type=submit]), select");
+      List<Element> elements = form.querySelectorAll("textarea, input:not([type=submit]), select");
       req.open(form.method.toUpperCase(), "?ajax=${Uri.encodeComponent(AJAXId)}");
       req.send(new FormData(form));
       event.preventDefault();
@@ -83,7 +83,7 @@ class FormHandler {
   }
 
   void clearForm(){
-    List<Element> elements = form.queryAll("textarea, input:not([type=submit])");
+    List<Element> elements = form.querySelectorAll("textarea, input:not([type=submit])");
     elements.forEach((Element elm){
       if(elm is InputElement){
         InputElement elm2 = elm;
@@ -96,7 +96,7 @@ class FormHandler {
   }
 
   void removeNotion() {
-    form.queryAll("span.notion").forEach((Element e) {e.remove();});
+    form.querySelectorAll("span.notion").forEach((Element e) {e.remove();});
 
   }
 
@@ -141,13 +141,13 @@ class Validator<E extends Element> {
         _validator = (InputElement elm) => regexp.hasMatch(elm.value);
     break;
       case "mail":
-        _validator = (InputElement elm) => validMail(elm.value);
+        _validator = (InputElement elm) => core.validMail(elm.value);
     break;
       case "url":
-        _validator = (InputElement elm) => validUrl(elm.value);
+        _validator = (InputElement elm) => core.validUrl(elm.value);
     break;
       case "non-empty":
-        _validator = (InputElement elm) => nonEmpty(elm.value);
+        _validator = (InputElement elm) => core.nonEmpty(elm.value);
     break;
     }
 
@@ -236,7 +236,7 @@ class FormValidator{
 
   List<Validator> get validators => _candidates.map((Element elm) => new Validator(elm));
 
-  List<Element> get _candidates => element.queryAll("input:not([type=submit]), textarea, select");
+  List<Element> get _candidates => element.querySelectorAll("input:not([type=submit]), textarea, select");
 
   bool get valid => element.classes.contains("valid");
 
@@ -283,7 +283,7 @@ class ValidatingForm {
     };
 
 
-    var inputs = _element.queryAll('input:not([type=submit]), textarea');
+    var inputs = _element.querySelectorAll('input:not([type=submit]), textarea');
     inputs.forEach((InputElement element) {
       element.onBlur.listen(listener(element,true));
       element.onFocus.listen(listener(element,false));
@@ -297,7 +297,7 @@ class ValidatingForm {
         _valueMap[element] = element.value;
       });
     });
-    var selects = _element.queryAll('select');
+    var selects = _element.querySelectorAll('select');
     selects.forEach((Element element) {
       element.onBlur.listen(listener(element,true));
       element.onFocus.listen(listener(element,false));
@@ -309,14 +309,14 @@ class ValidatingForm {
   }
 
   void validate([bool initial = true]) {
-    var inputs = _element.queryAll('input:not([type=submit]), textarea');
+    var inputs = _element.querySelectorAll('input:not([type=submit]), textarea');
     inputs.forEach((InputElement element) {
       if (_valueMap[element] != element.value) {
         _checkElement(element);
       }
       _valueMap[element] = element.value;
     });
-    var selects = _element.queryAll('select');
+    var selects = _element.querySelectorAll('select');
     selects.forEach((Element element) {
       _checkElement(element);
     });
@@ -342,7 +342,7 @@ class ValidatingForm {
         _infoBoxMap[element].remove();
         _infoBoxMap.remove(element);
       }
-      if (!_validForm && _element.query('input:not([type=submit]).invalid, textarea.invalid, select.invalid') == null) {
+      if (!_validForm && _element.querySelector('input:not([type=submit]).invalid, textarea.invalid, select.invalid') == null) {
         _validForm = true;
         _changeToValid();
       }

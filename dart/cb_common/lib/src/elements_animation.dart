@@ -22,7 +22,7 @@ class PxPropertyAnimation extends PropertyAnimation {
 
   int _fromm, _too;
 
-  Animation _animation;
+  core.Animation _animation;
 
   PxPropertyAnimation(Element element, String property) : super(element, property);
 
@@ -33,12 +33,12 @@ class PxPropertyAnimation extends PropertyAnimation {
     }
     stop();
 
-    _fromm = parseNumber(from);
-    _too = parseNumber(to);
+    _fromm = core.parseNumber(from);
+    _too = core.parseNumber(to);
     running = true;
 
-    _animation = new Animation(duration == null ? new Duration(milliseconds:100) : duration, (double pct) {
-      element.style.setProperty(property, "${linearAnimationFunction(pct, _fromm, _too).toInt()}px");
+    _animation = new core.Animation(duration == null ? new Duration(milliseconds:100) : duration, (double pct) {
+      element.style.setProperty(property, "${core.linearAnimationFunction(pct, _fromm, _too).toInt()}px");
     }, (bool b) {
 
       running = false;
@@ -80,7 +80,7 @@ class ScrollAnimation{
 
   static ScrollAnimation _cache;
 
-  Animation _scrollAnimation;
+  core.Animation _scrollAnimation;
 
   factory ScrollAnimation() => _cache == null?_cache = new ScrollAnimation._internal():_cache;
 
@@ -89,14 +89,14 @@ class ScrollAnimation{
   Future<bool> scrollToPosition(Point<int> p, {num animationFunction(num start, num end, num pct), Duration duration}){
     var completer = new Completer<bool>();
     duration = (duration == null)?new Duration(milliseconds:500):duration;
-    animationFunction = animationFunction == null?Animation.linearTween:animationFunction;
+    animationFunction = animationFunction == null?core.Animation.linearTween:animationFunction;
     if(_scrollAnimation != null){
       _scrollAnimation.stop();
     }
     var y = window.scrollY;
-    var c = Math.min(p.y, body.scrollHeight-window.innerHeight)-y;
+    var c = Math.min(p.y, core.body.scrollHeight-window.innerHeight)-y;
 
-    _scrollAnimation = new Animation(duration, (num pct){
+    _scrollAnimation = new core.Animation(duration, (num pct){
       window.scrollTo(window.scrollX,animationFunction(y, c, pct).toInt());
     }, completer.complete);
     _scrollAnimation.start();

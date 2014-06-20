@@ -105,11 +105,11 @@ class LoadingDialog extends DialogBox{
   }
 
   void open(){
-    escQueue.enabled = false;
+    core.escQueue.enabled = false;
   }
 
   void close(){
-    escQueue.enabled = true;
+    core.escQueue.enabled = true;
     super.close();
 
   }
@@ -186,7 +186,7 @@ class DialogContainer {
       return;
     }
     _appendDialog(dialog);
-    query('body').append(dialogBg);
+    querySelector('body').append(dialogBg);
     enableNoScrollBody();
 
   }
@@ -195,7 +195,7 @@ class DialogContainer {
     _cell.append(dialog.element);
     dialog.open();
     _currentDialog = dialog;
-    escQueue.add(() {
+    core.escQueue.add(() {
       if (dialog != _currentDialog) {
         return false;
       }
@@ -224,7 +224,7 @@ DialogContainer get dialogContainer => new DialogContainer();
 
 
 void enableNoScrollBody(){
-  var body = query('body');
+  var body = querySelector('body');
   if(window.innerHeight >= body.scrollHeight){
     return;
   }
@@ -234,9 +234,9 @@ void enableNoScrollBody(){
 
 
 void disableNoScrollBody(){
-  var body = query('body');
+  var body = querySelector('body');
   body.classes.remove('no_scroll');
-  var y = parseNumber(body.style.top);
+  var y = core.parseNumber(body.style.top);
   body.style.removeProperty('top');
   window.scrollTo(window.scrollX,y);
 

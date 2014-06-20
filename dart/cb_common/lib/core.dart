@@ -2,13 +2,9 @@ library core;
 
 import "dart:html";
 import "dart:math" as Math;
-import "dart:isolate";
 import "dart:async";
 
-import 'pcre_syntax_checker.dart';
-
 import 'json.dart';
-import 'site_classes.dart' as SiteClasses;
 
 part "src/core_animation.dart";
 part "src/core_keep_alive.dart";
@@ -106,7 +102,7 @@ class BodySelectManager {
 BodySelectManager get bodySelectManager => new BodySelectManager();
 
 
-BodyElement get body => query('body');
+BodyElement get body => querySelector('body');
 
 class NullTreeSanitizer implements NodeTreeSanitizer {
   void sanitizeTree(Node node) {
@@ -168,3 +164,97 @@ void debug(Object o) => debugger.debug(o);
 
 
 final double GOLDEN_RATIO = ((Math.sqrt(5)+1)/2);
+
+
+
+String dayNumberToName(int weekday) {
+  var ret;
+  switch (weekday) {
+    case 1:
+      ret = "mandag";
+      break;
+    case 2:
+      ret = "tirsdag";
+      break;
+    case 3:
+      ret = "onsdag";
+      break;
+    case 4:
+      ret = "torsdag";
+      break;
+    case 5:
+      ret = "fredag";
+      break;
+    case 6:
+      ret = "lørdag";
+      break;
+    case 7:
+      ret = "søndag";
+      break;
+  }
+  return ret;
+}
+
+String monthNumberToName(int monthNumber) {
+  var ret;
+  switch (monthNumber) {
+    case 1:
+      ret = "januar";
+      break;
+    case 2:
+      ret = "februar";
+      break;
+    case 3:
+      ret = "marts";
+      break;
+    case 4:
+      ret = "april";
+      break;
+    case 5:
+      ret = "maj";
+      break;
+    case 6:
+      ret = "juni";
+      break;
+    case 7:
+      ret = "juli";
+      break;
+    case 8:
+      ret = "august";
+      break;
+    case 9:
+      ret = "september";
+      break;
+    case 10:
+      ret = "oktober";
+      break;
+    case 11:
+      ret = "november";
+      break;
+    case 12:
+      ret = "december";
+      break;
+  }
+  return ret;
+}
+
+String addLeadingZero(int i) => i < 10 ? "0$i" : "$i";
+
+String dateString(DateTime dt) {
+  var now = new DateTime.now();
+
+  var returnString = "";
+  if (now.day != dt.day || now.month != dt.month || now.year != dt.year) {
+    returnString = "${dayNumberToName(dt.weekday)} ";
+  } else {
+    returnString = "i dag ";
+  }
+
+  if (dt.difference(now).inDays > 7) {
+    returnString += "d. ${dt.day}. ${monthNumberToName(dt.month)} ${dt.year} ";
+  }
+
+  returnString += "kl. ${addLeadingZero(dt.hour)}:${addLeadingZero(dt.minute)}";
+
+  return returnString.trim();
+}

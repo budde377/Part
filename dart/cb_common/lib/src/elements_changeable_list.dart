@@ -34,7 +34,7 @@ class ChangeableList {
   }
 
   void _setUp(){
-    list.queryAll("li").forEach((LIElement li){
+    list.querySelectorAll("li").forEach((LIElement li){
       li.draggable = true;
     });
 

@@ -2,7 +2,7 @@ part of user_settings;
 
 
 class UserSettingsActivePagesPath {
-  final DivElement _pagePath = query('#ActiveListPath');
+  final DivElement _pagePath = querySelector('#ActiveListPath');
 
   List<Page> _currentlyShowingPath = [];
 
@@ -18,16 +18,16 @@ class UserSettingsActivePagesPath {
   factory UserSettingsActivePagesPath() => _cache;
 
   UserSettingsActivePagesPath._internal(){
-    _up = _pagePath.query('.up');
-    _dot = _pagePath.query('.dot');
+    _up = _pagePath.querySelector('.up');
+    _dot = _pagePath.querySelector('.dot');
     _dot.onClick.listen((MouseEvent) => showSubMenu(""));
-    _up.onClick.listen((e) => _pagePath.queryAll('.dot,.file').reversed.toList()[1].click());
+    _up.onClick.listen((e) => _pagePath.querySelectorAll('.dot,.file').reversed.toList()[1].click());
   }
 
 
   void showSubMenu(String page_id) {
-    var activeList = query('#ActivePageList');
-    activeList.queryAll('.showSubList, .hasSubList').forEach((Element e) => e.classes..remove('showSubList')..remove('hasSubList'));
+    var activeList = querySelector('#ActivePageList');
+    activeList.querySelectorAll('.showSubList, .hasSubList').forEach((Element e) => e.classes..remove('showSubList')..remove('hasSubList'));
     if (page_id == null || page_id == "") {
       activeList.classes.remove('showSubList');
       _up.classes.add('hidden');
@@ -56,7 +56,7 @@ class UserSettingsActivePagesPath {
   void reset() => showSubMenu("");
 
   void _updatePath() {
-    _pagePath.queryAll(':not(.dot):not(.up)').forEach((Element e) {
+    _pagePath.querySelectorAll(':not(.dot):not(.up)').forEach((Element e) {
       e.remove();
     });
     _currentlyShowingPath.forEach((Page p) {
@@ -81,7 +81,7 @@ class UserSettingsPageLi {
 
   final PageOrder _pageOrder;
 
-  final UListElement _inactiveList = query('#InactivePageList'), _activeList = query('#ActivePageList');
+  final UListElement _inactiveList = querySelector('#InactivePageList'), _activeList = querySelector('#ActivePageList');
 
   final Page page;
 
@@ -122,8 +122,8 @@ class UserSettingsPageLi {
 
   UserSettingsPageLi._internal(this.li, this._pageOrder, this.page){
     _active = _pageOrder.isActive(page.id);
-    _returnNewDivIfNecessary(li.query('.padding'), ['padding'], true);
-    _anchor = li.query('a.val');
+    _returnNewDivIfNecessary(li.querySelector('.padding'), ['padding'], true);
+    _anchor = li.querySelector('a.val');
     if (_anchor == null) {
       _anchor = new AnchorElement();
       _anchor.text = page.title;
@@ -131,11 +131,11 @@ class UserSettingsPageLi {
       _anchor.classes.add('val');
       li.append(_anchor);
     }
-    //_handle = _returnNewDivIfNecessary(li.query('.handle'), ['handle'], _active);
-    _delete = _returnNewDivIfNecessary(li.query('.delete'), ['link', 'delete'], true, title:'Slet');
-    _activate = _returnNewDivIfNecessary(li.query('.activate'), ['link', 'activate'], true, title:_pageOrder.isActive(page.id) ? 'Deaktiver' : 'Aktiver');
-    _hide = _returnNewDivIfNecessary(li.query('.showhide'), ['link', 'showhide'], _active, title:page.hidden ? "Vis" : "Skjul");
-    _subPagesButton = _returnNewDivIfNecessary(li.query('.subpages.link'), ['link', 'subpages'], _active, title:'Undersider');
+    //_handle = _returnNewDivIfNecessary(li.querySelector('.handle'), ['handle'], _active);
+    _delete = _returnNewDivIfNecessary(li.querySelector('.delete'), ['link', 'delete'], true, title:'Slet');
+    _activate = _returnNewDivIfNecessary(li.querySelector('.activate'), ['link', 'activate'], true, title:_pageOrder.isActive(page.id) ? 'Deaktiver' : 'Aktiver');
+    _hide = _returnNewDivIfNecessary(li.querySelector('.showhide'), ['link', 'showhide'], _active, title:page.hidden ? "Vis" : "Skjul");
+    _subPagesButton = _returnNewDivIfNecessary(li.querySelector('.subpages.link'), ['link', 'subpages'], _active, title:'Undersider');
 
     updateInfo();
 
@@ -231,7 +231,7 @@ class UserSettingsPageLi {
       _subPagesButton.remove();
       //_handle.remove();
       var ul;
-      if ((ul = li.query('ul')) != null) {
+      if ((ul = li.querySelector('ul')) != null) {
         ul.remove();
       }
 

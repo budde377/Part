@@ -203,16 +203,16 @@ class EditorFileHandler implements EditorHandler {
 
   final ProgressBar progressBar = new ProgressBar();
 
-  FileProgress _fileProgress;
+  core.FileProgress _fileProgress;
 
 
   EditorFileHandler(AnchorElement dataElement) : this.dataElement = dataElement {
     _setUp();
   }
 
-  EditorFileHandler.fileProgress(this.dataElement, FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
+  EditorFileHandler.fileProgress(this.dataElement, core.FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
     var size = new SpanElement();
-    size.text = sizeToString(fileProgress.file.size);
+    size.text = core.sizeToString(fileProgress.file.size);
 
     _fileStandIn
       ..text = fileProgress.file.name
@@ -248,14 +248,14 @@ class EditorImageHandler implements EditorHandler {
 
   final ProgressBar progressBar = new ProgressBar();
 
-  FileProgress _fileProgress;
+  core.FileProgress _fileProgress;
 
 
   EditorImageHandler(ImageElement dataElement) : this.dataElement = dataElement {
     _setUp();
   }
 
-  EditorImageHandler.fileProgress(this.dataElement, FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
+  EditorImageHandler.fileProgress(this.dataElement, core.FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
     _fileProgress.onProgress.listen((_) => progressBar.percentage = _fileProgress.progress);
     _fileProgress.onPathAvailable.listen((_) {
       dataElement.src = _fileProgress.path;
@@ -315,7 +315,7 @@ class EditorFileContainer {
 
   }
 
-  EditorImageHandler addImage(ImageElement image, [FileProgress progress = null]) {
+  EditorImageHandler addImage(ImageElement image, [core.FileProgress progress = null]) {
     element.hidden = false;
     var handler;
     if (progress == null) {
@@ -330,7 +330,7 @@ class EditorFileContainer {
     return handler;
   }
 
-  EditorFileHandler addFile(AnchorElement fileLink, [FileProgress progress = null]) {
+  EditorFileHandler addFile(AnchorElement fileLink, [core.FileProgress progress = null]) {
     element.hidden = false;
     var handler;
     if (progress == null) {
@@ -417,7 +417,7 @@ class LinkImageHandler {
   ImageElement _foundImage;
 
   LinkImageHandler(this.element, this.editor) {
-//    _imageEditor.open(element.query('img'));
+//    _imageEditor.open(element.querySelector('img'));
     _enabled = editor.isOpen;
     editor.onOpenChange.listen((bool b) {
       _setUp();
@@ -445,7 +445,7 @@ class LinkImageHandler {
       ..classes.add('youtube')
       ..onClick.listen((MouseEvent mev) {
       mev.preventDefault();
-      var id = youtubeVideoIdFromUrl(_foundLink.href);
+      var id = core.youtubeVideoIdFromUrl(_foundLink.href);
       var width = element.clientWidth;
       var height = (width * 9 / 16).ceil();
       _foundLink.insertAdjacentHtml("afterEnd", '<iframe width="$width" height="$height" src="//www.youtube.com/embed/$id?badge=0&amp;modestbranding=1&amp;controls=1&amp;autohide=1&amp;showinfo=0&amp;rel=0&amp;fs=0" frameborder="0" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe>');
@@ -458,7 +458,7 @@ class LinkImageHandler {
       ..classes.add('vimeo')
       ..onClick.listen((MouseEvent mev) {
       mev.preventDefault();
-      var id = vimeoVideoIdFromUrl(_foundLink.href);
+      var id = core.vimeoVideoIdFromUrl(_foundLink.href);
       var width = element.clientWidth;
       var height = (width * 9 / 16).ceil();
       _foundLink.insertAdjacentHtml("afterEnd", '<iframe width="$width" height="$height" src="//player.vimeo.com/video/$id?badge=0&amp;modestbranding=1&amp;controls=1&amp;autohide=1&amp;showinfo=0&amp;rel=0&amp;fs=0" frameborder="0" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe>');
@@ -534,10 +534,10 @@ class LinkImageHandler {
 
     if (_foundLink != null) {
       _boxElement.append(_unlinkButton);
-      if (youtubeVideoIdFromUrl(_foundLink.href) != null) {
+      if (core.youtubeVideoIdFromUrl(_foundLink.href) != null) {
         _boxElement.append(_youtubeButton);
       }
-      if (vimeoVideoIdFromUrl(_foundLink.href) != null) {
+      if (core.vimeoVideoIdFromUrl(_foundLink.href) != null) {
         _boxElement.append(_vimeoButton);
       }
       _boxElement.append(_openButton);
@@ -673,7 +673,7 @@ class ContentEditor {
 
 
   void _loadRevision(Revision rev) {
-    element.setInnerHtml(rev.content, treeSanitizer:nullNodeTreeSanitizer);
+    element.setInnerHtml(rev.content, treeSanitizer:core.nullNodeTreeSanitizer);
     _currentRevision = rev;
     _notifyChange();
 
@@ -698,12 +698,12 @@ class ContentEditor {
     _previewAnimation.stop();
     var hidePreview = true;
     if (content != null) {
-      _preview.setInnerHtml(content.content, treeSanitizer:nullNodeTreeSanitizer);
+      _preview.setInnerHtml(content.content, treeSanitizer:core.nullNodeTreeSanitizer);
       hidePreview = false;
     }
 
     element.hidden = !(_preview.hidden = hidePreview);
-    var images = hidePreview ? element.queryAll("img") : _preview.queryAll('img');
+    var images = hidePreview ? element.querySelectorAll("img") : _preview.querySelectorAll('img');
     if (images.length > 0) {
       var i = 0;
       images.forEach((ImageElement e) {
@@ -737,7 +737,7 @@ class ContentEditor {
 
 
   void open() {
-    escQueue.add(() {
+    core.escQueue.add(() {
       if (_closed) {
         return false;
       }
@@ -815,7 +815,7 @@ class ContentEditor {
       }
       m = m.trim();
 
-      if (!validUrl(m) && !validMail(m)) {
+      if (!core.validUrl(m) && !core.validMail(m)) {
         return;
       }
 
@@ -825,7 +825,7 @@ class ContentEditor {
       p.insertBefore(t1, parentNode);
       var anchor = new AnchorElement();
       anchor.text = m;
-      anchor.href = (validMail(m) ? "mailto:" : "") + m;
+      anchor.href = (core.validMail(m) ? "mailto:" : "") + m;
       anchor.target = "_blank";
       p.insertBefore(anchor, parentNode);
       p.insertBefore(t2, parentNode);
@@ -867,7 +867,7 @@ class ContentEditor {
       return;
     }
 
-    var b = _topBar.query(".tool_bar button.active");
+    var b = _topBar.querySelector(".tool_bar button.active");
     if (b != null) {
       b.click();
     }
@@ -898,7 +898,7 @@ class ContentEditor {
     var savingBar = new SavingBar();
     var jobId = savingBar.startJob();
     _inputSinceSave = false;
-    var l = element.queryAll("h2, h1, h3");
+    var l = element.querySelectorAll("h2, h1, h3");
 
     l.forEach((Element h) {
       h.id = "";
@@ -912,7 +912,7 @@ class ContentEditor {
       }
       var base = id;
       var i = 1;
-      while (query("#$id") != null) {
+      while (querySelector("#$id") != null) {
         id = "${base}_$i";
         i++;
       }
@@ -984,7 +984,7 @@ class ContentEditor {
     _elementToSubMenu[element] = subMenu;
     subMenu.classes.add('menu');
     element.onClick.listen((_) {
-      var active = menu.query('.active');
+      var active = menu.querySelector('.active');
       if (active == null) {
         element.classes.add('active');
         subMenu.hidden = false;
@@ -1000,7 +1000,7 @@ class ContentEditor {
       }
 
       if (element.classes.contains('active')) {
-        escQueue.add(() {
+        core.escQueue.add(() {
 
           if (!element.classes.contains('active')) {
             return false;
@@ -1240,9 +1240,9 @@ class ContentEditor {
 //TODO Fix close fileupload with ESC
     preview.classes.add('preview');
 
-    var uploadStrategy = images ? new AJAXImageURIUploadStrategy(new ImageSize.scaleMethodLimitToOuterBox(element.clientWidth, 500), new ImageSize.scaleMethodLimitToOuterBox(70, 70, dataURI:true)) : new AJAXFileURIUploadStrategy();
+    var uploadStrategy = images ? new core.AJAXImageURIUploadStrategy(new core.ImageSize.scaleMethodLimitToOuterBox(element.clientWidth, 500), new core.ImageSize.scaleMethodLimitToOuterBox(70, 70, dataURI:true)) : new core.AJAXFileURIUploadStrategy();
     ;
-    var uploader = new FileUploader(uploadStrategy);
+    var uploader = new core.FileUploader(uploadStrategy);
     var container = new EditorFileContainer(new DivElement(), uploadIcon);
     container.onChange.listen((_) {
       _updatePlaceholder();
@@ -1253,13 +1253,13 @@ class ContentEditor {
       preview
         ..classes.add('image_preview')
         ..append(container.element);
-      uploader.onFileAddedToQueue.listen((FileProgress fp) => container.addImage(new ImageElement(), fp));
+      uploader.onFileAddedToQueue.listen((core.FileProgress fp) => container.addImage(new ImageElement(), fp));
     } else {
       menu.classes.add('file_menu');
       preview
         ..classes.add('file_preview')
         ..append(container.element);
-      uploader.onFileAddedToQueue.listen((FileProgress fp) => container.addFile(new AnchorElement(), fp));
+      uploader.onFileAddedToQueue.listen((core.FileProgress fp) => container.addFile(new AnchorElement(), fp));
     }
 
 
@@ -1267,10 +1267,10 @@ class ContentEditor {
       ..append(fileUploadElementWrapper)
       ..append(preview)
       ..append(uploadIconWrapper);
-    uploadIcon.onClick.listen((_) => fileUploadElementWrapper.query('input').click());
+    uploadIcon.onClick.listen((_) => fileUploadElementWrapper.querySelector('input').click());
 
     fileUploadElementWrapper.onChange.listen((_) {
-      uploader.uploadFiles(fileUploadElementWrapper.query('input').files);
+      uploader.uploadFiles(fileUploadElementWrapper.querySelector('input').files);
       fileUploadElement.remove();
       fileUploadElement = setUpFileUpload();
     });
@@ -1319,7 +1319,7 @@ class ContentEditor {
 
       var sizeActions = [new EditorAction.liElementWithInnerHtml("<font size='1'>Lille</font>", () => executor.setFontSize(1), (int s) => s == 1), new EditorAction.liElementWithInnerHtml("Normal", () {
         executor.setFontSize(3);
-        var fonts = element.queryAll("font");
+        var fonts = element.querySelectorAll("font");
         fonts.forEach((Element e) => e.attributes['size'] == '3' ? (() {
           e.attributes.remove("size");
         })() : () {
@@ -1411,12 +1411,12 @@ class ContentEditor {
           parent = parent.parentNode;
         }
 
-        var linksBefore = parent.queryAll("a");
+        var linksBefore = parent.querySelectorAll("a");
 
         ranges.first.selectNode(element);
         executor.createLink(s);
 
-        var linksAfter = parent.queryAll("a");
+        var linksAfter = parent.querySelectorAll("a");
 
         linksAfter.forEach((AnchorElement a) {
           if (!linksBefore.contains(a)) {
@@ -1465,7 +1465,7 @@ class ContentEditor {
               if (!(commonAncestor is Element)) {
                 return;
               }
-              commonAncestor.queryAll("*").forEach((Element elm) {
+              commonAncestor.querySelectorAll("*").forEach((Element elm) {
                 if (!selection.containsNode(elm, false)) {
                   return;
                 }
@@ -1587,7 +1587,7 @@ class MenuOverflowHandler {
  *
  */
 
-class EditorInitializer implements Initializer {
+class EditorInitializer implements core.Initializer {
 
   final PageOrder pageOrder;
 
@@ -1602,7 +1602,7 @@ class EditorInitializer implements Initializer {
 
   void setUp() {
     var user = userLibrary.userLoggedIn;
-    var editableElements = queryAll("div.editable");
+    var editableElements = querySelectorAll("div.editable");
 
     editableElements.forEach((DivElement div) {
       var id = (div.dataset.containsKey("id") ? div.dataset["id"] : div.id);

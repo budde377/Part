@@ -167,10 +167,10 @@ abstract class FloatingBox{
   }
   void showAt(int x, int y){
     if(element.parent == null){
-      query('body').append(element);
+      querySelector('body').append(element);
     }
     if(removeOnESC){
-      escQueue.add(_escRemover);
+      core.escQueue.add(_escRemover);
     }
     element.style.top = "${y}px";
     element.style.left = "${x}px";
@@ -241,8 +241,8 @@ class InfoBox extends FloatingBox{
     }
   }
   void showAt(int x, int y){
-    query('body').append(element);
-    x = x-(element.clientWidth/2).toInt();
+    querySelector('body').append(element);
+    x = x-(element.clientWidth~/2);
     y = y-(reversed ? 0: element.clientHeight-_arrowElement.clientHeight);
     super.showAt(x,y);
   }

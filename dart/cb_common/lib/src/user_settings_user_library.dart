@@ -9,11 +9,11 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
   UserSettingsJSONUserLibrary.initializeFromMenu(UListElement userList) : _userLibrary = _generateUserLibFromMenu(userList);
 
   static UserLibrary _generateUserLibFromMenu(UListElement userList){
-    var lis = userList.queryAll('li:not(.emptyListInfo)');
+    var lis = userList.querySelectorAll('li:not(.emptyListInfo)');
     var users = <User>[], currentUser = "";
 
     lis.forEach((LIElement li) {
-      var aElement = li.query('.val'), privileges = li.query('.privileges');
+      var aElement = li.querySelector('.val'), privileges = li.querySelector('.privileges');
       var username, mail, parent, t;
       parent = li.dataset["parent"];
       username = li.dataset["username"];

@@ -5,7 +5,7 @@ import "dart:html";
 import "dart:convert";
 import "dart:math" as Math;
 
-import 'core.dart';
+import 'core.dart' as core;
 import 'site_classes.dart';
 import 'json.dart';
 

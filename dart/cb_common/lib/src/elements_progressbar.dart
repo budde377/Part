@@ -66,7 +66,7 @@ class SavingBar{
   factory SavingBar() => _cached;
   final ProgressBar _progressBar = new ProgressBar();
   final DivElement _statusBar = new DivElement(), _text = new DivElement();
-  final BodyElement _body = query('body');
+  final BodyElement _body = querySelector('body');
   int _jobId = 0;
   final List<int> _runningJobs = new List<int>();
   final List<int> _endedJobs = new List<int>();

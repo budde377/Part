@@ -1,6 +1,6 @@
 part of elements;
 
-Position rotatePoint(num x, num y, num ox, num oy, num r) =>  new Position(x:(x-ox)*Math.cos(r) + (y-oy)*Math.sin(r)+ox,
+core.Position rotatePoint(num x, num y, num ox, num oy, num r) =>  new core.Position(x:(x-ox)*Math.cos(r) + (y-oy)*Math.sin(r)+ox,
 y:-(x-ox)*Math.sin(r) + (y-oy)*Math.cos(r)+oy);
 
 
@@ -249,7 +249,7 @@ abstract class CanvasShape {
   void beforeDraw(CanvasHandler h) {
   }
 
-  Position rotatePosition(num x, num y,  {num r, num rx, num ry}){
+  core.Position rotatePosition(num x, num y,  {num r, num rx, num ry}){
 
 
     r = r == null? _rotate: r;

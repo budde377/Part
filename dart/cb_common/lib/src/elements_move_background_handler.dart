@@ -58,7 +58,7 @@ class MoveBackgroundHandler {
       if(mouseMoveListener != null){
         mouseMoveListener.cancel();
       }
-      bodySelectManager.disableSelect();
+      core.bodySelectManager.disableSelect();
       mouseMoveListener = document.onMouseMove.listen((MouseEvent evt) {
         var x = evt.movement.x;
         var y = evt.movement.y;
@@ -87,7 +87,7 @@ class MoveBackgroundHandler {
       if (mouseMoveListener == null) {
         return;
       }
-      bodySelectManager.enableSelect();
+      core.bodySelectManager.enableSelect();
 
       mouseMoveListener.cancel();
       mouseMoveListener = null;
@@ -101,7 +101,7 @@ class MoveBackgroundHandler {
     background.style.background = computedStyle.background;
     background.classes.add('active');
     _orig_position = computedStyle.backgroundPosition;
-    escQueue.add((){
+    core.escQueue.add((){
       _disableMove(true);
       return true;
     });
