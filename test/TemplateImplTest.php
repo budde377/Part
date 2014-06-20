@@ -203,6 +203,15 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(strpos($v, "current_user") !== false);
     }
 
+
+    public function testTemplateAddsUpdater(){
+        $this->setUpConfig();
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{{ dump() }}");
+        $v = $this->template->render();
+        $this->assertTrue(strpos($v, "updater") !== false);
+    }
+
     public function testTemplateAddsHasSitePrivileges(){
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
@@ -291,6 +300,13 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $v = $this->template->render();
         $this->assertContains("site", $v);
     }
+    public function testTemplateAddsConfig(){
+        $this->setUpConfig();
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{{ dump() }}");
+        $v = $this->template->render();
+        $this->assertContains("config", $v);
+    }
 
     public function testTemplateAddsInitialize(){
         $this->setUpConfig();
@@ -373,6 +389,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%page_element initElement%}");
         $_SESSION['initialized'] = 0;
+        $this->assertEquals(0, $_SESSION['initialized']);
         $this->template->render();
         $this->assertEquals(1, $_SESSION['initialized']);
     }
@@ -381,6 +398,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%init_page_element initElement%}{%page_element initElement%}");
         $_SESSION['initialized'] = 0;
+        $this->assertEquals(0, $_SESSION['initialized']);
         $this->template->render();
         $this->assertEquals(1, $_SESSION['initialized']);
     }

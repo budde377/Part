@@ -23,4 +23,11 @@ class CheckInitializedPageElementImpl extends PageElementImpl
         }
         $_SESSION['initialized']++;
     }
+
+    public function generateContent()
+    {
+
+    }
+
+
 }
