@@ -14,6 +14,8 @@ abstract class User {
 
   String get parent;
 
+  DateTime get lastLogin;
+
   int get privileges;
 
   List<Page> get pages;
@@ -41,6 +43,8 @@ abstract class User {
 class JSONUser extends User {
   String _username, _mail, _parent;
 
+  DateTime _lastLogin;
+
   StreamController<User> _changeController = new StreamController<User>();
   Stream<User> _changeStream;
 
@@ -50,10 +54,11 @@ class JSONUser extends User {
 
   List<Page> _pages;
 
-  JSONUser(String username, String mail, String parent, int privileges, List<Page> pages, JSONClient client):_client = client {
+  JSONUser(String username, String mail, String parent, int lastLogin, int privileges, List<Page> pages, JSONClient client):_client = client {
     _username = username;
     _mail = mail;
     _parent = parent;
+    _lastLogin = lastLogin == null?null:new DateTime.fromMillisecondsSinceEpoch(lastLogin*1000);
     _pages = privileges == User.PRIVILEGE_PAGE ? new List<Page>.from(pages) : <Page>[];
     _privileges = privileges;
 
@@ -64,6 +69,8 @@ class JSONUser extends User {
   String get mail => _mail;
 
   String get parent => _parent;
+
+  DateTime get lastLogin => _lastLogin;
 
   void changeInfo({String username:null, String mail:null, ChangeCallback callback:null}) {
     mail = mail != null ? mail : _mail;

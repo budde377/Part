@@ -107,7 +107,7 @@ class JSONUserLibrary extends UserLibrary {
     var privilegesString = o.variables['privileges'];
     var pages = page_ids.map((String id) => _pageOrder.pages[id]);
     var privileges = privilegesString == 'root'?User.PRIVILEGE_ROOT:(privilegesString == 'site'?User.PRIVILEGE_SITE:User.PRIVILEGE_PAGE);
-    var user = new JSONUser(o.variables['username'], o.variables['mail'], o.variables['parent'], privileges, pages , _client);
+    var user = new JSONUser(o.variables['username'], o.variables['mail'], o.variables['parent'], o.variables['last-login'], privileges, pages , _client);
     _addUserListener(user);
     _users[user.username] = user;
     return user.username;

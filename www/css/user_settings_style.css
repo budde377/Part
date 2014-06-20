@@ -398,7 +398,7 @@ form.initial input.invalid {
     margin-left: 10px;
 }
 
-#ActivePageList .link, #InactivePageList .link, #PageUserList .delete, #UserList .delete{
+#ActivePageList .link, #InactivePageList .link, #PageUserList .link, #UserList .link{
     margin:0;
     width: 20px;
     background: transparent none scroll no-repeat center center;
@@ -410,6 +410,10 @@ form.initial input.invalid {
 
 #ActivePageList .delete, #InactivePageList .delete, #PageUserList .delete, #UserList .delete{
     background-image: url(/_common/img/redx.png) ;
+}
+
+#UserList .time{
+    background-image: url(/_common/img/time_icon_16.png) ;
 }
 
 #ActivePageList .activate{
@@ -597,6 +601,8 @@ form.initial input.invalid {
     color: #fff;
     font-weight: bold;
     font-size: 12px;
+    position: relative;
+    z-index: 75;
 }
 
 #UpdateInformationMessage a {

@@ -89,7 +89,7 @@ class UserSettingsInitializer extends core.Initializer {
 
 }
 
-class UserSettingsLoggerInitializer extends core.Initializer{
+class UserSettingsLoggerInitializer extends core.Initializer {
 
   TableElement _logTable = querySelector("#UserSettingsLogTable");
 
@@ -105,10 +105,10 @@ class UserSettingsLoggerInitializer extends core.Initializer{
     _numDiv.classes.add("num");
   }
 
-  bool get canBeSetUp => _logTable != null && _logLink != null &&_pElm != null;
+  bool get canBeSetUp => _logTable != null && _logLink != null && _pElm != null;
 
-  void _updateNum(){
-    if(_logTable.classes.contains("empty")){
+  void _updateNum() {
+    if (_logTable.classes.contains("empty")) {
       _numDiv.remove();
       return;
     }
@@ -120,24 +120,25 @@ class UserSettingsLoggerInitializer extends core.Initializer{
 
   void setUp() {
     _updateNum();
-    _logTable.querySelectorAll(".dumpfile a").forEach((AnchorElement a){
-      a.onClick.listen((MouseEvent evt){
+    _logTable.querySelectorAll(".dumpfile a").forEach((AnchorElement a) {
+      a.onClick.listen((MouseEvent evt) {
         var loader = dialogContainer.loading("Henter log filen");
-        ajaxClient.callFunction(new GetDumpFileLogJSONFunction(int.parse(a.dataset["id"]))).then((JSONResponse resp){
-          if(resp.type != JSONResponse.RESPONSE_TYPE_SUCCESS){
+        ajaxClient.callFunction(new GetDumpFileLogJSONFunction(int.parse(a.dataset["id"]))).then((JSONResponse resp) {
+          if (resp.type != JSONResponse.RESPONSE_TYPE_SUCCESS) {
             loader.close();
             return;
           }
           var button = new ButtonElement(), pre = new PreElement();
           button.text = "Luk";
-          button.onClick.listen((_)=>loader.close());
+          button.onClick.listen((_) => loader.close());
           pre.classes.add("code");
           pre.text = resp.payload;
-          loader.element..children.clear()
-                        ..append(pre)
-                        ..append(button);
+          loader.element
+            ..children.clear()
+            ..append(pre)
+            ..append(button);
           loader.stopLoading();
-          core.escQueue.add((){
+          core.escQueue.add(() {
             loader.close();
             return true;
           });
@@ -146,16 +147,16 @@ class UserSettingsLoggerInitializer extends core.Initializer{
     });
 
 
-    _logLink.onClick.listen((MouseEvent evt){
-      ajaxClient.callFunction(new ClearLogJSONFunction()).then((JSONResponse response){
-        if(response.type == JSONResponse.RESPONSE_TYPE_SUCCESS){
-          _logTable.querySelectorAll("tr:not(.empty_row)").forEach((TableRowElement li)=>li.remove());
+    _logLink.onClick.listen((MouseEvent evt) {
+      ajaxClient.callFunction(new ClearLogJSONFunction()).then((JSONResponse response) {
+        if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
+          _logTable.querySelectorAll("tr:not(.empty_row)").forEach((TableRowElement li) => li.remove());
           _logTable.classes.add("empty");
-          _pElm.querySelectorAll("i").forEach((Element e)=>e.text = "0");
+          _pElm.querySelectorAll("i").forEach((Element e) => e.text = "0");
           _updateNum();
         }
       });
-    evt.preventDefault();
+      evt.preventDefault();
     });
 
   }
@@ -169,7 +170,7 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
 
   JSONClient _client = new AJAXJSONClient();
 
-  DivElement _updateInformationMessage= querySelector("#UpdateInformationMessage");
+  DivElement _updateInformationMessage = querySelector("#UpdateInformationMessage");
 
   bool _canBeUpdated;
 
@@ -181,7 +182,7 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
 
     _checkButton.onClick.listen((_) {
       _updateCheckButton(true);
-      if(!_canBeUpdated){
+      if (!_canBeUpdated) {
 
         _client.callFunction(new CheckForSiteUpdatesJSONFunction()).then((JSONResponse response) {
           _checkTime.text = core.dateString(new DateTime.now());
@@ -211,13 +212,13 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
       }
 
     });
-    _updateInformationMessage.querySelector("a").onClick.listen((_)=>_updateSite());
+    _updateInformationMessage.querySelector("a").onClick.listen((_) => _updateSite());
   }
 
-  void _updateCheckButton([bool searching = false]){
-    if(searching){
+  void _updateCheckButton([bool searching = false]) {
+    if (searching) {
       _checkButton.disabled = true;
-      if(_canBeUpdated){
+      if (_canBeUpdated) {
         _checkButton.text = _checkButton.dataset["workUpdateValue"];
       } else {
         _checkButton.text = _checkButton.dataset["workCheckValue"];
@@ -225,7 +226,7 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
       return;
     }
     _checkButton.disabled = false;
-    if(_canBeUpdated){
+    if (_canBeUpdated) {
       _updateInformationMessage.hidden = false;
       _checkButton.text = _checkButton.dataset["updateValue"];
     } else {
@@ -253,7 +254,8 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
         return;
       }
       _canBeUpdated = false;
-      loader.element..innerHtml = "Siden er opdateret.<br /> Hjemmesiden genindlæses.";
+      loader.element
+        ..innerHtml = "Siden er opdateret.<br /> Hjemmesiden genindlæses.";
       loader.stopLoading();
       updateDone = true;
       _updateCheckButton();
@@ -277,52 +279,57 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
 
   FormElement _addUserToPageForm = querySelector('#AddUserToPageForm');
 
+  SelectElement _pageUserSelect = querySelector('#EditPageAddUserSelect');
+
   UserSettingsPageUserListFormInitializer(UserLibrary this._userLib, PageOrder this._order);
 
   bool get canBeSetUp => _pageUserList != null && _order.currentPage != null;
 
-  void setUp() {
-    var bar = new SavingBar();
-    var pageUserSelect = querySelector('#EditPageAddUserSelect'), pageUserLis = _pageUserList.querySelectorAll('li');
-    var addListener = (LIElement li) {
-      var val = li.querySelector('.val');
-      var delete = li.querySelector('.delete');
-      var username = val == null ? li.text : val.text;
-      var user = _userLib.users[username];
-      user.onChange.listen((User u) {
-        if (val == null) {
-          li.text = u.username;
-        } else {
-          val.text = u.username;
-        }
-      });
-      if (delete == null) {
-        return;
+  LIElement createUserLi(User user) {
+    var li = new LIElement();
+    li.innerHtml = "<span class='val'>${user.username}</span><div class='delete link' title='Slet'>&nbsp;</div>";
+    return li;
+  }
+
+  void addListener(LIElement li) {
+    var val = li.querySelector('.val');
+    var delete = li.querySelector('.delete');
+    var username = val == null ? li.text : val.text;
+    var user = _userLib.users[username];
+    user.onChange.listen((User u) {
+      if (val == null) {
+        li.text = u.username;
+      } else {
+        val.text = u.username;
       }
-      delete.onClick.listen((MouseEvent e) {
-        var dialogResult = new DialogContainer().confirm("Er du sikker på at du vil fjerne privilegierne?").result;
-        dialogResult.then((bool b) {
-          if (!b) {
-            return;
+    });
+    if (delete == null) {
+      return;
+    }
+    delete.onClick.listen((MouseEvent e) {
+      var dialogResult = new DialogContainer().confirm("Er du sikker på at du vil fjerne privilegierne?").result;
+      dialogResult.then((bool b) {
+        if (!b) {
+          return;
+        }
+        var i = savingBar.startJob();
+        user.revokePagePrivilege(_order.currentPage, (String status, [a, b]) {
+          if (status == CALLBACK_STATUS_SUCCESS) {
+            li.remove();
+            var opt = new OptionElement();
+            opt.text = opt.value = username;
+            _pageUserSelect.append(opt);
           }
-          var i = bar.startJob();
-          user.revokePagePrivilege(_order.currentPage, (String status, [a, b]) {
-            if (status == CALLBACK_STATUS_SUCCESS) {
-              li.remove();
-              var opt = new OptionElement();
-              opt.text = opt.value = username;
-              pageUserSelect.append(opt);
-            }
-            bar.endJob(i);
-          });
+          savingBar.endJob(i);
         });
       });
-    };
-    var createUserLi = (User user) {
-      var li = new LIElement();
-      li.innerHtml = "<span class='val'>${user.username}</span><div class='delete link' title='Slet'>&nbsp;</div>";
-      return li;
-    };
+    });
+  }
+
+  void setUp() {
+    var pageUserLis = _pageUserList.querySelectorAll('li');
+
+
     _userLib.onChange.listen((UserLibraryChangeEvent evt) {
       var changeType = evt.type, user = evt.user;
       if (changeType == UserLibraryChangeEvent.CHANGE_CREATE) {
@@ -338,10 +345,10 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
           _pageUserList.append(li);
           pageUserLis = _pageUserList.querySelectorAll('li');
 
-        } else if (pageUserSelect != null) {
+        } else if (_pageUserSelect != null) {
           var opt = new OptionElement();
           opt.text = opt.value = user.username;
-          pageUserSelect.append(opt);
+          _pageUserSelect.append(opt);
         }
       } else {
         pageUserLis.forEach((LIElement li) {
@@ -349,7 +356,7 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
             li.remove();
           }
         });
-        pageUserSelect.options.forEach((OptionElement o) {
+        _pageUserSelect.options.forEach((OptionElement o) {
           if (o.value == user.username) {
             o.remove();
           }
@@ -361,7 +368,7 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
     if (_addUserToPageForm == null) {
       return;
     }
-    new Validator(pageUserSelect).validator = (SelectElement e) => core.nonEmpty(e.value);
+    new Validator(_pageUserSelect).validator = (SelectElement e) => core.nonEmpty(e.value);
     new ValidatingForm(_addUserToPageForm).validate();
     var deco = new FormHandler(_addUserToPageForm);
     deco.submitFunction = (Map<String, String> data) {
@@ -375,8 +382,8 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
           deco.unBlur();
           return false;
         }
-        pageUserSelect.selectedOptions.first.remove();
-        pageUserSelect.dispatchEvent(new Event('change'));
+        _pageUserSelect.selectedOptions.first.remove();
+        _pageUserSelect.dispatchEvent(new Event('change'));
         var newLi = createUserLi(user);
         _pageUserList.append(newLi);
         pageUserLis = _pageUserList.querySelectorAll('li');
@@ -399,56 +406,75 @@ class UserSettingsUserListInitializer extends core.Initializer {
   UserSettingsUserListInitializer(UserLibrary this._userLib);
 
   bool get canBeSetUp => _userList != null;
-  String _userPrivilegeString (User u, [bool simple=false]) => u.privileges == User.PRIVILEGE_ROOT ? (simple?"root":"Root") : (u.privileges == User.PRIVILEGE_SITE ? (simple?"site":"Website") : (simple?"page":"Side"));
+
+  String _userPrivilegeString(User u, [bool simple=false]) => u.privileges == User.PRIVILEGE_ROOT ? (simple ? "root" : "Root") : (u.privileges == User.PRIVILEGE_SITE ? (simple ? "site" : "Website") : (simple ? "page" : "Side"));
+
+  void _setDataset(LIElement li, User user) {
+    li.dataset["username"] = user.username;
+    li.dataset["privileges"] = _userPrivilegeString(user, true);
+    li.dataset["lastLogin"] = user.lastLogin == null ? "" : user.lastLogin.millisecondsSinceEpoch ~/ 1000;
+    li.dataset["mail"] = user.mail;
+    li.dataset["pages"] = user.pages.map((Page p) => p.id).join(" ");
+  }
+
+  void _addListener(LIElement li) {
+    var val = li.querySelector('.val'), privileges = li.querySelector('.privileges');
+    var username = li.dataset['username'];
+    var user = _userLib.users[username];
+    user.onChange.listen((User u) {
+      val.text = u.username;
+      val.href = "mailto:${u.mail}";
+      privileges.text = "(${_userPrivilegeString(u)} Administrator)";
+      _setDataset(li, u);
+    });
+    var loginString = user.lastLogin == null?"Aldrig":core.dateString(user.lastLogin);
+    var infoBox = new InfoBox("Sidst set: $loginString");
+    var time = li.querySelector('.time');
+    infoBox.backgroundColor = InfoBox.COLOR_BLACK;
+    time.onMouseOver.listen((_)=>infoBox.showAboveCenterOfElement(time));
+    time.onMouseOut.listen((_)=>infoBox.remove());
+
+    var delete = li.querySelector('.delete');
+    if (delete == null) {
+      return;
+    }
+    delete.onClick.listen((MouseEvent e) {
+      var dialog = new DialogContainer();
+      dialog.confirm("Er du sikker på at du vil slette denne bruger?").result.then((bool b) {
+        if (!b) {
+          return;
+        }
+        var i = savingBar.startJob();
+        _userLib.deleteUser(username, (String status, [int error_code, p]) => savingBar.endJob(i));
+      });
+    });
+
+
+  }
 
   void setUp() {
-    var bar = new SavingBar();
-    var addListener = (LIElement li) {
-      var val = li.querySelector('.val'), privileges = li.querySelector('.privileges');
-      var username = li.dataset['username'];
-      _userLib.users[username].onChange.listen((User u) {
-        val.text = u.username;
-        val.href = "mailto:${u.mail}";
-        privileges.text = "(${_userPrivilegeString(u)} Administrator)";
-        li.dataset["username"] = u.username;
-        li.dataset["privileges"] = _userPrivilegeString(u,true);
-        li.dataset["mail"] = u.mail;
-        li.dataset["pages"] = u.pages.map((Page p)=>p.id).join(" ");
-      });
-      var delete = li.querySelector('.delete');
-      if (delete == null) {
-        return;
-      }
-      delete.onClick.listen((MouseEvent e) {
-        var dialog = new DialogContainer();
-        dialog.confirm("Er du sikker på at du vil slette denne bruger?").result.then((bool b) {
-          if (!b) {
-            return;
-          }
-          var i = bar.startJob();
-          _userLib.deleteUser(username, (String status, [int error_code, p]) => bar.endJob(i));
-        });
-      });
-    };
+
+
     var userLis = _userList.querySelectorAll('li');
-    userLis.forEach(addListener);
+    userLis.forEach(_addListener);
     _userLib.onChange.listen((UserLibraryChangeEvent evt) {
       var changeType = evt.type, user = evt.user;
       if (changeType == UserLibraryChangeEvent.CHANGE_CREATE) {
         var li = new LIElement();
         var privilege = _userPrivilegeString(user);
         var a = new AnchorElement();
-        a..text = user.username..classes.add("val")..href = "mailto:${user.mail}";
+        a
+          ..text = user.username
+          ..classes.add("val")
+          ..href = "mailto:${user.mail}";
         li.append(a);
-        li.appendHtml(", <span class='privileges'>($privilege Administrator)</span> <div class='delete link' title='Slet'>&nbsp;</div>");
-        li.dataset["username"] = user.username;
-        li.dataset["privileges"] = _userPrivilegeString(user, true);
-        li.dataset["mail"] = user.mail;
-        li.dataset["pages"] = user.pages.map((Page p)=>p.id).join(" ");
+        li.appendHtml(", <span class='privileges'>($privilege Administrator)</span> <div class='delete link' title='Slet'>&nbsp;</div><div class='time link'>&nbsp;</div>");
+        _setDataset(li, user);
+
 
         _userList.append(li);
         userLis = _userList.querySelectorAll('li');
-        addListener(li);
+        _addListener(li);
       } else {
         userLis.forEach((LIElement li) {
           if (li.querySelector('.val').text == user.username)li.remove();
@@ -718,15 +744,14 @@ class UserSettingsPageListsInitializer extends core.Initializer {
         var pageLi = new UserSettingsPageLi(li);
         newOrder.add(pageLi.page.id);
       });
-      var bar = new SavingBar();
-      var i = bar.startJob();
-      _order.changePageOrder(newOrder, callback:(String status, [int error_code, dynamic payload]) => bar.endJob(i), parent_id:parent);
+      var i = savingBar.startJob();
+      _order.changePageOrder(newOrder, callback:(String status, [int error_code, dynamic payload]) => savingBar.endJob(i), parent_id:parent);
       e.stopPropagation();
     };
     _activeList.onChange.listen(ULChangeListener(_activeList, null));
     _activeList.querySelectorAll('ul').forEach((UListElement ul) => ul.onChange.listen(ULChangeListener(ul, new UserSettingsPageLi(ul.parent).page.id)));
 
-    _order.onUpdate.listen((PageOrderChange change){
+    _order.onUpdate.listen((PageOrderChange change) {
       var page = change.page, changeType = change.type;
       switch (changeType) {
         case PageOrderChange.PAGE_ORDER_CHANGE_CREATE_PAGE:
@@ -775,7 +800,9 @@ class UserSettingsPageListsInitializer extends core.Initializer {
             _order.listPageOrder(parent_id:parent).forEach((Page p) {
               var ul = new UListElement();
               var pageLi = new UserSettingsPageLi.fromPage(p);
-              ul.classes..add('colorList')..add('draggable');
+              ul.classes
+                ..add('colorList')
+                ..add('draggable');
               ul.onChange.listen(ULChangeListener(ul, p.id));
               pageLi.updateActive();
 //            pageLi.li.children.removeWhere((Element e) => e is UListElement);

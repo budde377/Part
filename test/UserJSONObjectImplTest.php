@@ -9,12 +9,13 @@
 class UserJSONObjectImplTest extends PHPUnit_Framework_TestCase
 {
     public function testConstructorWillSetVariables(){
-        $jsonObject = new UserJSONObjectImpl('root','root@test.dk','root','bob');
+        $jsonObject = new UserJSONObjectImpl('root','root@test.dk','root',400,'bob');
         $this->assertEquals('user',$jsonObject->getName());
         $this->assertEquals('root',$jsonObject->getVariable('username'));
         $this->assertEquals('root@test.dk',$jsonObject->getVariable('mail'));
         $this->assertEquals('bob',$jsonObject->getVariable('parent'));
         $this->assertEquals('root',$jsonObject->getVariable('privileges'));
+        $this->assertEquals(400,$jsonObject->getVariable('last-login'));
     }
 
 

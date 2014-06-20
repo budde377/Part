@@ -23,7 +23,7 @@ class UserJSONObjectTranslatorImplTest extends PHPUnit_Framework_TestCase
         $this->userLibrary = new StubUserLibraryImpl();
         $this->translator = new UserJSONObjectTranslatorImpl($this->userLibrary);
         $this->user = new StubUserImpl();
-        $this->userPrivileges = new StubUserPrivilegesImpl(false,true,true);
+        $this->userPrivileges = new StubUserPrivilegesImpl(false, true, true);
     }
 
     public function testEncodeNonUserInstanceWillReturnFalse()
@@ -31,54 +31,61 @@ class UserJSONObjectTranslatorImplTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->translator->encode($this));
     }
 
-    public function testEncodeWillReturnRightInstance(){
+    public function testEncodeWillReturnRightInstance()
+    {
         $mail = 'some@some.dk';
         $this->user->setMail($mail);
-        $username ='someUser';
+        $username = 'someUser';
         $this->user->setUsername($username);
         $parent = 'bob';
         $this->user->setParent($parent);
         $this->user->setUserPrivileges($this->userPrivileges);
         $jsonObject = $this->translator->encode($this->user);
-        $this->assertInstanceOf('UserJSONObjectImpl',$jsonObject);
-        $this->assertEquals($mail,$jsonObject->getVariable('mail'));
-        $this->assertEquals($username,$jsonObject->getVariable('username'));
-        $this->assertEquals($parent,$jsonObject->getVariable('parent'));
-        $this->assertEquals('site',$jsonObject->getVariable('privileges'));
+        $this->assertInstanceOf('UserJSONObjectImpl', $jsonObject);
+        $this->assertEquals($mail, $jsonObject->getVariable('mail'));
+        $this->assertEquals($username, $jsonObject->getVariable('username'));
+        $this->assertEquals($parent, $jsonObject->getVariable('parent'));
+        $this->assertEquals('site', $jsonObject->getVariable('privileges'));
     }
 
-    public function testDecodeWillReturnFalseIfNotInstanceOfJSONObject(){
+    public function testDecodeWillReturnFalseIfNotInstanceOfJSONObject()
+    {
         $this->assertFalse($this->translator->decode($this));
     }
 
-    public function testDecodeWillReturnFalseIfNotRightName(){
+    public function testDecodeWillReturnFalseIfNotRightName()
+    {
         $this->setUpUserLibrary();
         $jsonObject = new JSONObjectImpl('notUser');
-        $jsonObject->setVariable('username','someUser');
-        $jsonObject->setVariable('mail','someMail');
+        $jsonObject->setVariable('username', 'someUser');
+        $jsonObject->setVariable('mail', 'someMail');
         $this->assertFalse($this->translator->decode($jsonObject));
     }
 
-    public function testDecodeWillReturnFalseIfNotRightParameters(){
+    public function testDecodeWillReturnFalseIfNotRightParameters()
+    {
         $this->setUpUserLibrary();
         $jsonObject = new JSONObjectImpl('user');
-        $jsonObject->setVariable('username','someUser');
+        $jsonObject->setVariable('username', 'someUser');
         $this->assertFalse($this->translator->decode($jsonObject));
     }
 
-    public function testDecodeWillReturnFalseIfNotInUserLibrary(){
-        $jsonObject = new UserJSONObjectImpl('someUser','someMail','root');
+    public function testDecodeWillReturnFalseIfNotInUserLibrary()
+    {
+        $jsonObject = new UserJSONObjectImpl('someUser', 'someMail', 'root', 400);
         $this->assertFalse($this->translator->decode($jsonObject));
     }
 
-    public function testDecodeWillReturnInstanceOfUserFromUserName(){
+    public function testDecodeWillReturnInstanceOfUserFromUserName()
+    {
         $this->setUpUserLibrary();
-        $jsonObject = new UserJSONObjectImpl('someUser','someMail','root');
+        $jsonObject = new UserJSONObjectImpl('someUser', 'someMail', 'root', 400);
         $user = $this->translator->decode($jsonObject);
         $this->assertTrue($user === $this->user);
     }
 
-    public function setUpUserLibrary(){
+    public function setUpUserLibrary()
+    {
         $userList = array($this->user);
         $this->userLibrary->setUserList($userList);
         $this->user->setUsername('someUser');

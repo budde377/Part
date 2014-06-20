@@ -28,7 +28,7 @@ class UserJSONObjectTranslatorImpl implements JSONObjectTranslator
         }
         $privilege = $object->getUserPrivileges();
         $p = $privilege->hasRootPrivileges()?'root':($privilege->hasSitePrivileges()?'site':'page');
-        $jsonUser = new UserJSONObjectImpl($object->getUsername(),$object->getMail(),$p, $object->getParent());
+        $jsonUser = new UserJSONObjectImpl($object->getUsername(),$object->getMail(),$p, $object->getLastLogin(), $object->getParent());
 
         return $jsonUser;
     }

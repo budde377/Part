@@ -14,10 +14,11 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
 
     lis.forEach((LIElement li) {
       var aElement = li.querySelector('.val'), privileges = li.querySelector('.privileges');
-      var username, mail, parent, t;
+      var username, mail, parent, lastLogin, t;
       parent = li.dataset["parent"];
       username = li.dataset["username"];
       mail = li.dataset["mail"];
+      lastLogin = li.dataset["lastLogin"]== ""?null:int.parse(li.dataset["lastLogin"]);
       var client = new AJAXJSONClient();
       var p = li.dataset["privileges"], privilege;
       switch(p){
@@ -35,7 +36,7 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
       var pagesString = li.dataset["pages"];
       var pageStringList = privilege == User.PRIVILEGE_PAGE && pagesString != null? pagesString.trim().split(" ") : [];
       var pageList = pageStringList.map((String id) => pageOrder.pages[id]).toList();
-      var user = new JSONUser(username, mail, parent, privilege, pageList, client);
+      var user = new JSONUser(username, mail, parent, lastLogin, privilege, pageList, client);
       users.add(user);
       if (li.classes.contains('current')) {
         currentUser = username;
