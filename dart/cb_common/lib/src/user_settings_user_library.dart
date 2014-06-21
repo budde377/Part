@@ -36,6 +36,7 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
       var pagesString = li.dataset["pages"];
       var pageStringList = privilege == User.PRIVILEGE_PAGE && pagesString != null? pagesString.trim().split(" ") : [];
       var pageList = pageStringList.map((String id) => pageOrder.pages[id]).toList();
+      pageList.removeWhere((e)=>!(e is Page));
       var user = new JSONUser(username, mail, parent, lastLogin, privilege, pageList, client);
       users.add(user);
       if (li.classes.contains('current')) {

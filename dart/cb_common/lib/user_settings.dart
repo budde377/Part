@@ -291,7 +291,7 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
     return li;
   }
 
-  void addListener(LIElement li) {
+  void _addListener(LIElement li) {
     var val = li.querySelector('.val');
     var delete = li.querySelector('.delete');
     var username = val == null ? li.text : val.text;
@@ -336,12 +336,12 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
         if (user.privileges != User.PRIVILEGE_PAGE) {
           var li = new LIElement();
           li.text = user.username;
-          addListener(li);
+          _addListener(li);
           _pageUserList.append(li);
           pageUserLis = _pageUserList.querySelectorAll('li');
         } else if (user.pages.contains(_order.currentPage)) {
           var li = createUserLi(user);
-          addListener(li);
+          _addListener(li);
           _pageUserList.append(li);
           pageUserLis = _pageUserList.querySelectorAll('li');
 
@@ -364,7 +364,7 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
       }
     });
 
-    pageUserLis.forEach(addListener);
+    pageUserLis.forEach(_addListener);
     if (_addUserToPageForm == null) {
       return;
     }
@@ -378,7 +378,7 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
       deco.blur();
       var user = _userLib.users[data['username']];
       user.addPagePrivilege(_order.currentPage).then((ChangeResponse response) {
-        if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
+        if (response.type == core.Response.RESPONSE_TYPE_ERROR) {
           deco.unBlur();
           return false;
         }
@@ -387,7 +387,7 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
         var newLi = createUserLi(user);
         _pageUserList.append(newLi);
         pageUserLis = _pageUserList.querySelectorAll('li');
-        addListener(newLi);
+        _addListener(newLi);
         deco.unBlur();
       });
 
