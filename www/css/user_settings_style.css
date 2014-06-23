@@ -485,6 +485,12 @@ form.initial input.invalid {
     display: none;
 }
 
+
+#ActivePageList.levelPage li.current,
+#InactivePageList.levelPage li.current{
+    padding-right: 0;
+}
+
 #ActivePageList li.current {
     padding-right: 30px;
 }

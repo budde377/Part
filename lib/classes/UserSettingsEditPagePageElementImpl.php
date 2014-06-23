@@ -60,6 +60,10 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
         $pageForm->insertInputSubmit("Rediger");
 
         $output .= $pageForm->getHTMLString();
+        $p = $this->currentUser->getUserPrivileges();
+        if(!$p->hasSitePrivileges() && !$p->hasRootPrivileges()){
+            return $output;
+        }
 
         $output .= "
         <h3>Administrer Brugerrettigheder</h3>
@@ -97,26 +101,7 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
         }
         $addUserAccessForm->insertInputSubmit("Tilføj Bruger");
         $output .= $addUserAccessForm->getHTMLString();
-/*
-        $output .= "
-        <h3>Administrer undersider</h3>
-        <ul class='colorList draggable' id='PageUserList'>
-            <li>Testside 1</li>
-            <li>Testside 2</li>
-        </ul>
-        ";
-        $createSubPageForm = new HTMLFormElementImpl(HTMLFormElement::FORM_METHOD_POST);
-        $createSubPageForm->setAttributes('id','AddSubPageForm');
-        $createSubPageForm->insertRadioButton('chooseMethod','ChooseMethod1','create','Opret og tilføj ny side');
-        $createSubPageForm->insertInputText('title','AddSubPageTitle','','Side titel')
-            ->setAttributes('class','hidden');
-        $createSubPageForm->insertRadioButton('chooseMethod','ChooseMethod2','activate','Tilføj inaktiv side');
-        $createSubPageForm->insertSelect('activateTitle','SelectInactiveSubPage','Inaktiv side',$select)
-            ->setAttributes('class','hidden');
 
-        $createSubPageForm->insertInputSubmit('Tilføj  Underside');
-        $output .= $createSubPageForm->getHTMLString();
-*/
 
         return $output;
     }
