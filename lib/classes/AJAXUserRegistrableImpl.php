@@ -43,7 +43,7 @@ class AJAXUserRegistrableImpl implements Registrable{
                 if(($user = $userLibrary->getUser($username)) == null){
                     if(!$this->validMail($username)){
                         return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR,
-                            JSONResponse::ERROR_CODE_USER_NOT_FOUND);
+                            JSONResponse::ERROR_CODE_INVALID_LOGIN);
                     }
 
                     foreach($userLibrary as $u){
@@ -55,14 +55,14 @@ class AJAXUserRegistrableImpl implements Registrable{
                     }
                     if($user == null){
                         return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR,
-                            JSONResponse::ERROR_CODE_USER_NOT_FOUND);
+                            JSONResponse::ERROR_CODE_INVALID_LOGIN);
                     }
                 }
                 if($user->login($password)){
                     return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_SUCCESS);
                 }
                 return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR,
-                    JSONResponse::ERROR_CODE_WRONG_PASSWORD);
+                    JSONResponse::ERROR_CODE_INVALID_LOGIN);
 
             },
             array('username', 'password'));

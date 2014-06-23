@@ -36,6 +36,7 @@ interface JSONResponse extends JSONElement
     const ERROR_CODE_INVALID_SUBJECT = 23;
     const ERROR_CODE_INVALID_MESSAGE = 24;
     const ERROR_CODE_INVALID_INPUT = 25;
+    const ERROR_CODE_INVALID_LOGIN = 26;
 
     /**
      * @return String

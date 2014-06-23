@@ -290,6 +290,7 @@ abstract class Response<V>{
   static const ERROR_CODE_INVALID_SUBJECT = 23;
   static const ERROR_CODE_INVALID_MESSAGE = 24;
   static const ERROR_CODE_INVALID_INPUT = 25;
+  static const ERROR_CODE_INVALID_LOGIN = 26;
 
   final String type;
   final int error_code;

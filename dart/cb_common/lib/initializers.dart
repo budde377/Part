@@ -55,14 +55,7 @@ class LoginFormulaInitializer implements Initializer {
       client.callFunction(new UserLoginJSONFunction(data['username'], data['password'])).then((JSONResponse response) {
         if (response.type == Response.RESPONSE_TYPE_ERROR) {
           form.unBlur();
-          switch (response.error_code) {
-            case Response.ERROR_CODE_USER_NOT_FOUND:
-              form.changeNotion("Ugyldig bruger", FormHandler.NOTION_TYPE_ERROR);
-              break;
-            case Response.ERROR_CODE_WRONG_PASSWORD:
-              form.changeNotion("Ugyldig kodeord", FormHandler.NOTION_TYPE_ERROR);
-              break;
-          }
+          form.changeNotion("Ugyldigt login", FormHandler.NOTION_TYPE_ERROR);
         } else {
           form.changeNotion("Du er nu logget ind", FormHandler.NOTION_TYPE_SUCCESS);
           window.location.href = "/?" + new DateTime.now().millisecondsSinceEpoch.toString();
