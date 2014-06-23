@@ -36,7 +36,7 @@ class UserSettingsEditPagesPageElementImpl extends PageElementImpl
         $this->evaluateDeletePage();
         $this->evaluateActivatePage();
         $this->evaluateDeactivatePage();
-        $levelClass = !$this->currentUserPrivileges->hasRootPrivileges() && !$this->currentUserPrivileges->hasSitePrivileges()? 'levelPage':'';
+        $levelClass = !$this->currentUserPrivileges->hasRootPrivileges() && !$this->currentUserPrivileges->hasSitePrivileges()? 'levelPage':'draggable';
         $output = "<h3>Aktive sider</h3>";
 
         $output .= "
@@ -72,7 +72,7 @@ class UserSettingsEditPagesPageElementImpl extends PageElementImpl
             $list
         </ul>";
 
-        if(strlen($levelClass) == 0){
+        if($levelClass == 'draggable'){
 
             $form = new HTMLFormElementImpl(HTMLFormElement::FORM_METHOD_POST);
             $form->setAttributes("class","oneLineForm");
@@ -117,7 +117,7 @@ class UserSettingsEditPagesPageElementImpl extends PageElementImpl
         if($list == ""){
             $list = "<li class='emptyListInfo'>Der er ingen aktive sider</li>";
         }
-        return "<ul $attr class='colorList draggable $class'> $list </ul>";
+        return "<ul $attr class='colorList $class'> $list </ul>";
     }
 
     private function evaluateForm(&$status = null,&$newId = null)

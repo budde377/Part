@@ -24,10 +24,12 @@ class AJAXLoggingRegistrableImpl implements Registrable
      */
     public function callback($id)
     {
+        $user = $this->container->getUserLibraryInstance()->getUserLoggedIn();
         $server = new JSONServerImpl();
         $logFile = $this->container->getLogInstance();
-        $server->registerJSONFunction(new JSONFunctionImpl("log", function($name, $stackTrace, $level) use ($logFile){
+        $server->registerJSONFunction(new JSONFunctionImpl("log", function($name, $stackTrace, $level) use ($logFile, $user){
             $f = $logFile->log("AJAX Log", $level, true);
+            $f->dumpVar("User", $user==null?null:$user->getUsername());
             $f->dumpVar("Name", $name);
             $f->dumpVar("Stack trace", $stackTrace);
             return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_SUCCESS);
