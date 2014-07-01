@@ -62,7 +62,7 @@ In order to ease your work, some variables has been added to the environment. Th
 The CMS provides some Twig nodes that should ease the development of templates.
 
  * `{% init_page_element {page-element} %}` This sets up the page element, without generating content.
- * `{% page_element {page-element} %}` This sets up the page element, generates content inserts it.
+ * `{% page_element {page-element} %}` This sets up the page element, generates content and inserts it. The `page_element` is either an class or an name as defined in setup.
  * `{% page_variable {page}[{id}] %}` or `{% page_variable {id} %}` This inserts the content of a page variable of the page (current or provided).
  * `{% page_content {page}[{optional id}] %}` or `{% page_content {optional id} %}` This inserts the latest page content of the page (current or provided).
  * `{% site_variable {id} %}`. This inserts the site variable matching id provided.

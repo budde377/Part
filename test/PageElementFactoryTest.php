@@ -27,6 +27,15 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertNull($element, 'Did not return null on element not in list');
     }
 
+    public function testWillReturnInstanceIfPageElementIsNotInConfigButIsImported()
+    {
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
+        $element = $pageElementFactory->getPageElement('NullPageElementImpl');
+        $this->assertInstanceOf('NullPageElementImpl', $element);
+    }
+
     public function testWillReturnPageElementIfElementInList()
     {
         $configXML = simplexml_load_string("
@@ -57,6 +66,20 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
         $element = $pageElementFactory->getPageElement('someElement');
         $element2 = $pageElementFactory->getPageElement('someElement');
+        $this->assertTrue($element === $element2);
+
+    }
+
+    public function testPageElementWillBeCachedAlsoWhenNotInConfig()
+    {
+        $configXML = simplexml_load_string("
+        <config>
+        {$this->defaultOwner}
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
+        $element = $pageElementFactory->getPageElement('NullPageElementImpl');
+        $element2 = $pageElementFactory->getPageElement('NullPageElementImpl');
         $this->assertTrue($element === $element2);
 
     }
@@ -93,6 +116,19 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($element === $element2);
     }
 
+    public function testPageElementCacheCanBeDisabledAlsoWhenElementNotInConfig()
+    {
+        $configXML = simplexml_load_string("
+        <config>
+        {$this->defaultOwner}
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
+        $element = $pageElementFactory->getPageElement('NullPageElementImpl');
+        $element2 = $pageElementFactory->getPageElement('NullPageElementImpl', false);
+        $this->assertFalse($element === $element2);
+    }
+
     public function testPageElementCacheWillBeUpdated()
     {
         $configXML = simplexml_load_string("
@@ -125,7 +161,7 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
         $exceptionWasThrown = false;
         try {
-            $element = $pageElementFactory->getPageElement('someElement');
+            $pageElementFactory->getPageElement('someElement');
         } catch (Exception $exception) {
             /** @var $exception ClassNotInstanceOfException */
             $this->assertInstanceOf('ClassNotInstanceOfException', $exception);
@@ -139,6 +175,33 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
 
 
     }
+    public function testWillReturnThrowExceptionIfElementNotInstanceOfPageElementAndNotInConfig()
+    {
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("
+        <config>
+        {$this->defaultOwner}
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
+        $exceptionWasThrown = false;
+        try {
+            $pageElementFactory->getPageElement('StubScriptImpl');
+        } catch (Exception $exception) {
+            /** @var $exception ClassNotInstanceOfException */
+            $this->assertInstanceOf('ClassNotInstanceOfException', $exception);
+            $exceptionWasThrown = true;
+            $this->assertEquals('StubScriptImpl', $exception->getClass(), 'Was not expected class');
+            $this->assertEquals('PageElement', $exception->getExpectedInstance(), 'Was not expected instance');
+
+        }
+
+        $this->assertTrue($exceptionWasThrown, 'No exception was thrown');
+
+
+    }
+
+
 
     public function testWillThrowExceptionIfInvalidLink()
     {

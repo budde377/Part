@@ -30,23 +30,31 @@ class PageElementFactoryImpl implements PageElementFactory
         }
 
         $element = $this->config->getPageElement($name);
-        if ($element === null) {
-            return null;
+        if($element === null){
+            if(!class_exists($name)){
+                return null;
+            }
+
+            $className = $name;
+
+
+        } else {
+            if (!file_exists($element['link'])) {
+                throw new FileNotFoundException($element['link'], 'PageElement');
+            }
+            require_once $element['link'];
+            if (!class_exists($element['className'])) {
+                throw new ClassNotDefinedException($element['className']);
+            }
+            $className = $element['className'];
         }
 
 
-        if (!file_exists($element['link'])) {
-            throw new FileNotFoundException($element['link'], 'PageElement');
-        }
-        require_once $element['link'];
-        if (!class_exists($element['className'])) {
-            throw new ClassNotDefinedException($element['className']);
-        }
 
-        $elementObject = new $element['className']($this->backendSingletonFactory);
+        $elementObject = new $className($this->backendSingletonFactory);
 
         if (!($elementObject instanceof PageElement)) {
-            throw new ClassNotInstanceOfException($element['className'], 'PageElement');
+            throw new ClassNotInstanceOfException($className, 'PageElement');
         }
 
         return $this->cache[$name] = $elementObject;

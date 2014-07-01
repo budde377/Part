@@ -350,6 +350,14 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals( "Hello World", $v);
     }
 
+   public function testTemplateSupportsPageElementTagAlsoWithElementNotInConfig(){
+        $this->setUpConfig();
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{%page_element HelloPageElementImpl%}");
+        $v = $this->template->render();
+        $this->assertEquals( "Hello World", $v);
+    }
+
     public function testTemplateBreakIfNoPageElement(){
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%page_element nonExistingElement%}");
@@ -591,10 +599,6 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->site->getVariables()->setValue("foo", "Hello World2");
         $this->assertEquals("Hello World2", $this->template->render());
     }
-
-
-
-    //TODO test for initialize
 
 }
 
