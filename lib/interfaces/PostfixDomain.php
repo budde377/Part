@@ -11,6 +11,7 @@ interface PostfixDomain {
     const EVENT_DELETE = 2;
 
 
+
     /**
      * Gets the current domain name.
      * @return string
@@ -74,5 +75,24 @@ interface PostfixDomain {
      * @return PostfixAddressLibrary
      */
     public function getAddressLibrary();
+
+
+    /**
+     * @return bool
+     */
+    public function isAliasDomain();
+
+    /**
+     * @param PostfixDomain $domain
+     * @return void
+     */
+    public function setAliasTarget(PostfixDomain $domain);
+
+    /**
+     * @return PostfixDomain
+     */
+    public function getAliasTarget();
+
+
 
 }

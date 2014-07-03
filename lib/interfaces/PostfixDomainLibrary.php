@@ -12,8 +12,13 @@ interface PostfixDomainLibrary {
      * List the domains in the library as an numeric array
      * @return array An array of PostfixDomain s
      */
-
     public function listDomains();
+
+    /**
+     * Lists the domain alias' in the library as an numeric array.
+     * @return array of PostfixDomainAlias
+     */
+    public function listDomainAlias();
 
     /**
      * Will get and reuse an instance of the domain.
@@ -23,7 +28,6 @@ interface PostfixDomainLibrary {
     public function getDomain($domain);
 
     /**
-     *
      * @param string $domain
      * @return PostfixDomain
      */
@@ -35,5 +39,6 @@ interface PostfixDomainLibrary {
      * @return void
      */
     public function deleteDomain(PostfixDomain $domain);
+
 
 } 
