@@ -50,7 +50,7 @@ interface PostfixAddress {
      * Creation time
      * @return int UNIX timestamp in seconds.
      */
-    public function createAt();
+    public function createdAt();
 
     /**
      * Checks if the address exists
@@ -70,4 +70,20 @@ interface PostfixAddress {
      */
     public function create();
 
+
+    /**
+     * @return PostfixDomain
+     */
+    public function getDomain();
+
+
+    /**
+     * @return void
+     */
+    public function activate();
+
+    /**
+     * @return void
+     */
+    public function deactivate();
 } 

@@ -32,6 +32,16 @@ interface PostfixDomain {
     public function isActive();
 
     /**
+     * @return void
+     */
+    public function activate();
+
+    /**
+     * @return void
+     */
+    public function deactivate();
+
+    /**
      * @return string
      */
     public function getDescription();

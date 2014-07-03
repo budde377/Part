@@ -8,4 +8,12 @@
 
 interface PostfixMailbox extends PostfixAddress{
 
+    public function setName($name);
+
+    public function getName();
+
+    public function getMailDir();
+
+    public function getDomain();
+
 } 
