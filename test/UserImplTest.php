@@ -606,7 +606,7 @@ class UserImplTest extends CustomDatabaseTestCase
      */
     protected function getConnection()
     {
-        $pdo = new PDO('mysql:dbname=' . self::database . ';host=' . self::host, self::username, self::password);
+        $pdo = self::$pdo;
         return $this->createDefaultDBConnection($pdo);
     }
 
@@ -620,9 +620,5 @@ class UserImplTest extends CustomDatabaseTestCase
         return $this->createMySQLXMLDataSet(dirname(__FILE__) . '/mysqlXML/UserImplTest.xml');
     }
 
-    const database = MySQLConstants::MYSQL_DATABASE;
-    const password = MySQLConstants::MYSQL_PASSWORD;
-    const username = MySQLConstants::MYSQL_USERNAME;
-    const host = MySQLConstants::MYSQL_HOST;
 
 }

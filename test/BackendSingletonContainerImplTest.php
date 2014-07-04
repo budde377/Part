@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -6,18 +7,25 @@
  * Time: 4:59 PM
  * To change this template use File | Settings | File Templates.
  */
-class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
+class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
 {
 
     /** @var $config StubConfigImpl */
     private $config;
-    /** @var $backContainer BackendSingletonContainerImpl*/
+    /** @var $backContainer BackendSingletonContainerImpl */
     private $backContainer;
+    /** @var  array */
+    private $connectionArray;
 
     protected function setUp()
     {
+        $this->connectionArray = array(
+            'host' => self::$mysqlOptions->getHost(),
+            'user' => self::$mysqlOptions->getUsername(),
+            'password' => self::$mysqlOptions->getPassword(),
+            'database' => self::$mysqlOptions->getDatabase());
         $this->config = new StubConfigImpl();
-        $this->config->setMysqlCon(array('host'=>MySQLConstants::MYSQL_HOST, 'user'=>MySQLConstants::MYSQL_USERNAME, 'password'=>MySQLConstants::MYSQL_PASSWORD, 'database'=>MySQLConstants::MYSQL_DATABASE));
+        $this->config->setMysqlCon($this->connectionArray);
         $this->backContainer = new BackendSingletonContainerImpl($this->config);
     }
 
@@ -72,10 +80,7 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetPageOrderRegisterReturnsSameInstanceOfPageOrder()
     {
-        $this->config->setMysqlCon(array('host' => MySQLConstants::MYSQL_HOST,
-            'user' => MySQLConstants::MYSQL_USERNAME,
-            'database' => MySQLConstants::MYSQL_DATABASE,
-            'password' => MySQLConstants::MYSQL_PASSWORD));
+        $this->config->setMysqlCon($this->connectionArray);
         $pageOrder1 = $this->backContainer->getPageOrderInstance();
         $this->assertInstanceOf('PageOrder', $pageOrder1, 'Did not return instance of PageOrder');
         $pageOrder2 = $this->backContainer->getPageOrderInstance();
@@ -85,10 +90,7 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetCurrentPageStrategyReturnsSameInstanceOfCurrentPageStrategy()
     {
-        $this->config->setMysqlCon(array('host' => MySQLConstants::MYSQL_HOST,
-            'user' => MySQLConstants::MYSQL_USERNAME,
-            'database' => MySQLConstants::MYSQL_DATABASE,
-            'password' => MySQLConstants::MYSQL_PASSWORD));
+        $this->config->setMysqlCon($this->connectionArray);
         $pageOrder1 = $this->backContainer->getCurrentPageStrategyInstance();
         $this->assertInstanceOf('CurrentPageStrategy', $pageOrder1, 'Did not return instance of CurrentPageStrategy');
         $pageOrder2 = $this->backContainer->getCurrentPageStrategyInstance();
@@ -99,10 +101,7 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetUserLibraryInstanceReturnsSameInstanceOfUserLibrary()
     {
-        $this->config->setMysqlCon(array('host' => MySQLConstants::MYSQL_HOST,
-            'user' => MySQLConstants::MYSQL_USERNAME,
-            'database' => MySQLConstants::MYSQL_DATABASE,
-            'password' => MySQLConstants::MYSQL_PASSWORD));
+        $this->config->setMysqlCon($this->connectionArray);
         $ret1 = $this->backContainer->getUserLibraryInstance();
         $this->assertInstanceOf('UserLibrary', $ret1, 'Did not return instance of SiteLibrary');
         $ret2 = $this->backContainer->getUserLibraryInstance();
@@ -110,7 +109,6 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
 
 
     }
-
 
 
     public function testGetConfigInstanceWillReturnSameInstanceOfConfig()
@@ -122,6 +120,7 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($ret1 === $ret2, 'Did not reuse instance');
 
     }
+
     public function testGetDefaultPageLibraryWillReturnASameInstanceOfDefaultPageLibrary()
     {
         $ret1 = $this->backContainer->getDefaultPageLibraryInstance();
@@ -132,48 +131,54 @@ class BackendSingletonContainerImplTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testGetCacheControlWillReturnSameInstanceOfCacheControl(){
+    public function testGetCacheControlWillReturnSameInstanceOfCacheControl()
+    {
         $ret1 = $this->backContainer->getCacheControlInstance();
-        $this->assertInstanceOf('CacheControl',$ret1);
-        $ret2 =$this->backContainer->getCacheControlInstance();
+        $this->assertInstanceOf('CacheControl', $ret1);
+        $ret2 = $this->backContainer->getCacheControlInstance();
         $this->assertTrue($ret1 === $ret2);
     }
 
-    public function testGetUpdaterWillReturnSameInstanceOfUpdater(){
+    public function testGetUpdaterWillReturnSameInstanceOfUpdater()
+    {
         $ret1 = $this->backContainer->getUpdater();
-        $this->assertInstanceOf('Updater',$ret1);
-        $ret2 =$this->backContainer->getUpdater();
+        $this->assertInstanceOf('Updater', $ret1);
+        $ret2 = $this->backContainer->getUpdater();
         $this->assertTrue($ret1 === $ret2);
     }
 
-    public function testGetSiteVariablesWillReturnSameInstanceOfUpdater(){
+    public function testGetSiteVariablesWillReturnSameInstanceOfUpdater()
+    {
         $ret1 = $this->backContainer->getSiteInstance();
-        $this->assertInstanceOf('Site',$ret1);
-        $ret2 =$this->backContainer->getSiteInstance();
+        $this->assertInstanceOf('Site', $ret1);
+        $ret2 = $this->backContainer->getSiteInstance();
         $this->assertTrue($ret1 === $ret2);
     }
 
-    public function testGetFileLibraryWillReturnSameInstance(){
+    public function testGetFileLibraryWillReturnSameInstance()
+    {
         $ret1 = $this->backContainer->getFileLibraryInstance();
-        $this->assertInstanceOf('FileLibrary',$ret1);
-        $ret2 =$this->backContainer->getFileLibraryInstance();
+        $this->assertInstanceOf('FileLibrary', $ret1);
+        $ret2 = $this->backContainer->getFileLibraryInstance();
         $this->assertTrue($ret1 === $ret2);
     }
 
-    public function testGetLogWillReturnSameInstance(){
+    public function testGetLogWillReturnSameInstance()
+    {
         $p = "/some/path";
         $this->config->setLogPath($p);
         $ret1 = $this->backContainer->getLogInstance();
-        $this->assertInstanceOf('LogFile',$ret1);
-        $ret2 =$this->backContainer->getLogInstance();
+        $this->assertInstanceOf('LogFile', $ret1);
+        $ret2 = $this->backContainer->getLogInstance();
         $this->assertTrue($ret1 === $ret2);
         $this->assertEquals($ret1->getAbsoluteFilePath(), $p);
     }
 
-    public function testGetLogWillReturnNullIfNoPathInConfig(){
+    public function testGetLogWillReturnNullIfNoPathInConfig()
+    {
         $ret1 = $this->backContainer->getLogInstance();
-        $this->assertInstanceOf('LogFile',$ret1);
-        $ret2 =$this->backContainer->getLogInstance();
+        $this->assertInstanceOf('LogFile', $ret1);
+        $ret2 = $this->backContainer->getLogInstance();
         $this->assertTrue($ret1 === $ret2);
 
     }

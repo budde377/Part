@@ -568,7 +568,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
      */
     protected function getConnection()
     {
-        $pdo = new PDO('mysql:dbname=' . self::database . ';host=' . self::host, self::username, self::password);
+        $pdo = self::$pdo;
         return $this->createDefaultDBConnection($pdo);
     }
 
@@ -592,9 +592,5 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     }
 
 
-    const database = MySQLConstants::MYSQL_DATABASE;
-    const password = MySQLConstants::MYSQL_PASSWORD;
-    const username = MySQLConstants::MYSQL_USERNAME;
-    const host = MySQLConstants::MYSQL_HOST;
 
 }

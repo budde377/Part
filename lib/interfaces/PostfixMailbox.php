@@ -8,12 +8,23 @@
 
 interface PostfixMailbox extends PostfixAddress{
 
+    /**
+     * Sets the owners name of the mailbox
+     * @param string $name
+     * @return void
+     */
     public function setName($name);
 
+    /**
+     * @return string The name of the owner
+     */
     public function getName();
 
-    public function getMailDir();
-
-    public function getDomain();
+    /**
+     * Sets the password of the mailbox
+     * @param string $password
+     * @return void
+     */
+    public function setPassword($password);
 
 } 

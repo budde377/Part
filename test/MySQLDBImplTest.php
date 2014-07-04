@@ -7,14 +7,22 @@
  * Time: 7:30 PM
  * To change this template use File | Settings | File Templates.
  */
-class MySQLDBImplTest extends PHPUnit_Framework_TestCase
+class MySQLDBImplTest extends CustomDatabaseTestCase
 {
 
-    private $host = MySQLConstants::MYSQL_HOST;
-    private $user = MySQLConstants::MYSQL_USERNAME;
-    private $pass = MySQLConstants::MYSQL_PASSWORD;
-    private $database = MySQLConstants::MYSQL_DATABASE;
+    private $host;
+    private $user;
+    private $pass;
+    private $database;
     private $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
+
+    public function setUp(){
+        parent::setUp();
+        $this->host = self::$mysqlOptions->getHost();
+        $this->user = self::$mysqlOptions->getUsername();
+        $this->pass = self::$mysqlOptions->getPassword();
+        $this->database = self::$mysqlOptions->getDatabase();
+    }
 
     public function testConnectionUsesConfigInfo()
     {

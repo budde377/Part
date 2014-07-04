@@ -1,0 +1,14 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: budde
+ * Date: 7/4/14
+ * Time: 11:53 PM
+ */
+
+
+class PostfixMySQLConstantsImpl extends MySQLConstantsImpl{
+    function __construct(){
+        parent::__construct('10.8.0.1', 'cms2012', 'plovMand50', 'cms2012testdb');
+    }
+}

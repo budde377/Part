@@ -103,6 +103,10 @@ interface PostfixDomain {
      */
     public function getAliasTarget();
 
+    /**
+     * @return void
+     */
+    public function clearAliasTarget();
 
 
 }

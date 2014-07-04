@@ -19,6 +19,12 @@ interface PostfixAddressLibrary {
     public function listAddresses($mode = PostfixAddressLibrary::LIST_MODE_ALL);
 
     /**
+     * @param string $address
+     * @return bool
+     */
+    public function hasAddress($address);
+
+    /**
      * Gets a address from the given address. Null if not found.
      * @param string $address
      * @return PostfixAddress
@@ -67,5 +73,24 @@ interface PostfixAddressLibrary {
      */
     public function getDomain();
 
+    /**
+     * @return PostfixAlias
+     */
+    public function getCatchallAlias();
 
-} 
+    /**
+     * @param array $targets
+     * @return PostfixAlias
+     */
+    public function createCatchallAlias(array $targets);
+
+    /**
+     * @return void
+     */
+    public function deleteCatchallAlias();
+
+    /**
+     * @return bool
+     */
+    public function hasCatchallAlias();
+}
