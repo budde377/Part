@@ -6,7 +6,7 @@
  * Time: 9:32 AM
  */
 
-interface PostfixDomain {
+interface MailDomain {
     const EVENT_DOMAIN_NAME_UPDATE = 1;
     const EVENT_DELETE = 2;
 
@@ -82,7 +82,7 @@ interface PostfixDomain {
     public function delete();
 
     /**
-     * @return PostfixAddressLibrary
+     * @return MailAddressLibrary
      */
     public function getAddressLibrary();
 
@@ -93,13 +93,13 @@ interface PostfixDomain {
     public function isAliasDomain();
 
     /**
-     * @param PostfixDomain $domain
+     * @param MailDomain $domain
      * @return void
      */
-    public function setAliasTarget(PostfixDomain $domain);
+    public function setAliasTarget(MailDomain $domain);
 
     /**
-     * @return PostfixDomain
+     * @return MailDomain
      */
     public function getAliasTarget();
 

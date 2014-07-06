@@ -6,7 +6,7 @@
  * Time: 2:13 PM
  */
 
-interface PostfixAlias extends PostfixAddress{
+interface MailAlias extends MailAddress{
 
     /**
      * @return array of strings indicating targets.

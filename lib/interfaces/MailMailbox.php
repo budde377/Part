@@ -6,7 +6,7 @@
  * Time: 2:13 PM
  */
 
-interface PostfixMailbox extends PostfixAddress{
+interface MailMailbox extends MailAddress{
 
     /**
      * Sets the owners name of the mailbox

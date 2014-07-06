@@ -6,7 +6,7 @@
  * Time: 2:19 PM
  */
 
-interface PostfixAddress {
+interface MailAddress {
 
     const EVENT_DELETE = 1;
     const EVENT_CHANGE_ADDRESS = 2;
@@ -72,7 +72,7 @@ interface PostfixAddress {
 
 
     /**
-     * @return PostfixDomain
+     * @return MailDomain
      */
     public function getDomain();
 

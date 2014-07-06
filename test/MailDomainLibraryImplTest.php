@@ -6,6 +6,6 @@
  * Time: 11:23 PM
  */
 
-class PostfixDomainLibraryImplTest extends CustomDatabasePostfixTestCase{
+class MailDomainLibraryImplTest extends CustomDatabaseTestCase{
 
 } 

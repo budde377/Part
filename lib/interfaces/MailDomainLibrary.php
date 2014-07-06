@@ -6,7 +6,7 @@
  * Time: 9:27 AM
  */
 
-interface PostfixDomainLibrary {
+interface MailDomainLibrary {
 
     /**
      * List the domains in the library as an numeric array
@@ -23,22 +23,22 @@ interface PostfixDomainLibrary {
     /**
      * Will get and reuse an instance of the domain.
      * @param string $domain The domain name as a string
-     * @return PostfixDomain
+     * @return MailDomain
      */
     public function getDomain($domain);
 
     /**
      * @param string $domain
-     * @return PostfixDomain
+     * @return MailDomain
      */
     public function createDomain($domain);
 
     /**
      * Will delete the domain, if it domain is an instance in the library.
-     * @param PostfixDomain $domain
+     * @param MailDomain $domain
      * @return void
      */
-    public function deleteDomain(PostfixDomain $domain);
+    public function deleteDomain(MailDomain $domain);
 
 
 } 

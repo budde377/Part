@@ -6,7 +6,7 @@
  * Time: 2:13 PM
  */
 
-interface PostfixAddressLibrary {
+interface MailAddressLibrary {
 
     const LIST_MODE_ALL = 1;
     const LIST_MODE_ALIAS = 2;
@@ -16,7 +16,7 @@ interface PostfixAddressLibrary {
      * @param int $mode Decides which will be listed (alias, mailbox or both)
      * @return array An array containing selected entries.
      */
-    public function listAddresses($mode = PostfixAddressLibrary::LIST_MODE_ALL);
+    public function listAddresses($mode = MailAddressLibrary::LIST_MODE_ALL);
 
     /**
      * @param string $address
@@ -27,21 +27,21 @@ interface PostfixAddressLibrary {
     /**
      * Gets a address from the given address. Null if not found.
      * @param string $address
-     * @return PostfixAddress
+     * @return MailAddress
      */
     public function getAddress($address);
 
     /**
      * Gets a alias from the given address. Null if not found.
      * @param string $address
-     * @return PostfixAlias
+     * @return MailAlias
      */
     public function getAlias($address);
 
     /**
      * Gets a mailbox from the given address. Null if not found.
      * @param string $address
-     * @return PostfixMailbox
+     * @return MailMailbox
      */
     public function getMailbox($address);
 
@@ -49,38 +49,38 @@ interface PostfixAddressLibrary {
      * Creates an Alias.
      * @param string $address
      * @param array $targets
-     * @return PostfixAlias
+     * @return MailAlias
      */
     public function createAlias($address, array $targets);
 
     /**
      * Creates an mailbox.
      * @param string $address
-     * @return PostFixAddress
+     * @return MailAddress
      */
     public function createMailbox($address);
 
     /**
      * Deletes an address. It must be an instance in the library.
-     * @param PostfixAddress $address
+     * @param MailAddress $address
      * @return void
      */
-    public function deleteAddress(PostfixAddress $address);
+    public function deleteAddress(MailAddress $address);
 
     /**
      * Returns the domain associated with the address.
-     * @return PostfixDomain
+     * @return MailDomain
      */
     public function getDomain();
 
     /**
-     * @return PostfixAlias
+     * @return MailAlias
      */
     public function getCatchallAlias();
 
     /**
      * @param array $targets
-     * @return PostfixAlias
+     * @return MailAlias
      */
     public function createCatchallAlias(array $targets);
 
