@@ -84,7 +84,7 @@ def setup_mysql(dart_name):
     call_mysql(root_password, host, 'CREATE DATABASE ' + database)
     call_mysql(root_password, host, "CREATE USER '" + username + "'@'%' IDENTIFIED BY '" + password + "'")
     call_mysql(root_password, host, "GRANT ALL PRIVILEGES ON " + database + ".* TO '" + username + "'@'%'")
-    call("mysql -uroot --password='"+root_password+"' --host='"+host+"' "+database+" < common/setupDatabase.sql", shell=True)
+    call("mysql -uroot --password='"+root_password+"' --host='"+host+"' "+database+" < common/db/CMSDatabase.sql", shell=True)
 
 
 def main():
