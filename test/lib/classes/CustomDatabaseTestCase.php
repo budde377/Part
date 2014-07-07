@@ -12,10 +12,13 @@ class CustomDatabaseTestCase extends PHPUnit_Extensions_Database_TestCase{
     protected static $pdo;
     /** @var  MySQLConstants */
     protected static $mysqlOptions;
+    /** @var  MySQLConstants */
+    protected static $mailMySQLOptions;
     protected $dataset;
 
     function __construct($dataset = null)
     {
+
         $this->dataset = $dataset == null?dirname(__FILE__) . '/../../mysqlXML/PageContentImplTest.xml':$dataset;
     }
 
@@ -52,6 +55,7 @@ class CustomDatabaseTestCase extends PHPUnit_Extensions_Database_TestCase{
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
+        self::$mailMySQLOptions = new MailMySQLConstantsImpl();
         if(self::$mysqlOptions == null){
 
             self::$mysqlOptions = new StandardMySQLConstantsImpl();

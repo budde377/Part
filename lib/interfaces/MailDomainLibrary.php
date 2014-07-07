@@ -9,16 +9,11 @@
 interface MailDomainLibrary {
 
     /**
-     * List the domains in the library as an numeric array
+     * List the domains in the library as an assoc array
      * @return array An array of PostfixDomain s
      */
     public function listDomains();
 
-    /**
-     * Lists the domain alias' in the library as an numeric array.
-     * @return array of PostfixDomainAlias
-     */
-    public function listDomainAlias();
 
     /**
      * Will get and reuse an instance of the domain.
@@ -42,5 +37,11 @@ interface MailDomainLibrary {
      */
     public function deleteDomain(MailDomain $domain, $password);
 
+    /**
+     * Check if the instance is in the library.
+     * @param MailDomain $domain
+     * @return bool
+     */
+    public function containsDomain(MailDomain $domain);
 
 } 

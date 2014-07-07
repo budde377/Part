@@ -2,28 +2,19 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 7/4/14
- * Time: 11:22 PM
+ * Date: 7/7/14
+ * Time: 2:14 PM
  */
 
-class MailDomainLibraryImpl implements MailDomainLibrary{
+class StubMailDomainLibraryImpl implements MailDomainLibrary{
 
     /**
-     * List the domains in the library as an numeric array
+     * List the domains in the library as an assoc array
      * @return array An array of PostfixDomain s
      */
     public function listDomains()
     {
         // TODO: Implement listDomains() method.
-    }
-
-    /**
-     * Lists the domain alias' in the library as an numeric array.
-     * @return array of PostfixDomainAlias
-     */
-    public function listDomainAlias()
-    {
-        // TODO: Implement listDomainAlias() method.
     }
 
     /**
@@ -38,9 +29,10 @@ class MailDomainLibraryImpl implements MailDomainLibrary{
 
     /**
      * @param string $domain
+     * @param string $password
      * @return MailDomain
      */
-    public function createDomain($domain)
+    public function createDomain($domain, $password)
     {
         // TODO: Implement createDomain() method.
     }
@@ -48,10 +40,21 @@ class MailDomainLibraryImpl implements MailDomainLibrary{
     /**
      * Will delete the domain, if it domain is an instance in the library.
      * @param MailDomain $domain
+     * @param string $password
      * @return void
      */
-    public function deleteDomain(MailDomain $domain)
+    public function deleteDomain(MailDomain $domain, $password)
     {
         // TODO: Implement deleteDomain() method.
+    }
+
+    /**
+     * Check if the instance is in the library.
+     * @param MailDomain $domain
+     * @return bool
+     */
+    public function containsDomain(MailDomain $domain)
+    {
+        // TODO: Implement containsDomain() method.
     }
 }

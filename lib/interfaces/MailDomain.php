@@ -6,8 +6,7 @@
  * Time: 9:32 AM
  */
 
-interface MailDomain {
-    const EVENT_DOMAIN_NAME_UPDATE = 1;
+interface MailDomain extends Observable{
     const EVENT_DELETE = 2;
 
 
@@ -18,12 +17,6 @@ interface MailDomain {
      */
     public function getDomainName();
 
-    /**
-     * Sets the domain name
-     * @param string $name
-     * @return void
-     */
-    public function setDomainName($name);
 
     /**
      * Indicates if the domain is active
