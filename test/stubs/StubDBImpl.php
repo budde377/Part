@@ -15,6 +15,16 @@ class StubDBImpl implements DB
      */
     private $connection;
 
+    private $mailConnection;
+
+    /**
+     * @param mixed $mailConnection
+     */
+    public function setMailConnection($mailConnection)
+    {
+        $this->mailConnection = $mailConnection;
+    }
+
     /**
      * @return PDO
      */
@@ -29,4 +39,12 @@ class StubDBImpl implements DB
     }
 
 
+    /**
+     * @param string $password
+     * @return PDO
+     */
+    public function getMailConnection($password)
+    {
+        return $this->connection;
+    }
 }

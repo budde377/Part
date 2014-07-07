@@ -12,7 +12,7 @@ abstract class MySQLConstantsImpl implements MySQLConstants{
     private $host;
     private $database;
 
-    function __construct( $host, $username, $password, $database)
+    function __construct( $host, $database, $username, $password)
     {
         $this->database = $database;
         $this->host = $host;

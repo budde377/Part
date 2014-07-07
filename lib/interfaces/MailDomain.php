@@ -71,15 +71,17 @@ interface MailDomain {
 
     /**
      * Creates the domain if it does not exist.
+     * @param string $password
      * @return mixed
      */
-    public function create();
+    public function create($password);
 
     /**
      * Deletes the domain.
+     * @param string $password
      * @return void
      */
-    public function delete();
+    public function delete($password);
 
     /**
      * @return MailAddressLibrary

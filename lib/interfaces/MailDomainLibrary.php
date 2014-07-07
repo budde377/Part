@@ -29,16 +29,18 @@ interface MailDomainLibrary {
 
     /**
      * @param string $domain
+     * @param string $password
      * @return MailDomain
      */
-    public function createDomain($domain);
+    public function createDomain($domain, $password);
 
     /**
      * Will delete the domain, if it domain is an instance in the library.
      * @param MailDomain $domain
+     * @param string $password
      * @return void
      */
-    public function deleteDomain(MailDomain $domain);
+    public function deleteDomain(MailDomain $domain, $password);
 
 
 } 

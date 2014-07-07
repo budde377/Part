@@ -21,6 +21,7 @@ class ConfigImpl implements Config
     private $ajaxRegistrable = null;
     private $optimizers = null;
     private $mysql = null;
+    private $mailMysql = null;
     private $debugMode;
     private $defaultPages;
     private $enableUpdater;
@@ -362,5 +363,20 @@ class ConfigImpl implements Config
         $result = $this->log = (string)$this->configFile->log['path'];
         return $result === null ? $this->log = "" : $result;
 
+    }
+
+    /**
+     * @return array | null Array with entries host, user, prefix, database and File setupFile, or null if not specified
+     */
+    public function getMailMySQLConnection()
+    {
+        if ($this->mailMysql === null && $this->configFile->MailMySQLConnection->getName()) {
+            $this->mailMysql = array(
+                'user' => (string)$this->configFile->MailMySQLConnection->username,
+                'database' => (string)$this->configFile->MailMySQLConnection->database,
+                'host' => (string)$this->configFile->MailMySQLConnection->host);
+        }
+
+        return $this->mailMysql;
     }
 }

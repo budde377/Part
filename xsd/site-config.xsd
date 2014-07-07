@@ -84,13 +84,12 @@
     </xs:complexType>
 
     <xs:complexType name="dbConnectionWithPassword">
-        <xs:complexContent>
-            <xs:extension base="dbConnection">
-                <xs:all>
-                    <xs:element name="password" type="xs:string" />
-                </xs:all>
-            </xs:extension>
-        </xs:complexContent>
+        <xs:all>
+            <xs:element name="host" type="xs:anyURI"/>
+            <xs:element name="database" type="xs:string"/>
+            <xs:element name="username" type="xs:string"/>
+            <xs:element name="password" type="xs:string" />
+        </xs:all>
     </xs:complexType>
 
     <xs:complexType name="pages">

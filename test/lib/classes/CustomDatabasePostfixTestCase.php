@@ -9,7 +9,7 @@
 
 class CustomDatabasePostfixTestCase extends CustomDatabaseTestCase{
     public static function setUpBeforeClass(){
-        self::$mysqlOptions = new PostfixMySQLConstantsImpl();
+        self::$mysqlOptions = new MailMySQLConstantsImpl();
         parent::setUpBeforeClass();
     }
 

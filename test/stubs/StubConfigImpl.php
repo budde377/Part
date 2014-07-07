@@ -16,7 +16,10 @@ class StubConfigImpl implements Config
     private $postScripts;
     private $pageElement;
     private $optimizer;
-    private $mysqlCon;
+    private $mysqlConnection;
+    private $mailMysqlConnection;
+
+
     private $defaultPages = array();
     private $logPath;
 
@@ -83,12 +86,12 @@ class StubConfigImpl implements Config
      */
     public function getMySQLConnection()
     {
-        return $this->mysqlCon;
+        return $this->mysqlConnection;
     }
 
-    public function setMysqlCon($mysqlCon)
+    public function setMysqlConnection($mysqlCon)
     {
-        $this->mysqlCon = $mysqlCon;
+        $this->mysqlConnection = $mysqlCon;
     }
 
     public function setOptimizer($optimizer)
@@ -232,4 +235,21 @@ class StubConfigImpl implements Config
     {
         $this->logPath = $logPath;
     }
+
+    /**
+     * @return array | null Array with entries host, user, prefix, database and File setupFile, or null if not specified
+     */
+    public function getMailMySQLConnection()
+    {
+        $this->mailMysqlConnection;
+    }
+
+    /**
+     * @param mixed $mailMysqlConnection
+     */
+    public function setMailMysqlConnection($mailMysqlConnection)
+    {
+        $this->mailMysqlConnection = $mailMysqlConnection;
+    }
+
 }

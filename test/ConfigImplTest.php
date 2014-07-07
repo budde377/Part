@@ -461,6 +461,60 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     }
 
+    public function testGetMailMySQLConnectionWillReturnArrayWithInfoAsInConfigXML()
+    {
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+            <MailMySQLConnection>
+                <host>someHost</host>
+                <database>someDatabase</database>
+                <username>someUser</username>
+            </MailMySQLConnection>
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $connArray = $config->getMailMySQLConnection();
+        $this->assertArrayHasKey('user', $connArray, 'Did not have user entry');
+        $this->assertArrayHasKey('host', $connArray, 'Did not have host entry');
+        $this->assertArrayHasKey('database', $connArray, 'Did not have database entry');
+
+        $this->assertEquals('someHost', $connArray['host'], 'Host was not right');
+        $this->assertEquals('someDatabase', $connArray['database'], 'Host was not right');
+        $this->assertEquals('someUser', $connArray['user'], 'Host was not right');
+
+    }
+
+
+    public function testGetMailMySQLConnectionWillReturnRightArrayAfterReturningMySQL()
+    {
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+            <MySQLConnection>
+                <host>asd</host>
+                <database>asd</database>
+                <username>asd</username>
+                <password>asd</password>
+            </MySQLConnection>
+            <MailMySQLConnection>
+                <host>someHost</host>
+                <database>someDatabase</database>
+                <username>someUser</username>
+            </MailMySQLConnection>
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $config->getMySQLConnection();
+        $connArray = $config->getMailMySQLConnection();
+        $this->assertArrayHasKey('user', $connArray, 'Did not have user entry');
+        $this->assertArrayHasKey('host', $connArray, 'Did not have host entry');
+        $this->assertArrayHasKey('database', $connArray, 'Did not have database entry');
+
+        $this->assertEquals('someHost', $connArray['host'], 'Host was not right');
+        $this->assertEquals('someDatabase', $connArray['database'], 'Host was not right');
+        $this->assertEquals('someUser', $connArray['user'], 'Host was not right');
+
+    }
+
     public function testWillReturnNullIfNotSpecifiedInConfig()
     {
         /** @var $configXML SimpleXMLElement */
