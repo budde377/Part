@@ -6,10 +6,6 @@
                 <field name="database">cms2012testdb</field>
                 <field name="domain">test.dk</field>
             </row>
-            <row>
-                <field name="database">someOtherDb</field>
-                <field name="domain">example.dk</field>
-            </row>
         </table_data>
     </database>
 

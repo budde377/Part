@@ -14,6 +14,9 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase{
     private $db;
     /** @var  MailDomainLibraryImpl */
     private $domainLibrary;
+    private $mailPass;
+    private $databaseName;
+
 
     function __construct()
     {
@@ -29,6 +32,9 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase{
             'database'=>self::$mailMySQLOptions->getDatabase(),
             'host'=>self::$mailMySQLOptions->getHost()
         ));
+        $this->mailPass = self::$mailMySQLOptions->getPassword();
+        $this->databaseName = self::$mailMySQLOptions->getDatabase();
+
         $this->config->setMysqlConnection(array(
             'user'=>self::$mysqlOptions->getUsername(),
             'database'=>self::$mysqlOptions->getDatabase(),
@@ -36,7 +42,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase{
             'password'=>self::$mysqlOptions->getPassword()
         ));
         $this->db = new MySQLDBImpl($this->config);
-        $this->domainLibrary = new MailDomainLibraryImpl($this->db);
+        $this->domainLibrary = new MailDomainLibraryImpl($this->config, $this->db);
     }
 
 
@@ -58,7 +64,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase{
 
     public function testGetDomainWillGetDomain(){
         $d = $this->domainLibrary->getDomain('test.dk');
-        $this->assertInstanceOf('MailDomain', $d);
+        $this->assertInstanceOf('MailDomainImpl', $d);
 
     }
 
@@ -72,5 +78,54 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase{
         $this->assertNull($this->domainLibrary->getDomain('non-existing.dk'));
     }
 
+    public function testGetDomainAndListReusesInstances(){
+        $this->assertTrue($this->domainLibrary->getDomain('test.dk') === $this->domainLibrary->listDomains()['test.dk']);
+    }
+
+    public function testContainsDomainFailsOnDifferentDomain(){
+        $this->assertFalse($this->domainLibrary->containsDomain(new MailDomainImpl('test.dk', $this->databaseName, $this->db, $this->domainLibrary)));
+    }
+
+    public function testContainsReturnsTrueIfContains(){
+        $this->assertTrue($this->domainLibrary->containsDomain($this->domainLibrary->getDomain('test.dk')));
+    }
+
+    public function testCreateDomainCreatesANewDomain(){
+        $d = $this->domainLibrary->createDomain('test2.dk', $this->mailPass);
+        $this->assertTrue($d->exists());
+    }
+
+    public function testCreateDomainReusesInstances(){
+        $d = $this->domainLibrary->createDomain('test.dk', $this->mailPass);
+        $this->assertTrue($this->domainLibrary->getDomain('test.dk') === $d);
+
+    }
+
+    public function testListReusesNewInstances(){
+        $d = $this->domainLibrary->createDomain('test2.dk', $this->mailPass);
+        $this->assertTrue($this->domainLibrary->getDomain('test2.dk') === $d);
+
+    }
+
+
+    public function testDeleteDomainDoesThat(){
+        $d = $this->domainLibrary->getDomain('test.dk');
+        $this->domainLibrary->deleteDomain($d, $this->mailPass);
+        $this->assertFalse($this->domainLibrary->containsDomain($d));
+        $this->assertFalse($d->exists());
+    }
+
+    public function testDeleteDomainEffectsLibrary(){
+        $d = $this->domainLibrary->getDomain('test.dk');
+        $d->delete($this->mailPass);
+        $this->assertFalse($this->domainLibrary->containsDomain($d));
+        $this->assertFalse($d->exists());
+    }
+
+    public function testWillNotDeleteInstancesNotInLibrary(){
+        $d = new MailDomainImpl('test.dk', $this->databaseName, $this->db, $this->domainLibrary);
+        $this->domainLibrary->deleteDomain($d, $this->mailPass);
+        $this->assertTrue($d->exists());
+    }
 
 } 

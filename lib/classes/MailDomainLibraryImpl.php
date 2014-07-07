@@ -1,13 +1,15 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: budde
  * Date: 7/4/14
  * Time: 11:22 PM
  */
+class MailDomainLibraryImpl implements MailDomainLibrary, Observer
+{
 
-class MailDomainLibraryImpl implements MailDomainLibrary{
-
+    private $databaseName;
     private $db;
     /** @var  array */
     private $domainList;
@@ -16,8 +18,9 @@ class MailDomainLibraryImpl implements MailDomainLibrary{
     /** @var  PDO */
     private $connection;
 
-    function __construct(DB $db)
+    function __construct(Config $config, DB $db)
     {
+        $this->databaseName = $config->getMySQLConnection()['database'];
         $this->db = $db;
         $this->connection = $db->getConnection();
     }
@@ -37,12 +40,12 @@ class MailDomainLibraryImpl implements MailDomainLibrary{
     /**
      * Will get and reuse an instance of the domain.
      * @param string $domain The domain name as a string
-     * @return MailDomain
+     * @return MailDomain | null
      */
     public function getDomain($domain)
     {
         $this->setUpList();
-        return isset($this->domainList[$domain])?$this->domainList[$domain]:null;
+        return isset($this->domainList[$domain]) ? $this->domainList[$domain] : null;
     }
 
 
@@ -53,7 +56,15 @@ class MailDomainLibraryImpl implements MailDomainLibrary{
      */
     public function createDomain($domain, $password)
     {
-        // TODO: Implement createDomain() method.
+        $d = $this->getDomain($domain);
+        if ($d == null) {
+            $d = ($this->domainList[$domain] = new MailDomainImpl($domain, $this->databaseName, $this->db, $this));
+            $d->attachObserver($this);
+        }
+
+        $d->create($password);
+
+        return $d;
     }
 
     /**
@@ -64,21 +75,35 @@ class MailDomainLibraryImpl implements MailDomainLibrary{
      */
     public function deleteDomain(MailDomain $domain, $password)
     {
-        // TODO: Implement deleteDomain() method.
+        if (!$this->containsDomain($domain)) {
+            return;
+        }
+
+        if (!$domain->delete($password)) {
+            return;
+        }
+
+
     }
 
     public function onChange(Observable $subject, $changeType)
     {
-        // TODO: Implement onChange() method.
+        if(!($subject instanceof MailDomainImpl) || !$this->containsDomain($subject) || $changeType != MailDomain::EVENT_DELETE){
+            return;
+        }
+
+        unset($this->domainList[$subject->getDomainName()]);
+        $subject->detachObserver($this);
+
     }
 
     private function setUpList()
     {
-        if($this->domainList != null){
+        if ($this->domainList != null) {
             return;
         }
 
-        if($this->listDomainStatement == null){
+        if ($this->listDomainStatement == null) {
             $this->listDomainStatement =
                 $this->connection->prepare("
                 SELECT domain
@@ -86,9 +111,10 @@ class MailDomainLibraryImpl implements MailDomainLibrary{
         }
         $this->listDomainStatement->execute();
         $this->domainList = array();
-        foreach($this->listDomainStatement->fetchAll(PDO::FETCH_ASSOC) as $d){
+        foreach ($this->listDomainStatement->fetchAll(PDO::FETCH_ASSOC) as $d) {
             $domain = $d['domain'];
-            $this->domainList[$domain] = new MailDomainImpl($domain,$this->db, $this);
+            $d = ($this->domainList[$domain] = new MailDomainImpl($domain, $this->databaseName, $this->db, $this));
+            $d->attachObserver($this);
         }
 
 
@@ -101,6 +127,7 @@ class MailDomainLibraryImpl implements MailDomainLibrary{
      */
     public function containsDomain(MailDomain $domain)
     {
-        // TODO: Implement containsDomain() method.
+        $this->setUpList();
+        return isset($this->domainList[$domain->getDomainName()]) && $this->domainList[$domain->getDomainName()] === $domain;
     }
 }
