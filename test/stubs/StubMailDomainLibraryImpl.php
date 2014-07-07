@@ -8,13 +8,23 @@
 
 class StubMailDomainLibraryImpl implements MailDomainLibrary{
 
+    private $listDomains;
+
+    /**
+     * @param mixed $listDomains
+     */
+    public function setDomainList($listDomains)
+    {
+        $this->listDomains = $listDomains;
+    }
+
     /**
      * List the domains in the library as an assoc array
      * @return array An array of PostfixDomain s
      */
     public function listDomains()
     {
-        // TODO: Implement listDomains() method.
+        return $this->listDomains;
     }
 
     /**
@@ -24,7 +34,7 @@ class StubMailDomainLibraryImpl implements MailDomainLibrary{
      */
     public function getDomain($domain)
     {
-        // TODO: Implement getDomain() method.
+        return isset($this->listDomains[$domain])?$this->listDomains[$domain]:null;
     }
 
     /**
@@ -34,7 +44,6 @@ class StubMailDomainLibraryImpl implements MailDomainLibrary{
      */
     public function createDomain($domain, $password)
     {
-        // TODO: Implement createDomain() method.
     }
 
     /**
@@ -45,7 +54,6 @@ class StubMailDomainLibraryImpl implements MailDomainLibrary{
      */
     public function deleteDomain(MailDomain $domain, $password)
     {
-        // TODO: Implement deleteDomain() method.
     }
 
     /**
@@ -55,6 +63,6 @@ class StubMailDomainLibraryImpl implements MailDomainLibrary{
      */
     public function containsDomain(MailDomain $domain)
     {
-        // TODO: Implement containsDomain() method.
+        return isset($this->listDomains[$d = $domain->getDomainName()]) && $this->listDomains[$d] === $domain;
     }
 }

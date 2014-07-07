@@ -1,30 +1,52 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: budde
  * Date: 7/7/14
  * Time: 1:23 PM
  */
+class MailDomainImpl implements MailDomain, Observer
+{
 
-class MailDomainImpl implements MailDomain{
+    private $addressLibrary;
 
     private $domain;
     /** @var  DB */
     private $db;
     private $library;
+    private $database;
 
     private $active = true;
-    private $desc;
+    private $desc = "";
+    /** @var  MailDomain */
     private $aliasTarget;
+    private $createdTime = 0;
+    private $modifiedTime = 0;
 
-    private $setupStatement = false;
-    private $hasBeenSetup;
+    private $setupStatement;
+    private $existsStatement;
+    private $createStatement1;
+    private $createStatement2;
+    private $deleteStatement1;
+    private $deleteStatement2;
+    private $createViewsStatement;
+    private $setupDomainStatement;
+    private $saveChangesStatement;
+    private $saveAliasChangesStatement1;
+    private $saveAliasChangesStatement2;
 
-    function __construct($domain, DB $db, MailDomainLibrary $library)
+    private $hasBeenSetup = false;
+    private $aliasHasBeenSetup = false;
+
+    private $observers = array();
+
+    function __construct($domain, $database, DB $db, MailDomainLibrary $library )
     {
         $this->db = $db;
         $this->domain = $domain;
         $this->library = $library;
+        $this->database = $database;
     }
 
 
@@ -54,7 +76,12 @@ class MailDomainImpl implements MailDomain{
     public function activate()
     {
         $this->setupDomain();
+        if($this->isActive()){
+            return;
+        }
+
         $this->active = true;
+        $this->saveChanges();
     }
 
     /**
@@ -63,7 +90,11 @@ class MailDomainImpl implements MailDomain{
     public function deactivate()
     {
         $this->setupDomain();
+        if(!$this->isActive()){
+            return;
+        }
         $this->active = false;
+        $this->saveChanges();
     }
 
     /**
@@ -83,6 +114,8 @@ class MailDomainImpl implements MailDomain{
     {
         $this->setupDomain();
         $this->desc = $description;
+        $this->saveChanges();
+
     }
 
     /**
@@ -91,7 +124,8 @@ class MailDomainImpl implements MailDomain{
      */
     public function lastModified()
     {
-        // TODO: Implement lastModified() method.
+        $this->setupDomain();
+        return $this->modifiedTime;
     }
 
     /**
@@ -100,7 +134,8 @@ class MailDomainImpl implements MailDomain{
      */
     public function createdAt()
     {
-        // TODO: Implement createdAt() method.
+        $this->setupDomain();
+        return $this->createdTime;
     }
 
     /**
@@ -108,27 +143,106 @@ class MailDomainImpl implements MailDomain{
      */
     public function exists()
     {
-        // TODO: Implement exists() method.
+        if ($this->existsStatement == null) {
+            $this->existsStatement = $this->db->getConnection()->prepare("SELECT * FROM MailDomain WHERE domain = :domain");
+            $this->existsStatement->bindParam('domain', $this->domain);
+        }
+
+        $this->existsStatement->execute();
+        return $this->existsStatement->rowCount() > 0;
     }
 
     /**
      * Creates the domain if it does not exist.
      * @param string $password
-     * @return mixed
+     * @return bool
      */
     public function create($password)
     {
-        // TODO: Implement create() method.
+        if($this->exists()){
+            return true;
+        }
+
+        try{
+            if ($this->createStatement1 == null) {
+                $this->createStatement1 =
+                    $this->db
+                        ->getMailConnection($password)
+                        ->prepare("INSERT INTO DomainAssignment (domain, `database`)
+                    VALUES (:domain, :database)");
+                $this->createStatement1->bindParam('domain', $this->domain);
+                $this->createStatement1->bindParam('database', $this->database);
+            }
+
+            $this->createStatement1->execute();
+
+            $this->createViews($password);
+
+        } catch (PDOException $e){
+            return false;
+        }
+
+
+        if ($this->createStatement2 == null) {
+            $this->createStatement2 =
+                $this->db
+                    ->getConnection()
+                    ->prepare("
+                    INSERT INTO MailDomain (domain, description, created, modified, active)
+                    VALUES (?, ?, NOW(), NOW(), ?)");
+
+        }
+
+        $this->createStatement2->execute(array($this->domain, $this->desc, $this->active?1:0));
+        $this->setupDomain(true);
+        return $this->exists();
     }
 
     /**
      * Deletes the domain.
      * @param string $password
-     * @return void
+     * @return bool
      */
     public function delete($password)
     {
-        // TODO: Implement delete() method.
+
+        if(!$this->exists()){
+            return true;
+        }
+
+        try{
+            if ($this->deleteStatement1 == null) {
+                $this->deleteStatement1 =
+                    $this->db
+                        ->getMailConnection($password)
+                        ->prepare("DELETE FROM DomainAssignment WHERE domain=:domain");
+                $this->deleteStatement1->bindParam('domain', $this->domain);
+            }
+
+            $this->deleteStatement1->execute();
+
+            $this->createViews($password);
+
+        } catch (PDOException $e){
+            return false;
+        }
+
+
+
+        if ($this->deleteStatement2 == null) {
+            $this->deleteStatement2 =
+                $this->db
+                    ->getConnection()
+                    ->prepare("DELETE FROM MailDomain WHERE domain=:domain");
+            $this->deleteStatement2->bindParam('domain', $this->domain);
+
+        }
+
+        $success = $this->deleteStatement2->execute();
+        if($success){
+            $this->callObservers();
+        }
+        return $success;
     }
 
     /**
@@ -136,7 +250,7 @@ class MailDomainImpl implements MailDomain{
      */
     public function getAddressLibrary()
     {
-        // TODO: Implement getAddressLibrary() method.
+        return $this->addressLibrary == null? $this->addressLibrary = new MailAddressLibraryImpl($this, $this->db):$this->addressLibrary;
     }
 
     /**
@@ -144,7 +258,8 @@ class MailDomainImpl implements MailDomain{
      */
     public function isAliasDomain()
     {
-        // TODO: Implement isAliasDomain() method.
+        $this->setupAlias();
+        return $this->aliasTarget != null;
     }
 
     /**
@@ -153,7 +268,19 @@ class MailDomainImpl implements MailDomain{
      */
     public function setAliasTarget(MailDomain $domain)
     {
-        // TODO: Implement setAliasTarget() method.
+        $this->setupAlias();
+        if(!$domain->exists()){
+            return;
+        }
+
+        if(!$this->library->containsDomain($domain)){
+            return;
+        }
+
+        $this->aliasTarget = $domain;
+        $domain->attachObserver($this);
+        $this->saveAliasChanges();
+
     }
 
     /**
@@ -161,7 +288,8 @@ class MailDomainImpl implements MailDomain{
      */
     public function getAliasTarget()
     {
-        // TODO: Implement getAliasTarget() method.
+        $this->setupAlias();
+        return $this->aliasTarget;
     }
 
     /**
@@ -169,36 +297,147 @@ class MailDomainImpl implements MailDomain{
      */
     public function clearAliasTarget()
     {
-        // TODO: Implement clearAliasTarget() method.
+        $this->setupAlias();
+        if($this->aliasTarget == null){
+            return;
+        }
+        $this->aliasTarget->detachObserver($this);
+        $this->aliasTarget = null;
+        $this->saveAliasChanges();
+
+
     }
 
     public function attachObserver(Observer $observer)
     {
-        // TODO: Implement attachObserver() method.
+        $this->observers[] = $observer;
     }
 
     public function detachObserver(Observer $observer)
     {
-        // TODO: Implement detachObserver() method.
+        foreach($this->observers as $k=>$o){
+            if($observer === $o){
+                unset($this->observers[$k]);
+            }
+        }
     }
 
-    private function setupDomain()
+    private function setupDomain($force = false)
     {
-        if($this->hasBeenSetup){
-            return;
+        if ($this->hasBeenSetup && !$force) {
+            return true;
         }
         $this->hasBeenSetup = true;
 
 
-        if($this->setupStatement == null){
+        if ($this->setupStatement == null) {
             $this->setupStatement =
                 $this->db->getConnection()->prepare("SELECT * FROM MailDomain WHERE domain = :domain");
             $this->setupStatement->bindParam('domain', $this->domain, PDO::PARAM_STR);
         }
 
         $this->setupStatement->execute();
+        if ($this->setupStatement->rowCount() == 0) {
+            return false;
+        }
         $result = $this->setupStatement->fetch(PDO::FETCH_ASSOC);
-        $this->active = $result['active'] == 1?true:false;
+        $this->active = $result['active'] == 1 ? true : false;
         $this->desc = $result['description'];
+        $this->modifiedTime = strtotime($result['modified']);
+        $this->createdTime = strtotime($result['created']);
+        return true;
+    }
+
+    /**
+     * @return MailDomainLibrary
+     */
+    public function getDomainLibrary()
+    {
+        return $this->library;
+    }
+
+    public function onChange(Observable $subject, $changeType)
+    {
+        if($subject !== $this->aliasTarget || $changeType != MailDomain::EVENT_DELETE){
+            return;
+        }
+        $this->clearAliasTarget();
+
+    }
+
+    private function callObservers()
+    {
+        foreach($this->observers as $observer){
+            /** @var $observer Observer */
+            $observer->onChange($this, MailDomain::EVENT_DELETE);
+        }
+    }
+
+    private function createViews($password)
+    {
+        if($this->createViewsStatement == null){
+            $this->createViewsStatement = $this->db->getMailConnection($password)->prepare("CALL procCreateViews()");
+        }
+        $this->createViewsStatement->execute();
+    }
+
+    private function setupAlias($force = false)
+    {
+        if($this->aliasHasBeenSetup && !$force){
+            return;
+        }
+        $this->aliasHasBeenSetup = true;
+
+        if($this->setupDomainStatement == null){
+            $this->setupDomainStatement = $this->db->getConnection()->prepare("
+            SELECT target_domain
+            FROM MailDomainAlias
+            WHERE alias_domain = :domain");
+            $this->setupDomainStatement->bindParam('domain', $this->domain);
+        }
+        $this->setupDomainStatement->execute();
+        if($this->setupDomainStatement->rowCount() == 0){
+            return;
+        }
+
+        $result = $this->setupDomainStatement->fetch(PDO::FETCH_NUM);
+        $this->aliasTarget = $this->library->getDomain($result[0]);
+
+
+    }
+
+    private function saveChanges()
+    {
+        if(!$this->exists()){
+            return;
+        }
+        if($this->saveChangesStatement == null){
+            $this->saveChangesStatement =
+                $this->db->getConnection()->prepare("UPDATE MailDomain SET active = ?, description= ?, modified = NOW() WHERE `domain`= ?");
+        }
+
+        $this->saveChangesStatement->execute(array($this->active?1:0, $this->desc, $this->domain));
+        $this->setupDomain(true);
+
+    }
+
+    private function saveAliasChanges()
+    {
+        if(!$this->isAliasDomain()){
+            if($this->saveAliasChangesStatement1 == null){
+                $this->saveAliasChangesStatement1 = $this->db->getConnection()->prepare("DELETE FROM MailDomainAlias WHERE alias_domain = :domain");
+                $this->saveAliasChangesStatement1->bindParam('domain', $this->domain);
+            }
+
+            $this->saveAliasChangesStatement1->execute();
+        } else {
+            if($this->saveAliasChangesStatement2 == null){
+                $this->saveAliasChangesStatement2 = $this->db->getConnection()->prepare("
+                INSERT INTO MailDomainAlias (alias_domain, target_domain, created, modified)
+                VALUES (?,?,NOW(), NOW()) ON DUPLICATE KEY UPDATE target_domain = ?, modified = NOW()");
+            }
+
+            $this->saveAliasChangesStatement2->execute(array($this->domain, $this->aliasTarget->getDomainName(), $this->aliasTarget->getDomainName()));
+        }
     }
 }

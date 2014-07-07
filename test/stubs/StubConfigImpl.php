@@ -241,7 +241,7 @@ class StubConfigImpl implements Config
      */
     public function getMailMySQLConnection()
     {
-        $this->mailMysqlConnection;
+        return $this->mailMysqlConnection;
     }
 
     /**

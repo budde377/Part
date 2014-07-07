@@ -65,14 +65,14 @@ interface MailDomain extends Observable{
     /**
      * Creates the domain if it does not exist.
      * @param string $password
-     * @return mixed
+     * @return bool
      */
     public function create($password);
 
     /**
      * Deletes the domain.
      * @param string $password
-     * @return void
+     * @return bool
      */
     public function delete($password);
 
@@ -102,6 +102,12 @@ interface MailDomain extends Observable{
      * @return void
      */
     public function clearAliasTarget();
+
+
+    /**
+     * @return MailDomainLibrary
+     */
+    public function getDomainLibrary();
 
 
 }

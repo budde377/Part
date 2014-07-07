@@ -1,3 +1,4 @@
+
 DROP PROCEDURE IF EXISTS procPrepareAndCreateView;
 DELIMITER &&
 CREATE PROCEDURE procPrepareAndCreateView(IN _name VARCHAR(255), IN _string LONGTEXT)
@@ -37,6 +38,46 @@ CREATE PROCEDURE procCreateUnionIfNotEmpty(INOUT _string LONGTEXT)
   END&&
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS procCreateEmptyPseudoAlias;
+DELIMITER &&
+CREATE PROCEDURE procCreateEmptyPseudoAlias(IN _name VARCHAR(255))
+  BEGIN
+    CALL procPrepareAndCreateView(_name, 'SELECT domain AS user, domain AS name, domain, domain AS target FROM DomainAssignment WHERE 1 = 2');
+  END&&
+DELIMITER ;
+
+
+DROP PROCEDURE IF EXISTS procCreateEmptyPseudoDomainAlias;
+DELIMITER &&
+CREATE PROCEDURE procCreateEmptyPseudoDomainAlias(IN _name VARCHAR(255))
+  BEGIN
+    CALL procPrepareAndCreateView(_name, 'SELECT domain AS alias_domain, domain AS target_domain FROM DomainAssignment WHERE 1 = 2');
+  END&&
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS procCreateEmptyPseudoMail;
+DELIMITER &&
+CREATE PROCEDURE procCreateEmptyPseudoMail(IN _name VARCHAR(255))
+  BEGIN
+    CALL procPrepareAndCreateView(_name, 'SELECT domain AS user, domain AS name, domain, domain AS mailDir FROM DomainAssignment WHERE 1 = 2');
+  END&&
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS procCreateEmptyPseudoMailLogin;
+DELIMITER &&
+CREATE PROCEDURE procCreateEmptyPseudoMailLogin(IN _name VARCHAR(255))
+  BEGIN
+    CALL procPrepareAndCreateView(_name, 'SELECT domain AS user, domain AS password, domain AS name, domain AS mailDir FROM DomainAssignment WHERE 1 = 2');
+  END&&
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS procCreateEmptyPseudoDomain;
+DELIMITER &&
+CREATE PROCEDURE procCreateEmptyPseudoDomain(IN _name VARCHAR(255))
+  BEGIN
+    CALL procPrepareAndCreateView(_name, 'SELECT domain FROM DomainAssignment WHERE 1 = 2');
+  END&&
+DELIMITER ;
 
 DROP PROCEDURE IF EXISTS procCreateMailboxViewString;
 DELIMITER &&
@@ -79,7 +120,8 @@ DELIMITER ;
 
 DROP PROCEDURE IF EXISTS procCreateAliasNonGroupedViewString;
 DELIMITER &&
-CREATE PROCEDURE procCreateAliasNonGroupedViewString(IN _dbname VARCHAR(255), IN _domain VARCHAR(255), INOUT _string LONGTEXT)
+CREATE PROCEDURE procCreateAliasNonGroupedViewString(IN _dbname VARCHAR(255), IN _domain VARCHAR(255),
+  INOUT                                                 _string LONGTEXT)
   BEGIN
     CALL procCreateUnionAllIfNotEmpty(_string);
     SET _string = CONCAT(_string,
@@ -105,7 +147,7 @@ CREATE PROCEDURE procCreateDomainAliasViewString(IN _dbname VARCHAR(255), INOUT 
     SET _string = CONCAT(_string,
                          'SELECT _dal.alias_domain, _dal.target_domain FROM ', _dbname,
                          '.MailDomainAlias AS _dal, DomainAssignment AS _das1, DomainAssignment AS _das2 WHERE _dal.alias_domain = _das1.domain AND _dal.target_domain = _das2.domain AND _das1.database = _das2.database AND _das1.database = \'',
-                         _dbname, '\' AND _dal.active = 1 ');
+                         _dbname, '\'');
 
   END&&
 DELIMITER ;
@@ -117,12 +159,18 @@ CREATE PROCEDURE procCreateDomainAliasMailboxAndAliasView()
   BEGIN
     DROP VIEW IF EXISTS AliasView;
     CREATE VIEW AliasView AS
-        SELECT user,name,domain, GROUP_CONCAT(target) AS target FROM AliasNonGroupedView GROUP BY user;
+      SELECT
+        user,
+        name,
+        domain,
+        GROUP_CONCAT(target) AS target
+      FROM AliasNonGroupedView
+      GROUP BY user;
 
     DROP VIEW IF EXISTS DomainAliasMailboxView;
     CREATE VIEW DomainAliasMailboxView AS
       SELECT
-        CONCAT(_m.name,'@', _da.alias_domain) as user,
+        CONCAT(_m.name, '@', _da.alias_domain)  AS user,
         _m.name,
         _da.alias_domain                        AS domain,
         CONCAT(_m.name, '@', _da.target_domain) AS target
@@ -132,9 +180,9 @@ CREATE PROCEDURE procCreateDomainAliasMailboxAndAliasView()
     DROP VIEW IF EXISTS DomainAliasAliasView;
     CREATE VIEW DomainAliasAliasView AS
       SELECT
-        CONCAT(_a.name,'@', _da.alias_domain) as user,
+        CONCAT(_a.name, '@', _da.alias_domain) AS user,
         _a.name,
-        _da.alias_domain AS domain,
+        _da.alias_domain                       AS domain,
         _a.target
       FROM DomainAliasView AS _da, AliasView AS _a;
 
@@ -155,7 +203,6 @@ CREATE PROCEDURE procCreateViews()
     DECLARE _domainViewString LONGTEXT DEFAULT '';
     DECLARE _aliasViewString LONGTEXT DEFAULT '';
     DECLARE _domainAliasViewString LONGTEXT DEFAULT '';
-
     DECLARE cur CURSOR FOR SELECT DISTINCT
                              `database`
                            FROM DomainAssignment;
@@ -166,44 +213,58 @@ CREATE PROCEDURE procCreateViews()
                             FROM DomainAssignment;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done := TRUE;
 
-    OPEN cur;
-    testLoop: LOOP
-      FETCH cur
-      INTO _dbname;
-      IF done
-      THEN
-        LEAVE testLoop;
-      END IF;
-      CALL procCreateDomainAliasViewString(_dbname, _domainAliasViewString);
-    END LOOP testLoop;
+    IF (SELECT
+          COUNT(domain)
+        FROM DomainAssignment) = 0
+    THEN
+      CALL procCreateEmptyPseudoMail('MailboxView');
+      CALL procCreateEmptyPseudoMailLogin('MailboxLoginView');
+      CALL procCreateEmptyPseudoDomain('DomainView');
+      CALL procCreateEmptyPseudoAlias('AliasNonGroupedView');
+      CALL procCreateEmptyPseudoDomainAlias('DomainAliasView');
 
-    CLOSE cur;
+    ELSE
 
-    SET done = FALSE;
 
-    OPEN cur2;
-    testLoop2: LOOP
-      FETCH cur2
-      INTO _dbname, _domain;
-      IF done
-      THEN
-        LEAVE testLoop2;
-      END IF;
-      CALL procCreateMailboxViewString(_dbname, _domain, _mailboxViewString);
-      CALL procCreateMailboxLoginViewString(_dbname, _domain, _mailboxLoginViewString);
-      CALL procCreateDomainViewString(_dbname, _domain, _domainViewString);
-      CALL procCreateAliasNonGroupedViewString(_dbname, _domain, _aliasViewString);
+      OPEN cur;
+      testLoop: LOOP
+        FETCH cur
+        INTO _dbname;
+        IF done
+        THEN
+          LEAVE testLoop;
+        END IF;
+        CALL procCreateDomainAliasViewString(_dbname, _domainAliasViewString);
+      END LOOP testLoop;
 
-    END LOOP testLoop2;
+      CLOSE cur;
 
-    CLOSE cur2;
+      SET done = FALSE;
 
-    CALL procPrepareAndCreateView('MailboxView', _mailboxViewString);
-    CALL procPrepareAndCreateView('MailboxLoginView', _mailboxLoginViewString);
-    CALL procPrepareAndCreateView('DomainView', _domainViewString);
-    CALL procPrepareAndCreateView('AliasNonGroupedView', _aliasViewString);
-    CALL procPrepareAndCreateView('DomainAliasView', _domainAliasViewString);
+      OPEN cur2;
+      testLoop2: LOOP
+        FETCH cur2
+        INTO _dbname, _domain;
+        IF done
+        THEN
+          LEAVE testLoop2;
+        END IF;
+        CALL procCreateMailboxViewString(_dbname, _domain, _mailboxViewString);
+        CALL procCreateMailboxLoginViewString(_dbname, _domain, _mailboxLoginViewString);
+        CALL procCreateDomainViewString(_dbname, _domain, _domainViewString);
+        CALL procCreateAliasNonGroupedViewString(_dbname, _domain, _aliasViewString);
 
+      END LOOP testLoop2;
+
+      CLOSE cur2;
+
+      CALL procPrepareAndCreateView('MailboxView', _mailboxViewString);
+      CALL procPrepareAndCreateView('MailboxLoginView', _mailboxLoginViewString);
+      CALL procPrepareAndCreateView('DomainView', _domainViewString);
+      CALL procPrepareAndCreateView('AliasNonGroupedView', _aliasViewString);
+      CALL procPrepareAndCreateView('DomainAliasView', _domainAliasViewString);
+
+    END IF;
     CALL procCreateDomainAliasMailboxAndAliasView();
 
   END &&
