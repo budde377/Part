@@ -18,7 +18,7 @@ class StubDBImpl implements DB
     private $mailConnection;
 
     /**
-     * @param mixed $mailConnection
+     * @param PDO $mailConnection
      */
     public function setMailConnection($mailConnection)
     {

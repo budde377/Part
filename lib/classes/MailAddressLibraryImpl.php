@@ -10,19 +10,20 @@ class MailAddressLibraryImpl implements MailAddressLibrary{
 
     private $db;
     private $domain;
+    private $domainLibrary;
 
-    function __construct(MailDomain $domain, DB $db)
+    function __construct(MailDomain $domain, MailDomainLibrary $domainLibrary, DB $db)
     {
         $this->db = $db;
         $this->domain = $domain;
+        $this->domainLibrary = $domainLibrary;
     }
 
 
     /**
-     * @param int $mode Decides which will be listed (alias, mailbox or both)
      * @return array An array containing selected entries.
      */
-    public function listAddresses($mode = MailAddressLibrary::LIST_MODE_ALL)
+    public function listAddresses()
     {
         // TODO: Implement listAddresses() method.
     }
@@ -47,47 +48,6 @@ class MailAddressLibraryImpl implements MailAddressLibrary{
     }
 
     /**
-     * Gets a alias from the given address. Null if not found.
-     * @param string $address
-     * @return MailAlias
-     */
-    public function getAlias($address)
-    {
-        // TODO: Implement getAlias() method.
-    }
-
-    /**
-     * Gets a mailbox from the given address. Null if not found.
-     * @param string $address
-     * @return MailMailbox
-     */
-    public function getMailbox($address)
-    {
-        // TODO: Implement getMailbox() method.
-    }
-
-    /**
-     * Creates an Alias.
-     * @param string $address
-     * @param array $targets
-     * @return MailAlias
-     */
-    public function createAlias($address, array $targets)
-    {
-        // TODO: Implement createAlias() method.
-    }
-
-    /**
-     * Creates an mailbox.
-     * @param string $address
-     * @return MailAddress
-     */
-    public function createMailbox($address)
-    {
-        // TODO: Implement createMailbox() method.
-    }
-
-    /**
      * Deletes an address. It must be an instance in the library.
      * @param MailAddress $address
      * @return void
@@ -107,35 +67,43 @@ class MailAddressLibraryImpl implements MailAddressLibrary{
     }
 
     /**
-     * @return MailAlias
+     * @return MailAddress
      */
-    public function getCatchallAlias()
+    public function getCatchallAddress()
     {
-        // TODO: Implement getCatchallAlias() method.
+        // TODO: Implement getCatchallAddress() method.
     }
 
     /**
      * @param array $targets
-     * @return MailAlias
+     * @return MailAddress
      */
-    public function createCatchallAlias(array $targets)
+    public function createCatchallAddress(array $targets)
     {
-        // TODO: Implement createCatchallAlias() method.
+        // TODO: Implement createCatchallAddress() method.
     }
 
     /**
      * @return void
      */
-    public function deleteCatchallAlias()
+    public function deleteCatchallAddress()
     {
-        // TODO: Implement deleteCatchallAlias() method.
+        // TODO: Implement deleteCatchallAddress() method.
     }
 
     /**
      * @return bool
      */
-    public function hasCatchallAlias()
+    public function hasCatchallAddress()
     {
-        // TODO: Implement hasCatchallAlias() method.
+        // TODO: Implement hasCatchallAddress() method.
+    }
+
+    /**
+     * @return MailDomainLibrary
+     */
+    public function getDomainLibrary()
+    {
+        return $this->domainLibrary;
     }
 }

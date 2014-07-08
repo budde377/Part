@@ -250,7 +250,7 @@ class MailDomainImpl implements MailDomain, Observer
      */
     public function getAddressLibrary()
     {
-        return $this->addressLibrary == null? $this->addressLibrary = new MailAddressLibraryImpl($this, $this->db):$this->addressLibrary;
+        return $this->addressLibrary == null? $this->addressLibrary = new MailAddressLibraryImpl($this, $this->getDomainLibrary(), $this->db):$this->addressLibrary;
     }
 
     /**

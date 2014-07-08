@@ -8,15 +8,10 @@
 
 interface MailAddressLibrary {
 
-    const LIST_MODE_ALL = 1;
-    const LIST_MODE_ALIAS = 2;
-    const LIST_MODE_MAILBOX = 3;
-
     /**
-     * @param int $mode Decides which will be listed (alias, mailbox or both)
      * @return array An array containing selected entries.
      */
-    public function listAddresses($mode = MailAddressLibrary::LIST_MODE_ALL);
+    public function listAddresses();
 
     /**
      * @param string $address
@@ -31,34 +26,7 @@ interface MailAddressLibrary {
      */
     public function getAddress($address);
 
-    /**
-     * Gets a alias from the given address. Null if not found.
-     * @param string $address
-     * @return MailAlias
-     */
-    public function getAlias($address);
 
-    /**
-     * Gets a mailbox from the given address. Null if not found.
-     * @param string $address
-     * @return MailMailbox
-     */
-    public function getMailbox($address);
-
-    /**
-     * Creates an Alias.
-     * @param string $address
-     * @param array $targets
-     * @return MailAlias
-     */
-    public function createAlias($address, array $targets);
-
-    /**
-     * Creates an mailbox.
-     * @param string $address
-     * @return MailAddress
-     */
-    public function createMailbox($address);
 
     /**
      * Deletes an address. It must be an instance in the library.
@@ -67,6 +35,7 @@ interface MailAddressLibrary {
      */
     public function deleteAddress(MailAddress $address);
 
+
     /**
      * Returns the domain associated with the address.
      * @return MailDomain
@@ -74,23 +43,30 @@ interface MailAddressLibrary {
     public function getDomain();
 
     /**
-     * @return MailAlias
+     * @return MailAddress
      */
-    public function getCatchallAlias();
+    public function getCatchallAddress();
 
     /**
      * @param array $targets
-     * @return MailAlias
+     * @return MailAddress
      */
-    public function createCatchallAlias(array $targets);
+    public function createCatchallAddress(array $targets);
 
     /**
      * @return void
      */
-    public function deleteCatchallAlias();
+    public function deleteCatchallAddress();
 
     /**
      * @return bool
      */
-    public function hasCatchallAlias();
+    public function hasCatchallAddress();
+
+
+    /**
+     * @return MailDomainLibrary
+     */
+    public function getDomainLibrary();
+
 }

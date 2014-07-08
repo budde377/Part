@@ -330,6 +330,14 @@ class MailDomainImplTest extends CustomDatabaseTestCase{
         $this->assertTrue($this->domain->getAddressLibrary() === $this->domain->getAddressLibrary());
     }
 
+    public function testGetAddressWillReuseInstanceOfDomain(){
+        $this->assertTrue($this->domain->getAddressLibrary()->getDomain() === $this->domain);
+    }
+
+    public function testGetAddressWillReuseInstanceOfDomainLibrary(){
+        $this->assertTrue($this->domain->getAddressLibrary()->getDomainLibrary() === $this->domainLib);
+    }
+
 
 
     /**

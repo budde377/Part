@@ -6,7 +6,9 @@
  * Time: 2:13 PM
  */
 
-interface MailMailbox extends MailAddress{
+interface MailMailbox extends Observable{
+
+    const EVENT_DELETE = 1;
 
     /**
      * Sets the owners name of the mailbox
@@ -27,4 +29,48 @@ interface MailMailbox extends MailAddress{
      */
     public function setPassword($password);
 
-} 
+    /**
+     * Checks if the password matches the stored password.
+     * @param string $password
+     * @return bool
+     */
+    public function checkPassword($password);
+
+    /**
+     * Deletes the mailbox
+     * @return bool
+     */
+    public function delete();
+
+    /**
+     * @return bool
+     */
+    public function exists();
+
+    /**
+     * Creates the mailbox
+     * @return bool
+     */
+    public function create();
+
+    /**
+     * @return MailAddress
+     */
+    public function getAddress();
+
+    /**
+     * @return MailAddressLibrary
+     */
+    public function getAddressLibrary();
+
+    /**
+     * @return MailDomain
+     */
+    public function getDomain();
+
+    /**
+     * @return MailDomainLibrary
+     */
+    public function getDomainLibrary();
+
+}

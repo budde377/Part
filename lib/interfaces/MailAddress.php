@@ -23,18 +23,6 @@ interface MailAddress {
     public function setAddress($address);
 
     /**
-     * Indicates if the address is a mailbox
-     * @return bool
-     */
-    public function isMailbox();
-
-    /**
-     * Indicates if the address is an alias
-     * @return bool
-     */
-    public function isAlias();
-
-    /**
      * Indicates if the address is active
      * @return bool
      */
@@ -78,6 +66,12 @@ interface MailAddress {
 
 
     /**
+     * @return MailAddressLibrary
+     */
+    public function getAddressLibrary();
+
+
+    /**
      * @return void
      */
     public function activate();
@@ -86,4 +80,63 @@ interface MailAddress {
      * @return void
      */
     public function deactivate();
-} 
+
+
+    /**
+     * @return array An array of strings containing targets. This should be a numeric array.
+     */
+    public function getTargets();
+
+    /**
+     * Adds an target if it doesn't exists
+     * @param string $address
+     * @return void
+     */
+    public function addTarget($address);
+
+    /**
+     * Removes a target if exists.
+     * @param string $address
+     * @return void
+     */
+    public function removeTarget($address);
+
+    /**
+     * Removes all targets.
+     * @return void
+     */
+    public function clearTargets();
+
+
+    /**
+     * Will return a mailbox, if there is any. If not it will return NULL
+     * @return MailMailbox | null
+     */
+    public function getMailbox();
+
+    /**
+     * @return bool
+     */
+    public function hasMailbox();
+
+    /**
+     * Creates a new mailbox if it doesn't have one, else it returns the instance.
+     * @param string $name
+     * @param string $password
+     * @return MailMailbox
+     */
+    public function createMailbox($name, $password);
+
+    /**
+     * Removes the mailbox.
+     * @return void
+     */
+    public function deleteMailbox();
+
+
+    /**
+     * @return MailDomainLibrary
+     */
+    public function getDomainLibrary();
+
+}

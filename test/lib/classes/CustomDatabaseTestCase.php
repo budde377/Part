@@ -48,7 +48,7 @@ class CustomDatabaseTestCase extends PHPUnit_Extensions_Database_TestCase{
     public function getSetUpOperation()
     {
         $cascadeTruncates = true;
-        return new PHPUnit_Extensions_Database_Operation_Composite(array(new TruncateOperation($cascadeTruncates), PHPUnit_Extensions_Database_Operation_Factory::INSERT()));
+        return new PHPUnit_Extensions_Database_Operation_Composite(array(new TruncateOperation($cascadeTruncates), new InsertOperation($cascadeTruncates)));
     }
 
 
