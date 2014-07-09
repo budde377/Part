@@ -6,17 +6,21 @@
  * Time: 11:17 PM
  */
 
-class MailAddressLibraryImpl implements MailAddressLibrary{
+class MailAddressLibraryImpl implements MailAddressLibrary, Observer{
 
     private $db;
     private $domain;
-    private $domainLibrary;
+    private $addressList;
+    private $domainName;
 
-    function __construct(MailDomain $domain, MailDomainLibrary $domainLibrary, DB $db)
+    private $setupStatement;
+
+    function __construct(MailDomain $domain, DB $db)
     {
         $this->db = $db;
         $this->domain = $domain;
-        $this->domainLibrary = $domainLibrary;
+        $this->domainName = $domain->getDomainName();
+
     }
 
 
@@ -25,26 +29,43 @@ class MailAddressLibraryImpl implements MailAddressLibrary{
      */
     public function listAddresses()
     {
-        // TODO: Implement listAddresses() method.
+        $this->setUpLibrary();
+        $a = array();
+        foreach($this->addressList as $k=>$v){
+            if($k == ""){
+                continue;
+            }
+            $a[$k] = $v;
+        }
+        return $a;
     }
 
     /**
-     * @param string $address
+     * @param string $localPart
      * @return bool
      */
-    public function hasAddress($address)
+    public function hasAddress($localPart)
     {
-        // TODO: Implement hasAddress() method.
+        $this->setUpLibrary();
+        return isset($this->addressList[trim($localPart)]);
     }
 
     /**
      * Gets a address from the given address. Null if not found.
-     * @param string $address
+     * @param string $localPart
      * @return MailAddress
      */
-    public function getAddress($address)
+    public function getAddress($localPart)
     {
-        // TODO: Implement getAddress() method.
+        $localPart = trim($localPart);
+
+        if($localPart == ''){
+            return null;
+        }
+
+        $this->setUpLibrary();
+        return isset($this->addressList[$localPart])?$this->addressList[$localPart]:null;
+
     }
 
     /**
@@ -54,7 +75,26 @@ class MailAddressLibraryImpl implements MailAddressLibrary{
      */
     public function deleteAddress(MailAddress $address)
     {
-        // TODO: Implement deleteAddress() method.
+        if(!$this->contains($address)){
+            return;
+        }
+
+        $address->delete();
+    }
+
+    /**
+     * @param string $localPart
+     * @return MailAddress
+     */
+    public function createAddress($localPart)
+    {
+        if($this->hasAddress($localPart)){
+            return $this->getAddress($localPart);
+        }
+        $a = new MailAddressImpl($localPart, $this->db, $this);
+        $a->create();
+        $this->addInstance($a);
+        return $a;
     }
 
     /**
@@ -71,16 +111,20 @@ class MailAddressLibraryImpl implements MailAddressLibrary{
      */
     public function getCatchallAddress()
     {
-        // TODO: Implement getCatchallAddress() method.
+        return $this->hasCatchallAddress()?$this->addressList['']:null;
     }
 
     /**
-     * @param array $targets
      * @return MailAddress
      */
-    public function createCatchallAddress(array $targets)
+    public function createCatchallAddress()
     {
-        // TODO: Implement createCatchallAddress() method.
+        if($this->hasCatchallAddress()){
+            return;
+        }
+        $address = new MailAddressImpl('', $this->db, $this);
+        $address->create();
+        $this->addInstance($address);
     }
 
     /**
@@ -88,7 +132,11 @@ class MailAddressLibraryImpl implements MailAddressLibrary{
      */
     public function deleteCatchallAddress()
     {
-        // TODO: Implement deleteCatchallAddress() method.
+        if(!$this->hasCatchallAddress()){
+            return;
+        }
+
+        $this->getCatchallAddress()->delete();
     }
 
     /**
@@ -96,7 +144,8 @@ class MailAddressLibraryImpl implements MailAddressLibrary{
      */
     public function hasCatchallAddress()
     {
-        // TODO: Implement hasCatchallAddress() method.
+        $this->setUpLibrary();
+        return isset($this->addressList['']);
     }
 
     /**
@@ -104,6 +153,65 @@ class MailAddressLibraryImpl implements MailAddressLibrary{
      */
     public function getDomainLibrary()
     {
-        return $this->domainLibrary;
+        return $this->domain->getDomainLibrary();
+    }
+
+    private function setUpLibrary($force = false)
+    {
+        if($this->addressList != null && !$force){
+            return;
+        }
+
+        $this->addressList = array();
+
+        if($this->setupStatement == null){
+            $this->setupStatement = $this->db->getConnection()->prepare("
+            SELECT name
+            FROM MailAddress
+            WHERE
+            (mailbox_id IS NULL OR (SELECT COUNT(id) FROM MailMailbox WHERE mailbox_id = id AND MailAddress.id = secondary_address_id) > 0 )
+            AND domain = :domain ");
+            $this->setupStatement->bindParam('domain', $this->domainName);
+        }
+
+        $this->setupStatement->execute();
+
+        foreach($this->setupStatement->fetchAll(PDO::FETCH_ASSOC) as $row){
+            $a = new MailAddressImpl($row['name'], $this->db, $this);
+            $this->addInstance($a);
+        }
+
+    }
+
+    /**
+     * @param MailAddress $address
+     * @return bool
+     */
+    public function contains(MailAddress $address)
+    {
+        return $this->hasAddress($l = $address->getLocalPart()) && $this->getAddress($l) === $address;
+    }
+
+    private function addInstance(MailAddressImpl $instance)
+    {
+        $this->addressList[$instance->getLocalPart()] = $instance;
+        $instance->attachObserver($this);
+    }
+
+    public function onChange(Observable $subject, $changeType)
+    {
+        if(!($subject instanceof MailAddress) || !$this->contains($subject)){
+        }
+
+        if($changeType == MailAddress::EVENT_DELETE){
+            unset($this->addressList[$subject->getLocalPart()]);
+            $subject->detachObserver($this);
+        }
+
+        if($changeType == MailAddress::EVENT_CHANGE_LOCAL_PART){
+            $oldKey = array_search($subject, $this->addressList, true);
+            $this->addressList[$subject->getLocalPart()] = $this->addressList[$oldKey];
+            unset($this->addressList[$oldKey]);
+        }
     }
 }

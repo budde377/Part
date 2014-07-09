@@ -49,7 +49,7 @@ interface MailMailbox extends Observable{
 
     /**
      * Creates the mailbox
-     * @return bool
+     * @return void
      */
     public function create();
 
@@ -73,4 +73,15 @@ interface MailMailbox extends Observable{
      */
     public function getDomainLibrary();
 
+
+    /**
+     * @return int
+     */
+    public function lastModified();
+
+
+    /**
+     * @return int
+     */
+    public function createdAt();
 }

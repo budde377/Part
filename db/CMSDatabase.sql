@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Vært: localhost
--- Genereringstid: 07. 07 2014 kl. 10:47:27
+-- Genereringstid: 09. 07 2014 kl. 13:24:55
 -- Serverversion: 5.5.35
 -- PHP-version: 5.5.14-1+deb.sury.org~precise+1
 
@@ -72,9 +72,7 @@ CREATE TABLE IF NOT EXISTS `MailDomainAlias` (
   `target_domain` varchar(255) NOT NULL,
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`alias_domain`),
-  KEY `active` (`active`),
   KEY `target_domain` (`target_domain`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Postfix Admin - Domain Aliases';
 
@@ -93,8 +91,8 @@ CREATE TABLE IF NOT EXISTS `MailMailbox` (
   `modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `id` varchar(255) NOT NULL,
   UNIQUE KEY `id` (`id`),
-  KEY `primary_address_id` (`primary_address_id`),
-  KEY `secondary_address_id` (`secondary_address_id`)
+  UNIQUE KEY `primary_address_id` (`primary_address_id`),
+  UNIQUE KEY `secondary_address_id` (`secondary_address_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Postfix Admin - Virtual Mailboxes';
 
 --
