@@ -10,7 +10,6 @@ class UserImpl implements User, Observable
 {
     use RequestTrait;
     use ValidationTrait;
-    private static $randomString = 'S6lmSif7i3gmoyPqoAoW';
 
     private $database;
     private $connection;
@@ -164,7 +163,7 @@ class UserImpl implements User, Observable
      */
     public function verifyLogin($password)
     {
-        return $this->getPassword() == $this->hashPassword($password);
+        return password_verify($password, $this->getPassword());
     }
 
     /**
@@ -329,8 +328,7 @@ class UserImpl implements User, Observable
 
     private function hashPassword($password)
     {
-        $salt = '$2a$07$' . self::$randomString . $this->getId() . '$';
-        return crypt($password, $salt);
+        return password_hash($password, PASSWORD_DEFAULT);
     }
 
     public function attachObserver(Observer $observer)
