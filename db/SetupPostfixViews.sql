@@ -85,7 +85,7 @@ CREATE PROCEDURE procCreateMailboxViewString(IN _dbname VARCHAR(255), IN _domain
   BEGIN
     CALL procCreateUnionAllIfNotEmpty(_string);
     SET _string = CONCAT(_string,
-                         'SELECT CONCAT(_ma.name,\'@\', _ma.domain) as user,_ma.name, _ma.domain, CONCAT(_ma.domain,\'/\',_ma.name,\'/\') AS mailDir FROM ',
+                         'SELECT CONCAT(_ma.name,\'@\', _ma.domain) as user,_ma.name, _ma.domain, LOWER(CONCAT(_ma.domain,\'/\',_ma.name,\'/\')) AS mailDir FROM ',
                          _dbname, '.MailMailbox AS _mb , ', _dbname,
                          '.MailAddress AS _ma WHERE _mb.primary_address_id = _ma.id AND _ma.domain = \'', _domain,
                          '\' AND _ma.active = 1');
@@ -99,7 +99,7 @@ CREATE PROCEDURE procCreateMailboxLoginViewString(IN _dbname VARCHAR(255), IN _d
   BEGIN
     CALL procCreateUnionAllIfNotEmpty(_string);
     SET _string = CONCAT(_string,
-                         'SELECT CONCAT(_ma.name,\'@\', _ma.domain) as user, _mb.password, _mb.name , CONCAT(_ma.domain,\'/\',_ma2.name,\'/\') AS mailDir FROM ',
+                         'SELECT CONCAT(_ma.name,\'@\', _ma.domain) as user, _mb.password, _mb.name , LOWER(CONCAT(_ma.domain,\'/\',_ma2.name,\'/\')) AS mailDir FROM ',
                          _dbname, '.MailMailbox AS _mb , ', _dbname, '.MailAddress AS _ma,', _dbname,
                          '.MailAddress AS _ma2  WHERE (_mb.primary_address_id = _ma.id OR _mb.secondary_address_id = _ma.id ) AND _ma.domain = \'',
                          _domain, '\' AND _ma2.domain = \'', _domain,
