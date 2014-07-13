@@ -8,6 +8,35 @@
 
 class MailMailboxImpl implements MailMailbox{
 
+
+    use EncryptionTrait;
+
+    private $observerLibrary;
+
+    private $address;
+    private $db;
+
+    private $name = '';
+    private $password;
+
+    private $hasBeenSetup = false;
+    /** @var  PDOStatement */
+    private $existsStatement;
+    private $deleteStatement;
+    private $createStatement1;
+    private $createStatement2;
+    private $created = 0;
+    private $modified = 0;
+    private $saveChangesStatement;
+
+    function __construct(MailAddress $address, DB $db)
+    {
+        $this->observerLibrary = new ObserverLibraryImpl($this);
+        $this->address = $address;
+        $this->db = $db;
+    }
+
+
     /**
      * Sets the owners name of the mailbox
      * @param string $name
@@ -15,7 +44,9 @@ class MailMailboxImpl implements MailMailbox{
      */
     public function setName($name)
     {
-        // TODO: Implement setName() method.
+        $this->setUp();
+        $this->name = trim($name);
+        $this->saveChanges();
     }
 
     /**
@@ -23,7 +54,8 @@ class MailMailboxImpl implements MailMailbox{
      */
     public function getName()
     {
-        // TODO: Implement getName() method.
+        $this->setUp();
+        return $this->name;
     }
 
     /**
@@ -33,16 +65,31 @@ class MailMailboxImpl implements MailMailbox{
      */
     public function setPassword($password)
     {
-        // TODO: Implement setPassword() method.
+        $password = trim($password);
+
+        if($password == ""){
+            return;
+        }
+
+        $this->setUp();
+
+        $this->password = crypt($password, "$1$".$this->generateMtRandomString()."$");
+        $this->saveChanges();
+
     }
 
     /**
      * Deletes the mailbox
-     * @return bool
+     * @return void
      */
     public function delete()
     {
-        // TODO: Implement delete() method.
+        if($this->deleteStatement == null){
+            $this->deleteStatement = $this->db->getConnection()->prepare("DELETE FROM MailMailbox WHERE secondary_address_id = :id ");
+
+        }
+        $this->deleteStatement->execute(array(':id'=>$this->address->getId()));
+        $this->observerLibrary->callObservers(MailMailbox::EVENT_DELETE);
     }
 
     /**
@@ -50,26 +97,65 @@ class MailMailboxImpl implements MailMailbox{
      */
     public function exists()
     {
-        // TODO: Implement exists() method.
+        if($this->existsStatement == null){
+            $this->existsStatement = $this->db->getConnection()->prepare("SELECT * FROM MailMailbox WHERE secondary_address_id = :id");
+        }
+
+        $this->existsStatement->execute(array(':id'=>$this->address->getId()));
+        return $this->existsStatement->rowCount() > 0;
     }
 
     /**
      * Creates the mailbox
-     * @return bool
+     * @return void
      */
     public function create()
     {
-        // TODO: Implement create() method.
+        if($this->exists()){
+            return;
+        }
+
+        $uniqueAddress = $this->address->getAddressLibrary()->createAddress($id = uniqid("mail"));
+
+        if($this->createStatement1 == null){
+            $this->createStatement1 = $this->db->getConnection()->prepare("
+            INSERT INTO MailMailbox (primary_address_id, secondary_address_id, password, name, created, modified, id)
+            VALUES (:primary_id, :secondary_id, :password, :name, NOW(), NOW(), :id)");
+            $this->createStatement2 = $this->db->getConnection()->prepare("UPDATE MailAddress SET mailbox_id = :mail_id WHERE id = :id1 OR id = :id2");
+        }
+
+        $primaryId = $uniqueAddress->getId();
+        $secondaryId = $this->address->getId();
+
+        if($this->password == null){
+            $this->setPassword(uniqid('password', true));
+        }
+
+
+        $this->createStatement1->execute(array(
+            ':primary_id'=>$primaryId,
+            ':secondary_id'=>$secondaryId,
+            ':password'=>$this->password,
+            ':name'=>$this->name,
+            ':id' => $id));
+
+        $this->createStatement2->execute(array(
+            'mail_id'=>$id,
+            ':id1'=> $primaryId,
+            ':id2'=>$secondaryId
+        ));
+
+        $this->setUp(true);
     }
 
     public function attachObserver(Observer $observer)
     {
-        // TODO: Implement attachObserver() method.
+        $this->observerLibrary->registerObserver($observer);
     }
 
     public function detachObserver(Observer $observer)
     {
-        // TODO: Implement detachObserver() method.
+        $this->observerLibrary->removeObserver($observer);
     }
 
     /**
@@ -79,7 +165,8 @@ class MailMailboxImpl implements MailMailbox{
      */
     public function checkPassword($password)
     {
-        // TODO: Implement checkPassword() method.
+        $this->setUp();
+        return password_verify($password, $this->password);
     }
 
     /**
@@ -87,7 +174,7 @@ class MailMailboxImpl implements MailMailbox{
      */
     public function getAddress()
     {
-        // TODO: Implement getAddress() method.
+        return $this->address;
     }
 
     /**
@@ -95,7 +182,7 @@ class MailMailboxImpl implements MailMailbox{
      */
     public function getAddressLibrary()
     {
-        // TODO: Implement getAddressLibrary() method.
+        return $this->address->getAddressLibrary();
     }
 
     /**
@@ -103,7 +190,7 @@ class MailMailboxImpl implements MailMailbox{
      */
     public function getDomain()
     {
-        // TODO: Implement getDomain() method.
+        return $this->address->getDomain();
     }
 
     /**
@@ -111,6 +198,60 @@ class MailMailboxImpl implements MailMailbox{
      */
     public function getDomainLibrary()
     {
-        // TODO: Implement getDomainLibrary() method.
+        return $this->address->getDomainLibrary();
+    }
+
+    private function setUp($force = false)
+    {
+
+        if($this->hasBeenSetup && !$force){
+            return;
+        }
+        $this->hasBeenSetup = true;
+        if(!$this->exists()){
+            return;
+        }
+
+        $row = $this->existsStatement->fetch(PDO::FETCH_ASSOC);
+
+        $this->name = $row['name'];
+        $this->modified = strtotime($row['modified']);
+        $this->created = strtotime($row['created']);
+        $this->password = $row['password'];
+
+    }
+
+
+
+
+    /**
+     * @return int
+     */
+    public function lastModified()
+    {
+        $this->setUp();
+        return $this->modified;
+    }
+
+    /**
+     * @return int
+     */
+    public function createdAt()
+    {
+        $this->setUp();
+        return $this->created;
+    }
+
+    private function saveChanges()
+    {
+        if($this->saveChangesStatement == null){
+            $this->saveChangesStatement = $this->db->getConnection()->prepare("
+            UPDATE MailMailbox
+            SET name = :name, password = :password, modified = NOW()
+            WHERE secondary_address_id = :id");
+        }
+
+        $this->saveChangesStatement->execute(array(':name'=>$this->name, ':password'=>$this->password, ':id'=>$this->address->getId()));
+        $this->setUp(true);
     }
 }

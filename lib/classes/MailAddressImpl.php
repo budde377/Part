@@ -1,28 +1,81 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: budde
  * Date: 7/8/14
  * Time: 6:02 PM
  */
+class MailAddressImpl implements MailAddress, Observer
+{
 
-class MailAddressImpl implements MailAddress{
+    use ValidationTrait;
+
+    /** @var  ObserverLibrary */
+    private $observerLibrary;
+
+    private $localPart;
+    private $db;
+    private $addressLibrary;
+    private $active = true;
+    private $hasBeenSetup = false;
+    private $domainName;
+    /** @var  MailMailbox */
+    private $mailbox;
+    private $aliasList;
+    private $id;
+
+    private $modified = 0;
+    private $created = 0;
+    /** @var  PDOStatement */
+    private $existsStatement;
+    private $deleteStatement;
+    private $createStatement;
+    private $saveStatement;
+    private $setupAliasStatement;
+    private $removeAliasStatement;
+    private $updateLastModifiedStatement;
+    private $addTargetStatement;
+    private $clearTargetsStatement;
+
+    function __construct($localPart, DB $db, MailAddressLibrary $addressLibrary)
+    {
+        $this->observerLibrary = new ObserverLibraryImpl($this);
+        $this->addressLibrary = $addressLibrary;
+        $this->db = $db;
+        $this->localPart = $localPart;
+        $this->domainName = $addressLibrary->getDomain()->getDomainName();
+    }
+
 
     /**
      * @return string
      */
-    public function getAddress()
+    public function getLocalPart()
     {
-        // TODO: Implement getAddress() method.
+        return $this->localPart;
     }
 
     /**
-     * @param $address
-     * @return void
+     * @param $localPart
+     * @return bool
      */
-    public function setAddress($address)
+    public function setLocalPart($localPart)
     {
-        // TODO: Implement setAddress() method.
+        $localPart = trim($localPart);
+
+        if (!$this->validMail("$localPart@example.org")) {
+            return false;
+        }
+        $this->setUp();
+        $oldName = $this->localPart;
+        $this->localPart = $localPart;
+        if(!$this->saveAddress()){
+            $this->localPart = $oldName;
+            return false;
+        }
+        $this->callObservers(MailAddress::EVENT_CHANGE_LOCAL_PART);
+        return true;
     }
 
     /**
@@ -31,7 +84,8 @@ class MailAddressImpl implements MailAddress{
      */
     public function isActive()
     {
-        // TODO: Implement isActive() method.
+        $this->setUp();
+        return $this->active;
     }
 
     /**
@@ -40,7 +94,8 @@ class MailAddressImpl implements MailAddress{
      */
     public function lastModified()
     {
-        // TODO: Implement lastModified() method.
+        $this->setUp();
+        return $this->modified;
     }
 
     /**
@@ -49,7 +104,8 @@ class MailAddressImpl implements MailAddress{
      */
     public function createdAt()
     {
-        // TODO: Implement createdAt() method.
+        $this->setUp();
+        return $this->created;
     }
 
     /**
@@ -58,8 +114,17 @@ class MailAddressImpl implements MailAddress{
      */
     public function exists()
     {
-        // TODO: Implement exists() method.
-    }
+        if ($this->existsStatement == null) {
+            $this->existsStatement = $this->db->getConnection()->prepare("SELECT * FROM MailAddress WHERE domain = :domain AND name = :local_part");
+            $this->existsStatement->bindParam("domain", $this->domainName);
+            $this->existsStatement->bindParam("local_part", $this->localPart);
+        }
+
+        $this->existsStatement->execute();
+
+        return $this->existsStatement->rowCount() > 0;
+
+   }
 
     /**
      * Deletes an address
@@ -67,7 +132,19 @@ class MailAddressImpl implements MailAddress{
      */
     public function delete()
     {
-        // TODO: Implement delete() method.
+
+        $this->setUp();
+        if($this->id == null){
+            return;
+        }
+
+        if($this->deleteStatement == null){
+            $this->deleteStatement = $this->db->getConnection()->prepare("DELETE FROM MailAddress WHERE id = :id");
+            $this->deleteStatement->bindParam('id', $this->id);
+        }
+        $this->deleteStatement->execute();
+        $this->callObservers(MailAddress::EVENT_DELETE);
+
     }
 
     /**
@@ -76,7 +153,24 @@ class MailAddressImpl implements MailAddress{
      */
     public function create()
     {
-        // TODO: Implement create() method.
+
+        if($this->exists()){
+            return;
+        }
+
+        if($this->createStatement == null){
+            $this->createStatement = $this->db->getConnection()->prepare("
+            INSERT INTO MailAddress (name, domain, id, mailbox_id, created, modified, active)
+            VALUES (:name, :domain, :id, NULL, NOW(), NOW(), :active)");
+        }
+        $this->id = uniqid('address', true);
+        $this->createStatement->execute(array(
+            ':name'=>$this->localPart,
+            ':domain'=>$this->domainName,
+            ':id'=>$this->id,
+            ':active'=>$this->active?1:0));
+
+        $this->loadTimestamps();
     }
 
     /**
@@ -84,7 +178,7 @@ class MailAddressImpl implements MailAddress{
      */
     public function getDomain()
     {
-        // TODO: Implement getDomain() method.
+        return $this->addressLibrary->getDomain();
     }
 
     /**
@@ -92,7 +186,9 @@ class MailAddressImpl implements MailAddress{
      */
     public function activate()
     {
-        // TODO: Implement activate() method.
+        $this->setUp();
+        $this->active = true;
+        $this->saveAddress();
     }
 
     /**
@@ -100,7 +196,9 @@ class MailAddressImpl implements MailAddress{
      */
     public function deactivate()
     {
-        // TODO: Implement deactivate() method.
+        $this->setUp();
+        $this->active = false;
+        $this->saveAddress();
     }
 
     /**
@@ -108,7 +206,8 @@ class MailAddressImpl implements MailAddress{
      */
     public function getTargets()
     {
-        // TODO: Implement getTargets() method.
+        $this->setUpAlias();
+        return $this->aliasList;
     }
 
     /**
@@ -118,7 +217,19 @@ class MailAddressImpl implements MailAddress{
      */
     public function addTarget($address)
     {
-        // TODO: Implement addTarget() method.
+        $address = trim($address);
+        if(!$this->validMail($address)){
+            return;
+        }
+        if($this->hasTarget($address)){
+            return;
+        }
+        if($this->addTargetStatement == null){
+            $this->addTargetStatement = $this->db->getConnection()->prepare("INSERT INTO MailAlias (address_id, target) VALUES (:id, :target)");
+
+        }
+        $this->addTargetStatement->execute(array('id'=>$this->id, 'target'=>$address));
+        $this->aliasList[$address] = $address;
     }
 
     /**
@@ -128,7 +239,21 @@ class MailAddressImpl implements MailAddress{
      */
     public function removeTarget($address)
     {
-        // TODO: Implement removeTarget() method.
+        $this->setUpAlias();
+        $address = trim($address);
+        if(!$this->hasTarget($address)){
+            return;
+        }
+
+        if($this->removeAliasStatement == null){
+            $this->removeAliasStatement = $this->db->getConnection()->prepare("DELETE FROM MailAlias WHERE address_id = :id AND target = :target");
+        }
+
+
+
+        $this->removeAliasStatement->execute(array(':id' => $this->id, ':target'=> $address));
+        unset($this->aliasList[$address]);
+        $this->updateLastModified();
     }
 
     /**
@@ -137,7 +262,13 @@ class MailAddressImpl implements MailAddress{
      */
     public function clearTargets()
     {
-        // TODO: Implement clearTargets() method.
+        $this->setUp();
+        if($this->clearTargetsStatement == null){
+            $this->clearTargetsStatement = $this->db->getConnection()->prepare("DELETE FROM MailAlias WHERE address_id = :id");
+            $this->clearTargetsStatement->bindParam("id", $this->id);
+        }
+        $this->clearTargetsStatement->execute();
+        $this->aliasList = [];
     }
 
     /**
@@ -146,7 +277,8 @@ class MailAddressImpl implements MailAddress{
      */
     public function getMailbox()
     {
-        // TODO: Implement getMailbox() method.
+        $this->setUp();
+        return $this->mailbox;
     }
 
     /**
@@ -154,7 +286,8 @@ class MailAddressImpl implements MailAddress{
      */
     public function hasMailbox()
     {
-        // TODO: Implement hasMailbox() method.
+        $this->setUp();
+        return $this->mailbox != null;
     }
 
     /**
@@ -165,7 +298,20 @@ class MailAddressImpl implements MailAddress{
      */
     public function createMailbox($name, $password)
     {
-        // TODO: Implement createMailbox() method.
+        if(!$this->exists()){
+            return null;
+        }
+
+        if($this->hasMailbox()){
+            return $this->mailbox;
+        }
+
+        $this->mailbox = new MailMailboxImpl($this, $this->db);
+        $this->mailbox->attachObserver($this);
+        $this->mailbox->setName($name);
+        $this->mailbox->setPassword($password);
+        $this->mailbox->create();
+        return $this->mailbox;
     }
 
     /**
@@ -174,7 +320,11 @@ class MailAddressImpl implements MailAddress{
      */
     public function deleteMailbox()
     {
-        // TODO: Implement deleteMailbox() method.
+        if(!$this->hasMailbox()){
+            return;
+        }
+
+        $this->mailbox->delete();
     }
 
     /**
@@ -182,7 +332,7 @@ class MailAddressImpl implements MailAddress{
      */
     public function getAddressLibrary()
     {
-        // TODO: Implement getAddressLibrary() method.
+        return $this->addressLibrary;
     }
 
     /**
@@ -190,6 +340,153 @@ class MailAddressImpl implements MailAddress{
      */
     public function getDomainLibrary()
     {
-        // TODO: Implement getDomainLibrary() method.
+        return $this->addressLibrary->getDomainLibrary();
+    }
+
+    public function attachObserver(Observer $observer)
+    {
+        $this->observerLibrary->registerObserver($observer);
+
+    }
+
+    public function detachObserver(Observer $observer)
+    {
+        $this->observerLibrary->removeObserver($observer);
+    }
+
+    private function setUp($force = false)
+    {
+        if ($this->hasBeenSetup && !$force) {
+            return;
+        }
+        $this->hasBeenSetup = true;
+
+
+        if (!$this->exists()) {
+            return;
+        }
+
+
+        $row = $this->existsStatement->fetch(PDO::FETCH_ASSOC);
+
+        if($row['mailbox_id'] != null){
+            $this->mailbox = new MailMailboxImpl($this, $this->db);
+            $this->mailbox->attachObserver($this);
+        }
+        $this->modified = strtotime($row['modified']);
+        $this->created = strtotime($row['created']);
+        $this->id = $row['id'];
+        $this->active = $row['active'] == 1;
+
+    }
+
+    /**
+     * @return bool
+     */
+    private function saveAddress()
+    {
+        if($this->saveStatement == null){
+            $this->saveStatement = $this->db->getConnection()->prepare("
+            UPDATE MailAddress SET name = :name, active = :active, modified = NOW() WHERE id = :id");
+        }
+
+
+        try{
+            $this->saveStatement->execute(array(
+                ':name'=>$this->localPart,
+                ':id'=>$this->id,
+                ':active'=>$this->active?1:0));
+
+
+        } catch (PDOException $e){
+            return false;
+        }
+
+
+        $this->loadTimestamps();
+
+        return true;
+    }
+
+    private function updateLastModified(){
+        if($this->updateLastModifiedStatement == null){
+            $this->updateLastModifiedStatement = $this->db->getConnection()->prepare("UPDATE MailAddress SET modified = NOW() WHERE id = :id");
+            $this->updateLastModifiedStatement->bindParam('id', $this->id);
+        }
+        $this->updateLastModifiedStatement->execute();
+        $this->loadTimestamps();
+    }
+
+
+    private function loadTimestamps()
+    {
+
+        if (!$this->exists()) {
+            return;
+        }
+
+
+        $row = $this->existsStatement->fetch(PDO::FETCH_ASSOC);
+        $this->modified = strtotime($row['modified']);
+        $this->created = strtotime($row['created']);
+    }
+
+    private function setUpAlias()
+    {
+        if($this->aliasList != null){
+            return;
+        }
+
+        $this->setUp();
+
+        if($this->setupAliasStatement == null){
+            $this->setupAliasStatement = $this->db->getConnection()->prepare("SELECT target FROM MailAlias WHERE address_id = :id ORDER BY target ASC");
+            $this->setupAliasStatement->bindParam("id", $this->id);
+        }
+
+
+        $this->setupAliasStatement->execute();
+
+        $this->aliasList = array();
+
+        foreach($this->setupAliasStatement->fetchAll(PDO::FETCH_NUM) as $row){
+            $this->aliasList[$row[0]] = $row[0];
+        }
+    }
+
+    /**
+     * @param string $target
+     * @return bool
+     */
+    public function hasTarget($target)
+    {
+        $this->setUpAlias();
+
+        return isset($this->aliasList[trim($target)]);
+    }
+
+    public function onChange(Observable $subject, $changeType)
+    {
+        if($this->mailbox !== $subject || $changeType != MailMailbox::EVENT_DELETE){
+            return;
+        }
+        $this->mailbox->detachObserver($this);
+        $this->mailbox = null;
+
+    }
+
+    private function callObservers($event)
+    {
+        $this->observerLibrary->callObservers($event);
+
+    }
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        $this->setUp();
+        return $this->id;
     }
 }

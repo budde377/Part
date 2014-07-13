@@ -14,19 +14,29 @@ interface MailAddressLibrary {
     public function listAddresses();
 
     /**
-     * @param string $address
+     * @param string $localPart
      * @return bool
      */
-    public function hasAddress($address);
+    public function hasAddress($localPart);
 
     /**
      * Gets a address from the given address. Null if not found.
-     * @param string $address
+     * @param string $localPart
      * @return MailAddress
      */
-    public function getAddress($address);
+    public function getAddress($localPart);
 
+    /**
+     * @param string $localPart
+     * @return MailAddress
+     */
+    public function createAddress($localPart);
 
+    /**
+     * @param MailAddress $address
+     * @return bool
+     */
+    public function contains(MailAddress $address);
 
     /**
      * Deletes an address. It must be an instance in the library.
@@ -48,10 +58,9 @@ interface MailAddressLibrary {
     public function getCatchallAddress();
 
     /**
-     * @param array $targets
      * @return MailAddress
      */
-    public function createCatchallAddress(array $targets);
+    public function createCatchallAddress();
 
     /**
      * @return void

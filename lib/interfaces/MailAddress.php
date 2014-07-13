@@ -6,21 +6,21 @@
  * Time: 2:19 PM
  */
 
-interface MailAddress {
+interface MailAddress extends Observable {
 
     const EVENT_DELETE = 1;
-    const EVENT_CHANGE_ADDRESS = 2;
+    const EVENT_CHANGE_LOCAL_PART = 2;
 
     /**
      * @return string
      */
-    public function getAddress();
+    public function getLocalPart();
 
     /**
-     * @param $address
+     * @param $localPart
      * @return void
      */
-    public function setAddress($address);
+    public function setLocalPart($localPart);
 
     /**
      * Indicates if the address is active
@@ -48,13 +48,13 @@ interface MailAddress {
 
     /**
      * Deletes an address
-     * @return void
+     * @return bool
      */
     public function delete();
 
     /**
      * Creates an address
-     * @return void
+     * @return bool
      */
     public function create();
 
@@ -109,6 +109,13 @@ interface MailAddress {
 
 
     /**
+     * @param string $target
+     * @return bool
+     */
+    public function hasTarget($target);
+
+
+    /**
      * Will return a mailbox, if there is any. If not it will return NULL
      * @return MailMailbox | null
      */
@@ -138,5 +145,10 @@ interface MailAddress {
      * @return MailDomainLibrary
      */
     public function getDomainLibrary();
+
+    /**
+     * @return string
+     */
+    public function getId();
 
 }

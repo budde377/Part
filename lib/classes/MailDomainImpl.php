@@ -8,7 +8,7 @@
  */
 class MailDomainImpl implements MailDomain, Observer
 {
-
+    private $observerLibrary;
     private $addressLibrary;
 
     private $domain;
@@ -39,10 +39,10 @@ class MailDomainImpl implements MailDomain, Observer
     private $hasBeenSetup = false;
     private $aliasHasBeenSetup = false;
 
-    private $observers = array();
 
     function __construct($domain, $database, DB $db, MailDomainLibrary $library )
     {
+        $this->observerLibrary = new ObserverLibraryImpl($this);
         $this->db = $db;
         $this->domain = $domain;
         $this->library = $library;
@@ -250,7 +250,7 @@ class MailDomainImpl implements MailDomain, Observer
      */
     public function getAddressLibrary()
     {
-        return $this->addressLibrary == null? $this->addressLibrary = new MailAddressLibraryImpl($this, $this->getDomainLibrary(), $this->db):$this->addressLibrary;
+        return $this->addressLibrary == null? $this->addressLibrary = new MailAddressLibraryImpl($this, $this->db):$this->addressLibrary;
     }
 
     /**
@@ -310,16 +310,13 @@ class MailDomainImpl implements MailDomain, Observer
 
     public function attachObserver(Observer $observer)
     {
-        $this->observers[] = $observer;
+        $this->observerLibrary->registerObserver($observer);
     }
 
     public function detachObserver(Observer $observer)
     {
-        foreach($this->observers as $k=>$o){
-            if($observer === $o){
-                unset($this->observers[$k]);
-            }
-        }
+
+        $this->observerLibrary->removeObserver($observer);
     }
 
     private function setupDomain($force = false)
@@ -367,10 +364,7 @@ class MailDomainImpl implements MailDomain, Observer
 
     private function callObservers()
     {
-        foreach($this->observers as $observer){
-            /** @var $observer Observer */
-            $observer->onChange($this, MailDomain::EVENT_DELETE);
-        }
+       $this->observerLibrary->callObservers(MailDomain::EVENT_DELETE);
     }
 
     private function createViews($password)

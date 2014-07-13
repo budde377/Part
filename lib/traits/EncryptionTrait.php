@@ -33,4 +33,25 @@ trait EncryptionTrait
     }
 
 
+    protected function generateRandomString($length = 10, $characters = null) {
+        $characters = $characters== null?'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ':$characters;
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, strlen($characters) - 1)];
+        }
+        return $randomString;
+    }
+
+
+
+    protected function generateMtRandomString($length = 10, $characters = null) {
+        $characters = $characters== null?'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ':$characters;
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[mt_rand(0, strlen($characters) - 1)];
+        }
+        return $randomString;
+    }
+
+
 }

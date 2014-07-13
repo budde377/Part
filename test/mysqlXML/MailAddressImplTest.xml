@@ -18,18 +18,30 @@
             </row>
         </table_data>
 
+        <table_data name="MailAlias">
+            <row>
+                <field name="address_id" >addressId1</field>
+                <field name="target">test2@example.org</field>
+            </row>
+            <row>
+                <field name="address_id" >addressId1</field>
+                <field name="target">test@example.org</field>
+            </row>
+
+        </table_data>
+
         <table_data name="MailAddress">
             <row>
-                <field name="name">test</field>
+                <field name="name">test2</field>
                 <field name="domain">test.dk</field>
                 <field name="id">addressId1</field>
                 <field name="mailbox_id" xsi:nil="true"/>
                 <field name="created">2000-01-03 12:00:00</field>
                 <field name="modified">2000-01-03 13:00:00</field>
-                <field name="active">1</field>
+                <field name="active">0</field>
             </row>
             <row>
-                <field name="name">test2</field>
+                <field name="name">test</field>
                 <field name="domain">test.dk</field>
                 <field name="id">addressId2</field>
                 <field name="mailbox_id">mailboxId1</field>
