@@ -20,7 +20,7 @@
     font-family: BebasNeueRegular, Impact, Charcoal, sans-serif;
     font-size: 30px;
     float: left;
-    width: 860px;
+    width: 870px;
     border-bottom: 1px solid #aaa;
     padding-left: 10px;
     font-weight: 100;
@@ -36,7 +36,7 @@
     font-size: 20px;
     padding: 10px 0 5px 0;
     float: left;
-    width: 100%;
+    width: 870px;
     color: #000;
 }
 
@@ -71,9 +71,10 @@
 
 
 #UserSettingsContent >  ul {
-    width: 5280px;
     list-style-type: none;
-    float: left;
+    overflow: hidden;
+    display: table;
+    table-layout: fixed;
 
 }
 
@@ -87,21 +88,22 @@
 
 #UserSettingsContent > ul > li {
     width: 880px;
-    float: left;
     padding-bottom: 20px;
+    overflow:  hidden;
+    display: table-cell;
+    vertical-align: top;
+
 }
+
 
 #UserSettingsContent > ul > li span.hidden {
     display: none;
 }
 
-#UserSettingsContent > ul {
-    list-style-type: none;
-}
 
 #UserSettingsContent ul.colorList {
     width: 550px;
-    margin-right: 330px;
+    margin-right: 320px;
     margin-top: 5px;
     margin-bottom: 20px;
 }
