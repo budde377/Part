@@ -39,6 +39,8 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $fileLibrary;
     /** @var  LogFile */
     private $log;
+    /** @var  MailDomainLibrary */
+    private $mailDomainLibrary;
 
     public function __construct(Config $config)
     {
@@ -224,5 +226,18 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
             $this->log = new LogFileImpl($this->getConfigInstance()->getLogPath());
         }
         return $this->log;
+    }
+
+    /**
+     * Will Create and reuse instance of MailDomainLibrary.
+     * @return MailDomainLibrary
+     */
+    public function getMailDomainLibraryInstance()
+    {
+        if($this->mailDomainLibrary == null){
+            $this->mailDomainLibrary = new MailDomainLibraryImpl($this->getConfigInstance(), $this->getDBInstance());
+        }
+
+        return $this->mailDomainLibrary;
     }
 }

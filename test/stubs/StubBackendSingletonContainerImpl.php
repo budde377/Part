@@ -24,6 +24,23 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     private $siteInstance;
     private $fileLibraryInstance;
     private $logInstance;
+    private $mailDomainLibraryInstance;
+
+    /**
+     * @param mixed $mailDomainLibraryInstance
+     */
+    public function setMailDomainLibraryInstance($mailDomainLibraryInstance)
+    {
+        $this->mailDomainLibraryInstance = $mailDomainLibraryInstance;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMailDomainLibraryInstance()
+    {
+        return $this->mailDomainLibraryInstance;
+    }
 
     /**
      * @param mixed $CSSRegisterInstance
@@ -277,4 +294,5 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     {
         $this->logInstance = $logInstance;
     }
+
 }

@@ -115,4 +115,10 @@ interface BackendSingletonContainer
     public function getLogInstance();
 
 
+    /**
+     * Will Create and reuse instance of MailDomainLibrary.
+     * @return MailDomainLibrary
+     */
+    public function getMailDomainLibraryInstance();
+
 }

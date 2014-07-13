@@ -40,10 +40,13 @@ class ChangeableList {
 
 
     list.onDragStart.listen((MouseEvent ev){
+      core.debug("DRAG START");
       var target = _getTargetFromEvent(ev);
       if(target == null){
+        core.debug("NOT RIGHT TARGET");
         return;
       }
+      core.debug("YISSS");
 
       LIElement li = target;
       ev.dataTransfer..setData("Text", li.hashCode.toString())
@@ -52,6 +55,7 @@ class ChangeableList {
       _dragging_li = li;
       li.classes.add("dragging");
       _setUpDividers();
+
     });
 
     list.onDragEnd.listen((MouseEvent ev){
