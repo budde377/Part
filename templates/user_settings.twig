@@ -7,6 +7,7 @@
                 <li class='pages' title='Administrer sider'>&nbsp;</li>
                 <li class='user ' title='Rediger oplysninger'>&nbsp;</li>
                 <li class='users' title='Administrer brugere'>&nbsp;</li>
+                <li class='mail ' title='Administrer mailkonti'>&nbsp;</li>
                 {% if config.updaterEnabled and  has_site_privileges %}
                     <li class='update_site' title='Opdater website'>&nbsp;</li>
                 {% endif %}
@@ -15,7 +16,6 @@
                 {% endif %}
                 {% block user_settings_menu %}
                 {% endblock %}
-                <!-- <li class='mail ' title='Administrer mailkonti'>&nbsp;</li>-->
             </ul>
         </div>
         <div id='UserSettingsContractLink'>&nbsp;</div>
@@ -39,6 +39,11 @@
                 <li>
                     <h2>Administrer Brugere</h2>
                     {% page_element UserSettingsEditUsersPageElementImpl %}
+                </li>
+                <li>
+                    <h2>Administrer Mailkonti</h2>
+                    {% page_element UserSettingsEditMailPageElementImpl %}
+
                 </li>
                 {% if config.updaterEnabled and  has_site_privileges %}
                     <li>
