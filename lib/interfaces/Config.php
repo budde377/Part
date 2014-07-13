@@ -83,6 +83,13 @@ interface Config
     public function getMySQLConnection();
 
     /**
+     * @abstract
+     * @return array | null Array with entries host, user, prefix, database and File setupFile, or null if not specified
+     */
+
+    public function getMailMySQLConnection();
+
+    /**
      * @return bool
      */
     public function isDebugMode();

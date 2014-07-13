@@ -8,10 +8,12 @@
 class SimpleDBImpl implements DB
 {
     private $connection;
+    private $mailConnection;
 
-    public function __construct(PDO $connection)
+    public function __construct(PDO $connection, PDO $mysqlConnection = null)
     {
         $this->connection = $connection;
+        $this->mailConnection = $mysqlConnection;
 
 
     }
@@ -22,5 +24,14 @@ class SimpleDBImpl implements DB
     public function getConnection()
     {
         return $this->connection;
+    }
+
+    /**
+     * @param string $password
+     * @return PDO
+     */
+    public function getMailConnection($password)
+    {
+        return $this->mailConnection;
     }
 }

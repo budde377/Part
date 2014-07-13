@@ -14,5 +14,10 @@ interface DB
      */
     public function getConnection();
 
+    /**
+     * @param string $password
+     * @return PDO
+     */
+    public function getMailConnection($password);
 
 }

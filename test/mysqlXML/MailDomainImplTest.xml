@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <database name="postfix_test">
+        <table_data name="postfix_test.DomainAssignment">
+            <row>
+                <field name="database">cms2012testdb</field>
+                <field name="domain">test.dk</field>
+            </row>
+        </table_data>
+    </database>
+
+    <database name="cms2012testdb">
+
+        <table_data name="MailDomain">
+            <row>
+                <field name="domain">test.dk</field>
+                <field name="description">Some desc.</field>
+                <field name="created">2000-01-01 12:00:00</field>
+                <field name="modified">2000-01-01 13:00:00</field>
+                <field name="active">1</field>
+            </row>
+            <row>
+                <field name="domain">test2.dk</field>
+                <field name="description">Some desc2.</field>
+                <field name="created">2000-01-02 12:00:00</field>
+                <field name="modified">2000-01-02 13:00:00</field>
+                <field name="active">1</field>
+            </row>
+        </table_data>
+        <table_data name="MailDomainAlias">
+            <row>
+                <field name="alias_domain">test2.dk</field>
+                <field name="target_domain">test.dk</field>
+                <field name="created">2000-01-01 12:00:00</field>
+                <field name="modified">2000-01-01 13:00:00</field>
+            </row>
+        </table_data>
+    </database>
+</mysqldump>

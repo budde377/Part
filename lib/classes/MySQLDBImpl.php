@@ -9,12 +9,22 @@
  */
 class MySQLDBImpl implements DB
 {
-    /** @var $connection null | PDO */
+    /** @var  PDO */
     private $connection = null;
     private $database = null;
     private $host = null;
     private $password = null;
     private $username = null;
+
+    /** @var PDO */
+    private $mailConnection = null;
+    private $mailDatabase = null;
+    private $mailHost = null;
+    private $mailUsername = null;
+    private $mailPassword = null;
+
+
+
 
     public function __construct(Config $config)
     {
@@ -25,6 +35,13 @@ class MySQLDBImpl implements DB
             $this->host = $connectionArray['host'];
             $this->password = $connectionArray['password'];
             $this->username = $connectionArray['user'];
+        }
+
+        $connectionArray = $config->getMailMySQLConnection();
+        if ($connectionArray !== null) {
+            $this->mailDatabase = $connectionArray['database'];
+            $this->mailHost = $connectionArray['host'];
+            $this->mailUsername = $connectionArray['user'];
         }
     }
 
@@ -44,5 +61,23 @@ class MySQLDBImpl implements DB
         }
 
         return $this->connection;
+    }
+
+    /**
+     * @param string $password
+     * @return PDO
+     */
+    public function getMailConnection($password)
+    {
+        if ($this->mailConnection === null || $this->mailPassword != $password) {
+            $this->mailPassword = $password;
+            $this->mailConnection = new PDO(
+                'mysql:dbname=' . $this->mailDatabase . ';host=' . $this->mailHost,
+                $this->mailUsername,
+                $password,
+                array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+        }
+
+        return $this->mailConnection;
     }
 }

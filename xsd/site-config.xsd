@@ -57,7 +57,8 @@
                         <xs:field xpath="@name"/>
                     </xs:unique>
                 </xs:element>
-                <xs:element name="MySQLConnection" type="dbConnection" minOccurs="0"/>
+                <xs:element name="MySQLConnection" type="dbConnectionWithPassword" minOccurs="0"/>
+                <xs:element name="MailMySQLConnection" type="dbConnection" minOccurs="0"/>
                 <xs:element name="debugMode" type="xs:boolean" minOccurs="0"/>
                 <xs:element name="enableUpdater" type="xs:boolean" minOccurs="0" />
                 <xs:element name="optimizers" type="pageElements" minOccurs="0">
@@ -79,8 +80,15 @@
             <xs:element name="host" type="xs:anyURI"/>
             <xs:element name="database" type="xs:string"/>
             <xs:element name="username" type="xs:string"/>
-            <xs:element name="password" type="xs:string"/>
+        </xs:all>
+    </xs:complexType>
 
+    <xs:complexType name="dbConnectionWithPassword">
+        <xs:all>
+            <xs:element name="host" type="xs:anyURI"/>
+            <xs:element name="database" type="xs:string"/>
+            <xs:element name="username" type="xs:string"/>
+            <xs:element name="password" type="xs:string" />
         </xs:all>
     </xs:complexType>
 
@@ -151,18 +159,16 @@
 
     <xs:complexType name="namedLinkedVal">
         <xs:simpleContent>
-            <xs:extension base="xs:string">
+            <xs:extension base="linkedVal">
                 <xs:attribute type="name" name="name" use="required"/>
-                <xs:attribute type="xs:anyURI" name="link" use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
 
     <xs:complexType name="ajaxIdLinkedVal">
         <xs:simpleContent>
-            <xs:extension base="xs:string">
+            <xs:extension base="linkedVal">
                 <xs:attribute type="name" name="ajax_id" use="required"/>
-                <xs:attribute type="xs:anyURI" name="link" use="required"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
