@@ -45,6 +45,17 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl{
             <li>test7@christian-budde.dk</li>
             <li class='add'></li>
         </ul>
+        <ul class='floating_list'>
+            <li>bob@christianbudde.dk</li>
+            <li>bob1@christianbudde.dk</li>
+            <li>bob2@christianbudde.dk</li>
+            <li>bob3@christianbudde.dk</li>
+            <li>bob4@christianbudde.dk</li>
+            <li>bob5@christianbudde.dk</li>
+            <li>bob6@christianbudde.dk</li>
+            <li>bob7@christianbudde.dk</li>
+            <li class='add'></li>
+        </ul>
 
         ";
 

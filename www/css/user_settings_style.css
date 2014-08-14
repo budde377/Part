@@ -9,7 +9,6 @@
     background: #CECECE;
     overflow: hidden;
     color: #000;
-
 }
 
 #UserSettingsContainer.expanded {
@@ -622,9 +621,14 @@ form.initial input.invalid {
 #UserSettingsContent .floating_list {
     list-style-type: none;
     width: 550px;
-}
-#UserSettingsContent .floating_list > li:not(.add){
     float: left;
+}
+
+#UserSettingsContent .floating_list > li {
+    float: left;
+}
+
+#UserSettingsContent .floating_list > li:not(.add){
     padding: 3px 15px;
     border: 1px solid #aaa;
     border-radius:3px;
@@ -668,3 +672,8 @@ form.initial input.invalid {
     width: 26px;
     height: 26px;
 }
+
+#UserSettingsContent .floating_list + .floating_list{
+    padding-top: 20px;
+}
+
