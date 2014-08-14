@@ -617,3 +617,54 @@ form.initial input.invalid {
     color: #fff;
     text-decoration: underline;
 }
+
+
+#UserSettingsContent .floating_list {
+    list-style-type: none;
+    width: 550px;
+}
+#UserSettingsContent .floating_list > li:not(.add){
+    float: left;
+    padding: 3px 15px;
+    border: 1px solid #aaa;
+    border-radius:3px;
+    margin:0 10px 10px 0;
+    background: rgb(253, 253, 253);
+    color: #000;
+}
+
+
+#UserSettingsContent .floating_list.points_to > li:not(.add){
+    padding: 0 !important;
+}
+
+#UserSettingsContent .floating_list.points_to > li:not(.add) > div{
+    float:left;
+    padding:3px 15px;
+}
+
+#UserSettingsContent .floating_list.points_to > li:not(.add) > div:first-child{
+    padding-right:10px;
+    background: #e0e0e0;
+    border-radius: 3px 0 0 3px;
+}
+
+#UserSettingsContent .floating_list.points_to > li:not(.add) > div:last-child{
+    padding-left:10px;
+}
+
+#UserSettingsContent .floating_list.points_to > li:not(.add) > div.arrow{
+    width: 0;
+    height: 0;
+    border-top: 13px solid transparent;
+    border-bottom: 13px solid transparent;
+
+    border-left:6px solid #e0e0e0;
+    padding:0;
+}
+
+
+#UserSettingsContent  .floating_list > li.add{
+    width: 26px;
+    height: 26px;
+}
