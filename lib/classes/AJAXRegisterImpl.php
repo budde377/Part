@@ -72,13 +72,15 @@ class AJAXRegisterImpl implements AJAXRegister
         $registrable = $config->getAJAXRegistrable();
         foreach ($registrable as $fileArray) {
             $className = $fileArray['class_name'];
-            $path = $fileArray['path'];
             $ajaxId = $fileArray['ajax_id'];
-            if (!file_exists($path)) {
-                throw new FileNotFoundException($path);
-            }
+            if(isset($fileArray['link'])){
+                $path = $fileArray['link'];
+                if (!file_exists($path)) {
+                    throw new FileNotFoundException($path);
+                }
 
-            require_once $path;
+                require_once $path;
+            }
 
             if (!class_exists($className)) {
                 throw new ClassNotDefinedException($className);

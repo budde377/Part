@@ -39,10 +39,12 @@ class PageElementFactoryImpl implements PageElementFactory
 
 
         } else {
-            if (!file_exists($element['link'])) {
-                throw new FileNotFoundException($element['link'], 'PageElement');
+            if(isset($element['link'])){
+                if (!file_exists($element['link'])) {
+                    throw new FileNotFoundException($element['link'], 'PageElement');
+                }
+                require_once $element['link'];
             }
-            require_once $element['link'];
             if (!class_exists($element['className'])) {
                 throw new ClassNotDefinedException($element['className']);
             }

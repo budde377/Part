@@ -36,10 +36,14 @@ class SiteFactoryImpl implements SiteFactory
         $preScriptArray = $this->config->getPreScripts();
         foreach ($preScriptArray as $className => $location) {
 
-            if (!file_exists($location)) {
-                throw new FileNotFoundException($location);
+            if($location !== null){
+                if (!file_exists($location)) {
+                    throw new FileNotFoundException($location);
+                }
+                require_once $location;
+
             }
-            require_once $location;
+
 
             if (!class_exists($className)) {
                 throw new ClassNotDefinedException($className);
@@ -76,10 +80,13 @@ class SiteFactoryImpl implements SiteFactory
         $postScriptArray = $this->config->getPostScripts();
         foreach ($postScriptArray as $className => $location) {
 
-            if (!file_exists($location)) {
-                throw new FileNotFoundException($location);
+            if($location !== null){
+                if (!file_exists($location)) {
+                    throw new FileNotFoundException($location);
+                }
+                require_once $location;
+
             }
-            require_once $location;
 
             if (!class_exists($className)) {
                 throw new ClassNotDefinedException($className);

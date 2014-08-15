@@ -58,6 +58,34 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($exceptionWasThrown, 'A exception was not thrown.');
 
     }
+    public function testBuildPreScriptWillReturnScriptChainWithScriptsSpecifiedInConfigButNoLink()
+    {
+
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        <preScripts>
+        <class>ExceptionStubScriptImpl</class>
+        </preScripts>
+        </config>");
+
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $factory = new SiteFactoryImpl($config);
+        $preScripts = $factory->buildPreScriptChain($this->backFactory);
+
+        $exceptionWasThrown = false;
+        try {
+            $preScripts->run('PreScript', null);
+
+        } catch (Exception $exception) {
+            $this->assertInstanceOf('ScriptHasRunException', $exception, 'The wrong exception was thrown.');
+            /** @var $exception ScriptHasRunException */
+            $exceptionWasThrown = true;
+            $this->assertEquals('PreScript', $exception->getName(), 'The Script ran with wrong name.');
+            $this->assertNull($exception->getArgs(), 'Script ran with wrong argument');
+        }
+        $this->assertTrue($exceptionWasThrown, 'A exception was not thrown.');
+
+    }
 
     public function testBuildPreScriptWillThrowExceptionWithNotScriptInConfig()
     {
@@ -121,6 +149,24 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         <config>{$this->defaultOwner}
         <postScripts>
         <class link='stubs/ExceptionStubScriptImpl.php'>ExceptionStubScriptImpl</class>
+        </postScripts>
+        </config>");
+
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $factory = new SiteFactoryImpl($config);
+        $postScripts = $factory->buildPostScriptChain($this->backFactory);
+
+        $this->setExpectedException('ScriptHasRunException');
+        $postScripts->run('PostScript', null);
+
+    }
+    public function testBuildPostScriptWillReturnScriptChainWithScriptsSpecifiedInConfigButNoLink()
+    {
+
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        <postScripts>
+        <class>ExceptionStubScriptImpl</class>
         </postScripts>
         </config>");
 

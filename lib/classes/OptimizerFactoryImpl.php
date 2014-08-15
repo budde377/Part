@@ -31,9 +31,13 @@ class OptimizerFactoryImpl implements OptimizerFactory
             return null;
         }
 
-        if (!file_exists($optimizer['link'])) {
-            throw new FileNotFoundException($optimizer['link'], 'Optimizer');
+        if(isset($optimizer['link'])){
+            if (!file_exists($location = $optimizer['link'])) {
+                throw new FileNotFoundException($location, 'Optimizer');
+            }
+            require_once $location;
         }
+
 
 
         if (!class_exists($optimizer['className'])) {
