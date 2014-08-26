@@ -10,6 +10,10 @@ part "src/site_class_page.dart";
 part "src/site_class_page_order.dart";
 part "src/site_class_user.dart";
 part "src/site_class_user_library.dart";
+part "src/site_class_mail_domain_library.dart";
+part "src/site_class_mail_domain.dart";
+part "src/site_class_mail_address.dart";
+part "src/site_class_mail_mailbox.dart";
 
 
 class ChangeResponse<V> extends Response<V>{

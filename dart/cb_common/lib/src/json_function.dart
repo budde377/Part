@@ -16,39 +16,59 @@ class JSONFunction {
 
 
 class PageJSONFunction extends JSONFunction {
-  PageJSONFunction(String name): super("Page.${name}");
+  PageJSONFunction(String name): super("Page.$name");
 }
 
 class UserJSONFunction extends JSONFunction {
-  UserJSONFunction(String name): super("User.${name}");
+  UserJSONFunction(String name): super("User.$name");
+}
+
+class MailDomainsJSONFunction extends JSONFunction{
+  MailDomainsJSONFunction(String name) : super("MailDomains.$name");
+}
+
+class MailDomainJSONFunction extends JSONFunction{
+  MailDomainJSONFunction(String name) : super("MailDomain.$name");
+}
+
+class MailAddressJSONFunction extends JSONFunction{
+  MailAddressJSONFunction(String name) : super("MailAddress.$name");
+}
+
+class MailMailboxJSONFunction extends JSONFunction{
+  MailMailboxJSONFunction(String name) : super("MailMailbox.$name");
 }
 
 class UserPrivilegesJSONFunction extends JSONFunction {
-  UserPrivilegesJSONFunction(String name): super("UserPrivileges.${name}");
+  UserPrivilegesJSONFunction(String name): super("UserPrivileges.$name");
 }
 
 class PageContentJSONFunction extends JSONFunction {
-  PageContentJSONFunction(String name): super("PageContent.${name}");
+  PageContentJSONFunction(String name): super("PageContent.$name");
 }
 
 class SiteContentJSONFunction extends JSONFunction {
-  SiteContentJSONFunction(String name): super("SiteContent.${name}");
+  SiteContentJSONFunction(String name): super("SiteContent.$name");
 }
 
 class PageOrderJSONFunction extends JSONFunction {
-  PageOrderJSONFunction(String name): super("PageOrder.${name}");
+  PageOrderJSONFunction(String name): super("PageOrder.$name");
 }
 
 class UsersJSONFunction extends JSONFunction {
-  UsersJSONFunction(String name) : super("Users.${name}");
+  UsersJSONFunction(String name) : super("Users.$name");
 }
 
 class FileUploadJSONFunction extends JSONFunction {
-  FileUploadJSONFunction(String name) : super("FileUpload.${name}");
+  FileUploadJSONFunction(String name) : super("FileUpload.$name");
 }
 
 class UpdaterJSONFunction extends JSONFunction {
-  UpdaterJSONFunction(String name) : super("Updater.${name}");
+  UpdaterJSONFunction(String name) : super("Updater.$name");
+}
+
+class LogJSONFunction extends JSONFunction{
+  LogJSONFunction (String fn) : super("Log.$fn");
 }
 
 // User functions
@@ -122,6 +142,20 @@ class DeactivatePageJSONFunction extends PageJSONFunction {
     this.arguments['page_id'] = page_id;
   }
 }
+
+// MailMailbox functions
+
+class ChangeMailboxInfoJSONFunction extends MailMailboxJSONFunction{
+
+  ChangeMailboxInfoJSONFunction(String address, String name, [String password =  null]) : super ('changeMailboxInfo') {
+    this.arguments['address'] = address;
+    this.arguments['name'] = name;
+    this.arguments['password'] = password;
+  }
+}
+
+
+
 
 // Page content functions
 
@@ -250,7 +284,6 @@ class UploadFileURIJSONFunction extends FileUploadJSONFunction {
   }
 }
 
-// Edit image functions
 
 // Updater functions
 
@@ -264,10 +297,6 @@ class UpdateSiteJSONFunction extends UpdaterJSONFunction {
 
 // Log function
 
-class LogJSONFunction extends JSONFunction{
-
-  LogJSONFunction (String fn) : super("Log.$fn");
-}
 
 
 class LogLogJSONFunction extends LogJSONFunction {

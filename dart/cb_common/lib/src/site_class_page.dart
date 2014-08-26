@@ -51,13 +51,8 @@ class JSONPage extends Page {
 
   Stream<Page> _changeStream;
 
-  JSONPage(String id, String title, String template, String alias, bool hidden, JSONClient client):_client = client {
-    _id = id;
-    _title = title;
-    _template = template;
-    _alias = alias;
-    _hidden = hidden;
-  }
+  JSONPage(String id, String title, String template, String alias, bool hidden, JSONClient client):_client = client, _id = id, _title = title, _template = template, _alias = alias, _hidden = hidden;
+
 
   Future<ChangeResponse<Page>> changeInfo({String id:null, String title:null, String template:null, String alias:null, bool hidden:null}) {
     id = id != null ? id : _id;
