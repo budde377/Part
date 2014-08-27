@@ -489,4 +489,34 @@ class MailAddressImpl implements MailAddress, Observer
         $this->setUp();
         return $this->id;
     }
+
+    /**
+     * Adds a user as owner of the address.
+     * @param User $owner
+     * @return void
+     */
+    public function addOwner(User $owner)
+    {
+        // TODO: Implement addOwner() method.
+    }
+
+    /**
+     * Removes a user as owner of the address.
+     * @param User $owner
+     * @return void
+     */
+    public function removeOwner(User $owner)
+    {
+        // TODO: Implement removeOwner() method.
+    }
+
+    /**
+     * Checks if a user is a owner of the address.
+     * @param User $owner
+     * @return bool
+     */
+    public function isOwner(User $owner)
+    {
+        // TODO: Implement isOwner() method.
+    }
 }
