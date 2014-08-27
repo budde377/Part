@@ -27,3 +27,4 @@ abstract class MailAddress{
   MailDomain get domain;
 
 }
+

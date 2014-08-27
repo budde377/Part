@@ -5,8 +5,6 @@ abstract class MailMailbox{
 
   String get name;
 
-  Future<ChangeResponse<bool>> checkPassword (String password);
-
   Future<ChangeResponse<MailMailbox>> changeInfo ({String name, String password});
 
   Future<ChangeResponse<MailMailbox>> delete ();
@@ -20,19 +18,21 @@ abstract class MailMailbox{
 
 class JSONMailMailbox extends MailMailbox{
 
+
   final MailAddress address;
 
   String _name;
 
   JSONClient _client = new AJAXJSONClient();
 
+
   JSONMailMailbox(MailAddress this.address, [this._name = ""]);
 
-  Future<ChangeResponse<bool>> checkPassword (String password);
+  String get name => _name;
 
-  Future<ChangeResponse<MailMailbox>> changeInfo ({String name, String password});
+  Future<ChangeResponse<MailMailbox>> changeInfo ({String name, String password}) => null;
 
-  Future<ChangeResponse<MailMailbox>> delete ();
+  Future<ChangeResponse<MailMailbox>> delete () => null;
 
 
 }
