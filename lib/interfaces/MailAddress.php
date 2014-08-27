@@ -151,4 +151,25 @@ interface MailAddress extends Observable {
      */
     public function getId();
 
+    /**
+     * Adds a user as owner of the address.
+     * @param User $owner
+     * @return void
+     */
+    public function addOwner(User $owner);
+
+    /**
+     * Removes a user as owner of the address.
+     * @param User $owner
+     * @return void
+     */
+    public function removeOwner(User $owner);
+
+    /**
+     * Checks if a user is a owner of the address.
+     * @param User $owner
+     * @return bool
+     */
+    public function isOwner(User $owner);
+
 }
