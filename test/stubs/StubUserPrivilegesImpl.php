@@ -22,7 +22,7 @@ class StubUserPrivilegesImpl implements  UserPrivileges{
      */
     public function addRootPrivileges()
     {
-        // TODO: Implement addRootPrivileges() method.
+
     }
 
     /**
@@ -31,7 +31,7 @@ class StubUserPrivilegesImpl implements  UserPrivileges{
      */
     public function addSitePrivileges()
     {
-        // TODO: Implement addSitePrivileges() method.
+
     }
 
     /**
@@ -41,7 +41,7 @@ class StubUserPrivilegesImpl implements  UserPrivileges{
      */
     public function addPagePrivileges(Page $page)
     {
-        // TODO: Implement addPagePrivileges() method.
+
     }
 
     /**
@@ -75,7 +75,7 @@ class StubUserPrivilegesImpl implements  UserPrivileges{
      */
     public function revokeRootPrivileges()
     {
-        // TODO: Implement revokeRootPrivileges() method.
+
     }
 
     /**
@@ -84,7 +84,7 @@ class StubUserPrivilegesImpl implements  UserPrivileges{
      */
     public function revokeSitePrivileges()
     {
-        // TODO: Implement revokeSitePrivileges() method.
+
     }
 
     /**
@@ -94,7 +94,7 @@ class StubUserPrivilegesImpl implements  UserPrivileges{
      */
     public function revokePagePrivileges(Page $page)
     {
-        // TODO: Implement revokePagePrivileges() method.
+
     }
 
     /**
@@ -103,6 +103,19 @@ class StubUserPrivilegesImpl implements  UserPrivileges{
      */
     public function revokeAllPrivileges()
     {
-        // TODO: Implement revokeAllPrivileges() method.
+
+    }
+
+    /**
+     * Will return an array of strings containing the sites that are under the users control.
+     * If the user has site or root privileges an empty array is returned.
+     * If the user has no privileges an empty array is returned.
+     *
+     * @param PageOrder $pageOrder If order is given it will return array containing instances from the PageOrder
+     * @return array
+     */
+    public function listPagePrivileges(PageOrder $pageOrder = null)
+    {
+
     }
 }
