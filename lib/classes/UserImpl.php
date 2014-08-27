@@ -6,7 +6,7 @@
  * Date: 22/07/12
  * Time: 14:29
  */
-class UserImpl implements User, Observable
+class UserImpl implements User
 {
     use RequestTrait;
     use ValidationTrait;

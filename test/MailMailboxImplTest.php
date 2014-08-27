@@ -46,7 +46,7 @@ class MailMailboxImplTest extends CustomDatabaseTestCase{
 
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->domainLibrary = new MailDomainLibraryImpl($this->config, $this->db);
+        $this->domainLibrary = new MailDomainLibraryImpl($this->config, $this->db, new StubUserLibraryImpl());
         $this->domain = $this->domainLibrary->getDomain('test.dk');
         $this->addressLibrary = $this->domain->getAddressLibrary();
         $this->address = $this->addressLibrary->getAddress('test');

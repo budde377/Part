@@ -17,6 +17,7 @@ class MailAddressImpl implements MailAddress, Observer
     private $localPart;
     private $db;
     private $addressLibrary;
+    private $userLibrary;
     private $active = true;
     private $hasBeenSetup = false;
     private $domainName;
@@ -37,11 +38,18 @@ class MailAddressImpl implements MailAddress, Observer
     private $updateLastModifiedStatement;
     private $addTargetStatement;
     private $clearTargetsStatement;
+    private $setUpOwnerStatement;
+    private $addOwnerStatement;
+    private $removeOwnerStatement;
 
-    function __construct($localPart, DB $db, MailAddressLibrary $addressLibrary)
+    private $owners = array();
+    private $reversedOwners = array();
+
+    function __construct($localPart, DB $db, UserLibrary $userLibrary, MailAddressLibrary $addressLibrary)
     {
         $this->observerLibrary = new ObserverLibraryImpl($this);
         $this->addressLibrary = $addressLibrary;
+        $this->userLibrary = $userLibrary;
         $this->db = $db;
         $this->localPart = $localPart;
         $this->domainName = $addressLibrary->getDomain()->getDomainName();
@@ -145,6 +153,8 @@ class MailAddressImpl implements MailAddress, Observer
         $this->deleteStatement->execute();
         $this->callObservers(MailAddress::EVENT_DELETE);
 
+        $this->owners = array();
+        $this->aliasList = array();
     }
 
     /**
@@ -217,6 +227,9 @@ class MailAddressImpl implements MailAddress, Observer
      */
     public function addTarget($address)
     {
+        if(!$this->exists()){
+            return;
+        }
         $address = trim($address);
         if(!$this->validMail($address)){
             return;
@@ -268,7 +281,7 @@ class MailAddressImpl implements MailAddress, Observer
             $this->clearTargetsStatement->bindParam("id", $this->id);
         }
         $this->clearTargetsStatement->execute();
-        $this->aliasList = [];
+        $this->aliasList = array();
     }
 
     /**
@@ -467,11 +480,32 @@ class MailAddressImpl implements MailAddress, Observer
 
     public function onChange(Observable $subject, $changeType)
     {
-        if($this->mailbox !== $subject || $changeType != MailMailbox::EVENT_DELETE){
-            return;
+
+        if($subject instanceof MailMailbox){
+            if($this->mailbox !== $subject || $changeType != MailMailbox::EVENT_DELETE){
+                return;
+            }
+            $this->mailbox->detachObserver($this);
+            $this->mailbox = null;
+
+        } else if($subject instanceof User){
+            if($changeType == User::EVENT_DELETE){
+                $subject->detachObserver($this);
+            } else if($changeType == User::EVENT_USERNAME_UPDATE){
+                $k = array_search($subject, $this->owners);
+                if($k === false){
+                    return;
+                }
+                if($k == $subject->getUsername()){
+                    return;
+                }
+                $this->owners[$subject->getUsername()] = $this->owners[$k];
+                unset($this->owners[$k]);
+
+
+            }
         }
-        $this->mailbox->detachObserver($this);
-        $this->mailbox = null;
+
 
     }
 
@@ -497,7 +531,18 @@ class MailAddressImpl implements MailAddress, Observer
      */
     public function addOwner(User $owner)
     {
-        // TODO: Implement addOwner() method.
+        if($this->isOwner($owner) || !$this->exists()){
+            return;
+        }
+
+        if($this->addOwnerStatement == null){
+            $this->addOwnerStatement = $this->db->getConnection()->prepare("INSERT INTO MailAddressUserOwnership (address_id, username) VALUES (?, ?)");
+        }
+        $this->addOwnerStatement->execute(array($this->getId(), $owner->getUsername()));
+        $this->owners[$owner->getUsername()] = $owner;
+        $owner->attachObserver($this);
+
+
     }
 
     /**
@@ -507,7 +552,20 @@ class MailAddressImpl implements MailAddress, Observer
      */
     public function removeOwner(User $owner)
     {
-        // TODO: Implement removeOwner() method.
+
+        if(!$this->isOwner($owner)){
+            return;
+        }
+
+        if($this->removeOwnerStatement == null){
+            $this->removeOwnerStatement= $this->db->getConnection()->prepare("DELETE FROM MailAddressUserOwnership WHERE address_id = ? AND username = ?");
+        }
+        $this->removeOwnerStatement->execute(array($this->getId(), $owner->getUsername()));
+
+        /** @var User $owner */
+        $owner = $this->owners[$owner->getUsername()];
+        $owner->detachObserver($this);
+        unset($this->owners[$owner->getUsername()]);
     }
 
     /**
@@ -517,6 +575,44 @@ class MailAddressImpl implements MailAddress, Observer
      */
     public function isOwner(User $owner)
     {
-        // TODO: Implement isOwner() method.
+        $this->setUpOwners();
+        return isset($this->owners[$owner->getUsername()]);
+    }
+
+    /**
+     * Lists the username of the owners as strings.
+     * @param bool $instances If true will returns instances rather than username strings
+     * @return array
+     */
+    public function listOwners($instances = false)
+    {
+        $returnArray = array();
+        if($instances){
+            foreach($this->owners as $key=>$val){
+                $returnArray[] = $this->userLibrary->getUser($key);
+            }
+
+        } else {
+            foreach($this->owners as $key=>$val){
+                $returnArray[] = $key;
+            }
+
+        }
+
+        return $returnArray;
+    }
+
+    private function setUpOwners()
+    {
+        if($this->setUpOwnerStatement == null){
+            $this->setUpOwnerStatement = $this->db->getConnection()->prepare("SELECT username FROM MailAddressUserOwnership WHERE address_id = ?");
+            $this->setUpOwnerStatement->execute(array($this->getId()));
+            foreach($this->setUpOwnerStatement->fetchAll(PDO::FETCH_NUM) as $row ){
+                $username = $row[0];
+                $this->owners[$username] = $user = $this->userLibrary->getUser($username);
+                $user->attachObserver($this);
+            }
+        }
+
     }
 }

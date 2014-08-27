@@ -26,7 +26,9 @@ class MailDomainImplTest extends CustomDatabaseTestCase{
     private $domainLib;
 
     private $mailPass;
+    /** @var  StubUserLibraryImpl */
     private $databaseName;
+    private $userLibrary;
 
     function __construct()
     {
@@ -52,11 +54,12 @@ class MailDomainImplTest extends CustomDatabaseTestCase{
         $this->db = new MySQLDBImpl($this->config);
         $this->databaseName = self::$mysqlOptions->getDatabase();
         $this->domainLib = new StubMailDomainLibraryImpl();
-        $this->domain = new MailDomainImpl('test.dk',$this->databaseName, $this->db, $this->domainLib);
-        $this->domain2 = new MailDomainImpl('test2.dk',$this->databaseName, $this->db, $this->domainLib);
+        $this->userLibrary = $userLibrary = new StubUserLibraryImpl();
+        $this->domain = new MailDomainImpl('test.dk',$this->databaseName, $this->db, $userLibrary, $this->domainLib);
+        $this->domain2 = new MailDomainImpl('test2.dk',$this->databaseName, $this->db, $userLibrary, $this->domainLib);
         $this->modTime = strtotime("2000-01-01 13:00:00");
         $this->creaTime = strtotime("2000-01-01 12:00:00");
-        $this->nonCreatedDomain = new MailDomainImpl('non-existing.dk',$this->databaseName, $this->db, $this->domainLib);
+        $this->nonCreatedDomain = new MailDomainImpl('non-existing.dk',$this->databaseName, $this->db, $userLibrary, $this->domainLib);
 
     }
 
@@ -346,7 +349,7 @@ class MailDomainImplTest extends CustomDatabaseTestCase{
      */
     private function cloneDomain($domain)
     {
-        return new MailDomainImpl($domain->getDomainName(), $this->databaseName, $this->db, $this->domainLib);
+        return new MailDomainImpl($domain->getDomainName(), $this->databaseName, $this->db, $this->userLibrary, $this->domainLib);
     }
 
 

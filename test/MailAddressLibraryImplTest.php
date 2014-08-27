@@ -42,7 +42,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase{
 
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->domainLibrary = new MailDomainLibraryImpl($this->config, $this->db);
+        $this->domainLibrary = new MailDomainLibraryImpl($this->config, $this->db, new StubUserLibraryImpl());
         $this->domain = $this->domainLibrary->getDomain('test.dk');
         $this->addressLibrary = $this->domain->getAddressLibrary();
     }
@@ -106,7 +106,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase{
     }
 
     public function testContainsReturnRightBool(){
-        $a = new MailAddressImpl('test', $this->db, $this->addressLibrary);
+        $a = new MailAddressImpl('test', $this->db, new StubUserLibraryImpl(), $this->addressLibrary);
         $this->assertTrue($this->addressLibrary->contains($this->addressLibrary->getAddress('test')));
         $this->assertFalse($this->addressLibrary->contains($a));
 
@@ -142,7 +142,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase{
     }
 
     public function testDeleteFromInstanceNotInLibDoesNothing(){
-        $a = new MailAddressImpl('test', $this->db, $this->addressLibrary);
+        $a = new MailAddressImpl('test', $this->db,new StubUserLibraryImpl(), $this->addressLibrary);
         $this->addressLibrary->deleteAddress($a);
         $this->assertTrue($a->exists());
     }

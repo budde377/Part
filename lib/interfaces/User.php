@@ -5,7 +5,7 @@
  * Date: 22/07/12
  * Time: 14:25
  */
-interface User
+interface User extends Observable
 {
     const EVENT_USERNAME_UPDATE = 1;
     const EVENT_DELETE = 2;

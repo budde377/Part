@@ -10,6 +10,7 @@ class MailDomainLibraryImpl implements MailDomainLibrary, Observer
 {
 
     private $databaseName;
+    private $userLibrary;
     private $db;
     /** @var  array */
     private $domainList;
@@ -18,8 +19,9 @@ class MailDomainLibraryImpl implements MailDomainLibrary, Observer
     /** @var  PDO */
     private $connection;
 
-    function __construct(Config $config, DB $db)
+    function __construct(Config $config, DB $db, UserLibrary $userLibrary)
     {
+        $this->userLibrary = $userLibrary;
         $this->databaseName = $config->getMySQLConnection()['database'];
         $this->db = $db;
         $this->connection = $db->getConnection();
@@ -58,7 +60,7 @@ class MailDomainLibraryImpl implements MailDomainLibrary, Observer
     {
         $d = $this->getDomain($domain);
         if ($d == null) {
-            $d = ($this->domainList[$domain] = new MailDomainImpl($domain, $this->databaseName, $this->db, $this));
+            $d = ($this->domainList[$domain] = new MailDomainImpl($domain, $this->databaseName, $this->db, $this->userLibrary, $this));
             $d->attachObserver($this);
         }
 
@@ -113,7 +115,7 @@ class MailDomainLibraryImpl implements MailDomainLibrary, Observer
         $this->domainList = array();
         foreach ($this->listDomainStatement->fetchAll(PDO::FETCH_ASSOC) as $d) {
             $domain = $d['domain'];
-            $d = ($this->domainList[$domain] = new MailDomainImpl($domain, $this->databaseName, $this->db, $this));
+            $d = ($this->domainList[$domain] = new MailDomainImpl($domain, $this->databaseName, $this->db, $this->userLibrary, $this));
             $d->attachObserver($this);
         }
 

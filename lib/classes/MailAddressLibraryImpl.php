@@ -12,11 +12,13 @@ class MailAddressLibraryImpl implements MailAddressLibrary, Observer{
     private $domain;
     private $addressList;
     private $domainName;
+    private $userLibrary;
 
     private $setupStatement;
 
-    function __construct(MailDomain $domain, DB $db)
+    function __construct(DB $db, UserLibrary $userLibrary, MailDomain $domain)
     {
+        $this->userLibrary = $userLibrary;
         $this->db = $db;
         $this->domain = $domain;
         $this->domainName = $domain->getDomainName();
@@ -91,7 +93,7 @@ class MailAddressLibraryImpl implements MailAddressLibrary, Observer{
         if($this->hasAddress($localPart)){
             return $this->getAddress($localPart);
         }
-        $a = new MailAddressImpl($localPart, $this->db, $this);
+        $a = new MailAddressImpl($localPart, $this->db, $this->userLibrary, $this);
         $a->create();
         $this->addInstance($a);
         return $a;
@@ -122,7 +124,7 @@ class MailAddressLibraryImpl implements MailAddressLibrary, Observer{
         if($this->hasCatchallAddress()){
             return;
         }
-        $address = new MailAddressImpl('', $this->db, $this);
+        $address = new MailAddressImpl('', $this->db, $this->userLibrary, $this);
         $address->create();
         $this->addInstance($address);
     }
@@ -177,7 +179,7 @@ class MailAddressLibraryImpl implements MailAddressLibrary, Observer{
         $this->setupStatement->execute();
 
         foreach($this->setupStatement->fetchAll(PDO::FETCH_ASSOC) as $row){
-            $a = new MailAddressImpl($row['name'], $this->db, $this);
+            $a = new MailAddressImpl($row['name'], $this->db,$this->userLibrary, $this);
             $this->addInstance($a);
         }
 

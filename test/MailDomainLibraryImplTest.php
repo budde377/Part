@@ -17,6 +17,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase{
     private $mailPass;
     private $databaseName;
 
+    private $userLibrary;
 
     function __construct()
     {
@@ -42,7 +43,8 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase{
             'password'=>self::$mysqlOptions->getPassword()
         ));
         $this->db = new MySQLDBImpl($this->config);
-        $this->domainLibrary = new MailDomainLibraryImpl($this->config, $this->db);
+        $this->userLibrary = new StubUserLibraryImpl();
+        $this->domainLibrary = new MailDomainLibraryImpl($this->config, $this->db, $this->userLibrary);
     }
 
 
@@ -83,7 +85,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase{
     }
 
     public function testContainsDomainFailsOnDifferentDomain(){
-        $this->assertFalse($this->domainLibrary->containsDomain(new MailDomainImpl('test.dk', $this->databaseName, $this->db, $this->domainLibrary)));
+        $this->assertFalse($this->domainLibrary->containsDomain(new MailDomainImpl('test.dk', $this->databaseName, $this->db, $this->userLibrary, $this->domainLibrary)));
     }
 
     public function testContainsReturnsTrueIfContains(){
@@ -123,7 +125,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase{
     }
 
     public function testWillNotDeleteInstancesNotInLibrary(){
-        $d = new MailDomainImpl('test.dk', $this->databaseName, $this->db, $this->domainLibrary);
+        $d = new MailDomainImpl('test.dk', $this->databaseName, $this->db, $this->userLibrary, $this->domainLibrary);
         $this->domainLibrary->deleteDomain($d, $this->mailPass);
         $this->assertTrue($d->exists());
     }

@@ -221,4 +221,14 @@ class StubUserImpl implements User
     {
         return null;
     }
+
+    public function attachObserver(Observer $observer)
+    {
+
+    }
+
+    public function detachObserver(Observer $observer)
+    {
+
+    }
 }

@@ -40,8 +40,9 @@ class MailDomainImpl implements MailDomain, Observer
     private $aliasHasBeenSetup = false;
 
 
-    function __construct($domain, $database, DB $db, MailDomainLibrary $library )
+    function __construct($domain, $database, DB $db,  UserLibrary $userLibrary, MailDomainLibrary $library)
     {
+        $this->userLibrary = $userLibrary;
         $this->observerLibrary = new ObserverLibraryImpl($this);
         $this->db = $db;
         $this->domain = $domain;
@@ -250,7 +251,7 @@ class MailDomainImpl implements MailDomain, Observer
      */
     public function getAddressLibrary()
     {
-        return $this->addressLibrary == null? $this->addressLibrary = new MailAddressLibraryImpl($this, $this->db):$this->addressLibrary;
+        return $this->addressLibrary == null? $this->addressLibrary = new MailAddressLibraryImpl($this->db, $this->userLibrary, $this):$this->addressLibrary;
     }
 
     /**

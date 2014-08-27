@@ -172,4 +172,10 @@ interface MailAddress extends Observable {
      */
     public function isOwner(User $owner);
 
+    /**
+     * Lists the username of the owners as strings.
+     * @param bool $instances If true will returns instances rather than username strings
+     * @return array
+     */
+    public function listOwners($instances = false);
 }

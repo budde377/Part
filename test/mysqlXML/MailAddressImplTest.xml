@@ -1,6 +1,24 @@
 <?xml version="1.0"?>
 <mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <database name="cms2012testdb">
+        <table_data name="User">
+            <row>
+                <field name="username">owner1</field>
+                <field name="mail">own1@owner.com</field>
+                <field name="password">somePass</field>
+                <field name="lastLogin">1337-01-03 03:07:00</field>
+                <field name="id">12345678901234567890123</field>
+            </row>
+            <row>
+                <field name="username">owner2</field>
+                <field name="mail">own2@owner.com</field>
+                <field name="password">somePass</field>
+                <field name="lastLogin">1337-01-03 03:07:00</field>
+                <field name="id">12345678901234567890124</field>
+            </row>
+        </table_data>
+        <table_data name="MailAddressUserOwnership">
+        </table_data>
         <table_data name="MailDomain">
             <row>
                 <field name="domain">test.dk</field>
