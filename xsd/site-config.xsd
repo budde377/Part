@@ -151,7 +151,7 @@
     <xs:complexType name="linkedVal">
         <xs:simpleContent>
             <xs:extension base="xs:string">
-                <xs:attribute type="xs:anyURI" name="link" use="required"/>
+                <xs:attribute type="xs:anyURI" name="link" use="optional"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>

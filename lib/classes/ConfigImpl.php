@@ -79,7 +79,7 @@ class ConfigImpl implements Config
             $postScripts = $this->configFile->postScripts->class;
             $this->postScripts = array();
             foreach ($postScripts as $script) {
-                $this->postScripts[(string)$script] = $this->rootPath . $script['link'];
+                $this->postScripts[(string)$script] = isset($script['link']) ? $this->rootPath . $script['link'] : null;
             }
         } else if ($this->postScripts === null) {
             $this->postScripts = array();
@@ -98,7 +98,7 @@ class ConfigImpl implements Config
             $preScripts = $this->configFile->preScripts->class;
             $this->preScripts = array();
             foreach ($preScripts as $script) {
-                $this->preScripts[(string)$script] = $this->rootPath . $script['link'];
+                $this->preScripts[(string)$script] = isset($script['link']) ? $this->rootPath . $script['link'] : null;
             }
         } else if ($this->preScripts === null) {
             $this->preScripts = array();
@@ -118,10 +118,16 @@ class ConfigImpl implements Config
             $this->pageElements = array();
             $elements = $this->configFile->pageElements->class;
             foreach ($elements as $element) {
-                $this->pageElements[(string)$element['name']] = array(
+                $ar = array(
                     'name' => (string)$element['name'],
-                    'link' => $this->rootPath . (string)$element['link'],
                     'className' => (string)$element);
+
+                if (isset($element['link'])) {
+                   $ar['link'] = $this->rootPath . (string)$element['link'];
+
+                }
+
+                $this->pageElements[(string)$element['name']] = $ar;
             }
         }
 
@@ -142,11 +148,15 @@ class ConfigImpl implements Config
             $this->optimizers = array();
             $optimizer = $this->configFile->optimizers->class;
             foreach ($optimizer as $element) {
-                $this->optimizers[(string)$element['name']] = array(
+                $ar = array(
                     'name' => (string)$element['name'],
-                    'link' => $this->rootPath . (string)$element['link'],
                     'className' => (string)$element);
+                if (isset($element['link'])) {
+                    $ar['link'] = $this->rootPath . (string)$element['link'];
+                }
+                $this->optimizers[(string)$element['name']] = $ar;
             }
+
         }
 
         if (isset($this->optimizers[$name])) {
@@ -233,8 +243,7 @@ class ConfigImpl implements Config
      * The link should be relative to a root path provided.
      * @return array
      */
-    public
-    function getAJAXRegistrable()
+    public function getAJAXRegistrable()
     {
 
         if ($this->ajaxRegistrable != null) {
@@ -249,8 +258,12 @@ class ConfigImpl implements Config
 
 
         foreach ($this->configFile->AJAXRegistrable->class as $registrable) {
-            $this->ajaxRegistrable[] = array("class_name" => (string)$registrable, "path" => $this->rootPath . $registrable['link'],
+            $ar = array("class_name" => (string)$registrable,
                 "ajax_id" => (string)$registrable['ajax_id']);
+            if (isset($registrable['link'])) {
+                $ar['link'] = $this->rootPath . $registrable['link'];
+            }
+            $this->ajaxRegistrable[] = $ar;
         }
         return $this->ajaxRegistrable;
     }

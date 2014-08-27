@@ -108,7 +108,7 @@ class AJAXRegisterImplTest extends PHPUnit_Framework_TestCase
 
     public function testRegisterWillThrowExceptionOnInvalidLink(){
         $config = new StubConfigImpl();
-        $config->setAJAXRegistrable(array(array('class_name'=>'nonExistingClass', 'path'=>'notARealFile', 'ajax_id'=>'someId')));
+        $config->setAJAXRegistrable(array(array('class_name'=>'nonExistingClass', 'link'=>'notARealFile', 'ajax_id'=>'someId')));
         $this->assertEquals(0, count($this->register->listRegistered()));
         $exceptionWasThrown = false;
         try{
@@ -123,7 +123,7 @@ class AJAXRegisterImplTest extends PHPUnit_Framework_TestCase
 
     public function testRegisterWillThrowExceptionOnInvalidClassName(){
         $config = new StubConfigImpl();
-        $config->setAJAXRegistrable(array(array('class_name'=>'nonExistingClass','path'=>__FILE__, 'ajax_id'=>'someId')));
+        $config->setAJAXRegistrable(array(array('class_name'=>'nonExistingClass','link'=>__FILE__, 'ajax_id'=>'someId')));
         $this->assertEquals(0, count($this->register->listRegistered()));
         $exceptionWasThrown = false;
         try{
@@ -137,7 +137,7 @@ class AJAXRegisterImplTest extends PHPUnit_Framework_TestCase
 
     public function testRegisterWillThrowExceptionOnNotRightInstance(){
         $config = new StubConfigImpl();
-        $config->setAJAXRegistrable(array(array('class_name'=>'AJAXRegisterImplTest', 'path'=>__FILE__, 'ajax_id'=>'someId')));
+        $config->setAJAXRegistrable(array(array('class_name'=>'AJAXRegisterImplTest', 'link'=>__FILE__, 'ajax_id'=>'someId')));
         $this->assertEquals(0, count($this->register->listRegistered()));
         $exceptionWasThrown = false;
         try{
@@ -151,7 +151,7 @@ class AJAXRegisterImplTest extends PHPUnit_Framework_TestCase
 
     public function testRegisterWillRegisterOnRightInstanceInConfig(){
         $config = new StubConfigImpl();
-        $config->setAJAXRegistrable(array(array('class_name'=>'NullRegistrableImpl', 'path'=>dirname(__FILE__).'/stubs/NullRegistrableImpl.php', 'ajax_id'=>'someId')));
+        $config->setAJAXRegistrable(array(array('class_name'=>'NullRegistrableImpl', 'link'=>dirname(__FILE__).'/stubs/NullRegistrableImpl.php', 'ajax_id'=>'someId')));
         $this->assertEquals(0, count($this->register->listRegistered()));
         $this->assertEquals(0, count($this->register->listRegistered()));
         $this->register->registerAJAXFromConfig($config);
@@ -163,7 +163,7 @@ class AJAXRegisterImplTest extends PHPUnit_Framework_TestCase
 
     public function testRegisterWillRegisterTwoOnRightInstanceInConfig(){
         $config = new StubConfigImpl();
-        $config->setAJAXRegistrable(array(array('class_name'=> 'NullRegistrableImpl', 'path'=>dirname(__FILE__).'/stubs/NullRegistrableImpl.php', 'ajax_id'=>'someId'),array('class_name'=> 'NullRegistrableImpl', 'path'=>dirname(__FILE__).'/stubs/NullRegistrableImpl.php', 'ajax_id'=>'someId2')));
+        $config->setAJAXRegistrable(array(array('class_name'=> 'NullRegistrableImpl', 'ajax_id'=>'someId'),array('class_name'=> 'NullRegistrableImpl', 'link'=>dirname(__FILE__).'/stubs/NullRegistrableImpl.php', 'ajax_id'=>'someId2')));
         $this->assertEquals(0, count($this->register->listRegistered()));
         $this->assertEquals(0, count($this->register->listRegistered()));
         $this->register->registerAJAXFromConfig($config);
@@ -173,4 +173,5 @@ class AJAXRegisterImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('someId2', $registered[1]);
     }
 
+    //TODO test for no link
 }

@@ -138,6 +138,26 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($rootPath . 'someLink', $element['link'], 'The element[link] was not as expected');
     }
 
+    public function testGetPageElementReturnArrayWithElementInListButNoLink()
+    {
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        <pageElements>
+            <class name='someName'>SomeClassName</class>
+        </pageElements>
+        </config>");
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $element = $config->getPageElement('someName');
+        $this->assertTrue(is_array($element), 'The getPageElement did not return array with element in list');
+        $this->assertArrayHasKey('className', $element, 'The array did not contain key className');
+        $this->assertArrayHasKey('name', $element, 'The array did not contain key name');
+        $this->assertArrayNotHasKey('link', $element);
+        $this->assertEquals('SomeClassName', $element['className'], 'The element[className] was not as expected');
+        $this->assertEquals('someName', $element['name'], 'The element[name] was not as expected');
+
+    }
+
 
     public function testGetOptimizerReturnNullWithEmptyConfigXML()
     {
@@ -184,6 +204,25 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($rootPath . 'someLink', $element['link'], 'The element[link] was not as expected');
     }
 
+    public function testGetOptimizerReturnArrayWithOptimizerInListButNoLink()
+    {
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        <optimizers>
+        <class name='someName'>SomeClassName</class>
+        </optimizers>
+        </config>");
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $element = $config->getOptimizer('someName');
+        $this->assertTrue(is_array($element), 'The getOptimizer did not return array with element in list');
+        $this->assertArrayHasKey('className', $element, 'The array did not contain key className');
+        $this->assertArrayHasKey('name', $element, 'The array did not contain key name');
+        $this->assertArrayNotHasKey('link', $element, 'The array did contain key link');
+        $this->assertEquals('SomeClassName', $element['className'], 'The element[className] was not as expected');
+        $this->assertEquals('someName', $element['name'], 'The element[name] was not as expected');
+    }
+
     public function testGetPreScriptReturnEmptyArrayWithEmptyConfig()
     {
         $emptyConfigXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
@@ -208,6 +247,22 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $preScript = $config->getPreScripts();
         $this->assertArrayHasKey('main', $preScript, 'getPreScripts did not return array with right entrance');
         $this->assertEquals($rootPath . 'some_link', $preScript['main'], 'getPreScripts did not return array with right link');
+
+    }
+
+    public function testGetPreScriptHasEntrySpecifiedInConfigWithLinkAsValButNoLink()
+    {
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        <preScripts>
+        <class >main</class>
+        </preScripts>
+        </config>");
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $preScript = $config->getPreScripts();
+        $this->assertArrayHasKey('main', $preScript, 'getPreScripts did not return array with right entrance');
+        $this->assertNull($preScript['main'], 'getPreScripts did not return array with right link');
 
     }
 
@@ -249,6 +304,20 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $config = new ConfigImpl($configXML, $rootPath);
         $preScript = $config->getPostScripts();
         $this->assertEquals($rootPath . 'some_link', $preScript['main'], 'getPostScripts did not return array with right link');
+
+    }
+    public function testGetPostScriptHasEntrySpecifiedInConfigWithLinkAsValAndRootPrependedButNoLink()
+    {
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        <postScripts>
+        <class >main</class>
+        </postScripts>
+        </config>");
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $preScript = $config->getPostScripts();
+        $this->assertNull( $preScript['main'], 'getPostScripts did not return array with right link');
 
     }
 
@@ -304,14 +373,13 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetAJAXRegistrableHasEntrySpecifiedInConfig()
     {
         $path1 = "path1";
-        $path2 = "path2";
         $id1 = "id1";
         $id2 = "id2";
         $configXML = simplexml_load_string("
         <config>{$this->defaultOwner}
         <AJAXRegistrable>
         <class link='$path1' ajax_id='$id1'>main</class>
-        <class link='$path2' ajax_id='$id2'>main2</class>
+        <class ajax_id='$id2'>main2</class>
         </AJAXRegistrable>
         </config>");
         $rootPath = dirname(__FILE__) . '/';
@@ -321,16 +389,15 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey(1, $registrable, 'getAJAXRegistrable did not return array with right entrance');
         $this->assertTrue(is_array($registrable[0]));
         $this->assertTrue(is_array($registrable[1]));
-        $this->assertArrayHasKey('path',$registrable[0]);
+        $this->assertArrayHasKey('link',$registrable[0]);
         $this->assertArrayHasKey('ajax_id',$registrable[0]);
         $this->assertArrayHasKey('class_name',$registrable[0]);
-        $this->assertEquals($registrable[0]['path'],$rootPath.$path1);
+        $this->assertEquals($registrable[0]['link'],$rootPath.$path1);
         $this->assertEquals($registrable[0]['ajax_id'],$id1);
         $this->assertEquals($registrable[0]['class_name'],'main');
-        $this->assertArrayHasKey('path',$registrable[1]);
+        $this->assertArrayNotHasKey('link',$registrable[1]);
         $this->assertArrayHasKey('ajax_id',$registrable[1]);
         $this->assertArrayHasKey('class_name',$registrable[1]);
-        $this->assertEquals($registrable[1]['path'],$rootPath.$path2);
         $this->assertEquals($registrable[1]['ajax_id'],$id2);
         $this->assertEquals($registrable[1]['class_name'],'main2');
     }

@@ -53,6 +53,23 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
 
     }
 
+    public function testClassPathIsOptional()
+    {
+        $configXML = simplexml_load_string("
+        <config>
+        {$this->defaultOwner}
+        <pageElements>
+            <class name='someElement' >NullPageElementImpl</class>
+        </pageElements>
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
+        $element = $pageElementFactory->getPageElement('someElement');
+        $this->assertTrue(is_object($element), 'Did not return an object');
+        $this->assertInstanceOf('NullPageElementImpl', $element, 'Did not return element of right instance.');
+
+    }
+
     public function testPageElementWillBeCached()
     {
         $configXML = simplexml_load_string("

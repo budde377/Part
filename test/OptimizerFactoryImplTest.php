@@ -38,6 +38,24 @@ class OptimizerFactoryImplTest extends PHPUnit_Framework_TestCase
 
     }
 
+    public function testWillReturnOptimizerIfElementInListButNoLink()
+    {
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("
+        <config>
+        {$this->defaultOwner}
+        <optimizers>
+            <class name='someElement'>NullOptimizerImpl</class>
+        </optimizers>
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $optimizerFactory = new OptimizerFactoryImpl($config);
+        $element = $optimizerFactory->getOptimizer('someElement');
+        $this->assertTrue(is_object($element), 'Did not return an object');
+        $this->assertInstanceOf('NullOptimizerImpl', $element, 'Did not return element of right instance.');
+
+    }
+
     public function testWillReturnThrowExceptionIfElementNotInstanceOfOptimizer()
     {
         /** @var $configXML SimpleXMLElement */
