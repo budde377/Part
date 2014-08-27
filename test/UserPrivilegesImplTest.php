@@ -19,6 +19,8 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
     /** @var $page2 */
     private $page2;
 
+    /** @var  StubPageOrderImpl */
+    private $pageLibrary;
 
     function __construct($dataset = null)
     {
@@ -37,6 +39,8 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
         $this->page2 = new PageImpl('page2', $this->db);
         $this->userPrivileges = new UserPrivilegesImpl($this->user, $this->db);
 
+        $this->pageLibrary = new StubPageOrderImpl();
+        $this->pageLibrary->setOrder(array(null => array($this->page1, $this->page2)));
     }
 
     private function setUpAllPrivileges()
@@ -137,6 +141,7 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
     }
 
 
+
     public function testRemovePagePrivilegesWillBePersistent()
     {
         $this->userPrivileges->addPagePrivileges($this->page1);
@@ -144,6 +149,39 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
         $this->userPrivileges = new UserPrivilegesImpl($this->user, $this->db);
         $this->assertFalse($this->userPrivileges->hasPagePrivileges($this->page1));
     }
+
+    public function testListPagePrivilegesWillListIdAsString(){
+        $this->userPrivileges->addPagePrivileges($this->page1);
+        $array = $this->userPrivileges->listPagePrivileges();
+        $this->assertTrue(is_array($array));
+        $this->assertEquals(1, count($array));
+        $this->assertArrayHasKey(0, $array);
+        $this->assertEquals($this->page1->getID(), $array[0]);
+    }
+
+    public function testListPagePrivilegesWillReturnEmptyArrayIfRoot(){
+        $this->userPrivileges->addPagePrivileges($this->page1);
+        $this->userPrivileges->addRootPrivileges();
+        $array = $this->userPrivileges->listPagePrivileges();
+        $this->assertEquals(0, count($array));
+    }
+
+    public function testListPagePrivilegesWillReturnEmptyArrayIfSiteAdmin(){
+        $this->userPrivileges->addPagePrivileges($this->page1);
+        $this->userPrivileges->addSitePrivileges();
+        $array = $this->userPrivileges->listPagePrivileges();
+        $this->assertEquals(0, count($array));
+    }
+
+    public function testListPagePrivilegesWillReturnRightInstanceIfGivenPageLibrary(){
+        $this->userPrivileges->addPagePrivileges($this->page1);
+        $array = $this->userPrivileges->listPagePrivileges($this->pageLibrary);
+        $this->assertTrue(is_array($array));
+        $this->assertEquals(1, count($array));
+        $this->assertArrayHasKey(0, $array);
+        $this->assertTrue($this->page1 === $array[0]);
+    }
+
 
     public function testRevokeAllPrivilegesWillBePersistent()
     {
@@ -173,5 +211,9 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
         $userPrivileges = new UserPrivilegesImpl($this->user, $this->db);
         $this->assertTrue($userPrivileges->hasRootPrivileges());
     }
+
+
+
+
 
 }

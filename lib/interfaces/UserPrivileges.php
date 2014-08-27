@@ -45,6 +45,16 @@ interface UserPrivileges
     public function hasPagePrivileges(Page $page);
 
     /**
+     * Will return an array of strings containing the sites that are under the users control.
+     * If the user has site or root privileges an empty array is returned.
+     * If the user has no privileges an empty array is returned.
+     *
+     * @param PageOrder $pageOrder If order is given it will return array containing instances from the PageOrder
+     * @return array
+     */
+    public function listPagePrivileges(PageOrder $pageOrder = null);
+
+    /**
      * Will revoke Root privileges
      * @return void
      */
