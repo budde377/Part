@@ -29,13 +29,15 @@ class UserSettingsEditUsersPageElementImpl extends PageElementImpl
     {
         $privileges = $user->getUserPrivileges();
         $pages = "";
-        if (!$privileges->hasRootPrivileges() && !$privileges->hasSitePrivileges()) {
-            /** @var $page Page */
-            foreach ($this->pageOrder->listPages() as $page) {
-                $pages .= $privileges->hasPagePrivileges($page) ? $page->getID() . " " : "";
+        $first = true;
+        foreach ($privileges->listPagePrivileges() as $pageString) {
+            if(!$first){
+                $pages .= " ";
             }
+            $pages .= $pageString ;
+            $first = false;
         }
-        $current = $user->isLoggedIn()?"current" : "";
+        $current = $user->isLoggedIn() ? "current" : "";
         return "
             <li class='$current' data-parent='{$user->getParent()}' data-mail='{$user->getMail()}' data-username='{$user->getUsername()}' data-privileges='{$this->userPrivilegeString($user, true)}' data-pages='$pages' data-last-login='{$user->getLastLogin()}'>
                 <a href='mailto:{$user->getMail()}' class='val'>{$user->getUsername()}</a>, <span class='privileges'>({$this->userPrivilegeString($user)})</span>
