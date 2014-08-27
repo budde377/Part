@@ -250,7 +250,7 @@ String dateString(DateTime dt) {
     returnString = "i dag ";
   }
 
-  if (dt.difference(now).inDays > 7) {
+  if (now.difference(dt).inDays > 7) {
     returnString += "d. ${dt.day}. ${monthNumberToName(dt.month)} ${dt.year} ";
   }
 

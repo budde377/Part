@@ -431,7 +431,7 @@ class UserSettingsUserListInitializer extends core.Initializer {
     var infoBox = new InfoBox("Sidst set: $loginString");
     var time = li.querySelector('.time');
     infoBox.backgroundColor = InfoBox.COLOR_BLACK;
-    time.onMouseOver.listen((_)=>infoBox.showAboveCenterOfElement(time));
+    time.onMouseOver.listen((_) => infoBox.showAboveCenterOfElement(time));
     time.onMouseOut.listen((_)=>infoBox.remove());
 
     var delete = li.querySelector('.delete');
