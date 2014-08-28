@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -6,7 +7,7 @@
  * Time: 15:31
  * To change this template use File | Settings | File Templates.
  */
-class JSONResponseImpl implements JSONResponse
+class JSONResponseImpl extends JSONElementImpl implements JSONResponse
 {
     private $errorCode;
     private $type;
@@ -37,32 +38,11 @@ class JSONResponseImpl implements JSONResponse
         $returnArray = array();
         $returnArray['type'] = 'response';
         $returnArray['response_type'] = $this->type;
-
-        if($this->errorCode !== null){
-            $returnArray['error_code'] = $this->errorCode;
-        }
-        if($this->payload !== null){
-            $returnArray['payload'] = $this->generatePayloadArray($this->payload);
-        }
-        if($this->id !== null){
-            $returnArray['id'] = $this->id;
-        }
+        $returnArray['error_code'] = $this->errorCode;
+        $returnArray['payload'] = $this->payload;
+        $returnArray['id'] = $this->id;
 
         return $returnArray;
-    }
-
-    private function generatePayloadArray($payload){
-        if(is_scalar($payload)){
-            return $payload;
-        } else if($payload instanceof JSONObject){
-            return $payload->getAsArray();
-        } else {
-            $returnArray = array();
-            foreach($payload as $key=>$val){
-                $returnArray[$key] = $this->generatePayloadArray($val);
-            }
-            return $returnArray;
-        }
     }
 
     /**
@@ -79,18 +59,19 @@ class JSONResponseImpl implements JSONResponse
      */
     public function setPayload($payload)
     {
-        if(!$this->checkPayload($payload)){
+        if (!$this->checkPayload($payload)) {
             return;
         }
         $this->payload = $payload;
     }
 
-    private function checkPayload($payload){
-        if(is_scalar($payload) || $payload instanceof JSONObject){
+    private function checkPayload($payload)
+    {
+        if (is_scalar($payload) || $payload instanceof JSONObject) {
             return true;
-        } else if (is_array($payload)){
+        } else if (is_array($payload)) {
             $ok_array = true;
-            foreach($payload as $val){
+            foreach ($payload as $val) {
                 $ok_array = $ok_array && $this->checkPayload($val);
             }
             return $ok_array;

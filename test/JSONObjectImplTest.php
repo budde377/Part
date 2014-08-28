@@ -9,7 +9,7 @@
 class JSONObjectImplTest extends PHPUnit_Framework_TestCase
 {
     private $objectName = "SomeObject";
-    /** @var JSONObject */
+    /** @var JSONObjectImpl */
     private $object;
 
     protected function setUp()
@@ -45,6 +45,18 @@ class JSONObjectImplTest extends PHPUnit_Framework_TestCase
         $this->object->setVariable($variableName,$this);
         $this->assertNull($this->object->getVariable($variableName));
     }
+    public function testSetterWillNotSetArrayWithNonScalar(){
+        $variableName = "testVariable";
+        $this->object->setVariable($variableName,array($this));
+        $this->assertNull($this->object->getVariable($variableName));
+    }
+
+    public function testSetterWillSetArrayContainingArraysOrScalars(){
+        $variableName = "testVariable";
+        $variableValue = array("test", 'asd' => 'dsa', array(1, 2 , 3));
+        $this->object->setVariable($variableName,$variableValue);
+        $this->assertEquals($variableValue, $this->object->getVariable($variableName));
+    }
 
     public function testSettersWillSetInstanceOfJSONObject(){
         $variableName = "testVariable";
@@ -70,15 +82,8 @@ class JSONObjectImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('object',$array['type']);
         $this->assertEquals($this->objectName,$array['name']);
         $this->assertEquals('test',$array['variables']['string']);
-        $this->assertTrue(is_array($array['variables']['object']));
-
-        $this->assertArrayHasKey('type',$array['variables']['object']);
-        $this->assertArrayHasKey('name',$array['variables']['object']);
-        $this->assertArrayHasKey('variables',$array['variables']['object']);
-        $this->assertTrue(is_array($array['variables']['object']['variables']));
-        $this->assertEquals('newObject',$array['variables']['object']['name']);
-        $this->assertEquals('object',$array['variables']['object']['type']);
-        $this->assertEquals(0,count($array['variables']['object']['variables']));
+        $this->assertInstanceOf('JSONObject', $array['variables']['object']);
+        $this->assertEquals($newObject, $array['variables']['object']);
     }
 
     public function testGetAsJSONStringWillBeLikeArray(){

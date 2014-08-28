@@ -6,13 +6,26 @@
  * Time: 10:00
  * To change this template use File | Settings | File Templates.
  */
-interface JSONFunction
+interface JSONFunction extends JSONTarget
 {
+
     /**
-     * Will return a numerical array of arguments as strings
+     * @return JSONTarget
+     */
+    public function getTarget();
+
+    /**
+     * Will return a numerical array of arguments
      * @return Array
      */
     public function getArgs();
+
+    /**
+     * Will return argument at index given
+     * @param $num
+     * @return mixed
+     */
+    public function getArg($num);
 
     /**
      * Will return the name of the function as a String
@@ -21,9 +34,16 @@ interface JSONFunction
     public function getName();
 
     /**
-     * @param array $args Associative array containing arg name and value
-     * @return JSONResponse
+     * Will set an argument with value
+     * @param int $num
+     * @param mixed $value
+     * @return void
      */
-    public function call(array $args = array());
+    public function setArg($num, $value);
 
+    /**
+     * Clears arguments
+     * @return void
+     */
+    public function clearArguments();
 }

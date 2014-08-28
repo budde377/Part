@@ -1,38 +1,67 @@
 <?php
 /**
- * Created by JetBrains PhpStorm.
+ * Created by PhpStorm.
  * User: budde
- * Date: 22/01/13
- * Time: 16:30
- * To change this template use File | Settings | File Templates.
+ * Date: 8/28/14
+ * Time: 12:53 PM
  */
-class JSONFunctionImpl implements JSONFunction
-{
-    private $callFunction;
-    private $args;
-    private $name;
 
-    function __construct($name, callable $callFunction, array $args = array())
+class JSONFunctionImpl extends JSONElementImpl implements JSONFunction{
+
+    private $target;
+    private $name;
+    private $args = array();
+
+    private $size = 0;
+
+    function __construct(JSONTarget $target, $name)
     {
-        $this->args = $args;
-        $this->callFunction = $callFunction;
         $this->name = $name;
+        $this->target = $target;
     }
 
 
     /**
-     * Will return a numerical array of arguments as strings
+     * @return string
+     */
+    public function getAsJSONString()
+    {
+        return json_encode($this->getAsArray());
+    }
+
+    /**
+     * @return array
+     */
+    public function getAsArray()
+    {
+        return array('type'=>'function', 'name' => $this->getName(), 'target' => $this->target->getAsArray(), 'arguments' => $this->args);
+    }
+
+    /**
+     * @return string | JSONFunction
+     */
+    public function getTarget()
+    {
+        return $this->target;
+    }
+
+    /**
+     * Will return a numerical array of arguments
      * @return Array
      */
     public function getArgs()
     {
-        $returnArgs = array();
-        foreach($this->args as $arg){
-            if(is_string($arg)){
-                $returnArgs[] = $arg;
-            }
-        }
-        return $returnArgs;
+        return $this->args;
+    }
+
+    /**
+     * Will return argument at index given
+     * @param $num
+     * @return mixed
+     */
+    public function getArg($num)
+    {
+        return isset($this->args[$num])?$this->args[$num]: null;
     }
 
     /**
@@ -45,12 +74,36 @@ class JSONFunctionImpl implements JSONFunction
     }
 
     /**
-     * @param array $args Associative array containing arg name and value
-     * @return JSONResponse
+     * Will set an argument with value
+     * @param int $num
+     * @param mixed $value
+     * @return void
      */
-    public function call(array $args = array())
+    public function setArg($num, $value)
     {
-        $call = $this->callFunction;
-        return call_user_func_array($call,$args);
+        if(!is_numeric($num)){
+            return;
+        }
+        if(!$this->validValue($value)){
+            return;
+        }
+
+        if($this->size < $num){
+            for($i = $this->size; $i < $num; $i++){
+                $this->args[$i] = null;
+            }
+        }
+        $this->size = $num +1;
+        $this->args[$num] = $value;
+    }
+
+    /**
+     * Clears arguments
+     * @return void
+     */
+    public function clearArguments()
+    {
+        $this->size = 0;
+        $this->args = array();
     }
 }

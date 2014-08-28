@@ -6,7 +6,7 @@
  * Time: 10:00
  * To change this template use File | Settings | File Templates.
  */
-interface JSONElement
+interface JSONElement extends JsonSerializable
 {
 
     /**

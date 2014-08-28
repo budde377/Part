@@ -1,0 +1,15 @@
+<config xmlns="http://christianbud.de/site-config">
+    <MailMySQLConnection>
+        <host>lars</host>
+        <database>lasse</database>
+        <username>bob</username>
+    </MailMySQLConnection>
+    <MySQLConnection>
+        <host>asd</host>
+        <database>asd</database>
+        <username>asd</username>
+        <password>asd</password>
+    </MySQLConnection>
+    <debugMode>false</debugMode>
+
+</config>

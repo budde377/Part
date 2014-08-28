@@ -27,6 +27,7 @@ class ConfigImpl implements Config
     private $enableUpdater;
     private $tmpFolderPath;
     private $log;
+    private $ajaxTypeHandlers;
 
     /**
      * @param SimpleXMLElement $configFile
@@ -123,7 +124,7 @@ class ConfigImpl implements Config
                     'className' => (string)$element);
 
                 if (isset($element['link'])) {
-                   $ar['link'] = $this->rootPath . (string)$element['link'];
+                    $ar['link'] = $this->rootPath . (string)$element['link'];
 
                 }
 
@@ -391,5 +392,33 @@ class ConfigImpl implements Config
         }
 
         return $this->mailMysql;
+    }
+
+    /**
+     * Will return AJAXTypeHandlers as an array, with the num key and an array containing "class_name" and "path" as value.
+     * The link should be relative to a root path provided.
+     * @return array
+     */
+    public function getAJAXTypeHandlers()
+    {
+        if ($this->ajaxTypeHandlers != null) {
+            return $this->ajaxTypeHandlers;
+        }
+
+        $this->ajaxTypeHandlers = array();
+
+        if (!$this->configFile->AJAXTypeHandlers->getName()) {
+            return $this->ajaxTypeHandlers;
+        }
+
+
+        foreach ($this->configFile->AJAXTypeHandlers->class as $handler) {
+            $ar = array("class_name" => (string)$handler);
+            if (isset($handler['link'])) {
+                $ar['link'] = $this->rootPath . $handler['link'];
+            }
+            $this->ajaxRegistrable[] = $ar;
+        }
+        return $this->ajaxRegistrable;
     }
 }

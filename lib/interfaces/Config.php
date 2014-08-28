@@ -63,6 +63,13 @@ interface Config
     public function getAJAXRegistrable();
 
     /**
+     * Will return AJAXTypeHandlers as an array, with the num key and an array containing "class_name" and "path" as value.
+     * The link should be relative to a root path provided.
+     * @return array
+     */
+    public function getAJAXTypeHandlers();
+
+    /**
      * @abstract
      * @param string $name name of the pageElement as specified in config
      * @return array | null Array with entrance className, name, path with ClassName, name provided, and absolute path respectively.

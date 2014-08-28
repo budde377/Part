@@ -18,6 +18,7 @@ class StubConfigImpl implements Config
     private $optimizer;
     private $mysqlConnection;
     private $mailMysqlConnection;
+    private $AJAXTypeHandlers;
 
 
     private $defaultPages = array();
@@ -250,6 +251,25 @@ class StubConfigImpl implements Config
     public function setMailMysqlConnection($mailMysqlConnection)
     {
         $this->mailMysqlConnection = $mailMysqlConnection;
+    }
+
+    /**
+     * Will return AJAXTypeHandlers as an array, with the num key and an array containing "class_name" and "path" as value.
+     * The link should be relative to a root path provided.
+     * @return array
+     */
+    public function getAJAXTypeHandlers()
+    {
+        return $this->AJAXTypeHandlers;
+    }
+
+
+    /**
+     * @param mixed $AJAXTypeHandlers
+     */
+    public function setAJAXTypeHandlers($AJAXTypeHandlers)
+    {
+        $this->AJAXTypeHandlers = $AJAXTypeHandlers;
     }
 
 }

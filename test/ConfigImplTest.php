@@ -422,6 +422,64 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
 
 
+    public function testGetAJAXTypeHandlersReturnEmptyArrayWithEmptyConfig()
+    {
+        $emptyConfigXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($emptyConfigXML, $rootPath);
+        $registrable = $config->getAJAXTypeHandlers();
+        $this->assertTrue(is_array($registrable), 'getAJAXTypeHandlers did not return an array with empty config.');
+        $this->assertTrue(empty($registrable), 'getAJAXTypeHandlers did not return an empty array with empty config.');
+    }
+
+    public function testGetAJAXTypeHandlersHasEntrySpecifiedInConfig()
+    {
+        $path1 = "path1";
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        <AJAXTypeHandlers>
+        <class link='$path1'>main</class>
+        <class >main2</class>
+        </AJAXTypeHandlers>
+        </config>");
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $registrable = $config->getAJAXTypeHandlers();
+        $this->assertArrayHasKey(0, $registrable, 'getAJAXTypeHandlers did not return array with right entrance');
+        $this->assertArrayHasKey(1, $registrable, 'getAJAXTypeHandlers did not return array with right entrance');
+        $this->assertTrue(is_array($registrable[0]));
+        $this->assertTrue(is_array($registrable[1]));
+        $this->assertArrayHasKey('link',$registrable[0]);
+
+        $this->assertArrayHasKey('class_name',$registrable[0]);
+        $this->assertEquals($registrable[0]['link'],$rootPath.$path1);
+        $this->assertEquals($registrable[0]['class_name'],'main');
+        $this->assertArrayNotHasKey('link',$registrable[1]);
+
+        $this->assertArrayHasKey('class_name',$registrable[1]);
+        $this->assertEquals($registrable[1]['class_name'],'main2');
+    }
+
+
+
+    public function testOrderOfAJAXTypeHandlersIsTheSameInFileAsOutput()
+    {
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        <AJAXTypeHandlers>
+        <class link='some_link2'>main2</class>
+        <class link='some_link'>main</class>
+        </AJAXTypeHandlers>
+        </config>");
+
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $registrable = $config->getAJAXTypeHandlers();
+        $this->assertEquals('main2', $registrable[0]['class_name']);
+    }
+
+
+
     public function testGetDefaultPagesWillReturnArrayOnEmptyConfig()
     {
         $configXML = simplexml_load_string("

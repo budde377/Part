@@ -6,7 +6,7 @@
  * Time: 14:57
  * To change this template use File | Settings | File Templates.
  */
-class JSONObjectImpl implements JSONObject
+class JSONObjectImpl extends JSONElementImpl implements JSONObject
 {
 
     private $name;
@@ -34,15 +34,8 @@ class JSONObjectImpl implements JSONObject
      */
     public function getAsArray()
     {
-        $variableArray = array();
-        foreach($this->variables as $key=>$val){
-            if($val instanceof JSONObject){
-                $variableArray[$key] = $val->getAsArray();
-            } else {
-                $variableArray[$key] = $val;
-            }
-        }
-        return array('name'=>$this->name,'type'=>'object','variables'=>$variableArray);
+
+        return array('name'=>$this->name,'type'=>'object','variables'=>$this->variables);
     }
 
     /**
@@ -60,7 +53,7 @@ class JSONObjectImpl implements JSONObject
      */
     public function setVariable($variableName, $value)
     {
-        if(!is_scalar($value) && !($value instanceof JSONObject)){
+        if(!$this->validValue($value)){
             return;
         }
         $this->variables[$variableName] = $value;

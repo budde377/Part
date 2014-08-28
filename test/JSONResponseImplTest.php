@@ -78,11 +78,12 @@ class JSONResponseImplTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('id',$array);
         $this->assertArrayHasKey('response_type',$array);
         $this->assertArrayHasKey('error_code',$array);
-        $this->assertArrayNotHasKey('payload',$array);
+        $this->assertArrayHasKey('payload',$array);
         $this->assertEquals('response',$array['type']);
         $this->assertEquals($this->responseType,$array['response_type']);
         $this->assertEquals(12333,$array['id']);
         $this->assertEquals($this->responseErrorCode,$array['error_code']);
+        $this->assertNull($array['payload']);
     }
 
     public function testGetAsArrayWillConsiderIndex(){
@@ -95,12 +96,11 @@ class JSONResponseImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('response',$array['type']);
 
         $this->assertArrayHasKey('response_type',$array);
-        $this->assertArrayNotHasKey('error_message',$array);
-        $this->assertArrayNotHasKey('error_code',$array);
+        $this->assertArrayHasKey('error_code',$array);
         $this->assertArrayHasKey('payload',$array);
         $this->assertEquals($newResponse->getResponseType(),$array['response_type']);
-        $this->assertTrue(is_array($array['payload']));
-        $this->assertArrayHasKey('type',$array['payload']);
+        $this->assertNull($array['error_code']);
+        $this->assertEquals($object, $array['payload']);
     }
 
     public function testGetAsJSONStringIsEquivalent(){
@@ -112,9 +112,10 @@ class JSONResponseImplTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('type',$array);
         $this->assertEquals('response',$array['type']);
         $this->assertArrayHasKey('response_type',$array);
-        $this->assertArrayNotHasKey('error_message',$array);
-        $this->assertArrayNotHasKey('error_code',$array);
+        $this->assertArrayHasKey('error_code',$array);
         $this->assertArrayHasKey('payload',$array);
+        $this->assertNull($array['error_code']);
+
         $this->assertEquals($newRequest->getResponseType(),$array['response_type']);
         $this->assertTrue(is_array($array['payload']));
         $this->assertArrayHasKey('type',$array['payload']);
@@ -125,7 +126,10 @@ class JSONResponseImplTest extends PHPUnit_Framework_TestCase
         $payload = array('test'=>$object);
         $this->response->setPayload($payload);
         $array = $this->response->getAsArray();
-        $this->assertTrue(is_array($array['payload']['test']));
+        $this->assertTrue(is_array($array['payload']));
+        $this->assertEquals($object, $array['payload']['test']);
     }
+
+
 
 }

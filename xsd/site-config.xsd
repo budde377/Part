@@ -26,32 +26,38 @@
                         </xs:all>
                     </xs:complexType>
                 </xs:element>
-                <xs:element name="defaultPages" type="pages" minOccurs="0">
+                <xs:element name="defaultPages" type="pageSequence" minOccurs="0">
                     <xs:unique name="pageTitle">
                         <xs:selector xpath="page"/>
                         <xs:field xpath="@title"/>
                     </xs:unique>
                 </xs:element>
-                <xs:element name="preScripts" type="scripts" minOccurs="0">
+                <xs:element name="preScripts" type="linkedValClassSequence" minOccurs="0">
                     <xs:unique name="preScriptName">
                         <xs:selector xpath="class"/>
                         <xs:field xpath="."/>
                     </xs:unique>
                 </xs:element>
-                <xs:element name="AJAXRegistrable" type="ajaxRegistrable" minOccurs="0">
+                <xs:element name="AJAXRegistrable" type="ajaxIdLinkedValClassSequence" minOccurs="0">
                     <xs:unique name="AJAXRegistrableName">
                         <xs:selector xpath="class"/>
                         <xs:field xpath="."/>
                     </xs:unique>
                 </xs:element>
-                <xs:element name="postScripts" type="scripts" minOccurs="0">
+                <xs:element name="AJAXTypeHandlers" type="linkedValClassSequence" minOccurs="0">
+                    <xs:unique name="AJAXTypeHandlersName">
+                        <xs:selector xpath="class"/>
+                        <xs:field xpath="."/>
+                    </xs:unique>
+                </xs:element>
+                <xs:element name="postScripts" type="linkedValClassSequence" minOccurs="0">
                     <xs:unique name="postScriptName">
                         <xs:selector xpath="class"/>
                         <xs:field xpath="."/>
                     </xs:unique>
                 </xs:element>
-                <xs:element name="templates" type="templates" minOccurs="0"/>
-                <xs:element name="pageElements" type="pageElements" minOccurs="0">
+                <xs:element name="templates" type="templateSequence" minOccurs="0"/>
+                <xs:element name="pageElements" type="namedLinkedValClassSequence" minOccurs="0">
                     <xs:unique name="pageElementName">
                         <xs:selector xpath="class"/>
                         <xs:field xpath="@name"/>
@@ -61,14 +67,14 @@
                 <xs:element name="MailMySQLConnection" type="dbConnection" minOccurs="0"/>
                 <xs:element name="debugMode" type="xs:boolean" minOccurs="0"/>
                 <xs:element name="enableUpdater" type="xs:boolean" minOccurs="0" />
-                <xs:element name="optimizers" type="pageElements" minOccurs="0">
+                <xs:element name="optimizers" type="namedLinkedValClassSequence" minOccurs="0">
                     <xs:unique name="optimizerName">
                         <xs:selector xpath="class"/>
                         <xs:field xpath="@name"/>
                     </xs:unique>
                 </xs:element>
-                <xs:element name="tmpFolder" type="temp_dir" minOccurs="0"/>
-                <xs:element name="log" type="temp_dir" minOccurs="0" />
+                <xs:element name="tmpFolder" type="requiredPathAttribute" minOccurs="0"/>
+                <xs:element name="log" type="requiredPathAttribute" minOccurs="0" />
             </xs:all>
         </xs:complexType>
     </xs:element>
@@ -89,10 +95,11 @@
             <xs:element name="database" type="xs:string"/>
             <xs:element name="username" type="xs:string"/>
             <xs:element name="password" type="xs:string" />
+
         </xs:all>
     </xs:complexType>
 
-    <xs:complexType name="pages">
+    <xs:complexType name="pageSequence">
         <xs:sequence>
             <xs:element name="page" maxOccurs="unbounded" minOccurs="0">
                 <xs:complexType>
@@ -109,39 +116,43 @@
     </xs:complexType>
 
 
-    <xs:complexType name="templates">
-        <xs:sequence>
-            <xs:element name="template" maxOccurs="unbounded" minOccurs="0">
-                <xs:complexType>
-                    <xs:simpleContent>
-                        <xs:extension base="xs:string">
-                            <xs:attribute name="filename" type="xs:string" />
-                        </xs:extension>
-                    </xs:simpleContent>
-                </xs:complexType>
-            </xs:element>
-        </xs:sequence>
+    <xs:complexType name="templateSequence">
+        <xs:complexContent>
+            <xs:extension base="requiredPathAttribute">
+                <xs:sequence>
+                    <xs:element name="template" maxOccurs="unbounded" minOccurs="0">
+                        <xs:complexType>
+                            <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                    <xs:attribute name="filename" type="xs:string" />
+                                </xs:extension>
+                            </xs:simpleContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="requiredPathAttribute">
         <xs:attribute name="path" type="xs:anyURI" use="required"/>
     </xs:complexType>
 
-    <xs:complexType name="temp_dir">
-        <xs:attribute name="path"/>
-    </xs:complexType>
-
-    <xs:complexType name="scripts">
+    <xs:complexType name="linkedValClassSequence">
         <xs:sequence>
             <xs:element name="class" type="linkedVal" maxOccurs="unbounded" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 
 
-    <xs:complexType name="ajaxRegistrable">
+    <xs:complexType name="ajaxIdLinkedValClassSequence">
         <xs:sequence>
             <xs:element name="class" type="ajaxIdLinkedVal" maxOccurs="unbounded" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="pageElements">
+
+    <xs:complexType name="namedLinkedValClassSequence">
         <xs:sequence>
             <xs:element name="class" type="namedLinkedVal" maxOccurs="unbounded" minOccurs="0"/>
         </xs:sequence>
