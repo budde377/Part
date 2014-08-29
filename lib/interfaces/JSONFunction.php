@@ -46,4 +46,9 @@ interface JSONFunction extends JSONTarget
      * @return void
      */
     public function clearArguments();
+
+
+    public function getId();
+
+    public function setId($id);
 }

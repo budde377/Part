@@ -12,7 +12,6 @@ class StubAJAXTypeHandlerImpl implements AJAXTypeHandler{
     public $types = [];
     public $handle = [];
     public $canHandle = [];
-    public $convert = [];
 
     function __construct()
     {
@@ -75,17 +74,4 @@ class StubAJAXTypeHandlerImpl implements AJAXTypeHandler{
         return $this->handle[$type];
 
     }
-
-    /**
-     * @param $type
-     * @param $instance
-     * @return JSONObject
-     */
-    public function convertInstanceToJSON($type, $instance)
-    {
-        $this->calledMethods[] = ['method'=>'convertInstanceToJSON', 'arguments'=>func_get_args()];
-
-        return $this->convert[$type];
-    }
-
 }

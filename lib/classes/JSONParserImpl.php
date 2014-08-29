@@ -38,10 +38,11 @@ class JSONParserImpl implements JSONParser{
                 return new JSONTypeImpl($obj['type_string']);
                 break;
             case "function":
-                if(!$this->checkArrayKeysExists(['target','name','arguments'], $obj)){
+                if(!$this->checkArrayKeysExists(['target','name','arguments','id'], $obj)){
                     break;
                 }
                 $function = new JSONFunctionImpl($this->parseDecoded($obj['target']), $obj['name']);
+                $function->setId($obj['id']);
                 foreach($obj['arguments'] as $key => $val){
                     $function->setArg($key, $this->parseDecoded($val));
                 }

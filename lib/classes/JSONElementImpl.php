@@ -1,12 +1,13 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: budde
  * Date: 8/28/14
  * Time: 2:31 PM
  */
-
-abstract class JSONElementImpl implements JSONElement{
+abstract class JSONElementImpl implements JSONElement
+{
     /**
      * (PHP 5 &gt;= 5.4.0)<br/>
      * Specify data which should be serialized to JSON
@@ -24,15 +25,20 @@ abstract class JSONElementImpl implements JSONElement{
      * @param mixed $val
      * @return bool
      */
-    protected function validValue($val){
-        if(!is_array($val)){
-          return is_scalar($val) || $val instanceof JSONElement;
+    protected function validValue(&$val)
+    {
+        if (!is_array($val)) {
+            if ($val instanceof JSONObjectSerializable) {
+                $val = $val->jsonObjectSerialize();
+            }
+            return is_scalar($val) || $val instanceof JsonSerializable;
         }
 
-        foreach($val as $v){
-            if(!$this->validValue($v)){
+        foreach ($val as $k => $v) {
+            if (!$this->validValue($v)) {
                 return false;
             }
+            $val[$k] = $v;
         }
         return true;
     }

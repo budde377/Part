@@ -12,12 +12,9 @@ class StubSiteFactoryImpl implements SiteFactory
 
     private $preScriptChain;
     private $postScriptChain;
-    private $template;
-    private $pageElementFactory;
+
     private $config;
-    private $CSSRegister;
-    private $JSRegister;
-    private $AJAXRegister;
+
     private $backendSingletonContainer;
 
     public function __construct()

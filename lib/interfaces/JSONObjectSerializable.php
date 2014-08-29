@@ -1,0 +1,17 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: budde
+ * Date: 8/28/14
+ * Time: 7:59 PM
+ */
+
+interface JSONObjectSerializable {
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+
+    public function jsonObjectSerialize();
+} 

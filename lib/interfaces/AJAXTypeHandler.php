@@ -41,11 +41,4 @@ interface AJAXTypeHandler {
      */
     public function handle($type, JSONFunction $function, $instance = null);
 
-    /**
-     * @param $type
-     * @param $instance
-     * @return JSONObject
-     */
-    public function convertInstanceToJSON($type, $instance);
-
 }

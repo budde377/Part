@@ -12,7 +12,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     private $DBInstance;
     private $CSSRegisterInstance;
     private $JSRegisterInstance;
-    private $AJAXRegisterInstance;
+    private $AJAXServerInstance;
     private $dartRegisterInstance;
     private $pageOrderInstance;
     private $currentPageStrategyInstance;
@@ -204,19 +204,19 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     }
 
     /**
-     * @param mixed $AJAXRegisterInstance
+     * @param AJAXServer $AJAXServerInstance
      */
-    public function setAJAXRegisterInstance(AJAXRegister $AJAXRegisterInstance)
+    public function setJAXServerInstance(AJAXServer $AJAXServerInstance)
     {
-        $this->AJAXRegisterInstance = $AJAXRegisterInstance;
+        $this->AJAXServerInstance = $AJAXServerInstance;
     }
 
     /**
      * @return mixed
      */
-    public function getAJAXRegisterInstance()
+    public function getAJAXServerInstance()
     {
-        return $this->AJAXRegisterInstance;
+        return $this->AJAXServerInstance;
     }
 
 

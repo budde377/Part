@@ -51,6 +51,12 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals(0, count($array));
     }
 
+    public function testSetterSetsId(){
+        $this->assertNull($this->function1->getId());
+        $this->function1->setId($id = 123);
+        $this->assertEquals($id, $this->function1->getId());
+    }
+
     public function testSetArgumentSetsArgument(){
         $val = "LOL";
         $this->function1->setArg(0, $val);
@@ -90,11 +96,23 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase{
     }
 
     public function testSetterWillSetArrayContainingArraysOrScalars(){
-        $variableValue = array("test", 'asd' => 'dsa', array(1, 2 , 3));
+        $variableValue = array("test", 'asd' => 'dsa', array(1, 2 , 3), new NullJsonSerializableImpl());
         $this->function1->setArg(0,$variableValue);
         $this->assertEquals($variableValue, $this->function1->getArg(0));
     }
 
+
+    public function testSetterWillSetArrayContainingJsonObjectSerializable(){
+        $variableValue = new NullJSONObjectSerializableImpl();
+        $this->function1->setArg(0,$variableValue);
+        $this->assertEquals($variableValue->jsonObjectSerialize(), $this->function1->getArg(0));
+    }
+
+    public function testSetterWillSetArrayContainingJsonObjectSerializableInArray(){
+        $variableValue = new NullJSONObjectSerializableImpl();
+        $this->function1->setArg(0, [[$variableValue]]);
+        $this->assertEquals([[$variableValue->jsonObjectSerialize()]], $this->function1->getArg(0));
+    }
 
     public function testWillSetJSONElement(){
         $this->function1->setArg(0, $this->function2);
@@ -106,6 +124,7 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase{
     public function testGetAsArrayReturnsRight(){
         $this->function2->setArg(0, "v0");
         $this->function2->setArg(2, "v2");
+        $this->function2->setId($id = 123);
         $array = $this->function2->getAsArray();
 
         $this->assertTrue(is_array($array));
@@ -113,8 +132,10 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase{
         $this->assertArrayHasKey('target', $array);
         $this->assertArrayHasKey('arguments', $array);
         $this->assertArrayHasKey('name', $array);
+        $this->assertArrayHasKey('id', $array);
         $this->assertEquals('function', $array['type']);
         $this->assertEquals($this->function2Name, $array['name']);
+        $this->assertEquals($id, $array['id']);
         $this->assertEquals($this->function1->getAsArray(), $array['target']);
         $this->assertEquals(array('v0', null,'v2'), $array['arguments']);
 

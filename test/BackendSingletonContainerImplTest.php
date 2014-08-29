@@ -68,12 +68,12 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
 
     }
 
-    public function testGetAJAXRegisterReturnsSameInstanceOfAJAXRegister()
+    public function testGetAJAXServerReturnsSameInstanceOfAJAXServer()
     {
-        $ajax1 = $this->backContainer->getAJAXRegisterInstance();
-        $this->assertInstanceOf('AJAXRegister', $ajax1, 'Did not return instance of AJAXRegister');
+        $ajax1 = $this->backContainer->getAJAXServerInstance();
+        $this->assertInstanceOf('AJAXServer', $ajax1, 'Did not return instance of AJAXServer');
         $this->config->setMysqlConnection(array('host' => 'lol', 'user' => 'lol', 'database' => '', 'password' => ''));
-        $ajax2 = $this->backContainer->getAJAXRegisterInstance();
+        $ajax2 = $this->backContainer->getAJAXServerInstance();
         $this->assertTrue($ajax1 === $ajax2, 'Did not reuse instance');
 
     }

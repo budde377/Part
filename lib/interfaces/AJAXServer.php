@@ -24,12 +24,12 @@ interface AJAXServer {
 
     /**
      * @param string $input
-     * @return string | null
+     * @return JSONResponse
      */
     public function handle($input);
 
     /**
-     * @return string | null
+     * @return JSONResponse
      */
     public function handleFromRequestBody();
 } 

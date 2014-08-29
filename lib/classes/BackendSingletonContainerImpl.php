@@ -17,8 +17,8 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $cssRegister = null;
     /** @var $jsRegister null | JSRegister */
     private $jsRegister;
-    /** @var $ajaxRegister null | AJAXRegister */
-    private $ajaxRegister;
+    /** @var null | AJAXServer */
+    private $ajaxServer;
     /** @var $pageOrder null | PageOrder */
     private $pageOrder;
     /** @var $pageOrder null | CurrentPageStrategy */
@@ -86,14 +86,14 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * This will return an ajax register, and reuse it from time to time
-     * @return AJAXRegister
+     * @return AJAXServerImpl
      */
-    public function getAJAXRegisterInstance()
+    public function getAJAXServerInstance()
     {
-        if ($this->ajaxRegister === null) {
-            $this->ajaxRegister = new AJAXRegisterImpl($this);
+        if ($this->ajaxServer === null) {
+            $this->ajaxServer = new AJAXServerImpl($this);
         }
-        return $this->ajaxRegister;
+        return $this->ajaxServer;
     }
 
     /**

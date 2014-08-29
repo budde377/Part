@@ -59,25 +59,13 @@ class JSONResponseImpl extends JSONElementImpl implements JSONResponse
      */
     public function setPayload($payload)
     {
-        if (!$this->checkPayload($payload)) {
+        if (!$this->validValue($payload)) {
             return;
         }
         $this->payload = $payload;
     }
 
-    private function checkPayload($payload)
-    {
-        if (is_scalar($payload) || $payload instanceof JSONObject) {
-            return true;
-        } else if (is_array($payload)) {
-            $ok_array = true;
-            foreach ($payload as $val) {
-                $ok_array = $ok_array && $this->checkPayload($val);
-            }
-            return $ok_array;
-        }
-        return false;
-    }
+
 
     /**
      * @return mixed

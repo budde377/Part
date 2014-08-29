@@ -48,14 +48,14 @@ class WebsiteImpl implements Website
         $currentPage = $pageStrategy->getCurrentPage();
         $template->setTemplateFromConfig($currentPage->getTemplate(),"_main");
 
-        $ajaxRegister = $this->backendContainer->getAJAXRegisterInstance();
+        $ajaxServer = $this->backendContainer->getAJAXServerInstance();
         if (($id = $this->GETValueOfIndexIfSetElseDefault('ajax', null)) !== null) {
             $template->onlyInitialize();
-            $ajaxRegister->registerAJAXFromConfig($this->config);
+            $ajaxServer->registerHandlersFromConfig();
         }
 
         //Decide output mode
-        if ($id !== null && ($ajax = $ajaxRegister->getAJAXFromRegisteredFromFunctionName($id)) !== null) {
+        if ($id !== null && ($ajax = $ajaxServer->handleFromRequestBody()) !== null) {
             echo $ajax;
         } else if(!$cacheControl->setUpCache()){
             echo $template->render();

@@ -13,9 +13,12 @@ class AJAXServerImpl implements AJAXServer{
 
     private $backendSingletonContainer;
 
+    private $jsonParser;
+
     function __construct(BackendSingletonContainer $backendSingletonContainer)
     {
         $this->backendSingletonContainer = $backendSingletonContainer;
+        $this->jsonParser = new JSONParserImpl();
     }
 
 
@@ -82,7 +85,7 @@ class AJAXServerImpl implements AJAXServer{
      */
     public function handle($input)
     {
-        // TODO: Implement handle() method.
+        return $this->wrapper($this->jsonParser->parse($input));
     }
 
     /**
@@ -90,6 +93,66 @@ class AJAXServerImpl implements AJAXServer{
      */
     public function handleFromRequestBody()
     {
-        // TODO: Implement handleFromRequestBody() method.
+        return $this->wrapper($this->jsonParser->parseFromRequestBody());
+    }
+
+
+    private function wrapper($input){
+        $result = $this->internalHandle($input);
+        if($result == null){
+            return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NOT_IMPLEMENTED);
+        }
+        if($result instanceof JSONResponse){
+            return $result;
+        }
+        $response = new JSONResponseImpl();
+        $response->setPayload($result);
+        return $response;
+    }
+
+    /**
+     * @param $function
+     * @return string | null
+     */
+    private function internalHandle($function){
+        if(!($function instanceof JSONFunction)){
+            return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_MALFORMED_REQUEST);
+        }
+
+        $target = $function->getTarget();
+        $types = [];
+        $instance = null;
+
+        if($target instanceof JSONType){
+
+            if(!isset($this->handlers[$type = $target->getTypeString()])){
+                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION);
+            }
+            $types[] = $target->getTypeString();
+
+        } else if($target instanceof JSONFunction){
+            $instance = $this->internalHandle($target);
+            if(!is_object($instance)){
+                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION);
+            }
+            $reflection = new ReflectionClass($instance);
+            $types = $reflection->getInterfaceNames();
+
+        }
+
+        foreach($types as $type){
+            if(!isset($this->handlers[$type])){
+                continue;
+            }
+            foreach($this->handlers[$type] as $h){
+                /** @var $h AJAXTypeHandler */
+                if(!$h->canHandle($type, $function, $instance)){
+                    continue;
+                }
+                return $h->handle($type, $function, $instance);
+            }
+
+        }
+        return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_MALFORMED_REQUEST);
     }
 }
