@@ -34,6 +34,18 @@ interface JSONFunction extends JSONTarget
     public function getName();
 
     /**
+     * @param string $name
+     * @return void
+     */
+    public function setName($name);
+
+    /**
+     * @param JSONTarget $target
+     * @return void
+     */
+    public function setTarget(JSONTarget $target);
+
+    /**
      * Will set an argument with value
      * @param int $num
      * @param mixed $value

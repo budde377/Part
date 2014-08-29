@@ -123,4 +123,22 @@ class JSONFunctionImpl extends JSONElementImpl implements JSONFunction
     {
         $this->id = $id;
     }
+
+    /**
+     * @param string $name
+     * @return void
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @param JSONTarget $target
+     * @return void
+     */
+    public function setTarget(JSONTarget $target)
+    {
+        $this->target = $target;
+    }
 }

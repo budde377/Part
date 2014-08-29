@@ -47,4 +47,86 @@ class StubJSONFunctionImpl implements JSONFunction
         return $this->response;
     }
 
+    /**
+     * @return string
+     */
+    public function getAsJSONString()
+    {
+    }
+
+    /**
+     * @return array
+     */
+    public function getAsArray()
+    {
+    }
+
+    /**
+     * @return JSONTarget
+     */
+    public function getTarget()
+    {
+    }
+
+    /**
+     * Will return argument at index given
+     * @param $num
+     * @return mixed
+     */
+    public function getArg($num)
+    {
+    }
+
+    /**
+     * @param string $name
+     * @return void
+     */
+    public function setName($name)
+    {
+    }
+
+    /**
+     * @param JSONTarget $target
+     * @return void
+     */
+    public function setTarget(JSONTarget $target)
+    {
+    }
+
+    /**
+     * Will set an argument with value
+     * @param int $num
+     * @param mixed $value
+     * @return void
+     */
+    public function setArg($num, $value)
+    {
+    }
+
+    /**
+     * Clears arguments
+     * @return void
+     */
+    public function clearArguments()
+    {
+    }
+
+    public function getId()
+    {
+    }
+
+    public function setId($id)
+    {
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.4.0)<br/>
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     */
+    public function jsonSerialize()
+    {
+    }
 }

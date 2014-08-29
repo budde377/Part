@@ -26,7 +26,13 @@ interface AJAXServer {
      * @param string $input
      * @return JSONResponse
      */
-    public function handle($input);
+    public function handleFromJSONString($input);
+
+    /**
+     * @param string $input
+     * @return JSONResponse
+     */
+    public function handleFromFunctionString($input);
 
     /**
      * @return JSONResponse

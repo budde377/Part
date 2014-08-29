@@ -36,10 +36,23 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals($this->function1, $this->function2->getTarget());
     }
 
+    public function testSetTargetSets(){
+        $this->function1->setTarget($this->function2);
+        $this->assertEquals($this->function2, $this->function1->getTarget());
+
+    }
+
 
     public function testGetNameGets(){
         $this->assertEquals($this->function1Name, $this->function1->getName());
         $this->assertEquals($this->function2Name, $this->function2->getName());
+    }
+
+    public function testSetNameSets(){
+        $name = "newName";
+        $this->function1->setName($name);
+        $this->assertEquals($name, $this->function1->getName());
+
     }
 
     public function testGetArgumentIsNullPrDefault(){
