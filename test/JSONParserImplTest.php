@@ -40,8 +40,9 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase{
 
         $this->parser = new JSONParserImpl();
         $this->function1Target = new JSONTypeImpl("SomeTarget");
-        $this->function1 = new JSONFunctionImpl($this->function1Target, $this->function1Name);
-        $this->function2 = new JSONFunctionImpl($this->function1, $this->function2Name);
+        $this->function1 = new JSONFunctionImpl($this->function1Name, $this->function1Target);
+
+        $this->function2 = new JSONFunctionImpl($this->function2Name, $this->function1);
         $this->function2->setId(123);
         $this->function2->setArg(3, "v3");
 

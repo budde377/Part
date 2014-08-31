@@ -16,6 +16,8 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
     /** @var  StubAJAXTypeHandlerImpl */
     private $handler1;
     private $handler2;
+    /** @var  FunctionStringParser */
+    private $functionStringParser;
 
     protected function setUp()
     {
@@ -24,6 +26,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->server = new AJAXServerImpl($this->backendContainer);
         $this->handler1 = new StubAJAXTypeHandlerImpl();
         $this->handler2 = new StubAJAXTypeHandlerImpl();
+        $this->functionStringParser = new FunctionStringParserImpl();
     }
 
 
@@ -127,7 +130,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
 
         $this->server->registerHandler($this->handler1);
         $this->server->registerHandler($this->handler2);
-        $func = new JSONFunctionImpl(new JSONTypeImpl($type),'func');
+        $func = new JSONFunctionImpl('func',new JSONTypeImpl($type));
         /** @var JSONResponse $r */
         $r = $this->server->handleFromJSONString($func->getAsJSONString());
         $this->assertInstanceOf('JSONResponse', $r);
@@ -158,7 +161,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->server->registerHandler($this->handler1);
         $this->server->registerHandler($this->handler2);
         $funcString = "someType.func()";
-        $func = new JSONFunctionImpl(new JSONTypeImpl($type),'func');
+        $func = new JSONFunctionImpl('func',new JSONTypeImpl($type));
         /** @var JSONResponse $r */
         $r = $this->server->handleFromFunctionString($funcString);
         $this->assertInstanceOf('JSONResponse', $r);
@@ -186,7 +189,10 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->server->registerHandler($this->handler1);
         $this->server->registerHandler($this->handler2);
         $funcString = "someType.func('asdasd','asdasdasdasd',123)";
-        $func = new JSONFunctionImpl(new JSONTypeImpl($type),'func');
+        $func = new JSONFunctionImpl('func',new JSONTypeImpl($type));
+        $func->setArg(0,'asdasd');
+        $func->setArg(1,'asdasdasdasd');
+        $func->setArg(2,123);
         /** @var JSONResponse $r */
         $r = $this->server->handleFromFunctionString($funcString);
         $this->assertInstanceOf('JSONResponse', $r);
@@ -212,7 +218,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
 
         $this->server->registerHandler($this->handler2);
 
-        $func = new JSONFunctionImpl(new JSONTypeImpl($type.'2'),'func');
+        $func = new JSONFunctionImpl('func',new JSONTypeImpl($type.'2'));
         /** @var JSONResponse $r */
         $r = $this->server->handleFromJSONString($func->getAsJSONString());
         $this->assertNull($this->checkIfFunctionIsCalled('canHandle', $this->handler2));
@@ -239,7 +245,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->server->registerHandler($this->handler1);
         $this->server->registerHandler($this->handler2);
 
-        $func2 = new JSONFunctionImpl($func1 = new JSONFunctionImpl(new JSONTypeImpl($type1),'func'),'func2');
+        $func2 = new JSONFunctionImpl('func2', $func1 = new JSONFunctionImpl('func',new JSONTypeImpl($type1)));
         /** @var JSONResponse $r */
         $r = $this->server->handleFromJSONString($func2->getAsJSONString());
         $this->assertInstanceOf('JSONResponse', $r);
@@ -253,6 +259,70 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([$type2, $func2, $instance1 ], $r2['arguments']);
 
         $this->assertEquals('success', $r->getPayload());
+    }
+
+    public function testHandleOnFunctionsInArgumentsIsOk(){
+
+
+        $type1 = 'SomeElement';
+        $this->handler1->types = [$type1];
+        $this->handler1->canHandle[$type1] = true;
+        $this->handler1->handle[$type1] = $instance1 = "success too";
+
+
+        $type2 = 'PageElement';
+        $this->handler2->types = [$type2];
+        $this->handler2->canHandle[$type2] = true;
+        $this->handler2->handle[$type2] = 'success';
+
+        $this->server->registerHandler($this->handler1);
+        $this->server->registerHandler($this->handler2);
+
+        /** @var JSONResponse $r */
+        $r = $this->server->handleFromFunctionString('SomeElement.func(PageElement.f())');
+        $this->assertInstanceOf('JSONResponse', $r);
+        $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('canHandle', $this->handler1));
+        $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled('canHandle', $this->handler2));
+        $this->assertNotEquals($r1, $r2);
+
+        $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('handle', $this->handler1));
+        $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled('handle', $this->handler2));
+        $this->functionStringParser->parseFunctionCall("SomeElement.func('success')", $func1);
+        $this->functionStringParser->parseFunctionCall("PageElement.f()", $func2);
+        $this->assertEquals([$type1,$func1 , null ], $r1['arguments']);
+        $this->assertEquals([$type2, $func2, null ], $r2['arguments']);
+
+        $this->assertEquals("success too", $r->getPayload());
+    }
+
+    public function testHandleOnFunctionsInArgumentReturnsFirstResponse(){
+
+
+        $type1 = 'SomeElement';
+        $this->handler1->types = [$type1];
+        $this->handler1->canHandle[$type1] = true;
+        $this->handler1->handle[$type1] = $instance1 = new NullPageElementImpl();
+
+
+        $type2 = 'PageElement';
+        $this->handler2->types = [$type2];
+        $this->handler2->canHandle[$type2] = true;
+        $expectedResponse = $this->handler2->handle[$type2] = new JSONResponseImpl();
+
+        $this->server->registerHandler($this->handler1);
+        $this->server->registerHandler($this->handler2);
+
+        /** @var JSONResponse $r */
+        $r = $this->server->handleFromFunctionString('SomeElement.func(PageElement.f())');
+        $this->assertInstanceOf('JSONResponse', $r);
+        $this->assertNull($r1 = $this->checkIfFunctionIsCalled('canHandle', $this->handler1));
+        $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled('canHandle', $this->handler2));
+
+        $this->assertNull($r1 = $this->checkIfFunctionIsCalled('handle', $this->handler1));
+        $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled('handle', $this->handler2));
+
+
+        $this->assertEquals($expectedResponse, $r);
     }
 
 
@@ -273,7 +343,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->server->registerHandler($this->handler1);
         $this->server->registerHandler($this->handler2);
 
-        $func2 = new JSONFunctionImpl($func1 = new JSONFunctionImpl(new JSONTypeImpl($type1),'func'),'func2');
+        $func2 = new JSONFunctionImpl('func2', $func1 = new JSONFunctionImpl('func',new JSONTypeImpl($type1)));
         /** @var JSONResponse $r */
         $r = $this->server->handleFromJSONString($func2->getAsJSONString());
         $this->assertInstanceOf('JSONResponse', $r);
@@ -304,7 +374,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->server->registerHandler($this->handler1);
         $this->server->registerHandler($this->handler2);
 
-        $func2 = new JSONFunctionImpl($func1 = new JSONFunctionImpl(new JSONTypeImpl($type1),'func'),'func2');
+        $func2 = new JSONFunctionImpl('func2', $func1 = new JSONFunctionImpl('func',new JSONTypeImpl($type1)));
         /** @var JSONResponse $r */
         $r = $this->server->handleFromJSONString($func2->getAsJSONString());
         $this->assertInstanceOf('JSONResponse', $r);
@@ -326,7 +396,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $expectedResponse = ($this->handler2->handle[$type] = new JSONResponseImpl());
         $expectedResponse->setPayload("success");
         $this->server->registerHandler($this->handler2);
-        $func = new JSONFunctionImpl(new JSONTypeImpl($type),'func');
+        $func = new JSONFunctionImpl('func',new JSONTypeImpl($type));
         /** @var JSONResponse $r */
         $r = $this->server->handleFromJSONString($func->getAsJSONString());
 

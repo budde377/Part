@@ -15,11 +15,16 @@ class AJAXServerImpl implements AJAXServer
     private $backendSingletonContainer;
 
     private $jsonParser;
+    private $functionStringParser;
+
+
 
     function __construct(BackendSingletonContainer $backendSingletonContainer)
     {
+
         $this->backendSingletonContainer = $backendSingletonContainer;
         $this->jsonParser = new JSONParserImpl();
+        $this->functionStringParser = new FunctionStringParserImpl();
     }
 
 
@@ -120,7 +125,7 @@ class AJAXServerImpl implements AJAXServer
      * @param JSONFunction $function
      * @return mixed
      */
-    private function internalHandle(JSONFunction $function)
+    private function internalHandle( $function)
     {
         if (!($function instanceof JSONFunction)) {
             return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_MALFORMED_REQUEST);
@@ -129,6 +134,20 @@ class AJAXServerImpl implements AJAXServer
         $target = $function->getTarget();
         $types = [];
         $instance = null;
+
+        foreach($function->getArgs() as $num => $arg){
+            if(!($arg instanceof JSONFunction)){
+                continue;
+            }
+
+            $argumentResponse = $this->internalHandle($arg);
+            if($argumentResponse instanceof JSONResponse){
+                return $argumentResponse;
+            }
+
+            $function->setArg($num, $argumentResponse);
+
+        }
 
         if ($target instanceof JSONType) {
 
@@ -174,84 +193,14 @@ class AJAXServerImpl implements AJAXServer
      */
     public function handleFromFunctionString($input)
     {
-        $func = $this->parseFunctionString($input);
-        return $this->wrapper($func);
+        $this->functionStringParser->parseFunctionCall($input, $result);
+        return $this->wrapper($result);
     }
 
-    /**
-     * <function_call>  = <target>.<function>
-     * <function>       = <name>([<arg>,...]*)
-     * <target>         = <function_call> | <name>
-     * <arg>            = <scalar> | <array> | <target>
-     * <array>          = \[ <array_index>, ... \]
-     * <array_index>    = <scalar> => <arg> | <arg>
-     * <scalar>         = true | false | null | *num* | *string*
-     * @param string $input
-     * @return JSONFunction
-     */
 
-    private function parseFunctionString($input)
-    {
-        return $this->parseFunctionCall($input, $result)?$result:null;
-    }
-
-    /**
-     * @param $input
-     * @param  $result
-     * @return bool
-     */
-    private function parseFunctionCall($input, &$result)
-    {
-        preg_match_all('/\./', $input, $matches, PREG_OFFSET_CAPTURE);
-        $matches = array_reverse($matches);
-
-        foreach ($matches as $match) {
-            if ($this->parseFunction(substr($input, $match[1] + 1), $resultFunction) &&
-                $this->parseTarget(substr($input, 0, $match[1]), $resultTarget)) {
-                /** @var $resultTarget JSONTarget */
-                /** @var $resultFunction JSONFunction */
-                $resultFunction->setTarget($resultTarget);
-                $result = $resultFunction;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @param $input
-     * @param  $result
-     * @return bool
-     */
-    private function parseFunction($input, &$result)
-    {
-    }
-
-    /**
-     * @param $input
-     * @param  $result
-     * @return bool
-     */
-    private function parseTarget($input, &$result)
-    {
-        return $this->parseName($input, $result) || $this->parseFunctionCall($input, $result);
-    }
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    private function parseName($input, &$result)
-    {
-        if($r = preg_match('/[a-z0-9_]/i', $input)){
-            $result = $input;
-        }
-
-        return $r == 1;
-    }
 
     // TODO test for functions in arguments
+    // TODO test for id is set correctly in response
 
 
 }

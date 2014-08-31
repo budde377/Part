@@ -16,7 +16,7 @@ class JSONFunctionImpl extends JSONElementImpl implements JSONFunction
 
     private $size = 0;
 
-    function __construct(JSONTarget $target, $name)
+    function __construct($name, JSONTarget $target = null)
     {
         $this->name = $name;
         $this->target = $target;

@@ -23,10 +23,10 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase{
         parent::setUp();
         $this->function1Name = "function1";
         $this->function1Target = new JSONTypeImpl("SomeTarget");
-        $this->function1 = new JSONFunctionImpl($this->function1Target, $this->function1Name);
+        $this->function1 = new JSONFunctionImpl($this->function1Name, $this->function1Target);
 
         $this->function2Name = "function2";
-        $this->function2 = new JSONFunctionImpl($this->function1, $this->function2Name);
+        $this->function2 = new JSONFunctionImpl($this->function2Name, $this->function1);
 
     }
 
