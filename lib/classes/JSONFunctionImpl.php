@@ -6,30 +6,25 @@
  * Date: 8/28/14
  * Time: 12:53 PM
  */
-class JSONFunctionImpl extends JSONElementImpl implements JSONFunction
+class JSONFunctionImpl extends JSONProgramImpl implements JSONFunction
 {
 
-    private $target;
     private $name;
-    private $id;
+
     private $args = array();
 
     private $size = 0;
 
-    function __construct($name, JSONTarget $target = null)
-    {
-        $this->name = $name;
-        $this->target = $target;
-    }
-
-
     /**
-     * @return string
+     * @param string $name
+     * @param JSONTarget $target
      */
-    public function getAsJSONString()
+    function __construct($name, JSONTarget $target)
     {
-        return json_encode($this->getAsArray());
+        parent::__construct($target);
+        $this->name = $name;
     }
+
 
     /**
      * @return array
@@ -39,17 +34,9 @@ class JSONFunctionImpl extends JSONElementImpl implements JSONFunction
         return array(
             'type' => 'function',
             'name' => $this->getName(),
-            'target' => $this->target->getAsArray(),
+            'target' => $this->target,
             'arguments' => $this->args,
             'id' => $this->id);
-    }
-
-    /**
-     * @return string | JSONFunction
-     */
-    public function getTarget()
-    {
-        return $this->target;
     }
 
     /**
@@ -114,15 +101,6 @@ class JSONFunctionImpl extends JSONElementImpl implements JSONFunction
         $this->args = array();
     }
 
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
 
     /**
      * @param string $name
@@ -134,11 +112,16 @@ class JSONFunctionImpl extends JSONElementImpl implements JSONFunction
     }
 
     /**
+     * Sets the root target, i.e. calls recursively on target until target is not a function.
      * @param JSONTarget $target
      * @return void
      */
-    public function setTarget(JSONTarget $target)
+    public function setRootTarget(JSONTarget $target)
     {
-        $this->target = $target;
+        if($this->target instanceof JSONFunction){
+            $this->target->setTarget($target);
+        } else {
+            $this->setTarget($target);
+        }
     }
 }

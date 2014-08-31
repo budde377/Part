@@ -42,9 +42,12 @@ class JSONParserImpl implements JSONParser{
                     break;
                 }
                 $function = new JSONFunctionImpl($obj['name'], $this->parseDecoded($obj['target']));
-                $function->setId($obj['id']);
+                if($obj['id'] != null){
+                    $function->setId($obj['id']);
+                }
                 foreach($obj['arguments'] as $key => $val){
-                    $function->setArg($key, $this->parseDecoded($val));
+                    $decodedVal = $this->parseDecoded($val);
+                    $function->setArg($key, $decodedVal);
                 }
 
                 return $function;
@@ -67,6 +70,21 @@ class JSONParserImpl implements JSONParser{
                 $response = new JSONResponseImpl($obj['response_type'], $obj['error_code']);
                 $response->setPayload($this->parseDecoded($obj['payload']));
                 return $response;
+                break;
+            case 'composite_function';
+                if(!$this->checkArrayKeysExists(['functions', 'id', 'target'], $obj)){
+                    break;
+                }
+
+                $compositeFunction = new JSONCompositeFunctionImpl($this->parseDecoded($obj['target']));
+                foreach($obj['functions'] as $f){
+                    $compositeFunction->appendFunction($this->parseDecoded($f));
+                }
+                if($obj['id'] != null){
+                    $compositeFunction->setId($obj['id']);
+                }
+                return $compositeFunction;
+
                 break;
 
         }

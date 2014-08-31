@@ -21,13 +21,6 @@ class JSONObjectImpl extends JSONElementImpl implements JSONObject
     }
 
 
-    /**
-     * @return string
-     */
-    public function getAsJSONString()
-    {
-        return json_encode($this->getAsArray());
-    }
 
     /**
      * @return array

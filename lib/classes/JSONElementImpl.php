@@ -43,5 +43,12 @@ abstract class JSONElementImpl implements JSONElement
         return true;
     }
 
+    /**
+     * @return string
+     */
+    public function getAsJSONString()
+    {
+        return json_encode($this);
+    }
 
 } 

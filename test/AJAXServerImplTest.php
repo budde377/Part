@@ -314,7 +314,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $type2 = 'PageElement';
         $this->handler2->types = [$type2];
         $this->handler2->canHandle[$type2] = true;
-        $expectedResponse = $this->handler2->handle[$type2] = new JSONResponseImpl();
+        $expectedResponse = ($this->handler2->handle[$type2] = new JSONResponseImpl());
 
         $this->server->registerHandler($this->handler1);
         $this->server->registerHandler($this->handler2);
@@ -372,7 +372,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $type1 = 'SomeElement';
         $this->handler1->types = [$type1];
         $this->handler1->canHandle[$type1] = true;
-        $expectedResponse = $this->handler1->handle[$type1] = $instance1 = new JSONResponseImpl();
+        $expectedResponse = ($this->handler1->handle[$type1] = $instance1 = new JSONResponseImpl());
 
 
         $type2 = 'PageElement';
@@ -444,6 +444,85 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
             }
         }
         return null;
+    }
+
+    public function testCompositeFunctionsAreOk()
+    {
+
+
+        $type1 = 'SomeElement';
+        $this->handler1->types = [$type1];
+        $this->handler1->canHandle[$type1] = true;
+        $this->handler1->handle[$type1] = $instance1 = "success";
+
+
+        $this->server->registerHandler($this->handler1);
+
+        /** @var JSONResponse $r */
+        $r = $this->server->handleFromFunctionString('SomeElement..func()..func2()');
+        $this->assertInstanceOf('JSONResponse', $r);
+        $this->assertNotNull($this->checkIfFunctionIsCalled('canHandle', $this->handler1));
+        $this->assertNotNull($this->checkIfFunctionIsCalled('canHandle', $this->handler1));
+        $this->assertNull($this->checkIfFunctionIsCalled('canHandle', $this->handler1));
+
+        $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('handle', $this->handler1));
+        $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled('handle', $this->handler1));
+        $this->assertNull($this->checkIfFunctionIsCalled('handle', $this->handler1));
+
+        $this->functionStringParser->parseFunctionCall("SomeElement.func()", $func1);
+        $this->functionStringParser->parseFunctionCall("SomeElement.func2()", $func2);
+
+        $this->assertEquals([$type1, $func1, null], $r1['arguments']);
+        $this->assertEquals([$type1, $func2, null], $r2['arguments']);
+
+        $this->assertEquals("success", $r->getPayload());
+
+    }
+
+    public function testCompositeFunctionsOnFunctionChainsAreOk()
+    {
+
+
+        $type1 = 'SomeElement';
+        $this->handler1->types = [$type1];
+        $this->handler1->canHandle[$type1] = true;
+        $this->handler1->handle[$type1] = $instance1 = new NullPageElementImpl();
+
+
+        $type2 = 'PageElement';
+        $this->handler2->types = [$type2];
+        $this->handler2->canHandle[$type2] = true;
+        $this->handler2->handle[$type2] = $instance2 = "success";
+
+        $this->server->registerHandler($this->handler1);
+        $this->server->registerHandler($this->handler2);
+
+        /** @var JSONResponse $r */
+        $r = $this->server->handleFromFunctionString('SomeElement.f()..f1()..f2()');
+        $this->assertInstanceOf('JSONResponse', $r);
+        $this->assertNotNull($this->checkIfFunctionIsCalled('canHandle', $this->handler1));
+        $this->assertNull($this->checkIfFunctionIsCalled('canHandle', $this->handler1));
+
+        $this->assertNotNull($this->checkIfFunctionIsCalled('canHandle', $this->handler2));
+        $this->assertNotNull($this->checkIfFunctionIsCalled('canHandle', $this->handler2));
+        $this->assertNull($this->checkIfFunctionIsCalled('canHandle', $this->handler2));
+
+        $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('handle', $this->handler1));
+        $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled('handle', $this->handler2));
+        $this->assertNotNull($r3 = $this->checkIfFunctionIsCalled('handle', $this->handler2));
+        $this->assertNull($this->checkIfFunctionIsCalled('handle', $this->handler1));
+        $this->assertNull($this->checkIfFunctionIsCalled('handle', $this->handler2));
+
+        $this->functionStringParser->parseFunctionCall("SomeElement.f()", $func1);
+        $this->functionStringParser->parseFunctionCall("SomeElement.f().f1()", $func2);
+        $this->functionStringParser->parseFunctionCall("SomeElement.f().f2()", $func3);
+
+        $this->assertEquals([$type1, $func1, null], $r1['arguments']);
+        $this->assertEquals([$type2, $func2, $instance1], $r2['arguments']);
+        $this->assertEquals([$type2, $func3, $instance1], $r3['arguments']);
+
+        $this->assertEquals("success", $r->getPayload());
+
     }
 
 

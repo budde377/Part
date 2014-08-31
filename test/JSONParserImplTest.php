@@ -36,6 +36,9 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase{
     private $responseType = JSONResponse::RESPONSE_TYPE_ERROR;
     private $responseErrorCode = JSONResponse::ERROR_CODE_MALFORMED_REQUEST;
 
+    /** @var  JSONCompositeFunctionImpl */
+    private $compositeFunction;
+
     public function setUp(){
 
         $this->parser = new JSONParserImpl();
@@ -56,6 +59,10 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase{
         $this->object1->setVariable("key1", $this->object2);
         $this->type = new JSONTypeImpl($this->typeString);
         $this->response = new JSONResponseImpl($this->responseType,$this->responseErrorCode);
+
+
+        $this->compositeFunction = new JSONCompositeFunctionImpl($this->function1Target);
+
     }
 
 
@@ -109,6 +116,23 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals($obj->getAsJSONString(), $this->type->getAsJSONString());
     }
 
+    public function testParserParseCompositeFunction(){
+        $this->compositeFunction->setId(123);
+        $this->compositeFunction->appendFunction($this->function1);
+        $obj = $this->parser->parse($this->compositeFunction->getAsJSONString());
+        $this->assertInstanceOf('JSONCompositeFunction', $obj);
+        $this->assertEquals($obj->getAsJSONString(), $this->compositeFunction->getAsJSONString());
+    }
+
+    public function testParserParseCompositeFunctionNotInRoot(){
+        $this->function1->setArg(0, $this->compositeFunction);
+        /** @var JSONFunction $obj */
+        $obj = $this->parser->parse($f = $this->function1->getAsJSONString());
+        $obj = $obj->getArg(0);
+        $this->assertInstanceOf('JSONCompositeFunction', $obj);
+        $this->assertEquals($obj->getAsArray(), $this->compositeFunction->getAsArray());
+    }
+
     public function testArrayWithTypeIsParsedCorrectly(){
         $array = array('type' => $this->function1);
         $result  = $this->parser->parse(json_encode($array));
@@ -135,6 +159,11 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase{
 
     public function testArrayWithMissingEntriesIsParsedCorrectlyOnResponse(){
         $array = array('type' => 'response');
+        $result  = $this->parser->parse(json_encode($array));
+        $this->assertEquals($array, $result);
+    }
+    public function testArrayWithMissingEntriesIsParsedCorrectlyOnCompositeFunction(){
+        $array = array('type' => 'composite_function');
         $result  = $this->parser->parse(json_encode($array));
         $this->assertEquals($array, $result);
     }

@@ -13,9 +13,11 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
     private $parser;
 
     private $validName = "Some_name89";
+    private $nullTarget;
 
     protected function setUp()
     {
+        $this->nullTarget  = new NullJSONTargetImpl();
         $this->parser = new FunctionStringParserImpl();
     }
 
@@ -325,6 +327,7 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
         $result = null;
         $this->assertTrue($this->parser->parseArgument("Site.func()", $result));
         $this->assertEquals(new JSONFunctionImpl('func', new JSONTypeImpl('Site')), $result);
+        $this->assertTrue($this->parser->parseArgument("Site..func()..func2()", $result));
         $this->assertFalse($this->parser->parseArgument("Site", $result));
 
     }
@@ -343,13 +346,14 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
 
     public function testParseFunction(){
         $f2 = new JSONFunctionImpl('f',new JSONTypeImpl('SomeType'));
-        $f = new JSONFunctionImpl('func');
+        $f = new JSONFunctionImpl('func', $this->nullTarget);
 
         $this->assertTrue($this->parser->parseFunction("func()",$result));
         $this->assertEquals($f, $result);
         $f->setArg(0,$f2);
         $this->assertTrue($this->parser->parseFunction("func(SomeType.f())",$result));
         $this->assertEquals($f, $result);
+        $this->assertTrue($this->parser->parseFunction("func(SomeType..f()..f2())",$result));
         $f->setArg(0,2);
         $this->assertTrue($this->parser->parseFunction(" func(2) ",$result));
         $this->assertEquals($f, $result);
@@ -366,6 +370,7 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
 
     public function testParseFunctionCall(){
         $f = new JSONFunctionImpl('func', new JSONTypeImpl('Site'));
+        $f2 = new JSONFunctionImpl('f2', $f);
         $this->assertTrue($this->parser->parseFunctionCall("Site.func()",$result));
         $this->assertEquals($f, $result);
         $f->setArg(0,2);
@@ -376,10 +381,107 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->parser->parseFunctionCall("Site . func(2,3,4)",$result));
         $this->assertEquals($f, $result);
 
+
+        $this->assertTrue($this->parser->parseFunctionCall("Site . func(2,3,4).f2()",$result));
+        $this->assertEquals($f2, $result);
+
     }
 
 
 
+
+    public function testFunctionChain(){
+        $f = new JSONFunctionImpl('func', $this->nullTarget);
+        $f2 = new JSONFunctionImpl('func2',  $this->nullTarget);
+        $f3 = new JSONFunctionImpl('func3', $this->nullTarget);
+        $this->assertTrue($this->parser->parseFunctionChain("func()",$result));
+        $this->assertEquals($f, $result);
+
+        $f2->setTarget($f);
+        $this->assertTrue($this->parser->parseFunctionChain("func().func2()",$result));
+        $this->assertEquals($f2, $result);
+        $f2->setTarget($f);
+
+        $f3->setTarget($f2);
+        $this->assertTrue($this->parser->parseFunctionChain("func() . func2() . func3()",$result));
+        $this->assertEquals($f3, $result);
+
+    }
+
+    public function testParseCompositeFunction(){
+        $f = new JSONFunctionImpl('func', $this->nullTarget);
+        $f2 = new JSONFunctionImpl('func2', $this->nullTarget);
+        $f3 = new JSONFunctionImpl('func3', $this->nullTarget);
+
+        $composite = new JSONCompositeFunctionImpl($this->nullTarget);
+        $composite->appendFunction($f);
+
+        $this->assertTrue($this->parser->parseCompositeFunction("..func()",$result));
+        $this->assertEquals($composite, $result);
+
+        $composite->appendFunction($f2);
+        $this->assertTrue($this->parser->parseCompositeFunction(" .. func() .. func2()",$result));
+        $this->assertEquals($composite, $result);
+
+        $composite->removeFunction($f2);
+        $composite->appendFunction($f3);
+
+        $f3->setTarget($f2);
+        $this->assertTrue($this->parser->parseCompositeFunction(".. func() .. func2() . func3()",$result));
+        $this->assertEquals($composite, $result);
+
+    }
+
+    public function testParseCompositeFunctionCall(){
+        $f = new JSONFunctionImpl('func', new JSONTypeImpl("Site"));
+        $f2 = new JSONFunctionImpl('func2',  $f);
+        $f3 = new JSONFunctionImpl('func3', $this->nullTarget);
+
+        $composite = new JSONCompositeFunctionImpl($f2);
+        $composite->appendFunction($f3);
+
+
+        $this->assertTrue($this->parser->parseCompositeFunctionCall("Site.func().func2()..func3()",$result));
+        $this->assertEquals($composite, $result);
+
+    }
+
+    public function testParseProgram(){
+        $this->assertTrue($this->parser->parseProgram("Site.func()", $result));
+        $this->assertTrue($this->parser->parseProgram("Site.func()..func2()..func3()..func4().func5()", $result));
+    }
+
+    public function testParseFunctionString(){
+        $r = $this->parser->parseFunctionString("Site.func()..func2()..func3()..func4().func5()");
+        $this->assertInstanceOf('JSONProgram', $r);
+        $r = $this->parser->parseFunctionString("Site.func().func5()");
+        $this->assertInstanceOf('JSONProgram', $r);
+        $r = $this->parser->parseFunctionString("Site.func()..func2()..func3()..func4.func5()");
+        $this->assertNull($r);
+    }
+
+
+
+    /**
+     * <program>                    = <composite_call> | <function_call>
+     *
+     * <composite_function_call>    = <target><function_chains>
+     * <composite_function>         = [..<function_chain>]*
+     * <function_chain>             = <function_chain>.<function> | <function>
+     *
+     * <function_call>              = <target>.<function>
+     * <function>                   = <name>([<arg>, ...])
+     * <target>                     = <function_call> | <name>
+     * <arg>                        = <scalar> | <array> | <function_call>
+     * <array>                      = \[ <array_index>, ... \]
+     * <array_index>                = <scalar> => <arg> | <arg>
+     * <scalar>                     = true | false | null | <num> | *string*
+     * <num>                        = [+-]? <integer> | <float>
+     * <integer>                    = *decimal* | *hexadecimal* | *octal* | *binary*
+     * <float>                      = *double_number* | *exp_double_number*
+     * @param string $input
+     * @return JSONFunction
+     */
 
 
 } 

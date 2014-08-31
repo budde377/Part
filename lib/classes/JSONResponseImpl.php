@@ -22,13 +22,6 @@ class JSONResponseImpl extends JSONElementImpl implements JSONResponse
     }
 
 
-    /**
-     * @return string
-     */
-    public function getAsJSONString()
-    {
-        return json_encode($this->getAsArray());
-    }
 
     /**
      * @return array

@@ -91,7 +91,7 @@ class AJAXServerImpl implements AJAXServer
      */
     public function handleFromJSONString($input)
     {
-        return $this->wrapper($this->jsonParser->parse($input));
+        return $this->wrapperHandler($this->jsonParser->parse($input));
     }
 
     /**
@@ -99,7 +99,7 @@ class AJAXServerImpl implements AJAXServer
      */
     public function handleFromRequestBody()
     {
-        return $this->wrapper($this->jsonParser->parseFromRequestBody());
+        return $this->wrapperHandler($this->jsonParser->parseFromRequestBody());
     }
 
     /**
@@ -107,13 +107,13 @@ class AJAXServerImpl implements AJAXServer
      * @return JSONResponseImpl
      */
 
-    private function wrapper($input)
-    {
-        if (!($input instanceof JSONFunction)) {
+    private function wrapperHandler($input){
+
+        if (!($input instanceof JSONProgram)) {
             return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_MALFORMED_REQUEST);
         }
 
-        $result = $this->internalHandle($input);
+        $result = $this->internalHandleProgram($input);
 
         if ($result == null) {
             $result = new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NOT_IMPLEMENTED);
@@ -124,14 +124,53 @@ class AJAXServerImpl implements AJAXServer
         }
         $result->setID($input->getId());
         return $result;
+
+    }
+
+    /**
+     * @param JSONProgram $input
+     * @return mixed
+     */
+    private function internalHandleProgram(JSONProgram $input)
+    {
+        $result = null;
+        if($input instanceof JSONCompositeFunction){
+
+
+            if(($target = $input->getTarget()) instanceof JSONType){
+
+                foreach($input->listFunctions() as $function){
+                    $result = $this->internalHandleFunction($function);
+                }
+
+
+            } else if($target instanceof JSONFunction) {
+
+                $instance = $this->internalHandleFunction($target);
+
+                foreach($input->listFunctions() as $function){
+                    $result = $this->internalHandleFunction($function, $target, $instance);
+                }
+
+            }
+
+        } else if($input instanceof JSONFunction){
+            $result =  $this->internalHandleFunction($input);
+        }
+
+        return $result;
+
     }
 
     /**
      * @param JSONFunction $function
+     * @param \JSONTarget $targetOverride
+     * @param mixed $overrideInstance
      * @return mixed
      */
-    private function internalHandle( $function)
+    private function internalHandleFunction(JSONFunction $function, JSONTarget $targetOverride = null, $overrideInstance = null)
     {
+
 
 
         $target = $function->getTarget();
@@ -139,11 +178,11 @@ class AJAXServerImpl implements AJAXServer
         $instance = null;
 
         foreach($function->getArgs() as $num => $arg){
-            if(!($arg instanceof JSONFunction)){
+            if(!($arg instanceof JSONProgram)){
                 continue;
             }
 
-            $argumentResponse = $this->internalHandle($arg);
+            $argumentResponse = $this->internalHandleProgram($arg);
             if($argumentResponse instanceof JSONResponse){
                 return $argumentResponse;
             }
@@ -160,7 +199,7 @@ class AJAXServerImpl implements AJAXServer
             $types[] = $target->getTypeString();
 
         } else if ($target instanceof JSONFunction) {
-            $instance = $this->internalHandle($target);
+            $instance = $target === $targetOverride?$overrideInstance:$this->internalHandleFunction($target, $targetOverride, $overrideInstance);
             if (!is_object($instance)) {
                 return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION);
             }
@@ -172,6 +211,8 @@ class AJAXServerImpl implements AJAXServer
             $reflection = new ReflectionClass($instance);
             $types = $reflection->getInterfaceNames();
 
+        } else {
+            return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION);
         }
 
         foreach ($types as $type) {
@@ -196,8 +237,8 @@ class AJAXServerImpl implements AJAXServer
      */
     public function handleFromFunctionString($input)
     {
-        $this->functionStringParser->parseFunctionCall($input, $result);
-        return $this->wrapper($result);
+
+        return $this->wrapperHandler($this->functionStringParser->parseFunctionString($input));
     }
 
 

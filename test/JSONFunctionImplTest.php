@@ -70,6 +70,13 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals($id, $this->function1->getId());
     }
 
+
+    public function testSetIdWillSetIntVal(){
+        $id = 'a';
+        $this->function1->setID($id);
+        $this->assertEquals(intval($id),$this->function1->getID());
+    }
+
     public function testSetArgumentSetsArgument(){
         $val = "LOL";
         $this->function1->setArg(0, $val);
@@ -149,11 +156,11 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals('function', $array['type']);
         $this->assertEquals($this->function2Name, $array['name']);
         $this->assertEquals($id, $array['id']);
-        $this->assertEquals($this->function1->getAsArray(), $array['target']);
+        $this->assertEquals($this->function1, $array['target']);
         $this->assertEquals(array('v0', null,'v2'), $array['arguments']);
 
 
-        $this->assertEquals($this->function1Target->getAsArray(), $this->function1->getAsArray()['target']);
+        $this->assertEquals($this->function1Target, $this->function1->getAsArray()['target']);
 
     }
 
@@ -183,5 +190,13 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase{
         $this->function1->setArg(0, $obj = new JSONObjectImpl("obj1"));
         $this->assertTrue(strpos($this->function1->getAsJSONString(), $obj->getAsJSONString()) !== false);
     }
+
+
+    public function testSetRootTargetSetsRootTarget(){
+        $this->function2->setRootTarget($t = new JSONTypeImpl("NewType"));
+        $this->assertEquals($this->function1, $this->function2->getTarget());
+        $this->assertEquals($t, $this->function1->getTarget());
+    }
+
 
 }

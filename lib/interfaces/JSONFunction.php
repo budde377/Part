@@ -6,13 +6,8 @@
  * Time: 10:00
  * To change this template use File | Settings | File Templates.
  */
-interface JSONFunction extends JSONTarget
+interface JSONFunction extends JSONTarget, JSONProgram
 {
-
-    /**
-     * @return JSONTarget
-     */
-    public function getTarget();
 
     /**
      * Will return a numerical array of arguments
@@ -40,12 +35,6 @@ interface JSONFunction extends JSONTarget
     public function setName($name);
 
     /**
-     * @param JSONTarget $target
-     * @return void
-     */
-    public function setTarget(JSONTarget $target);
-
-    /**
      * Will set an argument with value
      * @param int $num
      * @param mixed $value
@@ -60,7 +49,11 @@ interface JSONFunction extends JSONTarget
     public function clearArguments();
 
 
-    public function getId();
+    /**
+     * Sets the root target, i.e. calls recursively on target until target is not a function.
+     * @param JSONTarget $target
+     * @return void
+     */
+    public function setRootTarget(JSONTarget $target );
 
-    public function setId($id);
 }

@@ -16,6 +16,35 @@ interface FunctionStringParser
 {
     /**
      * @param $input
+     * @param  $result
+     * @return bool
+     */
+    public function parseProgram($input, &$result);
+
+    /**
+     * @param $input
+     * @param  $result
+     * @return bool
+     */
+    public function parseCompositeFunctionCall($input, &$result);
+
+
+    /**
+     * @param $input
+     * @param  $result
+     * @return bool
+     */
+    public function parseCompositeFunction($input, &$result);
+
+    /**
+     * @param $input
+     * @param  $result
+     * @return bool
+     */
+    public function parseFunctionChain($input, &$result);
+
+    /**
+     * @param $input
      * @param $result
      * @return bool
      */
@@ -96,7 +125,7 @@ interface FunctionStringParser
      * <integer>        = [+-]? ( *decimal* | *hexadecimal* | *octal* | *binary*)
      * <float>          = [+-]? *double_number* | *exp_double_number*
      * @param string $input
-     * @return JSONFunction
+     * @return JSONProgram
      */
     public function parseFunctionString($input);
 

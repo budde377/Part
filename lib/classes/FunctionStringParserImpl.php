@@ -20,23 +20,138 @@ class FunctionStringParserImpl implements FunctionStringParser
 
 
     /**
-     * <function_call>  = <target>.<function>
-     * <function>       = <name>([<arg>, ...])
-     * <target>         = <function_call> | <name>
-     * <arg>            = <scalar> | <array> | <function_call>
-     * <array>          = \[ <array_index>, ... \]
-     * <array_index>    = <scalar> => <arg> | <arg>
-     * <scalar>         = true | false | null | <num> | *string*
-     * <num>            = [+-]? <integer> | <float>
-     * <integer>        = ( *decimal* | *hexadecimal* | *octal* | *binary*)
-     * <float>          = *double_number* | *exp_double_number*
+     * <program>                    = <composite_call> | <function_call>
+     *
+     * <composite_function_call>    = <target><function_chains>
+     * <composite_function>         = [..<function_chain>]*
+     * <function_chain>             = <function_chain>.<function> | <function>
+     *
+     * <function_call>              = <target>.<function>
+     * <function>                   = <name>([<arg>, ...])
+     * <target>                     = <function_call> | <name>
+     * <arg>                        = <scalar> | <array> | <program>
+     * <array>                      = \[ <array_index>, ... \]
+     * <array_index>                = <scalar> => <arg> | <arg>
+     * <scalar>                     = true | false | null | <num> | *string*
+     * <num>                        = [+-]? <integer> | <float>
+     * <integer>                    = *decimal* | *hexadecimal* | *octal* | *binary*
+     * <float>                      = *double_number* | *exp_double_number*
      * @param string $input
-     * @return JSONFunction
+     * @return JSONProgram
      */
 
     public function parseFunctionString($input)
     {
-        return $this->parseFunctionCall($input, $result) ? $result : null;
+        return $this->parseProgram($input, $result) ? $result : null;
+    }
+
+
+    /**
+     * @param $input
+     * @param  $result
+     * @return bool
+     */
+    public function parseProgram($input, &$result){
+        return $this->parseFunctionCall($input, $result) || $this->parseCompositeFunctionCall($input, $result);
+    }
+
+    /**
+     * @param $input
+     * @param  $result
+     * @return bool
+     */
+    public function parseCompositeFunctionCall($input, &$result)
+    {
+
+        preg_match_all('/\.\./', $input, $matches, PREG_OFFSET_CAPTURE);
+
+
+        foreach ($matches as $match) {
+            if (!isset($match[0][1])) {
+                continue;
+            }
+            if ($this->parseTarget(substr($input, 0, $match[0][1]), $resultTarget) &&
+                $this->parseCompositeFunction(substr($input, $match[0][1]), $resultFunction)
+
+            ) {
+                /** @var $resultTarget JSONTarget */
+                /** @var $resultFunction JSONFunction */
+                $resultFunction->setTarget($resultTarget);
+                $result = $resultFunction;
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+
+
+    /**
+     * @param $input
+     * @param  $result
+     * @return bool
+     */
+    public function parseCompositeFunction($input, &$result)
+    {
+
+        $input = trim($input);
+        if(substr($input, 0,2) != ".."){
+            return false;
+        }
+
+        if($this->parseFunctionChain(substr($input, 2), $resultFunctionChainBaseCase)){
+            $result = new JSONCompositeFunctionImpl( new NullJSONTargetImpl());
+            $result->prependFunction($resultFunctionChainBaseCase);
+            return true;
+        }
+
+
+        $pos = strpos($input, "..",2);
+
+        while ($pos !== false) {
+            if ($this->parseCompositeFunction(substr($input, 0 ,$pos), $resultCompositeFunction) && $this->parseFunctionChain(substr($input, $pos+2), $resultFunctionChain)) {
+                /** @var $resultCompositeFunction JSONCompositeFunction */
+                $resultCompositeFunction->appendFunction($resultFunctionChain);
+                $result = $resultCompositeFunction;
+                return true;
+            }
+            $pos = strpos($input, "..", $pos + 2);
+        }
+
+        return false;
+
+    }
+
+    /**
+     * @param $input
+     * @param  $result
+     * @return bool
+     */
+    public function parseFunctionChain($input, &$result)
+    {
+
+
+        if($this->parseFunction($input, $result)){
+            return true;
+        }
+
+        preg_match_all('/\./', $input, $matches, PREG_OFFSET_CAPTURE);
+        array_reverse($matches);
+
+        foreach ($matches[0] as $match) {
+
+            if ($this->parseFunction(substr($input, $match[1] + 1), $resultFunction) &&
+                $this->parseFunctionChain(substr($input, 0, $match[1]), $resultFunctionChain)
+            ) {
+                /** @var $resultTarget JSONTarget */
+                /** @var $resultFunction JSONFunction */
+                $resultFunction->setTarget($resultFunctionChain);
+                $result = $resultFunction;
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -49,12 +164,10 @@ class FunctionStringParserImpl implements FunctionStringParser
         preg_match_all('/\./', $input, $matches, PREG_OFFSET_CAPTURE);
         $matches = array_reverse($matches);
 
-        foreach ($matches as $match) {
-            if (!isset($match[0][1])) {
-                continue;
-            }
-            if ($this->parseFunction(substr($input, $match[0][1] + 1), $resultFunction) &&
-                $this->parseTarget(substr($input, 0, $match[0][1]), $resultTarget)
+        foreach ($matches[0] as $match) {
+
+            if ($this->parseFunction(substr($input, $match[1] + 1), $resultFunction) &&
+                $this->parseTarget(substr($input, 0, $match[1]), $resultTarget)
             ) {
                 /** @var $resultTarget JSONTarget */
                 /** @var $resultFunction JSONFunction */
@@ -79,13 +192,13 @@ class FunctionStringParserImpl implements FunctionStringParser
 
         ) {
             if ($match[2] == "") {
-                $result = new JSONFunctionImpl($resultName);
+                $result = new JSONFunctionImpl($resultName, new NullJSONTargetImpl());
                 return true;
             }
 
             if ($this->parseArgumentList($match[2], $resultArgumentList)) {
 
-                $result = new JSONFunctionImpl($resultName);
+                $result = new JSONFunctionImpl($resultName, new NullJSONTargetImpl());
                 foreach ($resultArgumentList as $key => $arg) {
                     $result->setArg($key, $arg);
                 }
@@ -168,7 +281,7 @@ class FunctionStringParserImpl implements FunctionStringParser
      */
     public function parseArgument($input, &$result)
     {
-        return $this->parseScalar($input, $result) || $this->parseArray($input, $result) || $this->parseFunctionCall($input, $result);
+        return $this->parseScalar($input, $result) || $this->parseArray($input, $result) || $this->parseProgram($input, $result);
     }
 
 
@@ -497,4 +610,5 @@ class FunctionStringParserImpl implements FunctionStringParser
 
         return false;
     }
+
 } 
