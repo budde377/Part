@@ -397,6 +397,39 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
 
     }
 
+ public function testHandleOnCompositeFunctionsWithJSONResponseReturnedIsResponse()
+    {
+
+
+        $type1 = 'SomeElement';
+        $this->handler1->types = [$type1];
+        $this->handler1->canHandle[$type1] = true;
+        $expectedResponse = ($this->handler1->handle[$type1] = $instance1 = new JSONResponseImpl());
+
+
+        $type2 = 'JSONResponse';
+        $this->handler2->types = [$type2];
+        $this->handler2->canHandle[$type2] = true;
+        $this->handler2->handle[$type2] = 'success';
+
+        $this->server->registerHandler($this->handler1);
+        $this->server->registerHandler($this->handler2);
+
+        /** @var JSONResponse $r */
+        $r = $this->server->handleFromFunctionString("SomeElement.func().f()..f1()..f2()");
+        $this->assertInstanceOf('JSONResponse', $r);
+        $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('canHandle', $this->handler1));
+        $this->assertNull($this->checkIfFunctionIsCalled('canHandle', $this->handler1));
+        $this->assertNull($this->checkIfFunctionIsCalled('canHandle', $this->handler2));
+
+        $this->assertNotNull($this->checkIfFunctionIsCalled('handle', $this->handler1));
+        $this->assertNull($this->checkIfFunctionIsCalled('handle', $this->handler1));
+        $this->assertNull($this->checkIfFunctionIsCalled('handle', $this->handler2));
+
+        $this->assertEquals($expectedResponse, $r);
+
+    }
+
 
     public function testDoNotWrapJSONResponse()
     {
