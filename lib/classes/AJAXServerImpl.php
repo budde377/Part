@@ -109,16 +109,21 @@ class AJAXServerImpl implements AJAXServer
 
     private function wrapper($input)
     {
+        if (!($input instanceof JSONFunction)) {
+            return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_MALFORMED_REQUEST);
+        }
+
         $result = $this->internalHandle($input);
+
         if ($result == null) {
-            return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NOT_IMPLEMENTED);
+            $result = new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NOT_IMPLEMENTED);
+        } else if(!(($r = $result) instanceof JSONResponse)) {
+            $result = new JSONResponseImpl();
+            $result->setPayload($r);
+
         }
-        if ($result instanceof JSONResponse) {
-            return $result;
-        }
-        $response = new JSONResponseImpl();
-        $response->setPayload($result);
-        return $response;
+        $result->setID($input->getId());
+        return $result;
     }
 
     /**
@@ -127,9 +132,7 @@ class AJAXServerImpl implements AJAXServer
      */
     private function internalHandle( $function)
     {
-        if (!($function instanceof JSONFunction)) {
-            return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_MALFORMED_REQUEST);
-        }
+
 
         $target = $function->getTarget();
         $types = [];
@@ -197,10 +200,6 @@ class AJAXServerImpl implements AJAXServer
         return $this->wrapper($result);
     }
 
-
-
-    // TODO test for functions in arguments
-    // TODO test for id is set correctly in response
 
 
 }
