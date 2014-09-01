@@ -9,26 +9,155 @@
 class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler{
 
 
-    // Auth. function : f ( typeString, instance, functionName, arguments) => bool
+    private $object;
+    private $types;
+    private $typeWhitelist = [];
+    private $functions = [];
+    private $functionWhitelist = [];
+    private $customFunctions = [];
+
+    private $authFunctions = [];
+    private $typeAuthFunctions = [];
+    private $functionAuthFunctions = [];
+
+
+    function __construct($object)
+    {
+        $this->object = $object;
+        $reflection = new ReflectionClass($object);
+        $this->types = $reflection->getInterfaceNames();
+    }
+
 
     /**
-     * @param array $whiteList
-     * @param array $blackList
-     * @param callable $authFunction
-     * @return callable
+     * Adds an auth function of type: f(type, instance, function_name, arguments) => bool
+     * @param callable $function
      */
-    public function createAuthFunction($whiteList = array(), $blackList = array(), Callable $authFunction = null){
+    public function addAuthFunction(callable $function){
+        $this->authFunctions[] = $function;
+    }
+
+    /**
+     * Adds an auth function of type: f(type, instance, function_name, arguments) => bool
+     * @param string $type
+     * @param string $functionName
+     * @param callable $function
+     */
+    public function addFunctionAuthFunction($type, $functionName, callable $function){
+        $this->functionAuthFunctions[$type][$functionName] = $function;
+    }
+
+    /**
+     * Adds an auth function of type: f(type, instance, function_name, arguments) => bool
+     * @param string $type
+     * @param callable $function
+     */
+    public function addTypeAuthFunction($type, callable $function){
+        $this->typeAuthFunctions[$type][] = $function;
+    }
+
+    /**
+     * Adds a function of type: f(instance, arguments ... ) => mixed
+     * @param string $type
+     * @param string $name
+     * @param callable $function
+     */
+    public function addFunction($type, $name, callable $function){
+        $this->customFunctions[$type][$name] = $function;
+    }
+
+    /**
+     * If added function will be called before the function.
+     * The function should be of type : f(instance, &arguments) => void
+     * @param $type
+     * @param $name
+     * @param callable $function
+     */
+    public function addPreCallFunction($type, $name, callable $function){
 
     }
 
     /**
-     * @param mixed $object
-     * @param callable $authFunction
-     * @param array $type
+     * If added function will be called after the function.
+     * The function should be of type : f(instance, &result) => void
+     * @param $type
+     * @param $name
+     * @param callable $function
      */
-    public function registerObject($object, Callable $authFunction, $type = array()){
+    public function addPostCallFunction($type, $name, callable $function){
 
     }
+
+    /**
+     * If added function will be called before the function.
+     * The function should be of type : f(instance, &arguments) => void
+     * @param $type
+     * @param $name
+     * @param callable $function
+     */
+    public function addTypePreCallFunction($type, $name, callable $function){
+
+    }
+
+    /**
+     * If added function will be called after the function.
+     * The function should be of type : f(instance, &result) => void
+     * @param $type
+     * @param $name
+     * @param callable $function
+     */
+    public function addTypePostCallFunction($type, $name, callable $function){
+
+    }
+
+    /**
+     * If added function will be called before the function.
+     * The function should be of type : f(instance, &arguments) => void
+     * @param $type
+     * @param $name
+     * @param callable $function
+     */
+    public function addFunctionPreCallFunction($type, $name, callable $function){
+
+    }
+
+    /**
+     * If added function will be called after the function.
+     * The function should be of type : f(instance, &result) => void
+     * @param $type
+     * @param $name
+     * @param callable $function
+     */
+    public function addFunctionPostCallFunction($type, $name, callable $function){
+
+    }
+
+    /**
+     * Whitelists a type, if no type is whitelisted; all found types are whitelisted.
+     * @param string $type
+     */
+    public function whitelistType($type){
+        if(!$this->hasType($type)){
+            return;
+        }
+        $this->typeWhitelist[] = $type;
+    }
+
+    /**
+     * Whitelists a function, if no function is whitelisted; all found types are whitelisted.
+     * @param string $type
+     * @param string $functionName
+     */
+    public function whitelistFunction($type, $functionName){
+
+        if(isset($this->functions[$type]) && !in_array($functionName, $this->functions[$type])){
+            return;
+        }
+
+        $this->functionWhitelist[$type][] = $functionName;
+
+    }
+
 
     /**
      * Sets up the type handler for provided type.
@@ -39,7 +168,23 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler{
      */
     public function setUp(AJAXServer $server, $type)
     {
-        // TODO: Implement setUp() method.
+        $r = new ReflectionClass($type);
+        $methods = $r->getMethods();
+        $this->functions[$type] = array_map(function(ReflectionMethod $method){
+            return $method->getName();
+        }, $methods);
+
+        if(!isset($this->functionWhitelist[$type])){
+            return;
+        }
+
+        foreach($this->functionWhitelist[$type] as $k => $fn){
+            if(in_array($fn, $this->functions[$type])){
+                continue;
+            }
+            unset($this->functionWhitelist[$type][$k]);
+        }
+
     }
 
     /**
@@ -48,7 +193,30 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler{
      */
     public function listTypes()
     {
-        // TODO: Implement listTypes() method.
+        return count($this->typeWhitelist)?$this->typeWhitelist:$this->types;
+
+    }
+
+    /**
+     * @param string $type
+     * @return array
+     */
+    public function listFunctions($type){
+        if(!$this->hasType($type)){
+            return array();
+        }
+
+        if(!isset($this->functions[$type])){
+            return array();
+        }
+
+        if(isset($this->functionWhitelist[$type]) && count($this->functionWhitelist[$type]) > 0 ){
+            return $this->functionWhitelist[$type];
+        }
+
+        $customFunctions = isset($this->customFunctions[$type])?array_keys($this->customFunctions[$type]):[];
+
+        return array_merge($this->functions[$type], $customFunctions);
     }
 
     /**
@@ -60,7 +228,7 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler{
      */
     public function canHandle($type, JSONFunction $function, $instance = null)
     {
-        // TODO: Implement canHandle() method.
+        return $this->hasFunction($type, $function->getName());
     }
 
     /**
@@ -71,6 +239,70 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler{
      */
     public function handle($type, JSONFunction $function, $instance = null)
     {
-        // TODO: Implement handle() method.
+
+        $instance = $instance == null?$this->object:$instance;
+        $name = $function->getName();
+        if(!$this->checkAuth($type, $instance, $name, $function)){
+            return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_UNAUTHORIZED);
+        }
+
+        if(isset($this->customFunctions[$type][$name])){
+            $result = call_user_func_array($this->customFunctions[$type][$name],array_merge([$instance],$function->getArgs()));
+        } else {
+            $result = call_user_func_array(array($instance, $name), $function->getArgs());
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getObject(){
+        return $this->object;
+    }
+
+    /**
+     * @param string $type
+     * @return bool
+     */
+    public function hasType($type)
+    {
+        return in_array($type, $this->listTypes());
+    }
+
+
+    public function hasFunction($type, $function){
+        return in_array($function, $this->listFunctions($type));
+    }
+
+    private function checkAuth($type, $instance, $name, JSONFunction $function)
+    {
+        foreach($this->authFunctions as $f){
+            if(!$f($type, $instance, $name, $function->getArgs())){
+                return false;
+            }
+
+        }
+
+        if(isset($this->typeAuthFunctions[$type])){
+            foreach($this->typeAuthFunctions[$type] as $f){
+                if(!$f($type, $instance, $name, $function->getArgs())){
+                    return false;
+                }
+
+            }
+        }
+
+        if(isset($this->functionAuthFunctions[$type][$function->getName()])){
+            foreach($this->functionAuthFunctions[$type] as $f){
+                if(!$f($type, $instance, $name, $function->getArgs())){
+                    return false;
+                }
+
+            }
+        }
+
+        return true;
     }
 }

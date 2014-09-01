@@ -74,4 +74,14 @@ class StubAJAXTypeHandlerImpl implements AJAXTypeHandler{
         return $this->handle[$type];
 
     }
+
+    /**
+     * Check if it has type
+     * @param string $type
+     * @return bool
+     */
+    public function hasType($type)
+    {
+        $this->calledMethods[] = ['method'=>'hasType', 'arguments'=>func_get_args()];
+    }
 }

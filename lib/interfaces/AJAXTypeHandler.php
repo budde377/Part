@@ -41,4 +41,10 @@ interface AJAXTypeHandler {
      */
     public function handle($type, JSONFunction $function, $instance = null);
 
+    /**
+     * Check if it has type
+     * @param string $type
+     * @return bool
+     */
+    public function hasType($type);
 }
