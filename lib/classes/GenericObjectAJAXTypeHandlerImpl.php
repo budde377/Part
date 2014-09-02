@@ -31,6 +31,7 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
     private $functionPostCallFunctions = [];
 
 
+
     function __construct($object)
     {
 
@@ -46,6 +47,12 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
 
         $reflection = new ReflectionClass($object);
         $this->types = array_merge($this->types, $reflection->getInterfaceNames());
+
+        if(func_num_args() == 1){
+            return;
+        }
+
+        call_user_func_array(array($this, 'whitelistType'), array_slice(func_get_args(), 1));
 
     }
 

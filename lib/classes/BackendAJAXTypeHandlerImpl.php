@@ -27,11 +27,11 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler{
     {
         $userLibrary = $this->backend->getUserLibraryInstance();
         $currentUser = $userLibrary->getUserLoggedIn();
-        $server->registerHandler(new GenericObjectAJAXTypeHandlerImpl($userLibrary));
-        $server->registerHandler(new GenericObjectAJAXTypeHandlerImpl($currentUser == null?"User":$currentUser));
-        $server->registerHandler(new GenericObjectAJAXTypeHandlerImpl($this->backend->getPageOrderInstance()));
-        $server->registerHandler(new GenericObjectAJAXTypeHandlerImpl($this->backend->getCurrentPageStrategyInstance()->getCurrentPage()));
-        $server->registerHandler(new GenericObjectAJAXTypeHandlerImpl($this->backend->getLogInstance()));
+        $server->registerHandler(new GenericObjectAJAXTypeHandlerImpl($userLibrary, 'UserLibrary'));
+        $server->registerHandler(new GenericObjectAJAXTypeHandlerImpl($currentUser == null?"User":$currentUser), ' User');
+        $server->registerHandler(new GenericObjectAJAXTypeHandlerImpl($this->backend->getPageOrderInstance()), 'PageOrder');
+        $server->registerHandler(new GenericObjectAJAXTypeHandlerImpl($this->backend->getCurrentPageStrategyInstance()->getCurrentPage()), 'Page');
+        $server->registerHandler(new GenericObjectAJAXTypeHandlerImpl($this->backend->getLogInstance()), 'Log');
 
     }
 

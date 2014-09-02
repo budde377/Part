@@ -69,6 +69,16 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
         $this->assertEquals('JSONObject', $list[1]);
     }
 
+    public function testWhitelistTypeOfExistingTypeDoesWhitelistMultipleFromConstructor(){
+
+        $handler = new GenericObjectAJAXTypeHandlerImpl($this->object, "JSONElement", "JSONObject");
+
+        $list = $handler->listTypes();
+        $this->assertEquals(2, count($list));
+        $this->assertEquals('JSONElement', $list[0]);
+        $this->assertEquals('JSONObject', $list[1]);
+    }
+
 
 
     public function testHasTypeOnWhitelistIsRight(){
