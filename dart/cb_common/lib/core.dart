@@ -259,6 +259,7 @@ String dateString(DateTime dt) {
   return returnString.trim();
 }
 
+String quoteString(String string, [String quote = '"']) => quote+(string.replaceAll(quote, r"\"+quote))+quote;
 
 
 abstract class Response<V>{

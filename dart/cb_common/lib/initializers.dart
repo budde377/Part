@@ -5,6 +5,7 @@ import "site_classes.dart";
 import "json.dart";
 import "elements.dart";
 import "dart:html";
+import "dart:convert";
 
 class TitleURLUpdateInitializer extends Initializer {
 
@@ -52,7 +53,11 @@ class LoginFormulaInitializer implements Initializer {
     var client = new AJAXJSONClient();
     form.submitFunction = (Map<String, String> data) {
       form.blur();
-      client.callFunction(new UserLoginJSONFunction(data['username'], data['password'])).then((JSONResponse response) {
+
+      var username = quoteString(data['username']);
+      var password = quoteString(data['password']);
+
+      client.callFunctionString("UserLibrary.userLogin($username, $password)", (double pct) => debug("PCT $pct")).then((JSONResponse response) {
         if (response.type == Response.RESPONSE_TYPE_ERROR) {
           form.unBlur();
           form.changeNotion("Ugyldigt login", FormHandler.NOTION_TYPE_ERROR);

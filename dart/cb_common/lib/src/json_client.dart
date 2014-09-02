@@ -38,15 +38,32 @@ class AJAXJSONClient extends JSONClient {
     debug(function.jsonString);
     var request = new HttpRequest();
     var future = _setUpRequest(request);
-    if (progress != null) {
-      request.onLoad.listen((ProgressEvent evt) => progress(evt.loaded / evt.total));
-    }
+    _registerProgressHandler(request, progress);
 
     request.open("POST", urlPrefix + "?ajax=${function.name}");
     debug(urlPrefix + "?ajax=${function.name}");
     request.send(function.jsonString);
     return future;
   }
+
+  Future<JSONResponse> callFunctionString(String function, [void progress(double pct)]) {
+    var request = new HttpRequest();
+    var future = _setUpRequest(request);
+    _registerProgressHandler(request, progress);
+
+    request.open("GET", urlPrefix + "?ajax=$function");
+    debug(urlPrefix + "?ajax=$function");
+    request.send();
+    return future;
+  }
+  _registerProgressHandler(HttpRequest request, progress) {
+    if (progress != null) {
+      var f = (ProgressEvent evt) => evt.total == 0?0:progress(evt.loaded / evt.total);
+      request.onLoad.listen(f);
+      request.onProgress.listen(f);
+    }
+  }
+
 
 }
 
