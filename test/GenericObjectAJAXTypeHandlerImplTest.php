@@ -354,6 +354,70 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
     }
 
 
+    public function testPreCallFunctionIsCalledBeforeFunction(){
+        $this->handler->setUp($this->nullAJAXServer, 'JSONElement');
+        $a = [];
+        $i = 1;
+        $f = function($type, $instance, $functionName, &$arguments) use (&$a, &$i){
+            $arguments[] = $i;
+            $a[] = func_get_args();
+            $i++;
+        };
+        $this->handler->addPreCallFunction($f);
+        $this->handler->addTypePreCallFunction('JSONElement', $f);
+        $this->handler->addFunctionPreCallFunction('JSONElement', 'custom', $f);
+
+        $args = [];
+        $this->handler->addFunction('JSONElement','custom', function() use (&$args){
+            $args = func_get_args();
+        });
+        /** @var JSONFunction $f */
+        $f = $this->parser->parseFunctionString("JSONElement.custom()");
+
+        $this->handler->handle('JSONElement', $f);
+        $this->assertEquals([
+            ['JSONElement', $this->object, 'custom', [1]],
+            ['JSONElement', $this->object, 'custom', [1,2]],
+            ['JSONElement', $this->object, 'custom', [1,2,3]]
+
+    ], $a);
+        $this->assertEquals([$this->object, 1,2,3], $args);
+
+
+    }
+    public function testPostCallFunctionIsCalledAfterFunction(){
+        $this->handler->setUp($this->nullAJAXServer, 'JSONElement');
+        $a = [];
+        $i = 2;
+        $f = function($type, $instance, $functionName, &$result) use (&$a, &$i){
+            $result[] = $i;
+            $a[] = func_get_args();
+            $i++;
+        };
+        $this->handler->addPostCallFunction($f);
+        $this->handler->addTypePostCallFunction('JSONElement', $f);
+        $this->handler->addFunctionPostCallFunction('JSONElement', 'custom', $f);
+
+        $args = [];
+        $this->handler->addFunction('JSONElement','custom', function() use (&$args){
+            return [1];
+        });
+        /** @var JSONFunction $f */
+        $f = $this->parser->parseFunctionString("JSONElement.custom()");
+
+        $r = $this->handler->handle('JSONElement', $f);
+        $this->assertEquals([
+            ['JSONElement', $this->object, 'custom', [1,2]],
+            ['JSONElement', $this->object, 'custom', [1,2,3]],
+            ['JSONElement', $this->object, 'custom', [1,2,3,4]]
+
+    ], $a);
+        $this->assertEquals([ 1,2,3,4], $r);
+
+
+    }
+
+
     public function testAddedFunctionIsInFunctionList(){
         $this->handler->setUp($this->nullAJAXServer, 'JSONElement');
         $this->handler->addFunction('JSONElement','custom', function() {});

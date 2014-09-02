@@ -20,6 +20,15 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler{
     private $typeAuthFunctions = [];
     private $functionAuthFunctions = [];
 
+    private $preCallFunctions = [];
+    private $typePreCallFunctions = [];
+    private $functionPreCallFunctions = [];
+
+
+    private $postCallFunctions = [];
+    private $typePostCallFunctions = [];
+    private $functionPostCallFunctions = [];
+
 
     function __construct($object)
     {
@@ -69,45 +78,39 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler{
     /**
      * If added function will be called before the function.
      * The function should be of type : f(instance, &arguments) => void
-     * @param $type
-     * @param $name
      * @param callable $function
      */
-    public function addPreCallFunction($type, $name, callable $function){
-
+    public function addPreCallFunction(callable $function){
+        $this->preCallFunctions[] = $function;
     }
 
     /**
      * If added function will be called after the function.
      * The function should be of type : f(instance, &result) => void
-     * @param $type
-     * @param $name
      * @param callable $function
      */
-    public function addPostCallFunction($type, $name, callable $function){
-
+    public function addPostCallFunction( callable $function){
+        $this->postCallFunctions[] = $function;
     }
 
     /**
      * If added function will be called before the function.
      * The function should be of type : f(instance, &arguments) => void
      * @param $type
-     * @param $name
      * @param callable $function
      */
-    public function addTypePreCallFunction($type, $name, callable $function){
-
+    public function addTypePreCallFunction($type, callable $function){
+        $this->typePreCallFunctions[$type][] = $function;
     }
 
     /**
      * If added function will be called after the function.
      * The function should be of type : f(instance, &result) => void
      * @param $type
-     * @param $name
      * @param callable $function
      */
-    public function addTypePostCallFunction($type, $name, callable $function){
-
+    public function addTypePostCallFunction($type, callable $function){
+        $this->typePostCallFunctions[$type][] =$function;
     }
 
     /**
@@ -118,7 +121,7 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler{
      * @param callable $function
      */
     public function addFunctionPreCallFunction($type, $name, callable $function){
-
+        $this->functionPreCallFunctions[$type][$name][] = $function;
     }
 
     /**
@@ -129,7 +132,7 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler{
      * @param callable $function
      */
     public function addFunctionPostCallFunction($type, $name, callable $function){
-
+        $this->functionPostCallFunctions[$type][$name][] = $function;
     }
 
     /**
@@ -246,12 +249,14 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler{
             return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_UNAUTHORIZED);
         }
 
+        $arguments = $function->getArgs();
+        $this->callPreCallFunctions($type, $instance, $name, $arguments);
         if(isset($this->customFunctions[$type][$name])){
-            $result = call_user_func_array($this->customFunctions[$type][$name],array_merge([$instance],$function->getArgs()));
+            $result = call_user_func_array($this->customFunctions[$type][$name],array_merge([$instance],$arguments));
         } else {
-            $result = call_user_func_array(array($instance, $name), $function->getArgs());
+            $result = call_user_func_array(array($instance, $name), $arguments);
         }
-
+        $this->callPostCallFunctions($type, $instance, $name, $result);
         return $result;
     }
 
@@ -304,5 +309,48 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler{
         }
 
         return true;
+    }
+
+    private function callPreCallFunctions($type, $instance, $functionName, &$arguments)
+    {
+        foreach($this->preCallFunctions as $f){
+            $f($type, $instance, $functionName, $arguments);
+        }
+
+        if(isset($this->typePreCallFunctions[$type])){
+            foreach($this->typePreCallFunctions[$type] as $f){
+                $f($type, $instance, $functionName, $arguments);
+            }
+        }
+
+
+        if(isset($this->functionPreCallFunctions[$type][$functionName])){
+            foreach($this->functionPreCallFunctions[$type][$functionName] as $f){
+                $f($type, $instance, $functionName, $arguments);
+            }
+        }
+
+
+    }
+
+    private function callPostCallFunctions($type, $instance, $functionName, &$result)
+    {
+        foreach($this->postCallFunctions as $f){
+            $f($type, $instance, $functionName, $result);
+        }
+
+        if(isset($this->typePostCallFunctions[$type])){
+            foreach($this->typePostCallFunctions[$type] as $f){
+                $f($type, $instance, $functionName, $result);
+            }
+        }
+
+
+        if(isset($this->functionPostCallFunctions[$type][$functionName])){
+            foreach($this->functionPostCallFunctions[$type][$functionName] as $f){
+                $f($type, $instance, $functionName, $result);
+            }
+        }
+
     }
 }
