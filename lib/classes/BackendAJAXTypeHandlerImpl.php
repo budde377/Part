@@ -6,7 +6,7 @@
  * Time: 8:23 PM
  */
 
-class UserSettingsAJAXTypeHandlerImpl implements AJAXTypeHandler{
+class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler{
 
     private $backend;
 
