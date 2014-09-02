@@ -115,14 +115,18 @@ class AJAXServerImpl implements AJAXServer
 
         $result = $this->internalHandleProgram($input);
 
+
+
         if ($result == null) {
-            $result = new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NOT_IMPLEMENTED);
+            $result = new JSONResponseImpl();
         } else if(!(($r = $result) instanceof JSONResponse)) {
             $result = new JSONResponseImpl();
             $result->setPayload($r);
-
         }
-        $result->setID($input->getId());
+
+        if(($id = $input->getId()) != null){
+            $result->setID($id);
+        }
         return $result;
 
     }
@@ -212,7 +216,7 @@ class AJAXServerImpl implements AJAXServer
             $types = $reflection->getInterfaceNames();
 
         } else {
-            return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION);
+            return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_MALFORMED_REQUEST);
         }
 
         foreach ($types as $type) {
@@ -228,7 +232,7 @@ class AJAXServerImpl implements AJAXServer
             }
 
         }
-        return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_MALFORMED_REQUEST);
+        return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION);
     }
 
     /**

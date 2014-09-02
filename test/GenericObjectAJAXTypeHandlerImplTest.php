@@ -61,6 +61,15 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
     }
 
 
+    public function testWhitelistTypeOfExistingTypeDoesWhitelistMultiple(){
+        $this->handler->whitelistType('JSONElement', 'JSONObject');
+        $list = $this->handler->listTypes();
+        $this->assertEquals(2, count($list));
+        $this->assertEquals('JSONElement', $list[0]);
+        $this->assertEquals('JSONObject', $list[1]);
+    }
+
+
 
     public function testHasTypeOnWhitelistIsRight(){
         $this->handler->whitelistType('JSONElement');
@@ -116,6 +125,16 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
         $this->handler->whitelistFunction('JSONElement', 'getAsJSONString');
         $this->handler->setUp($this->nullAJAXServer, 'JSONElement');
         $this->handler->whitelistFunction('JSONElement', 'jsonSerialize');
+        $list = $this->handler->listFunctions('JSONElement');
+        $this->assertEquals(2, count($list));
+        $this->assertEquals('getAsJSONString', $list[0]);
+        $this->assertEquals('jsonSerialize', $list[1]);
+    }
+
+    public function testWhitelistFunctionDoesWhitelistWithMultiple(){
+
+        $this->handler->whitelistFunction('JSONElement', 'getAsJSONString', 'jsonSerialize');
+        $this->handler->setUp($this->nullAJAXServer, 'JSONElement');
         $list = $this->handler->listFunctions('JSONElement');
         $this->assertEquals(2, count($list));
         $this->assertEquals('getAsJSONString', $list[0]);
@@ -424,6 +443,56 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
         $list = $this->handler->listFunctions('JSONElement');
         $this->assertContains('custom', $list);
         $this->assertTrue($this->handler->hasFunction('JSONElement', 'custom'));
+    }
+
+
+    public function testNonTypeStringToConstructorAddsNoFunctions(){
+
+        $handler = new GenericObjectAJAXTypeHandlerImpl("NotARealType");
+        $this->assertTrue($handler->hasType('NotARealType'));
+        $this->assertEquals(0, count($handler->listFunctions('NotARealType')));
+
+    }
+
+    public function testStringToConstructorDoesNotAddDefaultInstance(){
+        $handler = new GenericObjectAJAXTypeHandlerImpl("User");
+        $this->assertTrue($handler->hasType("User"));
+        $handler->setUp(new NullAJAXServerImpl(), 'User');
+        /** @var JSONFunction $f */
+
+        $f = $this->parser->parseFunctionString('User.getName()');
+        $r = $handler->handle('User', $f);
+
+        $this->assertEquals(new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION), $r);
+
+    }
+
+    public function testStringToConstructorCanCallCustomFunctions(){
+        $handler = new GenericObjectAJAXTypeHandlerImpl("User");
+        $this->assertTrue($handler->hasType("User"));
+        $handler->setUp(new NullAJAXServerImpl(), 'User');
+        $args = [];
+        /** @var JSONFunction $f */
+        $handler->addFunction('User','custom', function() use (&$args){
+            $args = func_get_args();
+        });
+        $f = $this->parser->parseFunctionString('User.custom(1,2,3)');
+        $r = $handler->handle('User', $f);
+        $this->assertNull($r);
+        $this->assertEquals([null, 1,2,3], $args);
+
+
+    }
+
+
+    public function testStringOfActualTypeDoesAddTypesAndFunctions(){
+        $handler = new GenericObjectAJAXTypeHandlerImpl("JSONObject");
+        $this->assertTrue($handler->hasType("JSONElement"));
+
+        $handler = new GenericObjectAJAXTypeHandlerImpl("JSONObject");
+        $this->assertTrue($handler->hasType("JSONElement"));
+
+
     }
 
 

@@ -445,6 +445,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
 
         $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled('handle', $this->handler2));
         $this->assertEquals($expectedResponse, $r);
+        $this->assertNull($r->getID());
     }
 
     public function testIdIsCorrectlySetInResponse()
