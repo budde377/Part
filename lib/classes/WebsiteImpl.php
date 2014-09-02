@@ -55,8 +55,14 @@ class WebsiteImpl implements Website
         }
 
         //Decide output mode
-        if ($id !== null && ($ajax = $ajaxServer->handleFromRequestBody()) !== null) {
-            echo $ajax;
+        if ($id !== null) {
+            if(trim(file_get_contents("php://input")) == ""){
+                $ajax = $ajaxServer->handleFromFunctionString($id);
+            } else {
+                $ajax = $ajaxServer->handleFromRequestBody();
+            }
+
+            echo $ajax->getAsJSONString();
         } else if(!$cacheControl->setUpCache()){
             echo $template->render();
         }
