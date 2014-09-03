@@ -52,6 +52,7 @@ interface HTMLFormElement extends HTMLElement
      * @return HTMLElement
      */
     public function insertInputText($name,$id,$value= '',$label='',array $attributes = array());
+    //TODO add validation entry?
 
     /**
      * @abstract
