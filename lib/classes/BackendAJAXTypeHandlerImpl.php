@@ -96,7 +96,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
     {
 
         $server->registerHandler($userLibraryHandler = new GenericObjectAJAXTypeHandlerImpl($this->userLibrary, 'UserLibrary'));
-        $userLibraryHandler->addAuthFunction(function ($type, $instance, $functionName, $args) {
+        $userLibraryHandler->addAuthFunction(function ($type, $instance, $functionName) {
             if ($this->userLibrary->getUserLoggedIn() == null && $functionName != "userLogin") {
                 return false;
             }
@@ -191,7 +191,6 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
         });
 
-
     }
 
     private function setUpUserHandler(AJAXServer $server)
@@ -220,7 +219,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             return substr($functionName, 0,3) != "set" || $this->userLibrary->getUserLoggedIn() === $instance;
         });
 
-        $userHandler->addFunctionAuthFunction('User','delete',function ($type, $instance, $functionName, $args){
+        $userHandler->addFunctionAuthFunction('User','delete',function ($type, $instance){
             return  $this->isChildOfUser($instance);
         });
 
