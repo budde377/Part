@@ -15,6 +15,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
     private $sitePrivilegesFunction;
 
+
     function __construct(BackendSingletonContainer $backend)
     {
         $this->backend = $backend;
@@ -44,9 +45,10 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
         $this->setUpUserLibraryHandler($server);
         $this->setUpUserHandler($server);
-        $this->setUpPageOrderInstance($server);
-        $server->registerHandler(new GenericObjectAJAXTypeHandlerImpl($this->backend->getCurrentPageStrategyInstance()->getCurrentPage()), 'Page');
-        $server->registerHandler(new GenericObjectAJAXTypeHandlerImpl($this->backend->getLogInstance()), 'Log');
+        $this->setUpPageOrderHandler($server);
+
+        $this->setUpPageHandler($server);
+        $this->setUpLogHandler($server);
 
     }
 
@@ -234,7 +236,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         return in_array($user, $this->userLibrary->getChildren($this->userLibrary->getUserLoggedIn()));
     }
 
-    private function setUpPageOrderInstance(AJAXServer $server)
+    private function setUpPageOrderHandler(AJAXServer $server)
     {
         $server->registerHandler($pageOrderHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getPageOrderInstance()), 'PageOrder');
 
@@ -243,6 +245,61 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'setPageOrder', $this->sitePrivilegesFunction);
         $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'createPage', $this->sitePrivilegesFunction);
 
+    }
+
+    private function setUpPageHandler(AJAXServer $server)
+    {
+        $server->registerHandler($pageHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getPageOrderInstance()->getCurrentPage()), 'Page');
+        $pageHandler->whitelistFunction('Page',
+            'isHidden',
+            'hide',
+            'show',
+            'getID',
+            'getTitle',
+            'getTemplate',
+            'getAlias',
+            'getContent',
+            'setID',
+            'setTitle',
+            'setTemplate',
+            'setAlias',
+            'delete',
+            'match',
+            'isEditable',
+            'isValidID',
+            'isValidAlias',
+            'lastModified',
+            'modify',
+            'getVariables'
+        );
+
+        $pagePrivilegesFunction = function ($type, Page $instance){
+            $currentUser = $this->userLibrary->getUserLoggedIn();
+            if($currentUser == null){
+                return false;
+            }
+            return $currentUser->getUserPrivileges()->hasPagePrivileges($instance);
+
+        };
+
+        $pageHandler->addFunctionAuthFunction('Page','setID', $pagePrivilegesFunction);
+        $pageHandler->addFunctionAuthFunction('Page','setTitle', $pagePrivilegesFunction);
+        $pageHandler->addFunctionAuthFunction('Page','setTemplate', $pagePrivilegesFunction);
+        $pageHandler->addFunctionAuthFunction('Page','setAlias', $pagePrivilegesFunction);
+        $pageHandler->addFunctionAuthFunction('Page','modify', $pagePrivilegesFunction);
+
+        $pageHandler->addFunctionAuthFunction('Page','delete', $this->sitePrivilegesFunction);
+        $pageHandler->addFunctionAuthFunction('Page','hide', $this->sitePrivilegesFunction);
+        $pageHandler->addFunctionAuthFunction('Page','show', $this->sitePrivilegesFunction);
+
+    }
+
+    private function setUpLogHandler(AJAXServer $server)
+    {
+        $server->registerHandler($logHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getLogInstance()), 'Log');
+        $logHandler->addAuthFunction(function() {
+           return $this->userLibrary->getUserLoggedIn() != null;
+        });
     }
 
 }
