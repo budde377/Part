@@ -165,4 +165,13 @@ class StubPageOrderImpl implements PageOrder
     }
 
 
+    /**
+     * Will return the current page from the current page
+     * strategy.
+     * @return Page
+     */
+    public function getCurrentPage()
+    {
+
+    }
 }

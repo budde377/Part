@@ -12,6 +12,10 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
     /** @var $db StubDBImpl */
     private $db;
+    /** @var  PageOrderImpl */
+    private $pageOrder;
+    /** @var  StubBackendSingletonContainerImpl */
+    private $backendContainer;
 
 
     function __construct()
@@ -26,14 +30,17 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         parent::setUp();
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
+        $this->backendContainer = new StubBackendSingletonContainerImpl();
+        $this->backendContainer->setDBInstance($this->db);
+        $this->pageOrder = new PageOrderImpl($this->backendContainer);
     }
 
 
     public function testCreatePageWillReturnPageOnValidID()
     {
-        $pageOrder = new PageOrderImpl($this->db);
+
         $validID = 'someID';
-        $page = $pageOrder->createPage($validID);
+        $page = $this->pageOrder->createPage($validID);
         $this->assertTrue(is_object($page), 'Did not return an object');
         $this->assertInstanceOf('Page', $page, 'Did not return instance of Page');
         $this->assertEquals($validID, $page->getID(), 'IDs did not match');
@@ -43,26 +50,26 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
     public function testCreateWillReturnFALSEWithInvalidID()
     {
-        $pageOrder = new PageOrderImpl($this->db);
+
         $id = 'invalidID)=)=';
-        $page = $pageOrder->createPage($id);
+        $page = $this->pageOrder->createPage($id);
         $this->assertFalse($page, 'Did not return false');
 
     }
 
     public function testCreateWillReturnFALSEifIDExists()
     {
-        $pageOrder = new PageOrderImpl($this->db);
+
         $id = 'page';
-        $page = $pageOrder->createPage($id);
+        $page = $this->pageOrder->createPage($id);
         $this->assertFalse($page, 'Did not return false');
 
     }
 
     public function testListPagesWillListInactivePages()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $pages = $pageOrder->listPages(PageOrder::LIST_INACTIVE);
+
+        $pages = $this->pageOrder->listPages(PageOrder::LIST_INACTIVE);
         $this->assertTrue(is_array($pages), 'Did not return array');
         $this->assertTrue(!$this->isAssoc($pages), 'Array was not numeric');
         $this->assertEquals(1, count($pages), 'Did not return array with right number of entrances');
@@ -76,8 +83,8 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
     public function testListPagesWillListAllActivePages()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $pages = $pageOrder->listPages(PageOrder::LIST_ACTIVE);
+
+        $pages = $this->pageOrder->listPages(PageOrder::LIST_ACTIVE);
         $this->assertTrue(is_array($pages), 'Did not return array');
         $this->assertTrue(!$this->isAssoc($pages), 'Array was not numeric');
         $this->assertEquals(2, count($pages), 'Did not return array with right number of entrances');
@@ -97,8 +104,8 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
     public function testListPagesWillListAllPages()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $pages = $pageOrder->listPages(PageOrder::LIST_ALL);
+
+        $pages = $this->pageOrder->listPages(PageOrder::LIST_ALL);
         $this->assertTrue(is_array($pages), 'Did not return array');
         $this->assertTrue(!$this->isAssoc($pages), 'Array was not numeric');
         $this->assertEquals(3, count($pages), 'Did not return array with right number of entrances');
@@ -123,98 +130,98 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
     public function testCreateWillAddPageToInactiveList()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $newPage = $pageOrder->createPage('someId');
 
-        $pages = $pageOrder->listPages(PageOrder::LIST_INACTIVE);
+        $newPage = $this->pageOrder->createPage('someId');
+
+        $pages = $this->pageOrder->listPages(PageOrder::LIST_INACTIVE);
         $this->assertTrue(array_search($newPage, $pages) !== false, 'Did not add new page to inactive pages');
     }
 
 
     public function testIsActiveWillReturnTrueIfPageIsActive()
     {
-        $pageOrder = new PageOrderImpl($this->db);
 
-        $pages = $pageOrder->listPages(PageOrder::LIST_ACTIVE);
+
+        $pages = $this->pageOrder->listPages(PageOrder::LIST_ACTIVE);
         $activePage = array_pop($pages);
-        $this->assertTrue($pageOrder->isActive($activePage), 'Did not return true on active page');
+        $this->assertTrue($this->pageOrder->isActive($activePage), 'Did not return true on active page');
     }
 
     public function testIsActiveWillReturnFalseIfPageIsNotActive()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $newPage = $pageOrder->createPage('someId');
 
-        $this->assertFalse($pageOrder->isActive($newPage), 'Did not return false on inactive page');
+        $newPage = $this->pageOrder->createPage('someId');
+
+        $this->assertFalse($this->pageOrder->isActive($newPage), 'Did not return false on inactive page');
 
     }
 
     public function testDeactivatePageWillChangeStatusOfActivePage()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $activePages = $pageOrder->listPages(PageOrder::LIST_ACTIVE);
+
+        $activePages = $this->pageOrder->listPages(PageOrder::LIST_ACTIVE);
         $page = array_pop($activePages);
-        $this->assertTrue($pageOrder->isActive($page));
-        $pageOrder->deactivatePage($page);
-        $this->assertFalse($pageOrder->isActive($page));
+        $this->assertTrue($this->pageOrder->isActive($page));
+        $this->pageOrder->deactivatePage($page);
+        $this->assertFalse($this->pageOrder->isActive($page));
     }
 
     public function testDeactivatePageWillBePersistent(){
-        $pageOrder = new PageOrderImpl($this->db);
-        $activePages = $pageOrder->listPages(PageOrder::LIST_ACTIVE);
+
+        $activePages = $this->pageOrder->listPages(PageOrder::LIST_ACTIVE);
         /** @var $page Page */
         $page = array_pop($activePages);
-        $this->assertTrue($pageOrder->isActive($page));
-        $pageOrder->deactivatePage($page);
-        $this->assertFalse($pageOrder->isActive($page));
-        $pageOrder = new PageOrderImpl($this->db);
-        $newPage = $pageOrder->getPage($page->getID());
-        $this->assertFalse($pageOrder->isActive($newPage));
+        $this->assertTrue($this->pageOrder->isActive($page));
+        $this->pageOrder->deactivatePage($page);
+        $this->assertFalse($this->pageOrder->isActive($page));
+
+        $newPage = $this->pageOrder->getPage($page->getID());
+        $this->assertFalse($this->pageOrder->isActive($newPage));
     }
 
     public function testDeactivatePageWillNotPerserverSubPageOrder(){
-        $pageOrder = new PageOrderImpl($this->db);
-        $page = $pageOrder->getPage('page');
-        $this->assertTrue($pageOrder->isActive($page));
-        $order = $pageOrder->getPageOrder($page);
+
+        $page = $this->pageOrder->getPage('page');
+        $this->assertTrue($this->pageOrder->isActive($page));
+        $order = $this->pageOrder->getPageOrder($page);
         $this->assertTrue(is_array($order));
         $this->assertEquals(1,count($order));
         $subPage = array_pop($order);
         $this->assertInstanceOf('Page',$subPage);
-        $pageOrder->deactivatePage($page);
-        $this->assertFalse($pageOrder->isActive($subPage));
-        $pageOrder->setPageOrder($page);
-        $this->assertFalse($pageOrder->isActive($subPage));
+        $this->pageOrder->deactivatePage($page);
+        $this->assertFalse($this->pageOrder->isActive($subPage));
+        $this->pageOrder->setPageOrder($page);
+        $this->assertFalse($this->pageOrder->isActive($subPage));
     }
 
 
     public function testDeleteWillDeletePageAndReturnTrueOnSuccess()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $pages = $pageOrder->listPages(PageOrder::LIST_ALL);
+
+        $pages = $this->pageOrder->listPages(PageOrder::LIST_ALL);
         /** @var $page Page */
         $page = array_pop($pages);
 
-        $deleteRet = $pageOrder->deletePage($page);
+        $deleteRet = $this->pageOrder->deletePage($page);
 
         $this->assertTrue($deleteRet);
         $this->assertFalse($page->exists());
 
-        $pages = $pageOrder->listPages(PageOrder::LIST_ALL);
+        $pages = $this->pageOrder->listPages(PageOrder::LIST_ALL);
         $this->assertTrue(array_search($page, $pages) === false, 'Page was in list');
 
     }
 
     public function testDeleteWillDeletePageAndReturnFalseOnDeletionFailure()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $pages = $pageOrder->listPages(PageOrder::LIST_ALL);
+
+        $pages = $this->pageOrder->listPages(PageOrder::LIST_ALL);
         /** @var $page Page */
         $page = array_pop($pages);
         $altPage = new PageImpl($page->getID(), $this->db);
         $altPage->delete();
 
-        $deleteRet = $pageOrder->deletePage($page);
+        $deleteRet = $this->pageOrder->deletePage($page);
 
         $this->assertFalse($deleteRet);
 
@@ -222,17 +229,17 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
     public function testDeletePageNotGeneratedFromPageOrderReturnFalse()
     {
-        $pageOrder = new PageOrderImpl($this->db);
+
         $page = new PageImpl('page', $this->db);
         $this->assertTrue($page->exists());
-        $this->assertFalse($pageOrder->deletePage($page));
+        $this->assertFalse($this->pageOrder->deletePage($page));
     }
 
 
     public function testDeleteOnPageGeneratedFromPageOrderWillResultInDeletionFromPageOrder()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $pages = $pageOrder->listPages(PageOrder::LIST_ALL);
+
+        $pages = $this->pageOrder->listPages(PageOrder::LIST_ALL);
         /** @var $page Page */
         $page = array_pop($pages);
 
@@ -241,63 +248,63 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         $this->assertTrue($deleteRet);
         $this->assertFalse($page->exists());
 
-        $pages = $pageOrder->listPages(PageOrder::LIST_ALL);
+        $pages = $this->pageOrder->listPages(PageOrder::LIST_ALL);
         $this->assertTrue(array_search($page, $pages) === false, 'Page was in list');
     }
 
     public function testDeleteOnPageCreatedFromPageOrderWillResultInDeletionFromPageOrder()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $page = $pageOrder->createPage('someid');
+
+        $page = $this->pageOrder->createPage('someid');
 
         $deleteRet = $page->delete();
 
         $this->assertTrue($deleteRet);
         $this->assertFalse($page->exists());
 
-        $pages = $pageOrder->listPages(PageOrder::LIST_INACTIVE);
+        $pages = $this->pageOrder->listPages(PageOrder::LIST_INACTIVE);
         $this->assertTrue(array_search($page, $pages) === false, 'Page was in list');
     }
 
 
     public function testDeletePageWithChangeIDOnPageGeneratedByPageOrder()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $page = $pageOrder->createPage('someid');
+
+        $page = $this->pageOrder->createPage('someid');
         $page->setID('someOtherId');
 
-        $deleteRet = $pageOrder->deletePage($page);
+        $deleteRet = $this->pageOrder->deletePage($page);
 
         $this->assertTrue($deleteRet);
         $this->assertFalse($page->exists());
 
-        $pages = $pageOrder->listPages(PageOrder::LIST_ALL);
+        $pages = $this->pageOrder->listPages(PageOrder::LIST_ALL);
         $this->assertTrue(array_search($page, $pages) === false, 'Page was in list');
     }
 
 
     public function testDeleteActivePageWithChangeIDOnPageGeneratedByPageOrder()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $pages = $pageOrder->listPages(PageOrder::LIST_ACTIVE);
+
+        $pages = $this->pageOrder->listPages(PageOrder::LIST_ACTIVE);
         /** @var $page Page */
         $page = array_pop($pages);
         $page->setID('someotherid');
 
-        $deleteRet = $pageOrder->deletePage($page);
+        $deleteRet = $this->pageOrder->deletePage($page);
 
         $this->assertTrue($deleteRet);
         $this->assertFalse($page->exists());
 
-        $pages = $pageOrder->listPages(PageOrder::LIST_ACTIVE);
+        $pages = $this->pageOrder->listPages(PageOrder::LIST_ACTIVE);
         $this->assertTrue(array_search($page, $pages) === false, 'Page was in list');
     }
 
 
     public function testGetPageOrderWillReturnArrayWithPageOrder()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $topOrder = $pageOrder->getPageOrder();
+
+        $topOrder = $this->pageOrder->getPageOrder();
 
         $this->assertTrue(is_array($topOrder));
         $this->assertTrue(!$this->isAssoc($topOrder));
@@ -311,12 +318,12 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
     public function testGetPageOrderWithParentPageWillReturnArrayWithPageOrder()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $topOrder = $pageOrder->getPageOrder();
+
+        $topOrder = $this->pageOrder->getPageOrder();
         /** @var $parentPage Page */
         $parentPage = array_pop($topOrder);
 
-        $subOrder = $pageOrder->getPageOrder($parentPage);
+        $subOrder = $this->pageOrder->getPageOrder($parentPage);
 
         $this->assertTrue(is_array($subOrder));
         $this->assertTrue(!$this->isAssoc($subOrder));
@@ -330,10 +337,10 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
 /*    public function testGetPageOrderWillThrowExceptionIfWrongParameter()
     {
-        $pageOrder = new PageOrderImpl($this->db);
+
         $exceptionWasThrown = false;
         try {
-            $pageOrder->getPageOrder("Invalid Input");
+            $this->pageOrder->getPageOrder("Invalid Input");
         } catch (Exception $e) {
             $exceptionWasThrown = true;
             $this->assertInstanceOf('MalformedParameterException', $e, 'Wrong type of exception');
@@ -348,12 +355,12 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
     public function testGetPageOrderChangeOfParentIdWillReturnRightOrder()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $topOrder = $pageOrder->getPageOrder();
+
+        $topOrder = $this->pageOrder->getPageOrder();
         /** @var $parentPage Page */
         $parentPage = array_pop($topOrder);
         $parentPage->setID('someID');
-        $subOrder = $pageOrder->getPageOrder($parentPage);
+        $subOrder = $this->pageOrder->getPageOrder($parentPage);
         $this->assertTrue(is_array($subOrder));
         $this->assertEquals(1, count($subOrder));
 
@@ -362,24 +369,24 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     public function testSetInactivePageWillActivatePage()
     {
 
-        $pageOrder = new PageOrderImpl($this->db);
-        $page = $pageOrder->createPage('somePage');
-        $this->assertFalse($pageOrder->isActive($page), 'Page was active');
-        $setPageRet = $pageOrder->setPageOrder($page, 0);
+
+        $page = $this->pageOrder->createPage('somePage');
+        $this->assertFalse($this->pageOrder->isActive($page), 'Page was active');
+        $setPageRet = $this->pageOrder->setPageOrder($page, 0);
         $this->assertTrue($setPageRet, 'Set Page did not return true');
-        $this->assertTrue($pageOrder->isActive($page));
-        $order = $pageOrder->getPageOrder();
+        $this->assertTrue($this->pageOrder->isActive($page));
+        $order = $this->pageOrder->getPageOrder();
         $this->assertTrue($order[0] === $page, 'Order was not set');
     }
 
     public function testSetAppendInactivePageWillActivatePage()
     {
-        $pageOrder = new PageOrderImpl($this->db);
 
-        $page = $pageOrder->createPage('somePage');
-        $setPageRet = $pageOrder->setPageOrder($page, 5);
+
+        $page = $this->pageOrder->createPage('somePage');
+        $setPageRet = $this->pageOrder->setPageOrder($page, 5);
         $this->assertTrue($setPageRet, 'Did not return true');
-        $order = $pageOrder->getPageOrder();
+        $order = $this->pageOrder->getPageOrder();
         $this->assertTrue($order[1] === $page, 'Order was not set');
 
     }
@@ -387,14 +394,14 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
     public function testSetPageLastWillSetPageLast(){
 
-        $pageOrder = new PageOrderImpl($this->db);
-        $page = $pageOrder->createPage('somePage');
-        $page2 = $pageOrder->createPage('somePage2');
-        $setPageRet = $pageOrder->setPageOrder($page,PageOrder::PAGE_ORDER_LAST);
+
+        $page = $this->pageOrder->createPage('somePage');
+        $page2 = $this->pageOrder->createPage('somePage2');
+        $setPageRet = $this->pageOrder->setPageOrder($page,PageOrder::PAGE_ORDER_LAST);
         $this->assertTrue($setPageRet, 'Did not return true');
-        $setPageRet = $pageOrder->setPageOrder($page2,PageOrder::PAGE_ORDER_LAST);
+        $setPageRet = $this->pageOrder->setPageOrder($page2,PageOrder::PAGE_ORDER_LAST);
         $this->assertTrue($setPageRet, 'Did not return true');
-        $order = $pageOrder->getPageOrder();
+        $order = $this->pageOrder->getPageOrder();
         $this->assertTrue($order[1] === $page, 'Order was not set');
         $this->assertTrue($order[2] === $page2, 'Order was not set');
     }
@@ -402,18 +409,18 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
     public function testAppendActivePageWillRemoveFromOriginalPlace()
     {
-        $pageOrder = new PageOrderImpl($this->db);
 
-        $topPageOrder = $pageOrder->getPageOrder();
+
+        $topPageOrder = $this->pageOrder->getPageOrder();
         /** @var $topPage Page */
         $topPage = $topPageOrder[0];
-        $subPageOrder = $pageOrder->getPageOrder($topPage);
+        $subPageOrder = $this->pageOrder->getPageOrder($topPage);
         /** @var $subPage Page */
         $subPage = $subPageOrder[0];
-        $pageOrder->setPageOrder($subPage, 1);
+        $this->pageOrder->setPageOrder($subPage, 1);
 
-        $newTopPageOrder = $pageOrder->getPageOrder();
-        $newSubPageOrder = $pageOrder->getPageOrder($topPage);
+        $newTopPageOrder = $this->pageOrder->getPageOrder();
+        $newSubPageOrder = $this->pageOrder->getPageOrder($topPage);
 
         $this->assertEquals(0, count($newSubPageOrder), 'SubPageOrder was longer than expected');
         $this->assertTrue($subPage === $newTopPageOrder[0], 'SubPage was not appended in right place');
@@ -422,16 +429,16 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
     public function testAppendPageOnSubOrder()
     {
-        $pageOrder = new PageOrderImpl($this->db);
 
-        $topPageOrder = $pageOrder->getPageOrder();
+
+        $topPageOrder = $this->pageOrder->getPageOrder();
         /** @var $topPage Page */
         $topPage = $topPageOrder[0];
 
-        $newPage = $pageOrder->createPage('someID');
-        $pageOrder->setPageOrder($newPage, 4, $topPage);
+        $newPage = $this->pageOrder->createPage('someID');
+        $this->pageOrder->setPageOrder($newPage, 4, $topPage);
 
-        $newSubPageOrder = $pageOrder->getPageOrder($topPage);
+        $newSubPageOrder = $this->pageOrder->getPageOrder($topPage);
 
         $this->assertEquals(2, count($newSubPageOrder), 'SubPageOrder was not of expected length');
         $this->assertTrue($newPage === $newSubPageOrder[1], 'Was not inserted correctly');
@@ -440,44 +447,44 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
     public function testSetPageOrderReturnFalseOnPageNotInList()
     {
-        $pageOrder = new PageOrderImpl($this->db);
+
         $newPage = new PageImpl('someId', $this->db);
-        $setReturn = $pageOrder->setPageOrder($newPage, 3);
+        $setReturn = $this->pageOrder->setPageOrder($newPage, 3);
         $this->assertFalse($setReturn, 'Did not return false');
     }
 
     public function testSetPageOrderReturnFalseOnParentNotInList()
     {
-        $pageOrder = new PageOrderImpl($this->db);
+
         $newPage = new PageImpl('page', $this->db);
-        $topOrder = $pageOrder->getPageOrder();
+        $topOrder = $this->pageOrder->getPageOrder();
         $oldPage = $topOrder[0];
-        $setReturn = $pageOrder->setPageOrder($oldPage, 3, $newPage);
+        $setReturn = $this->pageOrder->setPageOrder($oldPage, 3, $newPage);
         $this->assertFalse($setReturn, 'Did not return false');
     }
 
     public function testSetPageOrderReturnFalseOnLoop()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $newPage = $pageOrder->createPage('subsubPage');
-        $topPageOrder = $pageOrder->getPageOrder();
-        $subPageOrder = $pageOrder->getPageOrder($topPageOrder[0]);
-        $pageOrder->setPageOrder($newPage, 0, $subPageOrder[0]);
-        $setRet = $pageOrder->setPageOrder($topPageOrder[0], 0, $newPage);
+
+        $newPage = $this->pageOrder->createPage('subsubPage');
+        $topPageOrder = $this->pageOrder->getPageOrder();
+        $subPageOrder = $this->pageOrder->getPageOrder($topPageOrder[0]);
+        $this->pageOrder->setPageOrder($newPage, 0, $subPageOrder[0]);
+        $setRet = $this->pageOrder->setPageOrder($topPageOrder[0], 0, $newPage);
         $this->assertFalse($setRet, 'Did not return false');
-        $newTopOrder = $pageOrder->getPageOrder();
+        $newTopOrder = $this->pageOrder->getPageOrder();
         $this->assertTrue($topPageOrder[0] === $newTopOrder[0], 'Did change order');
     }
 
     public function testSetPageOrderChangesArePersistent()
     {
-        $pageOrder = new PageOrderImpl($this->db);
-        $newPage = $pageOrder->createPage('someID');
-        $pageOrder->setPageOrder($newPage, 0);
 
-        $topOrder = $pageOrder->getPageOrder();
+        $newPage = $this->pageOrder->createPage('someID');
+        $this->pageOrder->setPageOrder($newPage, 0);
 
-        $newPageOrder = new PageOrderImpl($this->db);
+        $topOrder = $this->pageOrder->getPageOrder();
+
+        $newPageOrder = new PageOrderImpl($this->backendContainer);
         $newTopOrder = $newPageOrder->getPageOrder();
 
         /** @var Page $o1 */
@@ -496,47 +503,47 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
 
     public function testGetPageWillReturnNullIfPageNotFound(){
-        $pageOrder = new PageOrderImpl($this->db);
-        $this->assertNull($pageOrder->getPage('NonExistingPage'),'Did not return null');
+
+        $this->assertNull($this->pageOrder->getPage('NonExistingPage'),'Did not return null');
     }
 
     public function testGetPageWillReturnPage(){
-        $pageOrder = new PageOrderImpl($this->db);
-        $page = $pageOrder->getPage('page');
+
+        $page = $this->pageOrder->getPage('page');
         $this->assertInstanceOf('Page',$page,'Did not return right instance');
         $this->assertEquals('page',$page->getID(),'IDs did not match');
 
     }
     public function testGetPageWillReturnInactivePage(){
-        $pageOrder = new PageOrderImpl($this->db);
-        $page = $pageOrder->getPage('page3');
+
+        $page = $this->pageOrder->getPage('page3');
         $this->assertInstanceOf('Page',$page,'Did not return right instance');
         $this->assertEquals('page3',$page->getID(),'IDs did not match');
 
     }
 
     public function testGetPagePathWillReturnFalseIfPageNIL(){
-        $pageOrder = new PageOrderImpl($this->db);
+
         $page = new StubPageImpl();
         $page->setID('someID');
         $page->setTitle('someTitle');
-        $ret = $pageOrder->getPagePath($page);
+        $ret = $this->pageOrder->getPagePath($page);
         $this->assertFalse($ret,'Did not return false');
     }
 
     public function testGetPagePathWillReturnEmptyArrayIfPageIsInactive(){
-        $pageOrder = new PageOrderImpl($this->db);
-        $page = $pageOrder->getPage('page3');
-        $ret = $pageOrder->getPagePath($page);
+
+        $page = $this->pageOrder->getPage('page3');
+        $ret = $this->pageOrder->getPagePath($page);
         $this->assertTrue(is_array($ret),'Did not return array');
         $this->assertEquals(0,count($ret),'Did not return empty array');
 
     }
 
     public function testGetPagePathWillReturnNumericArrayWithPathOfPages(){
-        $pageOrder = new PageOrderImpl($this->db);
-        $page = $pageOrder->getPage('page2');
-        $ret = $pageOrder->getPagePath($page);
+
+        $page = $this->pageOrder->getPage('page2');
+        $ret = $this->pageOrder->getPagePath($page);
         $this->assertTrue(is_array($ret),'Did not return an array');
         $this->assertEquals(2,count($ret),'Did not return array of right size');
         $this->assertArrayHasKey(0,$ret,'Array was not numeric');
@@ -551,6 +558,13 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         $this->assertInstanceOf('Page',$p);
         $this->assertEquals('page2',$p->getID(),'IDs did not match');
 
+    }
+
+    public function testGetCurrentPageReturnsInstanceFromStrategy(){
+        $strategy = new StubCurrentPageStrategyImpl();
+        $strategy->setCurrentPage($p = new StubPageImpl());
+        $this->backendContainer->setCurrentPageStrategyInstance($strategy);
+        $this->assertTrue($p === $this->pageOrder->getCurrentPage());
     }
 
 

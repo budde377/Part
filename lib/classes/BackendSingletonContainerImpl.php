@@ -103,7 +103,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getPageOrderInstance()
     {
         if ($this->pageOrder === null) {
-            $this->pageOrder = new PageOrderImpl($this->getDBInstance());
+            $this->pageOrder = new PageOrderImpl($this);
         }
         return $this->pageOrder;
     }

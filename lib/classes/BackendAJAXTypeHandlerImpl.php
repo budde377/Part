@@ -12,10 +12,22 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
     private $backend;
     private $userLibrary;
 
+
+    private $sitePrivilegesFunction;
+
     function __construct(BackendSingletonContainer $backend)
     {
         $this->backend = $backend;
         $this->userLibrary = $backend->getUserLibraryInstance();
+        $this->sitePrivilegesFunction  = function (){
+            $currentUser = $this->userLibrary->getUserLoggedIn();
+            if($currentUser == null){
+                return false;
+            }
+            $privileges = $currentUser->getUserPrivileges();
+            return $privileges->hasSitePrivileges();
+
+        };
     }
 
 
@@ -100,6 +112,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             'getChildren',
             'createUserFromMail');
 
+
         $userLibraryHandler->addFunction("UserLibrary", "userLogin", function (UserLibrary $instance, $username, $password) {
             if (($user = $instance->getUser($username)) == null) {
                 return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_LOGIN);
@@ -116,6 +129,20 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
         $userLibraryHandler->addFunctionAuthFunction('UserLibrary', 'deleteUser', function ($type, UserLibrary $instance, $functionName, $args) {
             return $this->isChildOfUser($instance->getUser($args[0]));
+        });
+
+        $userLibraryHandler->addFunctionAuthFunction('UserLibrary', 'createUserFromMail', function ($type, UserLibrary $instance, $functionName, $args){
+            $privileges = $this->userLibrary->getUserLoggedIn()->getUserPrivileges();
+            if($privileges->hasRootPrivileges()){
+                return true;
+            }
+
+            if($privileges->hasSitePrivileges() && $args[1] != "root"){
+                return true;
+            }
+
+            return false;
+
         });
 
         $userLibraryHandler->addFunction("UserLibrary", "createUserFromMail", function (UserLibrary $instance, $mail, $privileges) {
@@ -210,7 +237,13 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
     private function setUpPageOrderInstance(AJAXServer $server)
     {
-        $server->registerHandler(new GenericObjectAJAXTypeHandlerImpl($this->backend->getPageOrderInstance()), 'PageOrder');
+        $server->registerHandler($pageOrderHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getPageOrderInstance()), 'PageOrder');
+
+        $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'deletePage', $this->sitePrivilegesFunction);
+        $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'deactivatePage', $this->sitePrivilegesFunction);
+        $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'setPageOrder', $this->sitePrivilegesFunction);
+        $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'createPage', $this->sitePrivilegesFunction);
 
     }
+
 }

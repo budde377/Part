@@ -19,13 +19,14 @@ class PageOrderImpl implements PageOrder, Observer
 
     /** @var PDOStatement */
     private $deactivatePageStatement;
+    private $backendContainer;
 
 
-    public function __construct(DB $database)
+    public function __construct(BackendSingletonContainer $container)
     {
-        $this->database = $database;
-        $this->connection = $database->getConnection();
-
+        $this->database = $container->getDBInstance();
+        $this->connection = $this->database->getConnection();
+        $this->backendContainer = $container;
         $this->initializePageOrder();
     }
 
@@ -428,5 +429,15 @@ class PageOrderImpl implements PageOrder, Observer
             }
         }
         return false;
+    }
+
+    /**
+     * Will return the current page from the current page
+     * strategy.
+     * @return Page
+     */
+    public function getCurrentPage()
+    {
+        return $this->backendContainer->getCurrentPageStrategyInstance()->getCurrentPage();
     }
 }

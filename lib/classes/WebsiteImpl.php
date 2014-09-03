@@ -39,14 +39,14 @@ class WebsiteImpl implements Website
 
 
         $cacheControl = $this->backendContainer->getCacheControlInstance();
-        if($this->config->isDebugMode()){
+        if ($this->config->isDebugMode()) {
             $cacheControl->disableCache();
             $template->setTwigDebug(true);
         }
 
 
         $currentPage = $pageStrategy->getCurrentPage();
-        $template->setTemplateFromConfig($currentPage->getTemplate(),"_main");
+        $template->setTemplateFromConfig($currentPage->getTemplate(), "_main");
 
         $ajaxServer = $this->backendContainer->getAJAXServerInstance();
         if (($id = $this->GETValueOfIndexIfSetElseDefault('ajax', null)) !== null) {
@@ -56,14 +56,9 @@ class WebsiteImpl implements Website
 
         //Decide output mode
         if ($id !== null) {
-            if(trim(file_get_contents("php://input")) == ""){
-                $ajax = $ajaxServer->handleFromFunctionString($id);
-            } else {
-                $ajax = $ajaxServer->handleFromRequestBody();
-            }
+            echo $ajax = $ajaxServer->handleFromFunctionString($id)->getAsJSONString();
 
-            echo $ajax->getAsJSONString();
-        } else if(!$cacheControl->setUpCache()){
+        } else if (!$cacheControl->setUpCache()) {
             echo $template->render();
         }
 

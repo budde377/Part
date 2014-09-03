@@ -104,4 +104,12 @@ interface PageOrder
      * @return bool | array
      */
     public function getPagePath(Page $page);
+
+
+    /**
+     * Will return the current page from the current page
+     * strategy.
+     * @return Page
+     */
+    public function getCurrentPage();
 }
