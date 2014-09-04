@@ -97,7 +97,9 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
     private function setUpUserLibraryHandler(AJAXServer $server)
     {
 
+
         $server->registerHandler($userLibraryHandler = new GenericObjectAJAXTypeHandlerImpl($this->userLibrary, 'UserLibrary'));
+
         $userLibraryHandler->addAuthFunction(function ($type, $instance, $functionName) {
             if ($this->userLibrary->getUserLoggedIn() == null && $functionName != "userLogin") {
                 return false;
@@ -108,6 +110,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $userLibraryHandler->whitelistFunction('UserLibrary',
             'listUsers',
             'deleteUser',
+            'userLogin',
             'getUserLoggedIn',
             'getUser',
             'getParent',

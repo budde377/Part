@@ -17,7 +17,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
     /** @var  FunctionStringParser */
     private $parser;
     private $falseFunction;
-    private $trueFunciton;
+    private $trueFunction;
 
     protected function setUp()
     {
@@ -27,7 +27,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
         $this->nullAJAXServer = new NullAJAXServerImpl();
         $this->parser = new FunctionStringParserImpl();
         $this->falseFunction = function () { return false;};
-        $this->trueFunciton = function () { return true;};
+        $this->trueFunction = function () { return true;};
     }
 
 
@@ -149,6 +149,15 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
         $this->assertEquals(2, count($list));
         $this->assertEquals('getAsJSONString', $list[0]);
         $this->assertEquals('jsonSerialize', $list[1]);
+    }
+
+    public function testWhitelistFunctionWorksWhenAddingFunctionLater(){
+
+        $this->handler->setUp($this->nullAJAXServer, 'JSONElement');
+        $this->handler->whitelistFunction('JSONElement', 'custom');
+        $this->handler->addFunction('JSONElement', 'custom', function(){});
+        $list = $this->handler->listFunctions('JSONElement');
+        $this->assertEquals(['custom'], $list);
     }
 
     public function testWhitelistFunctionDoesNotWhitelistNonExistingMethod(){

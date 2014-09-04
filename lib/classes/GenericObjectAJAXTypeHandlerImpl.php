@@ -193,10 +193,11 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
                 $first = false;
                 continue;
             }
+/*
             if (isset($this->functions[$type]) && !in_array($arg, $this->functions[$type])) {
                 continue;
             }
-
+*/
             $this->functionWhitelist[$type][] = $arg;
         }
 
@@ -258,7 +259,16 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
         }
 
         if (isset($this->functionWhitelist[$type]) && count($this->functionWhitelist[$type]) > 0) {
-            return $this->functionWhitelist[$type];
+            $resultArray = array();
+
+            foreach($this->functionWhitelist[$type] as $function){
+                if($this->hasRealFunction($type, $function)){
+                    $resultArray[] = $function;
+                }
+            }
+            if(count($resultArray) > 0){
+                return $resultArray;
+            }
         }
 
         $customFunctions = isset($this->customFunctions[$type]) ? array_keys($this->customFunctions[$type]) : [];
@@ -401,5 +411,16 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
             }
         }
 
+    }
+
+    private function hasRealFunction($type, $function)
+    {
+        if(isset($this->functions[$type]) && in_array($function, $this->functions[$type])){
+            return true;
+        }
+        if(isset($this->customFunctions[$type][$function])){
+            return true;
+        }
+        return false;
     }
 }
