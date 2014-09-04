@@ -268,6 +268,10 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
         $this->assertEquals($user1->getUsername(),$user3->getParent(),'Parent did not match');
     }
 
+    public function testLibraryIsJSONObjectSerializable(){
+        $this->assertEquals(new UserLibraryJSONObjectImpl($this->library), $this->library->jsonObjectSerialize());
+    }
+
     private function userInList($ret, User $user)
     {
         $success = false;

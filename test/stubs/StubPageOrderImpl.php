@@ -174,4 +174,13 @@ class StubPageOrderImpl implements PageOrder
     {
 
     }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+    public function jsonObjectSerialize()
+    {
+        return new PageOrderJSONObjectImpl($this);
+    }
 }

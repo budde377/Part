@@ -567,6 +567,11 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         $this->assertTrue($p === $this->pageOrder->getCurrentPage());
     }
 
+    public function testPageOrderReturnsRightJSONObject(){
+        $this->assertEquals(new PageOrderJSONObjectImpl($this->pageOrder), $this->pageOrder->jsonObjectSerialize());
+
+    }
+
 
 
     public function getSetUpOperation()

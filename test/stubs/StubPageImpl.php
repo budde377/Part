@@ -241,5 +241,6 @@ class StubPageImpl implements Page
      */
     public function jsonObjectSerialize()
     {
+        return new PageJSONObjectImpl($this);
     }
 }

@@ -5,7 +5,7 @@
  * Date: 22/07/12
  * Time: 14:26
  */
-interface UserLibrary extends Iterator
+interface UserLibrary extends Iterator, JSONObjectSerializable
 {
     /**
      * @abstract

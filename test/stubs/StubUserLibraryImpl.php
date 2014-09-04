@@ -147,4 +147,13 @@ class StubUserLibraryImpl implements UserLibrary
     public function rewind()
     {
     }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+    public function jsonObjectSerialize()
+    {
+        return new UserLibraryJSONObjectImpl($this);
+    }
 }

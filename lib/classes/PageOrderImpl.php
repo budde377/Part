@@ -440,4 +440,13 @@ class PageOrderImpl implements PageOrder, Observer
     {
         return $this->backendContainer->getCurrentPageStrategyInstance()->getCurrentPage();
     }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+    public function jsonObjectSerialize()
+    {
+        return new PageOrderJSONObjectImpl($this);
+    }
 }

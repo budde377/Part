@@ -255,4 +255,13 @@ class UserLibraryImpl implements UserLibrary, Observer
         $arrayObject = new ArrayObject($this->listUsers());
         $this->userListIterator = $arrayObject->getIterator();
     }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+    public function jsonObjectSerialize()
+    {
+        return new UserLibraryJSONObjectImpl($this);
+    }
 }

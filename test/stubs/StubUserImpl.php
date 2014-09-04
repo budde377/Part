@@ -228,5 +228,6 @@ class StubUserImpl implements User
      */
     public function jsonObjectSerialize()
     {
+        return new UserJSONObjectImpl($this);
     }
 }

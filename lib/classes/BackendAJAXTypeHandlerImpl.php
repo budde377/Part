@@ -116,7 +116,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             'getParent',
             'getChildren',
             'createUserFromMail');
-
+        $userLibraryHandler->addGetInstanceFunction('UserLibrary');
 
         $userLibraryHandler->addFunction("UserLibrary", "userLogin", function (UserLibrary $instance, $username, $password) {
             if (($user = $instance->getUser($username)) == null) {
@@ -257,6 +257,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
     private function setUpPageOrderHandler(AJAXServer $server)
     {
         $server->registerHandler($pageOrderHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getPageOrderInstance()), 'PageOrder');
+        $pageOrderHandler->addGetInstanceFunction('PageOrder');
 
         $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'deletePage', $this->sitePrivilegesFunction);
         $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'deactivatePage', $this->sitePrivilegesFunction);
