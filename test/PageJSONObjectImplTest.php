@@ -14,13 +14,22 @@ class PageJSONObjectImplTest extends PHPUnit_Framework_TestCase
         $title = 'someTitle';
         $template = 'someTemplate';
         $alias = 'someAlias';
-        $jsonObject = new PageJSONObjectImpl($id,$title,$template,$alias);
+        $page = new StubPageImpl();
+        $page->setID($id);
+        $page->setTitle($title);
+        $page->setTemplate($template);
+        $page->setAlias($alias);
+        $page->hide();
+
+        $jsonObject = new PageJSONObjectImpl($page);
 
         $this->assertEquals('page',$jsonObject->getName());
         $this->assertEquals($id,$jsonObject->getVariable('id'));
         $this->assertEquals($title,$jsonObject->getVariable('title'));
         $this->assertEquals($template,$jsonObject->getVariable('template'));
         $this->assertEquals($alias,$jsonObject->getVariable('alias'));
+        $this->assertTrue($jsonObject->getVariable('hidden'));
+        $this->assertFalse($jsonObject->getVariable('editable'));
     }
 
 }

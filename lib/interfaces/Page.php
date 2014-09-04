@@ -6,7 +6,7 @@
  * Time: 10:59 AM
  * To change this template use File | Settings | File Templates.
  */
-interface Page
+interface Page extends JSONObjectSerializable
 {
 
     const EVENT_ID_UPDATE = 1;

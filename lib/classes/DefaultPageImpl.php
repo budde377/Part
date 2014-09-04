@@ -228,4 +228,13 @@ class DefaultPageImpl implements Page
     {
         return null;
     }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+    public function jsonObjectSerialize()
+    {
+        return new PageJSONObjectImpl($this);
+    }
 }

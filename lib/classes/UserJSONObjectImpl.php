@@ -8,12 +8,12 @@
  */
 class UserJSONObjectImpl extends JSONObjectImpl
 {
-    public function __construct($username,$email,$privileges, $lastLogin,$parent = ''){
+    public function __construct(User $user){
         parent::__construct('user');
-        $this->setVariable('username',$username);
-        $this->setVariable('mail',$email);
-        $this->setVariable('parent',$parent);
-        $this->setVariable('privileges',$privileges);
-        $this->setVariable('last-login',$lastLogin);
+        $this->setVariable('username',$user->getUsername());
+        $this->setVariable('mail',$user->getMail());
+        $this->setVariable('parent',$user->getParent());
+        $this->setVariable('privileges',$user->getUserPrivileges());
+        $this->setVariable('last-login',$user->getLastLogin());
     }
 }

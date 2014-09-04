@@ -423,4 +423,15 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
         }
         return false;
     }
+
+    /**
+     * @param string $type
+     * @return void
+     */
+    public function addGetInstanceFunction($type){
+        $function = function ($instance) {
+            return $instance;
+        };
+        $this->addFunction($type, 'getInstance', $function);
+    }
 }

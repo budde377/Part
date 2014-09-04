@@ -210,4 +210,13 @@ class UserPrivilegesImpl implements UserPrivileges
         }
         return $returnArray;
     }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+    public function jsonObjectSerialize()
+    {
+        return new UserPrivilegesJSONObjectImpl($this);
+    }
 }

@@ -219,7 +219,10 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             "isValidUsername",
             "isValidPassword",
             "getUserVariables",
-            "delete");
+            "delete",
+            "getInstance");
+
+        $userHandler->addGetInstanceFunction("User");
 
         $userHandler->addTypeAuthFunction('User',function ($type, $instance, $functionName, $args){
             return substr($functionName, 0,3) != "set" || $this->userLibrary->getUserLoggedIn() === $instance;
@@ -285,7 +288,8 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             'isValidAlias',
             'lastModified',
             'modify',
-            'getVariables'
+            'getVariables',
+            'getInstance'
         );
 
         $pagePrivilegesFunction = function ($type, Page $instance){
@@ -306,6 +310,8 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $pageHandler->addFunctionAuthFunction('Page','delete', $this->sitePrivilegesFunction);
         $pageHandler->addFunctionAuthFunction('Page','hide', $this->sitePrivilegesFunction);
         $pageHandler->addFunctionAuthFunction('Page','show', $this->sitePrivilegesFunction);
+
+        $pageHandler->addGetInstanceFunction("Page");
 
     }
 

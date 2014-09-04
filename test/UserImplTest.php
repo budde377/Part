@@ -592,6 +592,11 @@ class UserImplTest extends CustomDatabaseTestCase
         $this->assertTrue($this->user->getUserVariables() === $this->user->getUserVariables());
     }
 
+    public function testUserIsJSONObjectSerializable(){
+        $this->assertInstanceOf('JSONObject', $o = $this->user->jsonObjectSerialize());
+        $this->assertEquals('user', $o->getName());
+    }
+
 
     public function getSetUpOperation()
     {

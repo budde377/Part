@@ -440,4 +440,13 @@ class PageImpl implements Page, Observable
             $this->contentLibrary = new PageContentLibraryImpl($this->database, $this):
             $this->contentLibrary;
     }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+    public function jsonObjectSerialize()
+    {
+        return new PageJSONObjectImpl($this);
+    }
 }

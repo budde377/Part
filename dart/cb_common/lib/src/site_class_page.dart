@@ -20,6 +20,8 @@ abstract class Page {
 
   bool get hidden;
 
+  bool get editable;
+
   Future<ChangeResponse<Page>> changeInfo({String id, String title, String template, String alias, bool hidden});
 
   Stream<Page> get onChange;
@@ -32,6 +34,7 @@ class JSONPage extends Page {
   String _id, _title, _template, _alias;
 
   bool _hidden = false;
+
 
   final JSONClient _client;
 
@@ -46,6 +49,7 @@ class JSONPage extends Page {
   String get alias => _alias;
 
   bool get hidden => _hidden;
+
 
   StreamController<Page> _changeController = new StreamController<Page>();
 
@@ -69,18 +73,22 @@ class JSONPage extends Page {
     var function = new ChangePageInfoJSONFunction(_id, id, title, template, alias, hidden);
     var functionCallback = (JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
-        _id = id;
-        _template = template;
-        _title = title;
-        _alias = alias;
-        _hidden = hidden;
-        _callListeners();
+        JSONObject payload = response.payload;
+        if(payload is JSONObject){
+          _id = payload.variables['id'];
+          _template = payload.variables['template'];
+          _title = payload.variables['title'];
+          _alias = payload.variables['alias'];
+          _hidden = payload.variables['hidden'];
+          _callListeners();
+        }
         completer.complete(new ChangeResponse<Page>.success(this));
       } else {
+
         completer.complete(new ChangeResponse<Page>.error(response.error_code));
       }
     };
-    _client.callFunction(function).then(functionCallback);
+    _client.callFunctionString("Page..setId(${quoteString(id)})..setTitle(${quoteString(title)})..setTemplate(${quoteString(template)})..setAlias(${quoteString(alias)})..setHidden($hidden)..getInstance()").then(functionCallback);
     return completer.future;
   }
 

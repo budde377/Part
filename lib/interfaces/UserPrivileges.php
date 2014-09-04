@@ -5,7 +5,7 @@
  * Date: 18/01/13
  * Time: 22:09
  */
-interface UserPrivileges
+interface UserPrivileges extends JSONObjectSerializable
 {
 
 

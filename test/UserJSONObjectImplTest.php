@@ -9,13 +9,28 @@
 class UserJSONObjectImplTest extends PHPUnit_Framework_TestCase
 {
     public function testConstructorWillSetVariables(){
-        $jsonObject = new UserJSONObjectImpl('root','root@test.dk','root',400,'bob');
+        $userName = 'root';
+        $mail = 'mail';
+        $parent = 'parent';
+        $privileges = new StubUserPrivilegesImpl(true, false, false);
+        $lastLogin = 1337;
+
+
+        $user = new StubUserImpl();
+        $user->setUsername($userName);
+        $user->setMail($mail);
+        $user->setParent($parent);
+        $user->setUserPrivileges($privileges);
+        $user->lastLogin = $lastLogin;
+
+        $jsonObject = new UserJSONObjectImpl($user);
+
         $this->assertEquals('user',$jsonObject->getName());
-        $this->assertEquals('root',$jsonObject->getVariable('username'));
-        $this->assertEquals('root@test.dk',$jsonObject->getVariable('mail'));
-        $this->assertEquals('bob',$jsonObject->getVariable('parent'));
-        $this->assertEquals('root',$jsonObject->getVariable('privileges'));
-        $this->assertEquals(400,$jsonObject->getVariable('last-login'));
+        $this->assertEquals($userName,$jsonObject->getVariable('username'));
+        $this->assertEquals($mail,$jsonObject->getVariable('mail'));
+        $this->assertEquals($parent,$jsonObject->getVariable('parent'));
+        $this->assertEquals($privileges->jsonObjectSerialize(),$jsonObject->getVariable('privileges'));
+        $this->assertEquals($lastLogin,$jsonObject->getVariable('last-login'));
     }
 
 

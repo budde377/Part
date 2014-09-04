@@ -467,4 +467,13 @@ class UserImpl implements User, Observable
     {
         return $this->userVariables == null?$this->userVariables = new UserVariablesImpl($this->database, $this): $this->userVariables;
     }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+    public function jsonObjectSerialize()
+    {
+        return new UserJSONObjectImpl($this);
+    }
 }

@@ -212,6 +212,11 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
         $this->assertTrue($userPrivileges->hasRootPrivileges());
     }
 
+    public function testPrivilegesIsJSONObjectSerializable(){
+        $o =$this->userPrivileges->jsonObjectSerialize();
+        $this->assertInstanceOf('UserPrivilegesJSONObjectImpl',$o);
+        $this->assertEquals(new UserPrivilegesJSONObjectImpl($this->userPrivileges), $o);
+    }
 
 
 

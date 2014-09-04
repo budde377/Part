@@ -11,7 +11,7 @@ class StubUserImpl implements User
     private $userPrivileges;
     private $username;
     private $mail;
-    private $lastLogin;
+    public $lastLogin;
     private $parent;
     private $id ;
 
@@ -220,5 +220,13 @@ class StubUserImpl implements User
     public function getUserVariables()
     {
         return null;
+    }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+    public function jsonObjectSerialize()
+    {
     }
 }

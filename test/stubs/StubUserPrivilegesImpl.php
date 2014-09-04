@@ -8,6 +8,7 @@
  */
 
 class StubUserPrivilegesImpl implements  UserPrivileges{
+    public $pagePrivileges;
     private $root, $site, $page;
 
     public function __construct($root, $site, $page){
@@ -116,6 +117,15 @@ class StubUserPrivilegesImpl implements  UserPrivileges{
      */
     public function listPagePrivileges(PageOrder $pageOrder = null)
     {
+        return $this->pagePrivileges;
+    }
 
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+    public function jsonObjectSerialize()
+    {
+        return new UserPrivilegesJSONObjectImpl($this);
     }
 }

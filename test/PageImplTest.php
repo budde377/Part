@@ -374,6 +374,13 @@ class PageImplTest extends CustomDatabaseTestCase
         $this->assertInstanceOf("ContentLibrary", $lib1);
     }
 
+    public function testPageIsJSONObjectSerializable(){
+        $o = $this->testPage->jsonObjectSerialize();
+        $this->assertInstanceOf('PageJSONObjectImpl', $o);
+        $this->assertEquals($o->getVariable('title'), $this->testPage->getTitle());
+
+    }
+
 
 
 

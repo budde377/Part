@@ -4,6 +4,8 @@ abstract class JSONClient {
   String urlPrefix = "";
 
   Future<JSONResponse> callFunction(JSONFunction function, [void progress(double pct)]);
+
+  Future<JSONResponse> callFunctionString(String function, [void progress(double pct)]);
 }
 
 

@@ -503,6 +503,17 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
 
     }
 
+    public function testAddGetInstanceFunctionAddsFunction(){
+        $this->handler->addGetInstanceFunction("JSONElement");
+        $this->handler->setUp(new NullAJAXServerImpl(),"JSONElement");
+        $list = $this->handler->listFunctions("JSONElement");
+        $this->assertContains("getInstance", $list);
+        /** @var JSONFunction $function */
+        $function = $this->parser->parseFunctionString("JSONElement.getInstance()");
+        $r = $this->handler->handle("JSONElement", $function, $this);
+        $this->assertTrue($this === $r);
+    }
+
 
     public function testStringOfActualTypeDoesAddTypesAndFunctions(){
         $handler = new GenericObjectAJAXTypeHandlerImpl("JSONObject");

@@ -9,20 +9,17 @@
 class PageJSONObjectImpl extends JSONObjectImpl
 {
     /**
-     * @param String $id
-     * @param string $title
-     * @param string $template
-     * @param string $alias
-     * @param bool $hidden
+     * @param Page $page
      */
-    function __construct($id,$title = '',$template = '',$alias='',$hidden=false)
+    function __construct(Page $page)
     {
         parent::__construct('page');
-        $this->setVariable('id',$id);
-        $this->setVariable('title',$title);
-        $this->setVariable('template',$template);
-        $this->setVariable('alias',$alias);
-        $this->setVariable('hidden',$hidden);
+        $this->setVariable('id',$page->getID());
+        $this->setVariable('title',$page->getTitle());
+        $this->setVariable('template',$page->getTemplate());
+        $this->setVariable('alias',$page->getAlias());
+        $this->setVariable('hidden',$page->isHidden());
+        $this->setVariable('editable', $page->isEditable());
     }
 
 
