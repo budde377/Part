@@ -46,9 +46,15 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $this->setUpUserLibraryHandler($server);
         $this->setUpUserHandler($server);
         $this->setUpPageOrderHandler($server);
-
         $this->setUpPageHandler($server);
         $this->setUpLogHandler($server);
+        $this->setUpUpdaterHandler($server);
+
+        $this->setUpPageContentHandler($server);
+        $this->setUpPageContentLibraryHandler($server);
+        $this->setUpSiteContentHandler($server);
+        $this->setUpSiteContentLibraryHandler($server);
+
 
     }
 
@@ -112,10 +118,12 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             'deleteUser',
             'userLogin',
             'getUserLoggedIn',
+            'getInstance',
             'getUser',
             'getParent',
             'getChildren',
             'createUserFromMail');
+
         $userLibraryHandler->addGetInstanceFunction('UserLibrary');
 
         $userLibraryHandler->addFunction("UserLibrary", "userLogin", function (UserLibrary $instance, $username, $password) {
@@ -218,7 +226,6 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             "isValidMail",
             "isValidUsername",
             "isValidPassword",
-            "getUserVariables",
             "delete",
             "getInstance");
 
@@ -289,7 +296,6 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             'isValidAlias',
             'lastModified',
             'modify',
-            'getVariables',
             'getInstance'
         );
 
@@ -322,6 +328,39 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $logHandler->addAuthFunction(function() {
            return $this->userLibrary->getUserLoggedIn() != null;
         });
+    }
+
+    private function setUpPageContentHandler(AJAXServer $server)
+    {
+        $server->registerHandler($contentHandler = new GenericObjectAJAXTypeHandlerImpl( 'PageContent'));
+        $contentHandler->addFunctionAuthFunction("PageContent", "addContent", function ($type, PageContent $instance){
+            return ($current = $this->backend->getUserLibraryInstance()->getUserLoggedIn()) != null && $current->getUserPrivileges()->hasPagePrivileges($instance->getPage());
+        });
+        $contentHandler->addGetInstanceFunction('PageContent');
+    }
+
+    private function setUpSiteContentHandler(AJAXServer $server)
+    {
+        $server->registerHandler($siteContentHandler = new GenericObjectAJAXTypeHandlerImpl('SiteContent'));
+        $siteContentHandler->addFunctionAuthFunction("SiteContent", "addContent", $this->sitePrivilegesFunction);
+        $siteContentHandler->addGetInstanceFunction('SiteContent');
+    }
+
+    private function setUpPageContentLibraryHandler(AJAXServer $server)
+    {
+        $server->registerHandler($siteContentHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getPageOrderInstance()->getCurrentPage()->getContentLibrary(), "PageContentLibrary"));
+    }
+
+    private function setUpSiteContentLibraryHandler(AJAXServer $server)
+    {
+        $server->registerHandler($siteContentHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getSiteInstance()->getContentLibrary(), "SiteContentLibrary"));
+    }
+
+    private function setUpUpdaterHandler(AJAXServer $server)
+    {
+        $server->registerHandler($updaterHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getUpdater(), "Updater"));
+        $updaterHandler->addFunctionAuthFunction('Updater', 'update', $this->sitePrivilegesFunction);
+        $updaterHandler->addFunctionAuthFunction('Updater', 'checkForUpdates', $this->sitePrivilegesFunction);
     }
 
 }

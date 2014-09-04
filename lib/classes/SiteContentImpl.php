@@ -6,7 +6,7 @@
  * Time: 12:54 PM
  */
 
-class SiteContentImpl implements Content{
+class SiteContentImpl implements SiteContent{
 
     private $db;
     private $id;
@@ -160,4 +160,22 @@ class SiteContentImpl implements Content{
         }
         $this->preparedSearchStatement->execute(array("%".$string."%", $this->id, date("Y-m-d H:i:s", $fromTime == null?0:$fromTime)));
         return $this->preparedSearchStatement->rowCount() > 0;    }
+
+    /**
+     * Returns the id
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+    public function jsonObjectSerialize()
+    {
+        return new SiteContentJSONObjectImpl($this);
+    }
 }

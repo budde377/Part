@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-class PageContentImpl implements Content
+class PageContentImpl implements PageContent
 {
 
     private $db;
@@ -166,5 +166,32 @@ class PageContentImpl implements Content
         }
         $this->preparedSearchStatement->execute(array("%".$string."%", $this->page->getID(), $this->id, date("Y-m-d H:i:s", $fromTime == null?0:$fromTime)));
         return $this->preparedSearchStatement->rowCount() > 0;
+    }
+
+    /**
+     * Returns the page instance of which the content is registered.
+     * @return Page
+     */
+    public function getPage()
+    {
+        return $this->page;
+    }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+    public function jsonObjectSerialize()
+    {
+        return new PageContentJSONObjectImpl($this);
+    }
+
+    /**
+     * Returns the id
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 }

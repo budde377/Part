@@ -75,4 +75,23 @@ class NullContentImpl implements Content{
     {
         return false;
     }
+
+    /**
+     * Returns the id
+     * @return string
+     */
+    public function getId()
+    {
+
+        return null;
+    }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+    public function jsonObjectSerialize()
+    {
+        return null;
+    }
 }

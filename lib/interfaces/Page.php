@@ -60,14 +60,14 @@ interface Page extends JSONObjectSerializable
     /**
      * This will return an object used to retrieve the content.
      * @param null | string $id Optional parameter specifying an id for the content.
-     * @return Content
+     * @return PageContent
      */
     public function getContent($id = "");
 
 
     /**
      * Will return and reuse a ContentLibrary instance.
-     * @return ContentLibrary
+     * @return PageContentLibrary
      */
     public function getContentLibrary();
 

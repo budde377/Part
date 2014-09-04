@@ -9,6 +9,7 @@
  */
 
 class SiteContentImplTest extends CustomDatabaseTestCase{
+    public $existingId2;
 
     /** @var  SiteImpl */
     private $site;
@@ -36,7 +37,7 @@ class SiteContentImplTest extends CustomDatabaseTestCase{
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
         $this->existingContent = new SiteContentImpl($this->db, $this->site);
-        $this->existingContent2 = new SiteContentImpl($this->db, $this->site, "Test");
+        $this->existingContent2 = new SiteContentImpl($this->db, $this->site, $this->existingId2 = "Test");
         $this->nonExistingContent = new SiteContentImpl($this->db, $this->site, "NoContent");
     }
 
@@ -149,4 +150,16 @@ class SiteContentImplTest extends CustomDatabaseTestCase{
     public function testContainsWillRespectTime(){
         $this->assertFalse($this->existingContent->containsSubString("Some", time()));
     }
+
+
+    public function testReturnsRightId(){
+        $this->assertEquals($this->existingId2, $this->existingContent2->getId());
+        $this->assertEquals("", $this->existingContent->getId());
+    }
+
+    public function testReturnsRightContent(){
+        $this->assertEquals(new SiteContentJSONObjectImpl($this->existingContent2), $this->existingContent2->jsonObjectSerialize());
+
+    }
+
 }

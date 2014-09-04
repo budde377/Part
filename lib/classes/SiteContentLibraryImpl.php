@@ -6,7 +6,7 @@
  * Date: 3/3/14
  * Time: 10:53 PM
  */
-class SiteContentLibraryImpl implements ContentLibrary
+class SiteContentLibraryImpl implements SiteContentLibrary
 {
 
 

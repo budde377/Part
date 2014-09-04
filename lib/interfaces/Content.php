@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-interface Content {
+interface Content extends JSONObjectSerializable{
 
 
     /**
@@ -55,5 +55,11 @@ interface Content {
      * @return String the latest content
      */
     public function __toString();
+
+    /**
+     * Returns the id
+     * @return string
+     */
+    public function getId();
 
 }

@@ -25,6 +25,7 @@ class PageContentImplTest extends CustomDatabaseTestCase{
     private $existingPage;
     /** @var  Page */
     private $nonExistingPage;
+    private $existingId2;
 
     function __construct()
     {
@@ -39,7 +40,7 @@ class PageContentImplTest extends CustomDatabaseTestCase{
         $this->existingPage = new PageImpl('testpage', $this->db);
         $this->existingContent = new PageContentImpl($this->db, $this->existingPage);
 
-        $this->existingContent2 = new PageContentImpl($this->db, $this->existingPage, "Test");
+        $this->existingContent2 = new PageContentImpl($this->db, $this->existingPage, $this->existingId2 = "Test");
 
         $this->nonExistingPage = new PageImpl('nonExisting', $this->db);
         $this->nonExistingContent = new PageContentImpl($this->db, $this->nonExistingPage);
@@ -168,6 +169,21 @@ class PageContentImplTest extends CustomDatabaseTestCase{
 
     public function testContainsWillRespectTime(){
         $this->assertFalse($this->existingContent->containsSubString("Some", time()));
+    }
+
+    public function testReturnsRightInstanceOfPage(){
+        $this->assertTrue($this->existingPage === $this->existingContent->getPage());
+    }
+
+    public function testReturnsRightId(){
+        $this->assertEquals($this->existingId2, $this->existingContent2->getId());
+        $this->assertEquals("", $this->existingContent->getId());
+    }
+
+
+    public function testReturnsRightContent(){
+        $this->assertEquals(new PageContentJSONObjectImpl($this->existingContent2), $this->existingContent2->jsonObjectSerialize());
+
     }
 
 

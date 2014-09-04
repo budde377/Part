@@ -9,7 +9,7 @@
 class JSONObjectImpl extends JSONElementImpl implements JSONObject
 {
 
-    private $name;
+    protected $name;
     private $variables = array();
 
     /**

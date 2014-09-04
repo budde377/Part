@@ -140,4 +140,8 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
         $this->assertEquals(1, count($ar));
     }
 
+    public function testLibraryReturnsRightPageInstance(){
+        $this->assertTrue($this->existingPage === $this->existingContentLibrary->getPage());
+    }
+
 }

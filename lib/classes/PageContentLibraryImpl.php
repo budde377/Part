@@ -6,7 +6,7 @@
  * Date: 3/3/14
  * Time: 10:10 PM
  */
-class PageContentLibraryImpl implements ContentLibrary
+class PageContentLibraryImpl implements PageContentLibrary
 {
 
     /** @var Page */
@@ -98,5 +98,14 @@ class PageContentLibraryImpl implements ContentLibrary
         }
 
         return $retArray;
+    }
+
+    /**
+     * Returns the page instance of which the library is registered.
+     * @return Page
+     */
+    public function getPage()
+    {
+        return $this->page;
     }
 }

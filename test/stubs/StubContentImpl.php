@@ -9,6 +9,7 @@
 
 class StubContentImpl implements Content{
 
+    public $id;
     private $content = array();
 
     /**
@@ -97,5 +98,23 @@ class StubContentImpl implements Content{
             }
         }
         return false;
+    }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+    public function jsonObjectSerialize()
+    {
+        return new ContentJSONObjectImpl($this);
+    }
+
+    /**
+     * Returns the id
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 }
