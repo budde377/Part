@@ -210,6 +210,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             "getUniqueId",
             "setMail",
             "setUsername",
+            "setPassword",
             "logout",
             "isValidMail",
             "isValidUsername",
@@ -223,6 +224,17 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
         $userHandler->addFunctionAuthFunction('User','delete',function ($type, $instance){
             return  $this->isChildOfUser($instance);
+        });
+
+        $userHandler->addFunction('User','setPassword', function(User $user, $oldPassword, $newPassword){
+            if(!$user->verifyLogin($oldPassword)){
+                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_WRONG_PASSWORD);
+            }
+
+            if(!$user->setPassword($newPassword)){
+                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_PASSWORD);
+            }
+            return new JSONResponseImpl();
         });
 
     }
