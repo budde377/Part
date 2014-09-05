@@ -45,7 +45,7 @@ class YUICompressorOptimizerImpl implements Optimizer
         if ($retVal != 0 || !$tempFile->exists()) {
             $logger = new LoggerImpl(dirname(__FILE__) . '/../');
             $tempFile->delete();
-            $logger->log($this, "Compression failed with command: '$command'");
+            $logger->log(Logger::LOG_LEVEL_WARNING, "Compression failed with command: '$command'");
             return false;
         }
         $outputFile->delete();
