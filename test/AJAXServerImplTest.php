@@ -560,6 +560,39 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
     }
 
 
+    public function testHandlerTypeFunctionRight(){
+
+        $type1 = 'Content';
+        $this->handler1->types = [$type1];
+        $this->handler1->canHandle[$type1] = true;
+        $this->handler1->handle[$type1] = $instance1 = "content";
+
+
+        $type2 = 'PageContent';
+        $this->handler2->types = [$type2];
+        $this->handler2->canHandle[$type2] = true;
+        $this->handler2->handle[$type2] = $instance2 = "pageContent";
+
+        $type3 = 'SomeElement';
+        $handler3 = new StubAJAXTypeHandlerImpl();
+        $handler3->types = [$type3];
+        $handler3->canHandle[$type3] = true;
+        $handler3->handle[$type3] = $instance3 = new StubPageContentImpl();
+
+        $this->server->registerHandler($this->handler1);
+        $this->server->registerHandler($this->handler2);
+        $this->server->registerHandler($handler3);
+
+        $r = $this->server->handleFromFunctionString("SomeElement.get().get()");
+
+        $this->assertNull($this->checkIfFunctionIsCalled('canHandle', $this->handler1));
+        $this->assertNotNull($this->checkIfFunctionIsCalled('canHandle', $this->handler2));
+
+
+
+    }
+
+
     protected function tearDown()
     {
         parent::tearDown();

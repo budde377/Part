@@ -213,7 +213,8 @@ class AJAXServerImpl implements AJAXServer
             }
 
             $reflection = new ReflectionClass($instance);
-            $types = $reflection->getInterfaceNames();
+            $types = $this->buildType($reflection);
+
 
         } else {
             return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_MALFORMED_REQUEST);
@@ -245,6 +246,31 @@ class AJAXServerImpl implements AJAXServer
         return $this->wrapperHandler($this->functionStringParser->parseFunctionString($input));
     }
 
+    private function buildType(ReflectionClass $reflection)
+    {
+        $result = [];
+
+        foreach($i = $reflection->getInterfaces() as $class){
+            $result[] = $class->getName();
+            $result = array_merge($result, $this->buildType($class));
+        }
+
+        if($parent = $reflection->getParentClass()){
+            $result = array_merge($result, $this->buildType($parent));
+        }
+
+        $r = [];
+
+        while(count($result)){
+            $e = array_pop($result);
+            if(in_array($e, $result)){
+                continue;
+            }
+            $r[] = $e;
+        }
+
+        return $r;
+    }
 
 
 }

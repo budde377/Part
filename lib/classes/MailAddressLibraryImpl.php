@@ -25,7 +25,7 @@ class MailAddressLibraryImpl implements MailAddressLibrary, Observer{
 
 
     /**
-     * @return array An array containing selected entries.
+     * @return MailAddress[] An array containing selected entries.
      */
     public function listAddresses()
     {

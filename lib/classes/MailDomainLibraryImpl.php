@@ -28,7 +28,7 @@ class MailDomainLibraryImpl implements MailDomainLibrary, Observer
 
     /**
      * List the domains in the library as an assoc array
-     * @return array An array of PostfixDomain s
+     * @return MailDomain[] An array of PostfixDomain s
      */
     public function listDomains()
     {

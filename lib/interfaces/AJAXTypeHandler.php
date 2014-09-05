@@ -19,7 +19,7 @@ interface AJAXTypeHandler {
 
     /**
      * Lists the types that this handler can handle.
-     * @return array An array of strings
+     * @return string[] An array of strings
      */
     public function listTypes();
 
