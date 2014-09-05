@@ -11,31 +11,31 @@ session_start();
 
 // LOCAL AUTOLOADERS
 
-require dirname(__FILE__)."/../AutoLoader.php";
+require dirname(__FILE__) . "/../AutoLoader.php";
 
 AutoLoader::registerAutoloader();
-AutoLoader::registerDirectory(dirname(__FILE__)."/../lib");
-AutoLoader::registerDirectory(dirname(__FILE__)."/../../lib");
+AutoLoader::registerDirectory(dirname(__FILE__) . "/../lib");
+AutoLoader::registerDirectory(dirname(__FILE__) . "/../../lib");
 // LOAD COMPOSER
-require dirname(__FILE__).'/../vendor/autoload.php';
-@include dirname(__FILE__).'/../../vendor/autoload.php';
+require dirname(__FILE__) . '/../vendor/autoload.php';
+@include dirname(__FILE__) . '/../../vendor/autoload.php';
 // PROVIDE A WAY TO INITIALIZE SITE FACTORY
-@include dirname(__FILE__).'/../../vendor/local.php';
+@include dirname(__FILE__) . '/../../vendor/local.php';
 
 date_default_timezone_set("Europe/Copenhagen");
 /** @var $siteConfig SimpleXMLElement */
 $siteConfig = simplexml_load_file('../site-config.xml');
 $config = new ConfigImpl($siteConfig, dirname(__FILE__) . '/../../');
 
-$factory = isset($factory)?$factory:new SiteFactoryImpl($config);
+$factory = isset($factory) ? $factory : new SiteFactoryImpl($config);
 
-$setUp = function() use ($factory){
+$setUp = function () use ($factory) {
     $website = new WebsiteImpl($factory);
     $website->generateSite();
     return $website;
 };
 
-if($config->isDebugMode()){
+if ($config->isDebugMode()) {
     error_reporting(E_ALL);
     ini_set("display_errors", 1);
     $setUp();
@@ -47,13 +47,13 @@ if($config->isDebugMode()){
         $mail = new MailImpl();
         $backendContainer = $factory->buildBackendSingletonContainer($config);
         /** @var $user User */
-        foreach($backendContainer->getUserLibraryInstance() as $user){
-            if($user->getUserPrivileges()->hasRootPrivileges()){
+        foreach ($backendContainer->getUserLibraryInstance() as $user) {
+            if ($user->getUserPrivileges()->hasRootPrivileges()) {
                 $mail->addReceiver($user);
             }
         }
-        $printVars = function ($title, $var){
-            $var = str_replace("\n","<br />", print_r($var,true));
+        $printVars = function ($title, $var) {
+            $var = str_replace("\n", "<br />", print_r($var, true));
             return "        <u><b>$title</b></u><br />
                     $var<br />";
         };
@@ -69,19 +69,20 @@ if($config->isDebugMode()){
         $mail->setMailType(Mail::MAIL_TYPE_HTML);
         $mail->sendMail();
 
-        if($log = $backendContainer->getLogInstance()){
-            $d = $log->log("PHP Exception", LogFile::LOG_LEVEL_ERROR, true);
-            $d->dumpVar("Exception", $exception);
-            $d->dumpVar('$_SERVER', $_SERVER);
-            $d->dumpVar('$_POST', $_POST);
-            $d->dumpVar('$_GET', $_GET);
-            $d->dumpVar('$_SESSION', $_SESSION);
-            $d->dumpVar('$_COOKIE', $_COOKIE);
+        if ($log = $backendContainer->getLoggerInstance()) {
+            $d = $log->error("PHP Exception", [
+                "Exception" => $exception,
+                '$_SERVER' => $_SERVER,
+                '$_POST' => $_POST,
+                '$_GET' => $_GET,
+                '$_SESSION' => $_SESSION,
+                '$_COOKIE' => $_COOKIE
+            ]);
+
         }
 
 
-
-        if(!isset($_SERVER['REQUEST_URI']) || strpos($_SERVER['REQUEST_URI'], '_500') === false){
+        if (!isset($_SERVER['REQUEST_URI']) || strpos($_SERVER['REQUEST_URI'], '_500') === false) {
             HTTPHeaderHelper::redirectToLocation("/_500");
         }
 

@@ -94,9 +94,10 @@ class PageContentImpl implements PageContent
     /**
      * @param int | null $from List history from a specific time. If null the whole history will be returned.
      * @param int| null $to List history to a specific time.
+     * @param bool $onlyTimestamps If true the result will be an array of timestamps.
      * @return array An array containing arrays with keys: "time" and "content"
      */
-    public function listContentHistory($from = null, $to = null)
+    public function listContentHistory($from = null, $to = null, $onlyTimestamps = false)
     {
         $this->initializeHistory();
         $result = $this->history;
@@ -115,6 +116,12 @@ class PageContentImpl implements PageContent
                 if ($e['time'] <= $to) {
                     $result[] = $e;
                 }
+            }
+        }
+
+        if($onlyTimestamps){
+            foreach($result as $k=>$r){
+                $result[$k] = $r['time'];
             }
         }
 

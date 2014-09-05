@@ -10,37 +10,163 @@
 class LoggerImpl implements Logger
 {
 
-    private $rootPath;
-    /** @var $file FileImpl */
-    private $file = null;
+    private $logFile;
+
+    function __construct($filePath)
+    {
+        $this->logFile = $filePath == ""?new StubLogFileImpl():new LogFileImpl($filePath);
+    }
+
 
     /**
-     * @param string $rootPath
+     * System is unusable.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
      */
-    public function __construct($rootPath)
+    public function emergency($message, array $context = array())
     {
-        $this->rootPath = $rootPath;
-
+        $this->log(Logger::LOG_LEVEL_EMERGENCY, $message, $context);
     }
 
     /**
-     * Logs message in specified
-     * @param Object $caller
-     * @param $message
-     * @throws MalformedParameterException
-     * @return void
+     * Action must be taken immediately.
+     *
+     * Example: Entire website down, database unavailable, etc. This should
+     * trigger the SMS alerts and wake you up.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
      */
-    public function log($caller, $message)
+    public function alert($message, array $context = array())
     {
+        $this->log(Logger::LOG_LEVEL_ALERT, $message, $context);
+    }
 
-        if (!is_object($caller)) {
-            throw new MalformedParameterException('Object', 1);
+    /**
+     * Critical conditions.
+     *
+     * Example: Application component unavailable, unexpected exception.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
+    public function critical($message, array $context = array())
+    {
+        $this->log(Logger::LOG_LEVEL_CRITICAL, $message, $context);
+    }
+
+    /**
+     * Runtime errors that do not require immediate action but should typically
+     * be logged and monitored.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
+    public function error($message, array $context = array())
+    {
+        $this->log(Logger::LOG_LEVEL_ERROR, $message, $context);
+    }
+
+    /**
+     * Exceptional occurrences that are not errors.
+     *
+     * Example: Use of deprecated APIs, poor use of an API, undesirable things
+     * that are not necessarily wrong.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
+    public function warning($message, array $context = array())
+    {
+        $this->log(Logger::LOG_LEVEL_WARNING, $message, $context);
+    }
+
+    /**
+     * Normal but significant events.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
+    public function notice($message, array $context = array())
+    {
+        $this->log(Logger::LOG_LEVEL_NOTICE, $message, $context);
+    }
+
+    /**
+     * Interesting events.
+     *
+     * Example: User logs in, SQL logs.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
+    public function info($message, array $context = array())
+    {
+        $this->log(Logger::LOG_LEVEL_INFO, $message, $context);
+    }
+
+    /**
+     * Detailed debug information.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
+    public function debug($message, array $context = array())
+    {
+        $this->log(Logger::LOG_LEVEL_DEBUG, $message, $context);
+    }
+
+    /**
+     * Logs with an arbitrary level.
+     *
+     * @param mixed $level
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
+    public function log($level, $message, array $context = array())
+    {
+        $dumpFile = $this->logFile->log($message, $level, $context != []);
+        if($dumpFile != null){
+            $dumpFile->writeSerialized($context);
         }
-        if ($this->file === null) {
-            $this->file = new FileImpl($this->rootPath . '/.log');
+    }
+
+    /**
+     * Use boolean or to combine which loglevels you whish to list.
+     * @param int $level
+     * @param bool $includeContext If false context will not be included in result.
+     * @param int $time The earliest returned entry will be after this value
+     * @return mixed
+     */
+    public function listLog($level = Logger::LOG_LEVEL_ALL, $includeContext = true, $time = 0)
+    {
+        $list = $this->logFile->listLog($level, $time);
+        $result = [];
+        foreach($list as $entry){
+            if(isset($entry['dumpfile'])){
+                /** @var DumpFile $dumpFile */
+                $dumpFile = $entry['dumpfile'];
+
+                $entry['context'] = $dumpFile->getUnSerializedContent()[0];
+
+
+                unset($entry['dumpfile']);
+
+            }
+            $result[] = $entry;
+
         }
-        $callerName = get_class($caller);
-        $time = date('Y-m-d H:i:s') . '.' . substr((string)microtime(), 1, 6);
-        $this->file->write("$time: $callerName -> $message\r\n");
+
+        return  $result;
     }
 }

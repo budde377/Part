@@ -78,6 +78,12 @@ class PageContentImplTest extends CustomDatabaseTestCase{
         $this->assertEquals(1, count($this->existingContent2->listContentHistory(1356994000, 1356995000)));
     }
 
+    public function testOnlyTimestampWillListTimestamps(){
+
+        $list = $this->existingContent2->listContentHistory(null, null, true);
+        $this->assertEquals([946681201, 1356994801], $list);
+    }
+
 
     public function testAddContentWillAddContent(){
         $content = "Lorem Ipsum";

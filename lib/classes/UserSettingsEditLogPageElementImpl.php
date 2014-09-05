@@ -21,10 +21,9 @@ class UserSettingsEditLogPageElementImpl extends PageElementImpl{
     {
         parent::generateContent();
 
-        $log = $this->container->getLogInstance();
+        $log = $this->container->getLoggerInstance();
        // $log->log(uniqid("MSG"),pow(2,rand(0,3)), rand(0,1));
         $rows = "";
-        $numError = $numWarning = $numNotice = $numDebug = 0;
         foreach($l = $log->listLog() as $entry){
             /** @var $entry array */
             $t = $entry['time'];
@@ -37,29 +36,17 @@ class UserSettingsEditLogPageElementImpl extends PageElementImpl{
                 <td class='dumpfile'>$dumpFile</td>
                 <td class='date'>$date</td>
             </tr>".$rows;
-            switch($entry["level"]){
-                case LogFile::LOG_LEVEL_ERROR:
-                    $numError++;
-                    break;
-                case LogFile::LOG_LEVEL_WARNING:
-                    $numWarning++;
-                    break;
-                case LogFile::LOG_LEVEL_NOTICE:
-                    $numNotice++;
-                    break;
-                case LogFile::LOG_LEVEL_DEBUG:
-                    $numDebug++;
-                    break;
-            }
+
         }
         $emptyClass = count($l)?"":"empty";
+        $count = count($l);
         $output = "
         <table id='UserSettingsLogTable' class='$emptyClass'>
             $rows
             <tr class='empty_row'><td>Loggen er tom</td></tr>
         </table>
         <p id='LogInfoParagraph'>
-        Der er registreret <i>$numError</i> error, <i>$numWarning</i> warning, <i>$numNotice</i> notice og <i>$numDebug</i> debug indgange.
+        Der er registreret <i>$count</i> indgange.
         <a href='#' id='ClearLogLink'>Ryd loggen</a>.
         </p>
         ";
@@ -79,19 +66,37 @@ class UserSettingsEditLogPageElementImpl extends PageElementImpl{
      */
     private function levelToString($level, $lowercase = false)
     {
+        if(!$lowercase){
+            return strtoupper($this->levelToString($level, true));
+        }
 
-        if($level & LogFile::LOG_LEVEL_ERROR){
-            return $lowercase?"error":"Error";
+        switch($level){
+            case Logger::LOG_LEVEL_ALERT:
+                return "alert";
+                break;
+            case Logger::LOG_LEVEL_DEBUG:
+                return "debug";
+                break;
+            case Logger::LOG_LEVEL_CRITICAL:
+                return "critical";
+                break;
+            case Logger::LOG_LEVEL_EMERGENCY:
+                return "emergency";
+                break;
+            case Logger::LOG_LEVEL_INFO:
+                return "info";
+                break;
+            case Logger::LOG_LEVEL_NOTICE:
+                return "notice";
+                break;
+            case Logger::LOG_LEVEL_WARNING:
+                return "warning";
+                break;
+            case Logger::LOG_LEVEL_ERROR:
+                return "error";
+                break;
         }
-        if($level & LogFile::LOG_LEVEL_WARNING){
-            return $lowercase?"warning":"Warning";
-        }
-        if($level & LogFile::LOG_LEVEL_NOTICE){
-            return $lowercase?"notice":"Notice";
-        }
-        if($level & LogFile::LOG_LEVEL_DEBUG){
-            return $lowercase?"debug":"Debug";
-        }
+
 
         return "";
 

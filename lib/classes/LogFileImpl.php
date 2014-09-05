@@ -26,7 +26,6 @@ class LogFileImpl extends FileImpl implements LogFile
         $ret = null;
         if($createDumpFile){
             $ret = new DumpFileImpl($this->getParentFolder()->getAbsolutePath()."/dump-".uniqid());
-            $ret->create();
             $this->dumparray[$array[] = $ret->getFilename()] = $ret;
         }
 
@@ -41,7 +40,7 @@ class LogFileImpl extends FileImpl implements LogFile
      * @param int $time The earliest time to retrieve.
      * @return array Will return an list ordered by log-time containing three indices: level, message and unix-time. Default is all
      */
-    public function listLog($level = LogFile::LOG_LEVEL_ALL, $time = 0)
+    public function listLog($level = null, $time = 0)
     {
         if(!$this->exists()){
             return array();
@@ -50,7 +49,7 @@ class LogFileImpl extends FileImpl implements LogFile
 
         $r = $this->getResource();
         while($e = fgetcsv($r)){
-            if($e[0] & $level && $time <= $e[1]){
+            if(($level == null || ($e[0] & $level)) && $time <= $e[1]){
                 $a = array("level"=>$e[0], "time"=>$e[1], "message"=>$e[2]);
                 if(isset($e[3])){
                     if(!isset($this->dumparray[$e[3]])){

@@ -71,6 +71,12 @@ class SiteContentImplTest extends CustomDatabaseTestCase{
     }
 
 
+    public function testOnlyTimestampWillListTimestamps(){
+
+        $list = $this->existingContent2->listContentHistory(null, null, true);
+        $this->assertEquals([946681201, 1356994801], $list);
+    }
+
     public function testAddContentWillAddContent(){
         $content = "Lorem Ipsum";
         $this->assertGreaterThan(time()-100, $this->existingContent->addContent($content));

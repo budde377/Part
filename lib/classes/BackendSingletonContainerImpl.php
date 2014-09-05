@@ -11,7 +11,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
 {
 
     private $config;
-    /** @var $database null | DB  */
+    /** @var $database null | DB */
     private $database = null;
     /** @var $cssRegister null | CSSRegister */
     private $cssRegister = null;
@@ -115,7 +115,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getCurrentPageStrategyInstance()
     {
         if ($this->currentPageStrategy === null) {
-            $this->currentPageStrategy = new CurrentPageStrategyImpl($this->getPageOrderInstance(),$this->getDefaultPageLibraryInstance());
+            $this->currentPageStrategy = new CurrentPageStrategyImpl($this->getPageOrderInstance(), $this->getDefaultPageLibraryInstance());
         }
         return $this->currentPageStrategy;
     }
@@ -149,7 +149,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
      */
     public function getDefaultPageLibraryInstance()
     {
-        if($this->defaultPageLibrary === null){
+        if ($this->defaultPageLibrary === null) {
             $this->defaultPageLibrary = new DefaultPageLibraryImpl($this->getConfigInstance());
         }
 
@@ -162,7 +162,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
      */
     public function getDartRegisterInstance()
     {
-        if($this->dartRegister === null){
+        if ($this->dartRegister === null) {
             $this->dartRegister = new DartRegisterImpl();
         }
         return $this->dartRegister;
@@ -174,7 +174,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
      */
     public function getCacheControlInstance()
     {
-        if($this->cacheControl == null){
+        if ($this->cacheControl == null) {
             $this->cacheControl = new CacheControlImpl($this->getSiteInstance(), $this->getCurrentPageStrategyInstance());
         }
         return $this->cacheControl;
@@ -186,7 +186,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
      */
     public function getUpdater()
     {
-        if($this->updater == null){
+        if ($this->updater == null) {
             $this->updater = new GitUpdaterImpl($this->getConfigInstance()->getRootPath(), $this->getSiteInstance());
         }
         return $this->updater;
@@ -199,7 +199,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
      */
     public function getSiteInstance()
     {
-        return $this->site == null? $this->site = new SiteImpl($this->getDBInstance()):$this->site;
+        return $this->site == null ? $this->site = new SiteImpl($this->getDBInstance()) : $this->site;
     }
 
     /**
@@ -208,23 +208,21 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
      */
     public function getFileLibraryInstance()
     {
-        return $this->fileLibrary == null? $this->fileLibrary = new FileLibraryImpl(new FolderImpl($this->getConfigInstance()->getRootPath()."/files/")):$this->fileLibrary;
+        return $this->fileLibrary == null ? $this->fileLibrary = new FileLibraryImpl(new FolderImpl($this->getConfigInstance()->getRootPath() . "/files/")) : $this->fileLibrary;
     }
 
     /**
-     * @return LogFile
+     * @return Logger
      */
-    public function getLogInstance()
+    public function getLoggerInstance()
     {
-        if($this->log != null){
+        if ($this->log != null) {
             return $this->log;
         }
 
-        if($this->config->getLogPath() == ""){
-            $this->log = new StubLogFileImpl();
-        } else {
-            $this->log = new LogFileImpl($this->getConfigInstance()->getLogPath());
-        }
+
+        $this->log = new LoggerImpl($this->getConfigInstance()->getLogPath());
+
         return $this->log;
     }
 
@@ -234,7 +232,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
      */
     public function getMailDomainLibraryInstance()
     {
-        if($this->mailDomainLibrary == null){
+        if ($this->mailDomainLibrary == null) {
             $this->mailDomainLibrary = new MailDomainLibraryImpl($this->getConfigInstance(), $this->getDBInstance());
         }
 

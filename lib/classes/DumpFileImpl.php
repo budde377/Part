@@ -8,23 +8,22 @@
 
 class DumpFileImpl extends FileImpl implements DumpFile{
 
-
-    public function dumpVar($name, $var)
+    /**
+     * Dumps a variable to the dumpfile using serialize.
+     * @param mixed $var
+     * @return void
+     */
+    public function writeSerialized($var)
     {
-
-        $this->write("\n## $name ##\n");
-        $this->write(print_r($var, true)."\n");
+        $data = (($c = $this->getUnSerializedContent()) == ""?[]:$c);
+        $data[] = $var;
+        $this->delete();
+        $this->write(serialize($data));
 
     }
 
-    public function create()
+    public function getUnSerializedContent()
     {
-        if($this->size() > 0){
-            return;
-        }
-        $this->write("# About #\n");
-        $this->write("This dump file was created on ". date("j-n-Y") . " at " .date("H:i:s").".\n\n");
-        $this->write("# Dumped variables #\n");
-
+        return unserialize($this->getContents());
     }
 }

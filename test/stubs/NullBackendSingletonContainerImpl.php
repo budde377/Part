@@ -146,7 +146,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
      * Will create and reuse instance of log.
      * @return LogFile
      */
-    public function getLogInstance()
+    public function getLoggerInstance()
     {
         return null;
     }

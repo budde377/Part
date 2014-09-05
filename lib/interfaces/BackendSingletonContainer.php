@@ -109,10 +109,10 @@ interface BackendSingletonContainer
     public function getFileLibraryInstance();
 
     /**
-     * Will create and reuse instance of log.
-     * @return LogFile|Null
+     * Will create and reuse instance of logger.
+     * @return Logger
      */
-    public function getLogInstance();
+    public function getLoggerInstance();
 
 
     /**

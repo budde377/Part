@@ -167,18 +167,17 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
     {
         $p = "/some/path";
         $this->config->setLogPath($p);
-        $ret1 = $this->backContainer->getLogInstance();
-        $this->assertInstanceOf('LogFile', $ret1);
-        $ret2 = $this->backContainer->getLogInstance();
+        $ret1 = $this->backContainer->getLoggerInstance();
+        $this->assertInstanceOf('Logger', $ret1);
+        $ret2 = $this->backContainer->getLoggerInstance();
         $this->assertTrue($ret1 === $ret2);
-        $this->assertEquals($ret1->getAbsoluteFilePath(), $p);
     }
 
     public function testGetLogWillReturnNullIfNoPathInConfig()
     {
-        $ret1 = $this->backContainer->getLogInstance();
-        $this->assertInstanceOf('LogFile', $ret1);
-        $ret2 = $this->backContainer->getLogInstance();
+        $ret1 = $this->backContainer->getLoggerInstance();
+        $this->assertInstanceOf('Logger', $ret1);
+        $ret2 = $this->backContainer->getLoggerInstance();
         $this->assertTrue($ret1 === $ret2);
 
     }

@@ -25,6 +25,7 @@ class StubLogFileImpl extends FileImpl implements LogFile{
         if($createDumpFile){
             return new StubDumpFileImpl();
         }
+        return null;
     }
 
     /**
@@ -32,7 +33,7 @@ class StubLogFileImpl extends FileImpl implements LogFile{
      * @param int $time The earliest time to retrieve.
      * @return array Will return an list ordered by log-time containing three indices: level, message and unix-time. Default is all
      */
-    public function listLog($level = LogFile::LOG_LEVEL_ALL, $time = 0)
+    public function listLog($level = null, $time = 0)
     {
         return array();
     }

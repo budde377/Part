@@ -47,7 +47,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $this->setUpUserHandler($server);
         $this->setUpPageOrderHandler($server);
         $this->setUpPageHandler($server);
-        $this->setUpLogHandler($server);
+        $this->setUpLoggerHandler($server);
         $this->setUpUpdaterHandler($server);
 
         $this->setUpPageContentHandler($server);
@@ -322,9 +322,9 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
     }
 
-    private function setUpLogHandler(AJAXServer $server)
+    private function setUpLoggerHandler(AJAXServer $server)
     {
-        $server->registerHandler($logHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getLogInstance()), 'Log');
+        $server->registerHandler($logHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getLoggerInstance()), 'Logger');
         $logHandler->addAuthFunction(function() {
            return $this->userLibrary->getUserLoggedIn() != null;
         });

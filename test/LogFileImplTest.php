@@ -28,7 +28,7 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
     {
         $msg = "SOME LOG MSG";
         $this->assertEquals("", $this->logFile->getContents());
-        $this->logFile->log($msg, LogFile::LOG_LEVEL_ERROR);
+        $this->logFile->log($msg, 1);
         $this->assertContains($msg, $this->logFile->getContents());
     }
 
@@ -37,8 +37,8 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
         $msg1 = uniqid("msg");
         $msg2 = uniqid("msg");
 
-        $this->logFile->log($msg1, LogFile::LOG_LEVEL_ERROR);
-        $this->logFile->log($msg2, LogFile::LOG_LEVEL_WARNING);
+        $this->logFile->log($msg1, 1);
+        $this->logFile->log($msg2, 2);
 
         $ar = $this->logFile->listLog();
 
@@ -62,15 +62,15 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($msg1, $ar1["message"]);
         $this->assertEquals($msg2, $ar2["message"]);
 
-        $this->assertEquals(LogFile::LOG_LEVEL_WARNING, $ar2["level"]);
-        $this->assertEquals(LogFile::LOG_LEVEL_ERROR, $ar1["level"]);
+        $this->assertEquals(2, $ar2["level"]);
+        $this->assertEquals(1, $ar1["level"]);
 
     }
 
     public function testNewLinesAreOk()
     {
         $msg = "some \n message";
-        $this->logFile->log($msg, LogFile::LOG_LEVEL_WARNING);
+        $this->logFile->log($msg, 2);
         $ar = $this->logFile->listLog();
         $this->assertEquals(1, count($ar));
         $this->assertEquals($msg, $ar[0]["message"]);
@@ -81,13 +81,13 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
         $msg1 = uniqid("msg");
         $msg2 = uniqid("msg");
 
-        $this->logFile->log($msg1, LogFile::LOG_LEVEL_ERROR);
-        $this->logFile->log($msg2, LogFile::LOG_LEVEL_WARNING);
+        $this->logFile->log($msg1, 1);
+        $this->logFile->log($msg2, 2);
 
-        $ar1 = $this->logFile->listLog(LogFile::LOG_LEVEL_ERROR);
-        $ar2 = $this->logFile->listLog(LogFile::LOG_LEVEL_WARNING);
-        $ar3 = $this->logFile->listLog(LogFile::LOG_LEVEL_DEBUG);
-        $ar4 = $this->logFile->listLog(LogFile::LOG_LEVEL_ERROR | LogFile::LOG_LEVEL_WARNING | LogFile::LOG_LEVEL_DEBUG);
+        $ar1 = $this->logFile->listLog(1);
+        $ar2 = $this->logFile->listLog(2);
+        $ar3 = $this->logFile->listLog(4);
+        $ar4 = $this->logFile->listLog(1 | 2 | 4);
 
         $this->assertEquals(1, count($ar1));
         $this->assertEquals(1, count($ar2));
@@ -103,20 +103,19 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testLogWillReturnNull()
     {
-        $this->assertNull($this->logFile->log("SOME MSG", LogFile::LOG_LEVEL_WARNING));
+        $this->assertNull($this->logFile->log("SOME MSG", 2));
     }
 
     public function testLogWillReturnDumpFile()
     {
-        $this->dumpFile = $this->logFile->log("MSG", LogFile::LOG_LEVEL_WARNING, true);
-        $this->assertInstanceOf("DumpFile", $this->dumpFile);
-        $this->assertTrue($this->dumpFile->exists());
-        $this->assertGreaterThan(0, strlen($this->dumpFile->getContents()));
+        $this->dumpFile = $this->logFile->log("MSG", 2, true);
+        $this->assertInstanceOf("DumpFileImpl", $this->dumpFile);
+
     }
 
     public function testListLogWillContainDumpFile()
     {
-        $d = $this->logFile->log("Some msg", LogFile::LOG_LEVEL_WARNING, true);
+        $d = $this->logFile->log("Some msg", 2, true);
         $ar = $this->logFile->listLog();
         $ar1 = $ar[0];
         $this->assertArrayHasKey("dumpfile", $ar1);
@@ -128,7 +127,7 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testListLogDumpFileAndReuseInstance()
     {
-        $d = $this->logFile->log("Some msg", LogFile::LOG_LEVEL_WARNING, true);
+        $d = $this->logFile->log("Some msg", 2, true);
         $ar = $this->logFile->listLog();
         $ar1 = $ar[0];
         $this->assertTrue($d === $ar1["dumpfile"]);
@@ -143,11 +142,11 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
         $msg1 = uniqid();
         $msg2 = uniqid();
 
-        $this->logFile->log($msg1, LogFile::LOG_LEVEL_ERROR);
+        $this->logFile->log($msg1, 1);
         sleep(1);
         $t = time();
-        $this->logFile->log($msg2, LogFile::LOG_LEVEL_ERROR);
-        $ar = $this->logFile->listLog(LogFile::LOG_LEVEL_ALL, $t);
+        $this->logFile->log($msg2, 1);
+        $ar = $this->logFile->listLog(7, $t);
 
         $this->assertEquals(1, count($ar));
         $this->assertEquals($msg2, $ar[0]["message"]);
@@ -156,10 +155,10 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testClearLogWillClearTheLog()
     {
-        $this->logFile->log("SOME SMG", LogFile::LOG_LEVEL_ERROR);
-        $this->logFile->log("SOME SMG", LogFile::LOG_LEVEL_ERROR);
-        $this->logFile->log("SOME SMG", LogFile::LOG_LEVEL_ERROR);
-        $this->logFile->log("SOME SMG", LogFile::LOG_LEVEL_ERROR);
+        $this->logFile->log("SOME SMG", 1);
+        $this->logFile->log("SOME SMG", 1);
+        $this->logFile->log("SOME SMG", 1);
+        $this->logFile->log("SOME SMG", 1);
 
         $this->assertGreaterThan(0, strlen($this->logFile->getContents()));
         $this->logFile->clearLog();
@@ -169,16 +168,17 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testCanWriteAfterClear()
     {
-        $this->logFile->log("SOME MSG", LogFile::LOG_LEVEL_ERROR);
+        $this->logFile->log("SOME MSG", 1);
         $this->logFile->clearLog();
-        $this->logFile->log("SOME MSG", LogFile::LOG_LEVEL_ERROR);
-        $this->logFile->log("SOME MSG", LogFile::LOG_LEVEL_ERROR);
+        $this->logFile->log("SOME MSG", 1);
+        $this->logFile->log("SOME MSG", 1);
         $this->assertEquals(2, count($this->logFile->listLog()));
     }
 
     public function testClearWillDeleteDumpFiles()
     {
-        $this->dumpFile = $f = $this->logFile->log("SOME MSG", LogFile::LOG_LEVEL_ERROR, true);
+        $this->dumpFile = $f = $this->logFile->log("SOME MSG", 1, true);
+        $f->writeSerialized([1, 2, 3]);
         $this->assertTrue($f->exists());
         $this->logFile->clearLog();
         $this->assertFalse($f->exists());
@@ -187,7 +187,7 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testAbsolutePathIsTheSameWithNewInstanceOfLogFile()
     {
-        $d = $this->logFile->log("LOL", LogFile::LOG_LEVEL_DEBUG, true);
+        $d = $this->logFile->log("LOL", 4, true);
         $this->dumpFile = $d;
         $logfile = new LogFileImpl($this->logFile->getAbsoluteFilePath());
         $dl = $logfile->listLog();
@@ -198,17 +198,17 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testClearLogWithNewInstanceOfLogFile()
     {
-        $d = $this->logFile->log("LOL", LogFile::LOG_LEVEL_DEBUG, true);
+        $d = $this->logFile->log("LOL", 4, true);
         $logfile = new LogFileImpl($this->logFile->getAbsoluteFilePath());
         $logfile->clearLog();
         $this->assertFalse($d->exists());
 
     }
 
-    public function testLogWillCreateFolderIfNessesary(){
+    public function testLogWillCreateFolderIfNecessary(){
         $l = new LogFileImpl($this->folder->getAbsolutePath().'/log/log/logFile');
         $this->assertFalse($this->folder->exists());
-        $l->log("LOL", LogFile::LOG_LEVEL_ERROR);
+        $l->log("LOL", 1);
         $this->assertTrue($this->folder->exists());
 
     }
