@@ -67,7 +67,7 @@ class UserSettingsEditLogPageElementImpl extends PageElementImpl{
     private function levelToString($level, $lowercase = false)
     {
         if(!$lowercase){
-            return strtoupper($this->levelToString($level, true));
+            return ucwords($this->levelToString($level, true));
         }
 
         switch($level){
