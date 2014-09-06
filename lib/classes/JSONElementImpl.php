@@ -36,9 +36,10 @@ abstract class JSONElementImpl implements JSONElement
 
         foreach ($val as $k => $v) {
             if (!$this->validValue($v)) {
-                return false;
+                $val[$k] = null;
+            } else {
+                $val[$k] = $v;
             }
-            $val[$k] = $v;
         }
         return true;
     }

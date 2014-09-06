@@ -55,6 +55,9 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $this->setUpSiteContentHandler($server);
         $this->setUpSiteContentLibraryHandler($server);
 
+        $this->setUpFileLibraryHandler($server);
+        $this->setUpFileHandler($server);
+
         $this->setUpArraysHandler($server);
 
     }
@@ -371,6 +374,27 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $handler->addArray("GET", $_GET);
         $handler->addArray("FILES", $_FILES);
         $server->registerHandler($handler);
+    }
+
+    private function setUpFileHandler(AJAXServer $server)
+    {
+        $server->registerHandler($fileHandler = new GenericObjectAJAXTypeHandlerImpl('File'));
+        $fileHandler->whitelistFunction("File",
+            'getContents',
+            'getFilename',
+            'getExtension',
+            'getBasename',
+            'size',
+            'getDataURI',
+            'getModificationTime',
+            'getCreationTime'
+        );
+    }
+
+    private function setUpFileLibraryHandler(AJAXServer $server)
+    {
+        $server->registerHandler($fileLibraryHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getFileLibraryInstance()), "FileLibrary");
+
     }
 
 }
