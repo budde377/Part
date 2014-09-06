@@ -168,7 +168,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $template = $config->getOptimizer('main');
         $this->assertNull($template, 'The getOptimizer was not null with empty config XML');
     }
-    //TODO Fix config tests
+
     public function testGetOptimizerReturnNullWithTemplateElementNIL()
     {
         /** @var $configXML SimpleXMLElement */

@@ -11,8 +11,7 @@ class LoggerImplTest extends PHPUnit_Framework_TestCase
 {
     /** @var  LogFileImpl */
     private $logFile;
-    /** @var  DumpFile */
-    private $dumpFile;
+
     /** @var Folder */
     private $folder;
     /** @var  LoggerImpl */
@@ -20,9 +19,8 @@ class LoggerImplTest extends PHPUnit_Framework_TestCase
 
 
     public function setUp(){
-        $this->folder = new FolderImpl(dirname(__FILE__)."/stubs/logFolder");
-        $this->logFile= new LogFileImpl(dirname(__FILE__)."/stubs/logFile");
-        $this->logFile->delete();
+        $this->folder = new FolderImpl('/tmp/testing'.time().'/');
+        $this->logFile= new LogFileImpl($this->folder->getAbsolutePath()."/".uniqid());
         $this->logger = new LoggerImpl($this->logFile->getAbsoluteFilePath());
     }
 
@@ -79,10 +77,7 @@ class LoggerImplTest extends PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        $this->logFile->delete();
-        if ($this->dumpFile != null) {
-            $this->dumpFile->delete();
-        }
+
         @$this->folder->delete(Folder::DELETE_FOLDER_RECURSIVE);
     }
 
