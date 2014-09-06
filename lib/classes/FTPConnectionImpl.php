@@ -50,7 +50,6 @@ class FTPConnectionImpl implements Connection
      */
     public function getFolder($path)
     {
-        // TODO: Implement getFolder() method.
     }
 
     /**
@@ -145,7 +144,7 @@ class FTPConnectionImpl implements Connection
         if ($this->isConnected() && is_array($a = ftp_nlist($this->connection, $path))) {
             $returnArray = array();
             foreach ($a as $file) {
-                $v = ftp_nlist($this->connection, $file);
+                ftp_nlist($this->connection, $file);
                 $returnArray[] = basename($file);
             }
             return $returnArray;

@@ -150,7 +150,6 @@ class ConnectionFolderImpl implements Folder
      */
     public function create($recursive = false)
     {
-        //TODO implement the recursive creation
         $this->setUpIterator();
         return $this->connection->createDirectory($this->path);
     }
@@ -282,10 +281,11 @@ class ConnectionFolderImpl implements Folder
 
     /**
      * Cleans the folder for all content, folders as files.
+     * @throws FunctionNotImplementedException
      * @return void
      */
     public function clean()
     {
-        throw new FunctionNotImplementedException("clean", "ConnectionFolderImpl"); //TODO implement on need
+        throw new FunctionNotImplementedException("clean", "ConnectionFolderImpl");
     }
 }

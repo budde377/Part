@@ -204,4 +204,18 @@ class ConnectionFileImpl implements File
     {
 
     }
+
+    /**
+     * @return int
+     */
+    public function getModificationTime()
+    {
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreationTime()
+    {
+    }
 }

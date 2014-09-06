@@ -32,6 +32,11 @@ class PageElementImplTest extends PHPUnit_Framework_TestCase{
         $this->assertFalse($this->pageElement->hasBeenSetUp());
     }
 
-    //TODO Test if setUp will be called if not called before generate
+    public function testSetUpWhenNotCalledButGenerated(){
+
+        $this->pageElement->generateContent();
+        $this->assertFalse($this->pageElement->hasBeenSetUp());
+    }
+
 
 } 
