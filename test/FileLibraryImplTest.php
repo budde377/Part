@@ -400,6 +400,22 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase
         $this->assertNull($this->lib->findVersionOfFile($f, time()));
     }
 
+    public function testModifiedIsChanged(){
+        $f = $this->setupExistingFiles();
+        $this->lib->addToWhitelist($f);
+        $this->assertGreaterThan(time()-100, $this->lib->getWhitelistLastModified());
+    }
+    public function testModifiedIsWhenRemoving(){
+        $f = $this->setupExistingFiles();
+        $this->lib->addToWhitelist($f);
+        $t = $this->lib->getWhitelistLastModified();
+        sleep(2);
+        $this->lib->removeFromWhitelist($f);
+
+        $t2 = $this->lib->getWhitelistLastModified();
+        $this->assertGreaterThan($t, $t2);
+    }
+
     public function createFile($name = null, $content = null)
     {
 

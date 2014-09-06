@@ -144,4 +144,14 @@ interface File
      * @return string
      */
     public function getDataURI();
+
+    /**
+     * @return int
+     */
+    public function getModificationTime();
+
+    /**
+     * @return int
+     */
+    public function getCreationTime();
 }

@@ -242,4 +242,20 @@ class FileImpl implements File
         $contents = base64_encode($this->getContents());
         return ($m = $this->getMimeType()) == null?null:"data:{$this->getMimeType()};base64,$contents";
     }
+
+    /**
+     * @return int
+     */
+    public function getModificationTime()
+    {
+        return $this->exists()?filemtime($this->getAbsoluteFilePath()):0;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreationTime()
+    {
+        return $this->exists()?filectime($this->getAbsoluteFilePath()):0;
+    }
 }

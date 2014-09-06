@@ -92,8 +92,7 @@ class FileLibraryImpl implements FileLibrary{
             return false;
         }
 
-        $this->whiteList[] = $this->filePath($file);
-        $this->writeWhitelist();
+        $this->writeWhitelist($this->whiteList[] = $this->filePath($file));
         return $this->whitelistContainsFile($file);
     }
 
@@ -165,12 +164,18 @@ class FileLibraryImpl implements FileLibrary{
         }
     }
 
-    private function writeWhitelist(){
+    private function writeWhitelist($appendFile = null){
         if(!$this->filesDir->exists()){
             $this->filesDir->create();
         }
 
-        $this->whitelistFile->delete();
+        if($appendFile != null){
+            $this->whitelistFile->setAccessMode(File::FILE_MODE_RW_POINTER_AT_END);
+            $this->whitelistFile->write($appendFile."\n");
+            return;
+        }
+        $this->whitelistFile->setAccessMode(File::FILE_MODE_RW_TRUNCATE_FILE_TO_ZERO_LENGTH);
+        $this->whitelistFile->write("");
         $this->whitelistFile->setAccessMode(File::FILE_MODE_RW_POINTER_AT_END);
         foreach($this->whiteList as $path){
             $this->whitelistFile->write($path."\n");
@@ -321,5 +326,14 @@ class FileLibraryImpl implements FileLibrary{
         $name = $this->versionFileName($file, $version);
         $f = new FileImpl($file->getParentFolder()->getAbsolutePath()."/".$name);
         return $this->containsFile($f)?$f:null;
+    }
+
+    /**
+     * Returns the last time the whitelist was modified
+     * @return int mixed
+     */
+    public function getWhitelistLastModified()
+    {
+        return $this->whitelistFile->getModificationTime();
     }
 }

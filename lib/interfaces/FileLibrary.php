@@ -137,4 +137,10 @@ interface FileLibrary {
      */
     public function findVersionOfFile($file, $version);
 
+    /**
+     * Returns the last time the whitelist was modified
+     * @return int mixed
+     */
+    public function getWhitelistLastModified();
+
 }

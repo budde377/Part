@@ -387,4 +387,18 @@ class FileImplTest extends PHPUnit_Framework_TestCase
     }
 
 
+    public function testModificationTimeAndCreationTimeAreRight(){
+        $fn = dirname(__FILE__).'/stubs/fileStub';
+        $file = new FileImpl($fn);
+        $this->assertEquals(filemtime($fn), $file->getModificationTime());
+        $this->assertEquals(filectime($fn), $file->getCreationTime());
+    }
+
+    public function testModificationTimeAndCreationTimeOfNonExistingIsOK(){
+        $fn = dirname(__FILE__).'/stubs/nonExistingFile';
+        $file = new FileImpl($fn);
+        $this->assertEquals(0, $file->getModificationTime());
+        $this->assertEquals(0, $file->getCreationTime());
+    }
+
 }
