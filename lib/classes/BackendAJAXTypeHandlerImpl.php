@@ -55,6 +55,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $this->setUpSiteContentHandler($server);
         $this->setUpSiteContentLibraryHandler($server);
 
+        $this->setUpArraysHandler($server);
 
     }
 
@@ -361,6 +362,15 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $server->registerHandler($updaterHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getUpdater(), "Updater"));
         $updaterHandler->addFunctionAuthFunction('Updater', 'update', $this->sitePrivilegesFunction);
         $updaterHandler->addFunctionAuthFunction('Updater', 'checkForUpdates', $this->sitePrivilegesFunction);
+    }
+
+    private function setUpArraysHandler(AJAXServer $server)
+    {
+        $handler = new ArrayAccessAJAXTypeHandlerImpl();
+        $handler->addArray("POST", $_POST);
+        $handler->addArray("GET", $_GET);
+        $handler->addArray("FILES", $_FILES);
+        $server->registerHandler($handler);
     }
 
 }
