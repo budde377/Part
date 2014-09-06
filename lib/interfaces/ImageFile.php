@@ -27,57 +27,64 @@ interface ImageFile extends File{
     /**
      * Will scale the image to given width, setting the height so that the ratio is maintained.
      * @param int $width
-     * @return void
+     * @param bool $saveAsNewFile
+     * @return null | ImageFile
      */
-    public function scaleToWidth($width);
+    public function scaleToWidth($width, $saveAsNewFile = false);
 
     /**
      * Will scale the image to given height, setting the width so that the ratio is maintained.
      * @param int $height
-     * @return void
+     * @param bool $saveAsNewFile
+     * @return null | ImageFile
      */
-    public function scaleToHeight($height);
+    public function scaleToHeight($height, $saveAsNewFile = false);
 
     /**
      * Will scale the image such that the inner box is just contained by the image.
      * Two sides of the image will have the same size as the inner box.
      * @param int $width
      * @param int $height
-     * @return void
+     * @param bool $saveAsNewFile
+     * @return null | ImageFile
      */
-    public function scaleToInnerBox($width, $height);
+    public function scaleToInnerBox($width, $height, $saveAsNewFile = false);
 
     /**
      * Will scale the image such that the image will become the inner box to the box given.
      * @param int $width
      * @param int $height
-     * @return void
+     * @param bool $saveAsNewFile
+     * @return null | ImageFile
      */
-    public function scaleToOuterBox($width, $height);
+    public function scaleToOuterBox($width, $height, $saveAsNewFile = false);
 
     /**
      * Will limit the image to an inner box. If the image is contained in the box, nothing will happen.
      * @param int $width
      * @param int $height
-     * @return void
+     * @param bool $saveAsNewFile
+     * @return null | ImageFile
      */
-    public function limitToInnerBox($width, $height);
+    public function limitToInnerBox($width, $height, $saveAsNewFile = false);
 
     /**
      * Will limit the image to an outer box. If the image is contained in the box, nothing will happen.
      * @param int $width
      * @param int $height
+     * @param bool $saveAsNewFile
      * @return mixed
      */
-    public function limitToOuterBox($width, $height);
+    public function limitToOuterBox($width, $height, $saveAsNewFile = false);
 
     /**
      * Will extend image to box. If the box is contained in the image, nothing will happen.
      * @param int $width
      * @param int $height
-     * @return void
+     * @param bool $saveAsNewFile
+     * @return null | ImageFile
      */
-    public function extendToInnerBox($width, $height);
+    public function extendToInnerBox($width, $height, $saveAsNewFile = false);
 
 
     /**
@@ -85,18 +92,20 @@ interface ImageFile extends File{
      * If the image is larger than the box on one side, nothing will happen.
      * @param int $width
      * @param int $height
-     * @return void
+     * @param bool $saveAsNewFile
+     * @return null | ImageFile
      */
-    public function extendToOuterBox($width, $height);
+    public function extendToOuterBox($width, $height, $saveAsNewFile = false);
 
 
     /**
      * Will force the size of the image, ignoring the ratio.
      * @param int $width
      * @param int $height
-     * @return void
+     * @param bool $saveAsNewFile
+     * @return null | ImageFile
      */
-    public function forceSize($width, $height);
+    public function forceSize($width, $height, $saveAsNewFile = false);
 
     /**
      * Will crop the image. If some of the cropped area is outside of the image,
@@ -105,27 +114,31 @@ interface ImageFile extends File{
      * @param int $y
      * @param int $width
      * @param int $height
-     * @return void
+     * @param bool $saveAsNewFile
+     * @return null | ImageFile
      */
-    public function crop($x, $y, $width, $height);
+    public function crop($x, $y, $width, $height, $saveAsNewFile = false);
 
 
     /**
      * @param $degree Double Number to rotate the image
-     * @return void
+     * @param bool $saveAsNewFile
+     * @return null | ImageFile
      */
-    public function rotate($degree);
+    public function rotate($degree, $saveAsNewFile = false);
 
     /**
      * Mirrors the image vertically
-     * @return void
+     * @param bool $saveAsNewFile
+     * @return null | ImageFile
      */
-    public function mirrorVertical();
+    public function mirrorVertical($saveAsNewFile = false);
 
     /**
      * Mirrors the image
-     * @return void
+     * @param bool $saveAsNewFile
+     * @return null | ImageFile
      */
-    public function mirrorHorizontal();
+    public function mirrorHorizontal($saveAsNewFile = false);
 
 }

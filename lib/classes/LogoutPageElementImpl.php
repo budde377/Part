@@ -37,7 +37,7 @@ class LogoutPageElementImpl extends PageElementImpl
         }
 
         $site = $this->container->getSiteInstance();
-        $vars = $site->getVariables();
+        $vars = $currentUser->getUserVariables();
         $lastRun = $vars->getValue("last-file-lib-cleanup");
         $lastRun = $lastRun == null ? 0 : $lastRun;
 
