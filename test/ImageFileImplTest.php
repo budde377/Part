@@ -471,6 +471,11 @@ class ImageFileImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->imageFile === $f);
     }
 
+    public function testJSONObjectIsRight(){
+        $o = $this->imageFile->jsonObjectSerialize();
+        $this->assertEquals(new ImageFileJSONObjectImpl($this->imageFile), $o);
+    }
+
 
 
     public function tearDown(){

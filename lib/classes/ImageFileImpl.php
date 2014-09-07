@@ -365,4 +365,11 @@ class ImageFileImpl extends FileImpl implements ImageFile
         }
         return $this->getBasename() . "-C_" . $x . "_" . $y . "_" . $width . "_" . $height;
     }
+
+    public function jsonObjectSerialize()
+    {
+        return new ImageFileJSONObjectImpl($this);
+    }
+
+
 }

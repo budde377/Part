@@ -112,7 +112,7 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase{
 
     public function testSetterWillNotSetArrayWithNonScalar(){
         $this->function1->setArg(0,array($this));
-        $this->assertNull($this->function1->getArg(0));
+        $this->assertEquals([null], $this->function1->getArg(0));
     }
 
     public function testSetterWillSetArrayContainingArraysOrScalars(){

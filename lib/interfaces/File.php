@@ -6,7 +6,7 @@
  * Time: 10:30 AM
  * To change this template use File | Settings | File Templates.
  */
-interface File
+interface File extends JSONObjectSerializable
 {
 
     const FILE_MODE_R_POINTER_AT_BEGINNING = 'rb';

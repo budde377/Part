@@ -258,4 +258,13 @@ class FileImpl implements File
     {
         return $this->exists()?filectime($this->getAbsoluteFilePath()):0;
     }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+    public function jsonObjectSerialize()
+    {
+        return new FileJSONObjectImpl($this);
+    }
 }

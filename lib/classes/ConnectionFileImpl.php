@@ -218,4 +218,12 @@ class ConnectionFileImpl implements File
     public function getCreationTime()
     {
     }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return JSONObject
+     */
+    public function jsonObjectSerialize()
+    {
+    }
 }

@@ -20,9 +20,9 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
     {
         $this->backend = $backend;
         $this->userLibrary = $backend->getUserLibraryInstance();
-        $this->sitePrivilegesFunction  = function (){
+        $this->sitePrivilegesFunction = function () {
             $currentUser = $this->userLibrary->getUserLoggedIn();
-            if($currentUser == null){
+            if ($currentUser == null) {
                 return false;
             }
             $privileges = $currentUser->getUserPrivileges();
@@ -142,18 +142,17 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         });
 
 
-
         $userLibraryHandler->addFunctionAuthFunction('UserLibrary', 'deleteUser', function ($type, UserLibrary $instance, $functionName, $args) {
             return $this->isChildOfUser($instance->getUser($args[0]));
         });
 
-        $userLibraryHandler->addFunctionAuthFunction('UserLibrary', 'createUserFromMail', function ($type, UserLibrary $instance, $functionName, $args){
+        $userLibraryHandler->addFunctionAuthFunction('UserLibrary', 'createUserFromMail', function ($type, UserLibrary $instance, $functionName, $args) {
             $privileges = $this->userLibrary->getUserLoggedIn()->getUserPrivileges();
-            if($privileges->hasRootPrivileges()){
+            if ($privileges->hasRootPrivileges()) {
                 return true;
             }
 
-            if($privileges->hasSitePrivileges() && $args[1] != "root"){
+            if ($privileges->hasSitePrivileges() && $args[1] != "root") {
                 return true;
             }
 
@@ -213,7 +212,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
     {
 
         $server->registerHandler($userHandler =
-            new GenericObjectAJAXTypeHandlerImpl(($u = $this->userLibrary->getUserLoggedIn()) == null ? "User" : $u),
+                new GenericObjectAJAXTypeHandlerImpl(($u = $this->userLibrary->getUserLoggedIn()) == null ? "User" : $u),
             ' User');
         $userHandler->whitelistFunction("User",
             "getUsername",
@@ -234,20 +233,20 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
         $userHandler->addGetInstanceFunction("User");
 
-        $userHandler->addTypeAuthFunction('User',function ($type, $instance, $functionName, $args){
-            return substr($functionName, 0,3) != "set" || $this->userLibrary->getUserLoggedIn() === $instance;
+        $userHandler->addTypeAuthFunction('User', function ($type, $instance, $functionName, $args) {
+            return substr($functionName, 0, 3) != "set" || $this->userLibrary->getUserLoggedIn() === $instance;
         });
 
-        $userHandler->addFunctionAuthFunction('User','delete',function ($type, $instance){
-            return  $this->isChildOfUser($instance);
+        $userHandler->addFunctionAuthFunction('User', 'delete', function ($type, $instance) {
+            return $this->isChildOfUser($instance);
         });
 
-        $userHandler->addFunction('User','setPassword', function(User $user, $oldPassword, $newPassword){
-            if(!$user->verifyLogin($oldPassword)){
+        $userHandler->addFunction('User', 'setPassword', function (User $user, $oldPassword, $newPassword) {
+            if (!$user->verifyLogin($oldPassword)) {
                 return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_WRONG_PASSWORD);
             }
 
-            if(!$user->setPassword($newPassword)){
+            if (!$user->setPassword($newPassword)) {
                 return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_PASSWORD);
             }
             return new JSONResponseImpl();
@@ -302,24 +301,24 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             'getInstance'
         );
 
-        $pagePrivilegesFunction = function ($type, Page $instance){
+        $pagePrivilegesFunction = function ($type, Page $instance) {
             $currentUser = $this->userLibrary->getUserLoggedIn();
-            if($currentUser == null){
+            if ($currentUser == null) {
                 return false;
             }
             return $currentUser->getUserPrivileges()->hasPagePrivileges($instance);
 
         };
 
-        $pageHandler->addFunctionAuthFunction('Page','setID', $pagePrivilegesFunction);
-        $pageHandler->addFunctionAuthFunction('Page','setTitle', $pagePrivilegesFunction);
-        $pageHandler->addFunctionAuthFunction('Page','setTemplate', $pagePrivilegesFunction);
-        $pageHandler->addFunctionAuthFunction('Page','setAlias', $pagePrivilegesFunction);
-        $pageHandler->addFunctionAuthFunction('Page','modify', $pagePrivilegesFunction);
+        $pageHandler->addFunctionAuthFunction('Page', 'setID', $pagePrivilegesFunction);
+        $pageHandler->addFunctionAuthFunction('Page', 'setTitle', $pagePrivilegesFunction);
+        $pageHandler->addFunctionAuthFunction('Page', 'setTemplate', $pagePrivilegesFunction);
+        $pageHandler->addFunctionAuthFunction('Page', 'setAlias', $pagePrivilegesFunction);
+        $pageHandler->addFunctionAuthFunction('Page', 'modify', $pagePrivilegesFunction);
 
-        $pageHandler->addFunctionAuthFunction('Page','delete', $this->sitePrivilegesFunction);
-        $pageHandler->addFunctionAuthFunction('Page','hide', $this->sitePrivilegesFunction);
-        $pageHandler->addFunctionAuthFunction('Page','show', $this->sitePrivilegesFunction);
+        $pageHandler->addFunctionAuthFunction('Page', 'delete', $this->sitePrivilegesFunction);
+        $pageHandler->addFunctionAuthFunction('Page', 'hide', $this->sitePrivilegesFunction);
+        $pageHandler->addFunctionAuthFunction('Page', 'show', $this->sitePrivilegesFunction);
 
         $pageHandler->addGetInstanceFunction("Page");
 
@@ -328,15 +327,15 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
     private function setUpLoggerHandler(AJAXServer $server)
     {
         $server->registerHandler($logHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getLoggerInstance()), 'Logger');
-        $logHandler->addAuthFunction(function() {
-           return $this->userLibrary->getUserLoggedIn() != null;
+        $logHandler->addAuthFunction(function () {
+            return $this->userLibrary->getUserLoggedIn() != null;
         });
     }
 
     private function setUpPageContentHandler(AJAXServer $server)
     {
-        $server->registerHandler($contentHandler = new GenericObjectAJAXTypeHandlerImpl( 'PageContent'));
-        $contentHandler->addFunctionAuthFunction("PageContent", "addContent", function ($type, PageContent $instance){
+        $server->registerHandler($contentHandler = new GenericObjectAJAXTypeHandlerImpl('PageContent'));
+        $contentHandler->addFunctionAuthFunction("PageContent", "addContent", function ($type, PageContent $instance) {
             return ($current = $this->backend->getUserLibraryInstance()->getUserLoggedIn()) != null && $current->getUserPrivileges()->hasPagePrivileges($instance->getPage());
         });
         $contentHandler->addGetInstanceFunction('PageContent');
@@ -377,7 +376,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
     private function setUpFileHandler(AJAXServer $server)
     {
-        $server->registerHandler($fileHandler = new GenericObjectAJAXTypeHandlerImpl('File'));
+        $server->registerHandler($fileHandler = new GenericObjectAJAXTypeHandlerImpl('ImageFile', 'File', 'ImageFile'));
         $fileHandler->whitelistFunction("File",
             'getContents',
             'getFilename',
@@ -386,8 +385,76 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             'size',
             'getDataURI',
             'getModificationTime',
-            'getCreationTime'
+            'getCreationTime',
+            'getFile'
         );
+
+        $fileHandler->whitelistFunction("ImageFile",
+            'getContents',
+            'getFilename',
+            'getExtension',
+            'getBasename',
+            'size',
+            'getDataURI',
+            'getModificationTime',
+            'getCreationTime',
+            'getFile',
+            'getWidth',
+            'getHeight',
+            'getRatio',
+            'scaleToWidth',
+            'scaleToHeight',
+            'scaleToInnerBox',
+            'scaleToOuterBox',
+            'limitToInnerBox',
+            'limitToOuterBox',
+            'extendToInnerBox',
+            'extendToOuterBox',
+            'forceSize',
+            'crop',
+            'rotate',
+            'mirrorVertical',
+            'mirrorHorizontal'
+        );
+        $library = $this->backend->getFileLibraryInstance();
+
+
+        $fileHandler->addFunction('File', 'getFile', function ($path) use ($library) {
+            $f = new FileImpl($library->getFilesFolder()->getAbsolutePath() . "/$path");
+            return $library->containsFile($f) ? $f : null;
+        });
+
+        $fileHandler->addFunction('ImageFile', 'getFile', function ($path) use ($library) {
+            $f = new ImageFileImpl($library->getFilesFolder()->getAbsolutePath() . "/$path");
+            return $library->containsFile($f) ? $f : null;
+        });
+
+        $fileHandler->addTypeAuthFunction('ImageFile', function ($type, $instance, $function) {
+            return
+                !in_array($function, ['scaleToWidth',
+                    'scaleToHeight',
+                    'scaleToInnerBox',
+                    'scaleToOuterBox',
+                    'limitToInnerBox',
+                    'limitToOuterBox',
+                    'extendToInnerBox',
+                    'extendToOuterBox',
+                    'forceSize',
+                    'crop',
+                    'rotate',
+                    'mirrorVertical',
+                    'mirrorHorizontal']) ||
+                $this
+                    ->backend
+                    ->getUserLibraryInstance()
+                    ->getUserLoggedIn()
+                    ->getUserPrivileges()
+                    ->hasPagePrivileges(
+                        $this
+                            ->backend
+                            ->getPageOrderInstance()
+                            ->getCurrentPage());
+        });
     }
 
 

@@ -76,7 +76,7 @@ class JSONResponseImplTest extends PHPUnit_Framework_TestCase
     public function testSetPayloadArrayMustContainScalar(){
         $array = array('test'=>$this);
         $this->response->setPayload($array);
-        $this->assertNull($this->response->getPayload());
+        $this->assertEquals(['test'=> null], $this->response->getPayload());
     }
 
     public function testGetErrorCodeWillReturnErrorCode(){

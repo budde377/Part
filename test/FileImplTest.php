@@ -230,13 +230,13 @@ class FileImplTest extends PHPUnit_Framework_TestCase
         $newFile = $file->copy($filePath . '2');
 
         $ret = $newFile->write('test123');
-        $this->assertEquals('test123', $newFile->getContents(), 'Did not write.');
+        $this->assertEquals('fileStubtest123', $newFile->getContents(), 'Did not write.');
         $this->assertTrue(is_int($ret), 'Did not return int');
         $this->assertGreaterThan(0, $ret, 'Did not return int greater than 0');
 
         $newFile->setAccessMode(File::FILE_MODE_RW_POINTER_AT_BEGINNING);
         $newFile->write('tset');
-        $this->assertEquals('tset123', $newFile->getContents(), 'Did not write.');
+        $this->assertEquals('tsetStubtest123', $newFile->getContents(), 'Did not write.');
 
         $newFile->setAccessMode(File::FILE_MODE_RW_TRUNCATE_FILE_TO_ZERO_LENGTH);
         $newFile->write('tteesstt');
@@ -363,7 +363,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
     public function testGetMimeTypeWillReturnMimeType(){
         $fn = dirname(__FILE__).'/stubs/fileStub';
         $file = new FileImpl($fn);
-        $this->assertEquals("inode/x-empty", $file->getMimeType());
+        $this->assertEquals("text/plain", $file->getMimeType());
 
     }
     public function testGetMimeTypeWillReturnNullOnNoFile(){
@@ -399,6 +399,14 @@ class FileImplTest extends PHPUnit_Framework_TestCase
         $file = new FileImpl($fn);
         $this->assertEquals(0, $file->getModificationTime());
         $this->assertEquals(0, $file->getCreationTime());
+    }
+
+    public function testJSONObjectIsRight(){
+        $fn = dirname(__FILE__).'/stubs/fileStub';
+        $file = new FileImpl($fn);
+
+        $o = $file->jsonObjectSerialize();
+        $this->assertEquals(new FileJSONObjectImpl($file), $o);
     }
 
 }

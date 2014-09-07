@@ -48,7 +48,7 @@ class JSONObjectImplTest extends PHPUnit_Framework_TestCase
     public function testSetterWillNotSetArrayWithNonScalar(){
         $variableName = "testVariable";
         $this->object->setVariable($variableName,array($this));
-        $this->assertNull($this->object->getVariable($variableName));
+        $this->assertEquals([null], $this->object->getVariable($variableName));
     }
 
     public function testSetterWillSetArrayContainingArraysOrScalars(){
