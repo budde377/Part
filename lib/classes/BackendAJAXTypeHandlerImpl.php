@@ -386,19 +386,13 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             'getDataURI',
             'getModificationTime',
             'getCreationTime',
-            'getFile'
+            'getFile',
+            'uploadFile'
         );
 
         $fileHandler->whitelistFunction("ImageFile",
-            'getContents',
-            'getFilename',
-            'getExtension',
-            'getBasename',
-            'size',
-            'getDataURI',
-            'getModificationTime',
-            'getCreationTime',
             'getFile',
+            'uploadFile',
             'getWidth',
             'getHeight',
             'getRatio',
@@ -416,6 +410,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             'mirrorVertical',
             'mirrorHorizontal'
         );
+
         $library = $this->backend->getFileLibraryInstance();
 
 
@@ -429,7 +424,32 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             return $library->containsFile($f) ? $f : null;
         });
 
-        $fileHandler->addTypeAuthFunction('ImageFile', function ($type, $instance, $function) {
+        $fileHandler->addFunction('File', 'uploadFile', function ($file) use ($library) {
+            return $library->uploadToLibrary($this->userLibrary->getUserLoggedIn(), $f = new FileImpl($file['tmp_name']));
+        });
+
+        $fileHandler->addFunction('ImageFile', 'uploadFile', function ($file) use ($library) {
+            $f = $library->uploadToLibrary($this->userLibrary->getUserLoggedIn(), new ImageFileImpl($file['tmp_name']));
+            return new ImageFileImpl($f->getAbsoluteFilePath());
+        });
+
+        $authFunction = function (){
+          return $this
+              ->backend
+              ->getUserLibraryInstance()
+              ->getUserLoggedIn()
+              ->getUserPrivileges()
+              ->hasPagePrivileges(
+                  $this
+                      ->backend
+                      ->getPageOrderInstance()
+                      ->getCurrentPage());
+        };
+
+        $fileHandler->addFunctionAuthFunction('File', 'uploadFile', $authFunction);
+
+
+        $fileHandler->addTypeAuthFunction('ImageFile', function ($type, $instance, $function) use ($authFunction) {
             return
                 !in_array($function, ['scaleToWidth',
                     'scaleToHeight',
@@ -443,17 +463,9 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
                     'crop',
                     'rotate',
                     'mirrorVertical',
-                    'mirrorHorizontal']) ||
-                $this
-                    ->backend
-                    ->getUserLibraryInstance()
-                    ->getUserLoggedIn()
-                    ->getUserPrivileges()
-                    ->hasPagePrivileges(
-                        $this
-                            ->backend
-                            ->getPageOrderInstance()
-                            ->getCurrentPage());
+                    'mirrorHorizontal',
+                    'uploadFile']) ||
+                $authFunction();
         });
     }
 
