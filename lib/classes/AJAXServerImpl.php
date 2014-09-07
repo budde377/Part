@@ -204,17 +204,21 @@ class AJAXServerImpl implements AJAXServer
 
         } else if ($target instanceof JSONFunction) {
             $instance = $target === $targetOverride?$overrideInstance:$this->internalHandleFunction($target, $targetOverride, $overrideInstance);
-            if (!is_object($instance)) {
-                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION);
+            if(is_array($instance)){
+                $types = ['array'];
+
+            } else {
+                if (!is_object($instance)) {
+                    return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION);
+                }
+
+                if ($instance instanceof JSONResponse) {
+                    return $instance;
+                }
+
+                $reflection = new ReflectionClass($instance);
+                $types = $this->buildType($reflection);
             }
-
-            if ($instance instanceof JSONResponse) {
-                return $instance;
-            }
-
-            $reflection = new ReflectionClass($instance);
-            $types = $this->buildType($reflection);
-
 
         } else {
             return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_MALFORMED_REQUEST);
