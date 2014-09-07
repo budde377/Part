@@ -20,13 +20,13 @@ class FunctionStringParserImpl implements FunctionStringParser
 
 
     /**
-     * <program>                    = <composite_call> | <function_call>
+     * <program>                    = <composite_function_call> | <function_call>
      *
-     * <composite_function_call>    = <target><function_chains>
-     * <composite_function>         = [..<function_chain>]*
+     * <composite_function_call>    = <target><composite_function>
+     * <composite_function>         = [..<function_chain>]+
      * <function_chain>             = <function_chain>.<function> | <function>
      *
-     * <function_call>              = <target>.<function>
+     * <function_call>              = <target>.<function> | <target>\[<scalar>\]
      * <function>                   = <name>([<arg>, ...])
      * <target>                     = <function_call> | <name>
      * <arg>                        = <scalar> | <array> | <program>
@@ -161,6 +161,25 @@ class FunctionStringParserImpl implements FunctionStringParser
      */
     public function parseFunctionCall($input, &$result)
     {
+        $input = trim($input);
+        if(substr($input, -1,1) == "]"){
+            preg_match_all('/\[/', $input, $matches, PREG_OFFSET_CAPTURE);
+            foreach ($matches[0] as $match) {
+
+                if ($this->parseScalar(substr($input, $match[1] + 1, -1), $resultScalar) &&
+                    $this->parseTarget(substr($input, 0, $match[1]), $resultTarget)
+                ) {
+                    /** @var $resultTarget JSONTarget */
+                    /** @var $resultFunction JSONFunction */
+                    $result = new JSONFunctionImpl("arrayAccess", $resultTarget);
+                    $result->setArg(0, $resultScalar);
+                    return true;
+                }
+            }
+        }
+
+
+
         preg_match_all('/\./', $input, $matches, PREG_OFFSET_CAPTURE);
         $matches = array_reverse($matches);
 

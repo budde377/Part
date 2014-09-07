@@ -20,7 +20,7 @@ class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase{
         parent::setUp();
         $this->handler = new ArrayAccessAJAXTypeHandlerImpl();
         $this->parser = new FunctionStringParserImpl();
-        $this->function = $this->parser->parseFunctionString("POST.getVar('id')");
+        $this->function = $this->parser->parseFunctionString("POST.arrayAccess('id')");
     }
 
 
@@ -39,7 +39,7 @@ class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase{
         $this->handler->addArray("GET", $_GET);
         $this->handler->addArray("FILES", $_FILES);
 
-        $this->assertEquals(["POST", "GET", "FILES"], $this->handler->listTypes());
+        $this->assertEquals(["array","POST", "GET", "FILES"], $this->handler->listTypes());
     }
 
     public function testHandleReturnsEntryInArray(){
@@ -57,8 +57,15 @@ class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase{
 
         $this->handler->addArray("POST", [1,2,3]);
         $this->assertTrue($this->handler->hasType('POST'));
+        $this->assertTrue($this->handler->hasType('array'));
         $this->assertFalse($this->handler->hasType('NOT_POST'));
     }
 
+    public function testCanHandleAccessOnArrayIfGivenInstance(){
+        $t = $this->handler->canHandle('array', $this->function, $array = ["id" =>1,2,3]);
+        $this->assertTrue($t);
+        $this->assertFalse($this->handler->canHandle('array', $this->function));
+        $this->assertEquals(1, $this->handler->handle('array', $this->function, $array));
+    }
 
 } 

@@ -27,7 +27,7 @@ class ArrayAccessAJAXTypeHandlerImpl implements AJAXTypeHandler{
      */
     public function listTypes()
     {
-        return array_keys($this->arrays);
+        return array_merge(["array"],array_keys($this->arrays));
     }
 
     /**
@@ -39,7 +39,7 @@ class ArrayAccessAJAXTypeHandlerImpl implements AJAXTypeHandler{
      */
     public function canHandle($type, JSONFunction $function, $instance = null)
     {
-        return $function->getName() == "getVar" && isset($this->arrays[$type]);
+        return $function->getName() == "arrayAccess" && (isset($this->arrays[$type]) || ($type == "array" && is_array($instance)));
     }
 
     /**
@@ -50,6 +50,10 @@ class ArrayAccessAJAXTypeHandlerImpl implements AJAXTypeHandler{
      */
     public function handle($type, JSONFunction $function, $instance = null)
     {
+        if($type == "array"){
+            return !isset($instance[$function->getArg(0)])?null:$instance[$function->getArg(0)];
+        }
+
         return !isset($this->arrays[$type][$function->getArg(0)])?null:$this->arrays[$type][$function->getArg(0)];
     }
 
@@ -60,7 +64,7 @@ class ArrayAccessAJAXTypeHandlerImpl implements AJAXTypeHandler{
      */
     public function hasType($type)
     {
-        return isset($this->arrays[$type]);
+        return $type == "array" || isset($this->arrays[$type]);
     }
 
     /**

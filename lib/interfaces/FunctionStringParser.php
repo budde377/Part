@@ -114,16 +114,22 @@ interface FunctionStringParser
     public function parseArray($input, &$result);
 
     /**
-     * <function_call>  = <target>.<function>
-     * <function>       = <name>([<arg>, ...])
-     * <target>         = <function_call> | <name>
-     * <arg>            = <scalar> | <array> | <function_call>
-     * <array>          = \[ <array_index>, ... \]
-     * <array_index>    = <scalar> => <arg> | <arg>
-     * <scalar>         = true | false | null | <num> | *string*
-     * <num>            = <integer> | <float>
-     * <integer>        = [+-]? ( *decimal* | *hexadecimal* | *octal* | *binary*)
-     * <float>          = [+-]? *double_number* | *exp_double_number*
+     * <program>                    = <composite_function_call> | <function_call>
+     *
+     * <composite_function_call>    = <target><composite_function>
+     * <composite_function>         = [..<function_chain>]+
+     * <function_chain>             = <function_chain>.<function> | <function>
+     *
+     * <function_call>              = <target>.<function> | <target>\[<scalar>\]
+     * <function>                   = <name>([<arg>, ...])
+     * <target>                     = <function_call> | <name>
+     * <arg>                        = <scalar> | <array> | <program>
+     * <array>                      = \[ <array_index>, ... \]
+     * <array_index>                = <scalar> => <arg> | <arg>
+     * <scalar>                     = true | false | null | <num> | *string*
+     * <num>                        = [+-]? <integer> | <float>
+     * <integer>                    = *decimal* | *hexadecimal* | *octal* | *binary*
+     * <float>                      = *double_number* | *exp_double_number*
      * @param string $input
      * @return JSONProgram
      */

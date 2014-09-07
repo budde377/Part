@@ -378,6 +378,12 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($f, $result);
         $f->setArg(1,3);
         $f->setArg(2,4);
+
+        $f3 = new JSONFunctionImpl("arrayAccess",new JSONTypeImpl("POST"));
+        $f3->setArg(0, $value = "SomeIndex");
+        $this->assertTrue($this->parser->parseFunctionCall(" POST [\"$value\"] ",$result));
+        $this->assertEquals($f3, $result);
+
         $this->assertTrue($this->parser->parseFunctionCall("Site . func(2,3,4)",$result));
         $this->assertEquals($f, $result);
 
