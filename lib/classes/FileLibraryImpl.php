@@ -336,4 +336,27 @@ class FileLibraryImpl implements FileLibrary{
     {
         return $this->whitelistFile->getModificationTime();
     }
+
+    /**
+     * Will move a file to the library. It will use move_upload_file
+     * function.
+     * @param User $user The uploading user
+     * @param File $file The file to be added
+     * @return File Will return newly added file
+     */
+    public function uploadToLibrary(User $user, File $file)
+    {
+        $folder = new FolderImpl($this->filesDir->getAbsolutePath()."/".$user->getUniqueId());
+        $ext = $file->getExtension() == ""?"":".".$file->getExtension();
+        $name = str_replace(".", "", uniqid("",true)).$ext;
+        if(!$this->filesDir->exists()){
+            $this->filesDir->create();
+        }
+        if(!$folder->exists()){
+            $folder->create();
+        }
+        $f = new FileImpl($folder->getAbsolutePath().'/'.$name);
+        move_uploaded_file($file->getAbsoluteFilePath(),$f->getAbsoluteFilePath());
+        return $f;
+    }
 }

@@ -56,6 +56,16 @@ interface FileLibrary {
      */
     public function addToLibrary(User $user, File $file);
 
+
+    /**
+     * Will move a file to the library. It will use move_upload_file
+     * function.
+     * @param User $user The uploading user
+     * @param File $file The file to be added
+     * @return File Will return newly added file
+     */
+    public function uploadToLibrary(User $user, File $file);
+
     /**
      * Will remove a file from library.
      * @param File $file
