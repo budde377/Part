@@ -77,9 +77,9 @@ class FileLibraryImpl implements FileLibrary{
             }
 
         }
-        return array_filter($returnList, function(File $f){
+        return array_values(array_filter($returnList, function(File $f){
             return !$this->isVersion($f);
-        });
+        }));
     }
 
     /**
