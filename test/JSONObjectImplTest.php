@@ -63,13 +63,13 @@ class JSONObjectImplTest extends PHPUnit_Framework_TestCase
     public function testSetterWillSetArrayContainingJsonObjectSerializable(){
         $variableValue = new NullJSONObjectSerializableImpl();
         $this->object->setVariable(0,$variableValue);
-        $this->assertEquals($variableValue->jsonObjectSerialize(), $this->object->getVariable(0));
+        $this->assertEquals($variableValue, $this->object->getVariable(0));
     }
 
     public function testSetterWillSetArrayContainingJsonObjectSerializableInArray(){
         $variableValue = new NullJSONObjectSerializableImpl();
         $this->object->setVariable(0, [$variableValue]);
-        $this->assertEquals([$variableValue->jsonObjectSerialize()], $this->object->getVariable(0));
+        $this->assertEquals([$variableValue], $this->object->getVariable(0));
     }
 
     public function testSettersWillSetInstanceOfJSONObject(){

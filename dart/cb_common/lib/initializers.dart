@@ -57,7 +57,7 @@ class LoginFormulaInitializer implements Initializer {
       var username = quoteString(data['username']);
       var password = quoteString(data['password']);
 
-      client.callFunctionString("UserLibrary.userLogin($username, $password)", (double pct) => debug("PCT $pct")).then((JSONResponse response) {
+      client.callFunctionString("UserLibrary.userLogin($username, $password)", progress:(double pct) => debug("PCT $pct")).then((JSONResponse response) {
         if (response.type == Response.RESPONSE_TYPE_ERROR) {
           form.unBlur();
           form.changeNotion("Ugyldigt login", FormHandler.NOTION_TYPE_ERROR);

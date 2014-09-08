@@ -28,9 +28,6 @@ abstract class JSONElementImpl implements JSONElement
     protected function validValue(&$val)
     {
         if (!is_array($val)) {
-            if ($val instanceof JSONObjectSerializable) {
-                $val = $val->jsonObjectSerialize();
-            }
             return is_scalar($val) || $val instanceof JsonSerializable;
         }
 

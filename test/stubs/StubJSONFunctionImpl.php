@@ -129,4 +129,13 @@ class StubJSONFunctionImpl implements JSONFunction
     public function jsonSerialize()
     {
     }
+
+    /**
+     * Sets the root target, i.e. calls recursively on target until target is not a function.
+     * @param JSONTarget $target
+     * @return void
+     */
+    public function setRootTarget(JSONTarget $target)
+    {
+    }
 }

@@ -142,7 +142,6 @@ abstract class UploadStrategy {
 
 class AJAXImageURIUploadStrategy extends UploadStrategy {
 
-  JSONClient _client;
 
   List<ImageSize> _sizes;
 
@@ -154,7 +153,6 @@ class AJAXImageURIUploadStrategy extends UploadStrategy {
     _sizes = [size, preview];
     _sizes.removeWhere((ImageSize s) => s == null);
     filter = UploadStrategy.FILTER_IMAGE;
-    _client = new AJAXJSONClient();
 
   }
 
@@ -164,7 +162,7 @@ class AJAXImageURIUploadStrategy extends UploadStrategy {
       progress = (_) {
       };
     }
-    _client.callFunction(new UploadImageURIJSONFunction(fileProgress.file.name, data, _sizes), progress).then((JSONResponse response) {
+    ajaxClient.callFunction(new UploadImageURIJSONFunction(fileProgress.file.name, data, _sizes), progress).then((JSONResponse response) {
       progress(1);
       var c = (String path) {
         fileProgress.path = path;
@@ -189,15 +187,11 @@ class AJAXImageURIUploadStrategy extends UploadStrategy {
 
 class AJAXFileURIUploadStrategy extends UploadStrategy {
 
-  JSONClient _client;
 
-  AJAXFileURIUploadStrategy() {
-    _client = new AJAXJSONClient();
-
-  }
+  AJAXFileURIUploadStrategy() ;
 
   void upload(FileProgress fileProgress, String data, {void callback(String path):null, void progress(num pct):null}) {
-    _client.callFunction(new UploadFileURIJSONFunction(fileProgress.file.name, data)).then((JSONResponse response) {
+    ajaxClient.callFunction(new UploadFileURIJSONFunction(fileProgress.file.name, data)).then((JSONResponse response) {
       if (progress != null) {
         progress(1);
       }

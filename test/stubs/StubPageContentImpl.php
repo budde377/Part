@@ -18,4 +18,6 @@ class StubPageContentImpl extends StubContentImpl implements PageContent{
     {
         return $this->page;
     }
+
+
 }

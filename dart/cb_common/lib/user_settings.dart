@@ -23,9 +23,9 @@ bool get pageOrderAvailable => querySelector("#ActivePageList") != null && query
 bool get userLibraryAvailable => querySelector('#UserList') != null;
 
 
-PageOrder get pageOrder => pageOrderAvailable ? new UserSettingsJSONPageOrder.initializeFromMenu(querySelector("#ActivePageList"), querySelector("#InactivePageList")) : null;
+PageOrder get pageOrder => pageOrderAvailable ? new UserSettingsJSONPageOrder() : null;
 
-UserLibrary get userLibrary => userLibraryAvailable && pageOrderAvailable ? new UserSettingsJSONUserLibrary.initializeFromMenu(querySelector('#UserList')) : null;
+UserLibrary get userLibrary => userLibraryAvailable && pageOrderAvailable ? new UserSettingsJSONUserLibrary() : null;
 
 String _errorMessage(int error_code) {
   switch (error_code) {
@@ -184,7 +184,7 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
       _updateCheckButton(true);
       if (!_canBeUpdated) {
 
-        _client.callFunction(new CheckForSiteUpdatesJSONFunction()).then((JSONResponse response) {
+        _client.callFunctionString("Updater.checkForUpdates()").then((JSONResponse response) {
           _checkTime.text = core.dateString(new DateTime.now());
           if (response.type != core.Response.RESPONSE_TYPE_SUCCESS) {
             _canBeUpdated = false;
@@ -247,7 +247,7 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
     });
 
     var loader = dialogContainer.loading("Opdaterer websitet.<br />Luk ikke din browser!");
-    _client.callFunction(new UpdateSiteJSONFunction()).then((JSONResponse response) {
+    _client.callFunctionString("Updater.update()").then((JSONResponse response) {
       if (response.type == core.Response.RESPONSE_TYPE_ERROR) {
         loader.close();
         _updateCheckButton();

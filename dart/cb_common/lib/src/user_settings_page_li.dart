@@ -36,7 +36,6 @@ class UserSettingsActivePagesPath {
       return;
     }
 
-    var pageOrder = new UserSettingsJSONPageOrder();
     if (!pageOrder.isActive(page_id)) {
       return;
     }
@@ -95,17 +94,14 @@ class UserSettingsPageLi {
 
   factory UserSettingsPageLi(LIElement li){
     var id = li.dataset["id"];
-    var pageOrder = new UserSettingsJSONPageOrder();
     return _resolveInstance(id, () => new UserSettingsPageLi._internal(li, pageOrder, pageOrder.pages[id]));
   }
 
   factory UserSettingsPageLi.fromPage(Page page){
-    var pageOrder = new UserSettingsJSONPageOrder();
     return _resolveInstance(page.id, () => new UserSettingsPageLi._internal(new LIElement(), pageOrder, page));
   }
 
   factory UserSettingsPageLi.fromPageId(String page_id){
-    var pageOrder = new UserSettingsJSONPageOrder();
     return _resolveInstance(page_id, () => new UserSettingsPageLi._internal(new LIElement(), pageOrder, pageOrder.pages[page_id]));
   }
 

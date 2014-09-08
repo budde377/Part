@@ -6,7 +6,7 @@
  * Time: 7:59 PM
  */
 
-interface JSONObjectSerializable {
+interface JSONObjectSerializable extends JsonSerializable{
 
     /**
      * Serializes the object to an instance of JSONObject.

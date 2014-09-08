@@ -64,13 +64,13 @@ class JSONResponseImplTest extends PHPUnit_Framework_TestCase
     public function testSetterWillSetArrayContainingJsonObjectSerializable(){
         $variableValue = new NullJSONObjectSerializableImpl();
         $this->response->setPayload($variableValue);
-        $this->assertEquals($variableValue->jsonObjectSerialize(), $this->response->getPayload());
+        $this->assertEquals($variableValue, $this->response->getPayload());
     }
 
     public function testSetterWillSetArrayContainingJsonObjectSerializableInArray(){
         $variableValue = new NullJSONObjectSerializableImpl();
         $this->response->setPayload([$variableValue]);
-        $this->assertEquals([$variableValue->jsonObjectSerialize()], $this->response->getPayload());
+        $this->assertEquals([$variableValue], $this->response->getPayload());
     }
 
     public function testSetPayloadArrayMustContainScalar(){

@@ -5,7 +5,7 @@ abstract class JSONClient {
 
   Future<JSONResponse> callFunction(JSONFunction function, [void progress(double pct)]);
 
-  Future<JSONResponse> callFunctionString(String function, [void progress(double pct)]);
+  Future<JSONResponse> callFunctionString(String function, {void progress(double pct), List<FormData> form_data:[]});
 }
 
 
@@ -38,26 +38,27 @@ class AJAXJSONClient extends JSONClient {
 
   Future<JSONResponse> callFunction(JSONFunction function, [void progress(double pct)]) {
     debug(function.jsonString);
-    var request = new HttpRequest();
-    var future = _setUpRequest(request);
-    _registerProgressHandler(request, progress);
+    throw "ERROR: Function is depricated.";
 
-    request.open("POST", urlPrefix + "?ajax=${function.name}");
-    debug(urlPrefix + "?ajax=${function.name}");
-    request.send(function.jsonString);
-    return future;
+
   }
-
-  Future<JSONResponse> callFunctionString(String function, [void progress(double pct)]) {
+  Future<JSONResponse> callFunctionString(String function, {void progress(double pct), FormData form_data:null}) {
     var request = new HttpRequest();
     var future = _setUpRequest(request);
     _registerProgressHandler(request, progress);
 
-    request.open("GET", urlPrefix + "?ajax=$function");
-    debug(urlPrefix + "?ajax=$function");
+    if(form_data != null){
+      request.open("POST", urlPrefix + "?ajax=$function");
+      request.send(form_data);
+      debug("POST: "+urlPrefix + "?ajax=$function");
+    } else {
+      request.open("GET", urlPrefix + "?ajax=$function");
+      debug("GET: "+urlPrefix + "?ajax=$function");
+    }
     request.send();
     return future;
   }
+
   _registerProgressHandler(HttpRequest request, progress) {
     if (progress != null) {
       var f = (ProgressEvent evt) => evt.total == 0?0:progress(evt.loaded / evt.total);

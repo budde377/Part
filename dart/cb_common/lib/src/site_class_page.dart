@@ -36,8 +36,6 @@ class JSONPage extends Page {
   bool _hidden = false;
 
 
-  final JSONClient _client;
-
   Map<String, Content> _content = new Map<String, Content>();
 
   String get id => _id;
@@ -55,7 +53,7 @@ class JSONPage extends Page {
 
   Stream<Page> _changeStream;
 
-  JSONPage(String id, String title, String template, String alias, bool hidden, JSONClient client):_client = client {
+  JSONPage(String id, String title, String template, String alias, bool hidden) {
     _id = id;
     _title = title;
     _template = template;
@@ -68,6 +66,12 @@ class JSONPage extends Page {
     title = title != null ? title : _title;
     template = template != null ? template : _template;
     alias = alias != null ? alias : _alias;
+    var hideFunction = "";
+    if(hidden && !_hidden){
+      hideFunction = "..hide()";
+    } else if (!hidden && _hidden){
+      hideFunction = "..show()";
+    }
     hidden = hidden != null ? hidden : _hidden;
     var completer = new Completer<ChangeResponse<Page>>();
     var function = new ChangePageInfoJSONFunction(_id, id, title, template, alias, hidden);
@@ -88,7 +92,7 @@ class JSONPage extends Page {
         completer.complete(new ChangeResponse<Page>.error(response.error_code));
       }
     };
-    _client.callFunctionString("Page..setId(${quoteString(id)})..setTitle(${quoteString(title)})..setTemplate(${quoteString(template)})..setAlias(${quoteString(alias)})..setHidden($hidden)..getInstance()").then(functionCallback);
+    ajaxClient.callFunctionString("PageOrder.getPage(${quoteString(id)})..setId(${quoteString(id)})..setTitle(${quoteString(title)})..setTemplate(${quoteString(template)})..setAlias(${quoteString(alias)})$hideFunction..getInstance()").then(functionCallback);
     return completer.future;
   }
 
@@ -98,7 +102,7 @@ class JSONPage extends Page {
   }
 
 
-  Content operator [](String id) => _content.putIfAbsent(id, () => new JSONContent.page(this, id, _client));
+  Content operator [](String id) => _content.putIfAbsent(id, () => new JSONContent.page(this, id));
 
   Stream<Page> get onChange => _changeStream == null ? _changeStream = _changeController.stream.asBroadcastStream() : _changeStream;
 

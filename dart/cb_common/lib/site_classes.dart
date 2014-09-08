@@ -1,6 +1,7 @@
 library site_classes;
 
 import "dart:async";
+import "dart:html";
 import 'json.dart';
 import 'core.dart';
 

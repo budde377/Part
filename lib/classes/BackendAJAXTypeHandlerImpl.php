@@ -273,6 +273,27 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'setPageOrder', $this->sitePrivilegesFunction);
         $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'createPage', $this->sitePrivilegesFunction);
 
+        $pageOrderHandler->addFunction('PageOrder', 'createPage', function(PageOrder $pageOrder, $title){
+            if (!$this->backend->getUserLibraryInstance()->getUserLoggedIn()->getUserPrivileges()->hasSitePrivileges()) {
+                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_UNAUTHORIZED);
+            }
+            if (strlen($title) == 0) {
+                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_PAGE_TITLE);
+            }
+            $id = strtolower($title);
+            $id = $baseId = str_replace(' ', '_', $id);
+            $id = $baseId = preg_replace('/[^a-z0-9\-_]/', '', $id);
+            $i = 2;
+            while (($p = $pageOrder->createPage($id)) === false) {
+                $id = $baseId . "_" . $i;
+                $i++;
+            }
+            $p->setTitle($title);
+            $p->setTemplate('_main');
+
+            return $p;
+        });
+
     }
 
     private function setUpPageHandler(AJAXServer $server)
@@ -350,7 +371,9 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
     private function setUpPageContentLibraryHandler(AJAXServer $server)
     {
-        $server->registerHandler($siteContentHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getPageOrderInstance()->getCurrentPage()->getContentLibrary(), "PageContentLibrary"));
+        $contentLibrary = $this->backend->getPageOrderInstance()->getCurrentPage()->getContentLibrary();
+        $siteContentHandler = new GenericObjectAJAXTypeHandlerImpl($contentLibrary == null?"PageContentLibrary":$contentLibrary);
+        $server->registerHandler($siteContentHandler, "PageContentLibrary");
     }
 
     private function setUpSiteContentLibraryHandler(AJAXServer $server)
@@ -411,39 +434,56 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             'mirrorHorizontal'
         );
 
+        $fileHandler->addFunctionPreCallFunction('ImageFile', 'crop', $f = $this->createSpliceAndTrueEndPreFunction(4));
+
+        $fileHandler->addFunctionPreCallFunction('ImageFile', 'forceSize', $f = $this->createSpliceAndTrueEndPreFunction(2));
+        $fileHandler->addFunctionPreCallFunction('ImageFile', 'scaleToInnerBox', $f);
+        $fileHandler->addFunctionPreCallFunction('ImageFile', 'scaleToOuterBox', $f);
+        $fileHandler->addFunctionPreCallFunction('ImageFile', 'limitToInnerBox', $f);
+        $fileHandler->addFunctionPreCallFunction('ImageFile', 'limitToOuterBox', $f);
+        $fileHandler->addFunctionPreCallFunction('ImageFile', 'extendToInnerBox', $f);
+        $fileHandler->addFunctionPreCallFunction('ImageFile', 'extendToOuterBox', $f);
+
+        $fileHandler->addFunctionPreCallFunction('ImageFile', 'scaleToWidth', $f = $this->createSpliceAndTrueEndPreFunction(1));
+        $fileHandler->addFunctionPreCallFunction('ImageFile', 'scaleToHeight', $f);
+        $fileHandler->addFunctionPreCallFunction('ImageFile', 'rotate', $f);
+
+        $fileHandler->addFunctionPreCallFunction('ImageFile', 'mirrorVertical', $f = $this->createSpliceAndTrueEndPreFunction(0));
+        $fileHandler->addFunctionPreCallFunction('ImageFile', 'mirrorVertical', $f);
+
         $library = $this->backend->getFileLibraryInstance();
 
 
-        $fileHandler->addFunction('File', 'getFile', function ($path) use ($library) {
+        $fileHandler->addFunction('File', 'getFile', function ($instance, $path) use ($library) {
             $f = new FileImpl($library->getFilesFolder()->getAbsolutePath() . "/$path");
             return $library->containsFile($f) ? $f : null;
         });
 
-        $fileHandler->addFunction('ImageFile', 'getFile', function ($path) use ($library) {
+        $fileHandler->addFunction('ImageFile', 'getFile', function ($instance, $path) use ($library) {
             $f = new ImageFileImpl($library->getFilesFolder()->getAbsolutePath() . "/$path");
             return $library->containsFile($f) ? $f : null;
         });
 
-        $fileHandler->addFunction('File', 'uploadFile', function ($file) use ($library) {
+        $fileHandler->addFunction('File', 'uploadFile', function ($instance, $file) use ($library) {
             return $library->uploadToLibrary($this->userLibrary->getUserLoggedIn(), $f = new FileImpl($file['tmp_name']));
         });
 
-        $fileHandler->addFunction('ImageFile', 'uploadFile', function ($file) use ($library) {
+        $fileHandler->addFunction('ImageFile', 'uploadFile', function ($instance, $file) use ($library) {
             $f = $library->uploadToLibrary($this->userLibrary->getUserLoggedIn(), new ImageFileImpl($file['tmp_name']));
             return new ImageFileImpl($f->getAbsoluteFilePath());
         });
 
-        $authFunction = function (){
-          return $this
-              ->backend
-              ->getUserLibraryInstance()
-              ->getUserLoggedIn()
-              ->getUserPrivileges()
-              ->hasPagePrivileges(
-                  $this
-                      ->backend
-                      ->getPageOrderInstance()
-                      ->getCurrentPage());
+        $authFunction = function () {
+            return $this
+                ->backend
+                ->getUserLibraryInstance()
+                ->getUserLoggedIn()
+                ->getUserPrivileges()
+                ->hasPagePrivileges(
+                    $this
+                        ->backend
+                        ->getPageOrderInstance()
+                        ->getCurrentPage());
         };
 
         $fileHandler->addFunctionAuthFunction('File', 'uploadFile', $authFunction);
@@ -467,6 +507,14 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
                     'uploadFile']) ||
                 $authFunction();
         });
+    }
+
+    private function createSpliceAndTrueEndPreFunction($length)
+    {
+        return function ($type, $instance, $functionName, &$arguments) use ($length) {
+            $arguments = array_splice($arguments, 0, $length);
+            $arguments[$length] = true;
+        };
     }
 
 

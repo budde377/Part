@@ -31,4 +31,17 @@ class StubDumpFileImpl extends FileImpl implements DumpFile{
     {
 
     }
+
+    /**
+     * Dumps a variable to the dumpfile using serialize.
+     * @param mixed $var
+     * @return void
+     */
+    public function writeSerialized($var)
+    {
+    }
+
+    public function getUnSerializedContent()
+    {
+    }
 }

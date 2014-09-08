@@ -5,8 +5,11 @@ part of user_settings;
 class UserSettingsJSONUserLibrary implements UserLibrary {
 
   final UserLibrary _userLibrary;
+  static final UserSettingsJSONUserLibrary _cache = new UserSettingsJSONUserLibrary._internal(querySelector('#UserList'));
 
-  UserSettingsJSONUserLibrary.initializeFromMenu(UListElement userList) : _userLibrary = _generateUserLibFromMenu(userList);
+  factory UserSettingsJSONUserLibrary() => _cache;
+
+  UserSettingsJSONUserLibrary._internal(UListElement userList) : _userLibrary = _generateUserLibFromMenu(userList);
 
   static UserLibrary _generateUserLibFromMenu(UListElement userList){
     var lis = userList.querySelectorAll('li:not(.emptyListInfo)');
@@ -37,7 +40,7 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
       var pageStringList = privilege == User.PRIVILEGE_PAGE && pagesString != null? pagesString.trim().split(" ") : [];
       var pageList = pageStringList.map((String id) => pageOrder.pages[id]).toList();
       pageList.removeWhere((e)=>!(e is Page));
-      var user = new JSONUser(username, mail, parent, lastLogin, privilege, pageList, client);
+      var user = new JSONUser(username, mail, parent, lastLogin, privilege, pageList);
       users.add(user);
       if (li.classes.contains('current')) {
         currentUser = username;
@@ -45,10 +48,10 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
 
     });
 
-    return new JSONUserLibrary.initializeFromLists(users, currentUser, pageOrder);
+    return new JSONUserLibrary(users, currentUser, pageOrder);
   }
 
-  UserSettingsJSONUserLibrary() : _userLibrary = new JSONUserLibrary(pageOrder);
+//  UserSettingsJSONUserLibrary() : _userLibrary = new JSONUserLibrary(pageOrder);
 
   Future<ChangeResponse<User>> createUser(String mail, String privileges) => _userLibrary.createUser(mail, privileges);
 
