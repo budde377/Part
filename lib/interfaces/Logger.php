@@ -115,12 +115,19 @@ interface Logger
     public function log($level, $message, array $context = array());
 
     /**
-     * Use boolean or to combine which loglevels you whish to list.
+     * Use boolean or to combine which loglevels you wish to list.
+     * Returns an array with entries
      * @param int $level
      * @param bool $includeContext If false context will not be included in result.
      * @param int $time The earliest returned entry will be after this value
-     * @return mixed
+     * @return array
      */
     public function listLog($level = Logger::LOG_LEVEL_ALL, $includeContext = true, $time = 0);
 
+    /**
+     * Returns the context corresponding to the time given.
+     * @param int $time
+     * @return array
+     */
+    public function getContextAt($time);
 }

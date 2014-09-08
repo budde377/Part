@@ -148,6 +148,7 @@ class LoggerImpl implements Logger
      * @param int $time The earliest returned entry will be after this value
      * @return mixed
      */
+    // TODO test for $includeContext 
     public function listLog($level = Logger::LOG_LEVEL_ALL, $includeContext = true, $time = 0)
     {
         $list = $this->logFile->listLog($level, $time);
@@ -168,5 +169,15 @@ class LoggerImpl implements Logger
         }
 
         return  $result;
+    }
+
+    /**
+     * Returns the context corresponding to the line given.
+     * @param int $line
+     * @return array
+     */
+    public function getContextAt($line)
+    {
+        // TODO: Implement getContextAt() method.
     }
 }
