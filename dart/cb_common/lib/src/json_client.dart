@@ -4,7 +4,7 @@ abstract class JSONClient {
   String urlPrefix = "";
 
 
-  Future<JSONResponse> callFunctionString(String function, {void progress(double pct), List<FormData> form_data:[]});
+  Future<JSONResponse> callFunctionString(String function, {void progress(double pct), List<FormData> form_data:null});
 }
 
 
