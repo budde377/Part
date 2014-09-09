@@ -20,7 +20,7 @@ abstract class Page {
 
   bool get hidden;
 
-  bool get editable;
+ // bool get editable;
 
   Future<ChangeResponse<Page>> changeInfo({String id, String title, String template, String alias, bool hidden});
 
@@ -74,7 +74,6 @@ class JSONPage extends Page {
     }
     hidden = hidden != null ? hidden : _hidden;
     var completer = new Completer<ChangeResponse<Page>>();
-    var function = new ChangePageInfoJSONFunction(_id, id, title, template, alias, hidden);
     var functionCallback = (JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         JSONObject payload = response.payload;

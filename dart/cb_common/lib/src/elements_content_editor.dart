@@ -500,7 +500,7 @@ class LinkImageHandler {
     if (!_enabled) {
       return;
     }
-    var elm = event.toElement;
+    var elm = event.relatedTarget;
     if (_infoBox.element.contains(elm)) {
       return;
     }

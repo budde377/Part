@@ -67,7 +67,7 @@ class JSONContent extends Content {
     var completer = new Completer<List<DateTime>>();
     ajaxClient.callFunctionString(contentStrategy.generateListContentFunction()).then((JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
-        List<int> payload = response.payload== null? []:response.payload;
+        List<String> payload = response.payload== null? []:response.payload;
         completer.complete(payload.map((String timeString) => new DateTime.fromMillisecondsSinceEpoch(int.parse(timeString) * 1000)).toList(growable:false));
       } else {
         completer.completeError(new Exception("Could not list times"));

@@ -111,9 +111,8 @@ class FileProgress {
 abstract class UploadStrategy {
   Pattern filter;
 
-  void upload(FileProgress fileProgress, String data, {void callback(String path):null, void progress(double pct):null});
 
-  void uploadFile(FileProgress fileProgress, {void callback(String path):null, void progress(double pct):null});
+  void uploadFile(FileProgress fileProgress, {void callback(String path):null, void progress(num pct):null});
 
 
   static const Pattern FILTER_IMAGE = "image/";
@@ -136,7 +135,7 @@ class AJAXImageUploadStrategy extends UploadStrategy {
 
   }
 
-  void uploadFile(FileProgress fileProgress, {void callback(String path):null, void progress(double pct):null}) {
+  void uploadFile(FileProgress fileProgress, {void callback(String path):null, void progress(num pct):null}) {
     var reader = new FileReader();
     reader.onLoadEnd.listen((_) {
       fileProgress.previewPath = reader.result;
@@ -176,7 +175,7 @@ class AJAXFileUploadStrategy extends UploadStrategy {
 
   AJAXFileUploadStrategy() ;
 
-  void uploadFile(FileProgress fileProgress, {void callback(String path):null, void progress(double pct):null}) {
+  void uploadFile(FileProgress fileProgress, {void callback(String path):null, void progress(num pct):null}) {
     var formData = new FormData();
     formData.appendBlob("file", fileProgress.file, fileProgress.file.name);
     ajaxClient.callFunctionString("File.uploadFile(FILES['file'])", progress:progress, form_data:formData).then((JSONResponse response) {

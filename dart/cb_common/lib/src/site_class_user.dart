@@ -102,7 +102,6 @@ class JSONUser extends User {
 
   Future<ChangeResponse<User>> changePassword(String currentPassword, String newPassword) {
     var completer = new Completer<ChangeResponse<User>>();
-    var jsonFunction = new ChangeUserPasswordJSONFunction(_username, currentPassword, newPassword);
     ajaxClient.callFunctionString("UserLibrary.getUser(${quoteString(_username)}).setPassword(${quoteString(currentPassword)}, ${quoteString(newPassword)})").then((JSONResponse response) {
       if(response.type == Response.RESPONSE_TYPE_SUCCESS){
         completer.complete(new ChangeResponse<User>.success(this));
@@ -128,7 +127,6 @@ class JSONUser extends User {
 
   Future<ChangeResponse<User>> addPagePrivilege(Page page) {
     var completer = new Completer<ChangeResponse<User>>();
-    var function = new AddUserPagePrivilegeJSONFunction(_username, page.id);
     ajaxClient.callFunctionString("UserLibrary.getUser().getUserPrivielges").then( (JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         _pages.add(page);
@@ -143,7 +141,6 @@ class JSONUser extends User {
 
   Future<ChangeResponse<User>> revokePagePrivilege(Page page) {
     var completer = new Completer<ChangeResponse<User>>();
-    var function = new RevokeUserPagePrivilegeJSONFunction(_username, page.id);
     ajaxClient.callFunctionString("UserLibrary.getUser(${quoteString(username)}).getUserPrivileges().revokePagePrivileges(PageOrder.getPage(${quoteString(page.id)}))").then((JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         _pages.remove(page);

@@ -11,7 +11,7 @@ abstract class Logger {
   static const LOG_LEVEL_INFO = 64;
   static const LOG_LEVEL_DEBUG = 128;
 
-  const LOG_LEVEL_ALL = 255;
+  static const LOG_LEVEL_ALL = 255;
 
   Future<ChangeResponse<Logger>> emergency(String message, Map context);
 

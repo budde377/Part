@@ -164,7 +164,6 @@ class JSONPageOrder extends PageOrder {
 
   Future<ChangeResponse<Page>> deactivatePage(String page_id) {
     var completer = new Completer<ChangeResponse<Page>>();
-    var function = new DeactivatePageJSONFunction(page_id);
     ajaxClient.callFunctionString("PageOrder.deactivatePage(PageOrder.getPage(${quoteString(page_id)}))").then((JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         _removeFromPageOrder(page_id);
@@ -299,7 +298,6 @@ class JSONPageOrder extends PageOrder {
 
   Future<ChangeResponse<Page>> createPage(String title) {
     var completer = new Completer<ChangeResponse<Page>>();
-    var function = new CreatePageJSONFunction(title);
     var functionCallback = (JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         String id = _addPageFromObject(response.payload);
@@ -315,7 +313,6 @@ class JSONPageOrder extends PageOrder {
 
   Future<ChangeResponse<Page>> deletePage(String id) {
     var completer = new Completer<ChangeResponse<Page>>();
-    var function = new DeletePageJSONFunction(id);
     var functionCallback = (JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         var page = _pages[id];

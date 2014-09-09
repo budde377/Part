@@ -141,7 +141,7 @@ abstract class FloatingBox{
     }
     if(b){
       _mouseDownSubscription = window.onMouseDown.listen((MouseEvent e){
-        if(element.contains(e.toElement)){
+        if(element.contains(e.relatedTarget)){
           return;
         }
         remove();
@@ -286,7 +286,7 @@ class DropDown{
     closeOnESC = true;
     element.onClick.listen((_)=>toggle());
     document.onMouseDown.listen((MouseEvent e){
-      if(element.contains(e.toElement) || _dropBox.element.contains(e.toElement)){
+      if(element.contains(e.relatedTarget) || _dropBox.element.contains(e.relatedTarget)){
         return;
       }
       close();

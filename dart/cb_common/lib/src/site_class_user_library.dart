@@ -39,7 +39,7 @@ abstract class UserLibrary {
 }
 
 class JSONUserLibrary extends UserLibrary {
-  final PageOrder _pageOrder;
+  final PageOrder pageOrder;
   String _userLoggedInId;
   Map<String, User> _users = <String, User>{
   };
@@ -56,7 +56,7 @@ class JSONUserLibrary extends UserLibrary {
   }
 */
 
-  JSONUserLibrary(List<User> users, String currentUserName, PageOrder pageOrder) {
+  JSONUserLibrary(List<User> users, String currentUserName, PageOrder pageOrder) : this.pageOrder = pageOrder {
     _setUpFromLists(users, currentUserName);
 
   }
@@ -100,7 +100,7 @@ class JSONUserLibrary extends UserLibrary {
 
   String _addUserFromObjectToUsers(JSONObject o, List<String> page_ids) {
     var privilegesString = o.variables['privileges'];
-    var pages = page_ids.map((String id) => _pageOrder.pages[id]);
+    var pages = page_ids.map((String id) => pageOrder.pages[id]);
     var privileges = privilegesString == 'root' ? User.PRIVILEGE_ROOT : (privilegesString == 'site' ? User.PRIVILEGE_SITE : User.PRIVILEGE_PAGE);
     var user = new JSONUser(o.variables['username'], o.variables['mail'], o.variables['parent'], o.variables['last-login'], privileges, pages);
     _addUserListener(user);
