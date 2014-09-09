@@ -21,12 +21,12 @@ class StubLogFileImplTest extends PHPUnit_Framework_TestCase{
     }
 
     public function testLogFileDoesNotWrite(){
-        $this->logFile->log("SomeMsg", LogFile::LOG_LEVEL_ERROR);
+        $this->logFile->log("SomeMsg", Logger::LOG_LEVEL_ERROR);
         $this->assertFalse($this->logFile->exists());
     }
 
     public function testLogFileDoesNotList(){
-        $this->logFile->log("LOL", LogFile::LOG_LEVEL_ERROR);
+        $this->logFile->log("LOL", Logger::LOG_LEVEL_ERROR);
         $this->assertTrue(is_array($l = $this->logFile->listLog()));
         $this->assertEquals(0, count($l));
     }
@@ -42,7 +42,7 @@ class StubLogFileImplTest extends PHPUnit_Framework_TestCase{
     }
 
     public function testLogDoesReturnFile(){
-        $this->assertInstanceOf("StubDumpFileImpl", $this->logFile->log("MSG", LogFile::LOG_LEVEL_ERROR, true));
+        $this->assertInstanceOf("StubDumpFileImpl", $this->logFile->log("MSG", Logger::LOG_LEVEL_ERROR, true));
     }
 
 } 

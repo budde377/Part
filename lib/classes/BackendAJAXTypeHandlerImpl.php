@@ -351,6 +351,10 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $logHandler->addAuthFunction(function () {
             return $this->userLibrary->getUserLoggedIn() != null;
         });
+
+        $logHandler->addFunctionAuthFunction("Logger", 'clearLog', $this->sitePrivilegesFunction);
+        $logHandler->addFunctionAuthFunction("Logger", 'listLog', $this->sitePrivilegesFunction);
+        $logHandler->addFunctionAuthFunction("Logger", 'getContextAt', $this->sitePrivilegesFunction);
     }
 
     private function setUpPageContentHandler(AJAXServer $server)
@@ -410,7 +414,8 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             'getModificationTime',
             'getCreationTime',
             'getFile',
-            'uploadFile'
+            'uploadFile',
+            'getPath'
         );
 
         $fileHandler->whitelistFunction("ImageFile",
@@ -448,11 +453,15 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $fileHandler->addFunctionPreCallFunction('ImageFile', 'scaleToHeight', $f);
         $fileHandler->addFunctionPreCallFunction('ImageFile', 'rotate', $f);
 
-        $fileHandler->addFunctionPreCallFunction('ImageFile', 'mirrorVertical', $f = $this->createSpliceAndTrueEndPreFunction(0));
+        $fileHandler->addFunctionPreCallFunction('ImageFile', 'mirrorHorizontal', $f = $this->createSpliceAndTrueEndPreFunction(0));
         $fileHandler->addFunctionPreCallFunction('ImageFile', 'mirrorVertical', $f);
 
         $library = $this->backend->getFileLibraryInstance();
 
+
+        $fileHandler->addFunction('File', 'getPath', function (File $instance) use ($library) {
+            return !$library->containsFile($instance)?null:$instance->getParentFolder()->getName()."/".$instance->getFilename();
+        });
 
         $fileHandler->addFunction('File', 'getFile', function ($instance, $path) use ($library) {
             $f = new FileImpl($library->getFilesFolder()->getAbsolutePath() . "/$path");
@@ -464,13 +473,68 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             return $library->containsFile($f) ? $f : null;
         });
 
-        $fileHandler->addFunction('File', 'uploadFile', function ($instance, $file) use ($library) {
-            return $library->uploadToLibrary($this->userLibrary->getUserLoggedIn(), $f = new FileImpl($file['tmp_name']));
+        $fileHandler->addFunction('File', 'uploadFile', function ($instance, array $file) use ($library) {
+            $f = $library->uploadToLibrary($this->userLibrary->getUserLoggedIn(), $file);
+            return $f == null?null:$f->getParentFolder()->getName()."/".$f->getFilename();
         });
 
-        $fileHandler->addFunction('ImageFile', 'uploadFile', function ($instance, $file) use ($library) {
-            $f = $library->uploadToLibrary($this->userLibrary->getUserLoggedIn(), new ImageFileImpl($file['tmp_name']));
-            return new ImageFileImpl($f->getAbsoluteFilePath());
+        $fileHandler->addFunction('ImageFile', 'uploadFile', function ($instance, array $file, array $sizes) use ($library) {
+            $f = $library->uploadToLibrary($this->userLibrary->getUserLoggedIn(), $file);
+            $f = new ImageFileImpl($f->getAbsoluteFilePath());
+
+            $result = [];
+            foreach($sizes as $key=>$val){
+                if(!is_array($val) || !isset($val["height"], $val["width"], $val["scaleMethod"], $val["dataURI"])){
+                    continue;
+                }
+                $width = $val["width"];
+                $height = $val["height"];
+
+                switch($val["scaleMethod"]){
+                    case 0:
+                        $newFile = $f->forceSize($width, $height, true);
+                        break;
+                    case 1:
+                        $newFile = $f->scaleToWidth($width, true);
+                        break;
+                    case 2:
+                        $newFile = $f->scaleToHeight($height, true);
+                        break;
+                    case 3:
+                        $newFile = $f->scaleToInnerBox($width, $height, true);
+                        break;
+                    case 4:
+                        $newFile = $f->scaleToOuterBox($width, $height, true);
+                        break;
+                    case 5:
+                        $newFile = $f->limitToInnerBox($width, $height, true);
+                        break;
+                    case 6:
+                        $newFile = $f->extendToInnerBox($width, $height, true);
+                        break;
+                    case 7:
+                        $newFile = $f->limitToOuterBox($width, $height, true);
+                        break;
+                    case 8:
+                        $newFile = $f->extendToOuterBox($width, $height, true);
+                        break;
+                    default:
+                        $newFile = null;
+
+                }
+                if($newFile == null){
+                    continue;
+                }
+                if($val["dataURI"]){
+                    $result[$key] = $newFile->getDataURI();
+                } else{
+                    $result[$key] = $newFile->getParentFolder()->getName(). "/". $newFile->getFilename();
+                }
+
+            }
+            $fp = $f == null?null:$f->getParentFolder()->getName()."/".$f->getFilename();
+            return ["path"=>$fp, "sizes"=>$result];
+
         });
 
         $authFunction = function () {

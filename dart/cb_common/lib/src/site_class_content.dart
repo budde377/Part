@@ -68,7 +68,7 @@ class JSONContent extends Content {
     ajaxClient.callFunctionString(contentStrategy.generateListContentFunction()).then((JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         List<int> payload = response.payload== null? []:response.payload;
-        completer.complete(payload.map((int) => new DateTime.fromMillisecondsSinceEpoch(int * 1000)).toList(growable:false));
+        completer.complete(payload.map((String timeString) => new DateTime.fromMillisecondsSinceEpoch(int.parse(timeString) * 1000)).toList(growable:false));
       } else {
         completer.completeError(new Exception("Could not list times"));
       }
@@ -118,7 +118,7 @@ class JSONContent extends Content {
     ajaxClient.callFunctionString(contentStrategy.generateListContentFunction(from:fromm, to:too, includeContent:true)).then((JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         List<Map<String, dynamic>> payload = response.payload == null? []:response.payload;
-        completer.complete(payload.map((Map<String, dynamic> m) => _generateRevision(new DateTime.fromMillisecondsSinceEpoch(m['time'] * 1000), m['content'])).toList(growable:false));
+        completer.complete(payload.map((Map<String, dynamic> m) => _generateRevision(new DateTime.fromMillisecondsSinceEpoch(int.parse(m['time']) * 1000), m['content'])).toList(growable:false));
 
       } else {
         completer.completeError(new Exception("Could not list revisions"));

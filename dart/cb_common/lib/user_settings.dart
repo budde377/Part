@@ -123,7 +123,7 @@ class UserSettingsLoggerInitializer extends core.Initializer {
     _logTable.querySelectorAll(".dumpfile a").forEach((AnchorElement a) {
       a.onClick.listen((MouseEvent evt) {
         var loader = dialogContainer.loading("Henter log filen");
-        ajaxClient.callFunction(new GetDumpFileLogJSONFunction(int.parse(a.dataset["id"]))).then((JSONResponse resp) {
+        ajaxClient.callFunctionString("Logger.getContextAt(${a.dataset["id"]})").then((JSONResponse resp) {
           if (resp.type != core.Response.RESPONSE_TYPE_SUCCESS) {
             loader.close();
             return;
@@ -148,7 +148,7 @@ class UserSettingsLoggerInitializer extends core.Initializer {
 
 
     _logLink.onClick.listen((MouseEvent evt) {
-      ajaxClient.callFunction(new ClearLogJSONFunction()).then((JSONResponse response) {
+      ajaxClient.callFunctionString("Logger.clearLog()").then((JSONResponse response) {
         if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
           _logTable.querySelectorAll("tr:not(.empty_row)").forEach((TableRowElement li) => li.remove());
           _logTable.classes.add("empty");

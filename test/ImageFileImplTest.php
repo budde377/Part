@@ -80,6 +80,22 @@ class ImageFileImplTest extends PHPUnit_Framework_TestCase
 
     }
 
+    public function testForceSizeWillForceSizeAndSaveAsNewWhenVar0(){
+
+        $this->fileToDelete = $f = $this->imageFile->forceSize(0,100, true);
+        $this->assertEquals($f->getParentFolder()->getAbsolutePath(), $this->imageFile->getParentFolder()->getAbsolutePath());
+
+        $this->assertEquals(150, $f->getWidth());
+        $this->assertEquals(100,$f->getHeight());
+        $this->assertEquals(1.5, $f->getRatio());
+        $this->assertEquals($this->imageFile->getBasename().'-S_150_100', $f->getBasename());
+
+        $this->assertNotEquals(150, $this->imageFile->getWidth());
+        $this->assertNotEquals(100,$this->imageFile->getHeight());
+        $this->assertEquals(1.5, $this->imageFile->getRatio());
+
+    }
+
     public function testForceSizeWillForceSizeAndSaveAsNewAndUpdateName(){
 
         $f = $this->imageFile->forceSize(200,100, true);

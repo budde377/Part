@@ -14,7 +14,7 @@ class LoggerImpl implements Logger
 
     function __construct($filePath)
     {
-        $this->logFile = $filePath == ""?new StubLogFileImpl():new LogFileImpl($filePath);
+        $this->logFile = $filePath == "" ? new StubLogFileImpl() : new LogFileImpl($filePath);
     }
 
 
@@ -136,7 +136,7 @@ class LoggerImpl implements Logger
     public function log($level, $message, array $context = array())
     {
         $dumpFile = $this->logFile->log($message, $level, $context != []);
-        if($dumpFile != null){
+        if ($dumpFile != null) {
             $dumpFile->writeSerialized($context);
         }
     }
@@ -148,17 +148,19 @@ class LoggerImpl implements Logger
      * @param int $time The earliest returned entry will be after this value
      * @return mixed
      */
-    // TODO test for $includeContext 
     public function listLog($level = Logger::LOG_LEVEL_ALL, $includeContext = true, $time = 0)
     {
         $list = $this->logFile->listLog($level, $time);
         $result = [];
-        foreach($list as $entry){
-            if(isset($entry['dumpfile'])){
-                /** @var DumpFile $dumpFile */
-                $dumpFile = $entry['dumpfile'];
+        foreach ($list as $entry) {
+            if (isset($entry['dumpfile'])) {
 
-                $entry['context'] = $dumpFile->getUnSerializedContent()[0];
+                if ($includeContext) {
+                    /** @var DumpFile $dumpFile */
+                    $dumpFile = $entry['dumpfile'];
+
+                    $entry['context'] = $dumpFile->getUnSerializedContent()[0];
+                }
 
 
                 unset($entry['dumpfile']);
@@ -168,16 +170,31 @@ class LoggerImpl implements Logger
 
         }
 
-        return  $result;
+        return $result;
     }
 
     /**
      * Returns the context corresponding to the line given.
-     * @param int $line
+     * @param int $time
      * @return array
      */
-    public function getContextAt($line)
+    public function getContextAt($time)
     {
-        // TODO: Implement getContextAt() method.
+        $l = $this->listLog(Logger::LOG_LEVEL_ALL, true, $time);
+        if(!count($l) || $l[0]["time"] != $time){
+            return null;
+        }
+
+        return $l[0]["context"];
+
+    }
+
+    /**
+     * Clears the log
+     * @return void
+     */
+    public function clearLog()
+    {
+        $this->logFile->clearLog();
     }
 }

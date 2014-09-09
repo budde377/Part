@@ -341,13 +341,16 @@ class FileLibraryImpl implements FileLibrary{
      * Will move a file to the library. It will use move_upload_file
      * function.
      * @param User $user The uploading user
-     * @param File $file The file to be added
+     * @param array $fileArray The file array to be added
      * @return File Will return newly added file
      */
-    public function uploadToLibrary(User $user, File $file)
+    public function uploadToLibrary(User $user, array $fileArray)
     {
+
+        $nameFile = new FileImpl(isset($fileArray['name'])?$fileArray['name']:$fileArray['tmp_name']);
+        $file = new FileImpl($fileArray['tmp_name']);
         $folder = new FolderImpl($this->filesDir->getAbsolutePath()."/".$user->getUniqueId());
-        $ext = $file->getExtension() == ""?"":".".$file->getExtension();
+        $ext = $nameFile->getExtension() == ""?"":".".$nameFile->getExtension();
         $name = str_replace(".", "", uniqid("",true)).$ext;
         if(!$this->filesDir->exists()){
             $this->filesDir->create();

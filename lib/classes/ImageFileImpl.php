@@ -121,6 +121,9 @@ class ImageFileImpl extends FileImpl implements ImageFile
      */
     public function forceSize($width, $height, $saveAsNewFile = false)
     {
+        $width  = $width <= 0?round($this->getRatio()*$height):$width;
+        $height = $height <= 0?round($width/$this->getRatio()):$height;
+
         if ($saveAsNewFile) {
             $fp = $this->getParentFolder()->getAbsolutePath() . '/' . $this->newForceImageSizeBasename($width, $height) . "." . $this->getExtension();
             if (file_exists($fp)) {
@@ -284,7 +287,7 @@ class ImageFileImpl extends FileImpl implements ImageFile
                 return new ImageFileImpl($fp);
             }
             $f = $this->copy($fp);
-            $f->mirrorHorizontal();
+            $f->mirrorVertical();
             return $f;
         }
         $this->updateInfo();
@@ -334,6 +337,7 @@ class ImageFileImpl extends FileImpl implements ImageFile
 
     private function newForceImageSizeBasename($width, $height)
     {
+
         if (preg_match("/-S((_[0-9]+_[0-9]+)+)/", $this->getBasename(), $match, PREG_OFFSET_CAPTURE)) {
             $offset = $match[1][1];
             $oldSizeString = $match[1][0];

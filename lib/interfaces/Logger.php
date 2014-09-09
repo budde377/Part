@@ -130,4 +130,10 @@ interface Logger
      * @return array
      */
     public function getContextAt($time);
+
+    /**
+     * Clears the log
+     * @return void
+     */
+    public function clearLog();
 }

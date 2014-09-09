@@ -221,7 +221,7 @@ class EditorFileHandler implements EditorHandler {
     _fileProgress.onProgress.listen((_) => progressBar.percentage = _fileProgress.progress);
     _fileProgress.onPathAvailable.listen((_) {
       dataElement
-        ..href = _fileProgress.path
+        ..href = "/_files/"+_fileProgress.path
         ..text = fileProgress.file.name;
       progressBar.bar.remove();
       element.classes.remove('uploading');
@@ -258,7 +258,7 @@ class EditorImageHandler implements EditorHandler {
   EditorImageHandler.fileProgress(this.dataElement, core.FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
     _fileProgress.onProgress.listen((_) => progressBar.percentage = _fileProgress.progress);
     _fileProgress.onPathAvailable.listen((_) {
-      dataElement.src = _fileProgress.path;
+      dataElement.src = "/_files/"+_fileProgress.path;
       progressBar.bar.remove();
       element.classes.remove('uploading');
       ready();
@@ -393,10 +393,6 @@ class EditorFileContainer {
 
 }
 
-
-class ImagePropertiesEditImageContentJSONFunction extends EditImageJSONFunction {
-  ImagePropertiesEditImageContentJSONFunction(ImageEditProperties properties) : super(properties.url, mirrorHorizontal:properties.mirrorHorizontal, mirrorVertical:properties.mirrorVertical, cropW:properties.cropW, cropH:properties.cropH, cropX:properties.cropX, cropY:properties.cropY, rotate:properties.rotate, width:properties.width, height:properties.height);
-}
 
 
 class LinkImageHandler {
@@ -1240,7 +1236,7 @@ class ContentEditor {
 //TODO Fix close fileupload with ESC
     preview.classes.add('preview');
 
-    var uploadStrategy = images ? new core.AJAXImageURIUploadStrategy(new core.ImageSize.scaleMethodLimitToOuterBox(element.clientWidth, 500), new core.ImageSize.scaleMethodLimitToOuterBox(70, 70, dataURI:true)) : new core.AJAXFileURIUploadStrategy();
+    var uploadStrategy = images ? new core.AJAXImageUploadStrategy(new core.ImageSize.scaleMethodLimitToOuterBox(element.clientWidth, 500), new core.ImageSize.scaleMethodLimitToOuterBox(70, 70, dataURI:true)) : new core.AJAXFileUploadStrategy();
     ;
     var uploader = new core.FileUploader(uploadStrategy);
     var container = new EditorFileContainer(new DivElement(), uploadIcon);

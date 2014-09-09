@@ -33,8 +33,8 @@ class PageOrderJSONObjectImplTest extends PHPUnit_Framework_TestCase{
 
         $object = new PageOrderJSONObjectImpl($pageOrder);
 
-        $this->assertEquals([null => [$page1->jsonObjectSerialize(), $page2->jsonObjectSerialize()], "id1" => [$page3->jsonObjectSerialize()]], $object->getVariable('order'));
-        $this->assertEquals([$page4->jsonObjectSerialize()], $object->getVariable('inactive'));
+        $this->assertEquals([null => [$page1, $page2], "id1" => [$page3]], $object->getVariable('order'));
+        $this->assertEquals([$page4], $object->getVariable('inactive'));
         $this->assertEquals('page_order', $object->getName());
 
     }

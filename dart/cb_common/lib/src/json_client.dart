@@ -3,7 +3,6 @@ part of json;
 abstract class JSONClient {
   String urlPrefix = "";
 
-  Future<JSONResponse> callFunction(JSONFunction function, [void progress(double pct)]);
 
   Future<JSONResponse> callFunctionString(String function, {void progress(double pct), List<FormData> form_data:[]});
 }
@@ -36,12 +35,6 @@ class AJAXJSONClient extends JSONClient {
     return completer.future;
   }
 
-  Future<JSONResponse> callFunction(JSONFunction function, [void progress(double pct)]) {
-    debug(function.jsonString);
-    throw "ERROR: Function is depricated.";
-
-
-  }
   Future<JSONResponse> callFunctionString(String function, {void progress(double pct), FormData form_data:null}) {
     var request = new HttpRequest();
     var future = _setUpRequest(request);
@@ -54,8 +47,8 @@ class AJAXJSONClient extends JSONClient {
     } else {
       request.open("GET", urlPrefix + "?ajax=$function");
       debug("GET: "+urlPrefix + "?ajax=$function");
+      request.send();
     }
-    request.send();
     return future;
   }
 
@@ -63,6 +56,7 @@ class AJAXJSONClient extends JSONClient {
     if (progress != null) {
       var f = (ProgressEvent evt) => evt.total == 0?0:progress(evt.loaded / evt.total);
       request.onLoad.listen(f);
+      request.onLoadEnd.listen(f);
       request.onProgress.listen(f);
     }
   }

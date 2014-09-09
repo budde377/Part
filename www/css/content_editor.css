@@ -508,7 +508,7 @@
 .edit_content_wrapper .menu.history_menu ul.history_list > li {
     height: 50px;
     width: 50px;
-    line-height: 50px;
+    line-height: 50px !important;
     margin: 0 10px 10px 0;
     background-color: #fff;
     float: left;

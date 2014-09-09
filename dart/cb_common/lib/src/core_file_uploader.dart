@@ -1,26 +1,5 @@
 part of core;
 
-/*
-class ImageSizes {
-
-  final int maxHeight, maxWidth, minWidth, minHeight;
-
-  final bool dataURI;
-
-  ImageSizes.atLeast(this.minWidth, this.minHeight, {bool dataURI:false}): maxWidth = -1, maxHeight = -1, this.dataURI = dataURI;
-
-  ImageSizes.atMost(this.maxWidth, this.maxHeight, {bool dataURI:false}): minWidth =-1, minHeight = -1, this.dataURI = dataURI;
-
-  ImageSizes.exactHeight(int height, {bool dataURI:false}): maxHeight = height, minHeight = height, maxWidth = -1, minWidth = -1, this.dataURI = dataURI;
-
-  ImageSizes.exactWidth(int width, {bool dataURI:false}) : maxWidth = width, minWidth = width, maxHeight = -1, minHeight = -1, this.dataURI = dataURI;
-
-  ImageSizes.exact(int width, int height, {bool dataURI:false}) : maxWidth = width, minWidth = width, maxHeight = height, minHeight = height, this.dataURI = dataURI;
-
-  Map<String, int> toJson() => {
-      "maxHeight":maxHeight, "minHeight":minHeight, "maxWidth":maxWidth, "minWidth":minWidth, "dataURI":dataURI
-  };
-}*/
 class ImageSize {
 
   static const SCALE_METHOD_EXACT = 0;
@@ -63,6 +42,8 @@ class ImageSize {
   Map<String, int> toJson() => {
       "height":height, "width":width, "scaleMethod" : scaleMethod, "dataURI":dataURI
   };
+
+  String toFunctionString() => '["height" => $height, "width"=>$width, "scaleMethod" => $scaleMethod, "dataURI"=>$dataURI]';
 }
 
 
@@ -132,7 +113,8 @@ abstract class UploadStrategy {
 
   void upload(FileProgress fileProgress, String data, {void callback(String path):null, void progress(double pct):null});
 
-  void read(FileReader reader, File file);
+  void uploadFile(FileProgress fileProgress, {void callback(String path):null, void progress(double pct):null});
+
 
   static const Pattern FILTER_IMAGE = "image/";
 
@@ -140,29 +122,37 @@ abstract class UploadStrategy {
 
 }
 
-class AJAXImageURIUploadStrategy extends UploadStrategy {
+class AJAXImageUploadStrategy extends UploadStrategy {
 
 
-  List<ImageSize> _sizes;
+  Map<String, ImageSize> _sizes;
 
   ImageSize _size, _preview;
 
-  AJAXImageURIUploadStrategy([ImageSize size = null, ImageSize preview = null]) {
+  AJAXImageUploadStrategy(ImageSize size, ImageSize preview) {
     _size = size;
     _preview = preview;
-    _sizes = [size, preview];
-    _sizes.removeWhere((ImageSize s) => s == null);
     filter = UploadStrategy.FILTER_IMAGE;
 
   }
 
-  void upload(FileProgress fileProgress, String data, {void callback(String path):null, void progress(num pct):null}) {
-    fileProgress.previewPath = data;
-    if (progress == null) {
-      progress = (_) {
-      };
-    }
-    ajaxClient.callFunction(new UploadImageURIJSONFunction(fileProgress.file.name, data, _sizes), progress).then((JSONResponse response) {
+  void uploadFile(FileProgress fileProgress, {void callback(String path):null, void progress(double pct):null}) {
+    var reader = new FileReader();
+    reader.onLoadEnd.listen((_) {
+      fileProgress.previewPath = reader.result;
+    });
+    reader.readAsDataUrl(fileProgress.file);
+    var form_data = new FormData();
+    form_data.appendBlob('file', fileProgress.file, fileProgress.file.name);
+
+    var sizesString = "[";
+    sizesString += "'size'=>" + _size.toFunctionString();
+    sizesString += ", ";
+    sizesString += "'preview'=>" + _preview.toFunctionString();
+    sizesString += "]";
+
+
+    ajaxClient.callFunctionString("ImageFile.uploadFile(FILES['file'], $sizesString )", progress:progress, form_data:form_data).then((JSONResponse response) {
       progress(1);
       var c = (String path) {
         fileProgress.path = path;
@@ -171,27 +161,25 @@ class AJAXImageURIUploadStrategy extends UploadStrategy {
         }
       };
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
-        c(_size == null ? response.payload['path'] : response.payload['thumbs'][0]);
-        if (_preview != null) {
-          fileProgress.previewPath = response.payload['thumbs'][1];
-        }
+        fileProgress.previewPath = response.payload['sizes']['preview'];
+        c(response.payload['sizes']['size']);
       } else {
         c(null);
       }
     });
   }
 
-  void read(FileReader reader, File file) => reader.readAsDataUrl(file);
-
 }
 
-class AJAXFileURIUploadStrategy extends UploadStrategy {
+class AJAXFileUploadStrategy extends UploadStrategy {
 
 
-  AJAXFileURIUploadStrategy() ;
+  AJAXFileUploadStrategy() ;
 
-  void upload(FileProgress fileProgress, String data, {void callback(String path):null, void progress(num pct):null}) {
-    ajaxClient.callFunction(new UploadFileURIJSONFunction(fileProgress.file.name, data)).then((JSONResponse response) {
+  void uploadFile(FileProgress fileProgress, {void callback(String path):null, void progress(double pct):null}) {
+    var formData = new FormData();
+    formData.appendBlob("file", fileProgress.file, fileProgress.file.name);
+    ajaxClient.callFunctionString("File.uploadFile(FILES['file'])", progress:progress, form_data:formData).then((JSONResponse response) {
       if (progress != null) {
         progress(1);
       }
@@ -201,11 +189,11 @@ class AJAXFileURIUploadStrategy extends UploadStrategy {
           callback(path);
         }
       };
-      c(response.type == Response.RESPONSE_TYPE_SUCCESS ? response.payload['path'] : null);
+      c(response.type == Response.RESPONSE_TYPE_SUCCESS ? response.payload : null);
     });
   }
 
-  void read(FileReader reader, File file) => reader.readAsDataUrl(file);
+
 
 }
 
@@ -217,9 +205,6 @@ class FileUploader {
 
   List<File> _queue = new List<File>();
 
-  File _currentFile;
-
-  FileProgress _currentFileProcess;
 
   int _size = 0, _uploaded = 0, _currentlyUploading = 0;
 
@@ -230,9 +215,9 @@ class FileUploader {
   Stream<FileUploader> _progress_stream, _upload_done_stream;
 
 
-  FileUploader.ajaxImages([ImageSize size = null, ImageSize preview = null]):this(new AJAXImageURIUploadStrategy(size, preview));
+  FileUploader.ajaxImages([ImageSize size = null, ImageSize preview = null]):this(new AJAXImageUploadStrategy(size, preview));
 
-  FileUploader.ajaxFiles():this(new AJAXFileURIUploadStrategy());
+  FileUploader.ajaxFiles():this(new AJAXFileUploadStrategy());
 
 
   FileUploader(this.uploadStrategy) {
@@ -241,12 +226,6 @@ class FileUploader {
     _upload_done_stream = _upload_done_controller.stream.asBroadcastStream();
     _file_added_to_queue_stream = _file_added_to_queue_controller.stream.asBroadcastStream();
 
-    _reader.onProgress.listen((ProgressEvent pe) => _currentFileProcess.progress = pe.loaded / (pe.total * 2));
-    _reader.onLoadEnd.listen((_) {
-      var fp = _currentFileProcess;
-      uploadStrategy.upload(_currentFileProcess, _reader.result, progress:(double pct) => fp.progress = 0.5 + pct / 2);
-      _startUpload();
-    });
   }
 
   double get progress => (_uploaded + _currentlyUploading) / _size;
@@ -285,10 +264,11 @@ class FileUploader {
       _notifyUploadDone();
       return;
     }
-    _currentFile = _queue.removeAt(0);
-    _currentFileProcess = new FileProgress(_currentFile);
-    uploadStrategy.read(_reader, _currentFile);
 
+    var fp = new FileProgress(_queue.removeAt(0));
+
+    uploadStrategy.uploadFile(fp, progress:(double pct) => fp.progress = 0.5 + pct / 2);
+    _startUpload();
   }
 
   Stream<FileUploader> get onProgress => _progress_stream;

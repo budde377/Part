@@ -39,7 +39,7 @@ class ImageEditProperties {
           _cropH = int.parse(vars[3]);
           break;
         case 'R':
-          _rotate = int.parse(vars[0]);
+          _rotate = int.parse(vars[0])~/90;
           break;
         case 'M':
           _mirrorVertical = int.parse(vars[0]) > 0;
@@ -96,6 +96,33 @@ class ImageEditProperties {
                                             p.mirrorVertical == mirrorVertical;
 
   int get hashCode => "${cropW}${cropH}${cropX}${cropY}${rotate}${width}${height}${mirrorHorizontal}${mirrorVertical}".hashCode;
+
+
+  String toFunctionString(){
+    var  src = url.split("_files").toList()[1];
+    var functionString = "ImageFile.getFile(${core.quoteString(src)})";
+
+    if(width != null && height != null ){
+      functionString += ".forceSize(${width}, ${height})";
+    }
+
+    if(cropX != null && cropY != null && cropH != null && cropW != null){
+      functionString += ".crop(${cropX}, ${cropY}, ${cropW}, ${cropH})";
+    }
+
+    if(rotate != 0){
+      functionString += ".rotate(${rotate*90})";
+    }
+
+    if(mirrorHorizontal){
+      functionString += ".mirrorHorizontal()";
+    }
+
+    if(mirrorVertical){
+      functionString += ".mirrorVertical()";
+    }
+    return functionString;
+  }
 
   //TODO write better get hashcode
 }
@@ -506,7 +533,10 @@ class ImageEditorHandler {
       _savingBar.append(pb.bar);
       _savingBar.classes.add("saving");
       _saving = true;
-      ajaxClient.callFunction(new ImagePropertiesEditImageContentJSONFunction(p)).then((JSONResponse response){
+
+
+
+      ajaxClient.callFunctionString(p.toFunctionString()+".getPath()").then((JSONResponse response){
         if(response.type != core.Response.RESPONSE_TYPE_SUCCESS){
           return;
         }
@@ -515,7 +545,7 @@ class ImageEditorHandler {
           _savingBar.classes.remove("saving");
           pb.bar.remove();
         });
-        editor.image.src = response.payload;
+        editor.image.src = "/_files/"+response.payload;
         _properties = p;
         _saving = false;
         _editStreamController.add(p);

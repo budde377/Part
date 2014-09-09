@@ -20,7 +20,7 @@ class UserLibraryJSONObjectImplTest extends  PHPUnit_Framework_TestCase{
 
         $object = new UserLibraryJSONObjectImpl($userLib);
 
-        $this->assertEquals([$user1->jsonObjectSerialize(), $user2->jsonObjectSerialize()], $object->getVariable('users'));
+        $this->assertEquals([$user1, $user2], $object->getVariable('users'));
         $this->assertEquals('user_library', $object->getName());
 
     }

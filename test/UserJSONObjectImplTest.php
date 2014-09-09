@@ -29,7 +29,7 @@ class UserJSONObjectImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($userName,$jsonObject->getVariable('username'));
         $this->assertEquals($mail,$jsonObject->getVariable('mail'));
         $this->assertEquals($parent,$jsonObject->getVariable('parent'));
-        $this->assertEquals($privileges->jsonObjectSerialize(),$jsonObject->getVariable('privileges'));
+        $this->assertEquals($privileges,$jsonObject->getVariable('privileges'));
         $this->assertEquals($lastLogin,$jsonObject->getVariable('last-login'));
     }
 
