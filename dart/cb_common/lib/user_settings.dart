@@ -123,16 +123,17 @@ class UserSettingsLoggerInitializer extends core.Initializer {
     _logTable.querySelectorAll(".dumpfile a").forEach((AnchorElement a) {
       a.onClick.listen((MouseEvent evt) {
         var loader = dialogContainer.loading("Henter log filen");
-        ajaxClient.callFunctionString("Logger.getContextAt(${a.dataset["id"]})").then((JSONResponse resp) {
+        logger.contextAt(new DateTime.fromMillisecondsSinceEpoch(int.parse(a.dataset["id"])*1000)).then((ChangeResponse<Map> resp) {
           if (resp.type != core.Response.RESPONSE_TYPE_SUCCESS) {
             loader.close();
             return;
           }
+
           var button = new ButtonElement(), pre = new PreElement();
           button.text = "Luk";
           button.onClick.listen((_) => loader.close());
           pre.classes.add("code");
-          pre.text = resp.payload;
+          pre.text = resp.payload.toString();
           loader.element
             ..children.clear()
             ..append(pre)
@@ -148,7 +149,7 @@ class UserSettingsLoggerInitializer extends core.Initializer {
 
 
     _logLink.onClick.listen((MouseEvent evt) {
-      ajaxClient.callFunctionString("Logger.clearLog()").then((JSONResponse response) {
+      logger.clearLog().then((ChangeResponse<Logger> response) {
         if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
           _logTable.querySelectorAll("tr:not(.empty_row)").forEach((TableRowElement li) => li.remove());
           _logTable.classes.add("empty");
@@ -184,7 +185,7 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
       _updateCheckButton(true);
       if (!_canBeUpdated) {
 
-        _client.callFunctionString("Updater.checkForUpdates()").then((JSONResponse response) {
+        updater.checkForUpdates().then((core.Response<bool> response) {
           _checkTime.text = core.dateString(new DateTime.now());
           if (response.type != core.Response.RESPONSE_TYPE_SUCCESS) {
             _canBeUpdated = false;
@@ -247,7 +248,7 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
     });
 
     var loader = dialogContainer.loading("Opdaterer websitet.<br />Luk ikke din browser!");
-    _client.callFunctionString("Updater.update()").then((JSONResponse response) {
+    updater.update().then((core.Response response) {
       if (response.type == core.Response.RESPONSE_TYPE_ERROR) {
         loader.close();
         _updateCheckButton();

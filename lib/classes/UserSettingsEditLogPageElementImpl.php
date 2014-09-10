@@ -27,7 +27,7 @@ class UserSettingsEditLogPageElementImpl extends PageElementImpl{
         foreach($l = $log->listLog() as $entry){
             /** @var $entry array */
             $t = $entry['time'];
-            $dumpFile = isset($entry["dumpfile"])?"<a href='#'  data-id='$t' >&nbsp;</a>":"";
+            $dumpFile = isset($entry["context"])?"<a href='#'  data-id='$t' >&nbsp;</a>":"";
             $date = date('j-n-Y \k\l. H:i:s',$t);
             $rows = "
             <tr class='{$this->levelToString($entry['level'], true)}' >

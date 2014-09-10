@@ -10,6 +10,7 @@ part "src/core_animation.dart";
 part "src/core_keep_alive.dart";
 part 'src/core_initializer.dart';
 part 'src/core_file_uploader.dart';
+part 'src/core_function_string_compiler.dart';
 
 
 int parseNumber(String pxString) => int.parse(pxString.replaceAll(new RegExp("[^0-9]"), ""), onError:(_) => 0);
@@ -260,6 +261,8 @@ String dateString(DateTime dt) {
 }
 
 String quoteString(String string, [String quote = '"']) => quote+(string.replaceAll(quote, r"\"+quote))+quote;
+
+
 
 
 abstract class Response<V>{

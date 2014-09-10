@@ -12,6 +12,7 @@ part "src/site_class_page_order.dart";
 part "src/site_class_user.dart";
 part "src/site_class_user_library.dart";
 part 'src/site_class_logger.dart';
+part 'src/site_class_updater.dart';
 
 class ChangeResponse<V> extends Response<V>{
 
@@ -21,10 +22,7 @@ class ChangeResponse<V> extends Response<V>{
 
 }
 
-
-
-
-
-
+Logger get logger => new AJAXLogger();
+Updater get updater => new AJAXUpdater();
 
 
