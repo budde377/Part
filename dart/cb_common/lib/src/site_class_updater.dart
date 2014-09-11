@@ -26,8 +26,9 @@ class AJAXUpdater extends Updater{
     ajaxClient.callFunctionString("Updater.update()").then((Response r){
       if(r.type == Response.RESPONSE_TYPE_SUCCESS){
         c.complete(new ChangeResponse.success(this));
+      } else {
+        c.complete(new ChangeResponse.error(r.error_code));
       }
-      c.complete(new ChangeResponse.error(r.error_code));
     });
     return c.future;
   }
@@ -36,8 +37,9 @@ class AJAXUpdater extends Updater{
     ajaxClient.callFunctionString("Updater.lastChecked()").then((Response<int> r){
       if(r.type == Response.RESPONSE_TYPE_SUCCESS){
         c.complete(new ChangeResponse.success(new DateTime.fromMillisecondsSinceEpoch(r.payload*1000)));
+      } else {
+        c.complete(new ChangeResponse.error(r.error_code));
       }
-      c.complete(new ChangeResponse.error(r.error_code));
     });
     return c.future;
   }
@@ -46,8 +48,9 @@ class AJAXUpdater extends Updater{
     ajaxClient.callFunctionString("Updater.lastChecked()").then((Response<int> r){
       if(r.type == Response.RESPONSE_TYPE_SUCCESS){
         c.complete(new ChangeResponse.success(new DateTime.fromMillisecondsSinceEpoch(r.payload*1000)));
+      } else {
+        c.complete(new ChangeResponse.error(r.error_code));
       }
-      c.complete(new ChangeResponse.error(r.error_code));
     });
     return c.future;
   }
