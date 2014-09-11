@@ -85,7 +85,6 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
         }
 
         call_user_func_array(array($this, 'whitelistType'), array_slice(func_get_args(), 1));
-
     }
 
 
@@ -252,7 +251,11 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
             if (!in_array($arg, $this->types)) {
                 continue;
             }
+            if (isset($this->alias[$arg])) {
+                call_user_func_array([$this, "whitelistType"], $this->alias[$arg]);
+            }
             $this->typeWhitelist[] = $arg;
+
         }
 
     }

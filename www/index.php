@@ -9,22 +9,15 @@
  */
 session_start();
 
-// LOCAL AUTOLOADERS
-
-require dirname(__FILE__) . "/../AutoLoader.php";
-
-AutoLoader::registerAutoloader();
-AutoLoader::registerDirectory(dirname(__FILE__) . "/../lib");
-AutoLoader::registerDirectory(dirname(__FILE__) . "/../../lib");
 // LOAD COMPOSER
-@include dirname(__FILE__) . '/../../vendor/autoload.php';
+@include '../vendor/autoload.php';
 // PROVIDE A WAY TO INITIALIZE SITE FACTORY
-@include dirname(__FILE__) . '/../../vendor/local.php';
+@include '../local.php';
 
 date_default_timezone_set("Europe/Copenhagen");
 /** @var $siteConfig SimpleXMLElement */
 $siteConfig = simplexml_load_file('../site-config.xml');
-$config = new ChristianBudde\cbweb\ConfigImpl($siteConfig, dirname(__FILE__) . '/../../');
+$config = new ChristianBudde\cbweb\ConfigImpl($siteConfig, '../');
 
 $factory = isset($factory) ? $factory : new ChristianBudde\cbweb\SiteFactoryImpl($config);
 
