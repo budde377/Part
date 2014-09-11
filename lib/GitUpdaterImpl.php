@@ -89,6 +89,7 @@ class GitUpdaterImpl implements Updater
         foreach ($this->subUpdaters as $updater) {
             $updater->update();
         }
+        $this->exec("make update");
         $this->canBeUpdated = false;
         $this->site->getVariables()->setValue("can_be_updated", 0);
         $this->site->modify();
