@@ -5,6 +5,13 @@
  * Date: 8/31/14
  * Time: 7:33 PM
  */
+use ChristianBudde\cbweb\JSONElement;
+use ChristianBudde\cbweb\GenericObjectAJAXTypeHandlerImpl;
+use ChristianBudde\cbweb\FunctionStringParserImpl;
+use ChristianBudde\cbweb\JSONObjectImpl;
+use ChristianBudde\cbweb\JSONFunction;
+use ChristianBudde\cbweb\JSONResponse;
+use ChristianBudde\cbweb\JSONResponseImpl;
 
 class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
 
@@ -14,7 +21,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
     private $handler;
 
     private $nullAJAXServer;
-    /** @var  FunctionStringParser */
+    /** @var  FunctionStringParserImpl */
     private $parser;
     private $falseFunction;
     private $trueFunction;
@@ -38,16 +45,18 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
     public function testListTypesGetsFromObject(){
         $list = $this->handler->listTypes();
         $this->assertTrue(is_array($list));
-        $this->assertEquals(3, count($list));
+        $this->assertEquals(5, count($list));
         $this->assertEquals('JsonSerializable', $list[0]);
-        $this->assertEquals('JSONElement', $list[1]);
-        $this->assertEquals('JSONObject', $list[2]);
+        $this->assertEquals('ChristianBudde\cbweb\JSONElement', $list[1]);
+        $this->assertEquals('ChristianBudde\cbweb\JSONObject', $list[2]);
+        $this->assertEquals('JSONElement', $list[3]);
+        $this->assertEquals('JSONObject', $list[4]);
     }
 
     public function testWhitelistTypeOfNonExistingTypeDoesNothing(){
         $this->handler->whitelistType('Page');
         $list = $this->handler->listTypes();
-        $this->assertEquals(3, count($list));
+        $this->assertEquals(5, count($list));
 
 
     }
@@ -104,9 +113,8 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
     }
 
     public function testListFunctionsListsFunctions(){
-        $this->handler->setUp($this->nullAJAXServer, 'JsonSerializable');
-        $this->handler->setUp($this->nullAJAXServer, 'JSONElement');
-        $this->handler->setUp($this->nullAJAXServer, 'JSONObject');
+
+        $this->setUpHandler($this->handler);
 
         $list = $this->handler->listFunctions('JsonSerializable');
         $this->assertTrue(is_array($list));
@@ -133,12 +141,11 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
     public function testWhitelistFunctionDoesWhitelist(){
 
         $this->handler->whitelistFunction('JSONElement', 'getAsJSONString');
-        $this->handler->setUp($this->nullAJAXServer, 'JSONElement');
+        $this->setUpHandler($this->handler);
         $this->handler->whitelistFunction('JSONElement', 'jsonSerialize');
         $list = $this->handler->listFunctions('JSONElement');
-        $this->assertEquals(2, count($list));
-        $this->assertEquals('getAsJSONString', $list[0]);
-        $this->assertEquals('jsonSerialize', $list[1]);
+        $this->assertEquals(['getAsJSONString', 'jsonSerialize'], $list);
+
     }
 
     public function testWhitelistFunctionDoesWhitelistWithMultiple(){
@@ -146,9 +153,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
         $this->handler->whitelistFunction('JSONElement', 'getAsJSONString', 'jsonSerialize');
         $this->handler->setUp($this->nullAJAXServer, 'JSONElement');
         $list = $this->handler->listFunctions('JSONElement');
-        $this->assertEquals(2, count($list));
-        $this->assertEquals('getAsJSONString', $list[0]);
-        $this->assertEquals('jsonSerialize', $list[1]);
+        $this->assertEquals(['getAsJSONString', 'jsonSerialize'], $list);
     }
 
     public function testWhitelistFunctionWorksWhenAddingFunctionLater(){
@@ -252,11 +257,11 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
         $this->assertTrue($this->handler->canHandle('JSONElement', $f));
         /** @var JSONResponse $r */
         $this->handler->handle('JSONElement',$f);
-        $this->assertEquals(['JSONElement', $this->object, 'getAsJSONString', ['test',123]],$args);
+        $this->assertEquals(['ChristianBudde\cbweb\JSONElement', $this->object, 'getAsJSONString', ['test',123]],$args);
 
         $o = new JSONObjectImpl('someNewObject');
         $this->handler->handle('JSONElement',$f, $o);
-        $this->assertEquals(['JSONElement', $o, 'getAsJSONString', ['test',123]],$args);
+        $this->assertEquals(['ChristianBudde\cbweb\JSONElement', $o, 'getAsJSONString', ['test',123]],$args);
     }
 
     public function testFunctionAuthFunctionIsPassedRightArguments(){
@@ -271,11 +276,11 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
         $this->assertTrue($this->handler->canHandle('JSONElement', $f));
         /** @var JSONResponse $r */
         $this->handler->handle('JSONElement',$f);
-        $this->assertEquals(['JSONElement', $this->object, 'getAsJSONString', ['test',123]],$args);
+        $this->assertEquals(['ChristianBudde\cbweb\JSONElement', $this->object, 'getAsJSONString', ['test',123]],$args);
 
         $o = new JSONObjectImpl('someNewObject');
         $this->handler->handle('JSONElement',$f, $o);
-        $this->assertEquals(['JSONElement', $o, 'getAsJSONString', ['test',123]],$args);
+        $this->assertEquals(['ChristianBudde\cbweb\JSONElement', $o, 'getAsJSONString', ['test',123]],$args);
     }
 
     public function testTypeAuthFunctionIsPassedRightArguments(){
@@ -290,11 +295,11 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
         $this->assertTrue($this->handler->canHandle('JSONElement', $f));
         /** @var JSONResponse $r */
         $this->handler->handle('JSONElement',$f);
-        $this->assertEquals(['JSONElement', $this->object, 'getAsJSONString', ['test',123]],$args);
+        $this->assertEquals(['ChristianBudde\cbweb\JSONElement', $this->object, 'getAsJSONString', ['test',123]],$args);
 
         $o = new JSONObjectImpl('someNewObject');
         $this->handler->handle('JSONElement',$f, $o);
-        $this->assertEquals(['JSONElement', $o, 'getAsJSONString', ['test',123]],$args);
+        $this->assertEquals(['ChristianBudde\cbweb\JSONElement', $o, 'getAsJSONString', ['test',123]],$args);
     }
 
     public function testHandleCallsWithRightArguments(){
@@ -317,7 +322,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
         $this->assertTrue($this->handler->canHandle('JSONElement', $f));
         /** @var JSONResponse $r */
         $r = $this->handler->handle('JSONElement',$f);
-        $this->assertInstanceOf('JSONResponse', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $r);
         $this->assertEquals(JSONResponse::RESPONSE_TYPE_ERROR, $r->getResponseType());
         $this->assertEquals(JSONResponse::ERROR_CODE_UNAUTHORIZED, $r->getErrorCode());
     }
@@ -330,7 +335,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
         $this->assertTrue($this->handler->canHandle('JSONElement', $f));
         /** @var JSONResponse $r */
         $r = $this->handler->handle('JSONElement',$f);
-        $this->assertInstanceOf('JSONResponse', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $r);
         $this->assertEquals(JSONResponse::RESPONSE_TYPE_ERROR, $r->getResponseType());
         $this->assertEquals(JSONResponse::ERROR_CODE_UNAUTHORIZED, $r->getErrorCode());
     }
@@ -343,7 +348,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
         $this->assertTrue($this->handler->canHandle('JSONElement', $f));
         /** @var JSONResponse $r */
         $r = $this->handler->handle('JSONElement',$f);
-        $this->assertInstanceOf('JSONResponse', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $r);
         $this->assertEquals(JSONResponse::RESPONSE_TYPE_ERROR, $r->getResponseType());
         $this->assertEquals(JSONResponse::ERROR_CODE_UNAUTHORIZED, $r->getErrorCode());
     }
@@ -414,9 +419,9 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
 
         $this->handler->handle('JSONElement', $f);
         $this->assertEquals([
-            ['JSONElement', $this->object, 'custom', [1]],
-            ['JSONElement', $this->object, 'custom', [1,2]],
-            ['JSONElement', $this->object, 'custom', [1,2,3]]
+            ['ChristianBudde\cbweb\JSONElement', $this->object, 'custom', [1]],
+            ['ChristianBudde\cbweb\JSONElement', $this->object, 'custom', [1,2]],
+            ['ChristianBudde\cbweb\JSONElement', $this->object, 'custom', [1,2,3]]
 
     ], $a);
         $this->assertEquals([$this->object, 1,2,3], $args);
@@ -445,9 +450,9 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
 
         $r = $this->handler->handle('JSONElement', $f);
         $this->assertEquals([
-            ['JSONElement', $this->object, 'custom', [1,2]],
-            ['JSONElement', $this->object, 'custom', [1,2,3]],
-            ['JSONElement', $this->object, 'custom', [1,2,3,4]]
+            ['ChristianBudde\cbweb\JSONElement', $this->object, 'custom', [1,2]],
+            ['ChristianBudde\cbweb\JSONElement', $this->object, 'custom', [1,2,3]],
+            ['ChristianBudde\cbweb\JSONElement', $this->object, 'custom', [1,2,3,4]]
 
     ], $a);
         $this->assertEquals([ 1,2,3,4], $r);
@@ -474,12 +479,14 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
     }
 
     public function testStringToConstructorDoesNotAddDefaultInstance(){
-        $handler = new GenericObjectAJAXTypeHandlerImpl("User");
+        $handler = new GenericObjectAJAXTypeHandlerImpl("ChristianBudde\\cbweb\\User");
+        $this->assertTrue($handler->hasType("ChristianBudde\\cbweb\\User"));
         $this->assertTrue($handler->hasType("User"));
         $handler->setUp(new NullAJAXServerImpl(), 'User');
         /** @var JSONFunction $f */
 
         $f = $this->parser->parseFunctionString('User.getName()');
+
         $r = $handler->handle('User', $f);
 
         $this->assertEquals(new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION), $r);
@@ -487,7 +494,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
     }
 
     public function testStringToConstructorCanCallCustomFunctions(){
-        $handler = new GenericObjectAJAXTypeHandlerImpl("User");
+        $handler = new GenericObjectAJAXTypeHandlerImpl("ChristianBudde\\cbweb\\User");
         $this->assertTrue($handler->hasType("User"));
         $handler->setUp(new NullAJAXServerImpl(), 'User');
         $args = [];
@@ -516,13 +523,26 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
 
 
     public function testStringOfActualTypeDoesAddTypesAndFunctions(){
-        $handler = new GenericObjectAJAXTypeHandlerImpl("JSONObject");
+        $handler = new GenericObjectAJAXTypeHandlerImpl("ChristianBudde\\cbweb\\JSONObject");
         $this->assertTrue($handler->hasType("JSONElement"));
 
-        $handler = new GenericObjectAJAXTypeHandlerImpl("JSONObject");
+        $handler = new GenericObjectAJAXTypeHandlerImpl("ChristianBudde\\cbweb\\JSONObject");
         $this->assertTrue($handler->hasType("JSONElement"));
 
 
+    }
+
+    public function testSetUpBogusElementIsOk(){
+        $handler = new GenericObjectAJAXTypeHandlerImpl("NonExistingObject");
+        $this->setUpHandler($handler);
+
+    }
+
+    private function setUpHandler(\ChristianBudde\cbweb\AJAXTypeHandler $handler)
+    {
+        foreach($handler->listTypes() as $type){
+            $handler->setUp($this->nullAJAXServer, $type);
+        }
     }
 
 

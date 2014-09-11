@@ -1,4 +1,5 @@
 <?php
+use ChristianBudde\cbweb\RequestHelper;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

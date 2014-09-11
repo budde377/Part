@@ -7,7 +7,8 @@
  * Time: 4:27 PM
  * To change this template use File | Settings | File Templates.
  */
-class StubObserverImpl implements Observer
+use ChristianBudde\cbweb\Observable;
+class StubObserverImpl implements \ChristianBudde\cbweb\Observer
 {
 
     private $hasBeenCalled = false;

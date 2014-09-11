@@ -6,14 +6,14 @@
  * Time: 5:00 PM
  */
 
-class NullAJAXServerImpl implements AJAXServer{
+class NullAJAXServerImpl implements ChristianBudde\cbweb\AJAXServer{
 
     /**
      * Registers a AJAX type.
-     * @param AJAXTypeHandler $type
+     * @param ChristianBudde\cbweb\AJAXTypeHandler $type
      * @return void
      */
-    public function registerHandler(AJAXTypeHandler $type)
+    public function registerHandler(ChristianBudde\cbweb\AJAXTypeHandler $type)
     {
     }
 
@@ -27,7 +27,7 @@ class NullAJAXServerImpl implements AJAXServer{
 
     /**
      * @param string $input
-     * @return JSONResponse
+     * @return ChristianBudde\cbweb\JSONResponse
      */
     public function handleFromJSONString($input)
     {
@@ -35,14 +35,14 @@ class NullAJAXServerImpl implements AJAXServer{
 
     /**
      * @param string $input
-     * @return JSONResponse
+     * @return ChristianBudde\cbweb\JSONResponse
      */
     public function handleFromFunctionString($input)
     {
     }
 
     /**
-     * @return JSONResponse
+     * @return ChristianBudde\cbweb\JSONResponse
      */
     public function handleFromRequestBody()
     {

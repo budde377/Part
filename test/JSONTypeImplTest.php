@@ -5,6 +5,7 @@
  * Date: 8/28/14
  * Time: 1:01 PM
  */
+use ChristianBudde\cbweb\JSONTypeImpl;
 
 class JSONTypeImplTest extends PHPUnit_Framework_TestCase{
 

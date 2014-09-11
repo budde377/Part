@@ -5,6 +5,8 @@
  * Date: 5/17/14
  * Time: 4:52 PM
  */
+use ChristianBudde\cbweb\StubLogFileImpl;
+use ChristianBudde\cbweb\Logger;
 
 class StubLogFileImplTest extends PHPUnit_Framework_TestCase{
     /** @var  StubLogFileImpl */
@@ -42,7 +44,7 @@ class StubLogFileImplTest extends PHPUnit_Framework_TestCase{
     }
 
     public function testLogDoesReturnFile(){
-        $this->assertInstanceOf("StubDumpFileImpl", $this->logFile->log("MSG", Logger::LOG_LEVEL_ERROR, true));
+        $this->assertInstanceOf("ChristianBudde\cbweb\StubDumpFileImpl", $this->logFile->log("MSG", Logger::LOG_LEVEL_ERROR, true));
     }
 
 } 

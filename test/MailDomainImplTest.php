@@ -5,6 +5,11 @@
  * Date: 7/7/14
  * Time: 1:50 PM
  */
+use ChristianBudde\cbweb\MailDomainImpl;
+use ChristianBudde\cbweb\Config;
+use ChristianBudde\cbweb\DB;
+use ChristianBudde\cbweb\MySQLDBImpl;
+use ChristianBudde\cbweb\MailDomain;
 
 class MailDomainImplTest extends CustomDatabaseTestCase{
 
@@ -321,8 +326,8 @@ class MailDomainImplTest extends CustomDatabaseTestCase{
     }
 
     public function testGetAddressLibraryReturnsRightInstance(){
-        $this->assertInstanceOf('MailAddressLibraryImpl', $a = $this->domain->getAddressLibrary());
-        $this->assertInstanceOf('MailAddressLibrary', $a);
+        $this->assertInstanceOf('ChristianBudde\cbweb\MailAddressLibraryImpl', $a = $this->domain->getAddressLibrary());
+        $this->assertInstanceOf('ChristianBudde\cbweb\MailAddressLibrary', $a);
         $this->assertTrue($this->domain === $a->getDomain());
     }
 

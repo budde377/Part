@@ -1,4 +1,7 @@
 <?php
+use ChristianBudde\cbweb\JSONResponse;
+use ChristianBudde\cbweb\JSONResponseImpl;
+use ChristianBudde\cbweb\JSONObjectImpl;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

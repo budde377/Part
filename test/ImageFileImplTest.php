@@ -1,4 +1,11 @@
 <?php
+
+use ChristianBudde\cbweb\ImageFileImpl;
+use ChristianBudde\cbweb\Folder;
+use ChristianBudde\cbweb\FolderImpl;
+use ChristianBudde\cbweb\ImageFile;
+use ChristianBudde\cbweb\ImageFileJSONObjectImpl;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -36,7 +43,7 @@ class ImageFileImplTest extends PHPUnit_Framework_TestCase
     public function testCopyWillReturnInstanceOfImageFile(){
         $f = $this->imageFile->copy($this->imageFile->getParentFolder()->getAbsolutePath().'/imgStub2.png');
         $f->delete();
-        $this->assertInstanceOf('ImageFileImpl', $f);
+        $this->assertInstanceOf('ChristianBudde\cbweb\ImageFileImpl', $f);
     }
 
     public function testGetWidthHeightRatioOfNonExistingFileReturnsNull(){

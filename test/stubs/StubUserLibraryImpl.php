@@ -5,7 +5,7 @@
  * Date: 06/08/12
  * Time: 22:24
  */
-class StubUserLibraryImpl implements UserLibrary
+class StubUserLibraryImpl implements ChristianBudde\cbweb\UserLibrary
 {
     private $userList = array();
     private $userLoggedIn;
@@ -21,10 +21,10 @@ class StubUserLibraryImpl implements UserLibrary
 
     /**
      * Will delete user. The user must be instance in library.
-     * @param User $user
+     * @param ChristianBudde\cbweb\User $user
      * @return bool
      */
-    public function deleteUser(User $user)
+    public function deleteUser(ChristianBudde\cbweb\User $user)
     {
         return false;
     }
@@ -36,16 +36,16 @@ class StubUserLibraryImpl implements UserLibrary
      * @param string $username
      * @param string $password
      * @param string $mail
-     * @param User $parent
-     * @return User | bool FALSE on failure else instance of User
+     * @param ChristianBudde\cbweb\User $parent
+     * @return ChristianBudde\cbweb\User | bool FALSE on failure else instance of User
      */
-    public function createUser($username, $password, $mail, User $parent)
+    public function createUser($username, $password, $mail, ChristianBudde\cbweb\User $parent)
     {
         return false;
     }
 
     /**
-     * @return User | null User logged in else null if no user is logged in.
+     * @return ChristianBudde\cbweb\User | null User logged in else null if no user is logged in.
      */
     public function getUserLoggedIn()
     {
@@ -54,13 +54,13 @@ class StubUserLibraryImpl implements UserLibrary
 
     /**
      * @param string $username
-     * @return User | null User if username is found, else null
+     * @return ChristianBudde\cbweb\User | null User if username is found, else null
      */
     public function getUser($username)
     {
         foreach($this->userList as $user){
-            /** @var $user User */
-            if($user instanceof User && $user->getUsername() == $username){
+            /** @var $user ChristianBudde\cbweb\User */
+            if($user instanceof ChristianBudde\cbweb\User && $user->getUsername() == $username){
                 return $user;
             }
 
@@ -72,7 +72,7 @@ class StubUserLibraryImpl implements UserLibrary
         $this->userList = $list;
     }
 
-    public function setUserLoggedIn(User $userLoggedIn=null)
+    public function setUserLoggedIn(ChristianBudde\cbweb\User $userLoggedIn=null)
     {
         $this->userLoggedIn = $userLoggedIn;
     }
@@ -81,19 +81,19 @@ class StubUserLibraryImpl implements UserLibrary
     /**
      *
      * Parameter must be an instance provided from Library.
-     * @param User $user
-     * @return User | null Will return User if the user provided has parent, else null.
+     * @param ChristianBudde\cbweb\User $user
+     * @return ChristianBudde\cbweb\User | null Will return User if the user provided has parent, else null.
      */
-    public function getParent(User $user)
+    public function getParent(ChristianBudde\cbweb\User $user)
     {
     }
 
     /**
      * Input must be instance of User and an instance provided by the library.
-     * @param User $user
+     * @param ChristianBudde\cbweb\User $user
      * @return array Array containing children User instances. Empty array on no children or input not valid.
      */
-    public function getChildren(User $user)
+    public function getChildren(ChristianBudde\cbweb\User $user)
     {
     }
 
@@ -150,11 +150,11 @@ class StubUserLibraryImpl implements UserLibrary
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return JSONObject
+     * @return ChristianBudde\cbweb\JSONObject
      */
     public function jsonObjectSerialize()
     {
-        return new UserLibraryJSONObjectImpl($this);
+        return new ChristianBudde\cbweb\UserLibraryJSONObjectImpl($this);
     }
 
 

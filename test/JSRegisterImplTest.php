@@ -1,4 +1,6 @@
 <?php
+use ChristianBudde\cbweb\JSRegisterImpl;
+use ChristianBudde\cbweb\JSFileImpl;
 
 /**
  * Created by JetBrains PhpStorm.

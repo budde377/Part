@@ -5,7 +5,8 @@
  * Date: 19/11/12
  * Time: 21:12
  */
-class StubConnectionImpl implements Connection
+use ChristianBudde\cbweb\Folder;
+class StubConnectionImpl implements ChristianBudde\cbweb\Connection
 {
     public $isConnected = false;
     public $connectionReturn = true;

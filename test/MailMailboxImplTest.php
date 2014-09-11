@@ -5,7 +5,10 @@
  * Date: 7/8/14
  * Time: 6:08 PM
  */
-
+use ChristianBudde\cbweb\MailAddressLibraryImpl;
+use ChristianBudde\cbweb\MailMailboxImpl;
+use ChristianBudde\cbweb\MailDomainLibraryImpl;
+use ChristianBudde\cbweb\MailMailbox;
 class MailMailboxImplTest extends CustomDatabaseTestCase{
 
 

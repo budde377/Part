@@ -6,7 +6,9 @@
  * Time: 3:53 PM
  * To change this template use File | Settings | File Templates.
  */
-
+use ChristianBudde\cbweb\PageVariablesImpl;
+use ChristianBudde\cbweb\Page;
+use ChristianBudde\cbweb\PageImpl;
 class PageVariablesImplTest extends CustomDatabaseTestCase{
 
     private $db;

@@ -6,7 +6,7 @@
  * Time: 10:58 PM
  */
 
-class StubVariablesImpl implements Variables {
+class StubVariablesImpl implements \ChristianBudde\cbweb\Variables{
 
     private $array;
 

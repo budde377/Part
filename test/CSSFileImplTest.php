@@ -1,4 +1,6 @@
 <?php
+use ChristianBudde\cbweb\CSSFileImpl;
+use ChristianBudde\cbweb\CSSFile;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -17,7 +19,7 @@ class CSSFileImplTest extends PHPUnit_Framework_TestCase
         $cssFile = new CSSFileImpl($file);
         $this->assertTrue($cssFile->exists(), 'File did not exists to begin with');
         $cssCopy = $cssFile->copy($file . '2');
-        $this->assertInstanceOf('CSSFile', $cssCopy);
+        $this->assertInstanceOf('ChristianBudde\cbweb\CSSFile', $cssCopy);
         $cssCopy->delete();
     }
 
@@ -71,7 +73,7 @@ class CSSFileImplTest extends PHPUnit_Framework_TestCase
         $originalContent = $cssFile->getContents();
         /** @var $ret CSSFile */
         $ret = $cssFile->minimize();
-        $this->assertInstanceOf('CSSFile', $ret, 'Did not return CSSFile');
+        $this->assertInstanceOf('ChristianBudde\cbweb\CSSFile', $ret, 'Did not return CSSFile');
         $this->assertEquals($fileCopy . '-original', $ret->getAbsoluteFilePath(), 'Did not return CSSFile with right path');
         $this->assertTrue($cssFile->isMinimized(), 'File was not minimized');
         $this->assertEquals($originalContent, $ret->getContents(), 'Content did not match');

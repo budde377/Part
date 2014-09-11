@@ -1,5 +1,8 @@
 <?php
-
+use ChristianBudde\cbweb\PageOrder;
+use ChristianBudde\cbweb\Page;
+use ChristianBudde\cbweb\PageOrderJSONObjectImpl;
+use ChristianBudde\cbweb\JSONObject;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

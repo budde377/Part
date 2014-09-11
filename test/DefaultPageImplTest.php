@@ -7,6 +7,8 @@
  * To change this template use File | Settings | File Templates.
  */
 
+use ChristianBudde\cbweb\DefaultPageImpl;
+
 class DefaultPageImplTest extends PHPUnit_Framework_TestCase{
     /** @var  DefaultPageImpl */
     private $defaultPage;
@@ -59,12 +61,12 @@ class DefaultPageImplTest extends PHPUnit_Framework_TestCase{
     }
 
     public function testContentIsNullPageContent(){
-        $this->assertInstanceOf('NullContentImpl',$this->defaultPage->getContent());
+        $this->assertInstanceOf('ChristianBudde\cbweb\NullContentImpl',$this->defaultPage->getContent());
     }
 
     public function testPageIsJSONObjectSerializable(){
         $o = $this->defaultPage->jsonObjectSerialize();
-        $this->assertInstanceOf('PageJSONObjectImpl', $o);
+        $this->assertInstanceOf('ChristianBudde\cbweb\PageJSONObjectImpl', $o);
         $this->assertEquals($o->getVariable('title'), $this->defaultPage->getTitle());
 
     }

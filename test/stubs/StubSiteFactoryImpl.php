@@ -1,5 +1,7 @@
 <?php
-
+use ChristianBudde\cbweb\BackendSingletonContainer;
+use ChristianBudde\cbweb\ScriptChain;
+use ChristianBudde\cbweb\Config;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -7,7 +9,7 @@
  * Time: 3:55 PM
  * To change this template use File | Settings | File Templates.
  */
-class StubSiteFactoryImpl implements SiteFactory
+class StubSiteFactoryImpl implements \ChristianBudde\cbweb\SiteFactory
 {
 
     private $preScriptChain;
@@ -19,15 +21,15 @@ class StubSiteFactoryImpl implements SiteFactory
 
     public function __construct()
     {
-        $this->preScriptChain = new ScriptChainImpl();
-        $this->postScriptChain = new ScriptChainImpl();
+        $this->preScriptChain = new \ChristianBudde\cbweb\ScriptChainImpl();
+        $this->postScriptChain = new \ChristianBudde\cbweb\ScriptChainImpl();
     }
 
     /**
      * Builds a new PreScriptChain and returns it. This must contain prescripts specified
      * in some config (it must be ready to run).
      * @param BackendSingletonContainer $backendContainer
-     * @return \ScriptChain
+     * @return ScriptChain
      */
     public function buildPreScriptChain(BackendSingletonContainer $backendContainer)
     {
@@ -38,7 +40,7 @@ class StubSiteFactoryImpl implements SiteFactory
      * Builds a new PostScriptChain and returns it. This must contain prescripts specified
      * in some config (it must be ready to run).
      * @param BackendSingletonContainer $backendContainer
-     * @return \ScriptChain
+     * @return ScriptChain
      */
     public function buildPostScriptChain(BackendSingletonContainer $backendContainer)
     {

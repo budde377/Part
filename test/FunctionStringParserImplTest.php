@@ -1,5 +1,11 @@
 <?php
-
+use ChristianBudde\cbweb\FunctionStringParserImpl;
+use ChristianBudde\cbweb\NullJSONTargetImpl;
+use ChristianBudde\cbweb\JSONFunctionImpl;
+use ChristianBudde\cbweb\JSONTypeImpl;
+use ChristianBudde\cbweb\JSONCompositeFunctionImpl;
+use ChristianBudde\cbweb\JSONFunction;
+use ChristianBudde\cbweb\JSONType;
 /**
  * Created by PhpStorm.
  * User: budde
@@ -55,11 +61,18 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
     }
 
 
+
+
     public function testParseType(){
         $this->assertTrue($this->parser->parseType($this->validName, $result));
-        $this->assertInstanceOf("JSONType", $result);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\JSONType", $result);
         /** @var JSONType $result  */
         $this->assertEquals($this->validName, $result->getTypeString());
+
+        $this->assertTrue($this->parser->parseType($n = "Site\\something", $result));
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\JSONType", $result);
+        /** @var JSONType $result  */
+        $this->assertEquals($n, $result->getTypeString());
     }
 
     public function testParseName(){
@@ -329,6 +342,8 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new JSONFunctionImpl('func', new JSONTypeImpl('Site')), $result);
         $this->assertTrue($this->parser->parseArgument("Site..func()..func2()", $result));
         $this->assertFalse($this->parser->parseArgument("Site", $result));
+        $this->assertFalse($this->parser->parseArgument("Site.f\\u", $result));
+        $this->assertFalse($this->parser->parseArgument("Site.\\u", $result));
 
     }
 
@@ -336,7 +351,7 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->parser->parseArgumentList("2",$result));
         $this->assertEquals([2], $result);
         $this->assertTrue($this->parser->parseArgumentList("Site.f()",$result));
-        $this->assertInstanceOf('JSONFunction', $result[0]);
+        $this->assertInstanceOf('ChristianBudde\cbweb\JSONFunction', $result[0]);
         $this->assertTrue($this->parser->parseArgumentList("123,456,2",$result));
         $this->assertEquals([123,456,2], $result);
         $this->assertFalse($this->parser->parseArgumentList("",$result));
@@ -459,9 +474,9 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
 
     public function testParseFunctionString(){
         $r = $this->parser->parseFunctionString("Site.func()..func2()..func3()..func4().func5()");
-        $this->assertInstanceOf('JSONProgram', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\JSONProgram', $r);
         $r = $this->parser->parseFunctionString("Site.func().func5()");
-        $this->assertInstanceOf('JSONProgram', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\JSONProgram', $r);
         $r = $this->parser->parseFunctionString("Site.func()..func2()..func3()..func4.func5()");
         $this->assertNull($r);
     }

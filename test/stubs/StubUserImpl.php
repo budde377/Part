@@ -5,7 +5,12 @@
  * Date: 02/08/12
  * Time: 15:24
  */
-class StubUserImpl implements User
+use ChristianBudde\cbweb\UserPrivileges;
+use ChristianBudde\cbweb\JSONObject;
+use ChristianBudde\cbweb\Variables;
+use ChristianBudde\cbweb\UserJSONObjectImpl;
+
+class StubUserImpl implements ChristianBudde\cbweb\User
 {
 
     private $userPrivileges;

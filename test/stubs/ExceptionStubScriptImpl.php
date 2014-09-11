@@ -6,7 +6,7 @@
  * Time: 3:03 PM
  * To change this template use File | Settings | File Templates.
  */
-class ExceptionStubScriptImpl implements Script
+class ExceptionStubScriptImpl implements ChristianBudde\cbweb\Script
 {
 
 

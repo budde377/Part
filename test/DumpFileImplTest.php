@@ -6,6 +6,8 @@
  * Date: 5/13/14
  * Time: 10:02 PM
  */
+use ChristianBudde\cbweb\DumpFileImpl;
+
 class DumpFileImplTest extends PHPUnit_Framework_TestCase
 {
 

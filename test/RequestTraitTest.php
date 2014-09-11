@@ -1,4 +1,6 @@
 <?php
+use ChristianBudde\cbweb\RequestTrait;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

@@ -5,6 +5,7 @@
  * Date: 9/4/14
  * Time: 6:05 PM
  */
+use ChristianBudde\cbweb\SiteContentJSONObjectImpl;
 
 class SiteContentJSONObjectImplTest extends PHPUnit_Framework_TestCase{
     public function testConstructorChangesName(){

@@ -6,6 +6,9 @@
  * Time: 5:35 PM
  */
 
+use ChristianBudde\cbweb\FileImpl;
+use ChristianBudde\cbweb\FileJSONObjectImpl;
+
 class FileJSONObjectImplTest extends PHPUnit_Framework_TestCase{
 
     public function testConstructorChangesName(){

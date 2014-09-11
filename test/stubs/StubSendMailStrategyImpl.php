@@ -5,7 +5,7 @@
  * Date: 02/08/12
  * Time: 14:59
  */
-class StubSendMailStrategyImpl implements SendMailStrategy
+class StubSendMailStrategyImpl implements ChristianBudde\cbweb\SendMailStrategy
 {
 
     private $called = false;

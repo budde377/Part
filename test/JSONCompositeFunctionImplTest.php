@@ -5,6 +5,9 @@
  * Date: 8/30/14
  * Time: 9:09 PM
  */
+use ChristianBudde\cbweb\JSONTypeImpl;
+use ChristianBudde\cbweb\JSONFunctionImpl;
+use ChristianBudde\cbweb\JSONCompositeFunctionImpl;
 
 class JSONCompositeFunctionImplTest extends PHPUnit_Framework_TestCase{
 

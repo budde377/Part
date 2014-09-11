@@ -6,7 +6,7 @@
  * Time: 10:48 AM
  * To change this template use File | Settings | File Templates.
  */
-class ReturnIncrementPageElementImpl extends PageElementImpl
+class ReturnIncrementPageElementImpl extends ChristianBudde\cbweb\PageElementImpl
 {
 
     /**

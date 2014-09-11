@@ -6,6 +6,9 @@
  * Time: 7:07 PM
  * To change this template use File | Settings | File Templates.
  */
+use ChristianBudde\cbweb\ConfigImpl;
+use ChristianBudde\cbweb\InvalidXMLException;
+
 class ConfigImplTest extends PHPUnit_Framework_TestCase
 {
 

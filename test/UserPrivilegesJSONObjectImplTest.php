@@ -5,6 +5,7 @@
  * Date: 9/3/14
  * Time: 10:06 PM
  */
+use ChristianBudde\cbweb\UserPrivilegesJSONObjectImpl;
 
 class UserPrivilegesJSONObjectImplTest extends  PHPUnit_Framework_TestCase{
     public function testConstructorWillSetVariables(){

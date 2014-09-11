@@ -6,6 +6,9 @@
  * Date: 18/01/13
  * Time: 11:46
  */
+use ChristianBudde\cbweb\DartRegisterImpl;
+use ChristianBudde\cbweb\DartFileImpl;
+
 class DartRegisterImplTest extends PHPUnit_Framework_TestCase
 {
 

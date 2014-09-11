@@ -5,6 +5,7 @@
  * Date: 9/4/14
  * Time: 12:36 PM
  */
+use ChristianBudde\cbweb\UserLibraryJSONObjectImpl;
 
 class UserLibraryJSONObjectImplTest extends  PHPUnit_Framework_TestCase{
 

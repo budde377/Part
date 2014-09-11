@@ -6,6 +6,9 @@
  * Date: 3/3/14
  * Time: 10:12 PM
  */
+use ChristianBudde\cbweb\DB;
+use ChristianBudde\cbweb\PageContentLibraryImpl;
+use ChristianBudde\cbweb\SiteContentLibraryImpl;
 class SiteContentLibraryImplTest extends CustomDatabaseTestCase
 {
 
@@ -35,9 +38,9 @@ class SiteContentLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue(is_array($list = $this->existingContentLibrary->listContents()));
         $this->assertEquals(2, count($list));
         $this->assertArrayHasKey("", $list);
-        $this->assertInstanceOf("Content", $list[""]);
+        $this->assertInstanceOf("ChristianBudde\cbweb\Content", $list[""]);
         $this->assertArrayHasKey("Test", $list);
-        $this->assertInstanceOf("Content", $list["Test"]);
+        $this->assertInstanceOf("ChristianBudde\cbweb\Content", $list["Test"]);
     }
 
 
@@ -61,7 +64,7 @@ class SiteContentLibraryImplTest extends CustomDatabaseTestCase
     public function testGetInstanceWillCreateNewInstance()
     {
         $c = $this->existingContentLibrary->getContent($id = "id" . time());
-        $this->assertInstanceOf("Content", $c);
+        $this->assertInstanceOf("ChristianBudde\cbweb\Content", $c);
         $c2 = $this->existingContentLibrary->getContent($id);
         $this->assertTrue($c === $c2);
     }
@@ -96,8 +99,8 @@ class SiteContentLibraryImplTest extends CustomDatabaseTestCase
         $this->assertEquals(2, count($ar));
         $this->assertArrayHasKey("", $ar);
         $this->assertArrayHasKey("Test", $ar);
-        $this->assertInstanceOf("Content", $ar[""]);
-        $this->assertInstanceOf("Content", $ar["Test"]);
+        $this->assertInstanceOf("ChristianBudde\cbweb\Content", $ar[""]);
+        $this->assertInstanceOf("ChristianBudde\cbweb\Content", $ar["Test"]);
     }
 
     public function testSearchLibraryWillReuseInstances(){

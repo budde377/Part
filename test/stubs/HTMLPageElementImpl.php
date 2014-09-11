@@ -7,7 +7,7 @@
  * Time: 11:21 AM
  * To change this template use File | Settings | File Templates.
  */
-class HTMLPageElementImpl extends PageElementImpl
+class HTMLPageElementImpl extends \ChristianBudde\cbweb\PageElementImpl
 {
 
     /**

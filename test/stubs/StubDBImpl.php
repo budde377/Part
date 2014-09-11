@@ -7,7 +7,7 @@
  * Time: 10:32 PM
  * To change this template use File | Settings | File Templates.
  */
-class StubDBImpl implements DB
+class StubDBImpl implements \ChristianBudde\cbweb\DB
 {
 
     /**

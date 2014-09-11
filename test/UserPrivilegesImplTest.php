@@ -1,4 +1,11 @@
 <?php
+use ChristianBudde\cbweb\User;
+use ChristianBudde\cbweb\UserPrivilegesImpl;
+use ChristianBudde\cbweb\DB;
+use ChristianBudde\cbweb\Page;
+use ChristianBudde\cbweb\UserImpl;
+use ChristianBudde\cbweb\PageImpl;
+use ChristianBudde\cbweb\UserPrivilegesJSONObjectImpl;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -214,7 +221,7 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
 
     public function testPrivilegesIsJSONObjectSerializable(){
         $o =$this->userPrivileges->jsonObjectSerialize();
-        $this->assertInstanceOf('UserPrivilegesJSONObjectImpl',$o);
+        $this->assertInstanceOf('ChristianBudde\cbweb\UserPrivilegesJSONObjectImpl',$o);
         $this->assertEquals(new UserPrivilegesJSONObjectImpl($this->userPrivileges), $o);
     }
 

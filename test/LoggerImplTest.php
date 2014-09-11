@@ -1,5 +1,9 @@
 <?php
-
+use ChristianBudde\cbweb\LogFileImpl;
+use ChristianBudde\cbweb\Folder;
+use ChristianBudde\cbweb\LoggerImpl;
+use ChristianBudde\cbweb\FolderImpl;
+use ChristianBudde\cbweb\Logger;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

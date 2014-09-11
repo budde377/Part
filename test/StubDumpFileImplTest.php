@@ -5,6 +5,7 @@
  * Date: 5/17/14
  * Time: 5:00 PM
  */
+use ChristianBudde\cbweb\StubDumpFileImpl;
 
 class StubDumpFileImplTest extends PHPUnit_Framework_TestCase{
     /** @var  StubDumpFileImpl */

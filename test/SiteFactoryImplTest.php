@@ -8,6 +8,11 @@
  * Time: 2:53 PM
  * To change this template use File | Settings | File Templates.
  */
+use ChristianBudde\cbweb\BackendSingletonContainer;
+use ChristianBudde\cbweb\ConfigImpl;
+use ChristianBudde\cbweb\SiteFactoryImpl;
+use ChristianBudde\cbweb\ClassNotInstanceOfException;
+
 class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
 {
     /** @var $backFactory BackendSingletonContainer */
@@ -25,8 +30,8 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $factory = new SiteFactoryImpl($config);
 
-        $this->assertInstanceOf('ScriptChain', $factory->buildPostScriptChain($this->backFactory), 'The buildPostScriptChain return must be instance of ScriptChain');
-        $this->assertInstanceOf('ScriptChain', $factory->buildPreScriptChain($this->backFactory), 'The buildPreScriptChain return must be instance of ScriptChain');
+        $this->assertInstanceOf('ChristianBudde\cbweb\ScriptChain', $factory->buildPostScriptChain($this->backFactory), 'The buildPostScriptChain return must be instance of ScriptChain');
+        $this->assertInstanceOf('ChristianBudde\cbweb\ScriptChain', $factory->buildPreScriptChain($this->backFactory), 'The buildPreScriptChain return must be instance of ScriptChain');
 
     }
 
@@ -104,7 +109,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         try {
             $factory->buildPreScriptChain($this->backFactory);
         } catch (Exception $exception) {
-            $this->assertInstanceOf('ClassNotInstanceOfException', $exception, 'The wrong exception was thrown.');
+            $this->assertInstanceOf('ChristianBudde\cbweb\ClassNotInstanceOfException', $exception, 'The wrong exception was thrown.');
             /** @var $exception ClassNotInstanceOfException */
             $exceptionWasThrown = true;
             $this->assertEquals('NullPageElementImpl', $exception->getClass(), 'Was not expected class');
@@ -132,7 +137,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         try {
             $factory->buildPostScriptChain($this->backFactory);
         } catch (Exception $exception) {
-            $this->assertInstanceOf('ClassNotInstanceOfException', $exception, 'The wrong exception was thrown.');
+            $this->assertInstanceOf('ChristianBudde\cbweb\ClassNotInstanceOfException', $exception, 'The wrong exception was thrown.');
             /** @var $exception ClassNotInstanceOfException */
             $exceptionWasThrown = true;
             $this->assertEquals('NullPageElementImpl', $exception->getClass(), 'Was not expected class');
@@ -189,7 +194,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         </preScripts>
         </config>");
 
-        $this->setExpectedException('FileNotFoundException');
+        $this->setExpectedException('ChristianBudde\cbweb\FileNotFoundException');
 
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $factory = new SiteFactoryImpl($config);
@@ -206,7 +211,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         </preScripts>
         </config>");
 
-        $this->setExpectedException('ClassNotDefinedException');
+        $this->setExpectedException('ChristianBudde\cbweb\ClassNotDefinedException');
 
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $factory = new SiteFactoryImpl($config);
@@ -224,7 +229,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         </postScripts>
         </config>");
 
-        $this->setExpectedException('FileNotFoundException');
+        $this->setExpectedException('ChristianBudde\cbweb\FileNotFoundException');
 
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $factory = new SiteFactoryImpl($config);
@@ -241,7 +246,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         </postScripts>
         </config>");
 
-        $this->setExpectedException('ClassNotDefinedException');
+        $this->setExpectedException('ChristianBudde\cbweb\ClassNotDefinedException');
 
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $factory = new SiteFactoryImpl($config);
@@ -259,7 +264,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $factory = new SiteFactoryImpl($config);
         $retConfig = $factory->buildConfig();
-        $this->assertInstanceOf('Config', $retConfig, 'Did not return Config');
+        $this->assertInstanceOf('ChristianBudde\cbweb\Config', $retConfig, 'Did not return Config');
     }
 
     public function testBuildConfigWillReturnNewInstanceOfConfig()

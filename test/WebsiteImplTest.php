@@ -1,6 +1,9 @@
 <?php
 
-
+use ChristianBudde\cbweb\WebsiteImpl;
+use ChristianBudde\cbweb\ScriptChainImpl;
+use ChristianBudde\cbweb\BackendSingletonContainerImpl;
+use ChristianBudde\cbweb\Website;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

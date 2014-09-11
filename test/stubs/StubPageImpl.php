@@ -1,4 +1,10 @@
 <?php
+use ChristianBudde\cbweb\Page;
+use ChristianBudde\cbweb\Content;
+use ChristianBudde\cbweb\Variables;
+use ChristianBudde\cbweb\ContentLibrary;
+use ChristianBudde\cbweb\JSONObject;
+use ChristianBudde\cbweb\PageJSONObjectImpl;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

@@ -1,5 +1,7 @@
 <?php
-
+use ChristianBudde\cbweb\Config;
+use ChristianBudde\cbweb\MySQLDBImpl;
+use ChristianBudde\cbweb\ConfigImpl;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

@@ -5,6 +5,10 @@
  * Date: 9/6/14
  * Time: 6:08 PM
  */
+use ChristianBudde\cbweb\ArrayAccessAJAXTypeHandlerImpl;
+use ChristianBudde\cbweb\FunctionStringParser;
+use ChristianBudde\cbweb\JSONFunction;
+use ChristianBudde\cbweb\FunctionStringParserImpl;
 
 class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase{
 

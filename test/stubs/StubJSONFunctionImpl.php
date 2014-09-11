@@ -6,14 +6,14 @@
  * Time: 13:46
  * To change this template use File | Settings | File Templates.
  */
-class StubJSONFunctionImpl implements JSONFunction
+class StubJSONFunctionImpl implements ChristianBudde\cbweb\JSONFunction
 {
 
     private $response;
     private $args;
     private $name;
     private $id;
-    function __construct($name, JSONResponse $response,$id = null,array $args = array())
+    function __construct($name, ChristianBudde\cbweb\JSONResponse $response,$id = null,array $args = array())
     {
         $this->response = $response;
         $this->args = $args;
@@ -40,7 +40,7 @@ class StubJSONFunctionImpl implements JSONFunction
 
     /**
      * @param array $args Associative array containing arg name and value
-     * @return JSONResponse
+     * @return ChristianBudde\cbweb\JSONResponse
      */
     public function call(array $args = array())
     {
@@ -62,7 +62,7 @@ class StubJSONFunctionImpl implements JSONFunction
     }
 
     /**
-     * @return JSONTarget
+     * @return ChristianBudde\cbweb\JSONTarget
      */
     public function getTarget()
     {
@@ -86,10 +86,10 @@ class StubJSONFunctionImpl implements JSONFunction
     }
 
     /**
-     * @param JSONTarget $target
+     * @param ChristianBudde\cbweb\JSONTarget $target
      * @return void
      */
-    public function setTarget(JSONTarget $target)
+    public function setTarget(ChristianBudde\cbweb\JSONTarget $target)
     {
     }
 
@@ -132,10 +132,10 @@ class StubJSONFunctionImpl implements JSONFunction
 
     /**
      * Sets the root target, i.e. calls recursively on target until target is not a function.
-     * @param JSONTarget $target
+     * @param ChristianBudde\cbweb\JSONTarget $target
      * @return void
      */
-    public function setRootTarget(JSONTarget $target)
+    public function setRootTarget(ChristianBudde\cbweb\JSONTarget $target)
     {
     }
 }

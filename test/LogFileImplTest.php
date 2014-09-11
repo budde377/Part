@@ -1,5 +1,8 @@
 <?php
-
+use ChristianBudde\cbweb\LogFileImpl;
+use ChristianBudde\cbweb\DumpFile;
+use ChristianBudde\cbweb\FolderImpl;
+use ChristianBudde\cbweb\Folder;
 /**
  * Created by PhpStorm.
  * User: budde
@@ -109,7 +112,7 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
     public function testLogWillReturnDumpFile()
     {
         $this->dumpFile = $this->logFile->log("MSG", 2, true);
-        $this->assertInstanceOf("DumpFileImpl", $this->dumpFile);
+        $this->assertInstanceOf("ChristianBudde\cbweb\DumpFileImpl", $this->dumpFile);
 
     }
 
@@ -119,7 +122,7 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
         $ar = $this->logFile->listLog();
         $ar1 = $ar[0];
         $this->assertArrayHasKey("dumpfile", $ar1);
-        $this->assertInstanceOf("DumpFile", $d2 = $ar1["dumpfile"]);
+        $this->assertInstanceOf("ChristianBudde\cbweb\DumpFile", $d2 = $ar1["dumpfile"]);
         $this->assertTrue($d === $d2);
         $this->dumpFile = $d;
     }

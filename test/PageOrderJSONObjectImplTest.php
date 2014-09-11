@@ -5,6 +5,7 @@
  * Date: 9/4/14
  * Time: 12:47 PM
  */
+use ChristianBudde\cbweb\PageOrderJSONObjectImpl;
 
 class PageOrderJSONObjectImplTest extends PHPUnit_Framework_TestCase{
 

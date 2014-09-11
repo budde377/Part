@@ -6,6 +6,10 @@
  * Date: 6/1/12
  * Time: 9:38 PM
  */
+use ChristianBudde\cbweb\FileImpl;
+use ChristianBudde\cbweb\File;
+use ChristianBudde\cbweb\FileJSONObjectImpl;
+
 class FileImplTest extends PHPUnit_Framework_TestCase
 {
 
@@ -143,7 +147,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
         $file = new FileImpl($filePath);
         $this->assertTrue($file->exists(), 'File did not exist to begin with.');
         $newFile = $file->copy($filePath . '2');
-        $this->assertInstanceOf('File', $newFile, 'Did not return an instance of File');
+        $this->assertInstanceOf('ChristianBudde\cbweb\File', $newFile, 'Did not return an instance of File');
         $this->assertEquals($filePath . '2', $newFile->getAbsoluteFilePath(), 'New file did not have right path');
         $this->assertTrue($newFile->exists(), 'The new file did note exists');
         unlink($newFile->getAbsoluteFilePath());
@@ -348,7 +352,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
         $fn = dirname(__FILE__).'/stubs/fileStub';
         $file = new FileImpl($fn);
         $folder = $file->getParentFolder();
-        $this->assertInstanceOf('Folder',$folder);
+        $this->assertInstanceOf('ChristianBudde\cbweb\Folder',$folder);
         $this->assertEquals(dirname(__FILE__).'/stubs',$folder->getAbsolutePath(),'Parent did not match');
     }
 

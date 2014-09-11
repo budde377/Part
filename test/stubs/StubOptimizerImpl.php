@@ -1,4 +1,6 @@
 <?php
+use ChristianBudde\cbweb\File;
+use ChristianBudde\cbweb\Optimizer;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

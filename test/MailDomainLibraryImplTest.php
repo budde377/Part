@@ -5,6 +5,11 @@
  * Date: 7/4/14
  * Time: 11:23 PM
  */
+use ChristianBudde\cbweb\Config;
+use ChristianBudde\cbweb\DB;
+use ChristianBudde\cbweb\MailDomainLibraryImpl;
+use ChristianBudde\cbweb\MySQLDBImpl;
+use ChristianBudde\cbweb\MailDomainImpl;
 
 class MailDomainLibraryImplTest extends CustomDatabaseTestCase{
 
@@ -52,7 +57,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase{
         $this->assertTrue(is_array($domainArray));
         $this->assertEquals(1,count($domainArray));
         $this->assertArrayHasKey('test.dk', $domainArray);
-        $this->assertInstanceOf('MailDomain', $domainArray['test.dk']);
+        $this->assertInstanceOf('ChristianBudde\cbweb\MailDomain', $domainArray['test.dk']);
     }
 
     public function testListDomainsWillReuseInstances(){
@@ -64,7 +69,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase{
 
     public function testGetDomainWillGetDomain(){
         $d = $this->domainLibrary->getDomain('test.dk');
-        $this->assertInstanceOf('MailDomainImpl', $d);
+        $this->assertInstanceOf('ChristianBudde\cbweb\MailDomainImpl', $d);
 
     }
 

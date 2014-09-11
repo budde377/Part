@@ -5,7 +5,8 @@
  * Date: 18/01/13
  * Time: 10:24
  */
-class StubDefaultPageLibraryImpl implements DefaultPageLibrary
+use ChristianBudde\cbweb\Page;
+class StubDefaultPageLibraryImpl implements ChristianBudde\cbweb\DefaultPageLibrary
 {
     private $iterator;
     private $pages;

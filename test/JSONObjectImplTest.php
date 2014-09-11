@@ -1,4 +1,6 @@
 <?php
+use ChristianBudde\cbweb\JSONObjectImpl;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -96,7 +98,7 @@ class JSONObjectImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('object',$array['type']);
         $this->assertEquals($this->objectName,$array['name']);
         $this->assertEquals('test',$array['variables']['string']);
-        $this->assertInstanceOf('JSONObject', $array['variables']['object']);
+        $this->assertInstanceOf('ChristianBudde\cbweb\JSONObject', $array['variables']['object']);
         $this->assertEquals($newObject, $array['variables']['object']);
     }
 

@@ -1,5 +1,8 @@
 <?php
-
+use ChristianBudde\cbweb\FolderImpl;
+use ChristianBudde\cbweb\FileImpl;
+use ChristianBudde\cbweb\Folder;
+use ChristianBudde\cbweb\File;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -196,27 +199,27 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
         $l = $fol->listFolder();
         /** @var $e File */
         $e = $l[0];
-        $this->assertInstanceOf('File', $e);
+        $this->assertInstanceOf('ChristianBudde\cbweb\File', $e);
         $this->assertEquals('1', $e->getFilename());
         /** @var $e File */
         $e = $l[1];
-        $this->assertInstanceOf('File', $e);
+        $this->assertInstanceOf('ChristianBudde\cbweb\File', $e);
         $this->assertEquals('2', $e->getFilename());
         /** @var $e Folder */
         $e = $l[2];
-        $this->assertInstanceOf('Folder', $e);
+        $this->assertInstanceOf('ChristianBudde\cbweb\Folder', $e);
         $this->assertEquals('3', $e->getName());
 
         $l = $fol->listFolder(Folder::LIST_FOLDER_FILES);
         $this->assertGreaterThan(0, count($l));
         foreach($l as $f){
-            $this->assertInstanceOf("File", $f);
+            $this->assertInstanceOf("ChristianBudde\cbweb\File", $f);
         }
 
         $l = $fol->listFolder(Folder::LIST_FOLDER_FOLDERS);
         $this->assertGreaterThan(0, count($l));
         foreach($l as $f){
-            $this->assertInstanceOf("Folder", $f);
+            $this->assertInstanceOf("ChristianBudde\cbweb\Folder", $f);
         }
 
 
@@ -279,7 +282,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
         @$this->rrmdir($folder . '2');
         $f = $this->setUpNonEmptyFolder($folder);
         $f2 = $f->copy($folder . '2');
-        $this->assertInstanceOf('Folder', $f2, 'Did not return instance of Folder');
+        $this->assertInstanceOf('ChristianBudde\cbweb\Folder', $f2, 'Did not return instance of Folder');
         /** @var $f2  Folder */
         $this->assertEquals($folder . '2', $f2->getAbsolutePath());
         $this->assertTrue($f->exists(), 'Folder was moved');
@@ -321,7 +324,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
         @$this->rrmdir($folder);
         $f = $this->setUpNonEmptyFolder($folder);
         $f2 = $f->copy($folder);
-        $this->assertInstanceOf('Folder', $f2);
+        $this->assertInstanceOf('ChristianBudde\cbweb\Folder', $f2);
         $this->assertEquals($f->getAbsolutePath(), $f2->getAbsolutePath());
 
     }

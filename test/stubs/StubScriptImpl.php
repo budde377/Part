@@ -7,7 +7,7 @@
  * Time: 9:09 AM
  * To change this template use File | Settings | File Templates.
  */
-class StubScriptImpl implements Script
+class StubScriptImpl implements \ChristianBudde\cbweb\Script
 {
 
     private $numRuns = 0;

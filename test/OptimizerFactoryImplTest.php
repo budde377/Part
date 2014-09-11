@@ -1,4 +1,7 @@
 <?php
+use ChristianBudde\cbweb\ConfigImpl;
+use ChristianBudde\cbweb\OptimizerFactoryImpl;
+use ChristianBudde\cbweb\ClassNotInstanceOfException;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -70,10 +73,10 @@ class OptimizerFactoryImplTest extends PHPUnit_Framework_TestCase
         $optimizerFactory = new OptimizerFactoryImpl($config);
         $exceptionWasThrown = false;
         try {
-            $element = $optimizerFactory->getOptimizer('someElement');
+            $optimizerFactory->getOptimizer('someElement');
         } catch (Exception $exception) {
             /** @var $exception ClassNotInstanceOfException */
-            $this->assertInstanceOf('ClassNotInstanceOfException', $exception);
+            $this->assertInstanceOf('ChristianBudde\cbweb\ClassNotInstanceOfException', $exception);
             $exceptionWasThrown = true;
             $this->assertEquals('StubScriptImpl', $exception->getClass(), 'Was not expected class');
             $this->assertEquals('Optimizer', $exception->getExpectedInstance(), 'Was not expected instance');
@@ -96,7 +99,7 @@ class OptimizerFactoryImplTest extends PHPUnit_Framework_TestCase
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $optimizerFactory = new OptimizerFactoryImpl($config);
-        $this->setExpectedException('FileNotFoundException');
+        $this->setExpectedException('ChristianBudde\cbweb\FileNotFoundException');
         $optimizerFactory->getOptimizer('someElement');
 
     }
@@ -112,7 +115,7 @@ class OptimizerFactoryImplTest extends PHPUnit_Framework_TestCase
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $optimizerFactory = new OptimizerFactoryImpl($config);
-        $this->setExpectedException('ClassNotDefinedException');
+        $this->setExpectedException('ChristianBudde\cbweb\ClassNotDefinedException');
         $optimizerFactory->getOptimizer('someElement');
 
     }

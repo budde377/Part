@@ -6,6 +6,9 @@
  * Time: 9:18 PM
  * To change this template use File | Settings | File Templates.
  */
+use ChristianBudde\cbweb\PageImpl;
+use ChristianBudde\cbweb\MalformedParameterException;
+use ChristianBudde\cbweb\Page;
 class PageImplTest extends CustomDatabaseTestCase
 {
 
@@ -181,7 +184,7 @@ class PageImplTest extends CustomDatabaseTestCase
 
         } catch (Exception $e) {
             $exceptionWasThrown = true;
-            $this->assertInstanceOf('MalformedParameterException', $e, 'Exception was of wrong instance');
+            $this->assertInstanceOf('ChristianBudde\cbweb\MalformedParameterException', $e, 'Exception was of wrong instance');
             /** @var $e MalformedParameterException */
             $this->assertEquals(1, $e->getParameterNumber(), 'Wrong parameter no');
             $this->assertEquals('RegEx[a-zA-Z0-9-_]+', $e->getExpectedType(), 'Wrong type');
@@ -332,7 +335,7 @@ class PageImplTest extends CustomDatabaseTestCase
     }
 
     public function testGetContentReturnsInstanceOfContent(){
-        $this->assertInstanceOf("Content",$this->testPage->getContent());
+        $this->assertInstanceOf("ChristianBudde\cbweb\Content",$this->testPage->getContent());
     }
 
     public function testGetContentReturnSameInstanceOnSameId(){
@@ -359,7 +362,7 @@ class PageImplTest extends CustomDatabaseTestCase
 
     public function testGetVariablesWillReturnInstanceOfVariables(){
         $var = $this->testPage->getVariables();
-        $this-> assertInstanceOf("PageVariablesImpl", $var);
+        $this-> assertInstanceOf("ChristianBudde\cbweb\PageVariablesImpl", $var);
     }
 
     public function testGetVariablesWillReturnSameInstance(){
@@ -371,12 +374,12 @@ class PageImplTest extends CustomDatabaseTestCase
         $lib1 = $this->testPage->getContentLibrary();
         $lib2 = $this->testPage->getContentLibrary();
         $this->assertTrue($lib1 === $lib2);
-        $this->assertInstanceOf("ContentLibrary", $lib1);
+        $this->assertInstanceOf("ChristianBudde\cbweb\ContentLibrary", $lib1);
     }
 
     public function testPageIsJSONObjectSerializable(){
         $o = $this->testPage->jsonObjectSerialize();
-        $this->assertInstanceOf('PageJSONObjectImpl', $o);
+        $this->assertInstanceOf('ChristianBudde\cbweb\PageJSONObjectImpl', $o);
         $this->assertEquals($o->getVariable('title'), $this->testPage->getTitle());
 
     }

@@ -6,8 +6,12 @@
  * Time: 22:47
  * To change this template use File | Settings | File Templates.
  */
+use ChristianBudde\cbweb\Page;
+use ChristianBudde\cbweb\PageOrder;
+use ChristianBudde\cbweb\JSONObject;
+use ChristianBudde\cbweb\UserPrivilegesJSONObjectImpl;
 
-class StubUserPrivilegesImpl implements  UserPrivileges{
+class StubUserPrivilegesImpl implements  \ChristianBudde\cbweb\UserPrivileges{
     public $pagePrivileges;
     private $root, $site, $page;
 

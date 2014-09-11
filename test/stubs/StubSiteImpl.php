@@ -1,6 +1,9 @@
 <?php
+use ChristianBudde\cbweb\Content;
+use ChristianBudde\cbweb\Variables;
+use ChristianBudde\cbweb\ContentLibrary;
 
-class StubSiteImpl implements Site{
+class StubSiteImpl implements ChristianBudde\cbweb\Site{
 
     private $content = array();
     private $variables;

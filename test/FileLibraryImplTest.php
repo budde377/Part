@@ -6,6 +6,13 @@
  * Date: 2/22/14
  * Time: 3:15 PM
  */
+use ChristianBudde\cbweb\Folder;
+use ChristianBudde\cbweb\FileLibraryImpl;
+use ChristianBudde\cbweb\User;
+use ChristianBudde\cbweb\FolderImpl;
+use ChristianBudde\cbweb\FileImpl;
+use ChristianBudde\cbweb\File;
+
 class FileLibraryImplTest extends PHPUnit_Framework_TestCase
 {
 
@@ -360,7 +367,7 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase
     public function testIfGetFilesFolderReturnsRightFolder()
     {
         $f = $this->lib->getFilesFolder();
-        $this->assertInstanceOf("Folder", $f);
+        $this->assertInstanceOf("ChristianBudde\cbweb\Folder", $f);
         $this->assertEquals($f->getAbsolutePath(), $this->testDir->getAbsolutePath());
         $this->assertFalse($this->testDir === $f);
     }

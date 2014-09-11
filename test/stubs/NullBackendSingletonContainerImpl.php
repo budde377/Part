@@ -6,12 +6,12 @@
  * Time: 5:21 PM
  * To change this template use File | Settings | File Templates.
  */
-class NullBackendSingletonContainerImpl implements BackendSingletonContainer
+class NullBackendSingletonContainerImpl implements ChristianBudde\cbweb\BackendSingletonContainer
 {
 
     /**
      * This will return a DB. The same from time to time
-     * @return DB
+     * @return ChristianBudde\cbweb\DB
      */
     public function getDBInstance()
     {
@@ -20,7 +20,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * This will return an css register, and reuse it from time to time
-     * @return CSSRegister
+     * @return ChristianBudde\cbweb\CSSRegister
      */
     public function getCSSRegisterInstance()
     {
@@ -30,7 +30,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * This will return an js register, and reuse it from time to time
-     * @return JSRegister
+     * @return ChristianBudde\cbweb\JSRegister
      */
     public function getJSRegisterInstance()
     {
@@ -39,7 +39,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * This will return an ajax register, and reuse it from time to time
-     * @return AJAXServer
+     * @return ChristianBudde\cbweb\AJAXServer
      */
     public function getAJAXServerInstance()
     {
@@ -48,7 +48,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * This will return an instance of PageOrder, and reuse it.
-     * @return PageOrder
+     * @return ChristianBudde\cbweb\PageOrder
      */
     public function getPageOrderInstance()
     {
@@ -58,7 +58,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * This will return an instance of CurrentPageStrategy, and reuse it.
-     * @return CurrentPageStrategy
+     * @return ChristianBudde\cbweb\CurrentPageStrategy
      */
     public function getCurrentPageStrategyInstance()
     {
@@ -67,7 +67,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * Will return an instance of Config, this might be the same as provided in constructor
-     * @return Config
+     * @return ChristianBudde\cbweb\Config
      */
     public function getConfigInstance()
     {
@@ -77,7 +77,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * Will create and reuse an instance of UserLibrary
-     * @return UserLibrary
+     * @return ChristianBudde\cbweb\UserLibrary
      */
     public function getUserLibraryInstance()
     {
@@ -88,7 +88,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * Will create and reuse an instance of DefaultPageLibrary
-     * @return DefaultPageLibrary
+     * @return ChristianBudde\cbweb\DefaultPageLibrary
      */
     public function getDefaultPageLibraryInstance()
     {
@@ -97,7 +97,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * This will return an dart register, and reuse it from time to time
-     * @return DartRegister
+     * @return ChristianBudde\cbweb\DartRegister
      */
     public function getDartRegisterInstance()
     {
@@ -107,7 +107,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * Will create and reuse an instance of CacheControl
-     * @return CacheControl
+     * @return ChristianBudde\cbweb\CacheControl
      */
     public function getCacheControlInstance()
     {
@@ -126,7 +126,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
     /**
      * Will create and reuse an instance of Variables.
      * These should reflect the site scoped variables.
-     * @return Variables
+     * @return ChristianBudde\cbweb\Variables
      */
     public function getSiteInstance()
     {
@@ -135,7 +135,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * Will create and reuse an instance of FileLibrary.
-     * @return FileLibrary
+     * @return ChristianBudde\cbweb\FileLibrary
      */
     public function getFileLibraryInstance()
     {
@@ -144,7 +144,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * Will create and reuse instance of log.
-     * @return LogFile
+     * @return ChristianBudde\cbweb\LogFile
      */
     public function getLoggerInstance()
     {
@@ -153,7 +153,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * Will Create and reuse instance of MailDomainLibrary.
-     * @return MailDomainLibrary
+     * @return ChristianBudde\cbweb\MailDomainLibrary
      */
     public function getMailDomainLibraryInstance()
     {

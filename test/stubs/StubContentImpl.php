@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-class StubContentImpl implements Content{
+class StubContentImpl implements \ChristianBudde\cbweb\Content{
 
     public $id;
     private $content = array();
@@ -103,11 +103,11 @@ class StubContentImpl implements Content{
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return JSONObject
+     * @return \ChristianBudde\cbweb\JSONObject
      */
     public function jsonObjectSerialize()
     {
-        return new ContentJSONObjectImpl($this);
+        return new \ChristianBudde\cbweb\ContentJSONObjectImpl($this);
     }
 
     /**

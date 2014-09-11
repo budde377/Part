@@ -6,7 +6,7 @@
  * Time: 3:46 PM
  */
 
-class StubAJAXTypeHandlerImpl implements AJAXTypeHandler{
+class StubAJAXTypeHandlerImpl implements ChristianBudde\cbweb\AJAXTypeHandler{
 
     public $calledMethods = [];
     public $types = [];
@@ -29,11 +29,11 @@ class StubAJAXTypeHandlerImpl implements AJAXTypeHandler{
     /**
      * Sets up the type handler for provided type.
      * This should be called for each registered type.
-     * @param AJAXServer $server The server which is setting-up the handler
+     * @param ChristianBudde\cbweb\AJAXServer $server The server which is setting-up the handler
      * @param string $type The type currently being set-up
      * @return void
      */
-    public function setUp(AJAXServer $server, $type)
+    public function setUp(ChristianBudde\cbweb\AJAXServer $server, $type)
     {
         $this->calledMethods[] = ['method'=>'setUp', 'arguments'=>func_get_args()];
     }
@@ -51,11 +51,11 @@ class StubAJAXTypeHandlerImpl implements AJAXTypeHandler{
     /**
      * Checks if handler can handle. If so handle will be called with same arguments, else next suitable handler will be called.
      * @param string $type
-     * @param JSONFunction $function
+     * @param ChristianBudde\cbweb\JSONFunction $function
      * @param mixed $instance
      * @return bool
      */
-    public function canHandle($type, JSONFunction $function, $instance = null)
+    public function canHandle($type, ChristianBudde\cbweb\JSONFunction $function, $instance = null)
     {
         $this->calledMethods[] = ['method'=>'canHandle', 'arguments'=>func_get_args()];
         return $this->canHandle[$type];
@@ -63,11 +63,11 @@ class StubAJAXTypeHandlerImpl implements AJAXTypeHandler{
 
     /**
      * @param string $type
-     * @param JSONFunction $function
+     * @param ChristianBudde\cbweb\JSONFunction $function
      * @param mixed $instance
      * @return mixed
      */
-    public function handle($type, JSONFunction $function, $instance = null)
+    public function handle($type, ChristianBudde\cbweb\JSONFunction $function, $instance = null)
     {
         $this->calledMethods[] = ['method'=>'handle', 'arguments'=>func_get_args()];
 

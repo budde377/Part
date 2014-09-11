@@ -1,4 +1,5 @@
 <?php
+use ChristianBudde\cbweb\UserJSONObjectImpl;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

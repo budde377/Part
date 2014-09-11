@@ -5,6 +5,10 @@
  * Date: 18/01/13
  * Time: 09:37
  */
+use ChristianBudde\cbweb\DefaultPageLibraryImpl;
+use ChristianBudde\cbweb\Config;
+use ChristianBudde\cbweb\Page;
+
 class DefaultPageLibraryImplTest extends PHPUnit_Framework_TestCase
 {
 
@@ -38,7 +42,7 @@ class DefaultPageLibraryImplTest extends PHPUnit_Framework_TestCase
     {
         /** @var $page Page */
         $page = $this->pageLibrary->getPage("p1");
-        $this->assertInstanceOf("DefaultPageImpl",$page);
+        $this->assertInstanceOf("ChristianBudde\cbweb\DefaultPageImpl",$page);
         $this->assertFalse($page->isEditable());
         $this->assertEquals("p1",$page->getID());
         $this->assertEquals("someTemplate",$page->getTemplate());
@@ -51,7 +55,7 @@ class DefaultPageLibraryImplTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey(0,$pages);
         /** @var $page Page */
         $page = $pages[0];
-        $this->assertInstanceOf("DefaultPageImpl",$page);
+        $this->assertInstanceOf("ChristianBudde\cbweb\DefaultPageImpl",$page);
         $this->assertFalse($page->isEditable());
         $this->assertEquals("p1",$page->getID());
         $this->assertEquals("someTemplate",$page->getTemplate());
@@ -60,7 +64,7 @@ class DefaultPageLibraryImplTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey(1,$pages);
         /** @var $page Page */
         $page = $pages[1];
-        $this->assertInstanceOf("DefaultPageImpl",$page);
+        $this->assertInstanceOf("ChristianBudde\cbweb\DefaultPageImpl",$page);
         $this->assertFalse($page->isEditable());
         $this->assertEquals("p2",$page->getID());
         $this->assertEquals("someTemplate2",$page->getTemplate());
@@ -71,6 +75,7 @@ class DefaultPageLibraryImplTest extends PHPUnit_Framework_TestCase
     public function testIterateIsAsListingPage(){
         $i = 0;
         foreach($this->pageLibrary as $page){
+            /** @var $page ChristianBudde\cbweb\Page */
             switch($i){
                 case 0:
                     $this->assertEquals("page1",$page->getTitle());

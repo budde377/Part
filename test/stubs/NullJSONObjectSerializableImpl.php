@@ -6,16 +6,16 @@
  * Time: 8:13 PM
  */
 
-class NullJSONObjectSerializableImpl implements JSONObjectSerializable{
+class NullJSONObjectSerializableImpl implements ChristianBudde\cbweb\JSONObjectSerializable{
 
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return JSONObject
+     * @return ChristianBudde\cbweb\JSONObject
      */
     public function jsonObjectSerialize()
     {
-        return new JSONObjectImpl(null);
+        return new ChristianBudde\cbweb\JSONObjectImpl(null);
     }
 
     /**

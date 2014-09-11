@@ -1,4 +1,8 @@
 <?php
+use ChristianBudde\cbweb\SiteImpl;
+use ChristianBudde\cbweb\DB;
+use ChristianBudde\cbweb\SiteContentImpl;
+use ChristianBudde\cbweb\SiteContentJSONObjectImpl;
 
 /**
  * Created by JetBrains PhpStorm.

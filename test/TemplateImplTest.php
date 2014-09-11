@@ -1,4 +1,15 @@
 <?php
+use ChristianBudde\cbweb\BackendSingletonContainer;
+use ChristianBudde\cbweb\Page;
+use ChristianBudde\cbweb\TemplateImpl;
+use ChristianBudde\cbweb\Site;
+use ChristianBudde\cbweb\FileNotFoundException;
+use ChristianBudde\cbweb\FolderImpl;
+use ChristianBudde\cbweb\FileImpl;
+use ChristianBudde\cbweb\PageElementFactoryImpl;
+use ChristianBudde\cbweb\ConfigImpl;
+use ChristianBudde\cbweb\EntryNotFoundException;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -99,7 +110,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         try {
             $this->template->setTemplate($file);
         } catch (Exception $exception) {
-            $this->assertInstanceOf('FileNotFoundException', $exception, 'Got the wrong exception');
+            $this->assertInstanceOf('ChristianBudde\cbweb\FileNotFoundException', $exception, 'Got the wrong exception');
             /** @var $exception FileNotFoundException */
             $exceptionWasThrown = true;
             $this->assertEquals($file->getAbsoluteFilePath(), $exception->getFileName(), 'Did not expect the right file');
@@ -139,7 +150,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         try {
             $this->template->setTemplateFromConfig('main');
         } catch (Exception $exception) {
-            $this->assertInstanceOf('FileNotFoundException', $exception, 'Got the wrong exception');
+            $this->assertInstanceOf('ChristianBudde\cbweb\FileNotFoundException', $exception, 'Got the wrong exception');
             /** @var $exception FileNotFoundException */
             $exceptionWasThrown = true;
             $this->assertEquals($this->rootPath . 'folder/NonExistingFile', $exception->getFileName(), 'Did not expect the right file');
@@ -169,7 +180,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         try {
             $this->template->setTemplateFromConfig('main');
         } catch (Exception $exception) {
-            $this->assertInstanceOf('EntryNotFoundException', $exception, 'Got the wrong exception');
+            $this->assertInstanceOf('ChristianBudde\cbweb\EntryNotFoundException', $exception, 'Got the wrong exception');
             /** @var $exception EntryNotFoundException */
             $exceptionWasThrown = true;
             $this->assertEquals('main', $exception->getEntry(), 'Could not find the right wrong entry');

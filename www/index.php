@@ -17,7 +17,6 @@ AutoLoader::registerAutoloader();
 AutoLoader::registerDirectory(dirname(__FILE__) . "/../lib");
 AutoLoader::registerDirectory(dirname(__FILE__) . "/../../lib");
 // LOAD COMPOSER
-require dirname(__FILE__) . '/../vendor/autoload.php';
 @include dirname(__FILE__) . '/../../vendor/autoload.php';
 // PROVIDE A WAY TO INITIALIZE SITE FACTORY
 @include dirname(__FILE__) . '/../../vendor/local.php';
@@ -25,12 +24,12 @@ require dirname(__FILE__) . '/../vendor/autoload.php';
 date_default_timezone_set("Europe/Copenhagen");
 /** @var $siteConfig SimpleXMLElement */
 $siteConfig = simplexml_load_file('../site-config.xml');
-$config = new ConfigImpl($siteConfig, dirname(__FILE__) . '/../../');
+$config = new ChristianBudde\cbweb\ConfigImpl($siteConfig, dirname(__FILE__) . '/../../');
 
-$factory = isset($factory) ? $factory : new SiteFactoryImpl($config);
+$factory = isset($factory) ? $factory : new ChristianBudde\cbweb\SiteFactoryImpl($config);
 
 $setUp = function () use ($factory) {
-    $website = new WebsiteImpl($factory);
+    $website = new ChristianBudde\cbweb\WebsiteImpl($factory);
     $website->generateSite();
     return $website;
 };
@@ -44,10 +43,11 @@ if ($config->isDebugMode()) {
         $setUp();
     } catch (Exception $exception) {
         ob_clean();
-        $mail = new MailImpl();
+        $mail = new ChristianBudde\cbweb\MailImpl();
         $backendContainer = $factory->buildBackendSingletonContainer($config);
-        /** @var $user User */
+
         foreach ($backendContainer->getUserLibraryInstance() as $user) {
+            /** @var $user ChristianBudde\cbweb\User */
             if ($user->getUserPrivileges()->hasRootPrivileges()) {
                 $mail->addReceiver($user);
             }
@@ -66,7 +66,7 @@ if ($config->isDebugMode()) {
 
         $mail->setSubject("Fejl på $host");
         $mail->setSender("no-reply@$host");
-        $mail->setMailType(Mail::MAIL_TYPE_HTML);
+        $mail->setMailType(ChristianBudde\cbweb\Mail::MAIL_TYPE_HTML);
         $mail->sendMail();
 
         if ($log = $backendContainer->getLoggerInstance()) {
@@ -83,7 +83,7 @@ if ($config->isDebugMode()) {
 
 
         if (!isset($_SERVER['REQUEST_URI']) || strpos($_SERVER['REQUEST_URI'], '_500') === false) {
-            HTTPHeaderHelper::redirectToLocation("/_500");
+            ChristianBudde\cbweb\HTTPHeaderHelper::redirectToLocation("/_500");
         }
 
 

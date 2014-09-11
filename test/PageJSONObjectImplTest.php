@@ -6,6 +6,9 @@
  * Time: 09:26
  * To change this template use File | Settings | File Templates.
  */
+use ChristianBudde\cbweb\PageJSONObjectImpl;
+
+
 class PageJSONObjectImplTest extends PHPUnit_Framework_TestCase
 {
     public function testConstructorWillSetVariables(){

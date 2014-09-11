@@ -1,5 +1,6 @@
 <?php
-
+use ChristianBudde\cbweb\UserImpl;
+use ChristianBudde\cbweb\User;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -576,7 +577,7 @@ class UserImplTest extends CustomDatabaseTestCase
     }
 
     public function testGetUserPrivilegesRightInstance(){
-        $this->assertInstanceOf("UserPrivileges", $this->user->getUserPrivileges());
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\UserPrivileges", $this->user->getUserPrivileges());
     }
 
     public function testGetUserPrivilegesReturnSameInstance(){
@@ -585,7 +586,7 @@ class UserImplTest extends CustomDatabaseTestCase
 
 
     public function testGetUserVariablesReturnsRightInstance(){
-        $this->assertInstanceOf("Variables", $this->user->getUserVariables());
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\Variables", $this->user->getUserVariables());
     }
 
     public function testGetUserVariablesReturnsSameInstance(){
@@ -593,7 +594,7 @@ class UserImplTest extends CustomDatabaseTestCase
     }
 
     public function testUserIsJSONObjectSerializable(){
-        $this->assertInstanceOf('JSONObject', $o = $this->user->jsonObjectSerialize());
+        $this->assertInstanceOf('ChristianBudde\cbweb\JSONObject', $o = $this->user->jsonObjectSerialize());
         $this->assertEquals('user', $o->getName());
     }
 

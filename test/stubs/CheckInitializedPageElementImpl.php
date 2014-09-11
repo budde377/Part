@@ -5,7 +5,7 @@
  * Date: 13/12/12
  * Time: 01:38
  */
-class CheckInitializedPageElementImpl extends PageElementImpl
+class CheckInitializedPageElementImpl extends ChristianBudde\cbweb\PageElementImpl
 {
 
 

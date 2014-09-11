@@ -5,6 +5,7 @@
  * Date: 3/3/14
  * Time: 11:11 PM
  */
+use ChristianBudde\cbweb\SiteImpl;
 
 class SiteImplTest extends CustomDatabaseTestCase{
 
@@ -29,7 +30,7 @@ class SiteImplTest extends CustomDatabaseTestCase{
 
     public function testGetSiteContentReturnSameInstance(){
         $this->assertTrue($this->site->getContentLibrary() === $this->site->getContentLibrary());
-        $this->assertInstanceOf("ContentLibrary", $this->site->getContentLibrary());
+        $this->assertInstanceOf("ChristianBudde\cbweb\ContentLibrary", $this->site->getContentLibrary());
 
     }
 
@@ -46,7 +47,7 @@ class SiteImplTest extends CustomDatabaseTestCase{
     }
 
     public function testVariablesWillReuseInstance(){
-        $this->assertInstanceOf("Variables", $this->site->getVariables());
+        $this->assertInstanceOf("ChristianBudde\cbweb\Variables", $this->site->getVariables());
         $this->assertTrue($this->site->getVariables() === $this->site->getVariables());
     }
 

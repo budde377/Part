@@ -1,4 +1,5 @@
 <?php
+use ChristianBudde\cbweb\ScriptChainImpl;
 
 /**
  * Created by JetBrains PhpStorm.

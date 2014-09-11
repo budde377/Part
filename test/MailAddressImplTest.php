@@ -5,6 +5,10 @@
  * Date: 7/8/14
  * Time: 6:08 PM
  */
+use ChristianBudde\cbweb\MailAddressLibrary;
+use ChristianBudde\cbweb\MailAddressImpl;
+use ChristianBudde\cbweb\MailDomainLibraryImpl;
+use ChristianBudde\cbweb\MailAddress;
 
 class MailAddressImplTest extends CustomDatabaseTestCase{
 
@@ -136,7 +140,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
     public function testGetMailBoxReturnsRightInstance(){
         $mb1 = $this->address->getMailbox();
         $mb2 = $this->address2->getMailbox();
-        $this->assertInstanceOf('MailMailboxImpl', $mb1);
+        $this->assertInstanceOf('ChristianBudde\cbweb\MailMailboxImpl', $mb1);
         $this->assertNull($mb2);
 
     }
@@ -246,7 +250,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
 
     public function testCreateMailboxWillCreate(){
         $mb = $this->address2->createMailbox($n = "Bent", $p = "BentsPass");
-        $this->assertInstanceOf('MailMailboxImpl', $mb);
+        $this->assertInstanceOf('ChristianBudde\cbweb\MailMailboxImpl', $mb);
         $this->assertEquals($n, $mb->getName());
         $this->assertTrue($mb->checkPassword($p));
         $this->assertTrue($mb->exists());

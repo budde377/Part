@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-class StubCurrentPageStrategyImpl implements  CurrentPageStrategy{
+class StubCurrentPageStrategyImpl implements  \ChristianBudde\cbweb\CurrentPageStrategy{
 
     private $currentPagePath;
     private $currentPage;

@@ -6,6 +6,9 @@
  * Time: 3:53 PM
  * To change this template use File | Settings | File Templates.
  */
+use ChristianBudde\cbweb\UserVariablesImpl;
+use ChristianBudde\cbweb\User;
+use ChristianBudde\cbweb\UserImpl;
 
 class UserVariablesImplTest extends CustomDatabaseTestCase{
 

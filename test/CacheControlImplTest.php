@@ -8,6 +8,8 @@
  * To change this template use File | Settings | File Templates.
  */
 
+use ChristianBudde\cbweb\CacheControlImpl;
+
 class CacheControlImplTest extends  PHPUnit_Framework_TestCase{
 
     /** @var  CacheControlImpl */

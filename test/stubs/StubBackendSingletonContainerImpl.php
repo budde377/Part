@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
+class StubBackendSingletonContainerImpl implements ChristianBudde\cbweb\BackendSingletonContainer{
 
     private $DBInstance;
     private $CSSRegisterInstance;
@@ -45,7 +45,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     /**
      * @param mixed $CSSRegisterInstance
      */
-    public function setCSSRegisterInstance(CSSRegister $CSSRegisterInstance)
+    public function setCSSRegisterInstance(ChristianBudde\cbweb\CSSRegister $CSSRegisterInstance)
     {
         $this->CSSRegisterInstance = $CSSRegisterInstance;
     }
@@ -61,7 +61,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     /**
      * @param mixed $JSRegisterInstance
      */
-    public function setJSRegisterInstance(JSRegister $JSRegisterInstance)
+    public function setJSRegisterInstance(ChristianBudde\cbweb\JSRegister $JSRegisterInstance)
     {
         $this->JSRegisterInstance = $JSRegisterInstance;
     }
@@ -77,7 +77,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     /**
      * @param mixed $cacheControlInstance
      */
-    public function setCacheControlInstance(CacheControl $cacheControlInstance)
+    public function setCacheControlInstance(ChristianBudde\cbweb\CacheControl $cacheControlInstance)
     {
         $this->cacheControlInstance = $cacheControlInstance;
     }
@@ -93,7 +93,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     /**
      * @param mixed $configInstance
      */
-    public function setConfigInstance(Config $configInstance)
+    public function setConfigInstance(ChristianBudde\cbweb\Config $configInstance)
     {
         $this->configInstance = $configInstance;
     }
@@ -109,7 +109,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     /**
      * @param mixed $currentPageStrategyInstance
      */
-    public function setCurrentPageStrategyInstance(CurrentPageStrategy $currentPageStrategyInstance)
+    public function setCurrentPageStrategyInstance(ChristianBudde\cbweb\CurrentPageStrategy $currentPageStrategyInstance)
     {
         $this->currentPageStrategyInstance = $currentPageStrategyInstance;
     }
@@ -125,7 +125,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     /**
      * @param mixed $dartRegisterInstance
      */
-    public function setDartRegisterInstance(DartRegister $dartRegisterInstance)
+    public function setDartRegisterInstance(ChristianBudde\cbweb\DartRegister $dartRegisterInstance)
     {
         $this->dartRegisterInstance = $dartRegisterInstance;
     }
@@ -141,7 +141,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     /**
      * @param mixed $defaultPageLibraryInstance
      */
-    public function setDefaultPageLibraryInstance(DefaultPageLibrary $defaultPageLibraryInstance)
+    public function setDefaultPageLibraryInstance(ChristianBudde\cbweb\DefaultPageLibrary $defaultPageLibraryInstance)
     {
         $this->defaultPageLibraryInstance = $defaultPageLibraryInstance;
     }
@@ -158,7 +158,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     /**
      * @param mixed $pageOrderInstance
      */
-    public function setPageOrderInstance(PageOrder $pageOrderInstance)
+    public function setPageOrderInstance(ChristianBudde\cbweb\PageOrder $pageOrderInstance)
     {
         $this->pageOrderInstance = $pageOrderInstance;
     }
@@ -174,7 +174,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     /**
      * @param mixed $updater
      */
-    public function setUpdater(Updater $updater)
+    public function setUpdater(\ChristianBudde\cbweb\Updater $updater)
     {
         $this->updater = $updater;
     }
@@ -190,7 +190,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     /**
      * @param mixed $userLibraryInstance
      */
-    public function setUserLibraryInstance(UserLibrary $userLibraryInstance)
+    public function setUserLibraryInstance(\ChristianBudde\cbweb\UserLibrary $userLibraryInstance)
     {
         $this->userLibraryInstance = $userLibraryInstance;
     }
@@ -204,9 +204,9 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     }
 
     /**
-     * @param AJAXServer $AJAXServerInstance
+     * @param \ChristianBudde\cbweb\AJAXServer $AJAXServerInstance
      */
-    public function setJAXServerInstance(AJAXServer $AJAXServerInstance)
+    public function setJAXServerInstance(\ChristianBudde\cbweb\AJAXServer $AJAXServerInstance)
     {
         $this->AJAXServerInstance = $AJAXServerInstance;
     }
@@ -222,7 +222,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
 
     /**
      * This will return a DB. The same from time to time
-     * @return DB
+     * @return \ChristianBudde\cbweb\DB
      */
     public function getDBInstance()
     {
@@ -235,7 +235,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     /**
      * @param mixed $DBInstance
      */
-    public function setDBInstance(DB $DBInstance)
+    public function setDBInstance(\ChristianBudde\cbweb\DB $DBInstance)
     {
         $this->DBInstance = $DBInstance;
     }
@@ -243,7 +243,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     /**
      * Will create and reuse an instance of Variables.
      * These should reflect the site scoped variables.
-     * @return Variables
+     * @return \ChristianBudde\cbweb\Site
      */
     public function getSiteInstance()
     {
@@ -253,7 +253,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     /**
      * @param mixed $siteInstance
      */
-    public function setSiteInstance($siteInstance)
+    public function setSiteInstance(\ChristianBudde\cbweb\Site $siteInstance)
     {
         $this->siteInstance = $siteInstance;
     }
@@ -261,7 +261,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
 
     /**
      * Will create and reuse an instance of FileLibrary.
-     * @return FileLibrary
+     * @return \ChristianBudde\cbweb\FileLibrary
      */
     public function getFileLibraryInstance()
     {
@@ -271,7 +271,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     /**
      * @param mixed $fileLibraryInstance
      */
-    public function setFileLibraryInstance($fileLibraryInstance)
+    public function setFileLibraryInstance(\ChristianBudde\cbweb\FileLibrary $fileLibraryInstance)
     {
         $this->fileLibraryInstance = $fileLibraryInstance;
     }
@@ -279,7 +279,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
 
     /**
      * Will create and reuse instance of log.
-     * @return LogFile
+     * @return \ChristianBudde\cbweb\Logger
      */
     public function getLoggerInstance()
     {
@@ -290,7 +290,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer{
     /**
      * @param mixed $logInstance
      */
-    public function setLogInstance($logInstance)
+    public function setLogInstance(\ChristianBudde\cbweb\Logger $logInstance)
     {
         $this->logInstance = $logInstance;
     }

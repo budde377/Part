@@ -6,6 +6,11 @@
  * Time: 11:13 AM
  * To change this template use File | Settings | File Templates.
  */
+use ChristianBudde\cbweb\BackendSingletonContainer;
+use ChristianBudde\cbweb\ConfigImpl;
+use ChristianBudde\cbweb\PageElementFactoryImpl;
+use ChristianBudde\cbweb\ClassNotInstanceOfException;
+
 class PageElementFactoryTest extends PHPUnit_Framework_TestCase
 {
     private $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
@@ -181,7 +186,7 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
             $pageElementFactory->getPageElement('someElement');
         } catch (Exception $exception) {
             /** @var $exception ClassNotInstanceOfException */
-            $this->assertInstanceOf('ClassNotInstanceOfException', $exception);
+            $this->assertInstanceOf('ChristianBudde\cbweb\ClassNotInstanceOfException', $exception);
             $exceptionWasThrown = true;
             $this->assertEquals('StubScriptImpl', $exception->getClass(), 'Was not expected class');
             $this->assertEquals('PageElement', $exception->getExpectedInstance(), 'Was not expected instance');
@@ -206,7 +211,7 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
             $pageElementFactory->getPageElement('StubScriptImpl');
         } catch (Exception $exception) {
             /** @var $exception ClassNotInstanceOfException */
-            $this->assertInstanceOf('ClassNotInstanceOfException', $exception);
+            $this->assertInstanceOf('ChristianBudde\cbweb\ClassNotInstanceOfException', $exception);
             $exceptionWasThrown = true;
             $this->assertEquals('StubScriptImpl', $exception->getClass(), 'Was not expected class');
             $this->assertEquals('PageElement', $exception->getExpectedInstance(), 'Was not expected instance');
@@ -231,7 +236,7 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
-        $this->setExpectedException('FileNotFoundException');
+        $this->setExpectedException('ChristianBudde\cbweb\FileNotFoundException');
         $pageElementFactory->getPageElement('someElement');
 
     }
@@ -247,7 +252,7 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
-        $this->setExpectedException('ClassNotDefinedException');
+        $this->setExpectedException('ChristianBudde\cbweb\ClassNotDefinedException');
         $pageElementFactory->getPageElement('someElement');
 
     }

@@ -1,5 +1,5 @@
 <?php
-
+use ChristianBudde\cbweb\File;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -7,7 +7,7 @@
  * Time: 9:47 AM
  * To change this template use File | Settings | File Templates.
  */
-class NullOptimizerImpl implements Optimizer
+class NullOptimizerImpl implements \ChristianBudde\cbweb\Optimizer
 {
 
     /**

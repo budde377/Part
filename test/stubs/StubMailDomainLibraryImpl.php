@@ -5,6 +5,9 @@
  * Date: 7/7/14
  * Time: 2:14 PM
  */
+use ChristianBudde\cbweb\MailDomain;
+use ChristianBudde\cbweb\MailDomainLibrary;
+
 
 class StubMailDomainLibraryImpl implements MailDomainLibrary{
 

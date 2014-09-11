@@ -5,6 +5,7 @@
  * Date: 7/9/14
  * Time: 3:09 PM
  */
+use ChristianBudde\cbweb\ObserverLibraryImpl;
 
 class ObserverLibraryImplTest extends  PHPUnit_Framework_TestCase{
 

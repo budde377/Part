@@ -5,6 +5,8 @@
  * Date: 9/7/14
  * Time: 6:03 PM
  */
+use ChristianBudde\cbweb\ImageFileImpl;
+use ChristianBudde\cbweb\ImageFileJSONObjectImpl;
 
 class ImageFileJSONObjectImplTest extends PHPUnit_Framework_TestCase{
 

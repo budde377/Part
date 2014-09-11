@@ -1,5 +1,6 @@
 <?php
-
+use ChristianBudde\cbweb\CSSRegisterImpl;
+use ChristianBudde\cbweb\CSSFileImpl;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

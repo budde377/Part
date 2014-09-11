@@ -6,7 +6,7 @@
  * Time: 6:00 PM
  */
 
-class StubSiteContentImpl extends StubContentImpl implements SiteContent{
+class StubSiteContentImpl extends StubContentImpl implements \ChristianBudde\cbweb\SiteContent{
 
 
 }

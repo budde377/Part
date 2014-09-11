@@ -6,8 +6,10 @@
  * Time: 10:26 AM
  */
 
+use ChristianBudde\cbweb\PageElementImpl;
+
 class PageElementImplTest extends PHPUnit_Framework_TestCase{
-    /** @var  PageElement */
+    /** @var  PageElementImpl */
     private $pageElement;
     public function setUp(){
         $this->pageElement = new PageElementImpl();

@@ -8,6 +8,12 @@
  * To change this template use File | Settings | File Templates.
  */
 
+use ChristianBudde\cbweb\DB;
+use ChristianBudde\cbweb\PageContentImpl;
+use ChristianBudde\cbweb\Page;
+use ChristianBudde\cbweb\PageImpl;
+use ChristianBudde\cbweb\PageContentJSONObjectImpl;
+
 class PageContentImplTest extends CustomDatabaseTestCase{
 
 

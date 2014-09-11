@@ -5,9 +5,12 @@
  * Date: 02/08/12
  * Time: 14:54
  */
+use ChristianBudde\cbweb\MailImpl;
+use ChristianBudde\cbweb\Mail;
+
 class MailImplTest extends  PHPUnit_Framework_TestCase
 {
-    use ValidationTrait;
+    use \ChristianBudde\cbweb\ValidationTrait;
     /** @var $strategy StubSendMailStrategyImpl */
     private $strategy;
     /** @var $mail MailImpl */
