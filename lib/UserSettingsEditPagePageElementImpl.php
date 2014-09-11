@@ -46,7 +46,7 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
         $pageForm->insertInputText("id", "EditPageEditIDField", $this->currentPage->getID(), "Side ID");
         /** @var $select HTMLSelectElement */
         $pageForm->insertSelect("template", "EditPageEditTemplateSelect", "Side type", $select);
-        foreach ($this->config->listTemplateNames() as $templateName) {
+	foreach ($this->config->listTemplateNames() as $templateName) {
             if (substr($templateName, 0, 1) != "_") {
                 $option = $select->insertOption($templateName, $templateName);
                 if ($templateName == $this->currentPage->getTemplate()) {

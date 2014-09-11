@@ -12,7 +12,7 @@ class HTMLSelectElementImpl implements HTMLSelectElement
     private $element;
     private $groups = array();
 
-    public function HTMLSelectElementImpl($name, $id, $multiple = false, $size = 1, $disabled = false)
+    public function __construct($name, $id, $multiple = false, $size = 1, $disabled = false)
     {
         $this->element = new HTMLElementImpl('select',array('name'=>$name,'id'=>$id,'size'=>$size));
         if($multiple){
@@ -89,7 +89,7 @@ class HTMLSelectElementImpl implements HTMLSelectElement
      */
     public function insertOption($text, $value, $group_id = null, array $attributes = array())
     {
-        $option = new HTMLOptionElementImpl($text,$value,$group_id,$attributes);
+        $option = new HTMLOptionElementImpl($text,$value,$group_id,$attributes);	
         if($group_id != null && isset($this->groups[$group_id])){
             /** @var $group HTMLElement */
             $group = $this->groups[$group_id];
