@@ -12,19 +12,28 @@ class TemplatePageElementTwigNodeImpl extends Twig_Node
 {
 
     /**
-     * @param string $name
+     * @param array $nameArray
      * @param int $line
      * @param int $tag
      */
-    function __construct($name, $line, $tag)
+    function __construct(array $nameArray, $line, $tag)
     {
-        parent::__construct(array(), array('name' => $name), $line, $tag);
+        parent::__construct(array(), array('nameArray' => $nameArray), $line, $tag);
 
     }
 
     public function compile(Twig_Compiler $compiler)
     {
-        $name = $this->getAttribute('name');
+        $nameArray = $this->getAttribute('nameArray');
+        $name = "";
+        if(count($nameArray) == 1){
+            $name = $nameArray[0];
+        } else {
+            foreach($nameArray as $n){
+                $name.= "\\$n";
+            }
+        }
+
         $varName = uniqid("var");
         $compiler
             ->write("\$$varName = \$context['page_element_factory']->getPageElement('$name');")->raw("\n")

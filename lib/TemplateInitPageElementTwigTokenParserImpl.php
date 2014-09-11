@@ -24,9 +24,14 @@ class TemplateInitPageElementTwigTokenParserImpl extends Twig_TokenParser
     public function parse(Twig_Token $token)
     {
         $stream = $this->parser->getStream();
-        $name = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
+        $nameArray = [];
+        $nameArray[] = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
+        while($stream->getCurrent()->getType() == Twig_Token::PUNCTUATION_TYPE){
+            $stream->expect(Twig_Token::PUNCTUATION_TYPE);
+            $nameArray[] = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
+        }
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
-        return new TemplateInitPageElementTwigNodeImpl($name, $token->getLine(), $this->getTag());
+        return new TemplateInitPageElementTwigNodeImpl($nameArray, $token->getLine(), $this->getTag());
     }
 
     /**

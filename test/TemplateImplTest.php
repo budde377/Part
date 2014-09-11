@@ -49,7 +49,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     private function setUpConfig($config = null)
     {
-        if($config == null){
+        if ($config == null) {
             $config = "
             <config>{$this->defaultOwner}
             <pageElements>
@@ -63,7 +63,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         /** @var $configXML SimpleXMLElement */
         $configXML = simplexml_load_string($config);
         $rootDir = new FolderImpl(dirname(__FILE__) . '/../');
-        $this->rootPath = $rootDir->getAbsolutePath()."/";
+        $this->rootPath = $rootDir->getAbsolutePath() . "/";
         $config = new ConfigImpl($configXML, $this->rootPath);
 
         // Setting up pages
@@ -121,7 +121,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testCanSetTemplateFromExistingFile(){
+    public function testCanSetTemplateFromExistingFile()
+    {
         $this->setUpConfig("
         <config>
             {$this->defaultOwner}
@@ -160,7 +161,9 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($exceptionWasThrown, 'Exception was not thrown');
 
     }
-    public function testCanAddFallbackConfigOnEntryNotFoundInConfigWithoutExceptions(){
+
+    public function testCanAddFallbackConfigOnEntryNotFoundInConfigWithoutExceptions()
+    {
         $this->setUpConfig("
         <config>
             {$this->defaultOwner}
@@ -191,14 +194,16 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testTemplatesUsesTwig(){
+    public function testTemplatesUsesTwig()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{%set t='World' %}Hello{{t}}");
         $this->assertEquals("HelloWorld", $this->template->render());
     }
 
-    public function testDebugEnablesDebug(){
+    public function testDebugEnablesDebug()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -206,7 +211,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testTemplateAddsCurrentUserName(){
+    public function testTemplateAddsCurrentUserName()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -215,7 +221,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testTemplateAddsUpdater(){
+    public function testTemplateAddsUpdater()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -223,7 +230,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(strpos($v, "updater") !== false);
     }
 
-    public function testTemplateAddsHasSitePrivileges(){
+    public function testTemplateAddsHasSitePrivileges()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -231,7 +239,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(strpos($v, "has_site_privileges") !== false);
     }
 
-    public function testTemplateAddsHasPagePrivileges(){
+    public function testTemplateAddsHasPagePrivileges()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -239,7 +248,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(strpos($v, "has_page_privileges") !== false);
     }
 
-    public function testTemplateAddsHasRootPrivileges(){
+    public function testTemplateAddsHasRootPrivileges()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -247,7 +257,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(strpos($v, "has_root_privileges") !== false);
     }
 
-    public function testTemplateAddsUserLibrary(){
+    public function testTemplateAddsUserLibrary()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -255,7 +266,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(strpos($v, "user_lib") !== false);
     }
 
-    public function testTemplateAddsCurrentPage(){
+    public function testTemplateAddsCurrentPage()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -264,7 +276,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testTemplateAddsCurrentPagePath(){
+    public function testTemplateAddsCurrentPagePath()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -272,7 +285,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(strpos($v, "current_page_path") !== false);
     }
 
-    public function testTemplateAddsPageOrder(){
+    public function testTemplateAddsPageOrder()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -280,7 +294,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(strpos($v, "page_order") !== false);
     }
 
-    public function testTemplateAddsBackendContainer(){
+    public function testTemplateAddsBackendContainer()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -288,7 +303,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(strpos($v, "backend_container") !== false);
     }
 
-    public function testTemplateAddsCSSRegister(){
+    public function testTemplateAddsCSSRegister()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -296,7 +312,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(strpos($v, "css_register") !== false);
     }
 
-    public function testTemplateAddsJSRegister(){
+    public function testTemplateAddsJSRegister()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -304,7 +321,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(strpos($v, "js_register") !== false);
     }
 
-    public function testTemplateAddsPageElementFacoty(){
+    public function testTemplateAddsPageElementFacoty()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -312,14 +330,17 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(strpos($v, "page_element_factory") !== false);
     }
 
-    public function testTemplateAddsSite(){
+    public function testTemplateAddsSite()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
         $v = $this->template->render();
         $this->assertContains("site", $v);
     }
-    public function testTemplateAddsConfig(){
+
+    public function testTemplateAddsConfig()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -327,7 +348,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertContains("config", $v);
     }
 
-    public function testTemplateAddsInitialize(){
+    public function testTemplateAddsInitialize()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -335,7 +357,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertContains("initialize", $v);
     }
 
-    public function testTemplateAddsLastModified(){
+    public function testTemplateAddsLastModified()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -344,7 +367,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testTemplateAddsDebug(){
+    public function testTemplateAddsDebug()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{{ dump() }}");
@@ -353,42 +377,71 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testTemplateSupportsPageElementTag(){
+    public function testTemplateSupportsPageElementTag()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{%page_element someElement%}");
         $v = $this->template->render();
-        $this->assertEquals( "Hello World", $v);
+        $this->assertEquals("Hello World", $v);
     }
 
-   public function testTemplateSupportsPageElementTagAlsoWithElementNotInConfig(){
+    public function testTemplateSupportsPageElementTagAlsoWithElementNotInConfig()
+    {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{%page_element HelloPageElementImpl%}");
         $v = $this->template->render();
-        $this->assertEquals( "Hello World", $v);
+        $this->assertEquals("Hello World", $v);
     }
 
-    public function testTemplateBreakIfNoPageElement(){
+    public function testTemplateSupportsPageElementTagAlsoWithElementNotInConfigAndWithNamespaces()
+    {
+        include dirname(__FILE__)."/stubs/HelloNamespacePageElementImpl.php";
+        $this->setUpConfig();
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{%page_element Testnamespace.test.HelloNamespacePageElementImpl  %}");
+        $v = $this->template->render();
+        $this->assertEquals("Hello World", $v);
+    }
+
+    public function testTemplateBreakIfNoPageElement()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%page_element nonExistingElement%}");
         $exception = false;
-        try{
+        try {
             $this->template->render();
-        } catch(Twig_Error $error){
+        } catch (Twig_Error $error) {
             $exception = true;
             $this->assertEquals(1, $error->getTemplateLine());
         }
         $this->assertTrue($exception);
     }
 
-    public function testTemplateInitializePageElementIsSupported(){
+    public function testTemplateInitializePageElementIsSupported()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%init_page_element someElement%}");
         $this->assertEquals("", $this->template->render());
     }
 
-    public function testTemplateInitializePageElementDoesJustThat(){
+    public function testTemplateInitializePageElementIsSupportedFromClassName()
+    {
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%init_page_element HelloPageElementImpl%}");
+        $this->assertEquals("", $this->template->render());
+    }
+
+    public function testTemplateInitializePageElementIsSupportedFromClassNameWithNamespace()
+    {
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{%init_page_element ChristianBudde.cbweb.TitlePageElementImpl%}");
+        $this->assertEquals("", $this->template->render());
+    }
+
+    public function testTemplateInitializePageElementDoesJustThat()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%init_page_element initElement%}");
         $_SESSION['initialized'] = 0;
@@ -396,7 +449,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $_SESSION['initialized']);
     }
 
-    public function testTemplateInitializePageElementCanBeCalledMultipleTimes(){
+    public function testTemplateInitializePageElementCanBeCalledMultipleTimes()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%init_page_element initElement%}{%init_page_element initElement%}");
         $_SESSION['initialized'] = 0;
@@ -404,7 +458,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $_SESSION['initialized']);
     }
 
-    public function testTemplateInitializePageElementAndPageElementCanBothBeDone(){
+    public function testTemplateInitializePageElementAndPageElementCanBothBeDone()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%init_page_element initElement%}{%page_element initElement%}");
         $_SESSION['initialized'] = 0;
@@ -412,7 +467,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $_SESSION['initialized']);
     }
 
-    public function testTemplateInitializeWillBeDoneOnPageElement(){
+    public function testTemplateInitializeWillBeDoneOnPageElement()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%page_element initElement%}");
         $_SESSION['initialized'] = 0;
@@ -421,7 +477,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $_SESSION['initialized']);
     }
 
-    public function testTemplateInitializePageElementWillOnlyBeInitializedOnceOnOneInitAndOneUsage(){
+    public function testTemplateInitializePageElementWillOnlyBeInitializedOnceOnOneInitAndOneUsage()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%init_page_element initElement%}{%page_element initElement%}");
         $_SESSION['initialized'] = 0;
@@ -430,7 +487,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $_SESSION['initialized']);
     }
 
-    public function testInitPageElementWillBeDoneTwiceOnTwiceRender(){
+    public function testInitPageElementWillBeDoneTwiceOnTwiceRender()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%init_page_element initElement%}");
         $_SESSION['initialized'] = 0;
@@ -439,32 +497,36 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(2, $_SESSION['initialized']);
     }
 
-    public function testTemplateInitializePageElementBreaksOnElementNotFound(){
+    public function testTemplateInitializePageElementBreaksOnElementNotFound()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%init_page_element nonExistingElement%}");
         $exception = false;
-        try{
+        try {
             $this->template->render();
-        } catch(Twig_Error $error){
+        } catch (Twig_Error $error) {
             $exception = true;
             $this->assertEquals(1, $error->getTemplateLine());
         }
         $this->assertTrue($exception);
     }
 
-    public function testTemplateWillSupportPageContent(){
+    public function testTemplateWillSupportPageContent()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%page_content someElement %}");
         $this->assertEquals("", $this->template->render());
     }
 
-    public function testTemplateWillSupportPageContentWithNoId(){
+    public function testTemplateWillSupportPageContentWithNoId()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%page_content asd%}");
         $this->assertEquals("", $this->template->render());
     }
 
-    public function testTemplateWillAddPageContent(){
+    public function testTemplateWillAddPageContent()
+    {
         $this->setUpConfig();
         $this->currentPage->getContent()->addContent("Hello World");
         $this->template->setTemplateFromString("{%page_content%}");
@@ -472,7 +534,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testTemplateWillUpdatePageContent(){
+    public function testTemplateWillUpdatePageContent()
+    {
         $this->setUpConfig();
         $this->currentPage->getContent()->addContent("Hello World");
         $this->template->setTemplateFromString("{%page_content%}");
@@ -481,7 +544,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("Hello World2", $this->template->render());
     }
 
-    public function testTemplateWillGetPageContentFromOtherSiteThanCurrent(){
+    public function testTemplateWillGetPageContentFromOtherSiteThanCurrent()
+    {
         $this->setUpConfig();
         $c = "LOLSTRING";
         $this->inactivePage->getContent("SomeId")->addContent($c);
@@ -489,7 +553,9 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $r = $this->template->render();
         $this->assertEquals($c, $r);
     }
-    public function testTemplateCanCallEmptyContentIdOnOtherSite(){
+
+    public function testTemplateCanCallEmptyContentIdOnOtherSite()
+    {
         $this->setUpConfig();
         $c = "LOLSTRING";
         $this->inactivePage->getContent()->addContent($c);
@@ -499,7 +565,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testTemplateWillReturnEmptyOnWrongId(){
+    public function testTemplateWillReturnEmptyOnWrongId()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%page_content somenonexitingid[SomeId] %}");
         $r = $this->template->render();
@@ -507,14 +574,15 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-
-    public function testTemplateWillSupportSiteContent(){
+    public function testTemplateWillSupportSiteContent()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%site_content someElement %}");
         $this->assertEquals("", $this->template->render());
     }
 
-    public function testTemplateWillAddSiteContent(){
+    public function testTemplateWillAddSiteContent()
+    {
         $this->setUpConfig();
         $this->site->getContent("")->addContent("Hello World");
         $this->template->setTemplateFromString("{%site_content%}");
@@ -522,7 +590,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testTemplateWillUpdateSiteContent(){
+    public function testTemplateWillUpdateSiteContent()
+    {
         $this->setUpConfig();
         $this->site->getContent("")->addContent("Hello World");
         $this->template->setTemplateFromString("{%site_content%}");
@@ -532,7 +601,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testTemplateWillAddSiteContentWithId(){
+    public function testTemplateWillAddSiteContentWithId()
+    {
         $this->setUpConfig();
         $this->site->getContent("someid")->addContent("Hello World");
         $this->template->setTemplateFromString("{%site_content someid%}");
@@ -540,19 +610,22 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testTemplateWillSupportPageVariables(){
+    public function testTemplateWillSupportPageVariables()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%page_variable someElement %}");
         $this->assertEquals("", $this->template->render());
     }
 
-    public function testTemplateWillSupportPageVariableWithNoId(){
+    public function testTemplateWillSupportPageVariableWithNoId()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%page_variable asd %}");
         $this->assertEquals("", $this->template->render());
     }
 
-    public function testTemplateWillAddPageVariable(){
+    public function testTemplateWillAddPageVariable()
+    {
         $this->setUpConfig();
         $this->currentPage->getVariables()->setValue("asd", "Hello World");
         $this->template->setTemplateFromString("{%page_variable asd%}");
@@ -560,7 +633,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testTemplateWillUpdatePageVariable(){
+    public function testTemplateWillUpdatePageVariable()
+    {
         $this->setUpConfig();
         $this->currentPage->getVariables()->setValue("foo", "Hello World");
         $this->template->setTemplateFromString("{%page_variable foo%}");
@@ -569,32 +643,35 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("Hello World2", $this->template->render());
     }
 
-    public function testTemplateSupportPageVariablesFromOtherPages(){
+    public function testTemplateSupportPageVariablesFromOtherPages()
+    {
         $this->setUpConfig();
         $k = "Foo";
         $v = "Bar";
         $id = $this->inactivePage->getID();
         $this->inactivePage->getVariables()->setValue($k, $v);
         $this->template->setTemplateFromString("{% page_variable {$id}[$k] %}");
-        $this->assertEquals($v,$this->template->render());
+        $this->assertEquals($v, $this->template->render());
     }
 
-    public function testTemplateSupportPageVariablesFromOtherNonExistingPages(){
+    public function testTemplateSupportPageVariablesFromOtherNonExistingPages()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{% page_variable somenonexistingid[someid] %}");
-        $this->assertEquals("",$this->template->render());
+        $this->assertEquals("", $this->template->render());
 
     }
 
 
-
-    public function testTemplateWillSupportSiteVariable(){
+    public function testTemplateWillSupportSiteVariable()
+    {
         $this->setUpConfig();
         $this->template->setTemplateFromString("{%site_variable someElement %}");
         $this->assertEquals("", $this->template->render());
     }
 
-    public function testTemplateWillAddSiteVariable(){
+    public function testTemplateWillAddSiteVariable()
+    {
         $this->setUpConfig();
         $this->site->getVariables()->setValue("foo", "Hello World");
         $this->template->setTemplateFromString("{%site_variable foo%}");
@@ -602,7 +679,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testTemplateWillUpdateSiteVariable(){
+    public function testTemplateWillUpdateSiteVariable()
+    {
         $this->setUpConfig();
         $this->site->getVariables()->setValue("foo", "Hello World");
         $this->template->setTemplateFromString("{%site_variable foo%}");
