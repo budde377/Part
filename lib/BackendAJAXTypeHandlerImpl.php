@@ -213,7 +213,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
     {
 
         $server->registerHandler($userHandler =
-                new GenericObjectAJAXTypeHandlerImpl(($u = $this->userLibrary->getUserLoggedIn()) == null ? "User" : $u),
+                new GenericObjectAJAXTypeHandlerImpl(($u = $this->userLibrary->getUserLoggedIn()) == null ? "ChristianBudde\\cbweb\\User" : $u),
             ' User');
         $userHandler->whitelistFunction("User",
             "getUsername",
@@ -364,7 +364,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
     private function setUpPageContentHandler(AJAXServer $server)
     {
-        $server->registerHandler($contentHandler = new GenericObjectAJAXTypeHandlerImpl('PageContent'));
+        $server->registerHandler($contentHandler = new GenericObjectAJAXTypeHandlerImpl('ChristianBudde\cbweb\PageContent'));
         $contentHandler->addFunctionAuthFunction("PageContent", "addContent", function ($type, PageContent $instance) {
             return ($current = $this->backend->getUserLibraryInstance()->getUserLoggedIn()) != null && $current->getUserPrivileges()->hasPagePrivileges($instance->getPage());
         });
@@ -373,7 +373,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
     private function setUpSiteContentHandler(AJAXServer $server)
     {
-        $server->registerHandler($siteContentHandler = new GenericObjectAJAXTypeHandlerImpl('SiteContent'));
+        $server->registerHandler($siteContentHandler = new GenericObjectAJAXTypeHandlerImpl('ChristianBudde\cbweb\SiteContent'));
         $siteContentHandler->addFunctionAuthFunction("SiteContent", "addContent", $this->sitePrivilegesFunction);
         $siteContentHandler->addGetInstanceFunction('SiteContent');
     }
@@ -381,7 +381,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
     private function setUpPageContentLibraryHandler(AJAXServer $server)
     {
         $contentLibrary = $this->backend->getPageOrderInstance()->getCurrentPage()->getContentLibrary();
-        $siteContentHandler = new GenericObjectAJAXTypeHandlerImpl($contentLibrary == null?"PageContentLibrary":$contentLibrary);
+        $siteContentHandler = new GenericObjectAJAXTypeHandlerImpl($contentLibrary == null?"ChristianBudde\\cbweb\\PageContentLibrary":$contentLibrary);
         $server->registerHandler($siteContentHandler, "PageContentLibrary");
     }
 
@@ -408,7 +408,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
     private function setUpFileHandler(AJAXServer $server)
     {
-        $server->registerHandler($fileHandler = new GenericObjectAJAXTypeHandlerImpl('ImageFile', 'File', 'ImageFile'));
+        $server->registerHandler($fileHandler = new GenericObjectAJAXTypeHandlerImpl('ChristianBudde\cbweb\ImageFile', 'File', 'ImageFile'));
         $fileHandler->whitelistFunction("File",
             'getContents',
             'getFilename',
