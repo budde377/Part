@@ -205,9 +205,11 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase{
         $this->function1->setArg(0, "test");
         $this->function1->setArg(0, null);
         $args = $this->function1->getArgs();
-        $this->assertEquals([], $args);
+        $this->assertEquals([null], $args);
 
     }
+
+
     public function testCorrectArgumentWithNullUnSetsFromArgumentListNotIfNotLast(){
         $this->function1->setArg(0, "test");
         $this->function1->setArg(1, "test");
