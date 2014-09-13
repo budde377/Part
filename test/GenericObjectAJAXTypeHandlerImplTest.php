@@ -538,6 +538,26 @@ class GenericObjectAJAXTypeHandlerImplTest extends  PHPUnit_Framework_TestCase{
 
     }
 
+
+    public function testAddFunctionAuthIsOnlyAddedToOne(){
+        $this->setUpHandler($this->handler);
+        $this->handler->addFunction("JSONElement", "custom1", $f = function() {
+            return true;
+        });
+        $this->handler->addFunction("JSONElement", "custom2", $f);
+
+        $this->handler->addFunctionAuthFunction('JSONElement', 'custom1', function(){
+           return false;
+        });
+        /** @var JSONFunction $f */
+        $f = $this->parser->parseFunctionString("JSONElement.custom2()");
+        $this->assertTrue($this->handler->handle('JSONElement', $f));
+
+
+    }
+
+
+
     private function setUpHandler(\ChristianBudde\cbweb\AJAXTypeHandler $handler)
     {
         foreach($handler->listTypes() as $type){

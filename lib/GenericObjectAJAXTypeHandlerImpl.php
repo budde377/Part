@@ -478,8 +478,8 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
             }
         }
 
-        if (isset($this->functionAuthFunctions[$type][$function->getName()])) {
-            foreach ($this->functionAuthFunctions[$type] as $f) {
+        if (isset($this->functionAuthFunctions[$type][$fn = $function->getName()])) {
+            foreach ($this->functionAuthFunctions[$type][$fn] as $f) {
                 if (!$f($type, $instance, $name, $function->getArgs())) {
                     return false;
                 }
