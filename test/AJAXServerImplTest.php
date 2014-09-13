@@ -8,6 +8,7 @@ use ChristianBudde\cbweb\JSONResponseImpl;
 use ChristianBudde\cbweb\JSONFunction;
 use ChristianBudde\cbweb\JSONFunctionImpl;
 use ChristianBudde\cbweb\JSONTypeImpl;
+
 /**
  * Created by PhpStorm.
  * User: budde
@@ -405,7 +406,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
 
     }
 
- public function testHandleOnCompositeFunctionsWithJSONResponseReturnedIsResponse()
+    public function testHandleOnCompositeFunctionsWithJSONResponseReturnedIsResponse()
     {
 
 
@@ -568,7 +569,8 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testHandlerTypeFunctionRight(){
+    public function testHandlerTypeFunctionRight()
+    {
 
         $type1 = 'Content';
         $this->handler1->types = [$type1];
@@ -596,7 +598,24 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->assertNull($this->checkIfFunctionIsCalled('canHandle', $this->handler1));
         $this->assertNotNull($this->checkIfFunctionIsCalled('canHandle', $this->handler2));
 
+    }
 
+    public function testFunctionReturningNullAsArgumentToAnotherFunctionIsNull()
+    {
+        $type1 = 'Content';
+        $this->handler1->types = [$type1];
+        $this->handler1->canHandle[$type1] = true;
+        $this->handler1->handle[$type1] = $instance1 = null;
+        $this->server->registerHandler($this->handler1);
+        $this->server->handleFromFunctionString("Content.c1(Content.c2())");
+
+        $this->assertNotNull($this->checkIfFunctionIsCalled('canHandle', $this->handler1));
+        $this->assertNotNull($this->checkIfFunctionIsCalled('canHandle', $this->handler1));
+        $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('handle', $this->handler1));
+        $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled( 'handle', $this->handler1));
+
+        $this->assertEquals([$type1, $this->functionStringParser->parseFunctionString("Content.c2()"), $instance1], $r1['arguments']);
+        $this->assertEquals([$type1, $this->functionStringParser->parseFunctionString("Content.c1()"), $instance1], $r2['arguments']);
 
     }
 

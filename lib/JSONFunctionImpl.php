@@ -75,6 +75,13 @@ class JSONFunctionImpl extends JSONProgramImpl implements JSONFunction
      */
     public function setArg($num, $value)
     {
+
+        if($value == null && $num == $this->size-1){
+            unset($this->args[$num]);
+            $this->size--;
+            return;
+        }
+
         if (!is_numeric($num)) {
             return;
         }

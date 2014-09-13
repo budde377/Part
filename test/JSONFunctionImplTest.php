@@ -194,6 +194,29 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase{
         $this->assertTrue(strpos($this->function1->getAsJSONString(), $obj->getAsJSONString()) !== false);
     }
 
+    public function testCorrectArgumentWithNullUnSets(){
+        $this->function1->setArg(0, "test");
+        $this->function1->setArg(0, null);
+        $this->assertNull($this->function1->getArg(0));
+
+    }
+
+    public function testCorrectArgumentWithNullUnSetsFromArgumentList(){
+        $this->function1->setArg(0, "test");
+        $this->function1->setArg(0, null);
+        $args = $this->function1->getArgs();
+        $this->assertEquals([], $args);
+
+    }
+    public function testCorrectArgumentWithNullUnSetsFromArgumentListNotIfNotLast(){
+        $this->function1->setArg(0, "test");
+        $this->function1->setArg(1, "test");
+        $this->function1->setArg(0, null);
+        $args = $this->function1->getArgs();
+        $this->assertEquals([null, "test"], $args);
+
+    }
+
 
     public function testSetRootTargetSetsRootTarget(){
         $this->function2->setRootTarget($t = new JSONTypeImpl("NewType"));
