@@ -79,7 +79,7 @@ class JSONUser extends User {
       functionString += "..setMail(${quoteString(mail)})";
     }
 
-    if(username == null){
+    if(username != null){
       functionString += "..setUsername(${quoteString(username)})";
     }
 
