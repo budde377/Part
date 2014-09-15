@@ -8,8 +8,6 @@
 namespace ChristianBudde\cbweb\test\stub;
 
 use ChristianBudde\cbweb\model\mail\MailDomain;
-use ChristianBudde\cbweb\model\mail\MailAddressLibrary;
-use ChristianBudde\cbweb\model\mail\MailDomainLibrary;
 use ChristianBudde\cbweb\util\Observer;
 
 

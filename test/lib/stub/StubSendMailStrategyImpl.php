@@ -1,12 +1,14 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
+use ChristianBudde\cbweb\util\mail\SendMailStrategy;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 02/08/12
  * Time: 14:59
  */
-class StubSendMailStrategyImpl implements \ChristianBudde\cbweb\util\mail\SendMailStrategy
+class StubSendMailStrategyImpl implements SendMailStrategy
 {
 
     private $called = false;

@@ -8,7 +8,7 @@
 
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\PageElementImpl;
+use ChristianBudde\cbweb\view\page_element\PageElementImpl;
 use PHPUnit_Framework_TestCase;
 
 class PageElementImplTest extends PHPUnit_Framework_TestCase

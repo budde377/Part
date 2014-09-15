@@ -1,5 +1,9 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
+use ChristianBudde\cbweb\controller\ajax\AJAXServer;
+use ChristianBudde\cbweb\controller\ajax\AJAXTypeHandler;
+use ChristianBudde\cbweb\controller\json\JSONFunction;
+
 /**
  * Created by PhpStorm.
  * User: budde
@@ -7,7 +11,7 @@ namespace ChristianBudde\cbweb\test\stub;
  * Time: 3:46 PM
  */
 
-class StubAJAXTypeHandlerImpl implements \ChristianBudde\cbweb\controller\ajax\AJAXTypeHandler
+class StubAJAXTypeHandlerImpl implements AJAXTypeHandler
 {
 
     public $calledMethods = [];
@@ -35,7 +39,7 @@ class StubAJAXTypeHandlerImpl implements \ChristianBudde\cbweb\controller\ajax\A
      * @param string $type The type currently being set-up
      * @return void
      */
-    public function setUp(\ChristianBudde\cbweb\controller\ajax\AJAXServer $server, $type)
+    public function setUp(AJAXServer $server, $type)
     {
         $this->calledMethods[] = ['method' => 'setUp', 'arguments' => func_get_args()];
     }
@@ -57,7 +61,7 @@ class StubAJAXTypeHandlerImpl implements \ChristianBudde\cbweb\controller\ajax\A
      * @param mixed $instance
      * @return bool
      */
-    public function canHandle($type, \ChristianBudde\cbweb\controller\json\JSONFunction $function, $instance = null)
+    public function canHandle($type, JSONFunction $function, $instance = null)
     {
         $this->calledMethods[] = ['method' => 'canHandle', 'arguments' => func_get_args()];
         return $this->canHandle[$type];
@@ -69,7 +73,7 @@ class StubAJAXTypeHandlerImpl implements \ChristianBudde\cbweb\controller\ajax\A
      * @param mixed $instance
      * @return mixed
      */
-    public function handle($type, \ChristianBudde\cbweb\controller\json\JSONFunction $function, $instance = null)
+    public function handle($type, JSONFunction $function, $instance = null)
     {
         $this->calledMethods[] = ['method' => 'handle', 'arguments' => func_get_args()];
 

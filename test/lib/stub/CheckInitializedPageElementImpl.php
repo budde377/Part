@@ -1,6 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde;
+use ChristianBudde\cbweb\view\page_element\PageElementImpl;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -8,7 +8,7 @@ use ChristianBudde;
  * Date: 13/12/12
  * Time: 01:38
  */
-class CheckInitializedPageElementImpl extends ChristianBudde\cbweb\PageElementImpl
+class CheckInitializedPageElementImpl extends PageElementImpl
 {
 
 

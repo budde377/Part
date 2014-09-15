@@ -1,6 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde\cbweb\test\stub\ScriptHasRunException;
+use ChristianBudde\cbweb\util\script\Script;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -9,7 +9,7 @@ use ChristianBudde\cbweb\test\stub\ScriptHasRunException;
  * Time: 3:03 PM
  * To change this template use File | Settings | File Templates.
  */
-class ExceptionStubScriptImpl implements \ChristianBudde\cbweb\util\script\Script
+class ExceptionStubScriptImpl implements Script
 {
 
 

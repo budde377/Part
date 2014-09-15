@@ -7,13 +7,14 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\file\StubLogFileImpl;
-use ChristianBudde\cbweb\Logger;
+use ChristianBudde\cbweb\log\Logger;
+
+use ChristianBudde\cbweb\util\file\StubLogFileImpl;
 use PHPUnit_Framework_TestCase;
 
 class StubLogFileImplTest extends PHPUnit_Framework_TestCase
 {
-    /** @var  \ChristianBudde\cbweb\file\StubLogFileImpl */
+    /** @var  StubLogFileImpl */
     private $logFile;
 
     protected function setUp()
@@ -54,7 +55,7 @@ class StubLogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testLogDoesReturnFile()
     {
-        $this->assertInstanceOf("ChristianBudde\cbweb\StubDumpFileImpl", $this->logFile->log("MSG", Logger::LOG_LEVEL_ERROR, true));
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\StubDumpFileImpl", $this->logFile->log("MSG", Logger::LOG_LEVEL_ERROR, true));
     }
 
 }

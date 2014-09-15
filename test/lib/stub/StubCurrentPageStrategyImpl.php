@@ -1,5 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
+use ChristianBudde\cbweb\model\page\CurrentPageStrategy;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -8,7 +10,7 @@ namespace ChristianBudde\cbweb\test\stub;
  * To change this template use File | Settings | File Templates.
  */
 
-class StubCurrentPageStrategyImpl implements \ChristianBudde\cbweb\model\page\CurrentPageStrategy
+class StubCurrentPageStrategyImpl implements CurrentPageStrategy
 {
 
     private $currentPagePath;

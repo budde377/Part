@@ -1,13 +1,13 @@
 <?php
 namespace ChristianBudde\cbweb\test;
 
+use ChristianBudde\cbweb\model\site\SiteContentImpl;
 use ChristianBudde\cbweb\model\site\SiteImpl;
-use ChristianBudde\cbweb\DB;
-use ChristianBudde\cbweb\SiteContentImpl;
 use ChristianBudde\cbweb\controller\json\SiteContentJSONObjectImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
 use ChristianBudde\cbweb\test\stub\StubSiteImpl;
+use ChristianBudde\cbweb\util\db\DB;
 
 /**
  * Created by JetBrains PhpStorm.

@@ -16,15 +16,15 @@ class JSONCompositeFunctionImplTest extends PHPUnit_Framework_TestCase
 {
 
     private $function1Name;
-    /** @var  \ChristianBudde\cbweb\ajax\json\\ChristianBudde\cbweb\controller\ajax\json\JSONTypeImpl */
+    /** @var  JSONTypeImpl */
     private $function1Target;
-    /** @var  \ChristianBudde\cbweb\ajax\json\\ChristianBudde\cbweb\controller\ajax\json\JSONFunctionImpl */
+    /** @var  JSONFunctionImpl */
     private $function1;
 
     private $function2Name;
-    /** @var  \ChristianBudde\cbweb\ajax\json\\ChristianBudde\cbweb\controller\ajax\json\JSONFunctionImpl */
+    /** @var  JSONFunctionImpl */
     private $function2;
-    /** @var  \ChristianBudde\cbweb\ajax\json\\ChristianBudde\cbweb\controller\ajax\json\JSONCompositeFunctionImpl */
+    /** @var  JSONCompositeFunctionImpl */
     private $compositeFunction;
 
     protected function setUp()

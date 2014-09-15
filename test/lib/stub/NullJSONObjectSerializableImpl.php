@@ -1,5 +1,8 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
+use ChristianBudde\cbweb\controller\json\JSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\JSONObjectSerializable;
+
 /**
  * Created by PhpStorm.
  * User: budde
@@ -7,7 +10,7 @@ namespace ChristianBudde\cbweb\test\stub;
  * Time: 8:13 PM
  */
 
-class NullJSONObjectSerializableImpl implements \ChristianBudde\cbweb\controller\json\JSONObjectSerializable
+class NullJSONObjectSerializableImpl implements JSONObjectSerializable
 {
 
 
@@ -17,7 +20,7 @@ class NullJSONObjectSerializableImpl implements \ChristianBudde\cbweb\controller
      */
     public function jsonObjectSerialize()
     {
-        return new \ChristianBudde\cbweb\controller\json\JSONObjectImpl(null);
+        return new JSONObjectImpl(null);
     }
 
     /**

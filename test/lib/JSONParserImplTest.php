@@ -25,26 +25,26 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase
     private $parser;
 
     private $function1Name = "function1";
-    /** @var  \ChristianBudde\cbweb\ajax\json\JSONTypeImpl */
+    /** @var  JSONTypeImpl */
     private $function1Target;
-    /** @var  \ChristianBudde\cbweb\ajax\json\\ChristianBudde\cbweb\controller\ajax\json\JSONFunctionImpl */
+    /** @var  JSONFunctionImpl */
     private $function1;
 
     private $function2Name = "function2";
-    /** @var  \ChristianBudde\cbweb\ajax\json\\ChristianBudde\cbweb\controller\ajax\json\JSONFunctionImpl */
+    /** @var  JSONFunctionImpl */
     private $function2;
 
 
     private $objectName = "SomeObject";
-    /** @var \ChristianBudde\cbweb\controller\json\JSONObject */
+    /** @var JSONObject */
     private $object1;
     private $object2;
 
 
     private $typeString = "someType";
-    /** @var  \ChristianBudde\cbweb\ajax\json\JSONTypeImpl */
+    /** @var  JSONTypeImpl */
     private $type;
-    /** @var  \ChristianBudde\cbweb\ajax\json\\ChristianBudde\cbweb\controller\ajax\json\JSONResponseImpl */
+    /** @var  JSONResponseImpl */
     private $response;
     private $responseType = JSONResponse::RESPONSE_TYPE_ERROR;
     private $responseErrorCode = JSONResponse::ERROR_CODE_MALFORMED_REQUEST;
@@ -82,7 +82,7 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase
 
     public function testParserParsesObject()
     {
-        /** @var \ChristianBudde\cbweb\ajax\json\\ChristianBudde\cbweb\controller\ajax\json\JSONObject $obj */
+        /** @var JSONObject $obj */
         $obj = $this->parser->parse($this->object1->getAsJSONString());
         $this->assertInstanceOf('ChristianBudde\cbweb\JSONObject', $obj);
         $this->assertEquals($obj->getAsJSONString(), $this->object1->getAsJSONString());
@@ -91,7 +91,7 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase
 
     public function testParserParsesFunction()
     {
-        /** @var \ChristianBudde\cbweb\ajax\json\\ChristianBudde\cbweb\controller\ajax\json\JSONFunction $obj */
+        /** @var JSONFunction $obj */
         $obj = $this->parser->parse($this->function1->getAsJSONString());
         $this->assertInstanceOf('ChristianBudde\cbweb\JSONFunction', $obj);
         $this->assertEquals($this->object1, $obj->getArg(4));
@@ -150,7 +150,7 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase
     public function testParserParseCompositeFunctionNotInRoot()
     {
         $this->function1->setArg(0, $this->compositeFunction);
-        /** @var \ChristianBudde\cbweb\ajax\json\\ChristianBudde\cbweb\controller\ajax\json\JSONFunction $obj */
+        /** @var JSONFunction $obj */
         $obj = $this->parser->parse($f = $this->function1->getAsJSONString());
         $obj = $obj->getArg(0);
         $this->assertInstanceOf('ChristianBudde\cbweb\JSONCompositeFunction', $obj);

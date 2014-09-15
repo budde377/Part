@@ -2,11 +2,11 @@
 namespace ChristianBudde\cbweb\test\stub;
 
 use ChristianBudde\cbweb\model\Content;
-use ChristianBudde\cbweb\Variables;
-use ChristianBudde\cbweb\ContentLibrary;
-use StubContentImpl;
+use ChristianBudde\cbweb\model\ContentLibrary;
+use ChristianBudde\cbweb\model\site\Site;
+use ChristianBudde\cbweb\model\Variables;
 
-class StubSiteImpl implements \ChristianBudde\cbweb\model\site\Site
+class StubSiteImpl implements Site
 {
 
     private $content = array();
@@ -42,7 +42,7 @@ class StubSiteImpl implements \ChristianBudde\cbweb\model\site\Site
     }
 
     /**
-     * Returns last modified timestamp, NULL if site hasn't been modified
+     * Returns last modified timestamp, NULL if site has not been modified
      * @return int | null
      */
     public function lastModified()

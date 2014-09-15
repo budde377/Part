@@ -1,6 +1,8 @@
 <?php
 
 namespace ChristianBudde\cbweb\test\stub;
+use ChristianBudde\cbweb\util\script\Script;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -8,7 +10,7 @@ namespace ChristianBudde\cbweb\test\stub;
  * Time: 9:09 AM
  * To change this template use File | Settings | File Templates.
  */
-class StubScriptImpl implements \ChristianBudde\cbweb\util\script\Script
+class StubScriptImpl implements Script
 {
 
     private $numRuns = 0;

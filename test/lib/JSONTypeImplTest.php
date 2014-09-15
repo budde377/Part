@@ -14,7 +14,7 @@ class JSONTypeImplTest extends PHPUnit_Framework_TestCase
 {
 
     private $typeString;
-    /** @var  \ChristianBudde\cbweb\ajax\json\\ChristianBudde\cbweb\controller\ajax\json\JSONTypeImpl */
+    /** @var  JSONTypeImpl */
     private $type;
 
 

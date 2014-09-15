@@ -1,5 +1,8 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
+use ChristianBudde\cbweb\controller\json\ContentJSONObjectImpl;
+use ChristianBudde\cbweb\model\Content;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -8,7 +11,7 @@ namespace ChristianBudde\cbweb\test\stub;
  * To change this template use File | Settings | File Templates.
  */
 
-class StubContentImpl implements \ChristianBudde\cbweb\model\Content
+class StubContentImpl implements Content
 {
 
     public $id;
@@ -36,7 +39,7 @@ class StubContentImpl implements \ChristianBudde\cbweb\model\Content
     }
 
     /**
-     * @return int | null Returns the time of latest content as timestamp since epoc. If no content, then return null;
+     * @return int | null Returns the time of latest content as timestamp since epoch. If no content, then return null;
      */
     public function latestTime()
     {
@@ -109,7 +112,7 @@ class StubContentImpl implements \ChristianBudde\cbweb\model\Content
      */
     public function jsonObjectSerialize()
     {
-        return new \ChristianBudde\cbweb\controller\json\ContentJSONObjectImpl($this);
+        return new ContentJSONObjectImpl($this);
     }
 
     /**

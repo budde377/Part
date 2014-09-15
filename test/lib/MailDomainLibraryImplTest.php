@@ -9,7 +9,7 @@ namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\Config;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
-use ChristianBudde\cbweb\util\db\DB;
+
 use ChristianBudde\cbweb\model\mail\MailDomainLibraryImpl;
 use ChristianBudde\cbweb\util\db\MySQLDBImpl;
 use ChristianBudde\cbweb\model\mail\MailDomainImpl;

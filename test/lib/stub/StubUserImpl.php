@@ -7,12 +7,12 @@
  */
 namespace ChristianBudde\cbweb\test\stub;
 
+use ChristianBudde\cbweb\model\user\User;
 use ChristianBudde\cbweb\model\user\UserPrivileges;
-use ChristianBudde\cbweb\controller\json\JSONObject;
 use ChristianBudde\cbweb\model\Variables;
 use ChristianBudde\cbweb\controller\json\UserJSONObjectImpl;
 
-class StubUserImpl implements \ChristianBudde\cbweb\model\user\User
+class StubUserImpl implements User
 {
 
     private $userPrivileges;

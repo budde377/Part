@@ -1,12 +1,13 @@
 <?php
 
 namespace ChristianBudde\cbweb\test;
+use ChristianBudde\cbweb\controller\json\ImageFileJSONObjectImpl;
+use ChristianBudde\cbweb\util\file\Folder;
+use ChristianBudde\cbweb\util\file\FolderImpl;
+use ChristianBudde\cbweb\util\file\ImageFile;
+use ChristianBudde\cbweb\util\file\ImageFileImpl;
+use PHPUnit_Framework_TestCase;
 
-use ChristianBudde\cbweb\file\ImageFileImpl;
-use ChristianBudde\cbweb\file\Folder;
-use ChristianBudde\cbweb\file\FolderImpl;
-use ChristianBudde\cbweb\file\ImageFile;
-use ChristianBudde\cbweb\ImageFileJSONObjectImpl;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -22,11 +23,11 @@ class ImageFileImplTest extends PHPUnit_Framework_TestCase
     /** @var  ImageFileImpl */
     private $notImageFile;
 
-    /** @var  \ChristianBudde\cbweb\file\ImageFileImpl */
+    /** @var  ImageFileImpl */
     private $fileToDelete;
     /** @var  ImageFileImpl */
     private $nonExistingFile;
-    /** @var  \ChristianBudde\cbweb\file\Folder */
+    /** @var  Folder */
     private $folder;
 
     public function setUp()
@@ -475,7 +476,7 @@ class ImageFileImplTest extends PHPUnit_Framework_TestCase
         $f = $this->imageFile->mirrorHorizontal(true);
         $f = $f->mirrorVertical(true);
         $this->assertEquals($this->imageFile->getBasename() . "-M_1_1", $f->getBasename());
-        /** @var \ChristianBudde\cbweb\file\ImageFile $f */
+        /** @var ImageFile $f */
         $f = $f->mirrorVertical(true);
         $this->assertEquals($this->imageFile->getBasename() . "-M_0_1", $f->getBasename());
     }

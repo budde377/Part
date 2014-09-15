@@ -1,16 +1,12 @@
 <?php
 namespace ChristianBudde\cbweb\test\util;
 
-use ChristianBudde\cbweb\test\util\InsertOperation;
-use ChristianBudde\cbweb\test\util\MailMySQLConstantsImpl;
-use ChristianBudde\cbweb\test\util\MySQLConstants;
 use PDO;
 use PHPUnit_Extensions_Database_DataSet_IDataSet;
 use PHPUnit_Extensions_Database_DB_IDatabaseConnection;
 use PHPUnit_Extensions_Database_Operation_Composite;
 use PHPUnit_Extensions_Database_TestCase;
-use ChristianBudde\cbweb\test\util\StandardMySQLConstantsImpl;
-use ChristianBudde\cbweb\test\util\TruncateOperation;
+
 
 /**
  * Created by PhpStorm.

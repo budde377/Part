@@ -78,8 +78,8 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
     public function testRegisterFromConfigWillRegister()
     {
         $this->config->setAJAXTypeHandlers([
-            ['class_name' => 'StubAJAXTypeHandlerImpl'],
-            ['class_name' => 'StubAJAXTypeHandlerImpl', 'path' => dirname(__FILE__) . '/stubs/StubAJAXTypeHandlerImpl.php']
+            ['class_name' => 'ChristianBudde\cbweb\test\stub\StubAJAXTypeHandlerImpl'],
+            ['class_name' => 'ChristianBudde\cbweb\test\stub\StubAJAXTypeHandlerImpl', 'path' => dirname(__FILE__) . '/stub/StubAJAXTypeHandlerImpl.php']
         ]);
         $this->server->registerHandlersFromConfig();
 
@@ -96,10 +96,10 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
     public function testRegisterFromConfigWithWrongLinkWillThrowException()
     {
         $this->config->setAJAXTypeHandlers([
-            ['class_name' => 'StubAJAXTypeHandlerImpl', 'path' => '_stub/notarealink.php']
+            ['class_name' => 'ChristianBudde\cbweb\test\stub\StubAJAXTypeHandlerImpl', 'path' => '_stub/notarealink.php']
         ]);
 
-        $this->setExpectedException('ChristianBudde\cbweb\FileNotFoundException');
+        $this->setExpectedException('ChristianBudde\cbweb\exception\FileNotFoundException');
         $this->server->registerHandlersFromConfig();
 
     }
@@ -107,10 +107,10 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
     public function testRegisterFromConfigWithNonExistingClassNameWillThrowException()
     {
         $this->config->setAJAXTypeHandlers([
-            ['class_name' => 'NotARealClassName', 'path' => dirname(__FILE__) . '/stubs/StubAJAXTypeHandlerImpl.php']
+            ['class_name' => 'NotARealClassName', 'path' => dirname(__FILE__) . '/stub/StubAJAXTypeHandlerImpl.php']
         ]);
 
-        $this->setExpectedException('ChristianBudde\cbweb\ClassNotDefinedException');
+        $this->setExpectedException('ChristianBudde\cbweb\exception\ClassNotDefinedException');
         $this->server->registerHandlersFromConfig();
 
     }
@@ -118,10 +118,10 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
     public function testRegisterFromConfigWithWrongInstanceThrowsException()
     {
         $this->config->setAJAXTypeHandlers([
-            ['class_name' => 'NullOptimizerImpl']
+            ['class_name' => 'ChristianBudde\cbweb\test\stub\NullOptimizerImpl']
         ]);
 
-        $this->setExpectedException('ChristianBudde\cbweb\ClassNotInstanceOfException');
+        $this->setExpectedException('ChristianBudde\cbweb\exception\ClassNotInstanceOfException');
         $this->server->registerHandlersFromConfig();
 
     }
@@ -132,9 +132,10 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->server->registerHandler($this->handler1);
         /** @var \ChristianBudde\cbweb\controller\json\JSONResponse $r */
         $r = $this->server->handleFromJSONString((new JSONObjectImpl('someType'))->getAsJSONString());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONResponse', $r);
         $this->assertEquals(JSONResponse::RESPONSE_TYPE_ERROR, $r->getResponseType());
         $this->assertEquals(JSONResponse::ERROR_CODE_MALFORMED_REQUEST, $r->getErrorCode());
+
     }
 
     public function testHandleOnJSONFunctionReturnsCallsAppropriateHandler()
@@ -152,7 +153,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $func = new JSONFunctionImpl('func', new JSONTypeImpl($type));
         /** @var JSONResponse $r */
         $r = $this->server->handleFromJSONString($func->getAsJSONString());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONResponse', $r);
         $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('canHandle', $this->handler1));
         $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled('canHandle', $this->handler2));
         $this->assertEquals($r1, $r2);
@@ -183,7 +184,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $func = new JSONFunctionImpl('func', new JSONTypeImpl($type));
         /** @var \ChristianBudde\cbweb\controller\json\JSONResponse $r */
         $r = $this->server->handleFromFunctionString($funcString);
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONResponse', $r);
         $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('canHandle', $this->handler1));
         $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled('canHandle', $this->handler2));
         $this->assertEquals($r1, $r2);
@@ -215,7 +216,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $func->setArg(2, 123);
         /** @var JSONResponse $r */
         $r = $this->server->handleFromFunctionString($funcString);
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONResponse', $r);
         $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('canHandle', $this->handler1));
         $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled('canHandle', $this->handler2));
         $this->assertEquals($r1, $r2);
@@ -244,7 +245,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $r = $this->server->handleFromJSONString($func->getAsJSONString());
         $this->assertNull($this->checkIfFunctionIsCalled('canHandle', $this->handler2));
         $this->assertNull($this->checkIfFunctionIsCalled('handle', $this->handler1));
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONResponse', $r);
         $this->assertEquals(JSONResponse::RESPONSE_TYPE_ERROR, $r->getResponseType());
         $this->assertEquals(JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION, $r->getErrorCode());
     }
@@ -259,7 +260,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->handler1->handle[$type1] = $instance1 = new NullPageElementImpl();
 
 
-        $type2 = 'ChristianBudde\cbweb\PageElement';
+        $type2 = 'ChristianBudde\cbweb\view\page_element\PageElement';
         $this->handler2->types = [$type2];
         $this->handler2->canHandle[$type2] = true;
         $this->handler2->handle[$type2] = 'success';
@@ -270,7 +271,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $func2 = new JSONFunctionImpl('func2', $func1 = new JSONFunctionImpl('func', new JSONTypeImpl($type1)));
         /** @var JSONResponse $r */
         $r = $this->server->handleFromJSONString($func2->getAsJSONString());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONResponse', $r);
         $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('canHandle', $this->handler1));
         $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled('canHandle', $this->handler2));
         $this->assertNotEquals($r1, $r2);
@@ -303,7 +304,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
 
         /** @var JSONResponse $r */
         $r = $this->server->handleFromFunctionString('SomeElement.func(PageElement.f())');
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONResponse', $r);
         $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('canHandle', $this->handler1));
         $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled('canHandle', $this->handler2));
         $this->assertNotEquals($r1, $r2);
@@ -338,7 +339,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
 
         /** @var \ChristianBudde\cbweb\controller\json\JSONResponse $r */
         $r = $this->server->handleFromFunctionString('SomeElement.func(PageElement.f())');
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONResponse', $r);
         $this->assertNull($r1 = $this->checkIfFunctionIsCalled('canHandle', $this->handler1));
         $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled('canHandle', $this->handler2));
 
@@ -371,7 +372,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $func2 = new JSONFunctionImpl('func2', $func1 = new JSONFunctionImpl('func', new JSONTypeImpl($type1)));
         /** @var \ChristianBudde\cbweb\controller\json\JSONResponse $r */
         $r = $this->server->handleFromJSONString($func2->getAsJSONString());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONResponse', $r);
         $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('canHandle', $this->handler1));
         $this->assertNull($this->checkIfFunctionIsCalled('canHandle', $this->handler2));
 
@@ -403,7 +404,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $func2 = new JSONFunctionImpl('func2', $func1 = new JSONFunctionImpl('func', new JSONTypeImpl($type1)));
         /** @var \ChristianBudde\cbweb\controller\json\JSONResponse $r */
         $r = $this->server->handleFromJSONString($func2->getAsJSONString());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONResponse', $r);
         $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('canHandle', $this->handler1));
         $this->assertNull($this->checkIfFunctionIsCalled('canHandle', $this->handler2));
 
@@ -434,7 +435,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
 
         /** @var JSONResponse $r */
         $r = $this->server->handleFromFunctionString("SomeElement.func().f()..f1()..f2()");
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONResponse', $r);
         $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('canHandle', $this->handler1));
         $this->assertNull($this->checkIfFunctionIsCalled('canHandle', $this->handler1));
         $this->assertNull($this->checkIfFunctionIsCalled('canHandle', $this->handler2));
@@ -511,7 +512,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
 
         /** @var \ChristianBudde\cbweb\controller\json\JSONResponse $r */
         $r = $this->server->handleFromFunctionString('SomeElement..func()..func2()');
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONResponse', $r);
         $this->assertNotNull($this->checkIfFunctionIsCalled('canHandle', $this->handler1));
         $this->assertNotNull($this->checkIfFunctionIsCalled('canHandle', $this->handler1));
         $this->assertNull($this->checkIfFunctionIsCalled('canHandle', $this->handler1));
@@ -540,7 +541,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->handler1->handle[$type1] = $instance1 = new NullPageElementImpl();
 
 
-        $type2 = 'ChristianBudde\cbweb\PageElement';
+        $type2 = 'ChristianBudde\cbweb\view\page_element\PageElement';
         $this->handler2->types = [$type2];
         $this->handler2->canHandle[$type2] = true;
         $this->handler2->handle[$type2] = $instance2 = "success";
@@ -550,7 +551,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
 
         /** @var \ChristianBudde\cbweb\controller\json\JSONResponse $r */
         $r = $this->server->handleFromFunctionString('SomeElement.f()..f1()..f2()');
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONResponse', $r);
         $this->assertNotNull($this->checkIfFunctionIsCalled('canHandle', $this->handler1));
         $this->assertNull($this->checkIfFunctionIsCalled('canHandle', $this->handler1));
 
@@ -586,7 +587,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->handler1->handle[$type1] = $instance1 = "content";
 
 
-        $type2 = 'ChristianBudde\cbweb\PageContent';
+        $type2 = 'ChristianBudde\cbweb\model\page\PageContent';
         $this->handler2->types = [$type2];
         $this->handler2->canHandle[$type2] = true;
         $this->handler2->handle[$type2] = $instance2 = "pageContent";

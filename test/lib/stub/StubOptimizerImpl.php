@@ -2,6 +2,7 @@
 namespace ChristianBudde\cbweb\test\stub;
 
 use ChristianBudde\cbweb\util\file\File;
+use ChristianBudde\cbweb\util\file\Optimizer;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -10,7 +11,7 @@ use ChristianBudde\cbweb\util\file\File;
  * Time: 11:48 PM
  * To change this template use File | Settings | File Templates.
  */
-class StubOptimizerImpl implements \ChristianBudde\cbweb\util\file\Optimizer
+class StubOptimizerImpl implements Optimizer
 {
     /** @var bool */
     private $optimizeReturn;

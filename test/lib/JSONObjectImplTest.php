@@ -2,6 +2,9 @@
 namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\controller\json\JSONObjectImpl;
+use ChristianBudde\cbweb\test\stub\NullJSONObjectSerializableImpl;
+use ChristianBudde\cbweb\test\stub\NullJsonSerializableImpl;
+use PHPUnit_Framework_TestCase;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -13,7 +16,7 @@ use ChristianBudde\cbweb\controller\json\JSONObjectImpl;
 class JSONObjectImplTest extends PHPUnit_Framework_TestCase
 {
     private $objectName = "SomeObject";
-    /** @var \ChristianBudde\cbweb\ajax\json\JSONObjectImpl */
+    /** @var JSONObjectImpl */
     private $object;
 
     protected function setUp()

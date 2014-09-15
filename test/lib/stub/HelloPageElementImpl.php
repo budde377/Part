@@ -10,7 +10,7 @@ use ChristianBudde\cbweb\view\page_element\PageElementImpl;
  * Time: 11:21 AM
  * To change this template use File | Settings | File Templates.
  */
-class HelloPageElementImpl extends \ChristianBudde\cbweb\view\page_element\PageElementImpl
+class HelloPageElementImpl extends PageElementImpl
 {
 
     /**

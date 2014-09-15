@@ -10,8 +10,9 @@
 namespace ChristianBudde\cbweb\test\stub;
 
 use ChristianBudde\cbweb\util\Observable;
+use ChristianBudde\cbweb\util\Observer;
 
-class StubObserverImpl implements \ChristianBudde\cbweb\util\Observer
+class StubObserverImpl implements Observer
 {
 
     private $hasBeenCalled = false;

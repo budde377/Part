@@ -2,16 +2,14 @@
 namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\model\page\Page;
+use ChristianBudde\cbweb\exception\EntryNotFoundException;
+use ChristianBudde\cbweb\view\page_element\PageElementFactoryImpl;
 use ChristianBudde\cbweb\view\template\TemplateImpl;
 use ChristianBudde\cbweb\model\site\Site;
 use ChristianBudde\cbweb\exception\FileNotFoundException;
 use ChristianBudde\cbweb\util\file\FolderImpl;
 use ChristianBudde\cbweb\util\file\FileImpl;
-use ChristianBudde\cbweb\PageElementFactoryImpl;
 use ChristianBudde\cbweb\ConfigImpl;
-use ChristianBudde\cbwChristianBudde\cbweb\exception\tion;
-use EntryNotFoundException;
 use Exception;
 use PHPUnit_Framework_TestCase;
 use SimpleXMLElement;
@@ -411,10 +409,9 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     public function testTemplateSupportsPageElementTagAlsoWithElementNotInConfigAndWithNamespaces()
     {
-        include dirname(__FILE__) . "/stubs/HelloNamespacePageElementImpl.php";
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
-        $this->template->setTemplateFromString("{%page_element Testnamespace.test.HelloNamespacePageElementImpl  %}");
+        $this->template->setTemplateFromString("{%page_element ChristianBudde.cbweb.test.stub.HelloNamespacePageElementImpl  %}");
         $v = $this->template->render();
         $this->assertEquals("Hello World", $v);
     }

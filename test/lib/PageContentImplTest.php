@@ -10,13 +10,13 @@
 
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\DB;
 use ChristianBudde\cbweb\model\page\PageContentImpl;
 use ChristianBudde\cbweb\model\page\Page;
 use ChristianBudde\cbweb\model\page\PageImpl;
 use ChristianBudde\cbweb\controller\json\PageContentJSONObjectImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
+use ChristianBudde\cbweb\util\db\DB;
 
 class PageContentImplTest extends CustomDatabaseTestCase
 {

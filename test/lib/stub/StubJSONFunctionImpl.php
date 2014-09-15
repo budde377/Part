@@ -2,6 +2,7 @@
 namespace ChristianBudde\cbweb\test\stub;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
 use ChristianBudde\cbweb\controller\json\JSONResponse;
+use ChristianBudde\cbweb\controller\json\JSONTarget;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -46,7 +47,7 @@ class StubJSONFunctionImpl implements JSONFunction
 
     /**
      * @param array $args Associative array containing arg name and value
-     * @return \ChristianBudde\cbweb\controller\json\JSONResponse
+     * @return JSONResponse
      */
     public function call(array $args = array())
     {
@@ -92,10 +93,10 @@ class StubJSONFunctionImpl implements JSONFunction
     }
 
     /**
-     * @param \ChristianBudde\cbweb\controller\json\JSONTarget $target
+     * @param JSONTarget $target
      * @return void
      */
-    public function setTarget(\ChristianBudde\cbweb\controller\json\JSONTarget $target)
+    public function setTarget(JSONTarget $target)
     {
     }
 
@@ -138,10 +139,10 @@ class StubJSONFunctionImpl implements JSONFunction
 
     /**
      * Sets the root target, i.e. calls recursively on target until target is not a function.
-     * @param \ChristianBudde\cbweb\controller\json\JSONTarget $target
+     * @param JSONTarget $target
      * @return void
      */
-    public function setRootTarget(\ChristianBudde\cbweb\controller\json\JSONTarget $target)
+    public function setRootTarget(JSONTarget $target)
     {
     }
 }

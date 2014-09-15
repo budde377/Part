@@ -8,7 +8,7 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\file\DumpFileImpl;
+use ChristianBudde\cbweb\util\file\DumpFileImpl;
 use PHPUnit_Framework_TestCase;
 
 class DumpFileImplTest extends PHPUnit_Framework_TestCase

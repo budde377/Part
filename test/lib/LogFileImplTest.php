@@ -2,7 +2,7 @@
 namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\util\file\LogFileImpl;
-use ChristianBudde\cbweb\util\file\DumpFile;
+
 use ChristianBudde\cbweb\util\file\FolderImpl;
 use ChristianBudde\cbweb\util\file\Folder;
 use PHPUnit_Framework_TestCase;

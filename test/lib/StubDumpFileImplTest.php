@@ -7,7 +7,7 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\StubDumpFileImpl;
+use ChristianBudde\cbweb\util\file\StubDumpFileImpl;
 use PHPUnit_Framework_TestCase;
 
 class StubDumpFileImplTest extends PHPUnit_Framework_TestCase

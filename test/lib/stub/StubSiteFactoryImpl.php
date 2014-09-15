@@ -2,8 +2,10 @@
 namespace ChristianBudde\cbweb\test\stub;
 
 use ChristianBudde\cbweb\BackendSingletonContainer;
+use ChristianBudde\cbweb\SiteFactory;
 use ChristianBudde\cbweb\util\script\ScriptChain;
 use ChristianBudde\cbweb\Config;
+use ChristianBudde\cbweb\util\script\ScriptChainImpl;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -12,7 +14,7 @@ use ChristianBudde\cbweb\Config;
  * Time: 3:55 PM
  * To change this template use File | Settings | File Templates.
  */
-class StubSiteFactoryImpl implements \ChristianBudde\cbweb\SiteFactory
+class StubSiteFactoryImpl implements SiteFactory
 {
 
     private $preScriptChain;
@@ -24,8 +26,8 @@ class StubSiteFactoryImpl implements \ChristianBudde\cbweb\SiteFactory
 
     public function __construct()
     {
-        $this->preScriptChain = new \ChristianBudde\cbweb\util\script\ScriptChainImpl();
-        $this->postScriptChain = new \ChristianBudde\cbweb\util\script\ScriptChainImpl();
+        $this->preScriptChain = new ScriptChainImpl();
+        $this->postScriptChain = new ScriptChainImpl();
     }
 
     /**

@@ -1,9 +1,8 @@
 <?php
 namespace ChristianBudde\cbweb\test;
 
+use ChristianBudde\cbweb\util\file\JSFileImpl;
 use ChristianBudde\cbweb\util\file\JSRegisterImpl;
-use ChristianBudde\cbweb\util\file\eImpl;
-use JSFileImpl;
 use PHPUnit_Framework_TestCase;
 
 /**

@@ -2,12 +2,13 @@
 namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\controller\function_string\FunctionStringParserImpl;
+use ChristianBudde\cbweb\controller\json\JSONType;
 use ChristianBudde\cbweb\controller\json\NullJSONTargetImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
 use ChristianBudde\cbweb\controller\json\JSONTypeImpl;
 use ChristianBudde\cbweb\controller\json\JSONCompositeFunctionImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
-use ChristianBudde\cbweb\controller\json\JSONType;
+use PHPUnit_Framework_TestCase;
 
 /**
  * Created by PhpStorm.
@@ -68,12 +69,12 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
     {
         $this->assertTrue($this->parser->parseType($this->validName, $result));
         $this->assertInstanceOf("ChristianBudde\\cbweb\\JSONType", $result);
-        /** @var \ChristianBudde\cbweb\ajax\json\\ChristianBudde\cbweb\controller\ajax\json\JSONType $result */
+        /** @var JSONType $result */
         $this->assertEquals($this->validName, $result->getTypeString());
 
         $this->assertTrue($this->parser->parseType($n = "Site\\something", $result));
         $this->assertInstanceOf("ChristianBudde\\cbweb\\JSONType", $result);
-        /** @var \ChristianBudde\cbweb\ajax\json\\ChristianBudde\cbweb\controller\ajax\json\JSONType $result */
+        /** @var JSONType $result */
         $this->assertEquals($n, $result->getTypeString());
     }
 

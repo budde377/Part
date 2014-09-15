@@ -1,6 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde;
+use ChristianBudde\cbweb\view\page_element\PageElementImpl;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -9,7 +9,7 @@ use ChristianBudde;
  * Time: 10:48 AM
  * To change this template use File | Settings | File Templates.
  */
-class ReturnIncrementPageElementImpl extends ChristianBudde\cbweb\PageElementImpl
+class ReturnIncrementPageElementImpl extends PageElementImpl
 {
 
     /**

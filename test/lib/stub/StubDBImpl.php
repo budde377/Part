@@ -1,6 +1,7 @@
 <?php
 
 namespace ChristianBudde\cbweb\test\stub;
+use ChristianBudde\cbweb\util\db\DB;
 use PDO;
 
 /**
@@ -10,7 +11,7 @@ use PDO;
  * Time: 10:32 PM
  * To change this template use File | Settings | File Templates.
  */
-class StubDBImpl implements \ChristianBudde\cbweb\util\db\DB
+class StubDBImpl implements DB
 {
 
     /**

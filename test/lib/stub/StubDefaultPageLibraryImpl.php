@@ -8,10 +8,10 @@
 namespace ChristianBudde\cbweb\test\stub;
 
 use ArrayIterator;
-use ChristianBudde;
-use ChristianBudde\cbweb\Page;
+use ChristianBudde\cbweb\model\page\DefaultPageLibrary;
+use ChristianBudde\cbweb\model\page\Page;
 
-class StubDefaultPageLibraryImpl implements ChristianBudde\cbweb\DefaultPageLibrary
+class StubDefaultPageLibraryImpl implements DefaultPageLibrary
 {
     private $iterator;
     private $pages;

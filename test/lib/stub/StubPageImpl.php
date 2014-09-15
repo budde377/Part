@@ -3,12 +3,10 @@ namespace ChristianBudde\cbweb\test\stub;
 
 use ChristianBudde\cbweb\model\page\Page;
 use ChristianBudde\cbweb\model\Content;
-use ChristianBudde\cbweb\test\stub\StubContentImpl;
-use ChristianBudde\cbweb\Variables;
-use ChristianBudde\cbweb\ContentLibrary;
+use ChristianBudde\cbweb\model\ContentLibrary;
 use ChristianBudde\cbweb\controller\json\JSONObject;
 use ChristianBudde\cbweb\controller\json\PageJSONObjectImpl;
-use ChristianBudde\cbweb\test\stub\StubVariablesImpl;
+use ChristianBudde\cbweb\model\Variables;
 
 /**
  * Created by JetBrains PhpStorm.

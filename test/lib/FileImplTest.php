@@ -11,6 +11,7 @@ namespace ChristianBudde\cbweb\test;
 use ChristianBudde\cbweb\util\file\FileImpl;
 use ChristianBudde\cbweb\util\file\File;
 use ChristianBudde\cbweb\controller\json\FileJSONObjectImpl;
+use PHPUnit_Framework_TestCase;
 
 class FileImplTest extends PHPUnit_Framework_TestCase
 {

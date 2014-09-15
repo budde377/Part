@@ -13,7 +13,7 @@ use PHPUnit_Framework_TestCase;
  */
 class RequestTraitTest extends PHPUnit_Framework_TestCase
 {
-    use \ChristianBudde\cbweb\util\traits\RequestTrait;
+    use RequestTrait;
 
     public function testURLFromGETMatchesGET()
     {

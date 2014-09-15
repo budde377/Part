@@ -2,7 +2,7 @@
 namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\util\file\JSFileImpl;
-use ChristianBudde\cbweb\util\file\CSSFile;
+
 use PHPUnit_Framework_TestCase;
 use ChristianBudde\cbweb\test\stub\StubOptimizerImpl;
 

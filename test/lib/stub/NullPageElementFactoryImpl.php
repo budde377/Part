@@ -1,5 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
+use ChristianBudde\cbweb\view\page_element\PageElementFactory;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -7,7 +9,7 @@ namespace ChristianBudde\cbweb\test\stub;
  * Time: 10:56 AM
  * To change this template use File | Settings | File Templates.
  */
-class NullPageElementFactoryImpl implements \ChristianBudde\cbweb\view\page_element\PageElementFactory
+class NullPageElementFactoryImpl implements PageElementFactory
 {
 
 

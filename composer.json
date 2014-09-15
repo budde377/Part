@@ -22,6 +22,8 @@
         }
     },
     "autoload-dev" : {
-      "classmap" : ["test"]
+        "psr-4" : {
+            "ChristianBudde\\cbweb\\test\\" :"test/lib"
+        }
     }
 }

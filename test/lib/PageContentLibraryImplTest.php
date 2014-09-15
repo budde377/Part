@@ -8,12 +8,12 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\DB;
 use ChristianBudde\cbweb\model\page\Page;
 use ChristianBudde\cbweb\model\page\PageContentLibraryImpl;
 use ChristianBudde\cbweb\model\page\PageImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
+use ChristianBudde\cbweb\util\db\DB;
 
 class PageContentLibraryImplTest extends CustomDatabaseTestCase
 {
@@ -52,9 +52,9 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue(is_array($list = $this->existingContentLibrary->listContents()));
         $this->assertEquals(2, count($list));
         $this->assertArrayHasKey("", $list);
-        $this->assertInstanceOf("ChristianBudde\cbweb\Content", $list[""]);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\Content", $list[""]);
         $this->assertArrayHasKey("Test", $list);
-        $this->assertInstanceOf("ChristianBudde\cbweb\Content", $list["Test"]);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\Content", $list["Test"]);
     }
 
 

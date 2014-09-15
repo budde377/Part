@@ -1,6 +1,8 @@
 <?php
 
 namespace ChristianBudde\cbweb\test\stub;
+use ChristianBudde\cbweb\view\page_element\PageElementImpl;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -8,7 +10,7 @@ namespace ChristianBudde\cbweb\test\stub;
  * Time: 11:21 AM
  * To change this template use File | Settings | File Templates.
  */
-class HTMLPageElementImpl extends \ChristianBudde\cbweb\PageElementImpl
+class HTMLPageElementImpl extends PageElementImpl
 {
 
     /**

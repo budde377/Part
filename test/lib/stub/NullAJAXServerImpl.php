@@ -1,5 +1,8 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
+use ChristianBudde\cbweb\controller\ajax\AJAXServer;
+use ChristianBudde\cbweb\controller\ajax\AJAXTypeHandler;
+
 /**
  * Created by PhpStorm.
  * User: budde
@@ -7,15 +10,15 @@ namespace ChristianBudde\cbweb\test\stub;
  * Time: 5:00 PM
  */
 
-class NullAJAXServerImpl implements \ChristianBudde\cbweb\controller\ajax\AJAXServer
+class NullAJAXServerImpl implements AJAXServer
 {
 
     /**
      * Registers a AJAX type.
-     * @param \ChristianBudde\cbweb\controller\ajax\AJAXTypeHandler $type
+     * @param AJAXTypeHandler $type
      * @return void
      */
-    public function registerHandler(\ChristianBudde\cbweb\controller\ajax\AJAXTypeHandler $type)
+    public function registerHandler(AJAXTypeHandler $type)
     {
     }
 

@@ -7,12 +7,16 @@
  */
 namespace ChristianBudde\cbweb\test;
 
+use ChristianBudde\cbweb\test\stub\StubSendMailStrategyImpl;
+use ChristianBudde\cbweb\test\stub\StubUserImpl;
 use ChristianBudde\cbweb\util\mail\MailImpl;
 use ChristianBudde\cbweb\util\mail\Mail;
+use ChristianBudde\cbweb\util\traits\ValidationTrait;
+use PHPUnit_Framework_TestCase;
 
 class MailImplTest extends PHPUnit_Framework_TestCase
 {
-    use \ChristianBudde\cbweb\util\traits\ValidationTrait;
+    use ValidationTrait;
     /** @var $strategy StubSendMailStrategyImpl */
     private $strategy;
     /** @var $mail \ChristianBudde\cbweb\util\mail\MailImpl */

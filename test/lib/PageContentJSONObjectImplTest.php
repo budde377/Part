@@ -6,8 +6,7 @@
  * Time: 5:59 PM
  */
 namespace ChristianBudde\cbweb\test;
-
-use ChristianBudde\cbweb\PageContentJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\PageContentJSONObjectImpl;
 use PHPUnit_Framework_TestCase;
 use ChristianBudde\cbweb\test\stub\StubPageContentImpl;
 

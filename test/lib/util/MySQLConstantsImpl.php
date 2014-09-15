@@ -1,7 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\test\util;
 
-use ChristianBudde\cbweb\test\util\MySQLConstants;
 
 /**
  * Created by PhpStorm.

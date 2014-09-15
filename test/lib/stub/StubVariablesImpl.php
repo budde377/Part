@@ -1,6 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
 use ArrayIterator;
+use ChristianBudde\cbweb\model\Variables;
 use Traversable;
 
 /**
@@ -10,7 +11,7 @@ use Traversable;
  * Time: 10:58 PM
  */
 
-class StubVariablesImpl implements \ChristianBudde\cbweb\model\Variables
+class StubVariablesImpl implements Variables
 {
 
     private $array;

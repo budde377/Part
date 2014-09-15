@@ -8,12 +8,12 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\DB;
-use ChristianBudde\cbweb\PageContentLibraryImpl;
-use ChristianBudde\cbweb\SiteContentLibraryImpl;
+use ChristianBudde\cbweb\model\page\PageContentLibraryImpl;
+use ChristianBudde\cbweb\model\site\SiteContentLibraryImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
 use ChristianBudde\cbweb\test\stub\StubSiteImpl;
+use ChristianBudde\cbweb\util\db\DB;
 
 class SiteContentLibraryImplTest extends CustomDatabaseTestCase
 {

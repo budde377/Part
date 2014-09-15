@@ -10,7 +10,7 @@ namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\model\page\PageOrderImpl;
 use ChristianBudde\cbweb\model\page\PageOrder;
-use ChristianBudde\cbweb\model\page\Page;
+
 use ChristianBudde\cbweb\model\page\PageImpl;
 use ChristianBudde\cbweb\controller\json\PageOrderJSONObjectImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;

@@ -4,6 +4,9 @@ namespace ChristianBudde\cbweb\test;
 use ChristianBudde\cbweb\controller\json\JSONResponse;
 use ChristianBudde\cbweb\controller\json\JSONResponseImpl;
 use ChristianBudde\cbweb\controller\json\JSONObjectImpl;
+use ChristianBudde\cbweb\test\stub\NullJSONObjectSerializableImpl;
+use ChristianBudde\cbweb\test\stub\NullJsonSerializableImpl;
+use PHPUnit_Framework_TestCase;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -14,7 +17,7 @@ use ChristianBudde\cbweb\controller\json\JSONObjectImpl;
  */
 class JSONResponseImplTest extends PHPUnit_Framework_TestCase
 {
-    /** @var \ChristianBudde\cbweb\ajax\json\JSONResponseImpl */
+    /** @var JSONResponseImpl */
     private $response;
     private $responseType = JSONResponse::RESPONSE_TYPE_ERROR;
     private $responseErrorCode = JSONResponse::ERROR_CODE_MALFORMED_REQUEST;

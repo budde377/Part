@@ -1,7 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
-
-use ChristianBudde\cbweb\test\stub\StubContentImpl;
+use ChristianBudde\cbweb\model\site\SiteContent;
 
 /**
  * Created by PhpStorm.
@@ -9,7 +8,7 @@ use ChristianBudde\cbweb\test\stub\StubContentImpl;
  * Date: 9/4/14
  * Time: 6:00 PM
  */
-class StubSiteContentImpl extends StubContentImpl implements \ChristianBudde\cbweb\SiteContent
+class StubSiteContentImpl extends StubContentImpl implements SiteContent
 {
 
 

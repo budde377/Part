@@ -7,7 +7,7 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\model\mail\MailAddressLibraryImpl;
+
 use ChristianBudde\cbweb\model\mail\MailMailboxImpl;
 use ChristianBudde\cbweb\model\mail\MailDomainLibraryImpl;
 use ChristianBudde\cbweb\model\mail\MailMailbox;

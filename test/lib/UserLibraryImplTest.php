@@ -5,6 +5,7 @@ use ChristianBudde\cbweb\model\user\UserLibraryImpl;
 use ChristianBudde\cbweb\model\user\UserImpl;
 use ChristianBudde\cbweb\model\user\User;
 use ChristianBudde\cbweb\controller\json\UserLibraryJSONObjectImpl;
+use ChristianBudde\cbweb\test\stub\StubDBImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 
 /**
@@ -18,7 +19,7 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
 
     /** @var $db StubDBImpl */
     private $db;
-    /** @var $user \ChristianBudde\cbweb\model\user\UserLibraryImpl */
+    /** @var $user UserLibraryImpl */
     private $library;
 
     function __construct($dataset = null)

@@ -1,12 +1,16 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
+use ChristianBudde\cbweb\controller\json\UserLibraryJSONObjectImpl;
+use ChristianBudde\cbweb\model\user\User;
+use ChristianBudde\cbweb\model\user\UserLibrary;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 06/08/12
  * Time: 22:24
  */
-class StubUserLibraryImpl implements \ChristianBudde\cbweb\model\user\UserLibrary
+class StubUserLibraryImpl implements UserLibrary
 {
     private $userList = array();
     private $userLoggedIn;
@@ -22,10 +26,10 @@ class StubUserLibraryImpl implements \ChristianBudde\cbweb\model\user\UserLibrar
 
     /**
      * Will delete user. The user must be instance in library.
-     * @param \ChristianBudde\cbweb\model\user\User $user
+     * @param User $user
      * @return bool
      */
-    public function deleteUser(\ChristianBudde\cbweb\model\user\User $user)
+    public function deleteUser(User $user)
     {
         return false;
     }
@@ -37,16 +41,16 @@ class StubUserLibraryImpl implements \ChristianBudde\cbweb\model\user\UserLibrar
      * @param string $username
      * @param string $password
      * @param string $mail
-     * @param \ChristianBudde\cbweb\model\user\User $parent
-     * @return \ChristianBudde\cbweb\model\user\User | bool FALSE on failure else instance of User
+     * @param User $parent
+     * @return User | bool FALSE on failure else instance of User
      */
-    public function createUser($username, $password, $mail, \ChristianBudde\cbweb\model\user\User $parent)
+    public function createUser($username, $password, $mail, User $parent)
     {
         return false;
     }
 
     /**
-     * @return \ChristianBudde\cbweb\model\user\User | null User logged in else null if no user is logged in.
+     * @return User | null User logged in else null if no user is logged in.
      */
     public function getUserLoggedIn()
     {
@@ -55,13 +59,13 @@ class StubUserLibraryImpl implements \ChristianBudde\cbweb\model\user\UserLibrar
 
     /**
      * @param string $username
-     * @return \ChristianBudde\cbweb\model\user\User | null User if username is found, else null
+     * @return User | null User if username is found, else null
      */
     public function getUser($username)
     {
         foreach ($this->userList as $user) {
-            /** @var $user \ChristianBudde\cbweb\model\user\User */
-            if ($user instanceof \ChristianBudde\cbweb\model\user\User && $user->getUsername() == $username) {
+            /** @var $user User */
+            if ($user instanceof User && $user->getUsername() == $username) {
                 return $user;
             }
 
@@ -74,7 +78,7 @@ class StubUserLibraryImpl implements \ChristianBudde\cbweb\model\user\UserLibrar
         $this->userList = $list;
     }
 
-    public function setUserLoggedIn(\ChristianBudde\cbweb\model\user\User $userLoggedIn = null)
+    public function setUserLoggedIn(User $userLoggedIn = null)
     {
         $this->userLoggedIn = $userLoggedIn;
     }
@@ -83,19 +87,19 @@ class StubUserLibraryImpl implements \ChristianBudde\cbweb\model\user\UserLibrar
     /**
      *
      * Parameter must be an instance provided from Library.
-     * @param \ChristianBudde\cbweb\model\user\User $user
-     * @return \ChristianBudde\cbweb\model\user\User | null Will return User if the user provided has parent, else null.
+     * @param User $user
+     * @return User | null Will return User if the user provided has parent, else null.
      */
-    public function getParent(\ChristianBudde\cbweb\model\user\User $user)
+    public function getParent(User $user)
     {
     }
 
     /**
      * Input must be instance of User and an instance provided by the library.
-     * @param \ChristianBudde\cbweb\model\user\User $user
+     * @param User $user
      * @return array Array containing children User instances. Empty array on no children or input not valid.
      */
-    public function getChildren(\ChristianBudde\cbweb\model\user\User $user)
+    public function getChildren(User $user)
     {
     }
 
@@ -156,7 +160,7 @@ class StubUserLibraryImpl implements \ChristianBudde\cbweb\model\user\UserLibrar
      */
     public function jsonObjectSerialize()
     {
-        return new \ChristianBudde\cbweb\controller\json\UserLibraryJSONObjectImpl($this);
+        return new UserLibraryJSONObjectImpl($this);
     }
 
 

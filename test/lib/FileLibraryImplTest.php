@@ -8,12 +8,12 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\file\Folder;
-use ChristianBudde\cbweb\file\FileLibraryImpl;
 use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\file\FolderImpl;
-use ChristianBudde\cbweb\file\FileImpl;
-use ChristianBudde\cbweb\file\File;
+use ChristianBudde\cbweb\util\file\File;
+use ChristianBudde\cbweb\util\file\FileImpl;
+use ChristianBudde\cbweb\util\file\FileLibraryImpl;
+use ChristianBudde\cbweb\util\file\Folder;
+use ChristianBudde\cbweb\util\file\FolderImpl;
 use PHPUnit_Framework_TestCase;
 use ChristianBudde\cbweb\test\stub\StubConfigImpl;
 use ChristianBudde\cbweb\test\stub\StubUserImpl;
@@ -21,7 +21,7 @@ use ChristianBudde\cbweb\test\stub\StubUserImpl;
 class FileLibraryImplTest extends PHPUnit_Framework_TestCase
 {
 
-    /** @var  \ChristianBudde\cbweb\file\Folder */
+    /** @var  Folder */
     private $testDir;
 
     private $testString = "testString";
@@ -166,7 +166,7 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->lib->addToWhitelist($f));
         $whitelist = $this->lib->getWhitelist();
         $this->assertEquals(1, count($whitelist));
-        /** @var \ChristianBudde\cbweb\file\File $o */
+        /** @var File $o */
         $o = $whitelist[0];
         $this->assertEquals($f->getAbsoluteFilePath(), $o->getAbsoluteFilePath());
     }

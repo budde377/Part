@@ -1,10 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\model\user\User;
 use ChristianBudde\cbweb\model\user\UserPrivilegesImpl;
-use ChristianBudde\cbweb\DB;
-use ChristianBudde\cbweb\model\page\Page;
 use ChristianBudde\cbweb\model\user\UserImpl;
 use ChristianBudde\cbweb\model\page\PageImpl;
 use ChristianBudde\cbweb\controller\json\UserPrivilegesJSONObjectImpl;
@@ -12,6 +9,7 @@ use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
 use ChristianBudde\cbweb\test\stub\StubPageImpl;
 use ChristianBudde\cbweb\test\stub\StubPageOrderImpl;
+use ChristianBudde\cbweb\util\db\DB;
 
 /**
  * Created by JetBrains PhpStorm.

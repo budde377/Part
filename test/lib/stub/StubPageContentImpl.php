@@ -9,7 +9,7 @@ namespace ChristianBudde\cbweb\test\stub;
 
 use ChristianBudde\cbweb\model\page\PageContent;
 use ChristianBudde\cbweb\model\page\Page;
-use StubContentImpl;
+
 
 class StubPageContentImpl extends StubContentImpl implements PageContent
 {

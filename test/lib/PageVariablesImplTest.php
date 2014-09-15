@@ -8,9 +8,9 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\PageVariablesImpl;
 use ChristianBudde\cbweb\model\page\Page;
 use ChristianBudde\cbweb\model\page\PageImpl;
+use ChristianBudde\cbweb\model\page\PageVariablesImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
 

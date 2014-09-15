@@ -7,8 +7,8 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\file\ImageFileImpl;
 use ChristianBudde\cbweb\controller\json\ImageFileJSONObjectImpl;
+use ChristianBudde\cbweb\util\file\ImageFileImpl;
 use PHPUnit_Framework_TestCase;
 
 class ImageFileJSONObjectImplTest extends PHPUnit_Framework_TestCase

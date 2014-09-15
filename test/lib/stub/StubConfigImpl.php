@@ -1,6 +1,8 @@
 <?php
 
 namespace ChristianBudde\cbweb\test\stub;
+use ChristianBudde\cbweb\Config;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -8,7 +10,7 @@ namespace ChristianBudde\cbweb\test\stub;
  * Time: 5:00 PM
  * To change this template use File | Settings | File Templates.
  */
-class StubConfigImpl implements \ChristianBudde\cbweb\Config
+class StubConfigImpl implements Config
 {
 
     private $AJAXRegistrable;

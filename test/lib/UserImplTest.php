@@ -3,8 +3,14 @@ namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\model\user\UserImpl;
 use ChristianBudde\cbweb\model\user\User;
+use ChristianBudde\cbweb\test\stub\StubDBImpl;
+use ChristianBudde\cbweb\test\stub\StubObserverImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\util\TruncateOperation;
+use PHPUnit_Extensions_Database_DataSet_IDataSet;
+use PHPUnit_Extensions_Database_DB_IDatabaseConnection;
+use PHPUnit_Extensions_Database_Operation_Composite;
+use PHPUnit_Extensions_Database_Operation_Factory;
 
 /**
  * Created by JetBrains PhpStorm.
