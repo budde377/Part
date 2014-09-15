@@ -1,5 +1,8 @@
 <?php
 namespace ChristianBudde\cbweb;
+use ChristianBudde\cbweb\util\traits\RequestTrait;
+
+use ChristianBudde\cbweb\view\template\TemplateImpl;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -34,7 +37,7 @@ class WebsiteImpl implements Website
     public function generateSite()
     {
 
-        $elementFactory = new PageElementFactoryImpl($this->config, $this->backendContainer);
+        $elementFactory = new view\page_element\PageElementFactoryImpl($this->config, $this->backendContainer);
         $template = new TemplateImpl($elementFactory, $this->backendContainer);
         $pageStrategy = $this->backendContainer->getCurrentPageStrategyInstance();
 

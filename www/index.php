@@ -36,11 +36,11 @@ if ($config->isDebugMode()) {
         $setUp();
     } catch (Exception $exception) {
         ob_clean();
-        $mail = new ChristianBudde\cbweb\MailImpl();
+        $mail = new \ChristianBudde\cbweb\util\mail\MailImpl();
         $backendContainer = $factory->buildBackendSingletonContainer($config);
 
         foreach ($backendContainer->getUserLibraryInstance() as $user) {
-            /** @var $user ChristianBudde\cbweb\User */
+            /** @var $user \ChristianBudde\cbweb\model\user\User */
             if ($user->getUserPrivileges()->hasRootPrivileges()) {
                 $mail->addReceiver($user);
             }
@@ -59,7 +59,7 @@ if ($config->isDebugMode()) {
 
         $mail->setSubject("Fejl på $host");
         $mail->setSender("no-reply@$host");
-        $mail->setMailType(ChristianBudde\cbweb\Mail::MAIL_TYPE_HTML);
+        $mail->setMailType(\ChristianBudde\cbweb\util\mail\Mail::MAIL_TYPE_HTML);
         $mail->sendMail();
 
         if ($log = $backendContainer->getLoggerInstance()) {
@@ -76,7 +76,7 @@ if ($config->isDebugMode()) {
 
 
         if (!isset($_SERVER['REQUEST_URI']) || strpos($_SERVER['REQUEST_URI'], '_500') === false) {
-            ChristianBudde\cbweb\HTTPHeaderHelper::redirectToLocation("/_500");
+            \ChristianBudde\cbweb\util\helper\HTTPHeaderHelper::redirectToLocation("/_500");
         }
 
 

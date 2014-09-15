@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb;
+use ChristianBudde\cbweb\exception\InvalidXMLException;
 use SimpleXMLElement;
 use DOMDocument;
 /**
