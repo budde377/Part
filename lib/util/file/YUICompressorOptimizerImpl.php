@@ -49,7 +49,7 @@ class YUICompressorOptimizerImpl implements Optimizer
         $command = "yui-compressor --type {$this->type} {$file->getAbsoluteFilePath()} > {$tempFile->getAbsoluteFilePath()}";
         exec($command, $v = null, $retVal);
         if ($retVal != 0 || !$tempFile->exists()) {
-            $logger = new LoggerImpl(dirname(__FILE__) . '/../');
+            $logger = new LoggerImpl(dirname(__FILE__) . '/../../../../log');
             $tempFile->delete();
             $logger->log(Logger::LOG_LEVEL_WARNING, "Compression failed with command: '$command'");
             return false;
