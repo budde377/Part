@@ -34,7 +34,7 @@ class PageVariablesImplTest extends CustomDatabaseTestCase
 
     function __construct($dataset = null)
     {
-        parent::__construct(dirname(__FILE__) . '/mysqlXML/PageVariablesImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/PageVariablesImplTest.xml');
     }
 
 

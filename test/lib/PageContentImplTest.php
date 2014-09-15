@@ -39,7 +39,7 @@ class PageContentImplTest extends CustomDatabaseTestCase
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__) . '/mysqlXML/PageContentImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/PageContentImplTest.xml');
     }
 
 

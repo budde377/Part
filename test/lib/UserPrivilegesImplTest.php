@@ -36,7 +36,7 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
 
     function __construct($dataset = null)
     {
-        parent::__construct(dirname(__FILE__) . '/mysqlXML/UserPrivilegesImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/UserPrivilegesImplTest.xml');
     }
 
 
@@ -229,7 +229,7 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
     public function testPrivilegesIsJSONObjectSerializable()
     {
         $o = $this->userPrivileges->jsonObjectSerialize();
-        $this->assertInstanceOf('ChristianBudde\cbweb\UserPrivilegesJSONObjectImpl', $o);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\UserPrivilegesJSONObjectImpl', $o);
         $this->assertEquals(new UserPrivilegesJSONObjectImpl($this->userPrivileges), $o);
     }
 

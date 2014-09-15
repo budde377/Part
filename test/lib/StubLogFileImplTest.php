@@ -55,7 +55,7 @@ class StubLogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testLogDoesReturnFile()
     {
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\StubDumpFileImpl", $this->logFile->log("MSG", Logger::LOG_LEVEL_ERROR, true));
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\util\\file\\StubDumpFileImpl", $this->logFile->log("MSG", Logger::LOG_LEVEL_ERROR, true));
     }
 
 }

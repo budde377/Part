@@ -34,10 +34,10 @@ class ImageFileImplTest extends PHPUnit_Framework_TestCase
     {
         $this->folder = new FolderImpl("/tmp/" . uniqid());
         $this->folder->create();
-        $file = new ImageFileImpl(dirname(__FILE__) . '/stubs/imageFileStub300x200.png');
+        $file = new ImageFileImpl(dirname(__FILE__) . '/../stubs/imageFileStub300x200.png');
         $this->imageFile = $file->copy($this->folder->getAbsolutePath() . '/imgStub.png');
 
-        $file = new ImageFileImpl(dirname(__FILE__) . '/stubs/fileStub');
+        $file = new ImageFileImpl(dirname(__FILE__) . '/../stubs/fileStub');
         $this->notImageFile = $file->copy($this->folder->getAbsolutePath() . '/fileStub2');
         $this->nonExistingFile = new ImageFileImpl('nonExistingFile');
 
@@ -48,7 +48,7 @@ class ImageFileImplTest extends PHPUnit_Framework_TestCase
     {
         $f = $this->imageFile->copy($this->imageFile->getParentFolder()->getAbsolutePath() . '/imgStub2.png');
         $f->delete();
-        $this->assertInstanceOf('ChristianBudde\cbweb\ImageFileImpl', $f);
+        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\ImageFileImpl', $f);
     }
 
     public function testGetWidthHeightRatioOfNonExistingFileReturnsNull()

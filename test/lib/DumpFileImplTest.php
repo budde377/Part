@@ -19,7 +19,7 @@ class DumpFileImplTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->dumpFile = new DumpFileImpl(dirname(__FILE__) . "/stubs/dumpFile");
+        $this->dumpFile = new DumpFileImpl(dirname(__FILE__) . "/../stubs/dumpFile");
         $this->dumpFile->delete();
 
     }

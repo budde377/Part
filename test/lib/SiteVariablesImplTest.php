@@ -22,7 +22,7 @@ class SiteVariablesImplTest extends CustomDatabaseTestCase
 
     function __construct($dataset = null)
     {
-        parent::__construct(dirname(__FILE__) . '/mysqlXML/SiteVariablesImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/SiteVariablesImplTest.xml');
     }
 
 

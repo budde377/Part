@@ -34,7 +34,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__).'/mysqlXML/MailAddressImplTest.xml');
+        parent::__construct(dirname(__FILE__).'/../mysqlXML/MailAddressImplTest.xml');
     }
 
     protected function setUp()
@@ -144,7 +144,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
     public function testGetMailBoxReturnsRightInstance(){
         $mb1 = $this->address->getMailbox();
         $mb2 = $this->address2->getMailbox();
-        $this->assertInstanceOf('ChristianBudde\cbweb\MailMailboxImpl', $mb1);
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailMailboxImpl', $mb1);
         $this->assertNull($mb2);
 
     }
@@ -254,7 +254,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
 
     public function testCreateMailboxWillCreate(){
         $mb = $this->address2->createMailbox($n = "Bent", $p = "BentsPass");
-        $this->assertInstanceOf('ChristianBudde\cbweb\MailMailboxImpl', $mb);
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailMailboxImpl', $mb);
         $this->assertEquals($n, $mb->getName());
         $this->assertTrue($mb->checkPassword($p));
         $this->assertTrue($mb->exists());

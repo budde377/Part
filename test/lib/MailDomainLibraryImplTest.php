@@ -30,7 +30,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__) . '/mysqlXML/MailDomainLibraryImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/MailDomainLibraryImplTest.xml');
     }
 
 
@@ -63,7 +63,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue(is_array($domainArray));
         $this->assertEquals(1, count($domainArray));
         $this->assertArrayHasKey('test.dk', $domainArray);
-        $this->assertInstanceOf('ChristianBudde\cbweb\MailDomain', $domainArray['test.dk']);
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailDomain', $domainArray['test.dk']);
     }
 
     public function testListDomainsWillReuseInstances()
@@ -77,7 +77,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
     public function testGetDomainWillGetDomain()
     {
         $d = $this->domainLibrary->getDomain('test.dk');
-        $this->assertInstanceOf('ChristianBudde\cbweb\MailDomainImpl', $d);
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailDomainImpl', $d);
 
     }
 

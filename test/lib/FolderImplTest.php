@@ -5,6 +5,7 @@ use ChristianBudde\cbweb\util\file\FolderImpl;
 use ChristianBudde\cbweb\util\file\FileImpl;
 use ChristianBudde\cbweb\util\file\Folder;
 use ChristianBudde\cbweb\util\file\File;
+use ChristianBudde\cbweb\util\traits\FilePathTrait;
 use PHPUnit_Framework_TestCase;
 
 /**
@@ -16,6 +17,8 @@ use PHPUnit_Framework_TestCase;
  */
 class FolderImplTest extends PHPUnit_Framework_TestCase
 {
+
+    use FilePathTrait;
 
     public function rrmdir($dir)
     {
@@ -30,13 +33,13 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testFolderWillReturnCorrectAbsolutePath()
     {
-        $f = new FolderImpl(dirname(__FILE__) . '/stubs/../stubs');
-        $this->assertEquals(dirname(__FILE__) . '/stubs', $f->getAbsolutePath(), 'Did not return right path');
+        $f = new FolderImpl(dirname(__FILE__) . '/../stubs/../stubs');
+        $this->assertEquals($this->relativeToAbsolute(dirname(__FILE__) . '/../stubs'), $f->getAbsolutePath(), 'Did not return right path');
     }
 
     public function testExistsWillReturnExistIfExist()
     {
-        $f = new FolderImpl(dirname(__FILE__) . '/stubs/');
+        $f = new FolderImpl(dirname(__FILE__) . '/../stubs/');
         $this->assertTrue($f->exists(), 'Did not return true on exist');
     }
 
@@ -48,16 +51,16 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testExistsWillReturnFalseIfFile()
     {
-        $f = new FolderImpl(dirname(__FILE__) . '/stubs/fileStub');
+        $f = new FolderImpl(dirname(__FILE__) . '/../stubs/fileStub');
         $this->assertFalse($f->exists(), 'Did not return false on file');
     }
 
     public function testGetParentFolderWillReturnParentFolder()
     {
-        $f = new FolderImpl(dirname(__FILE__) . '/stubs/../stubs');
+        $f = new FolderImpl(dirname(__FILE__) . '/../stubs/../stubs');
         $parentF = $f->getParentFolder();
         $this->assertNotNull($parentF, 'Did return null');
-        $this->assertEquals(dirname(__FILE__), $parentF->getAbsolutePath(), 'Did not return right parent folder');
+        $this->assertEquals($this->relativeToAbsolute(dirname(__FILE__)."/../"), $parentF->getAbsolutePath(), 'Did not return right parent folder');
     }
 
     public function testGetParentFolderOfRootWillReturnNull()
@@ -77,7 +80,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
     public function testGetRelativePathToWillReturnRelativePathToSubElement()
     {
         $f1 = new FolderImpl(dirname(__FILE__));
-        $this->assertEquals('../', $f1->getRelativePathTo(dirname(__FILE__) . '/stubs'), 'Did not return right relative path');
+        $this->assertEquals('../lib', $f1->getRelativePathTo(dirname(__FILE__) . '/../stubs/'), 'Did not return right relative path');
     }
 
     public function testGetRelativePathToWillReturnRelativePathToSibling()
@@ -89,12 +92,12 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
     public function testGetRelativePathToWillReturnRelativePathToSuperElement()
     {
         $f1 = new FolderImpl(dirname(__FILE__));
-        $this->assertEquals('test', $f1->getRelativePathTo(dirname(__FILE__) . '/..'), 'Did not return right relative path');
+        $this->assertEquals('lib', $f1->getRelativePathTo(dirname(__FILE__) . '/..'), 'Did not return right relative path');
     }
 
     public function testCreateWillCreateFolder()
     {
-        $folder = dirname(__FILE__) . '/stubs/testFolder';
+        $folder = dirname(__FILE__) . '/../stubs/testFolder';
         @$this->rrmdir($folder);
         $f = new FolderImpl($folder);
         $this->assertFalse($f->exists(), 'Folder did exist');
@@ -104,7 +107,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testCreateRecursiveWillCreateFolderRecursive()
     {
-        $folder = dirname(__FILE__) . '/stubs/testFolder';
+        $folder = dirname(__FILE__) . '/../stubs/testFolder';
         @$this->rrmdir($folder);
         $f = new FolderImpl($folder . '/test');
         $this->assertFalse($f->exists(), 'Folder did exist');
@@ -114,7 +117,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testCreateWillReturnFalseIfFolderExist()
     {
-        $folder = dirname(__FILE__) . '/stubs/testFolder';
+        $folder = dirname(__FILE__) . '/../stubs/testFolder';
         @mkdir($folder);
         $f = new FolderImpl($folder);
         $this->assertFalse($f->create(), 'Did not return false on folder exists');
@@ -122,7 +125,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testCreateWillReturnFalseIfFileExists()
     {
-        $folder = dirname(__FILE__) . '/stubs/fileStub';
+        $folder = dirname(__FILE__) . '/../stubs/fileStub';
         $f = new FolderImpl($folder);
         $this->assertFalse($f->create(), 'Did not return false on file exists');
 
@@ -130,7 +133,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testDeleteWillDeleteFolder()
     {
-        $folder = dirname(__FILE__) . '/stubs/testFolder';
+        $folder = dirname(__FILE__) . '/../stubs/testFolder';
         @$this->rrmdir($folder);
         $f = new FolderImpl($folder);
         $f->create();
@@ -140,7 +143,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testDeleteWillReturnFalseOnNonExistingFolder()
     {
-        $folder = dirname(__FILE__) . '/stubs/nonExistingFolder';
+        $folder = dirname(__FILE__) . '/../stubs/nonExistingFolder';
         $f = new FolderImpl($folder);
         $this->assertFalse($f->exists(), 'Folder does exist');
         $this->assertFalse($f->delete(), 'Did not return false on folder not existing');
@@ -148,7 +151,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testDeleteOnFolderBeingAFileWillReturnFalse()
     {
-        $folder = dirname(__FILE__) . '/stubs/fileStub';
+        $folder = dirname(__FILE__) . '/../stubs/fileStub';
         $f = new FolderImpl($folder);
         $file = new FileImpl($folder);
         $this->assertTrue($file->exists(), 'File did not exist');
@@ -158,7 +161,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testDeleteNonEmptyFolderWillReturnFalse()
     {
-        $folder = dirname(__FILE__) . '/stubs/testFolder';
+        $folder = dirname(__FILE__) . '/../stubs/testFolder';
         $f = $this->setUpNonEmptyFolder($folder);
         $this->assertFalse($f->delete(), 'Did not return false on deletion of non empty folder');
         $this->assertTrue($f->exists(), 'Folder was deleted');
@@ -166,7 +169,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testDeleteNonEmptyFolderWillReturnTrueAndDeleteWithRecursiveArgument()
     {
-        $folder = dirname(__FILE__) . '/stubs/testFolder';
+        $folder = dirname(__FILE__) . '/../stubs/testFolder';
         $f = $this->setUpNonEmptyFolder($folder);
         $this->assertTrue($f->delete(Folder::DELETE_FOLDER_RECURSIVE), 'Did not return true on deletion of non empty folder');
         $this->assertFalse($f->exists(), 'Folder was not deleted');
@@ -174,7 +177,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testListDirectoryWillReturnFalseOnFolderNotExisting()
     {
-        $folder = dirname(__FILE__) . '/stubs/nonExistingFolder';
+        $folder = dirname(__FILE__) . '/../stubs/nonExistingFolder';
         $f = new FolderImpl($folder);
         $this->assertFalse($f->exists(), 'Folder does exist');
         $this->assertFalse($f->listFolder(), 'Did not return false on non existing folder');
@@ -182,7 +185,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testListDirectoryWillReturnFalseOnFolderBeingFile()
     {
-        $folder = dirname(__FILE__) . '/stubs/fileStub';
+        $folder = dirname(__FILE__) . '/../stubs/fileStub';
         $f = new FolderImpl($folder);
         $this->assertFalse($f->listFolder(), 'Did not return false on folder being file');
 
@@ -190,7 +193,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testListDirectoryWillReturnArrayOfRightSize()
     {
-        $folder = dirname(__FILE__) . '/stubs/';
+        $folder = dirname(__FILE__) . '/../stubs/';
         $f = new FolderImpl($folder);
         $this->assertTrue(is_array($f->listFolder()), 'Did not return array');
         $this->assertEquals(count(scandir($folder)) - 2, count($f->listFolder()), 'Array length did not match');
@@ -198,32 +201,32 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testListDirectoryWillReturnArrayOfFileAndFolderInstances()
     {
-        $folder = dirname(__FILE__) . '/stubs/testFolder';
+        $folder = dirname(__FILE__) . '/../stubs/testFolder';
         $fol = $this->setUpNonEmptyFolder($folder);
         $l = $fol->listFolder();
         /** @var $e \ChristianBudde\cbweb\util\file\File */
         $e = $l[0];
-        $this->assertInstanceOf('ChristianBudde\cbweb\File', $e);
+        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\File', $e);
         $this->assertEquals('1', $e->getFilename());
         /** @var $e File */
         $e = $l[1];
-        $this->assertInstanceOf('ChristianBudde\cbweb\File', $e);
+        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\File', $e);
         $this->assertEquals('2', $e->getFilename());
         /** @var $e \ChristianBudde\cbweb\util\file\Folder */
         $e = $l[2];
-        $this->assertInstanceOf('ChristianBudde\cbweb\Folder', $e);
+        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\Folder', $e);
         $this->assertEquals('3', $e->getName());
 
         $l = $fol->listFolder(Folder::LIST_FOLDER_FILES);
         $this->assertGreaterThan(0, count($l));
         foreach ($l as $f) {
-            $this->assertInstanceOf("ChristianBudde\cbweb\File", $f);
+            $this->assertInstanceOf("ChristianBudde\\cbweb\\util\\file\\File", $f);
         }
 
         $l = $fol->listFolder(Folder::LIST_FOLDER_FOLDERS);
         $this->assertGreaterThan(0, count($l));
         foreach ($l as $f) {
-            $this->assertInstanceOf("ChristianBudde\cbweb\Folder", $f);
+            $this->assertInstanceOf("ChristianBudde\\cbweb\\util\\file\\Folder", $f);
         }
 
 
@@ -233,7 +236,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testMoveFolderWillMoveFolder()
     {
-        $folder = dirname(__FILE__) . '/stubs/testFolder';
+        $folder = $this->relativeToAbsolute(dirname(__FILE__) . '/../stubs/testFolder');
         @$this->rrmdir($folder);
         @$this->rrmdir($folder . '2');
         $f = $this->setUpNonEmptyFolder($folder);
@@ -244,8 +247,8 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testMoveFolderWillReturnFalseIfDestinationExists()
     {
-        $folder = dirname(__FILE__) . '/stubs/testFolder';
-        $folder2 = dirname(__FILE__) . '/stubs/testFolder2';
+        $folder = dirname(__FILE__) . '/../stubs/testFolder';
+        $folder2 = dirname(__FILE__) . '/../stubs/testFolder2';
         @$this->rrmdir($folder);
         @$this->rrmdir($folder . '2');
         $f = $this->setUpNonEmptyFolder($folder);
@@ -257,7 +260,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testMoveFolderWillReturnFalseOnNonExistingFolder()
     {
-        $folder = dirname(__FILE__) . '/stubs/nonExistingFolder';
+        $folder = dirname(__FILE__) . '/../stubs/nonExistingFolder';
 
         $f = new FolderImpl($folder);
         $this->assertFalse($f->move($folder . '2'));
@@ -265,7 +268,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testMoveFolderWillReturnFalseOnFolderBeingAFile()
     {
-        $folder = dirname(__FILE__) . '/stubs/fileStub';
+        $folder = dirname(__FILE__) . '/../stubs/fileStub';
 
         $f = new FolderImpl($folder);
         $this->assertFalse($f->move($folder . '2'));
@@ -273,7 +276,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testMoveFolderWillReturnTrueDestinationBeingOrigin()
     {
-        $folder = dirname(__FILE__) . '/stubs/testFolder';
+        $folder = dirname(__FILE__) . '/../stubs/testFolder';
         @$this->rrmdir($folder);
         $f = $this->setUpNonEmptyFolder($folder);
         $this->assertTrue($f->move($folder));
@@ -281,12 +284,12 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testCopyFolderWillCopyFolder()
     {
-        $folder = dirname(__FILE__) . '/stubs/testFolder';
+        $folder = $this->relativeToAbsolute(dirname(__FILE__) . '/../stubs/testFolder');
         @$this->rrmdir($folder);
         @$this->rrmdir($folder . '2');
         $f = $this->setUpNonEmptyFolder($folder);
         $f2 = $f->copy($folder . '2');
-        $this->assertInstanceOf('ChristianBudde\cbweb\Folder', $f2, 'Did not return instance of Folder');
+        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\Folder', $f2, 'Did not return instance of Folder');
         /** @var $f2  Folder */
         $this->assertEquals($folder . '2', $f2->getAbsolutePath());
         $this->assertTrue($f->exists(), 'Folder was moved');
@@ -295,8 +298,8 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testCopyFolderWillReturnNullIfDestinationExists()
     {
-        $folder = dirname(__FILE__) . '/stubs/testFolder';
-        $folder2 = dirname(__FILE__) . '/stubs/testFolder2';
+        $folder = dirname(__FILE__) . '/../stubs/testFolder';
+        $folder2 = dirname(__FILE__) . '/../stubs/testFolder2';
         @$this->rrmdir($folder);
         @$this->rrmdir($folder . '2');
         $f = $this->setUpNonEmptyFolder($folder);
@@ -308,7 +311,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testCopyFolderWillReturnFalseOnNonExistingFolder()
     {
-        $folder = dirname(__FILE__) . '/stubs/nonExistingFolder';
+        $folder = dirname(__FILE__) . '/../stubs/nonExistingFolder';
 
         $f = new FolderImpl($folder);
         $this->assertNull($f->copy($folder . '2'));
@@ -316,7 +319,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testCopyFolderWillReturnFalseOnFolderBeingAFile()
     {
-        $folder = dirname(__FILE__) . '/stubs/fileStub';
+        $folder = dirname(__FILE__) . '/../stubs/fileStub';
 
         $f = new FolderImpl($folder);
         $this->assertNull($f->copy($folder . '2'));
@@ -324,11 +327,11 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testCopyFolderWillReturnFileIfDestinationBeingOrigin()
     {
-        $folder = dirname(__FILE__) . '/stubs/testFolder';
+        $folder = dirname(__FILE__) . '/../stubs/testFolder';
         @$this->rrmdir($folder);
         $f = $this->setUpNonEmptyFolder($folder);
         $f2 = $f->copy($folder);
-        $this->assertInstanceOf('ChristianBudde\cbweb\Folder', $f2);
+        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\Folder', $f2);
         $this->assertEquals($f->getAbsolutePath(), $f2->getAbsolutePath());
 
     }
@@ -340,7 +343,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testIteratingWillMatchList()
     {
-        $folder = dirname(__FILE__) . '/stubs/testFolder';
+        $folder = dirname(__FILE__) . '/../stubs/testFolder';
         @$this->rrmdir($folder);
         $f = $this->setUpNonEmptyFolder($folder);
         $count = 0;
@@ -365,7 +368,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testCleanWillCleanFolder()
     {
-        $folder = dirname(__FILE__) . '/stubs/testFolder';
+        $folder = dirname(__FILE__) . '/../stubs/testFolder';
         @$this->rrmdir($folder);
         $f = $this->setUpNonEmptyFolder($folder);
         $this->assertGreaterThan(0, count($f->listFolder()));
@@ -376,15 +379,15 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testPutFileWillReturnNullIfDirDoesNotExist()
     {
-        $file = new FileImpl(dirname(__FILE__) . '/stubs/fileStub');
-        $folder = new FolderImpl(dirname(__FILE__) . "/stubs/nonExistingFolder");
+        $file = new FileImpl(dirname(__FILE__) . '/../stubs/fileStub');
+        $folder = new FolderImpl(dirname(__FILE__) . "/../stubs/nonExistingFolder");
         $this->assertNull($folder->putFile($file));
     }
 
     public function testPutFileWillReturnNullIfFile()
     {
-        $file = new FileImpl(dirname(__FILE__) . '/stubs/fileStub');
-        $folder = new FolderImpl(dirname(__FILE__) . "/stubs/fileStub");
+        $file = new FileImpl(dirname(__FILE__) . '/../stubs/fileStub');
+        $folder = new FolderImpl(dirname(__FILE__) . "/../stubs/fileStub");
         $this->assertNull($folder->putFile($file));
 
     }
@@ -392,8 +395,8 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testPutFileWillPutFile()
     {
-        $folder = $this->setUpNonEmptyFolder(dirname(__FILE__) . '/stubs/testFolder');
-        $file = new FileImpl(dirname(__FILE__) . '/stubs/fileStub');
+        $folder = $this->setUpNonEmptyFolder(dirname(__FILE__) . '/../stubs/testFolder');
+        $file = new FileImpl(dirname(__FILE__) . '/../stubs/fileStub');
         $newFile = $folder->putFile($file);
         $this->assertEquals(0, strpos($folder->getAbsolutePath(), $newFile->getAbsoluteFilePath()));
         $this->assertTrue($newFile->exists());
@@ -402,8 +405,8 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testPutFileWillChangeName()
     {
-        $folder = $this->setUpNonEmptyFolder(dirname(__FILE__) . '/stubs/testFolder');
-        $file = new FileImpl(dirname(__FILE__) . '/stubs/fileStub');
+        $folder = $this->setUpNonEmptyFolder(dirname(__FILE__) . '/../stubs/testFolder');
+        $file = new FileImpl(dirname(__FILE__) . '/../stubs/fileStub');
         $newName = "newFileStub";
         $newFile = $folder->putFile($file, $newName);
         $this->assertEquals(0, strpos($folder->getAbsolutePath(), $newFile->getAbsoluteFilePath()));
@@ -414,8 +417,8 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testPutFileWillOverride()
     {
-        $folder = $this->setUpNonEmptyFolder(dirname(__FILE__) . '/stubs/testFolder');
-        $file = new FileImpl(dirname(__FILE__) . '/stubs/fileStub');
+        $folder = $this->setUpNonEmptyFolder(dirname(__FILE__) . '/../stubs/testFolder');
+        $file = new FileImpl(dirname(__FILE__) . '/../stubs/fileStub');
         $newName = "1";
         $newFile = $folder->putFile($file, $newName);
         $this->assertTrue($newFile->exists());
@@ -426,8 +429,8 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testPutFileWillReturnNullIfGivenFileDoesNotExist()
     {
-        $folder = $this->setUpNonEmptyFolder(dirname(__FILE__) . '/stubs/testFolder');
-        $file = new FileImpl(dirname(__FILE__) . '/stubs/NonExistingFile');
+        $folder = $this->setUpNonEmptyFolder(dirname(__FILE__) . '/../stubs/testFolder');
+        $file = new FileImpl(dirname(__FILE__) . '/../stubs/NonExistingFile');
         $this->assertNull($folder->putFile($file));
     }
 
@@ -450,8 +453,8 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        @$this->rrmdir(dirname(__FILE__) . '/stubs/testFolder');
-        @$this->rrmdir(dirname(__FILE__) . '/stubs/testFolder2');
+        @$this->rrmdir(dirname(__FILE__) . '/../stubs/testFolder');
+        @$this->rrmdir(dirname(__FILE__) . '/../stubs/testFolder2');
 
     }
 

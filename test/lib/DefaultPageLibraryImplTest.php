@@ -47,7 +47,7 @@ class DefaultPageLibraryImplTest extends PHPUnit_Framework_TestCase
     {
         /** @var $page Page */
         $page = $this->pageLibrary->getPage("p1");
-        $this->assertInstanceOf("ChristianBudde\cbweb\DefaultPageImpl", $page);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\page\\DefaultPageImpl", $page);
         $this->assertFalse($page->isEditable());
         $this->assertEquals("p1", $page->getID());
         $this->assertEquals("someTemplate", $page->getTemplate());
@@ -61,7 +61,7 @@ class DefaultPageLibraryImplTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey(0, $pages);
         /** @var $page \ChristianBudde\cbweb\model\page\Page */
         $page = $pages[0];
-        $this->assertInstanceOf("ChristianBudde\cbweb\DefaultPageImpl", $page);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\page\\DefaultPageImpl", $page);
         $this->assertFalse($page->isEditable());
         $this->assertEquals("p1", $page->getID());
         $this->assertEquals("someTemplate", $page->getTemplate());
@@ -70,7 +70,7 @@ class DefaultPageLibraryImplTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey(1, $pages);
         /** @var $page Page */
         $page = $pages[1];
-        $this->assertInstanceOf("ChristianBudde\cbweb\DefaultPageImpl", $page);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\page\\DefaultPageImpl", $page);
         $this->assertFalse($page->isEditable());
         $this->assertEquals("p2", $page->getID());
         $this->assertEquals("someTemplate2", $page->getTemplate());

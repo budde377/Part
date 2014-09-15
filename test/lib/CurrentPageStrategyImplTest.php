@@ -37,7 +37,7 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
         $strategy = new CurrentPageStrategyImpl($this->pageOrder, $this->defaultPageLibrary);
         $page = $strategy->getCurrentPage();
         $this->assertTrue(is_object($page), 'Did not return an object');
-        $this->assertInstanceOf('ChristianBudde\cbweb\Page', $page, 'Page was not an instance of Page');
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\Page', $page, 'Page was not an instance of Page');
 
     }
 
@@ -48,7 +48,7 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
         $path = $strategy->getCurrentPagePath();
         $this->assertTrue(is_array($path), 'Did not return an array');
         $this->assertArrayHasKey(0, $path, 'Did not have index 0');
-        $this->assertInstanceOf('ChristianBudde\cbweb\Page', $path[0]);
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\Page', $path[0]);
     }
 
 
@@ -285,7 +285,7 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey(0, $currentPagePath, 'Did not have index 0');
         $this->assertArrayNotHasKey(1, $currentPagePath, 'Did not have index 0');
         $this->assertTrue($page2 !== $currentPagePath[0], "Did not return array of right format");
-        $this->assertInstanceOf('ChristianBudde\cbweb\NotFoundPageImpl', $currentPagePath[0]);
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\NotFoundPageImpl', $currentPagePath[0]);
         //$this->assertEquals(ErrorPage::Error404, $currentPagePath[0]->getError(), 'Not right error code');
 
 
@@ -327,7 +327,7 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
 
         $this->assertFalse($page2 === $currentPage, 'Did not return right page');
         $this->assertFalse($page1 === $currentPage, 'Did not return right page');
-        $this->assertInstanceOf('ChristianBudde\cbweb\NotFoundPageImpl', $currentPage);
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\NotFoundPageImpl', $currentPage);
         // $this->assertEquals(ErrorPage::Error404, $currentPage->getError(), 'Not right error code');
 
 

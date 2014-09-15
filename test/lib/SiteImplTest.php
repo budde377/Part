@@ -21,7 +21,7 @@ class SiteImplTest extends CustomDatabaseTestCase
 
     function __construct($dataset = null)
     {
-        parent::__construct(dirname(__FILE__) . '/mysqlXML/SiteImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/SiteImplTest.xml');
     }
 
 
@@ -37,7 +37,7 @@ class SiteImplTest extends CustomDatabaseTestCase
     public function testGetSiteContentReturnSameInstance()
     {
         $this->assertTrue($this->site->getContentLibrary() === $this->site->getContentLibrary());
-        $this->assertInstanceOf("ChristianBudde\cbweb\ContentLibrary", $this->site->getContentLibrary());
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\ContentLibrary", $this->site->getContentLibrary());
 
     }
 
@@ -57,7 +57,7 @@ class SiteImplTest extends CustomDatabaseTestCase
 
     public function testVariablesWillReuseInstance()
     {
-        $this->assertInstanceOf("ChristianBudde\cbweb\Variables", $this->site->getVariables());
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Variables", $this->site->getVariables());
         $this->assertTrue($this->site->getVariables() === $this->site->getVariables());
     }
 

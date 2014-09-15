@@ -84,7 +84,7 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase
     {
         /** @var JSONObject $obj */
         $obj = $this->parser->parse($this->object1->getAsJSONString());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONObject', $obj);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONObject', $obj);
         $this->assertEquals($obj->getAsJSONString(), $this->object1->getAsJSONString());
         $this->assertEquals($this->object2, $obj->getVariable('key1'));
     }
@@ -93,21 +93,21 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase
     {
         /** @var JSONFunction $obj */
         $obj = $this->parser->parse($this->function1->getAsJSONString());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONFunction', $obj);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONFunction', $obj);
         $this->assertEquals($this->object1, $obj->getArg(4));
         $this->assertEquals($obj->getAsJSONString(), $this->function1->getAsJSONString());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONTarget', $obj->getTarget());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONType', $obj->getTarget());
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONTarget', $obj->getTarget());
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONType', $obj->getTarget());
     }
 
     public function testParserParsesFunction2()
     {
         /** @var JSONFunction $obj */
         $obj = $this->parser->parse($this->function2->getAsJSONString());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONFunction', $obj);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONFunction', $obj);
         $this->assertEquals($obj->getAsJSONString(), $this->function2->getAsJSONString());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONTarget', $obj->getTarget());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONFunction', $obj->getTarget());
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONTarget', $obj->getTarget());
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONFunction', $obj->getTarget());
 
     }
 
@@ -116,9 +116,9 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase
         /** @var JSONResponse $obj */
         $this->response->setPayload($this->object1);
         $obj = $this->parser->parse($this->response->getAsJSONString());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $obj);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONResponse', $obj);
         $this->assertEquals($obj->getAsJSONString(), $this->response->getAsJSONString());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONObject', $obj->getPayload());
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONObject', $obj->getPayload());
 
     }
 
@@ -126,7 +126,7 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase
     {
         /** @var JSONResponse $obj */
         $obj = $this->parser->parse($this->response->getAsJSONString());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONResponse', $obj);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONResponse', $obj);
         $this->assertEquals($obj->getAsJSONString(), $this->response->getAsJSONString());
 
     }
@@ -134,7 +134,7 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase
     public function testsParserParsesType()
     {
         $obj = $this->parser->parse($this->type->getAsJSONString());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONType', $obj);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONType', $obj);
         $this->assertEquals($obj->getAsJSONString(), $this->type->getAsJSONString());
     }
 
@@ -143,7 +143,7 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase
         $this->compositeFunction->setId(123);
         $this->compositeFunction->appendFunction($this->function1);
         $obj = $this->parser->parse($this->compositeFunction->getAsJSONString());
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONCompositeFunction', $obj);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONCompositeFunction', $obj);
         $this->assertEquals($obj->getAsJSONString(), $this->compositeFunction->getAsJSONString());
     }
 
@@ -153,7 +153,7 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase
         /** @var JSONFunction $obj */
         $obj = $this->parser->parse($f = $this->function1->getAsJSONString());
         $obj = $obj->getArg(0);
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONCompositeFunction', $obj);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONCompositeFunction', $obj);
         $this->assertEquals($obj->getAsArray(), $this->compositeFunction->getAsArray());
     }
 

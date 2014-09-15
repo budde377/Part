@@ -32,7 +32,7 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__) . '/mysqlXML/PageContentImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/PageContentImplTest.xml');
 
     }
 
@@ -52,9 +52,9 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue(is_array($list = $this->existingContentLibrary->listContents()));
         $this->assertEquals(2, count($list));
         $this->assertArrayHasKey("", $list);
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\Content", $list[""]);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Content", $list[""]);
         $this->assertArrayHasKey("Test", $list);
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\Content", $list["Test"]);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Content", $list["Test"]);
     }
 
 
@@ -78,7 +78,7 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
     public function testGetInstanceWillCreateNewInstance()
     {
         $c = $this->existingContentLibrary->getContent($id = "id" . time());
-        $this->assertInstanceOf("ChristianBudde\cbweb\Content", $c);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Content", $c);
         $c2 = $this->existingContentLibrary->getContent($id);
         $this->assertTrue($c === $c2);
     }
@@ -124,8 +124,8 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
         $this->assertEquals(2, count($ar));
         $this->assertArrayHasKey("", $ar);
         $this->assertArrayHasKey("Test", $ar);
-        $this->assertInstanceOf("ChristianBudde\cbweb\Content", $ar[""]);
-        $this->assertInstanceOf("ChristianBudde\cbweb\Content", $ar["Test"]);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Content", $ar[""]);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Content", $ar["Test"]);
     }
 
     public function testSearchLibraryWillReuseInstances()

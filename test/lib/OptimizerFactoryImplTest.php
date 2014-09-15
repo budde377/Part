@@ -35,14 +35,14 @@ class OptimizerFactoryImplTest extends PHPUnit_Framework_TestCase
         <config>
         {$this->defaultOwner}
         <optimizers>
-            <class name='someElement' link='stubs/NullOptimizerImpl.php'>NullOptimizerImpl</class>
+            <class name='someElement' link='stub/NullOptimizerImpl.php'>ChristianBudde\\cbweb\\test\\stub\\NullOptimizerImpl</class>
         </optimizers>
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $optimizerFactory = new OptimizerFactoryImpl($config);
         $element = $optimizerFactory->getOptimizer('someElement');
         $this->assertTrue(is_object($element), 'Did not return an object');
-        $this->assertInstanceOf('NullOptimizerImpl', $element, 'Did not return element of right instance.');
+        $this->assertInstanceOf('ChristianBudde\cbweb\test\stub\NullOptimizerImpl', $element, 'Did not return element of right instance.');
 
     }
 
@@ -53,14 +53,14 @@ class OptimizerFactoryImplTest extends PHPUnit_Framework_TestCase
         <config>
         {$this->defaultOwner}
         <optimizers>
-            <class name='someElement'>NullOptimizerImpl</class>
+            <class name='someElement'>ChristianBudde\\cbweb\\test\\stub\\NullOptimizerImpl</class>
         </optimizers>
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $optimizerFactory = new OptimizerFactoryImpl($config);
         $element = $optimizerFactory->getOptimizer('someElement');
         $this->assertTrue(is_object($element), 'Did not return an object');
-        $this->assertInstanceOf('NullOptimizerImpl', $element, 'Did not return element of right instance.');
+        $this->assertInstanceOf('ChristianBudde\cbweb\test\stub\NullOptimizerImpl', $element, 'Did not return element of right instance.');
 
     }
 
@@ -71,7 +71,7 @@ class OptimizerFactoryImplTest extends PHPUnit_Framework_TestCase
         <config>
         {$this->defaultOwner}
         <optimizers>
-            <class name='someElement' link='stubs/StubScriptImpl.php'>StubScriptImpl</class>
+            <class name='someElement' link='stub/StubScriptImpl.php'>ChristianBudde\\cbweb\\test\\stub\\StubScriptImpl</class>
         </optimizers>
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
@@ -81,9 +81,9 @@ class OptimizerFactoryImplTest extends PHPUnit_Framework_TestCase
             $optimizerFactory->getOptimizer('someElement');
         } catch (Exception $exception) {
             /** @var $exception ClassNotInstanceOfException */
-            $this->assertInstanceOf('ChristianBudde\cbweb\ClassNotInstanceOfException', $exception);
+            $this->assertInstanceOf('ChristianBudde\cbweb\exception\ClassNotInstanceOfException', $exception);
             $exceptionWasThrown = true;
-            $this->assertEquals('StubScriptImpl', $exception->getClass(), 'Was not expected class');
+            $this->assertEquals('ChristianBudde\\cbweb\\test\\stub\\StubScriptImpl', $exception->getClass(), 'Was not expected class');
             $this->assertEquals('Optimizer', $exception->getExpectedInstance(), 'Was not expected instance');
 
         }
@@ -99,12 +99,12 @@ class OptimizerFactoryImplTest extends PHPUnit_Framework_TestCase
         <config>
         {$this->defaultOwner}
         <optimizers>
-            <class name='someElement' link='notAValidLink'>OptimizerNullImpl</class>
+            <class name='someElement' link='notAValidLink'>ChristianBudde\\cbweb\\test\\stub\\NullOptimizerImpl</class>
         </optimizers>
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $optimizerFactory = new OptimizerFactoryImpl($config);
-        $this->setExpectedException('ChristianBudde\cbweb\FileNotFoundException');
+        $this->setExpectedException('ChristianBudde\cbweb\exception\FileNotFoundException');
         $optimizerFactory->getOptimizer('someElement');
 
     }
@@ -115,12 +115,12 @@ class OptimizerFactoryImplTest extends PHPUnit_Framework_TestCase
         <config>
         {$this->defaultOwner}
         <optimizers>
-            <class name='someElement' link='stubs/NullOptimizerImpl.php'>NotAValidClassName</class>
+            <class name='someElement' link='stub/NullOptimizerImpl.php'>NotAValidClassName</class>
         </optimizers>
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $optimizerFactory = new OptimizerFactoryImpl($config);
-        $this->setExpectedException('ChristianBudde\cbweb\ClassNotDefinedException');
+        $this->setExpectedException('ChristianBudde\cbweb\exception\ClassNotDefinedException');
         $optimizerFactory->getOptimizer('someElement');
 
     }

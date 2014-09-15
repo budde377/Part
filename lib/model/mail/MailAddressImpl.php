@@ -1,11 +1,12 @@
 <?php
 namespace ChristianBudde\cbweb\model\mail;
+
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\util\Observable;
 use ChristianBudde\cbweb\util\Observer;
 use ChristianBudde\cbweb\util\ObserverLibrary;
 use ChristianBudde\cbweb\util\ObserverLibraryImpl;
-use ChristianBudde\cbweb\ValidationTrait;
+use ChristianBudde\cbweb\util\traits\ValidationTrait;
 use PDOStatement;
 use PDO;
 use PDOException;

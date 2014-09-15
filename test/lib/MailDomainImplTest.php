@@ -42,7 +42,7 @@ class MailDomainImplTest extends CustomDatabaseTestCase
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__) . '/mysqlXML/MailDomainImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/MailDomainImplTest.xml');
     }
 
 
@@ -378,8 +378,8 @@ class MailDomainImplTest extends CustomDatabaseTestCase
 
     public function testGetAddressLibraryReturnsRightInstance()
     {
-        $this->assertInstanceOf('ChristianBudde\cbweb\MailAddressLibraryImpl', $a = $this->domain->getAddressLibrary());
-        $this->assertInstanceOf('ChristianBudde\cbweb\MailAddressLibrary', $a);
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailAddressLibraryImpl', $a = $this->domain->getAddressLibrary());
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailAddressLibrary', $a);
         $this->assertTrue($this->domain === $a->getDomain());
     }
 

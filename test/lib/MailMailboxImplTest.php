@@ -36,7 +36,7 @@ class MailMailboxImplTest extends CustomDatabaseTestCase
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__) . '/mysqlXML/MailMailboxImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/MailMailboxImplTest.xml');
     }
 
     public function setUp()

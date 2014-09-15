@@ -28,7 +28,7 @@ class UserImplTest extends CustomDatabaseTestCase
 
     function __construct($dataset = null)
     {
-        parent::__construct(dirname(__FILE__) . '/mysqlXML/UserImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/UserImplTest.xml');
     }
 
 
@@ -603,7 +603,7 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testGetUserPrivilegesRightInstance()
     {
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\UserPrivileges", $this->user->getUserPrivileges());
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\user\\UserPrivileges", $this->user->getUserPrivileges());
     }
 
     public function testGetUserPrivilegesReturnSameInstance()
@@ -614,7 +614,7 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testGetUserVariablesReturnsRightInstance()
     {
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\Variables", $this->user->getUserVariables());
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Variables", $this->user->getUserVariables());
     }
 
     public function testGetUserVariablesReturnsSameInstance()
@@ -624,7 +624,7 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testUserIsJSONObjectSerializable()
     {
-        $this->assertInstanceOf('ChristianBudde\cbweb\JSONObject', $o = $this->user->jsonObjectSerialize());
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONObject', $o = $this->user->jsonObjectSerialize());
         $this->assertEquals('user', $o->getName());
     }
 
@@ -653,7 +653,7 @@ class UserImplTest extends CustomDatabaseTestCase
      */
     protected function getDataSet()
     {
-        return $this->createMySQLXMLDataSet(dirname(__FILE__) . '/mysqlXML/UserImplTest.xml');
+        return $this->createMySQLXMLDataSet(dirname(__FILE__) . '/../mysqlXML/UserImplTest.xml');
     }
 
 

@@ -11,10 +11,12 @@ namespace ChristianBudde\cbweb\test;
 use ChristianBudde\cbweb\util\file\FileImpl;
 use ChristianBudde\cbweb\util\file\File;
 use ChristianBudde\cbweb\controller\json\FileJSONObjectImpl;
+use ChristianBudde\cbweb\util\traits\FilePathTrait;
 use PHPUnit_Framework_TestCase;
 
 class FileImplTest extends PHPUnit_Framework_TestCase
 {
+    use FilePathTrait;
 
     public function testFileExistsReturnFalseOnFileNotFound()
     {
@@ -24,14 +26,14 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testFileExistsReturnTrueOnFileExists()
     {
-        $filePath = dirname(__FILE__) . '/stubs/templateStub.twig';
+        $filePath = dirname(__FILE__) . '/../stubs/templateStub.twig';
         $file = new FileImpl($filePath);
         $this->assertTrue($file->exists(), 'Did not return true on existing file');
     }
 
     public function testFileExistReturnFalseOnDirectory()
     {
-        $filePath = dirname(__FILE__) . '/stubs';
+        $filePath = dirname(__FILE__) . '/../stubs';
         $file = new FileImpl($filePath);
         $this->assertFalse($file->exists(), 'Did not return false on directory');
     }
@@ -44,7 +46,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetContentsReturnContentOnFileFound()
     {
-        $filePath = dirname(__FILE__) . '/stubs/templateStub.twig';
+        $filePath = dirname(__FILE__) . '/../stubs/templateStub.twig';
         $file = new FileImpl($filePath);
         $this->assertEquals(file_get_contents($filePath), $file->getContents(), 'Content did not match');
     }
@@ -52,10 +54,10 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetAbsolutePathReturnAbsolutePathToFile()
     {
-        $filePath = dirname(__FILE__) . '/.././test/stubs/templateStub.twig';
-        $altFilePath = 'stubs/templateStub.twig';
+        $filePath = dirname(__FILE__) . '/.././stubs/templateStub.twig';
+        $altFilePath = $this->relativeToAbsolute(dirname(__FILE__).'/../stubs/templateStub.twig');
         $file = new FileImpl($filePath);
-        $this->assertEquals(dirname(__FILE__) . '/' . $altFilePath, $file->getAbsoluteFilePath(),
+        $this->assertEquals( $altFilePath, $file->getAbsoluteFilePath(),
             'Did not return right absolute file path');
     }
 
@@ -63,7 +65,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
     {
         $file = dirname(__FILE__) . '/someFile';
         $relativeDir = dirname(__FILE__) . '/../class';
-        $expected = '../test/someFile';
+        $expected = '../lib/someFile';
         $file = new FileImpl($file);
         $this->assertEquals($expected, $file->getRelativeFilePathTo($relativeDir), 'Paths did not match');
     }
@@ -132,7 +134,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testMoveMovesAndReturnTrueOnSuccess()
     {
-        $filePath = dirname(__FILE__) . '/stubs/fileStub';
+        $filePath = $this->relativeToAbsolute(dirname(__FILE__) . '/../stubs/fileStub');
         $file = new FileImpl($filePath);
         $this->assertTrue($file->exists(), 'File did not exist to begin with.');
         $this->assertTrue($file->move($filePath . '2'), 'Move did not return true');
@@ -143,7 +145,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testMoveReturnFalseOnFileNotFound()
     {
-        $filePath = dirname(__FILE__) . '/stubs/notAReadFile';
+        $filePath = $this->relativeToAbsolute(dirname(__FILE__) . '/../stubs/notAReadFile');
         $file = new FileImpl($filePath);
         $this->assertFalse($file->exists(), 'File did exist to begin with.');
         $this->assertFalse($file->move($filePath . '2'), 'Move did return true');
@@ -153,11 +155,11 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testCopyCopiesAndReturnFileOnSuccess()
     {
-        $filePath = dirname(__FILE__) . '/stubs/fileStub';
+        $filePath = $this->relativeToAbsolute(dirname(__FILE__) . '/../stubs/fileStub');
         $file = new FileImpl($filePath);
         $this->assertTrue($file->exists(), 'File did not exist to begin with.');
         $newFile = $file->copy($filePath . '2');
-        $this->assertInstanceOf('ChristianBudde\cbweb\File', $newFile, 'Did not return an instance of File');
+        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\File', $newFile, 'Did not return an instance of File');
         $this->assertEquals($filePath . '2', $newFile->getAbsoluteFilePath(), 'New file did not have right path');
         $this->assertTrue($newFile->exists(), 'The new file did note exists');
         unlink($newFile->getAbsoluteFilePath());
@@ -165,7 +167,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testCopyReturnNullOnNoFile()
     {
-        $filePath = dirname(__FILE__) . '/stubs/notAReadFile';
+        $filePath = dirname(__FILE__) . '/../stubs/notAReadFile';
         $file = new FileImpl($filePath);
         $this->assertFalse($file->exists(), 'File did exist to begin with.');
         $this->assertNull($file->copy($filePath . '2'), 'Copy did not return null');
@@ -173,7 +175,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testDeleteDeletesAFileAndReturnTrueOnSuccess()
     {
-        $filePath = dirname(__FILE__) . '/stubs/fileStub';
+        $filePath = dirname(__FILE__) . '/../stubs/fileStub';
         if (file_exists($filePath . '2')) {
             unlink($filePath . '2');
         }
@@ -187,7 +189,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testDeleteReturnsFalseOnNoFile()
     {
-        $filePath = dirname(__FILE__) . '/stubs/notAReadFile';
+        $filePath = dirname(__FILE__) . '/../stubs/notAReadFile';
         $file = new FileImpl($filePath);
         $this->assertFalse($file->exists(), 'File did exist to begin with.');
         $this->assertFalse($file->delete(), 'Did not return false');
@@ -195,7 +197,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testDeleteReturnsFalseOnDirectoryAndCanNotDelete()
     {
-        $filePath = dirname(__FILE__) . '/stubs/testFileFolder';
+        $filePath = dirname(__FILE__) . '/../stubs/testFileFolder';
         if (file_exists($filePath)) {
             @unlink($filePath);
             @rmdir($filePath);
@@ -209,14 +211,14 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testDefaultAccessModeIsReadAndWritePointerAtEnd()
     {
-        $filePath = dirname(__FILE__) . '/stubs/notAReadFile';
+        $filePath = dirname(__FILE__) . '/../stubs/notAReadFile';
         $file = new FileImpl($filePath);
         $this->assertEquals(File::FILE_MODE_RW_POINTER_AT_END, $file->getAccessMode(), 'The file did not have the right access mode');
     }
 
     public function testModeIsChangeable()
     {
-        $filePath = dirname(__FILE__) . '/stubs/notAReadFile';
+        $filePath = dirname(__FILE__) . '/../stubs/notAReadFile';
         $file = new FileImpl($filePath);
         $file->setAccessMode(File::FILE_MODE_RW_POINTER_AT_BEGINNING);
         $this->assertEquals(File::FILE_MODE_RW_POINTER_AT_BEGINNING, $file->getAccessMode(), 'The file did not have the right access mode');
@@ -225,7 +227,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testModeIsOnlyAllowedModeDefinedInFileModeConstant()
     {
-        $filePath = dirname(__FILE__) . '/stubs/notAReadFile';
+        $filePath = dirname(__FILE__) . '/../stubs/notAReadFile';
         $file = new FileImpl($filePath);
         $file->setAccessMode('NotAValidMode');
         $this->assertEquals(File::FILE_MODE_RW_POINTER_AT_END, $file->getAccessMode(), 'The file did not have the right access mode');
@@ -235,7 +237,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testWriteWillWriteStringToFile()
     {
-        $filePath = dirname(__FILE__) . '/stubs/fileStub';
+        $filePath = dirname(__FILE__) . '/../stubs/fileStub';
         if (file_exists($filePath . '2')) {
             unlink($filePath . '2');
         }
@@ -262,7 +264,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testWriteToDirectoryReturnFalse()
     {
-        $fp = dirname(__FILE__) . '/stubs/testFileFolder';
+        $fp = dirname(__FILE__) . '/../stubs/testFileFolder';
         if (file_exists($fp)) {
             @unlink($fp);
             @rmdir($fp);
@@ -277,7 +279,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testSizeReturnFileSize()
     {
-        $filePath = dirname(__FILE__) . '/stubs/fileStub';
+        $filePath = dirname(__FILE__) . '/../stubs/fileStub';
         if (file_exists($filePath . '2')) {
             unlink($filePath . '2');
         }
@@ -295,7 +297,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testSizeWillReturn0AsSizeOfFileNotFound()
     {
-        $filePath = dirname(__FILE__) . '/stubs/notAReadFile';
+        $filePath = dirname(__FILE__) . '/../stubs/notAReadFile';
         $file = new FileImpl($filePath);
         $this->assertEquals(-1, $file->size(), 'Size did not match');
     }
@@ -303,8 +305,8 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testCopyFolderReturnsNull()
     {
-        $filePath = dirname(__FILE__) . '/stubs/testFileFolder';
-        $newPath = dirname(__FILE__) . '/stubs/_newStub';
+        $filePath = dirname(__FILE__) . '/../stubs/testFileFolder';
+        $newPath = dirname(__FILE__) . '/../stubs/_newStub';
         if (file_exists($filePath)) {
             @unlink($filePath);
             @rmdir($filePath);
@@ -322,8 +324,8 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testMoveFolderReturnsNull()
     {
-        $filePath = dirname(__FILE__) . '/stubs/testFileFolder';
-        $newPath = dirname(__FILE__) . '/stubs/_newStub';
+        $filePath = dirname(__FILE__) . '/../stubs/testFileFolder';
+        $newPath = dirname(__FILE__) . '/../stubs/_newStub';
         if (file_exists($filePath)) {
             @unlink($filePath);
             @rmdir($filePath);
@@ -340,7 +342,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetFileContentsWillReturnFalseIfDirectory()
     {
-        $filePath = dirname(__FILE__) . '/stubs/testFileFolder';
+        $filePath = dirname(__FILE__) . '/../stubs/testFileFolder';
         if (file_exists($filePath)) {
             @unlink($filePath);
             @rmdir($filePath);
@@ -352,7 +354,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testSizeOfFolderWillReturnMinus1()
     {
-        $filePath = dirname(__FILE__) . '/stubs/testFileFolder';
+        $filePath = dirname(__FILE__) . '/../stubs/testFileFolder';
         if (file_exists($filePath)) {
             @unlink($filePath);
             @rmdir($filePath);
@@ -364,17 +366,18 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetParentFolderWillReturnParentFolder()
     {
-        $fn = dirname(__FILE__) . '/stubs/fileStub';
+        $fn = $this->relativeToAbsolute(dirname(__FILE__) . '/../stubs/fileStub');
+        $folderNo = $this->relativeToAbsolute(dirname(__FILE__) . '/../stubs');
         $file = new FileImpl($fn);
         $folder = $file->getParentFolder();
-        $this->assertInstanceOf('ChristianBudde\cbweb\Folder', $folder);
-        $this->assertEquals(dirname(__FILE__) . '/stubs', $folder->getAbsolutePath(), 'Parent did not match');
+        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\Folder', $folder);
+        $this->assertEquals($folderNo, $folder->getAbsolutePath(), 'Parent did not match');
     }
 
 
     public function testGetResourceWillReturnFileResource()
     {
-        $fn = dirname(__FILE__) . '/stubs/fileStub';
+        $fn = dirname(__FILE__) . '/../stubs/fileStub';
         $file = new FileImpl($fn);
         $resType = @get_resource_type($file->getResource());
         $this->assertTrue('file' == $resType || $resType == 'stream', 'Did not return resource of right type');
@@ -382,7 +385,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetMimeTypeWillReturnMimeType()
     {
-        $fn = dirname(__FILE__) . '/stubs/fileStub';
+        $fn = dirname(__FILE__) . '/../stubs/fileStub';
         $file = new FileImpl($fn);
         $this->assertEquals("text/plain", $file->getMimeType());
 
@@ -390,7 +393,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetMimeTypeWillReturnNullOnNoFile()
     {
-        $fn = dirname(__FILE__) . '/stubs/nonExistingFile';
+        $fn = dirname(__FILE__) . '/../stubs/nonExistingFile';
         $file = new FileImpl($fn);
         $this->assertNull($file->getMimeType());
 
@@ -398,14 +401,14 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetDataURIWillReturnNullOnNoFile()
     {
-        $fn = dirname(__FILE__) . '/stubs/nonExistingFile';
+        $fn = dirname(__FILE__) . '/../stubs/nonExistingFile';
         $file = new FileImpl($fn);
         $this->assertNull($file->getDataURI());
     }
 
     public function testGetDataURIWillReturnURIOnFile()
     {
-        $fn = dirname(__FILE__) . '/stubs/imageFileStub300x200.png';
+        $fn = dirname(__FILE__) . '/../stubs/imageFileStub300x200.png';
         $file = new FileImpl($fn);
         $this->assertNotNull($file->getDataURI());
         $this->assertStringStartsWith("data:{$file->getMimeType()};base64,", $file->getDataURI());
@@ -414,7 +417,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testModificationTimeAndCreationTimeAreRight()
     {
-        $fn = dirname(__FILE__) . '/stubs/fileStub';
+        $fn = dirname(__FILE__) . '/../stubs/fileStub';
         $file = new FileImpl($fn);
         $this->assertEquals(filemtime($fn), $file->getModificationTime());
         $this->assertEquals(filectime($fn), $file->getCreationTime());
@@ -422,7 +425,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testModificationTimeAndCreationTimeOfNonExistingIsOK()
     {
-        $fn = dirname(__FILE__) . '/stubs/nonExistingFile';
+        $fn = dirname(__FILE__) . '/../stubs/nonExistingFile';
         $file = new FileImpl($fn);
         $this->assertEquals(0, $file->getModificationTime());
         $this->assertEquals(0, $file->getCreationTime());
@@ -430,7 +433,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
 
     public function testJSONObjectIsRight()
     {
-        $fn = dirname(__FILE__) . '/stubs/fileStub';
+        $fn = dirname(__FILE__) . '/../stubs/fileStub';
         $file = new FileImpl($fn);
 
         $o = $file->jsonObjectSerialize();

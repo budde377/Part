@@ -34,7 +34,7 @@ class SiteContentImplTest extends CustomDatabaseTestCase
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__) . '/mysqlXML/SiteContentImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/SiteContentImplTest.xml');
     }
 
 

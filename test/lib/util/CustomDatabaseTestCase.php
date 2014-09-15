@@ -28,7 +28,7 @@ class CustomDatabaseTestCase extends PHPUnit_Extensions_Database_TestCase
     function __construct($dataset = null)
     {
 
-        $this->dataset = $dataset == null ? dirname(__FILE__) . '/../mysqlXML/PageContentImplTest.xml' : $dataset;
+        $this->dataset = $dataset == null ? dirname(__FILE__) . '/../../mysqlXML/PageContentImplTest.xml' : $dataset;
     }
 
 

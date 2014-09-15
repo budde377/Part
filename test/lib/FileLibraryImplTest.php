@@ -41,7 +41,7 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase
         $this->user = new StubUserImpl();
         $this->user2 = new StubUserImpl();
 
-        $this->testDir = new FolderImpl(dirname(__FILE__) . "/stubs/testFolderFileLibrary");
+        $this->testDir = new FolderImpl(dirname(__FILE__) . "/../stubs/testFolderFileLibrary");
         $this->testDir->create();
         $this->config = new StubConfigImpl();
 
@@ -373,7 +373,7 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase
     public function testIfGetFilesFolderReturnsRightFolder()
     {
         $f = $this->lib->getFilesFolder();
-        $this->assertInstanceOf("ChristianBudde\cbweb\Folder", $f);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\util\\file\\Folder", $f);
         $this->assertEquals($f->getAbsolutePath(), $this->testDir->getAbsolutePath());
         $this->assertFalse($this->testDir === $f);
     }
