@@ -368,15 +368,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $logHandler->addAuthFunction(function () {
             return $this->userLibrary->getUserLoggedIn() != null;
         });
-/*        $logHandler->addFunctionPreCallFunction("Logger", "log",  function ($type, $instance, $functionName, &$arguments){
-            print_r($arguments);
-            if(!isset($arguments[2])){
-                return;
-            }
-            $parser = new FunctionStringParserImpl();
-            $parser->parseArray($arguments[2], $result);
-            $arguments[2] =$result;
-        });*/
+
         $logHandler->addFunctionAuthFunction("Logger", 'clearLog', $this->sitePrivilegesFunction);
         $logHandler->addFunctionAuthFunction("Logger", 'listLog', $this->sitePrivilegesFunction);
         $logHandler->addFunctionAuthFunction("Logger", 'getContextAt', $this->sitePrivilegesFunction);

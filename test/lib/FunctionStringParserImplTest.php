@@ -501,6 +501,8 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
     {
         $r = $this->parser->parseFunctionString("Site.func()..func2()..func3()..func4().func5()");
         $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONProgram', $r);
+        $r = $this->parser->parseFunctionString("Logger.log(1,\"test\",[])");
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONProgram', $r);
         $r = $this->parser->parseFunctionString("Site.func().func5()");
         $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONProgram', $r);
         $r = $this->parser->parseFunctionString("Site.func()..func2()..func3()..func4.func5()");
