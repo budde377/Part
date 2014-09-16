@@ -74,6 +74,8 @@ if ($config->isDebugMode()) {
 
         }
 
+        $log = new \ChristianBudde\cbweb\log\LoggerImpl($config->getLogPath());
+        $log->error("Exception: ".$exception->getMessage(), $exception->getTrace());
 
         if (!isset($_SERVER['REQUEST_URI']) || strpos($_SERVER['REQUEST_URI'], '_500') === false) {
             \ChristianBudde\cbweb\util\helper\HTTPHeaderHelper::redirectToLocation("/_500");

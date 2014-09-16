@@ -161,7 +161,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
 
         $userLibraryHandler->addFunctionAuthFunction('UserLibrary', 'deleteUser', function ($type, UserLibrary $instance, $functionName, $args) {
-            return $this->isChildOfUser($instance->getUser($args[0]));
+            return $this->isChildOfUser($args[0]);
         });
 
         $userLibraryHandler->addFunctionAuthFunction('UserLibrary', 'createUserFromMail', function ($type, UserLibrary $instance, $functionName, $args) {
