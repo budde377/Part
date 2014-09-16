@@ -94,8 +94,8 @@ class AJAXLogger extends Logger {
     context = context == null ? [] : context;
     var c = new Completer<ChangeResponse<Logger>>();
     var fd = new FormData();
-    fd.append("context", FunctionStringCompiler.compile(context));
-    ajaxClient.callFunctionString("Logger.log($level, ${FunctionStringCompiler.compile(message)}, POST['context'])", form_data:fd).then((JSONResponse response) {
+    fd.append("context", JSON.encode(context));
+    ajaxClient.callFunctionString("Logger.log($level, ${FunctionStringCompiler.compile(message)}, Parser.parseJson(POST['context']))", form_data:fd).then((JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         c.complete(new ChangeResponse.success(this));
       } else {

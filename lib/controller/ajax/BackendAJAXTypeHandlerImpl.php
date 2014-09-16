@@ -71,6 +71,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $this->setUpPageContentLibraryHandler($server);
         $this->setUpSiteContentHandler($server);
         $this->setUpSiteContentLibraryHandler($server);
+        $this->setUpParserHandler($server);
 
         $this->setUpFileHandler($server);
 
@@ -229,7 +230,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
     {
 
         $server->registerHandler($userHandler =
-                new GenericObjectAJAXTypeHandlerImpl(($u = $this->userLibrary->getUserLoggedIn()) == null ? "ChristianBudde\\cbweb\\User" : $u),
+                new GenericObjectAJAXTypeHandlerImpl(($u = $this->userLibrary->getUserLoggedIn()) == null ? "ChristianBudde\\cbweb\\model\\user\\User" : $u),
             ' User');
         $userHandler->whitelistFunction("User",
             "getUsername",
@@ -376,7 +377,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
     private function setUpPageContentHandler(AJAXServer $server)
     {
-        $server->registerHandler($contentHandler = new GenericObjectAJAXTypeHandlerImpl('ChristianBudde\cbweb\PageContent'));
+        $server->registerHandler($contentHandler = new GenericObjectAJAXTypeHandlerImpl('ChristianBudde\cbweb\model\page\PageContent'));
         $contentHandler->addFunctionAuthFunction("PageContent", "addContent", function ($type, PageContent $instance) {
             return ($current = $this->backend->getUserLibraryInstance()->getUserLoggedIn()) != null && $current->getUserPrivileges()->hasPagePrivileges($instance->getPage());
         });
@@ -385,7 +386,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
     private function setUpSiteContentHandler(AJAXServer $server)
     {
-        $server->registerHandler($siteContentHandler = new GenericObjectAJAXTypeHandlerImpl('ChristianBudde\cbweb\SiteContent'));
+        $server->registerHandler($siteContentHandler = new GenericObjectAJAXTypeHandlerImpl('ChristianBudde\cbweb\model\site\SiteContent'));
         $siteContentHandler->addFunctionAuthFunction("SiteContent", "addContent", $this->sitePrivilegesFunction);
         $siteContentHandler->addGetInstanceFunction('SiteContent');
     }
@@ -393,7 +394,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
     private function setUpPageContentLibraryHandler(AJAXServer $server)
     {
         $contentLibrary = $this->backend->getPageOrderInstance()->getCurrentPage()->getContentLibrary();
-        $siteContentHandler = new GenericObjectAJAXTypeHandlerImpl($contentLibrary == null?"ChristianBudde\\cbweb\\PageContentLibrary":$contentLibrary);
+        $siteContentHandler = new GenericObjectAJAXTypeHandlerImpl($contentLibrary == null?"ChristianBudde\\cbweb\\model\\page\\PageContentLibrary":$contentLibrary);
         $server->registerHandler($siteContentHandler, "PageContentLibrary");
     }
 
@@ -420,7 +421,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
     private function setUpFileHandler(AJAXServer $server)
     {
-        $server->registerHandler($fileHandler = new GenericObjectAJAXTypeHandlerImpl('ChristianBudde\cbweb\ImageFile', 'File', 'ImageFile'));
+        $server->registerHandler($fileHandler = new GenericObjectAJAXTypeHandlerImpl('ChristianBudde\cbweb\util\file\ImageFile', 'File', 'ImageFile'));
         $fileHandler->whitelistFunction("File",
             'getContents',
             'getFilename',
@@ -596,6 +597,25 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             $arguments = array_splice($arguments, 0, $length);
             $arguments[$length] = true;
         };
+    }
+
+    private function setUpParserHandler(AJAXServer $server)
+    {
+        $server->registerHandler($handler = new GenericObjectAJAXTypeHandlerImpl('Parser'));
+        $handler->addFunction('Parser', 'parseJson', function($instance, $string){
+            if(!is_string($string)){
+                return $string;
+            }
+            return json_decode($string, true);
+        });
+        $handler->addFunction('Parser', 'parseFunctionStringArray', function($instance, $string){
+            if(!is_string($string)){
+                return $string;
+            }
+            $p = new FunctionStringParserImpl();
+            $p->parseArray($string, $result);
+            return $result;
+        });
     }
 
 
