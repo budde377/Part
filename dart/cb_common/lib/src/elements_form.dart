@@ -2,7 +2,7 @@ part of elements;
 
 class FormHandler {
   final FormElement form;
-  final SpanElement filter = new SpanElement();
+  //final SpanElement filter = new SpanElement();
 
   Function _submitFunction;
 
@@ -16,7 +16,7 @@ class FormHandler {
   factory FormHandler(FormElement form) => _cache.putIfAbsent(form, ()=>new FormHandler._internal(form));
 
   FormHandler._internal(FormElement form):this.form = form{
-    filter.classes.add('filter');
+    //filter.classes.add('filter');
   }
 
     set submitFunction(bool f(Map<String,String> data)){
@@ -102,13 +102,13 @@ class FormHandler {
 
   void blur() {
     form.classes.add("blur");
-    form.insertAdjacentElement("afterBegin", filter);
+    //form.insertAdjacentElement("afterBegin", filter);
 
   }
 
   void unBlur() {
     form.classes.remove("blur");
-    filter.remove();
+    //filter.remove();
   }
 
 }

@@ -348,15 +348,15 @@ form > span.notion {
     width: 100%;
 }
 
-#UserSettingsContent .blur > .filter {
-    background: rgba(206, 206, 206, 0.7) url(/_common/img/ajax-loader_light.gif) scroll no-repeat center center;
+#UserSettingsContent .blur:after{
+    background: rgba(206, 206, 206, 0.7);
 }
 
 #UserSettingsContent .colorList > li.blur {
     background-color: #EEE;
 }
 
-#UserSettingsContent .colorList > li.blur > .filter {
+#UserSettingsContent .colorList > li.blur:after {
     background-image: none;
 }
 

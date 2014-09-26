@@ -399,15 +399,43 @@ select.better_select_select {
     position: relative;
 }
 
-.blur > .filter {
+.blur:before{
     display: block;
     position: absolute;
+    z-index: 201;
+    content: "";
+    height: 100px;
+    width: 100px;
+    margin-top: -50px;
+    margin-left: -50px;
+    top: 50%;
+    left: 50%;
+    background: url('/_common/img/loader_sprite.png') 0 center;
+    animation:play_loader .8s steps(20) infinite;
+    -webkit-animation: play_loader 1.5s steps(18) infinite;
+    padding: 10px;
+
+}
+
+@keyframes play_loader {
+    100% { background-position: -1800px; }
+}
+
+@-webkit-keyframes play_loader {
+    100% { background-position: -2160px; }
+}
+
+.blur:after{
+    display: block;
+    position: absolute;
+    content: "";
     z-index: 200;
     top: 0;
+    bottom: 0;
     left: 0;
     right: 0;
-    bottom: 0;
     background: url(/_common/img/ajax-loader.gif) scroll no-repeat center center;
+
 }
 
 .colorList > li {
