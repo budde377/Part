@@ -410,19 +410,12 @@ select.better_select_select {
     margin-left: -50px;
     top: 50%;
     left: 50%;
-    background: url('/_common/img/loader_sprite.png') 0 center;
-    animation:play_loader .8s steps(20) infinite;
-    -webkit-animation: play_loader 1.5s steps(18) infinite;
+
+    background: transparent url(/_common/img/loader.svg) scroll no-repeat center center;
+    background-size: 75px 75px ;
     padding: 10px;
 
-}
 
-@keyframes play_loader {
-    100% { background-position: -1800px; }
-}
-
-@-webkit-keyframes play_loader {
-    100% { background-position: -2160px; }
 }
 
 .blur:after{
