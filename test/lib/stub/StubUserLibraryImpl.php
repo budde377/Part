@@ -1,6 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde\cbweb\controller\json\UserLibraryJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\UserLibraryObjectImpl;
 use ChristianBudde\cbweb\model\user\User;
 use ChristianBudde\cbweb\model\user\UserLibrary;
 
@@ -156,11 +156,11 @@ class StubUserLibraryImpl implements UserLibrary
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return \ChristianBudde\cbweb\controller\json\JSONObject
+     * @return \ChristianBudde\cbweb\controller\json\Object
      */
     public function jsonObjectSerialize()
     {
-        return new UserLibraryJSONObjectImpl($this);
+        return new UserLibraryObjectImpl($this);
     }
 
 

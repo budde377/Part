@@ -7,7 +7,7 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\json\SiteContentJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\SiteContentObjectImpl;
 use PHPUnit_Framework_TestCase;
 use ChristianBudde\cbweb\test\stub\StubSiteContentImpl;
 
@@ -16,7 +16,7 @@ class SiteContentJSONObjectImplTest extends PHPUnit_Framework_TestCase
     public function testConstructorChangesName()
     {
         $content = new StubSiteContentImpl();
-        $object = new SiteContentJSONObjectImpl($content);
+        $object = new SiteContentObjectImpl($content);
         $this->assertEquals('site_content', $object->getName());
     }
 }

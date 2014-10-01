@@ -1,7 +1,7 @@
 <?php
 
 namespace ChristianBudde\cbweb\test;
-use ChristianBudde\cbweb\controller\json\ImageFileJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\ImageFileObjectImpl;
 use ChristianBudde\cbweb\util\file\Folder;
 use ChristianBudde\cbweb\util\file\FolderImpl;
 use ChristianBudde\cbweb\util\file\ImageFile;
@@ -570,7 +570,7 @@ class ImageFileImplTest extends PHPUnit_Framework_TestCase
     public function testJSONObjectIsRight()
     {
         $o = $this->imageFile->jsonObjectSerialize();
-        $this->assertEquals(new ImageFileJSONObjectImpl($this->imageFile), $o);
+        $this->assertEquals(new ImageFileObjectImpl($this->imageFile), $o);
     }
 
 

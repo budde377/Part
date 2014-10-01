@@ -1,6 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\controller\ajax;
-use ChristianBudde\cbweb\controller\json\JSONResponse;
+use ChristianBudde\cbweb\controller\json\Response;
 
 /**
  * Created by PhpStorm.
@@ -27,18 +27,18 @@ interface AJAXServer {
 
     /**
      * @param string $input
-     * @return JSONResponse
+     * @return Response
      */
     public function handleFromJSONString($input);
 
     /**
      * @param string $input
-     * @return JSONResponse
+     * @return Response
      */
     public function handleFromFunctionString($input);
 
     /**
-     * @return JSONResponse
+     * @return Response
      */
     public function handleFromRequestBody();
 } 

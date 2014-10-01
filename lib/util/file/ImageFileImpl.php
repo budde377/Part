@@ -1,7 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\util\file;
 
-use ChristianBudde\cbweb\controller\json\ImageFileJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\ImageFileObjectImpl;
 use Imagick;
 use ImagickException;
 
@@ -377,7 +377,7 @@ class ImageFileImpl extends FileImpl implements ImageFile
 
     public function jsonObjectSerialize()
     {
-        return new ImageFileJSONObjectImpl($this);
+        return new ImageFileObjectImpl($this);
     }
 
 

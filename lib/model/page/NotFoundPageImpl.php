@@ -1,8 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\model\page;
 use ChristianBudde\cbweb\model\ContentLibrary;
-use ChristianBudde\cbweb\controller\json\JSONObject;
-use ChristianBudde\cbweb\controller\json\PageJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\PageObjectImpl;
 use ChristianBudde\cbweb\util\helper\HTTPHeaderHelper;
 use ChristianBudde\cbweb\model\Content;
 
@@ -240,11 +239,11 @@ class NotFoundPageImpl implements Page
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return JSONObject
+     * @return Object
      */
     public function jsonObjectSerialize()
     {
-        return new PageJSONObjectImpl($this);
+        return new PageObjectImpl($this);
     }
 
 

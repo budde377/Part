@@ -1,6 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde\cbweb\controller\json\JSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\ObjectImpl;
 use ChristianBudde\cbweb\controller\json\JSONObjectSerializable;
 
 /**
@@ -16,11 +16,11 @@ class NullJSONObjectSerializableImpl implements JSONObjectSerializable
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return \ChristianBudde\cbweb\controller\json\JSONObject
+     * @return \ChristianBudde\cbweb\controller\json\Object
      */
     public function jsonObjectSerialize()
     {
-        return new JSONObjectImpl(null);
+        return new ObjectImpl(null);
     }
 
     /**

@@ -1,13 +1,12 @@
 <?php
 namespace ChristianBudde\cbweb\model\page;
 use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\controller\json\JSONObject;
 use ChristianBudde\cbweb\exception\MalformedParameterException;
 
 
 use ChristianBudde\cbweb\util\Observable;
 use ChristianBudde\cbweb\util\Observer;
-use ChristianBudde\cbweb\controller\json\PageOrderJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\PageOrderObjectImpl;
 use PDOStatement;
 use PDO;
 use Exception;
@@ -454,11 +453,11 @@ class PageOrderImpl implements PageOrder, Observer
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return JSONObject
+     * @return Object
      */
     public function jsonObjectSerialize()
     {
-        return new PageOrderJSONObjectImpl($this);
+        return new PageOrderObjectImpl($this);
     }
 
 

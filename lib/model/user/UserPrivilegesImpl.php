@@ -1,7 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\model\user;
 
-use ChristianBudde\cbweb\controller\json\UserPrivilegesJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\UserPrivilegesObjectImpl;
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\model\page\Page;
 use ChristianBudde\cbweb\model\page\PageOrder;
@@ -223,11 +223,11 @@ class UserPrivilegesImpl implements UserPrivileges
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return \ChristianBudde\cbweb\controller\json\JSONObject
+     * @return \ChristianBudde\cbweb\controller\json\Object
      */
     public function jsonObjectSerialize()
     {
-        return new UserPrivilegesJSONObjectImpl($this);
+        return new UserPrivilegesObjectImpl($this);
     }
 
 

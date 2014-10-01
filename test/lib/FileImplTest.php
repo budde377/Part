@@ -10,7 +10,7 @@ namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\util\file\FileImpl;
 use ChristianBudde\cbweb\util\file\File;
-use ChristianBudde\cbweb\controller\json\FileJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\FileObjectImpl;
 use ChristianBudde\cbweb\util\traits\FilePathTrait;
 use PHPUnit_Framework_TestCase;
 
@@ -437,7 +437,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
         $file = new FileImpl($fn);
 
         $o = $file->jsonObjectSerialize();
-        $this->assertEquals(new FileJSONObjectImpl($file), $o);
+        $this->assertEquals(new FileObjectImpl($file), $o);
     }
 
 }

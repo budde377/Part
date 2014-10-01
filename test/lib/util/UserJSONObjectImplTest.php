@@ -1,7 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\test\util;
 
-use ChristianBudde\cbweb\controller\json\UserJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\UserObjectImpl;
 use PHPUnit_Framework_TestCase;
 use ChristianBudde\cbweb\test\stub\StubUserImpl;
 use ChristianBudde\cbweb\test\stub\StubUserPrivilegesImpl;
@@ -31,7 +31,7 @@ class UserJSONObjectImplTest extends PHPUnit_Framework_TestCase
         $user->setUserPrivileges($privileges);
         $user->lastLogin = $lastLogin;
 
-        $jsonObject = new UserJSONObjectImpl($user);
+        $jsonObject = new UserObjectImpl($user);
 
         $this->assertEquals('user', $jsonObject->getName());
         $this->assertEquals($userName, $jsonObject->getVariable('username'));

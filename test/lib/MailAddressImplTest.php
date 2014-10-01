@@ -5,10 +5,10 @@
  * Date: 7/8/14
  * Time: 6:08 PM
  */
-use ChristianBudde\cbweb\model\mail\MailAddressLibrary;
-use ChristianBudde\cbweb\model\mail\MailAddressImpl;
-use ChristianBudde\cbweb\model\mail\MailDomainLibraryImpl;
-use ChristianBudde\cbweb\model\mail\MailAddress;
+use ChristianBudde\cbweb\model\mail\AddressLibrary;
+use ChristianBudde\cbweb\model\mail\AddressImpl;
+use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
+use ChristianBudde\cbweb\model\mail\Address;
 use ChristianBudde\cbweb\test\stub\StubConfigImpl;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
 use ChristianBudde\cbweb\test\stub\StubObserverImpl;
@@ -17,18 +17,18 @@ use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 class MailAddressImplTest extends CustomDatabaseTestCase{
 
     private $config;
-    /** @var  MailAddressLibrary */
+    /** @var  AddressLibrary */
     private $addressLibrary;
-    /** @var  MailAddressImpl */
+    /** @var  AddressImpl */
     private $address;
-    /** @var  MailAddressImpl */
+    /** @var  AddressImpl */
     private $nonExistingAddress;
 
     private $db;
     private $domainLibrary;
     private $domain;
     private $mailPass;
-    /** @var  \ChristianBudde\cbweb\model\mail\MailAddressImpl */
+    /** @var  \ChristianBudde\cbweb\model\mail\AddressImpl */
     private $address2;
 
 
@@ -57,7 +57,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
 
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->domainLibrary = new MailDomainLibraryImpl($this->config, $this->db);
+        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db);
         $this->domain = $this->domainLibrary->getDomain('test.dk');
         $this->addressLibrary = $this->domain->getAddressLibrary();
         $this->address = $this->addressLibrary->getAddress('test');
@@ -376,7 +376,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
         $this->address->attachObserver($ob);
         $this->address->delete();
         $this->assertTrue($ob->hasBeenCalled());
-        $this->assertEquals(MailAddress::EVENT_DELETE, $ob->getLastCallType());
+        $this->assertEquals(Address::EVENT_DELETE, $ob->getLastCallType());
     }
 
     public function testObserversWillBeNotNotifiedOnDeleteAfterDetachment(){
@@ -412,7 +412,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
         $this->address->attachObserver($ob);
         $this->address->setLocalPart('test3');
         $this->assertTrue($ob->hasBeenCalled());
-        $this->assertEquals(MailAddress::EVENT_CHANGE_LOCAL_PART, $ob->getLastCallType());
+        $this->assertEquals(Address::EVENT_CHANGE_LOCAL_PART, $ob->getLastCallType());
     }
 
     public function testGetIdReturnsId(){
@@ -425,11 +425,11 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
 
     /**
      * @param string $string
-     * @return MailAddressImpl
+     * @return AddressImpl
      */
     private function createAddress($string)
     {
-        return new MailAddressImpl($string, $this->db, $this->addressLibrary);
+        return new AddressImpl($string, $this->db, $this->addressLibrary);
     }
 
 

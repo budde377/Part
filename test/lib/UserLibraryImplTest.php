@@ -4,7 +4,7 @@ namespace ChristianBudde\cbweb\test;
 use ChristianBudde\cbweb\model\user\UserLibraryImpl;
 use ChristianBudde\cbweb\model\user\UserImpl;
 use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\controller\json\UserLibraryJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\UserLibraryObjectImpl;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 
@@ -297,7 +297,7 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
 
     public function testLibraryIsJSONObjectSerializable()
     {
-        $this->assertEquals(new UserLibraryJSONObjectImpl($this->library), $this->library->jsonObjectSerialize());
+        $this->assertEquals(new UserLibraryObjectImpl($this->library), $this->library->jsonObjectSerialize());
     }
 
     private function userInList($ret, User $user)

@@ -3,7 +3,7 @@ namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\model\site\SiteContentImpl;
 use ChristianBudde\cbweb\model\site\SiteImpl;
-use ChristianBudde\cbweb\controller\json\SiteContentJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\SiteContentObjectImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
 use ChristianBudde\cbweb\test\stub\StubSiteImpl;
@@ -194,7 +194,7 @@ class SiteContentImplTest extends CustomDatabaseTestCase
 
     public function testReturnsRightContent()
     {
-        $this->assertEquals(new SiteContentJSONObjectImpl($this->existingContent2), $this->existingContent2->jsonObjectSerialize());
+        $this->assertEquals(new SiteContentObjectImpl($this->existingContent2), $this->existingContent2->jsonObjectSerialize());
 
     }
 

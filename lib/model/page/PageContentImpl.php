@@ -1,10 +1,9 @@
 <?php
 namespace ChristianBudde\cbweb\model\page;
-use ChristianBudde\cbweb\controller\json\JSONObject;
 use ChristianBudde\cbweb\util\db\DB;
 
 
-use ChristianBudde\cbweb\controller\json\PageContentJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\PageContentObjectImpl;
 use PDOStatement;
 use PDO;
 /**
@@ -194,11 +193,11 @@ class PageContentImpl implements PageContent
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return JSONObject
+     * @return Object
      */
     public function jsonObjectSerialize()
     {
-        return new PageContentJSONObjectImpl($this);
+        return new PageContentObjectImpl($this);
     }
 
     /**

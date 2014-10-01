@@ -32,7 +32,7 @@ class NullAJAXServerImpl implements AJAXServer
 
     /**
      * @param string $input
-     * @return \ChristianBudde\cbweb\controller\json\JSONResponse
+     * @return \ChristianBudde\cbweb\controller\json\Response
      */
     public function handleFromJSONString($input)
     {
@@ -40,14 +40,14 @@ class NullAJAXServerImpl implements AJAXServer
 
     /**
      * @param string $input
-     * @return \ChristianBudde\cbweb\controller\json\JSONResponse
+     * @return \ChristianBudde\cbweb\controller\json\Response
      */
     public function handleFromFunctionString($input)
     {
     }
 
     /**
-     * @return \ChristianBudde\cbweb\controller\json\JSONResponse
+     * @return \ChristianBudde\cbweb\controller\json\Response
      */
     public function handleFromRequestBody()
     {

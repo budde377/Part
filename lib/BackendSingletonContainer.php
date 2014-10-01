@@ -7,7 +7,7 @@ use ChristianBudde\cbweb\util\file\DartRegister;
 use ChristianBudde\cbweb\util\file\FileLibrary;
 use ChristianBudde\cbweb\util\file\JSRegister;
 use ChristianBudde\cbweb\log\Logger;
-use ChristianBudde\cbweb\model\mail\MailDomainLibrary;
+use ChristianBudde\cbweb\model\mail\DomainLibrary;
 use ChristianBudde\cbweb\model\page\CurrentPageStrategy;
 use ChristianBudde\cbweb\model\page\DefaultPageLibrary;
 use ChristianBudde\cbweb\model\page\PageOrder;
@@ -134,7 +134,7 @@ interface BackendSingletonContainer
 
     /**
      * Will Create and reuse instance of MailDomainLibrary.
-     * @return MailDomainLibrary
+     * @return DomainLibrary
      */
     public function getMailDomainLibraryInstance();
 

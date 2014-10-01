@@ -6,9 +6,7 @@ namespace ChristianBudde\cbweb\model\site;
  * Date: 10/23/13
  * Time: 1:16 PM
  */
-use ChristianBudde\cbweb\model\ContentLibrary;
 use ChristianBudde\cbweb\model\Content;
-use ChristianBudde\cbweb\model\Variables;
 
 /**
  * Created by PhpStorm.

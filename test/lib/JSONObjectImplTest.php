@@ -1,7 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\json\JSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\ObjectImpl;
 use ChristianBudde\cbweb\test\stub\NullJSONObjectSerializableImpl;
 use ChristianBudde\cbweb\test\stub\NullJsonSerializableImpl;
 use PHPUnit_Framework_TestCase;
@@ -16,12 +16,12 @@ use PHPUnit_Framework_TestCase;
 class JSONObjectImplTest extends PHPUnit_Framework_TestCase
 {
     private $objectName = "SomeObject";
-    /** @var JSONObjectImpl */
+    /** @var ObjectImpl */
     private $object;
 
     protected function setUp()
     {
-        $this->object = new JSONObjectImpl($this->objectName);
+        $this->object = new ObjectImpl($this->objectName);
     }
 
     public function testGetNameWillReturnName()
@@ -97,7 +97,7 @@ class JSONObjectImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetAsArrayWillReturnCorrectArray()
     {
-        $newObject = new JSONObjectImpl('newObject');
+        $newObject = new ObjectImpl('newObject');
         $this->object->setVariable('object', $newObject);
         $this->object->setVariable('string', 'test');
 
@@ -120,7 +120,7 @@ class JSONObjectImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetAsJSONStringWillBeLikeArray()
     {
-        $newObject = new JSONObjectImpl('newObject');
+        $newObject = new ObjectImpl('newObject');
         $this->object->setVariable('object', $newObject);
         $this->object->setVariable('string', 'test');
 

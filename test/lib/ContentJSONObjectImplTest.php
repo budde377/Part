@@ -7,7 +7,7 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\json\ContentJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\ContentObjectImpl;
 use PHPUnit_Framework_TestCase;
 use ChristianBudde\cbweb\test\stub\StubContentImpl;
 
@@ -22,7 +22,7 @@ class ContentJSONObjectImplTest extends PHPUnit_Framework_TestCase
         $userLib->id = "testid";
         $userLib->addContent($t = "TestString");
 
-        $object = new ContentJSONObjectImpl($userLib);
+        $object = new ContentObjectImpl($userLib);
 
         $this->assertEquals($t, $object->getVariable('latest_content'));
         $this->greaterThanOrEqual(time(), $object->getVariable('latest_time'));

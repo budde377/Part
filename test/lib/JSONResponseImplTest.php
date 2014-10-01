@@ -1,9 +1,9 @@
 <?php
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\json\JSONResponse;
-use ChristianBudde\cbweb\controller\json\JSONResponseImpl;
-use ChristianBudde\cbweb\controller\json\JSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\Response;
+use ChristianBudde\cbweb\controller\json\ResponseImpl;
+use ChristianBudde\cbweb\controller\json\ObjectImpl;
 use ChristianBudde\cbweb\test\stub\NullJSONObjectSerializableImpl;
 use ChristianBudde\cbweb\test\stub\NullJsonSerializableImpl;
 use PHPUnit_Framework_TestCase;
@@ -17,14 +17,14 @@ use PHPUnit_Framework_TestCase;
  */
 class JSONResponseImplTest extends PHPUnit_Framework_TestCase
 {
-    /** @var JSONResponseImpl */
+    /** @var ResponseImpl */
     private $response;
-    private $responseType = JSONResponse::RESPONSE_TYPE_ERROR;
-    private $responseErrorCode = JSONResponse::ERROR_CODE_MALFORMED_REQUEST;
+    private $responseType = Response::RESPONSE_TYPE_ERROR;
+    private $responseErrorCode = Response::ERROR_CODE_MALFORMED_REQUEST;
 
     public function setUp()
     {
-        $this->response = new JSONResponseImpl($this->responseType, $this->responseErrorCode);
+        $this->response = new ResponseImpl($this->responseType, $this->responseErrorCode);
     }
 
     public function testGetTypeWillReturnType()
@@ -66,7 +66,7 @@ class JSONResponseImplTest extends PHPUnit_Framework_TestCase
 
     public function testSetPayloadCanBeJSONObject()
     {
-        $object = new JSONObjectImpl("testName");
+        $object = new ObjectImpl("testName");
         $this->response->setPayload($object);
         $this->assertTrue($object == $this->response->getPayload());
     }
@@ -124,8 +124,8 @@ class JSONResponseImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetAsArrayWillConsiderIndex()
     {
-        $newResponse = new JSONResponseImpl();
-        $object = new JSONObjectImpl("testName");
+        $newResponse = new ResponseImpl();
+        $object = new ObjectImpl("testName");
         $newResponse->setPayload($object);
 
         $array = $newResponse->getAsArray();
@@ -142,8 +142,8 @@ class JSONResponseImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetAsJSONStringIsEquivalent()
     {
-        $newRequest = new JSONResponseImpl();
-        $object = new JSONObjectImpl("testName");
+        $newRequest = new ResponseImpl();
+        $object = new ObjectImpl("testName");
         $newRequest->setPayload($object);
 
         $array = json_decode($newRequest->getAsJSONString(), true);
@@ -161,7 +161,7 @@ class JSONResponseImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetAsArrayWillReturnPayloadArrayContainingObjectAsArray()
     {
-        $object = new JSONObjectImpl('testName');
+        $object = new ObjectImpl('testName');
         $payload = array('test' => $object);
         $this->response->setPayload($payload);
         $array = $this->response->getAsArray();

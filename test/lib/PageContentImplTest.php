@@ -13,7 +13,7 @@ namespace ChristianBudde\cbweb\test;
 use ChristianBudde\cbweb\model\page\PageContentImpl;
 use ChristianBudde\cbweb\model\page\Page;
 use ChristianBudde\cbweb\model\page\PageImpl;
-use ChristianBudde\cbweb\controller\json\PageContentJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\PageContentObjectImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
 use ChristianBudde\cbweb\util\db\DB;
@@ -225,7 +225,7 @@ class PageContentImplTest extends CustomDatabaseTestCase
 
     public function testReturnsRightContent()
     {
-        $this->assertEquals(new PageContentJSONObjectImpl($this->existingContent2), $this->existingContent2->jsonObjectSerialize());
+        $this->assertEquals(new PageContentObjectImpl($this->existingContent2), $this->existingContent2->jsonObjectSerialize());
 
     }
 

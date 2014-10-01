@@ -1,7 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\model\site;
-use ChristianBudde\cbweb\controller\json\JSONObject;
-use ChristianBudde\cbweb\controller\json\SiteContentJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\SiteContentObjectImpl;
 use ChristianBudde\cbweb\util\db\DB;
 
 
@@ -186,11 +185,11 @@ class SiteContentImpl implements SiteContent{
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return JSONObject
+     * @return Object
      */
     public function jsonObjectSerialize()
     {
-        return new SiteContentJSONObjectImpl($this);
+        return new SiteContentObjectImpl($this);
     }
 
 

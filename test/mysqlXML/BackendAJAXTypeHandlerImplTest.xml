@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <database name="cms2012testdb">
+        <table_data name="User">
+            <row>
+                <field name="username">root</field>
+                <field name="mail">root@root.com</field>
+                <field name="password">somePass</field>
+                <field name="lastLogin">1337-01-03 03:07:00</field>
+                <field name="id">12345678901234567890123</field>
+            </row>
+        </table_data>
+        <table_data name="UserPrivileges">
+        </table_data>
+        <table_data name="Page">
+            <row>
+                <field name="page_id">page</field>
+                <field name="title">title</field>
+                <field name="template">template</field>
+                <field name="alias">alias</field>
+            </row>
+            <row>
+                <field name="page_id">page2</field>
+                <field name="title">title</field>
+                <field name="template">template</field>
+                <field name="alias">alias</field>
+            </row>
+            <row>
+                <field name="page_id">page3</field>
+                <field name="title">title</field>
+                <field name="template">template</field>
+                <field name="alias">alias</field>
+            </row>
+        </table_data>
+        <table_data name="PageOrder">
+            <row>
+                <field name="page_id">page</field>
+                <field name="order_no">1</field>
+                <field name="parent_id" xsi:nil="true"/>
+            </row>
+            <row>
+                <field name="page_id">page2</field>
+                <field name="order_no">1</field>
+                <field name="parent_id">page</field>
+            </row>
+        </table_data>
+
+        <table_data name="MailDomain">
+            <row>
+                <field name="domain">test.dk</field>
+                <field name="description">Some desc.</field>
+                <field name="created">2000-01-01 12:00:00</field>
+                <field name="modified">2000-01-01 13:00:00</field>
+                <field name="active">1</field>
+            </row>
+            <row>
+                <field name="domain">test2.dk</field>
+                <field name="description">Some desc2.</field>
+                <field name="created">2000-01-02 12:00:00</field>
+                <field name="modified">2000-01-02 13:00:00</field>
+                <field name="active">1</field>
+            </row>
+        </table_data>
+
+        <table_data name="MailAlias">
+            <row>
+                <field name="address_id">addressId1</field>
+                <field name="target">test2@example.org</field>
+            </row>
+            <row>
+                <field name="address_id">addressId1</field>
+                <field name="target">test@example.org</field>
+            </row>
+
+        </table_data>
+
+        <table_data name="MailAddress">
+            <row>
+                <field name="name">test2</field>
+                <field name="domain">test.dk</field>
+                <field name="id">addressId1</field>
+                <field name="mailbox_id" xsi:nil="true"/>
+                <field name="created">2000-01-03 12:00:00</field>
+                <field name="modified">2000-01-03 13:00:00</field>
+                <field name="active">0</field>
+            </row>
+            <row>
+                <field name="name">test</field>
+                <field name="domain">test.dk</field>
+                <field name="id">addressId2</field>
+                <field name="mailbox_id">mailboxId1</field>
+                <field name="created">2000-01-04 12:00:00</field>
+                <field name="modified">2000-01-04 13:00:00</field>
+                <field name="active">1</field>
+            </row>
+            <row>
+                <field name="name">someHiddenId</field>
+                <field name="domain">test.dk</field>
+                <field name="id">addressId3</field>
+                <field name="mailbox_id">mailboxId1</field>
+                <field name="created">2000-01-04 12:00:00</field>
+                <field name="modified">2000-01-04 13:00:00</field>
+                <field name="active">1</field>
+            </row>
+            <row>
+                <field name="name"></field>
+                <field name="domain">test.dk</field>
+                <field name="id">addressId4</field>
+                <field name="mailbox_id" xsi:nil="true"/>
+                <field name="created">2000-01-04 12:00:00</field>
+                <field name="modified">2000-01-04 13:00:00</field>
+                <field name="active">1</field>
+            </row>
+        </table_data>
+        <table_data name="MailMailbox">
+            <row>
+                <field name="primary_address_id">addressId3</field>
+                <field name="secondary_address_id">addressId2</field>
+                <field name="password">$1$salt$qJH7.N4xYta3aEG/dfqo/0</field>
+                <field name="name">Test Testesen</field>
+                <field name="created">2000-01-04 12:00:00</field>
+                <field name="modified">2000-01-04 13:00:00</field>
+                <field name="id">mailboxId1</field>
+            </row>
+        </table_data>
+
+    </database>
+</mysqldump>

@@ -14,7 +14,7 @@ interface JSONObjectSerializable extends JsonSerializable{
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return JSONObject
+     * @return Object
      */
 
     public function jsonObjectSerialize();

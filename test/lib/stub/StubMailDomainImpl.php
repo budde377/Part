@@ -7,11 +7,11 @@
  */
 namespace ChristianBudde\cbweb\test\stub;
 
-use ChristianBudde\cbweb\model\mail\MailDomain;
+use ChristianBudde\cbweb\model\mail\Domain;
 use ChristianBudde\cbweb\util\Observer;
 
 
-class StubMailDomainImpl implements MailDomain
+class StubMailDomainImpl implements Domain
 {
 
     private $active;
@@ -124,7 +124,7 @@ class StubMailDomainImpl implements MailDomain
     }
 
     /**
-     * @return \ChristianBudde\cbweb\model\mail\MailAddressLibrary
+     * @return \ChristianBudde\cbweb\model\mail\AddressLibrary
      */
     public function getAddressLibrary()
     {
@@ -140,16 +140,16 @@ class StubMailDomainImpl implements MailDomain
     }
 
     /**
-     * @param \ChristianBudde\cbweb\model\mail\MailDomain $domain
+     * @param \ChristianBudde\cbweb\model\mail\Domain $domain
      * @return void
      */
-    public function setAliasTarget(MailDomain $domain)
+    public function setAliasTarget(Domain $domain)
     {
 
     }
 
     /**
-     * @return \ChristianBudde\cbweb\model\mail\MailDomain
+     * @return \ChristianBudde\cbweb\model\mail\Domain
      */
     public function getAliasTarget()
     {
@@ -165,7 +165,7 @@ class StubMailDomainImpl implements MailDomain
     }
 
     /**
-     * @return \ChristianBudde\cbweb\model\mail\MailDomainLibrary
+     * @return \ChristianBudde\cbweb\model\mail\DomainLibrary
      */
     public function getDomainLibrary()
     {

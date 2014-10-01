@@ -7,8 +7,8 @@ use ChristianBudde\cbweb\util\file\FileImpl;
 use ChristianBudde\cbweb\controller\function_string\FunctionStringParserImpl;
 use ChristianBudde\cbweb\util\file\ImageFileImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
-use ChristianBudde\cbweb\controller\json\JSONResponse;
-use ChristianBudde\cbweb\controller\json\JSONResponseImpl;
+use ChristianBudde\cbweb\controller\json\Response;
+use ChristianBudde\cbweb\controller\json\ResponseImpl;
 use ChristianBudde\cbweb\util\mail\Mail;
 use ChristianBudde\cbweb\util\mail\MailImpl;
 use ChristianBudde\cbweb\model\page\Page;
@@ -124,8 +124,8 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
     private function setUpUserLibraryHandler(AJAXServer $server)
     {
 
-
         $server->registerHandler($userLibraryHandler = new GenericObjectAJAXTypeHandlerImpl($this->userLibrary, 'UserLibrary'));
+
 
         $userLibraryHandler->addAuthFunction(function ($type, $instance, $functionName) {
             if ($this->userLibrary->getUserLoggedIn() == null && $functionName != "userLogin") {
@@ -149,13 +149,13 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
         $userLibraryHandler->addFunction("UserLibrary", "userLogin", function (UserLibrary $instance, $username, $password) {
             if (($user = $instance->getUser($username)) == null) {
-                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_LOGIN);
+                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_LOGIN);
             }
 
             if ($user->login($password)) {
                 return $user;
             }
-            return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_LOGIN);
+            return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_LOGIN);
 
         });
 
@@ -182,7 +182,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
 
             if (!$this->userLibrary->getUserLoggedIn()->isValidMail($mail)) {
-                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_MAIL);
+                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_MAIL);
             }
             $username = explode('@', $mail);
             $username = $baseUsername = strtolower($username[0]);
@@ -194,7 +194,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             $password = uniqid();
 
             if (!($user = $instance->createUser($username, $password, $mail, $this->userLibrary->getUserLoggedIn()))) {
-                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR);
+                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR);
             }
             $p = $user->getUserPrivileges();
             if ($privileges == 'root') {
@@ -261,13 +261,13 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
         $userHandler->addFunction('User', 'setPassword', function (User $user, $oldPassword, $newPassword) {
             if (!$user->verifyLogin($oldPassword)) {
-                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_WRONG_PASSWORD);
+                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_WRONG_PASSWORD);
             }
 
             if (!$user->setPassword($newPassword)) {
-                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_PASSWORD);
+                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_PASSWORD);
             }
-            return new JSONResponseImpl();
+            return new ResponseImpl();
         });
 
     }
@@ -293,10 +293,10 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
         $pageOrderHandler->addFunction('PageOrder', 'createPage', function(PageOrder $pageOrder, $title){
             if (!$this->backend->getUserLibraryInstance()->getUserLoggedIn()->getUserPrivileges()->hasSitePrivileges()) {
-                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_UNAUTHORIZED);
+                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_UNAUTHORIZED);
             }
             if (strlen($title) == 0) {
-                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_INVALID_PAGE_TITLE);
+                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_PAGE_TITLE);
             }
             $id = strtolower($title);
             $id = $baseId = str_replace(' ', '_', $id);

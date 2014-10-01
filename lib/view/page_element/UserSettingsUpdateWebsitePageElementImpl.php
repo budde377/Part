@@ -1,6 +1,5 @@
 <?php
 namespace ChristianBudde\cbweb\view\page_element;
-use ChristianBudde\cbweb\model\updater\Updater;
 
 use ChristianBudde\cbweb\BackendSingletonContainer;
 use ChristianBudde\cbweb\util\traits\DateTimeTrait;

@@ -2,8 +2,7 @@
 namespace ChristianBudde\cbweb\model\user;
 use ArrayObject;
 use ArrayIterator;
-use ChristianBudde\cbweb\controller\json\JSONObject;
-use ChristianBudde\cbweb\controller\json\UserLibraryJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\UserLibraryObjectImpl;
 use ChristianBudde\cbweb\util\db\DB;
 
 
@@ -250,11 +249,11 @@ class UserLibraryImpl implements UserLibrary, Observer
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return JSONObject
+     * @return Object
      */
     public function jsonObjectSerialize()
     {
-        return new UserLibraryJSONObjectImpl($this);
+        return new UserLibraryObjectImpl($this);
     }
 
 

@@ -7,11 +7,11 @@
  */
 namespace ChristianBudde\cbweb\test\stub;
 
-use ChristianBudde\cbweb\model\mail\MailDomain;
-use ChristianBudde\cbweb\model\mail\MailDomainLibrary;
+use ChristianBudde\cbweb\model\mail\Domain;
+use ChristianBudde\cbweb\model\mail\DomainLibrary;
 
 
-class StubMailDomainLibraryImpl implements MailDomainLibrary
+class StubMailDomainLibraryImpl implements DomainLibrary
 {
 
     private $listDomains;
@@ -36,7 +36,7 @@ class StubMailDomainLibraryImpl implements MailDomainLibrary
     /**
      * Will get and reuse an instance of the domain.
      * @param string $domain The domain name as a string
-     * @return \ChristianBudde\cbweb\model\mail\MailDomain
+     * @return \ChristianBudde\cbweb\model\mail\Domain
      */
     public function getDomain($domain)
     {
@@ -46,7 +46,7 @@ class StubMailDomainLibraryImpl implements MailDomainLibrary
     /**
      * @param string $domain
      * @param string $password
-     * @return \ChristianBudde\cbweb\model\mail\MailDomain
+     * @return \ChristianBudde\cbweb\model\mail\Domain
      */
     public function createDomain($domain, $password)
     {
@@ -54,20 +54,20 @@ class StubMailDomainLibraryImpl implements MailDomainLibrary
 
     /**
      * Will delete the domain, if it domain is an instance in the library.
-     * @param \ChristianBudde\cbweb\model\mail\MailDomain $domain
+     * @param \ChristianBudde\cbweb\model\mail\Domain $domain
      * @param string $password
      * @return void
      */
-    public function deleteDomain(MailDomain $domain, $password)
+    public function deleteDomain(Domain $domain, $password)
     {
     }
 
     /**
      * Check if the instance is in the library.
-     * @param \ChristianBudde\cbweb\model\mail\MailDomain $domain
+     * @param \ChristianBudde\cbweb\model\mail\Domain $domain
      * @return bool
      */
-    public function containsDomain(MailDomain $domain)
+    public function containsDomain(Domain $domain)
     {
         return isset($this->listDomains[$d = $domain->getDomainName()]) && $this->listDomains[$d] === $domain;
     }

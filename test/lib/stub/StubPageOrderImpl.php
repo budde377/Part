@@ -1,10 +1,9 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
 
-use ChristianBudde\cbweb\controller\json\JSONObject;
 use ChristianBudde\cbweb\model\page\PageOrder;
 use ChristianBudde\cbweb\model\page\Page;
-use ChristianBudde\cbweb\controller\json\PageOrderJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\PageOrderObjectImpl;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -183,11 +182,11 @@ class StubPageOrderImpl implements PageOrder
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return JSONObject
+     * @return Object
      */
     public function jsonObjectSerialize()
     {
-        return new PageOrderJSONObjectImpl($this);
+        return new PageOrderObjectImpl($this);
     }
 
 

@@ -1,6 +1,5 @@
 <?php
 namespace ChristianBudde\cbweb\model;
-use ChristianBudde\cbweb\controller\json\JSONObject;
 
 
 /**
@@ -92,7 +91,7 @@ class NullContentImpl implements Content{
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return JSONObject
+     * @return Object
      */
     public function jsonObjectSerialize()
     {

@@ -2,8 +2,8 @@
 namespace ChristianBudde\cbweb\controller\ajax;
 
 use ChristianBudde\cbweb\controller\json\JSONFunction;
-use ChristianBudde\cbweb\controller\json\JSONResponse;
-use ChristianBudde\cbweb\controller\json\JSONResponseImpl;
+use ChristianBudde\cbweb\controller\json\Response;
+use ChristianBudde\cbweb\controller\json\ResponseImpl;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -412,6 +412,11 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
 
 
         $name = $function->getName();
+
+        if(!$this->hasFunction($type, $name)){
+            return false;
+        }
+
         $args = $function->getArgs();
         /** @var \ReflectionParameter[] $parameters */
         $parameters = null;
@@ -446,7 +451,7 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
                 }
                 return $this->handle($target,$function, $instance);
             }
-            return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION);
+            return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION);
 
         }
 
@@ -454,7 +459,7 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
         $instance = $instance == null ? $this->object : $instance;
         $name = $function->getName();
         if (!$this->checkAuth($type, $instance, $name, $function)) {
-            return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_UNAUTHORIZED);
+            return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_UNAUTHORIZED);
         }
 
         $arguments = $function->getArgs();
@@ -463,7 +468,7 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
             $result = call_user_func_array($this->customFunctions[$type][$name], array_merge([$instance], $arguments));
         } else {
             if ($instance == null) {
-                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION);
+                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION);
             }
             $result = call_user_func_array(array($instance, $name), $arguments);
         }

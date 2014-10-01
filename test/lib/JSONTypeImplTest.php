@@ -7,21 +7,21 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\json\JSONTypeImpl;
+use ChristianBudde\cbweb\controller\json\TypeImpl;
 use PHPUnit_Framework_TestCase;
 
 class JSONTypeImplTest extends PHPUnit_Framework_TestCase
 {
 
     private $typeString;
-    /** @var  JSONTypeImpl */
+    /** @var  TypeImpl */
     private $type;
 
 
     protected function setUp()
     {
         $this->typeString = "someType";
-        $this->type = new JSONTypeImpl($this->typeString);
+        $this->type = new TypeImpl($this->typeString);
 
 
     }

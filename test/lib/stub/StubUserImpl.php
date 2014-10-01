@@ -10,7 +10,7 @@ namespace ChristianBudde\cbweb\test\stub;
 use ChristianBudde\cbweb\model\user\User;
 use ChristianBudde\cbweb\model\user\UserPrivileges;
 use ChristianBudde\cbweb\model\Variables;
-use ChristianBudde\cbweb\controller\json\UserJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\UserObjectImpl;
 
 class StubUserImpl implements User
 {
@@ -233,11 +233,11 @@ class StubUserImpl implements User
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return \ChristianBudde\cbweb\controller\json\JSONObject
+     * @return \ChristianBudde\cbweb\controller\json\Object
      */
     public function jsonObjectSerialize()
     {
-        return new UserJSONObjectImpl($this);
+        return new UserObjectImpl($this);
     }
 
 

@@ -7,7 +7,7 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\json\PageOrderJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\PageOrderObjectImpl;
 use PHPUnit_Framework_TestCase;
 use ChristianBudde\cbweb\test\stub\StubPageImpl;
 use ChristianBudde\cbweb\test\stub\StubPageOrderImpl;
@@ -39,7 +39,7 @@ class PageOrderJSONObjectImplTest extends PHPUnit_Framework_TestCase
         $pageOrder->setOrder([null => [$page1, $page2], "id1" => [$page3]]);
 
 
-        $object = new PageOrderJSONObjectImpl($pageOrder);
+        $object = new PageOrderObjectImpl($pageOrder);
 
         $this->assertEquals([null => [$page1, $page2], "id1" => [$page3]], $object->getVariable('order'));
         $this->assertEquals([$page4], $object->getVariable('inactive'));

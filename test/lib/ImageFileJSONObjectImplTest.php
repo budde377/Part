@@ -7,7 +7,7 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\json\ImageFileJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\ImageFileObjectImpl;
 use ChristianBudde\cbweb\util\file\ImageFileImpl;
 use PHPUnit_Framework_TestCase;
 
@@ -17,7 +17,7 @@ class ImageFileJSONObjectImplTest extends PHPUnit_Framework_TestCase
     public function testConstructorSetsVariablesWhenImageFile()
     {
         $file = new ImageFileImpl(dirname(__FILE__) . '/stubs/imageFileStub300x200.png');
-        $object = new ImageFileJSONObjectImpl($file);
+        $object = new ImageFileObjectImpl($file);
         $this->assertEquals('image_file', $object->getName());
         $this->assertEquals($file->getFilename(), $object->getVariable('filename'));
         $this->assertEquals($file->getBasename(), $object->getVariable('basename'));

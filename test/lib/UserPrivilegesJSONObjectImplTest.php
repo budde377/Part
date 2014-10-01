@@ -7,7 +7,7 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\json\UserPrivilegesJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\UserPrivilegesObjectImpl;
 use PHPUnit_Framework_TestCase;
 use ChristianBudde\cbweb\test\stub\StubUserPrivilegesImpl;
 
@@ -20,7 +20,7 @@ class UserPrivilegesJSONObjectImplTest extends PHPUnit_Framework_TestCase
         $privileges = new StubUserPrivilegesImpl(true, true, true);
         $privileges->pagePrivileges = ['page1', 'page2'];
 
-        $jsonObject = new UserPrivilegesJSONObjectImpl($privileges);
+        $jsonObject = new UserPrivilegesObjectImpl($privileges);
 
         $this->assertEquals('user_privileges', $jsonObject->getName());
         $this->assertTrue($jsonObject->getVariable('root_privileges'));

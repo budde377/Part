@@ -8,7 +8,7 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\json\PageJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\PageObjectImpl;
 use PHPUnit_Framework_TestCase;
 use ChristianBudde\cbweb\test\stub\StubPageImpl;
 
@@ -29,7 +29,7 @@ class PageJSONObjectImplTest extends PHPUnit_Framework_TestCase
         $page->setAlias($alias);
         $page->hide();
 
-        $jsonObject = new PageJSONObjectImpl($page);
+        $jsonObject = new PageObjectImpl($page);
 
         $this->assertEquals('page', $jsonObject->getName());
         $this->assertEquals($id, $jsonObject->getVariable('id'));

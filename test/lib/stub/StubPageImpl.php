@@ -4,8 +4,7 @@ namespace ChristianBudde\cbweb\test\stub;
 use ChristianBudde\cbweb\model\page\Page;
 use ChristianBudde\cbweb\model\Content;
 use ChristianBudde\cbweb\model\ContentLibrary;
-use ChristianBudde\cbweb\controller\json\JSONObject;
-use ChristianBudde\cbweb\controller\json\PageJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\PageObjectImpl;
 use ChristianBudde\cbweb\model\Variables;
 
 /**
@@ -246,11 +245,11 @@ class StubPageImpl implements Page
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return JSONObject
+     * @return Object
      */
     public function jsonObjectSerialize()
     {
-        return new PageJSONObjectImpl($this);
+        return new PageObjectImpl($this);
     }
 
 

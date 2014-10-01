@@ -8,9 +8,9 @@
 namespace ChristianBudde\cbweb\test;
 
 
-use ChristianBudde\cbweb\model\mail\MailMailboxImpl;
-use ChristianBudde\cbweb\model\mail\MailDomainLibraryImpl;
-use ChristianBudde\cbweb\model\mail\MailMailbox;
+use ChristianBudde\cbweb\model\mail\MailboxImpl;
+use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
+use ChristianBudde\cbweb\model\mail\Mailbox;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubConfigImpl;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
@@ -24,14 +24,14 @@ class MailMailboxImplTest extends CustomDatabaseTestCase
     private $db;
     private $domainLibrary;
     private $domain;
-    /** @var  \ChristianBudde\cbweb\model\mail\MailAddressLibraryImpl */
+    /** @var  \ChristianBudde\cbweb\model\mail\AddressLibraryImpl */
     private $addressLibrary;
     private $address;
-    /** @var  \ChristianBudde\cbweb\model\mail\MailMailboxImpl */
+    /** @var  \ChristianBudde\cbweb\model\mail\MailboxImpl */
     private $mailbox;
-    /** @var  \ChristianBudde\cbweb\model\mail\MailMailboxImpl */
+    /** @var  \ChristianBudde\cbweb\model\mail\MailboxImpl */
     private $nonExistingMailbox;
-    /** @var  MailMailboxImpl */
+    /** @var  MailboxImpl */
     private $mailbox2;
 
     function __construct()
@@ -57,13 +57,13 @@ class MailMailboxImplTest extends CustomDatabaseTestCase
 
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->domainLibrary = new MailDomainLibraryImpl($this->config, $this->db);
+        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db);
         $this->domain = $this->domainLibrary->getDomain('test.dk');
         $this->addressLibrary = $this->domain->getAddressLibrary();
         $this->address = $this->addressLibrary->getAddress('test');
         $this->mailbox = $this->address->getMailbox();
-        $this->mailbox2 = new MailMailboxImpl($this->address, $this->db);
-        $this->nonExistingMailbox = new MailMailboxImpl($this->addressLibrary->getAddress('test2'), $this->db);
+        $this->mailbox2 = new MailboxImpl($this->address, $this->db);
+        $this->nonExistingMailbox = new MailboxImpl($this->addressLibrary->getAddress('test2'), $this->db);
     }
 
 
@@ -89,7 +89,7 @@ class MailMailboxImplTest extends CustomDatabaseTestCase
 
     public function testExistsIsFresh()
     {
-        $m = new MailMailboxImpl($this->address, $this->db);
+        $m = new MailboxImpl($this->address, $this->db);
         $m->delete();
         $this->assertFalse($this->mailbox->exists());
 
@@ -194,7 +194,7 @@ class MailMailboxImplTest extends CustomDatabaseTestCase
         $this->mailbox->attachObserver($ob);
         $this->mailbox->delete();
         $this->assertTrue($ob->hasBeenCalled());
-        $this->assertEquals(MailMailbox::EVENT_DELETE, $ob->getLastCallType());
+        $this->assertEquals(Mailbox::EVENT_DELETE, $ob->getLastCallType());
         $this->assertTrue($ob->getLastCallSubject() === $this->mailbox);
     }
 

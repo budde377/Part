@@ -2,11 +2,11 @@
 namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\controller\function_string\FunctionStringParserImpl;
-use ChristianBudde\cbweb\controller\json\JSONType;
-use ChristianBudde\cbweb\controller\json\NullJSONTargetImpl;
+use ChristianBudde\cbweb\controller\json\Type;
+use ChristianBudde\cbweb\controller\json\NullTargetImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
-use ChristianBudde\cbweb\controller\json\JSONTypeImpl;
-use ChristianBudde\cbweb\controller\json\JSONCompositeFunctionImpl;
+use ChristianBudde\cbweb\controller\json\TypeImpl;
+use ChristianBudde\cbweb\controller\json\CompositeFunctionImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
 use PHPUnit_Framework_TestCase;
 
@@ -27,7 +27,7 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->nullTarget = new NullJSONTargetImpl();
+        $this->nullTarget = new NullTargetImpl();
         $this->parser = new FunctionStringParserImpl();
     }
 
@@ -69,12 +69,12 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
     {
         $this->assertTrue($this->parser->parseType($this->validName, $result));
         $this->assertInstanceOf("ChristianBudde\\cbweb\\controller\\json\\JSONType", $result);
-        /** @var JSONType $result */
+        /** @var Type $result */
         $this->assertEquals($this->validName, $result->getTypeString());
 
         $this->assertTrue($this->parser->parseType($n = "Site\\something", $result));
         $this->assertInstanceOf("ChristianBudde\\cbweb\\controller\\json\\JSONType", $result);
-        /** @var JSONType $result */
+        /** @var Type $result */
         $this->assertEquals($n, $result->getTypeString());
     }
 
@@ -307,7 +307,7 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([true], $result);
         $result = null;
         $this->assertTrue($this->parser->parseArrayListEntry("Site.func()", $result));
-        $this->assertEquals([new JSONFunctionImpl('func', new JSONTypeImpl('Site'))], $result);
+        $this->assertEquals([new JSONFunctionImpl('func', new TypeImpl('Site'))], $result);
 
         $this->assertFalse($this->parser->parseArrayListEntry("a", $result));
 
@@ -359,7 +359,7 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([], $result);
         $result = null;
         $this->assertTrue($this->parser->parseArgument("Site.func()", $result));
-        $this->assertEquals(new JSONFunctionImpl('func', new JSONTypeImpl('Site')), $result);
+        $this->assertEquals(new JSONFunctionImpl('func', new TypeImpl('Site')), $result);
         $this->assertTrue($this->parser->parseArgument("Site..func()..func2()", $result));
         $this->assertFalse($this->parser->parseArgument("Site", $result));
         $this->assertFalse($this->parser->parseArgument("Site.f\\u", $result));
@@ -382,7 +382,7 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
 
     public function testParseFunction()
     {
-        $f2 = new JSONFunctionImpl('f', new JSONTypeImpl('SomeType'));
+        $f2 = new JSONFunctionImpl('f', new TypeImpl('SomeType'));
         $f = new JSONFunctionImpl('func', $this->nullTarget);
 
         $this->assertTrue($this->parser->parseFunction("func()", $result));
@@ -407,7 +407,7 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
 
     public function testParseFunctionCall()
     {
-        $f = new JSONFunctionImpl('func', new JSONTypeImpl('Site'));
+        $f = new JSONFunctionImpl('func', new TypeImpl('Site'));
         $f2 = new JSONFunctionImpl('f2', $f);
         $this->assertTrue($this->parser->parseFunctionCall("Site.func()", $result));
         $this->assertEquals($f, $result);
@@ -417,7 +417,7 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
         $f->setArg(1, 3);
         $f->setArg(2, 4);
 
-        $f3 = new JSONFunctionImpl("arrayAccess", new JSONTypeImpl("POST"));
+        $f3 = new JSONFunctionImpl("arrayAccess", new TypeImpl("POST"));
         $f3->setArg(0, $value = "SomeIndex");
         $this->assertTrue($this->parser->parseFunctionCall(" POST [\"$value\"] ", $result));
         $this->assertEquals($f3, $result);
@@ -457,7 +457,7 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
         $f2 = new JSONFunctionImpl('func2', $this->nullTarget);
         $f3 = new JSONFunctionImpl('func3', $this->nullTarget);
 
-        $composite = new JSONCompositeFunctionImpl($this->nullTarget);
+        $composite = new CompositeFunctionImpl($this->nullTarget);
         $composite->appendFunction($f);
 
         $this->assertTrue($this->parser->parseCompositeFunction("..func()", $result));
@@ -478,11 +478,11 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
 
     public function testParseCompositeFunctionCall()
     {
-        $f = new JSONFunctionImpl('func', new JSONTypeImpl("Site"));
+        $f = new JSONFunctionImpl('func', new TypeImpl("Site"));
         $f2 = new JSONFunctionImpl('func2', $f);
         $f3 = new JSONFunctionImpl('func3', $this->nullTarget);
 
-        $composite = new JSONCompositeFunctionImpl($f2);
+        $composite = new CompositeFunctionImpl($f2);
         $composite->appendFunction($f3);
 
 

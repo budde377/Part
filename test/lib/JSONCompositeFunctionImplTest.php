@@ -7,16 +7,16 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\json\JSONTypeImpl;
+use ChristianBudde\cbweb\controller\json\TypeImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
-use ChristianBudde\cbweb\controller\json\JSONCompositeFunctionImpl;
+use ChristianBudde\cbweb\controller\json\CompositeFunctionImpl;
 use PHPUnit_Framework_TestCase;
 
 class JSONCompositeFunctionImplTest extends PHPUnit_Framework_TestCase
 {
 
     private $function1Name;
-    /** @var  JSONTypeImpl */
+    /** @var  TypeImpl */
     private $function1Target;
     /** @var  JSONFunctionImpl */
     private $function1;
@@ -24,20 +24,20 @@ class JSONCompositeFunctionImplTest extends PHPUnit_Framework_TestCase
     private $function2Name;
     /** @var  JSONFunctionImpl */
     private $function2;
-    /** @var  JSONCompositeFunctionImpl */
+    /** @var  CompositeFunctionImpl */
     private $compositeFunction;
 
     protected function setUp()
     {
         parent::setUp();
         $this->function1Name = "function1";
-        $this->function1Target = new JSONTypeImpl("SomeTarget");
+        $this->function1Target = new TypeImpl("SomeTarget");
         $this->function1 = new JSONFunctionImpl($this->function1Name, $this->function1Target);
 
         $this->function2Name = "function2";
         $this->function2 = new JSONFunctionImpl($this->function2Name, $this->function1);
 
-        $this->compositeFunction = new JSONCompositeFunctionImpl($this->function1Target);
+        $this->compositeFunction = new CompositeFunctionImpl($this->function1Target);
 
 
     }
@@ -134,14 +134,14 @@ class JSONCompositeFunctionImplTest extends PHPUnit_Framework_TestCase
 
     public function testCompositeFunctionSetsRootTarget()
     {
-        $this->compositeFunction->setTarget($t1 = new JSONTypeImpl("newType"));
+        $this->compositeFunction->setTarget($t1 = new TypeImpl("newType"));
         $this->compositeFunction->appendFunction($this->function2);
         $this->assertEquals($t1, $this->function1->getTarget());
     }
 
     public function testCompositeFunctionSetsRootTargetOnPrepend()
     {
-        $this->compositeFunction->setTarget($t1 = new JSONTypeImpl("newType"));
+        $this->compositeFunction->setTarget($t1 = new TypeImpl("newType"));
         $this->compositeFunction->prependFunction($this->function2);
         $this->assertEquals($t1, $this->function1->getTarget());
     }
@@ -149,7 +149,7 @@ class JSONCompositeFunctionImplTest extends PHPUnit_Framework_TestCase
     public function testCompositeFunctionUpdatesRootTarget()
     {
         $this->compositeFunction->appendFunction($this->function2);
-        $this->compositeFunction->setTarget($t1 = new JSONTypeImpl("newType"));
+        $this->compositeFunction->setTarget($t1 = new TypeImpl("newType"));
         $this->assertEquals($t1, $this->function1->getTarget());
     }
 

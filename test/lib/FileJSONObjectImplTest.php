@@ -9,7 +9,7 @@
 namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\util\file\FileImpl;
-use ChristianBudde\cbweb\controller\json\FileJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\FileObjectImpl;
 use PHPUnit_Framework_TestCase;
 
 class FileJSONObjectImplTest extends PHPUnit_Framework_TestCase
@@ -18,7 +18,7 @@ class FileJSONObjectImplTest extends PHPUnit_Framework_TestCase
     public function testConstructorChangesName()
     {
         $file = new FileImpl(dirname(__FILE__) . '/stubs/fileStub');
-        $object = new FileJSONObjectImpl($file);
+        $object = new FileObjectImpl($file);
         $this->assertEquals('file', $object->getName());
         $this->assertEquals($file->getFilename(), $object->getVariable('filename'));
         $this->assertEquals($file->getBasename(), $object->getVariable('basename'));

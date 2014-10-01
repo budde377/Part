@@ -12,7 +12,7 @@ use ChristianBudde\cbweb\model\page\PageOrderImpl;
 use ChristianBudde\cbweb\model\page\PageOrder;
 
 use ChristianBudde\cbweb\model\page\PageImpl;
-use ChristianBudde\cbweb\controller\json\PageOrderJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\PageOrderObjectImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\util\TruncateOperation;
 use PHPUnit_Extensions_Database_DataSet_IDataSet;
@@ -598,7 +598,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
     public function testPageOrderReturnsRightJSONObject()
     {
-        $this->assertEquals(new PageOrderJSONObjectImpl($this->pageOrder), $this->pageOrder->jsonObjectSerialize());
+        $this->assertEquals(new PageOrderObjectImpl($this->pageOrder), $this->pageOrder->jsonObjectSerialize());
 
     }
 

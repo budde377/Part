@@ -4,7 +4,7 @@ namespace ChristianBudde\cbweb\test;
 use ChristianBudde\cbweb\model\user\UserPrivilegesImpl;
 use ChristianBudde\cbweb\model\user\UserImpl;
 use ChristianBudde\cbweb\model\page\PageImpl;
-use ChristianBudde\cbweb\controller\json\UserPrivilegesJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\UserPrivilegesObjectImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
 use ChristianBudde\cbweb\test\stub\StubPageImpl;
@@ -230,7 +230,7 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
     {
         $o = $this->userPrivileges->jsonObjectSerialize();
         $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\UserPrivilegesJSONObjectImpl', $o);
-        $this->assertEquals(new UserPrivilegesJSONObjectImpl($this->userPrivileges), $o);
+        $this->assertEquals(new UserPrivilegesObjectImpl($this->userPrivileges), $o);
     }
 
 

@@ -16,8 +16,8 @@ use ChristianBudde\cbweb\util\file\JSRegisterImpl;
 use ChristianBudde\cbweb\util\file\LogFile;
 use ChristianBudde\cbweb\log\Logger;
 use ChristianBudde\cbweb\log\LoggerImpl;
-use ChristianBudde\cbweb\model\mail\MailDomainLibrary;
-use ChristianBudde\cbweb\model\mail\MailDomainLibraryImpl;
+use ChristianBudde\cbweb\model\mail\DomainLibrary;
+use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
 use ChristianBudde\cbweb\model\page\CurrentPageStrategy;
 use ChristianBudde\cbweb\model\page\CurrentPageStrategyImpl;
 use ChristianBudde\cbweb\model\page\DefaultPageLibrary;
@@ -73,7 +73,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $fileLibrary;
     /** @var  LogFile */
     private $log;
-    /** @var  MailDomainLibrary */
+    /** @var  DomainLibrary */
     private $mailDomainLibrary;
 
     public function __construct(Config $config)
@@ -262,12 +262,12 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * Will Create and reuse instance of MailDomainLibrary.
-     * @return MailDomainLibrary
+     * @return DomainLibrary
      */
     public function getMailDomainLibraryInstance()
     {
         if ($this->mailDomainLibrary == null) {
-            $this->mailDomainLibrary = new MailDomainLibraryImpl($this->getConfigInstance(), $this->getDBInstance());
+            $this->mailDomainLibrary = new DomainLibraryImpl($this->getConfigInstance(), $this->getDBInstance());
         }
 
         return $this->mailDomainLibrary;

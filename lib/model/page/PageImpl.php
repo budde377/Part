@@ -1,7 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\model\page;
 use ChristianBudde\cbweb\model\ContentLibrary;
-use ChristianBudde\cbweb\controller\json\JSONObject;
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\exception\MalformedParameterException;
 use ChristianBudde\cbweb\model\Content;
@@ -9,7 +8,7 @@ use ChristianBudde\cbweb\model\Content;
 
 use ChristianBudde\cbweb\util\Observable;
 use ChristianBudde\cbweb\util\Observer;
-use ChristianBudde\cbweb\controller\json\PageJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\PageObjectImpl;
 
 use ChristianBudde\cbweb\model\Variables;
 use PDOStatement;
@@ -458,11 +457,11 @@ class PageImpl implements Page, Observable
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return JSONObject
+     * @return Object
      */
     public function jsonObjectSerialize()
     {
-        return new PageJSONObjectImpl($this);
+        return new PageObjectImpl($this);
     }
 
     /**

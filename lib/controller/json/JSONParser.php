@@ -15,12 +15,12 @@ interface JSONParser {
 
     /**
      * @param string $input
-     * @return JSONElement
+     * @return Element
      */
     public function parse($input);
 
     /**
-     * @return JSONElement
+     * @return Element
      */
     public function parseFromRequestBody();
 

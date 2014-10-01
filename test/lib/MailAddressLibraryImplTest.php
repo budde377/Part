@@ -7,9 +7,9 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\model\mail\MailAddressLibrary;
-use ChristianBudde\cbweb\model\mail\MailDomainLibraryImpl;
-use ChristianBudde\cbweb\model\mail\MailAddressImpl;
+use ChristianBudde\cbweb\model\mail\AddressLibrary;
+use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
+use ChristianBudde\cbweb\model\mail\AddressImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubConfigImpl;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
@@ -19,7 +19,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
 
     private $config;
-    /** @var  MailAddressLibrary */
+    /** @var  AddressLibrary */
     private $addressLibrary;
     private $db;
     private $domainLibrary;
@@ -51,7 +51,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->domainLibrary = new MailDomainLibraryImpl($this->config, $this->db);
+        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db);
         $this->domain = $this->domainLibrary->getDomain('test.dk');
         $this->addressLibrary = $this->domain->getAddressLibrary();
     }
@@ -77,9 +77,9 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
         $this->assertArrayHasKey('test', $l);
         $this->assertArrayHasKey('test2', $l);
 
-        /** @var MailAddressImpl $i1 */
+        /** @var AddressImpl $i1 */
         $i1 = $l['test'];
-        /** @var \ChristianBudde\cbweb\model\mail\MailAddressImpl $i2 */
+        /** @var \ChristianBudde\cbweb\model\mail\AddressImpl $i2 */
         $i2 = $l['test2'];
         $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailAddressImpl', $i1);
         $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailAddressImpl', $i2);
@@ -125,7 +125,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
     public function testContainsReturnRightBool()
     {
-        $a = new MailAddressImpl('test', $this->db, $this->addressLibrary);
+        $a = new AddressImpl('test', $this->db, $this->addressLibrary);
         $this->assertTrue($this->addressLibrary->contains($this->addressLibrary->getAddress('test')));
         $this->assertFalse($this->addressLibrary->contains($a));
 
@@ -166,7 +166,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
     public function testDeleteFromInstanceNotInLibDoesNothing()
     {
-        $a = new MailAddressImpl('test', $this->db, $this->addressLibrary);
+        $a = new AddressImpl('test', $this->db, $this->addressLibrary);
         $this->addressLibrary->deleteAddress($a);
         $this->assertTrue($a->exists());
     }

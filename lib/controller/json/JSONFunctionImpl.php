@@ -8,7 +8,7 @@ namespace ChristianBudde\cbweb\controller\json;
  * Date: 8/28/14
  * Time: 12:53 PM
  */
-class JSONFunctionImpl extends JSONProgramImpl implements JSONFunction
+class JSONFunctionImpl extends ProgramImpl implements JSONFunction
 {
 
     private $name;
@@ -19,9 +19,9 @@ class JSONFunctionImpl extends JSONProgramImpl implements JSONFunction
 
     /**
      * @param string $name
-     * @param JSONTarget $target
+     * @param Target $target
      */
-    function __construct($name, JSONTarget $target)
+    function __construct($name, Target $target)
     {
         parent::__construct($target);
         $this->name = $name;
@@ -116,10 +116,10 @@ class JSONFunctionImpl extends JSONProgramImpl implements JSONFunction
 
     /**
      * Sets the root target, i.e. calls recursively on target until target is not a function.
-     * @param JSONTarget $target
+     * @param Target $target
      * @return void
      */
-    public function setRootTarget(JSONTarget $target)
+    public function setRootTarget(Target $target)
     {
         if($this->target instanceof JSONFunction){
             $this->target->setTarget($target);

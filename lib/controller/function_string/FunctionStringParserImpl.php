@@ -1,14 +1,14 @@
 <?php
 namespace ChristianBudde\cbweb\controller\function_string;
 
-use ChristianBudde\cbweb\controller\json\JSONCompositeFunctionImpl;
+use ChristianBudde\cbweb\controller\json\CompositeFunctionImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
 use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
 
 
-use ChristianBudde\cbweb\controller\json\JSONTypeImpl;
+use ChristianBudde\cbweb\controller\json\TypeImpl;
 
-use ChristianBudde\cbweb\controller\json\NullJSONTargetImpl;
+use ChristianBudde\cbweb\controller\json\NullTargetImpl;
 
 /**
  * Created by PhpStorm.
@@ -48,7 +48,7 @@ class FunctionStringParserImpl implements FunctionStringParser
      * <integer>                    = *decimal* | *hexadecimal* | *octal* | *binary*
      * <float>                      = *double_number* | *exp_double_number*
      * @param string $input
-     * @return \ChristianBudde\cbweb\controller\json\JSONProgram
+     * @return \ChristianBudde\cbweb\controller\json\Program
      */
 
     public function parseFunctionString($input)
@@ -85,7 +85,7 @@ class FunctionStringParserImpl implements FunctionStringParser
                 $this->parseCompositeFunction(substr($input, $match[0][1]), $resultFunction)
 
             ) {
-                /** @var $resultTarget \ChristianBudde\cbweb\controller\json\JSONTarget */
+                /** @var $resultTarget \ChristianBudde\cbweb\controller\json\Target */
                 /** @var $resultFunction \ChristianBudde\cbweb\controller\json\JSONFunction */
                 $resultFunction->setTarget($resultTarget);
                 $result = $resultFunction;
@@ -112,7 +112,7 @@ class FunctionStringParserImpl implements FunctionStringParser
         }
 
         if($this->parseFunctionChain(substr($input, 2), $resultFunctionChainBaseCase)){
-            $result = new JSONCompositeFunctionImpl( new NullJSONTargetImpl());
+            $result = new CompositeFunctionImpl( new NullTargetImpl());
             $result->prependFunction($resultFunctionChainBaseCase);
             return true;
         }
@@ -122,7 +122,7 @@ class FunctionStringParserImpl implements FunctionStringParser
 
         while ($pos !== false) {
             if ($this->parseCompositeFunction(substr($input, 0 ,$pos), $resultCompositeFunction) && $this->parseFunctionChain(substr($input, $pos+2), $resultFunctionChain)) {
-                /** @var $resultCompositeFunction \ChristianBudde\cbweb\controller\json\JSONCompositeFunction */
+                /** @var $resultCompositeFunction \ChristianBudde\cbweb\controller\json\CompositeFunction */
                 $resultCompositeFunction->appendFunction($resultFunctionChain);
                 $result = $resultCompositeFunction;
                 return true;
@@ -155,7 +155,7 @@ class FunctionStringParserImpl implements FunctionStringParser
             if ($this->parseFunction(substr($input, $match[1] + 1), $resultFunction) &&
                 $this->parseFunctionChain(substr($input, 0, $match[1]), $resultFunctionChain)
             ) {
-                /** @var $resultTarget \ChristianBudde\cbweb\controller\json\JSONTarget */
+                /** @var $resultTarget \ChristianBudde\cbweb\controller\json\Target */
                 /** @var $resultFunction JSONFunction */
                 $resultFunction->setTarget($resultFunctionChain);
                 $result = $resultFunction;
@@ -180,7 +180,7 @@ class FunctionStringParserImpl implements FunctionStringParser
                 if ($this->parseScalar(substr($input, $match[1] + 1, -1), $resultScalar) &&
                     $this->parseTarget(substr($input, 0, $match[1]), $resultTarget)
                 ) {
-                    /** @var $resultTarget \ChristianBudde\cbweb\controller\json\JSONTarget */
+                    /** @var $resultTarget \ChristianBudde\cbweb\controller\json\Target */
                     /** @var $resultFunction \ChristianBudde\cbweb\controller\json\JSONFunction */
                     $result = new JSONFunctionImpl("arrayAccess", $resultTarget);
                     $result->setArg(0, $resultScalar);
@@ -199,7 +199,7 @@ class FunctionStringParserImpl implements FunctionStringParser
             if ($this->parseFunction(substr($input, $match[1] + 1), $resultFunction) &&
                 $this->parseTarget(substr($input, 0, $match[1]), $resultTarget)
             ) {
-                /** @var $resultTarget \ChristianBudde\cbweb\controller\json\JSONTarget */
+                /** @var $resultTarget \ChristianBudde\cbweb\controller\json\Target */
                 /** @var $resultFunction \ChristianBudde\cbweb\controller\json\JSONFunction */
                 $resultFunction->setTarget($resultTarget);
                 $result = $resultFunction;
@@ -222,13 +222,13 @@ class FunctionStringParserImpl implements FunctionStringParser
 
         ) {
             if ($match[2] == "") {
-                $result = new JSONFunctionImpl($resultName, new NullJSONTargetImpl());
+                $result = new JSONFunctionImpl($resultName, new NullTargetImpl());
                 return true;
             }
 
             if ($this->parseArgumentList($match[2], $resultArgumentList)) {
 
-                $result = new JSONFunctionImpl($resultName, new NullJSONTargetImpl());
+                $result = new JSONFunctionImpl($resultName, new NullTargetImpl());
                 foreach ($resultArgumentList as $key => $arg) {
                     $result->setArg($key, $arg);
                 }
@@ -257,7 +257,7 @@ class FunctionStringParserImpl implements FunctionStringParser
     public function parseType($input, &$result)
     {
         if ($this->parseNamespaceName($input, $resultName)) {
-            $result = new JSONTypeImpl($resultName);
+            $result = new TypeImpl($resultName);
             return true;
         }
         return false;

@@ -7,7 +7,7 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\json\UserLibraryJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\UserLibraryObjectImpl;
 use PHPUnit_Framework_TestCase;
 use ChristianBudde\cbweb\test\stub\StubUserImpl;
 use ChristianBudde\cbweb\test\stub\StubUserLibraryImpl;
@@ -26,7 +26,7 @@ class UserLibraryJSONObjectImplTest extends PHPUnit_Framework_TestCase
         $user2->setUsername("user2");
         $userLib->setUserList([$user1, $user2]);
 
-        $object = new UserLibraryJSONObjectImpl($userLib);
+        $object = new UserLibraryObjectImpl($userLib);
 
         $this->assertEquals([$user1, $user2], $object->getVariable('users'));
         $this->assertEquals('user_library', $object->getName());

@@ -132,7 +132,7 @@ interface FunctionStringParser
      * <integer>                    = *decimal* | *hexadecimal* | *octal* | *binary*
      * <float>                      = *double_number* | *exp_double_number*
      * @param string $input
-     * @return \ChristianBudde\cbweb\controller\json\JSONProgram
+     * @return \ChristianBudde\cbweb\controller\json\Program
      */
     public function parseFunctionString($input);
 

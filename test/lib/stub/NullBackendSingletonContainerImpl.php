@@ -157,7 +157,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * Will Create and reuse instance of MailDomainLibrary.
-     * @return \ChristianBudde\cbweb\model\mail\MailDomainLibrary
+     * @return \ChristianBudde\cbweb\model\mail\DomainLibrary
      */
     public function getMailDomainLibraryInstance()
     {

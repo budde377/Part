@@ -10,9 +10,9 @@ namespace ChristianBudde\cbweb\test;
 use ChristianBudde\cbweb\Config;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 
-use ChristianBudde\cbweb\model\mail\MailDomainLibraryImpl;
+use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
 use ChristianBudde\cbweb\util\db\MySQLDBImpl;
-use ChristianBudde\cbweb\model\mail\MailDomainImpl;
+use ChristianBudde\cbweb\model\mail\DomainImpl;
 use ChristianBudde\cbweb\test\stub\StubConfigImpl;
 
 class MailDomainLibraryImplTest extends CustomDatabaseTestCase
@@ -22,7 +22,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
     private $config;
     /** @var  \ChristianBudde\cbweb\util\db\DB */
     private $db;
-    /** @var  \ChristianBudde\cbweb\model\mail\MailDomainLibraryImpl */
+    /** @var  \ChristianBudde\cbweb\model\mail\DomainLibraryImpl */
     private $domainLibrary;
     private $mailPass;
     private $databaseName;
@@ -53,7 +53,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
             'password' => self::$mysqlOptions->getPassword()
         ));
         $this->db = new MySQLDBImpl($this->config);
-        $this->domainLibrary = new MailDomainLibraryImpl($this->config, $this->db);
+        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db);
     }
 
 
@@ -100,7 +100,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
 
     public function testContainsDomainFailsOnDifferentDomain()
     {
-        $this->assertFalse($this->domainLibrary->containsDomain(new MailDomainImpl('test.dk', $this->databaseName, $this->db, $this->domainLibrary)));
+        $this->assertFalse($this->domainLibrary->containsDomain(new DomainImpl('test.dk', $this->databaseName, $this->db, $this->domainLibrary)));
     }
 
     public function testContainsReturnsTrueIfContains()
@@ -147,7 +147,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
 
     public function testWillNotDeleteInstancesNotInLibrary()
     {
-        $d = new MailDomainImpl('test.dk', $this->databaseName, $this->db, $this->domainLibrary);
+        $d = new DomainImpl('test.dk', $this->databaseName, $this->db, $this->domainLibrary);
         $this->domainLibrary->deleteDomain($d, $this->mailPass);
         $this->assertTrue($d->exists());
     }

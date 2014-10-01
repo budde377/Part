@@ -7,7 +7,7 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\model\mail\MailDomainImpl;
+use ChristianBudde\cbweb\model\mail\DomainImpl;
 use ChristianBudde\cbweb\Config;
 use ChristianBudde\cbweb\test\stub\StubConfigImpl;
 use ChristianBudde\cbweb\test\stub\StubMailDomainLibraryImpl;
@@ -15,17 +15,17 @@ use ChristianBudde\cbweb\test\stub\StubObserverImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\util\db\MySQLDBImpl;
-use ChristianBudde\cbweb\model\mail\MailDomain;
+use ChristianBudde\cbweb\model\mail\Domain;
 
 class MailDomainImplTest extends CustomDatabaseTestCase
 {
 
-    /** @var  MailDomainImpl */
+    /** @var  DomainImpl */
     private $domain;
 
-    /** @var  MailDomainImpl */
+    /** @var  DomainImpl */
     private $domain2;
-    /** @var  MailDomainImpl */
+    /** @var  DomainImpl */
     private $nonCreatedDomain;
     /** @var  Config */
     private $config;
@@ -65,11 +65,11 @@ class MailDomainImplTest extends CustomDatabaseTestCase
         $this->db = new MySQLDBImpl($this->config);
         $this->databaseName = self::$mysqlOptions->getDatabase();
         $this->domainLib = new StubMailDomainLibraryImpl();
-        $this->domain = new MailDomainImpl('test.dk', $this->databaseName, $this->db, $this->domainLib);
-        $this->domain2 = new MailDomainImpl('test2.dk', $this->databaseName, $this->db, $this->domainLib);
+        $this->domain = new DomainImpl('test.dk', $this->databaseName, $this->db, $this->domainLib);
+        $this->domain2 = new DomainImpl('test2.dk', $this->databaseName, $this->db, $this->domainLib);
         $this->modTime = strtotime("2000-01-01 13:00:00");
         $this->creaTime = strtotime("2000-01-01 12:00:00");
-        $this->nonCreatedDomain = new MailDomainImpl('non-existing.dk', $this->databaseName, $this->db, $this->domainLib);
+        $this->nonCreatedDomain = new DomainImpl('non-existing.dk', $this->databaseName, $this->db, $this->domainLib);
 
     }
 
@@ -257,7 +257,7 @@ class MailDomainImplTest extends CustomDatabaseTestCase
         $this->domain->attachObserver($ob);
         $this->domain->delete($this->mailPass);
         $this->assertTrue($ob->hasBeenCalled());
-        $this->assertEquals($ob->getLastCallType(), MailDomain::EVENT_DELETE);
+        $this->assertEquals($ob->getLastCallType(), Domain::EVENT_DELETE);
         $this->assertEquals($ob->getLastCallSubject(), $this->domain);
 
     }
@@ -400,12 +400,12 @@ class MailDomainImplTest extends CustomDatabaseTestCase
 
 
     /**
-     * @param MailDomainImpl $domain
-     * @return \ChristianBudde\cbweb\model\mail\MailDomainImpl
+     * @param DomainImpl $domain
+     * @return \ChristianBudde\cbweb\model\mail\DomainImpl
      */
     private function cloneDomain($domain)
     {
-        return new MailDomainImpl($domain->getDomainName(), $this->databaseName, $this->db, $this->domainLib);
+        return new DomainImpl($domain->getDomainName(), $this->databaseName, $this->db, $this->domainLib);
     }
 
 

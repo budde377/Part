@@ -5,14 +5,14 @@ use ChristianBudde\cbweb\exception\ClassNotDefinedException;
 use ChristianBudde\cbweb\exception\ClassNotInstanceOfException;
 use ChristianBudde\cbweb\exception\FileNotFoundException;
 use ChristianBudde\cbweb\controller\function_string\FunctionStringParserImpl;
-use ChristianBudde\cbweb\controller\json\JSONCompositeFunction;
+use ChristianBudde\cbweb\controller\json\CompositeFunction;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
 use ChristianBudde\cbweb\controller\json\JSONParserImpl;
-use ChristianBudde\cbweb\controller\json\JSONProgram;
-use ChristianBudde\cbweb\controller\json\JSONResponse;
-use ChristianBudde\cbweb\controller\json\JSONResponseImpl;
-use ChristianBudde\cbweb\controller\json\JSONTarget;
-use ChristianBudde\cbweb\controller\json\JSONType;
+use ChristianBudde\cbweb\controller\json\Program;
+use ChristianBudde\cbweb\controller\json\Response;
+use ChristianBudde\cbweb\controller\json\ResponseImpl;
+use ChristianBudde\cbweb\controller\json\Target;
+use ChristianBudde\cbweb\controller\json\Type;
 use ReflectionClass;
 
 /**
@@ -102,7 +102,7 @@ class AJAXServerImpl implements AJAXServer
 
     /**
      * @param string $input
-     * @return JSONResponse
+     * @return Response
      */
     public function handleFromJSONString($input)
     {
@@ -110,7 +110,7 @@ class AJAXServerImpl implements AJAXServer
     }
 
     /**
-     * @return JSONResponse
+     * @return Response
      */
     public function handleFromRequestBody()
     {
@@ -119,23 +119,23 @@ class AJAXServerImpl implements AJAXServer
 
     /**
      * @param $input
-     * @return JSONResponse
+     * @return Response
      */
 
     private function wrapperHandler($input){
 
-        if (!($input instanceof JSONProgram)) {
-            return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_MALFORMED_REQUEST);
+        if (!($input instanceof Program)) {
+            return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_MALFORMED_REQUEST);
         }
 
         $result = $this->internalHandleProgram($input);
 
 
 
-        if ($result == null) {
-            $result = new JSONResponseImpl();
-        } else if(!(($r = $result) instanceof JSONResponse)) {
-            $result = new JSONResponseImpl();
+        if ($result === null) {
+            $result = new ResponseImpl();
+        } else if(!(($r = $result) instanceof Response)) {
+            $result = new ResponseImpl();
             $result->setPayload($r);
         }
 
@@ -147,16 +147,16 @@ class AJAXServerImpl implements AJAXServer
     }
 
     /**
-     * @param JSONProgram $input
+     * @param Program $input
      * @return mixed
      */
-    private function internalHandleProgram(JSONProgram $input)
+    private function internalHandleProgram(Program $input)
     {
         $result = null;
-        if($input instanceof JSONCompositeFunction){
+        if($input instanceof CompositeFunction){
 
 
-            if(($target = $input->getTarget()) instanceof JSONType){
+            if(($target = $input->getTarget()) instanceof Type){
 
                 foreach($input->listFunctions() as $function){
                     $result = $this->internalHandleFunction($function);
@@ -183,11 +183,11 @@ class AJAXServerImpl implements AJAXServer
 
     /**
      * @param JSONFunction $function
-     * @param JSONTarget $targetOverride
+     * @param Target $targetOverride
      * @param mixed $overrideInstance
      * @return mixed
      */
-    private function internalHandleFunction(JSONFunction $function, JSONTarget $targetOverride = null, $overrideInstance = null)
+    private function internalHandleFunction(JSONFunction $function, Target $targetOverride = null, $overrideInstance = null)
     {
 
 
@@ -197,12 +197,12 @@ class AJAXServerImpl implements AJAXServer
         $instance = null;
 
         foreach($function->getArgs() as $num => $arg){
-            if(!($arg instanceof JSONProgram)){
+            if(!($arg instanceof Program)){
                 continue;
             }
 
             $argumentResponse = $this->internalHandleProgram($arg);
-            if($argumentResponse instanceof JSONResponse){
+            if($argumentResponse instanceof Response){
                 return $argumentResponse;
             }
 
@@ -210,10 +210,10 @@ class AJAXServerImpl implements AJAXServer
 
         }
 
-        if ($target instanceof JSONType) {
+        if ($target instanceof Type) {
 
             if (!isset($this->handlers[$type = $target->getTypeString()])) {
-                return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION);
+                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION);
             }
             $types[] = $target->getTypeString();
 
@@ -224,10 +224,10 @@ class AJAXServerImpl implements AJAXServer
 
             } else {
                 if (!is_object($instance)) {
-                    return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION);
+                    return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION);
                 }
 
-                if ($instance instanceof JSONResponse) {
+                if ($instance instanceof Response) {
                     return $instance;
                 }
 
@@ -236,7 +236,7 @@ class AJAXServerImpl implements AJAXServer
             }
 
         } else {
-            return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_MALFORMED_REQUEST);
+            return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_MALFORMED_REQUEST);
         }
 
         foreach ($types as $type) {
@@ -252,12 +252,12 @@ class AJAXServerImpl implements AJAXServer
             }
 
         }
-        return new JSONResponseImpl(JSONResponse::RESPONSE_TYPE_ERROR, JSONResponse::ERROR_CODE_NO_SUCH_FUNCTION);
+        return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION);
     }
 
     /**
      * @param string $input
-     * @return JSONResponse
+     * @return Response
      */
     public function handleFromFunctionString($input)
     {

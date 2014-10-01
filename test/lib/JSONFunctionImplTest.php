@@ -7,9 +7,9 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\json\JSONTypeImpl;
+use ChristianBudde\cbweb\controller\json\TypeImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
-use ChristianBudde\cbweb\controller\json\JSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\ObjectImpl;
 use ChristianBudde\cbweb\test\stub\NullJSONObjectSerializableImpl;
 use ChristianBudde\cbweb\test\stub\NullJsonSerializableImpl;
 use PHPUnit_Framework_TestCase;
@@ -18,7 +18,7 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase
 {
 
     private $function1Name;
-    /** @var  JSONTypeImpl */
+    /** @var  TypeImpl */
     private $function1Target;
     /** @var  JSONFunctionImpl */
     private $function1;
@@ -31,7 +31,7 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase
     {
         parent::setUp();
         $this->function1Name = "function1";
-        $this->function1Target = new JSONTypeImpl("SomeTarget");
+        $this->function1Target = new TypeImpl("SomeTarget");
         $this->function1 = new JSONFunctionImpl($this->function1Name, $this->function1Target);
 
         $this->function2Name = "function2";
@@ -218,7 +218,7 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase
 
     public function testSetArgumentToObjectIsOk()
     {
-        $this->function1->setArg(0, $obj = new JSONObjectImpl("obj1"));
+        $this->function1->setArg(0, $obj = new ObjectImpl("obj1"));
         $this->assertTrue(strpos($this->function1->getAsJSONString(), $obj->getAsJSONString()) !== false);
     }
 
@@ -253,7 +253,7 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase
 
     public function testSetRootTargetSetsRootTarget()
     {
-        $this->function2->setRootTarget($t = new JSONTypeImpl("NewType"));
+        $this->function2->setRootTarget($t = new TypeImpl("NewType"));
         $this->assertEquals($this->function1, $this->function2->getTarget());
         $this->assertEquals($t, $this->function1->getTarget());
     }

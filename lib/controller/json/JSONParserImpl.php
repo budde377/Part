@@ -12,7 +12,7 @@ class JSONParserImpl implements JSONParser{
 
     /**
      * @param string $input
-     * @return JSONElement
+     * @return Element
      */
     public function parse($input)
     {
@@ -37,13 +37,13 @@ class JSONParserImpl implements JSONParser{
                 if(!array_key_exists('type_string', $obj)){
                     break;
                 }
-                return new JSONTypeImpl($obj['type_string']);
+                return new TypeImpl($obj['type_string']);
                 break;
             case "function":
                 if(!$this->checkArrayKeysExists(['target','name','arguments','id'], $obj)){
                     break;
                 }
-                /** @var JSONTarget $target */
+                /** @var Target $target */
                 $target = $this->parseDecoded($obj['target']);
                 $function = new JSONFunctionImpl($obj['name'],$target );
                 if($obj['id'] != null){
@@ -61,7 +61,7 @@ class JSONParserImpl implements JSONParser{
                     break;
                 }
 
-                $object = new JSONObjectImpl($obj['name']);
+                $object = new ObjectImpl($obj['name']);
                 foreach($obj['variables'] as $key => $val){
                     $object->setVariable($key, $this->parseDecoded($val));
                 }
@@ -71,7 +71,7 @@ class JSONParserImpl implements JSONParser{
                 if(!$this->checkArrayKeysExists(['response_type','error_code', 'payload', 'id'], $obj)){
                     break;
                 }
-                $response = new JSONResponseImpl($obj['response_type'], $obj['error_code']);
+                $response = new ResponseImpl($obj['response_type'], $obj['error_code']);
                 $response->setPayload($this->parseDecoded($obj['payload']));
                 return $response;
                 break;
@@ -79,9 +79,9 @@ class JSONParserImpl implements JSONParser{
                 if(!$this->checkArrayKeysExists(['functions', 'id', 'target'], $obj)){
                     break;
                 }
-                /** @var JSONTarget  $target */
+                /** @var Target  $target */
                 $target = $this->parseDecoded($obj['target']);
-                $compositeFunction = new JSONCompositeFunctionImpl($target);
+                $compositeFunction = new CompositeFunctionImpl($target);
                 foreach($obj['functions'] as $f){
                     /** @var JSONFunction $func */
                     $func = $this->parseDecoded($f);
@@ -100,7 +100,7 @@ class JSONParserImpl implements JSONParser{
     }
 
     /**
-     * @return JSONElement
+     * @return Element
      */
     public function parseFromRequestBody()
     {

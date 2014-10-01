@@ -9,7 +9,7 @@ namespace ChristianBudde\cbweb\controller\json;
  * Time: 10:00
  * To change this template use File | Settings | File Templates.
  */
-interface JSONFunction extends JSONTarget, JSONProgram
+interface JSONFunction extends Target, Program
 {
 
     /**
@@ -54,9 +54,9 @@ interface JSONFunction extends JSONTarget, JSONProgram
 
     /**
      * Sets the root target, i.e. calls recursively on target until target is not a function.
-     * @param JSONTarget $target
+     * @param Target $target
      * @return void
      */
-    public function setRootTarget(JSONTarget $target );
+    public function setRootTarget(Target $target );
 
 }

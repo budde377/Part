@@ -8,10 +8,9 @@
  */
 namespace ChristianBudde\cbweb\test\stub;
 
-use ChristianBudde\cbweb\controller\json\JSONObject;
 use ChristianBudde\cbweb\model\page\Page;
 use ChristianBudde\cbweb\model\page\PageOrder;
-use ChristianBudde\cbweb\controller\json\UserPrivilegesJSONObjectImpl;
+use ChristianBudde\cbweb\controller\json\UserPrivilegesObjectImpl;
 use ChristianBudde\cbweb\model\user\UserPrivileges;
 
 
@@ -132,11 +131,11 @@ class StubUserPrivilegesImpl implements UserPrivileges
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return JSONObject
+     * @return Object
      */
     public function jsonObjectSerialize()
     {
-        return new UserPrivilegesJSONObjectImpl($this);
+        return new UserPrivilegesObjectImpl($this);
     }
 
 
