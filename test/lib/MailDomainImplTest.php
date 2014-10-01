@@ -378,8 +378,8 @@ class MailDomainImplTest extends CustomDatabaseTestCase
 
     public function testGetAddressLibraryReturnsRightInstance()
     {
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailAddressLibraryImpl', $a = $this->domain->getAddressLibrary());
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailAddressLibrary', $a);
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\AddressLibraryImpl', $a = $this->domain->getAddressLibrary());
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\AddressLibrary', $a);
         $this->assertTrue($this->domain === $a->getDomain());
     }
 

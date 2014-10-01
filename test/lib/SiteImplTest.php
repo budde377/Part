@@ -19,7 +19,7 @@ class SiteImplTest extends CustomDatabaseTestCase
     /** @var  SiteImpl */
     private $site;
 
-    function __construct($dataset = null)
+    function __construct()
     {
         parent::__construct(dirname(__FILE__) . '/../mysqlXML/SiteImplTest.xml');
     }
@@ -61,7 +61,7 @@ class SiteImplTest extends CustomDatabaseTestCase
         $this->assertTrue($this->site->getVariables() === $this->site->getVariables());
     }
 
-    public function testModifyWillBePersisten()
+    public function testModifyWillBePersistent()
     {
         $t1 = $this->site->lastModified();
         $this->site->modify();

@@ -192,7 +192,7 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
     public function testGetMailDomainLibraryWillReturnNullIfNoPathInConfig()
     {
         $ret1 = $this->backContainer->getMailDomainLibraryInstance();
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailDomainLibrary', $ret1);
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\DomainLibrary', $ret1);
         $ret2 = $this->backContainer->getMailDomainLibraryInstance();
         $this->assertTrue($ret1 === $ret2);
 

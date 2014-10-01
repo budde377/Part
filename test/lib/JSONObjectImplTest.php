@@ -114,7 +114,7 @@ class JSONObjectImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('object', $array['type']);
         $this->assertEquals($this->objectName, $array['name']);
         $this->assertEquals('test', $array['variables']['string']);
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONObject', $array['variables']['object']);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\Object', $array['variables']['object']);
         $this->assertEquals($newObject, $array['variables']['object']);
     }
 

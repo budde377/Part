@@ -147,8 +147,9 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
     {
         $currentUser = $this->setUpSiteUserLogin();
         $this->assertErrorResponse('UserLibrary.createUserFromMail()',Response::ERROR_CODE_NO_SUCH_FUNCTION);
-        $this->assertErrorResponse('UserLibrary.createUserFromMail("test", "root")',Response::ERROR_CODE_INVALID_MAIL);
-        $this->assertSuccessResponse('UserLibrary.createUserFromMail("test@example.com")',Response::ERROR_CODE_INVALID_MAIL);
+        $this->assertErrorResponse('UserLibrary.createUserFromMail("test", "root")',Response::ERROR_CODE_UNAUTHORIZED);
+        $this->assertErrorResponse('UserLibrary.createUserFromMail("test", "site")',Response::ERROR_CODE_INVALID_MAIL);
+        $this->assertSuccessResponse('UserLibrary.createUserFromMail("test@example.com", "site")');
         $userLibrary = $this->container->getUserLibraryInstance();
         $user = $userLibrary->getUser('test');
         $this->assertTrue($user->exists());

@@ -79,7 +79,7 @@ class DefaultPageImplTest extends PHPUnit_Framework_TestCase
     public function testPageIsJSONObjectSerializable()
     {
         $o = $this->defaultPage->jsonObjectSerialize();
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\PageJSONObjectImpl', $o);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\PageObjectImpl', $o);
         $this->assertEquals($o->getVariable('title'), $this->defaultPage->getTitle());
 
     }

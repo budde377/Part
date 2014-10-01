@@ -229,7 +229,7 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
     public function testPrivilegesIsJSONObjectSerializable()
     {
         $o = $this->userPrivileges->jsonObjectSerialize();
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\UserPrivilegesJSONObjectImpl', $o);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\UserPrivilegesObjectImpl', $o);
         $this->assertEquals(new UserPrivilegesObjectImpl($this->userPrivileges), $o);
     }
 

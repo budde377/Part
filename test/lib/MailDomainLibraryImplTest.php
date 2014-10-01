@@ -63,7 +63,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue(is_array($domainArray));
         $this->assertEquals(1, count($domainArray));
         $this->assertArrayHasKey('test.dk', $domainArray);
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailDomain', $domainArray['test.dk']);
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\Domain', $domainArray['test.dk']);
     }
 
     public function testListDomainsWillReuseInstances()
@@ -77,7 +77,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
     public function testGetDomainWillGetDomain()
     {
         $d = $this->domainLibrary->getDomain('test.dk');
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailDomainImpl', $d);
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\DomainImpl', $d);
 
     }
 

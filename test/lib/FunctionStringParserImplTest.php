@@ -68,12 +68,12 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
     public function testParseType()
     {
         $this->assertTrue($this->parser->parseType($this->validName, $result));
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\controller\\json\\JSONType", $result);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\controller\\json\\Type", $result);
         /** @var Type $result */
         $this->assertEquals($this->validName, $result->getTypeString());
 
         $this->assertTrue($this->parser->parseType($n = "Site\\something", $result));
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\controller\\json\\JSONType", $result);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\controller\\json\\Type", $result);
         /** @var Type $result */
         $this->assertEquals($n, $result->getTypeString());
     }
@@ -500,11 +500,11 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
     public function testParseFunctionString()
     {
         $r = $this->parser->parseFunctionString("Site.func()..func2()..func3()..func4().func5()");
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONProgram', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\Program', $r);
         $r = $this->parser->parseFunctionString("Logger.log(1,\"test\",[])");
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONProgram', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\Program', $r);
         $r = $this->parser->parseFunctionString("Site.func().func5()");
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\JSONProgram', $r);
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\Program', $r);
         $r = $this->parser->parseFunctionString("Site.func()..func2()..func3()..func4.func5()");
         $this->assertNull($r);
     }

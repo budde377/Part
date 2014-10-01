@@ -81,8 +81,8 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
         $i1 = $l['test'];
         /** @var \ChristianBudde\cbweb\model\mail\AddressImpl $i2 */
         $i2 = $l['test2'];
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailAddressImpl', $i1);
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailAddressImpl', $i2);
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\AddressImpl', $i1);
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\AddressImpl', $i2);
 
         $this->assertEquals('test', $i1->getLocalPart());
         $this->assertEquals('test2', $i2->getLocalPart());
@@ -90,7 +90,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
     public function testGetReturnsRightInstance()
     {
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailAddressImpl', $this->addressLibrary->getAddress('test'));
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\AddressImpl', $this->addressLibrary->getAddress('test'));
         $this->assertTrue($this->addressLibrary->getAddress('test') === $this->addressLibrary->listAddresses()['test']);
     }
 
@@ -112,7 +112,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
     public function testGetCatchallAddressReturnsRightAddress()
     {
         $adr = $this->addressLibrary->getCatchallAddress();
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailAddressImpl', $adr);
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\AddressImpl', $adr);
         $this->assertEquals('', $adr->getLocalPart());
     }
 
@@ -142,7 +142,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
     {
         $a = $this->addressLibrary->createAddress('test3');
         $this->assertTrue($a->exists());
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailAddressImpl', $a);
+        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\AddressImpl', $a);
         $this->assertEquals('test3', $a->getLocalPart());
         $this->assertTrue($this->addressLibrary->contains($a));
     }
