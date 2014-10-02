@@ -701,6 +701,8 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($handler->canHandle('JSONProgram', $f));
     }
 
+    //TODO test for null value to Typed parameter. This is not allowed in PHP.
+
 
     private function setUpHandler(AJAXTypeHandler $handler)
     {
