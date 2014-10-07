@@ -71,6 +71,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $this->setUpPageContentLibraryHandler($server);
         $this->setUpSiteContentHandler($server);
         $this->setUpSiteContentLibraryHandler($server);
+
         $this->setUpParserHandler($server);
 
         $this->setUpFileHandler($server);
@@ -292,9 +293,6 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'createPage', $this->sitePrivilegesFunction);
 
         $pageOrderHandler->addFunction('PageOrder', 'createPage', function(PageOrder $pageOrder, $title){
-            if (!$this->backend->getUserLibraryInstance()->getUserLoggedIn()->getUserPrivileges()->hasSitePrivileges()) {
-                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_UNAUTHORIZED);
-            }
             if (strlen($title) == 0) {
                 return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_PAGE_TITLE);
             }

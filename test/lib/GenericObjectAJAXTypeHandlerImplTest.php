@@ -11,6 +11,7 @@ use ChristianBudde\cbweb\controller\ajax\AJAXTypeHandler;
 use ChristianBudde\cbweb\controller\json\Element;
 use ChristianBudde\cbweb\controller\ajax\GenericObjectAJAXTypeHandlerImpl;
 use ChristianBudde\cbweb\controller\function_string\FunctionStringParserImpl;
+use ChristianBudde\cbweb\controller\json\Object;
 use ChristianBudde\cbweb\controller\json\ObjectImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
 use ChristianBudde\cbweb\controller\json\Response;
@@ -641,7 +642,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
     public function testCanNotHandleWithWrongNumberOfArguments()
     {
         $this->setUpHandler($this->handler);
-        $this->handler->addFunction('Element', 'custom', function (Element $element, array $a) {
+        $this->handler->addFunction('Element', 'custom', function ($element, array $a) {
         });
         /** @var JSONFunction $f */
         $f = $this->parser->parseFunctionString("Element . custom()");
@@ -652,7 +653,18 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
     public function testCanHandleWithSomeArgumentsBeingOptional()
     {
         $this->setUpHandler($this->handler);
-        $this->handler->addFunction('Element', 'custom', function (Element $element, array $a = []) {
+        $this->handler->addFunction('Element', 'custom', function ($element, array $a = []) {
+        });
+        /** @var JSONFunction $f */
+        $f = $this->parser->parseFunctionString("Element . custom()");
+        $this->assertTrue($this->handler->canHandle('Element', $f));
+    }
+
+
+    public function testCanHandleWithSomeArgumentsBeingOptionalAndTyped()
+    {
+        $this->setUpHandler($this->handler);
+        $this->handler->addFunction('Element', 'custom', function ($element, Object $a = null) {
         });
         /** @var JSONFunction $f */
         $f = $this->parser->parseFunctionString("Element . custom()");
@@ -662,17 +674,18 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
     public function testCanHandleWithSomeMiddleArgumentsBeingOptional()
     {
         $this->setUpHandler($this->handler);
-        $this->handler->addFunction('Element', 'custom', function (Element $element, array $a = [], $v) {
+        $this->handler->addFunction('Element', 'custom', function ($element, array $a = [], $v) {
         });
         /** @var JSONFunction $f */
         $f = $this->parser->parseFunctionString("Element . custom([])");
         $this->assertFalse($this->handler->canHandle('Element', $f));
     }
 
+
     public function testCanNotHandleWithWrongArguments()
     {
         $this->setUpHandler($this->handler);
-        $this->handler->addFunction('Element', 'custom', function (Element $element, array $a) {
+        $this->handler->addFunction('Element', 'custom', function ($element, array $a) {
         });
         /** @var JSONFunction $f */
         $f = $this->parser->parseFunctionString("Element . custom('string')");
@@ -682,10 +695,20 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
     public function testCanNotHandleWithWrongArgumentsType()
     {
         $this->setUpHandler($this->handler);
-        $this->handler->addFunction('Element', 'custom', function (Element $element, Page $a) {
+        $this->handler->addFunction('Element', 'custom', function ($element, Page $a) {
         });
         /** @var JSONFunction $f */
         $f = $this->parser->parseFunctionString("Element . custom('string')");
+        $this->assertFalse($this->handler->canHandle('Element', $f));
+    }
+
+    public function testCanNotHandleWithWrongNullToTypedArgument()
+    {
+        $this->setUpHandler($this->handler);
+        $this->handler->addFunction('Element', 'custom', function ($element, Page $a) {
+        });
+        /** @var JSONFunction $f */
+        $f = $this->parser->parseFunctionString("Element . custom(null)");
         $this->assertFalse($this->handler->canHandle('Element', $f));
     }
 
@@ -701,7 +724,6 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($handler->canHandle('JSONProgram', $f));
     }
 
-    //TODO test for null value to Typed parameter. This is not allowed in PHP.
 
 
     private function setUpHandler(AJAXTypeHandler $handler)

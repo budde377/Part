@@ -160,13 +160,13 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
     public function testUserLibraryFunctionsNotLoggedIn()
     {
         $this->assertErrorResponse("UserLibrary.listUsers()", Response::ERROR_CODE_UNAUTHORIZED);
-        $this->assertErrorResponse("UserLibrary.deleteUser(null)", Response::ERROR_CODE_UNAUTHORIZED);
+        $this->assertErrorResponse("UserLibrary.deleteUser(UserLibrary.getUserLoggedIn())", Response::ERROR_CODE_UNAUTHORIZED);
         $this->assertErrorResponse("UserLibrary.getUserLoggedIn()", Response::ERROR_CODE_UNAUTHORIZED);
         $this->assertErrorResponse("UserLibrary.getInstance()", Response::ERROR_CODE_UNAUTHORIZED);
         $this->assertErrorResponse("UserLibrary.getUser('someUser')", Response::ERROR_CODE_UNAUTHORIZED);
-        $this->assertErrorResponse("UserLibrary.getParent(null)", Response::ERROR_CODE_UNAUTHORIZED);
-        $this->assertErrorResponse("UserLibrary.getChildren(null)", Response::ERROR_CODE_UNAUTHORIZED);
-        $this->assertErrorResponse("UserLibrary.getChildren(null)", Response::ERROR_CODE_UNAUTHORIZED);
+        $this->assertErrorResponse("UserLibrary.getParent(UserLibrary.getUserLoggedIn())", Response::ERROR_CODE_UNAUTHORIZED);
+        $this->assertErrorResponse("UserLibrary.getChildren(UserLibrary.getUserLoggedIn())", Response::ERROR_CODE_UNAUTHORIZED);
+        $this->assertErrorResponse("UserLibrary.getChildren(UserLibrary.getUserLoggedIn())", Response::ERROR_CODE_UNAUTHORIZED);
         $this->assertErrorResponse("UserLibrary.createUserFromMail('test@example.com', 'root')", Response::ERROR_CODE_UNAUTHORIZED);
 
         $this->assertErrorResponse("UserLibrary.createUser('test', 'test', 'test@example.com', null)", Response::ERROR_CODE_NO_SUCH_FUNCTION);
@@ -257,7 +257,115 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
 
     }
 
+    public function testCallPageOrderWithoutPage(){
+        $pageOrder = $this->container->getPageOrderInstance();
+        $this->assertResponsePayloadEquals("PageOrder.getPageOrder()", $pageOrder->getPageOrder());
+    }
 
+    public function testCallingNonAuthorizedFunctionsIsOk(){
+        $currentPage = "PageOrder.getCurrentPage()";
+        $pageOrder = $this->container->getPageOrderInstance();
+        $this->assertResponsePayloadEquals("PageOrder.getInstance()", $pageOrder);
+        $this->assertResponsePayloadEquals($currentPage, $pageOrder->getCurrentPage());
+        $this->assertResponsePayloadEquals("PageOrder.getPageOrder($currentPage)", $pageOrder->getPageOrder($pageOrder->getCurrentPage()));
+        $this->assertResponsePayloadEquals("PageOrder.isActive($currentPage)", $pageOrder->isActive($pageOrder->getCurrentPage()));
+        $this->assertResponsePayloadEquals("PageOrder.listPages()", $pageOrder->listPages());
+        $this->assertResponsePayloadEquals("PageOrder.getPage($currentPage.getID())", $pageOrder->getPage($pageOrder->getCurrentPage()->getID()));
+        $this->assertResponsePayloadEquals("PageOrder.getPagePath($currentPage)", $pageOrder->getPagePath($pageOrder->getCurrentPage()));
+    }
+
+    public function testCallingWithWrongAuthIsNotOk(){
+        $this->setUpPageUserLogin();
+        $currentPage = "PageOrder.getCurrentPage()";
+        $this->assertErrorResponse("PageOrder.deletePage($currentPage)", Response::ERROR_CODE_UNAUTHORIZED);
+        $this->assertErrorResponse("PageOrder.deactivatePage($currentPage)", Response::ERROR_CODE_UNAUTHORIZED);
+        $this->assertErrorResponse("PageOrder.setPageOrder($currentPage)", Response::ERROR_CODE_UNAUTHORIZED);
+        $this->assertErrorResponse("PageOrder.createPage('test_title')", Response::ERROR_CODE_UNAUTHORIZED);
+
+    }
+
+
+    public function testCreatePageWithEmptyTitleIsNotOk(){
+        $this->setUpSiteUserLogin();
+        $this->assertErrorResponse("PageOrder.createPage('')", Response::ERROR_CODE_INVALID_PAGE_TITLE);
+    }
+
+    public function testCreatePageIsOk(){
+        $this->setUpSiteUserLogin();
+
+        $response = $this->assertSuccessResponse("PageOrder.createPage('New Title')");
+        $p = $this->container->getPageOrderInstance()->getPage("new_title");
+        $this->assertEquals($p, $response->getPayload());
+
+    }
+
+    public function testModifyPageIsOkWithRightPrivileges(){
+        $page = $this->container->getPageOrderInstance()->getCurrentPage();
+        $user = $this->setUpPageUserLogin();
+        $this->assertErrorResponse('Page.setTitle("New Title")', Response::ERROR_CODE_UNAUTHORIZED);
+        $user->getUserPrivileges()->addPagePrivileges($page);
+        $this->assertSuccessResponse('Page.setTitle("New Title")');
+        $this->assertEquals($page->getTitle(), 'New Title');
+
+    }
+
+
+    public function testDeleteIsNotOkayWithoutSitePrivileges(){
+        $page = $this->container->getPageOrderInstance()->getCurrentPage();
+        $u = $this->setUpPageUserLogin();
+        $this->assertErrorResponse('Page.delete()', Response::ERROR_CODE_UNAUTHORIZED);
+        $this->assertTrue($page->exists());
+        $u->logout();
+        $this->setUpSiteUserLogin();
+        $this->assertSuccessResponse('Page.delete()');
+        $this->assertFalse($page->exists());
+    }
+
+    public function testDeactivatePageIsOk(){
+        $this->setUpSiteUserLogin();
+        $currentPage = "PageOrder.getCurrentPage()";
+        $this->assertSuccessResponse("PageOrder.deactivatePage($currentPage)");
+        $this->assertFalse($this->container->getPageOrderInstance()->isActive($this->container->getPageOrderInstance()->getCurrentPage()));
+    }
+
+
+    public function testLoggerHasSitePrivileges(){
+
+        $u = $this->setUpPageUserLogin();
+        $this->assertErrorResponse('Logger.clearLog()', Response::ERROR_CODE_UNAUTHORIZED);
+
+        $u->logout();
+        $this->setUpSiteUserLogin();
+        $this->assertSuccessResponse('Logger.clearLog()');
+
+    }
+
+    public function testLoggerLogIsOk(){
+        $this->assertErrorResponse('Logger.alert("alert")', Response::ERROR_CODE_UNAUTHORIZED);
+        $this->setUpPageUserLogin();
+        $this->assertSuccessResponse("Logger.alert('alert')");
+
+    }
+
+    public function testUpdaterIsNotOkWithoutSitePrivileges(){
+        $u = $this->setUpPageUserLogin();
+        $this->assertErrorResponse('Updater.checkForUpdates()', Response::ERROR_CODE_UNAUTHORIZED);
+
+        $u->logout();
+        $this->setUpSiteUserLogin();
+        $this->assertSuccessResponse('Updater.checkForUpdates()');
+
+    }
+
+    public function  testArrayAccess(){
+        $_POST['test'] = 1;
+        $_GET['test'] = 2;
+        $this->setUpServer();
+        $this->assertSuccessResponse('POST["test"]');
+        $this->assertSuccessResponse('GET["test"]');
+        $this->assertResponsePayloadEquals("POST['test']", 1);
+        $this->assertResponsePayloadEquals("GET['test']", 2);
+    }
 
 
 
@@ -270,6 +378,7 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
     {
         $response = $this->server->handleFromFunctionString($functionString);
         $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\Response', $response);
+        $this->assertEquals($response->getResponseType(), Response::RESPONSE_TYPE_SUCCESS);
         $this->assertEquals($equals, $response->getPayload());
         return $response;
 

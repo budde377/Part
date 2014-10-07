@@ -52,7 +52,7 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
             }
             $reflection = new ReflectionClass($object);
             $sn = $reflection->getShortName();
-            if($i && preg_match("/\\\\$sn/", $object)){
+            if ($i && preg_match("/\\\\$sn/", $object)) {
                 $this->types[] = $sn;
                 $this->alias[$sn][] = $object;
             }
@@ -66,7 +66,7 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
 
         $alias = array_values(array_map(function (ReflectionClass $class) {
             $s = $class->getShortName();
-            $found  = false;
+            $found = false;
             foreach ($this->types as $t) {
                 if (preg_match("/\\\\$s/", $t)) {
                     $this->alias[$s][] = $t;
@@ -75,10 +75,10 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
             }
 
 
-            return $found ? $s:null;
+            return $found ? $s : null;
         }, $reflection->getInterfaces()));
 
-        $alias = array_filter($alias, function($s){
+        $alias = array_filter($alias, function ($s) {
             return $s != null;
         });
         $this->types = array_values(array_merge($this->types, $alias));
@@ -108,8 +108,8 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
      */
     public function addFunctionAuthFunction($type, $functionName, callable $function)
     {
-        if(isset($this->alias[$type])){
-            foreach($this->alias[$type] as $target){
+        if (isset($this->alias[$type])) {
+            foreach ($this->alias[$type] as $target) {
                 $this->addFunctionAuthFunction($target, $functionName, $function);
             }
             return;
@@ -124,8 +124,8 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
      */
     public function addTypeAuthFunction($type, callable $function)
     {
-        if(isset($this->alias[$type])){
-            foreach($this->alias[$type] as $target){
+        if (isset($this->alias[$type])) {
+            foreach ($this->alias[$type] as $target) {
                 $this->addTypeAuthFunction($target, $function);
             }
             return;
@@ -141,8 +141,8 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
      */
     public function addFunction($type, $name, callable $function)
     {
-        if(isset($this->alias[$type])){
-            foreach($this->alias[$type] as $target){
+        if (isset($this->alias[$type])) {
+            foreach ($this->alias[$type] as $target) {
                 $this->addFunction($target, $name, $function);
             }
             return;
@@ -179,8 +179,8 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
      */
     public function addTypePreCallFunction($type, callable $function)
     {
-        if(isset($this->alias[$type])){
-            foreach($this->alias[$type] as $target){
+        if (isset($this->alias[$type])) {
+            foreach ($this->alias[$type] as $target) {
                 $this->addTypePreCallFunction($target, $function);
             }
             return;
@@ -197,8 +197,8 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
      */
     public function addTypePostCallFunction($type, callable $function)
     {
-        if(isset($this->alias[$type])){
-            foreach($this->alias[$type] as $target){
+        if (isset($this->alias[$type])) {
+            foreach ($this->alias[$type] as $target) {
                 $this->addTypePostCallFunction($target, $function);
             }
             return;
@@ -216,8 +216,8 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
      */
     public function addFunctionPreCallFunction($type, $name, callable $function)
     {
-        if(isset($this->alias[$type])){
-            foreach($this->alias[$type] as $target){
+        if (isset($this->alias[$type])) {
+            foreach ($this->alias[$type] as $target) {
                 $this->addFunctionPreCallFunction($target, $name, $function);
             }
             return;
@@ -235,8 +235,8 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
      */
     public function addFunctionPostCallFunction($type, $name, callable $function)
     {
-        if(isset($this->alias[$type])){
-            foreach($this->alias[$type] as $target){
+        if (isset($this->alias[$type])) {
+            foreach ($this->alias[$type] as $target) {
                 $this->addFunctionPostCallFunction($target, $name, $function);
             }
             return;
@@ -303,18 +303,18 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
     public function setUp(AJAXServer $server, $type)
     {
 
-        if(in_array($type, $this->hasBeenSetUp)){
+        if (in_array($type, $this->hasBeenSetUp)) {
             return;
         }
         $this->hasBeenSetUp[] = $type;
 
         if (isset($this->alias[$type])) {
-            foreach($this->alias[$type] as $target){
+            foreach ($this->alias[$type] as $target) {
                 $this->setUp($server, $target);
             }
             return;
         }
-        if(!class_exists($type) && !interface_exists($type)){
+        if (!class_exists($type) && !interface_exists($type)) {
             return;
         }
         $r = new ReflectionClass($type);
@@ -382,7 +382,7 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
             $result = $this->functions[$type];
         }
 
-        if(isset($this->customFunctions[$type])){
+        if (isset($this->customFunctions[$type])) {
             $result = array_merge($result, array_keys($this->customFunctions[$type]));
         }
 
@@ -399,21 +399,21 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
      */
     public function canHandle($type, JSONFunction $function, $instance = null)
     {
-        if(isset($this->alias[$type])){
+        if (isset($this->alias[$type])) {
             $canHandle = false;
-            foreach($this->alias[$type] as $target){
+            foreach ($this->alias[$type] as $target) {
                 $canHandle = $canHandle || $this->canHandle($target, $function, $instance);
             }
             return $canHandle;
         }
 
 
-        $instance = $instance == null?$this->object:$instance;
+        $instance = $instance == null ? $this->object : $instance;
 
 
         $name = $function->getName();
 
-        if(!$this->hasFunction($type, $name)){
+        if (!$this->hasFunction($type, $name)) {
             return false;
         }
 
@@ -425,11 +425,11 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
             $f = new \ReflectionFunction($this->customFunctions[$type][$name]);
             $parameters = $f->getParameters();
             $args = array_merge([$instance], $args);
-        } else if ($instance != null && isset($this->functions[$type]) && in_array($name, $this->functions[$type])){
+        } else if ($instance != null && isset($this->functions[$type]) && in_array($name, $this->functions[$type])) {
             $m = new \ReflectionMethod($instance, $name);
             $parameters = $m->getParameters();
         }
-        if($parameters === null){
+        if ($parameters === null) {
             return false;
         }
         return $this->parametersCheck($args, $parameters);
@@ -444,12 +444,12 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
      */
     public function handle($type, JSONFunction $function, $instance = null)
     {
-        if(isset($this->alias[$type])){
-            foreach($this->alias[$type] as $target){
-                if(!$this->canHandle($target, $function, $instance)){
+        if (isset($this->alias[$type])) {
+            foreach ($this->alias[$type] as $target) {
+                if (!$this->canHandle($target, $function, $instance)) {
                     continue;
                 }
-                return $this->handle($target,$function, $instance);
+                return $this->handle($target, $function, $instance);
             }
             return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION);
 
@@ -606,29 +606,38 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
 
         $numRequiredParameters = 0;
         $lastRequiredFound = false;
-        foreach(array_reverse($parameters) as $param){
+        foreach (array_reverse($parameters) as $param) {
             /** @var $param \ReflectionParameter */
 
             $lastRequiredFound = $lastRequiredFound || !$param->isOptional();
-            if($lastRequiredFound){
+            if ($lastRequiredFound) {
                 $numRequiredParameters++;
             }
         }
 
-        if($numRequiredParameters > count($functionArgs)){
+        if ($numRequiredParameters > count($functionArgs)) {
             return false;
         }
 
-        foreach($parameters as $k => $param){
-            if($param->isArray()){
-                if(isset($functionArgs[$k]) && !is_array($functionArgs[$k])){
+        foreach ($parameters as $k => $param) {
+            if ($param->isArray()) {
+                if (isset($functionArgs[$k]) && !is_array($functionArgs[$k])) {
                     return false;
                 }
             }
-            if($c = $param->getClass()){
-                if(isset($functionArgs[$k]) && !is_a($functionArgs[$k], $c->getName())){
+            if ($c = $param->getClass()) {
+                if (isset($functionArgs[$k])) {
+                    if (!is_a($functionArgs[$k], $c->getName())) {
+                        return false;
+                    } else {
+                        continue;
+                    }
+                }
+                if (!$param->isOptional()) {
                     return false;
                 }
+
+
             }
 
         }
