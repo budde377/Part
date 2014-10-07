@@ -82,7 +82,7 @@ class FileProgress {
     _notifyPreviewPath();
   }
 
-  double get progress => _progress;
+  num get progress => _progress;
 
   set progress(num progress) {
     if (_progress == progress) {
@@ -112,7 +112,7 @@ abstract class UploadStrategy {
   Pattern filter;
 
 
-  void uploadFile(FileProgress fileProgress, {void callback(String path):null, void progress(num pct):null});
+  Future<Response<String>> uploadFile(FileProgress fileProgress, {void progress(num pct):null});
 
 
   static const Pattern FILTER_IMAGE = "image/";
@@ -135,7 +135,8 @@ class AJAXImageUploadStrategy extends UploadStrategy {
 
   }
 
-  void uploadFile(FileProgress fileProgress, {void callback(String path):null, void progress(num pct):null}) {
+  Future<Response<String>> uploadFile(FileProgress fileProgress, {void progress(num pct):null}) {
+    var completer = new Completer();
     var reader = new FileReader();
     reader.onLoadEnd.listen((_) {
       fileProgress.previewPath = reader.result;
@@ -151,13 +152,13 @@ class AJAXImageUploadStrategy extends UploadStrategy {
     sizesString += "]";
 
 
+
     ajaxClient.callFunctionString("ImageFile.uploadFile(FILES['file'], $sizesString )", progress:progress, form_data:form_data).then((JSONResponse response) {
       progress(1);
       var c = (String path) {
         fileProgress.path = path;
-        if (callback != null) {
-          callback(path);
-        }
+        completer.complete(path);
+
       };
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         fileProgress.previewPath = response.payload['sizes']['preview'];
@@ -166,6 +167,7 @@ class AJAXImageUploadStrategy extends UploadStrategy {
         c(null);
       }
     });
+    return completer.future;
   }
 
 }
@@ -175,7 +177,8 @@ class AJAXFileUploadStrategy extends UploadStrategy {
 
   AJAXFileUploadStrategy() ;
 
-  void uploadFile(FileProgress fileProgress, {void callback(String path):null, void progress(num pct):null}) {
+  Future<Response<String>>  uploadFile(FileProgress fileProgress, { void progress(num pct):null}) {
+    var completer = new Completer();
     var formData = new FormData();
     formData.appendBlob("file", fileProgress.file, fileProgress.file.name);
     ajaxClient.callFunctionString("File.uploadFile(FILES['file'])", progress:progress, form_data:formData).then((JSONResponse response) {
@@ -184,12 +187,13 @@ class AJAXFileUploadStrategy extends UploadStrategy {
       }
       var c = (String path) {
         fileProgress.path = path;
-        if (callback != null) {
-          callback(path);
-        }
+        completer.complete(path);
+
       };
       c(response.type == Response.RESPONSE_TYPE_SUCCESS ? response.payload : null);
     });
+    return completer.future;
+
   }
 
 
@@ -266,8 +270,8 @@ class FileUploader {
 
     var fp = new FileProgress(_queue.removeAt(0));
 
-    uploadStrategy.uploadFile(fp, progress:(num pct) => fp.progress = 0.5 + pct / 2);
-    _startUpload();
+    uploadStrategy.uploadFile(fp, progress:(num n)=>fp.progress = n).then((_)=>_startUpload());
+
   }
 
   Stream<FileUploader> get onProgress => _progress_stream;
