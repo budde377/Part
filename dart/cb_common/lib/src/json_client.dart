@@ -35,7 +35,7 @@ class AJAXJSONClient extends JSONClient {
     return completer.future;
   }
 
-  Future<JSONResponse> callFunctionString(String function, {void progress(double pct), FormData form_data:null}) {
+  Future<JSONResponse> callFunctionString(String function, {void progress(num pct), FormData form_data:null}) {
     var request = new HttpRequest();
     var future = _setUpRequest(request);
     _registerProgressHandler(request, progress);
@@ -55,9 +55,8 @@ class AJAXJSONClient extends JSONClient {
   _registerProgressHandler(HttpRequest request, progress) {
     if (progress != null) {
       var f = (ProgressEvent evt) => evt.total == 0?0:progress(evt.loaded / evt.total);
-      request.onLoad.listen(f);
-      request.onLoadEnd.listen(f);
-      request.onProgress.listen(f);
+      request.upload.onProgress.listen(f);
+      request.upload.onLoadEnd.listen(f);
     }
   }
 

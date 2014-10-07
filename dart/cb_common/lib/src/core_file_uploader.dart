@@ -52,7 +52,7 @@ class FileProgress {
 
   final File file;
 
-  double _progress = 0.0;
+  num _progress = 0;
 
   String _path, _previewPath;
 
@@ -70,7 +70,7 @@ class FileProgress {
     if (_path != null) {
       return;
     }
-    progress = 1.0;
+    progress = 1;
     _path = p;
     _notifyPath();
   }
@@ -84,7 +84,7 @@ class FileProgress {
 
   double get progress => _progress;
 
-  set progress(double progress) {
+  set progress(num progress) {
     if (_progress == progress) {
       return;
     }
@@ -266,7 +266,7 @@ class FileUploader {
 
     var fp = new FileProgress(_queue.removeAt(0));
 
-    uploadStrategy.uploadFile(fp, progress:(double pct) => fp.progress = 0.5 + pct / 2);
+    uploadStrategy.uploadFile(fp, progress:(num pct) => fp.progress = 0.5 + pct / 2);
     _startUpload();
   }
 
