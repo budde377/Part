@@ -24,6 +24,8 @@ class UserImplTest extends CustomDatabaseTestCase
     private $db;
     /** @var $user \ChristianBudde\cbweb\model\user\UserImpl */
     private $user;
+    /** @var $user \ChristianBudde\cbweb\model\user\UserImpl */
+    private $user2;
 
 
     function __construct($dataset = null)
@@ -44,6 +46,7 @@ class UserImplTest extends CustomDatabaseTestCase
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
         $this->user = new UserImpl('someUser', $this->db);
+        $this->user2 = new UserImpl('root', $this->db);
     }
 
 
@@ -652,6 +655,26 @@ class UserImplTest extends CustomDatabaseTestCase
         $this->assertEquals('user', $o->getName());
     }
 
+
+    public function testGetTokenReturnsToken(){
+        $this->assertNotEquals($this->user->getUserToken(), $this->user2->getUserToken());
+    }
+
+    public function testGetTokenReturnsTokenEqualOnSameUser(){
+        $this->assertEquals($this->user->getUserToken(), $this->user->getUserToken());
+    }
+
+    public function testGetTokenReturnsNewTokenAfterLogin(){
+        $h1 = $this->user2->getUserToken();
+        $this->user2->setPassword($password = "some super secret password");
+        $h2 = $this->user2->getUserToken();
+        $this->assertTrue($this->user2->login($password));
+        $h3 = $this->user2->getUserToken();
+        $this->assertNotEquals($h1, $h2);
+        $this->assertNotEquals($h2, $h3);
+        $this->assertNotEquals($h1, $h3);
+
+    }
 
     public function getSetUpOperation()
     {

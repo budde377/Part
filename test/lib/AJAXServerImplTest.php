@@ -11,6 +11,7 @@ use ChristianBudde\cbweb\controller\json\JSONFunction;
 use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
 use ChristianBudde\cbweb\controller\json\TypeImpl;
 use ChristianBudde\cbweb\test\stub\NullPageElementImpl;
+use ChristianBudde\cbweb\test\stub\StubUserLibraryImpl;
 use PHPUnit_Framework_TestCase;
 use ChristianBudde\cbweb\test\stub\StubAJAXTypeHandlerImpl;
 use ChristianBudde\cbweb\test\stub\StubBackendSingletonContainerImpl;
@@ -35,15 +36,19 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
     private $handler2;
     /** @var  ParserImpl */
     private $functionStringParser;
+    /** @var  StubUserLibraryImpl */
+    private $userLibrary;
 
     protected function setUp()
     {
         $this->backendContainer = new StubBackendSingletonContainerImpl();
         $this->backendContainer->setConfigInstance($this->config = new StubConfigImpl());
+        $this->backendContainer->setUserLibraryInstance($this->userLibrary = new StubUserLibraryImpl());
         $this->server = new ServerImpl($this->backendContainer);
         $this->handler1 = new StubAJAXTypeHandlerImpl();
         $this->handler2 = new StubAJAXTypeHandlerImpl();
         $this->functionStringParser = new ParserImpl();
+
     }
 
 
@@ -196,6 +201,17 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('success', $r->getPayload());
     }
+
+    public function testAllCallsAreUnauthorizedIfTokenDoesNotVerify()
+    {
+        $this->userLibrary->verifyUserSessionToken = false;
+        $r = $this->server->handleFromFunctionString("Target.f()");
+        $this->assertEquals(new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_UNAUTHORIZED), $r);
+
+    }
+
+
+
 
     public function testHandleOnJSONFunctionReturnsCallsAppropriateHandlerFromStringWithArguments()
     {

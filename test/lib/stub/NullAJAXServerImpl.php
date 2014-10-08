@@ -2,6 +2,7 @@
 namespace ChristianBudde\cbweb\test\stub;
 use ChristianBudde\cbweb\controller\ajax\Server;
 use ChristianBudde\cbweb\controller\ajax\TypeHandler;
+use ChristianBudde\cbweb\controller\json\Response;
 
 /**
  * Created by PhpStorm.
@@ -32,24 +33,27 @@ class NullAJAXServerImpl implements Server
 
     /**
      * @param string $input
-     * @return \ChristianBudde\cbweb\controller\json\Response
+     * @param string $token
+     * @return Response
      */
-    public function handleFromJSONString($input)
+    public function handleFromJSONString($input, $token = null)
     {
     }
 
     /**
      * @param string $input
-     * @return \ChristianBudde\cbweb\controller\json\Response
+     * @param string $token
+     * @return Response
      */
-    public function handleFromFunctionString($input)
+    public function handleFromFunctionString($input, $token = null)
     {
     }
 
     /**
-     * @return \ChristianBudde\cbweb\controller\json\Response
+     * @param string $token
+     * @return Response
      */
-    public function handleFromRequestBody()
+    public function handleFromRequestBody($token = null)
     {
     }
 }

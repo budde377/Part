@@ -14,6 +14,7 @@ class StubUserLibraryImpl implements UserLibrary
 {
     private $userList = array();
     private $userLoggedIn;
+    public  $verifyUserSessionToken = true;
 
     /**
      * Will list all users
@@ -193,5 +194,8 @@ class StubUserLibraryImpl implements UserLibrary
      */
     public function verifyUserSessionToken($token)
     {
+        return $this->verifyUserSessionToken;
     }
+
+
 }

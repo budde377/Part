@@ -165,4 +165,10 @@ interface User extends JSONObjectSerializable
      */
     public function getUserVariables();
 
+    /**
+     * Returns a token "unique" to the user and the last login time.
+     * @return String
+     */
+    public function getUserToken();
+
 }

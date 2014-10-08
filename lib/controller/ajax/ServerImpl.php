@@ -102,27 +102,34 @@ class ServerImpl implements Server
 
     /**
      * @param string $input
+     * @param string $token
      * @return Response
      */
-    public function handleFromJSONString($input)
+    public function handleFromJSONString($input, $token = null)
     {
-        return $this->wrapperHandler($this->jsonParser->parse($input));
+        return $this->wrapperHandler($this->jsonParser->parse($input), $token);
     }
 
     /**
+     * @param string $token
      * @return Response
      */
-    public function handleFromRequestBody()
+    public function handleFromRequestBody($token = null)
     {
-        return $this->wrapperHandler($this->jsonParser->parseFromRequestBody());
+        return $this->wrapperHandler($this->jsonParser->parseFromRequestBody(), $token);
     }
 
     /**
      * @param $input
+     * @param $token
      * @return Response
      */
 
-    private function wrapperHandler($input){
+    private function wrapperHandler($input, $token){
+
+        if(!$this->backendSingletonContainer->getUserLibraryInstance()->verifyUserSessionToken($token)){
+            return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_UNAUTHORIZED);
+        }
 
         if (!($input instanceof Program)) {
             return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_MALFORMED_REQUEST);
@@ -257,12 +264,13 @@ class ServerImpl implements Server
 
     /**
      * @param string $input
+     * @param string $token
      * @return Response
      */
-    public function handleFromFunctionString($input)
+    public function handleFromFunctionString($input, $token = null)
     {
 
-        return $this->wrapperHandler($this->functionStringParser->parseFunctionString($input));
+        return $this->wrapperHandler($this->functionStringParser->parseFunctionString($input), $token);
     }
 
     private function buildType(ReflectionClass $reflection)

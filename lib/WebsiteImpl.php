@@ -55,17 +55,14 @@ class WebsiteImpl implements Website
 
         $ajaxServer = $this->backendContainer->getAJAXServerInstance();
         $id = null;
-        if (
-            ($this->backendContainer->getUserLibraryInstance()->verifyUserSessionToken($this->GETValueOfIndexIfSetElseDefault('token', ''))) &&
-            ($id = $this->GETValueOfIndexIfSetElseDefault('ajax')) !== null
-        ) {
+        if (($id = $this->GETValueOfIndexIfSetElseDefault('ajax')) !== null) {
             $template->onlyInitialize();
             $ajaxServer->registerHandlersFromConfig();
         }
 
         //Decide output mode
         if ($id !== null) {
-            echo $ajax = $ajaxServer->handleFromFunctionString($id)->getAsJSONString();
+            echo $ajax = $ajaxServer->handleFromFunctionString($id, $this->GETValueOfIndexIfSetElseDefault('token'))->getAsJSONString();
 
         } else if (!$cacheControl->setUpCache()) {
             echo $template->render();

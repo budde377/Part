@@ -252,4 +252,13 @@ class StubUserImpl implements User
     {
         return $this->jsonObjectSerialize()->jsonSerialize();
     }
+
+    /**
+     * Returns a token "unique" to the user and the last login time.
+     * @return String
+     */
+    public function getUserToken()
+    {
+        return "";
+    }
 }

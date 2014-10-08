@@ -272,8 +272,7 @@ class UserImpl implements User, Observable
      */
     public function isLoggedIn()
     {
-        return $this->SESSIONValueOfIndexIfSetElseDefault('login-username', false) == $this->getUsername() &&
-            $this->SESSIONValueOfIndexIfSetElseDefault('login-password', false) == $this->getPassword();
+        return $this->SESSIONValueOfIndexIfSetElseDefault('model-user-login-token', false) == $this->getUserToken();
     }
 
     /**
@@ -284,8 +283,7 @@ class UserImpl implements User, Observable
         if (!$this->isLoggedIn()) {
             return false;
         }
-        unset($_SESSION['login-username']);
-        unset($_SESSION['login-password']);
+        unset($_SESSION['model-user-login-token']);
         return true;
     }
 
@@ -494,13 +492,20 @@ class UserImpl implements User, Observable
 
     private function updateLoginSession()
     {
-        $_SESSION['login-password'] = $this->getPassword();
-        $_SESSION['login-username'] = $this->getUsername();
+        $_SESSION['model-user-login-token'] = $this->getUserToken();
     }
 
     private function someOneLoggedIn()
     {
-        return $this->SESSIONValueOfIndexIfSetElseDefault('login-username') ||
-        $this->SESSIONValueOfIndexIfSetElseDefault('login-password');
+        return isset($_SESSION['model-user-login-token']);
+    }
+
+    /**
+     * Returns a token "unique" to the user and the last login time.
+     * @return String
+     */
+    public function getUserToken()
+    {
+        return sha1($this->getUsername().$this->getPassword().$this->getLastLogin());
     }
 }

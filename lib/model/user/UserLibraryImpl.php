@@ -22,6 +22,8 @@ class UserLibraryImpl implements UserLibrary, Observer
     private $connection;
     /** @var $userListIterator ArrayIterator */
     private $userListIterator;
+    /** @var  User */
+    private $userLoggedIn;
 
     public function __construct(DB $database)
     {
@@ -112,16 +114,15 @@ class UserLibraryImpl implements UserLibrary, Observer
      */
     public function getUserLoggedIn()
     {
-
-        $loggedInUser = null;
-        $list = $this->userList;
-        while ($loggedInUser == null && ($u = array_pop($list)) != null) {
-            /** @var $u User */
-            if ($u->isLoggedIn()) {
-                $loggedInUser = $u;
-            }
+        if($this->userLoggedIn == null){
+            return null;
         }
-        return $loggedInUser;
+
+        if(!$this->userLoggedIn->isLoggedIn()){
+            return $this->userLoggedIn = null;
+        }
+
+        return $this->userLoggedIn;
     }
 
     public function onChange(Observable $subject, $changeType)
@@ -145,7 +146,7 @@ class UserLibraryImpl implements UserLibrary, Observer
                 $this->userList[$subject->getUsername()] = $subject;
                 break;
             case User::EVENT_LOGIN:
-                $_SESSION['login-token'] = uniqid('token', true);
+                $this->userLoggedIn = $subject;
         }
     }
 
@@ -279,12 +280,7 @@ class UserLibraryImpl implements UserLibrary, Observer
      */
     public function getUserSessionToken()
     {
-        if($this->getUserLoggedIn() == null || !isset($_SESSION['login-token'])){
-            return null;
-        }
-
-        return $_SESSION['login-token'];
-
+        return ($u = $this->getUserLoggedIn()) == null?null:$u->getUserToken();
     }
 
     /**

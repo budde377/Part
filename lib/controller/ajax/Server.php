@@ -27,18 +27,21 @@ interface Server {
 
     /**
      * @param string $input
+     * @param string $token
      * @return Response
      */
-    public function handleFromJSONString($input);
+    public function handleFromJSONString($input, $token = null);
 
     /**
      * @param string $input
+     * @param string $token
      * @return Response
      */
-    public function handleFromFunctionString($input);
+    public function handleFromFunctionString($input, $token = null);
 
     /**
+     * @param string $token
      * @return Response
      */
-    public function handleFromRequestBody();
+    public function handleFromRequestBody($token = null);
 } 

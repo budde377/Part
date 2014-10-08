@@ -188,32 +188,18 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue($loggedIn === $user, 'Did not return logged in user');
     }
 
-    /**
-     * public function testGetLoggedInWillReturnLoggedInWithLoginDoneOnInstanceNIL(){
-     * $password = 'somePassword';
-     * $user = new UserImpl('user1',$this->db);
-     * $ret = $user->setPassword($password);
-     * $this->assertTrue($ret,'Could not set password');
-     * $ret = $user->login($password);
-     * $this->assertTrue($ret,'Could not log in');
-     *
-     * $loggedIn = $this->library->getUserLoggedIn();
-     * $this->assertEquals($user->getUsername(),$loggedIn->getUsername(),'Usernames did not match');
-     * }
-     **/
+
     public function testGetLoggedInWillReturnNullWithUserLoggedOut()
     {
         $password = 'somePassword';
-        $user = new UserImpl('user1', $this->db);
-        $ret = $user->setPassword($password);
-        $this->assertTrue($ret, 'Could not set password');
-        $ret = $user->login($password);
-        $this->assertTrue($ret, 'Could not log in');
-        $ret = $user->logout();
-        $this->assertTrue($ret, 'Did not log out');
-
-        $loggedIn = $this->library->getUserLoggedIn();
-        $this->assertNull($loggedIn, 'Was not null');
+        $list = $this->library->listUsers();
+        /** @var $user \ChristianBudde\cbweb\model\user\User */
+        $user = $list[1];
+        $user->setPassword($password);
+        $user->login($password);
+        $this->assertTrue($user === $this->library->getUserLoggedIn());
+        $user->logout();
+        $this->assertNull($this->library->getUserLoggedIn(), 'Was not null');
     }
 
     public function testDeleteOnObjectWillReflectInList()
@@ -312,6 +298,7 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue($user->login($password));
         $token = $this->library->getUserSessionToken();
         $user->logout();
+        sleep(1);
         $this->assertTrue($user->login($password));
         $this->assertNotNull($token2 = $this->library->getUserSessionToken());
         $this->assertNotEquals($token, $token2);
