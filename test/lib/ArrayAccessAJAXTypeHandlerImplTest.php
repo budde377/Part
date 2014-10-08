@@ -7,17 +7,17 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\ajax\ArrayAccessAJAXTypeHandlerImpl;
+use ChristianBudde\cbweb\controller\ajax\ArrayAccessTypeHandlerImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
-use ChristianBudde\cbweb\controller\function_string\FunctionStringParserImpl;
+use ChristianBudde\cbweb\controller\function_string\ParserImpl;
 use PHPUnit_Framework_TestCase;
 
 class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase
 {
 
-    /** @var  \ChristianBudde\cbweb\controller\ajax\ArrayAccessAJAXTypeHandlerImpl */
+    /** @var  \ChristianBudde\cbweb\controller\ajax\ArrayAccessTypeHandlerImpl */
     private $handler;
-    /** @var  \ChristianBudde\cbweb\controller\function_string\FunctionStringParser */
+    /** @var  \ChristianBudde\cbweb\controller\function_string\Parser */
     private $parser;
     /** @var  JSONFunction */
     private $function;
@@ -25,8 +25,8 @@ class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->handler = new ArrayAccessAJAXTypeHandlerImpl();
-        $this->parser = new FunctionStringParserImpl();
+        $this->handler = new ArrayAccessTypeHandlerImpl();
+        $this->parser = new ParserImpl();
         $this->function = $this->parser->parseFunctionString("POST.arrayAccess('id')");
     }
 

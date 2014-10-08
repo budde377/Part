@@ -7,7 +7,7 @@ namespace ChristianBudde\cbweb\view\html;
  * Date: 19/01/13
  * Time: 17:01
  */
-interface HTMLOptionElement extends HTMLElement
+interface OptionElement extends Element
 {
 
     /**

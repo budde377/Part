@@ -9,15 +9,15 @@ use ChristianBudde\cbweb\controller\json\Response;
  * Time: 11:20 AM
  */
 
-interface AJAXServer {
+interface Server {
 
     /**
      * Registers a AJAX type.
-     * @param AJAXTypeHandler $type
+     * @param TypeHandler $type
      * @return void
      */
 
-    public function registerHandler(AJAXTypeHandler $type);
+    public function registerHandler(TypeHandler $type);
 
     /**
      * Registers the handlers from config.

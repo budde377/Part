@@ -16,7 +16,7 @@ use ChristianBudde\cbweb\controller\json\NullTargetImpl;
  * Date: 8/30/14
  * Time: 5:08 PM
  */
-class FunctionStringParserImpl implements FunctionStringParser
+class ParserImpl implements Parser
 {
 
     private $lNumPattern;

@@ -13,7 +13,7 @@ namespace ChristianBudde\cbweb\controller\function_string;
  * Date: 8/30/14
  * Time: 5:08 PM
  */
-interface FunctionStringParser
+interface Parser
 {
     /**
      * @param $input

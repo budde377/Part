@@ -8,17 +8,17 @@
 namespace ChristianBudde\cbweb\controller\ajax;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
 
-class ArrayAccessAJAXTypeHandlerImpl implements AJAXTypeHandler{
+class ArrayAccessTypeHandlerImpl implements TypeHandler{
     public $arrays;
 
     /**
      * Sets up the type handler for provided type.
      * This should be called for each registered type.
-     * @param AJAXServer $server The server which is setting-up the handler
+     * @param Server $server The server which is setting-up the handler
      * @param string $type The type currently being set-up
      * @return void
      */
-    public function setUp(AJAXServer $server, $type)
+    public function setUp(Server $server, $type)
     {
 
     }

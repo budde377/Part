@@ -12,7 +12,7 @@ use \Twig_Node;
  * Time: 9:13 PM
  */
 
-class TemplateInitPageElementTwigTokenParserImpl extends Twig_TokenParser
+class InitPageElementTwigTokenParserImpl extends Twig_TokenParser
 {
 
     /**
@@ -32,7 +32,7 @@ class TemplateInitPageElementTwigTokenParserImpl extends Twig_TokenParser
             $nameArray[] = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
         }
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
-        return new TemplateInitPageElementTwigNodeImpl($nameArray, $token->getLine(), $this->getTag());
+        return new InitPageElementTwigNodeImpl($nameArray, $token->getLine(), $this->getTag());
     }
 
     /**

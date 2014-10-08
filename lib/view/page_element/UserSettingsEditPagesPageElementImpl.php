@@ -3,8 +3,8 @@ namespace ChristianBudde\cbweb\view\page_element;
 use ChristianBudde\cbweb\BackendSingletonContainer;
 use ChristianBudde\cbweb\model\page\Page;
 use ChristianBudde\cbweb\model\page\PageOrder;
-use ChristianBudde\cbweb\view\html\HTMLFormElement;
-use ChristianBudde\cbweb\view\html\HTMLFormElementImpl;
+use ChristianBudde\cbweb\view\html\FormElement;
+use ChristianBudde\cbweb\view\html\FormElementImpl;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -81,7 +81,7 @@ class UserSettingsEditPagesPageElementImpl extends PageElementImpl
 
         if($levelClass == 'draggable'){
 
-            $form = new HTMLFormElementImpl(HTMLFormElement::FORM_METHOD_POST);
+            $form = new FormElementImpl(FormElement::FORM_METHOD_POST);
             $form->setAttributes("class","oneLineForm");
             $form->setAttributes("id","EditPagesForm");
             $form->insertInputText("title","EditPagesAddPage","","Side titel");
@@ -142,10 +142,10 @@ class UserSettingsEditPagesPageElementImpl extends PageElementImpl
                 $newId = $id;
                 $p->setTitle($title);
                 $p->setTemplate('main');
-                $status = HTMLFormElement::NOTION_TYPE_SUCCESS;
+                $status = FormElement::NOTION_TYPE_SUCCESS;
                 return true;
             }
-            $status = HTMLFormElement::NOTION_TYPE_ERROR;
+            $status = FormElement::NOTION_TYPE_ERROR;
             return true;
         }
         return false;
@@ -155,9 +155,9 @@ class UserSettingsEditPagesPageElementImpl extends PageElementImpl
         if(isset($_POST['deletePageFromPages'],$_POST['id'])){
             $id = trim($_POST['id']);
             if(($p = $this->pageOrder->getPage($id)) != null && $this->pageOrder->deletePage($p)){
-                $status = HTMLFormElement::NOTION_TYPE_SUCCESS;
+                $status = FormElement::NOTION_TYPE_SUCCESS;
             } else {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
             }
             return true;
         }
@@ -170,9 +170,9 @@ class UserSettingsEditPagesPageElementImpl extends PageElementImpl
             $id = trim($_POST['id']);
             if(($p = $this->pageOrder->getPage($id)) != null && !$this->pageOrder->isActive($p)){
                 $this->pageOrder->setPageOrder($p);
-                $status = HTMLFormElement::NOTION_TYPE_SUCCESS;
+                $status = FormElement::NOTION_TYPE_SUCCESS;
             } else {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
             }
             return true;
         }
@@ -185,9 +185,9 @@ class UserSettingsEditPagesPageElementImpl extends PageElementImpl
             $id = trim($_POST['id']);
             if(($p = $this->pageOrder->getPage($id)) != null && $this->pageOrder->isActive($p)){
                 $this->pageOrder->deactivatePage($p);
-                $status = HTMLFormElement::NOTION_TYPE_SUCCESS;
+                $status = FormElement::NOTION_TYPE_SUCCESS;
             } else {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
             }
             return true;
         }

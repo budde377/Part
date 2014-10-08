@@ -8,7 +8,7 @@ namespace ChristianBudde\cbweb\view\html;
  * Date: 25/07/12
  * Time: 14:53
  */
-interface HTMLFormElement extends HTMLElement
+interface FormElement extends Element
 {
     const FORM_METHOD_GET = 'get';
     const FORM_METHOD_POST = 'post';
@@ -24,7 +24,7 @@ interface HTMLFormElement extends HTMLElement
      * @param string $method
      * @return void
      */
-    public function setMethod($method = HTMLFormElementImpl::FORM_METHOD_GET);
+    public function setMethod($method = FormElementImpl::FORM_METHOD_GET);
 
     /**
      * @abstract Sets the action of the form, default is #
@@ -41,7 +41,7 @@ interface HTMLFormElement extends HTMLElement
      * @param string $type
      * @return void
      */
-    public function setNotion($notion,$type=HTMLFormElementImpl::NOTION_TYPE_INFORMATION);
+    public function setNotion($notion,$type=FormElementImpl::NOTION_TYPE_INFORMATION);
 
     /**
      * @abstract
@@ -51,7 +51,7 @@ interface HTMLFormElement extends HTMLElement
      * @param string $id
      * @param string $label
      * @param array $attributes
-     * @return HTMLElement
+     * @return Element
      */
     public function insertInputText($name,$id,$value= '',$label='',array $attributes = array());
     //TODO add validation entry?
@@ -64,7 +64,7 @@ interface HTMLFormElement extends HTMLElement
      * @param string $id
      * @param string $label
      * @param array $attributes
-     * @return HTMLElement
+     * @return Element
      */
     public function insertInputPassword($name,$id,$value='',$label='',array $attributes = array());
 
@@ -73,7 +73,7 @@ interface HTMLFormElement extends HTMLElement
      * @param string $value
      * @param string $name
      * @param array $attributes
-     * @return HTMLElement
+     * @return Element
      */
     public function insertInputHidden($name,$value,array $attributes = array());
 
@@ -85,7 +85,7 @@ interface HTMLFormElement extends HTMLElement
      * @param string $id
      * @param string $label
      * @param array $attributes
-     * @return HTMLElement
+     * @return Element
      */
     public function insertTextArea($name,$id,$value='',$label='',array $attributes = array());
 
@@ -94,7 +94,7 @@ interface HTMLFormElement extends HTMLElement
      * Will insert an input submit
      * @param string $value
      * @param array $attributes
-     * @return HTMLElement
+     * @return Element
      */
     public function insertInputSubmit($value,array $attributes = array());
 
@@ -104,7 +104,7 @@ interface HTMLFormElement extends HTMLElement
      * @param string $id
      * @param string $label
      * @param array $attributes
-     * @return HTMLElement
+     * @return Element
      */
     public function insertInputFileUpload($name,$id,$label='',array $attributes= array());
 
@@ -115,7 +115,7 @@ interface HTMLFormElement extends HTMLElement
      * @param string $label
      * @param null $select
      * @param array $attributes
-     * @return HTMLSelectElement
+     * @return SelectElement
      */
     public function insertSelect($name,$id,$label = '',&$select = null, array $attributes = array());
 
@@ -127,7 +127,7 @@ interface HTMLFormElement extends HTMLElement
      * @param string $value
      * @param string $label
      * @param array $attributes
-     * @return HTMLElement
+     * @return Element
      */
     public function insertCheckbox($name,$id,$value = '', $label = '', array $attributes = array());
 
@@ -138,7 +138,7 @@ interface HTMLFormElement extends HTMLElement
      * @param string $value
      * @param string $label
      * @param array $attributes
-     * @return HTMLElement
+     * @return Element
      */
     public function insertRadioButton($name,$id,$value = '', $label = '', array $attributes = array());
 }

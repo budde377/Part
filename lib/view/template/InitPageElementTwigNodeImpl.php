@@ -9,7 +9,7 @@ use \Twig_Compiler;
  * Time: 9:14 PM
  */
 
-class TemplateInitPageElementTwigNodeImpl extends Twig_Node
+class InitPageElementTwigNodeImpl extends Twig_Node
 {
 
 

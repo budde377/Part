@@ -1,7 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\function_string\FunctionStringParserImpl;
+use ChristianBudde\cbweb\controller\function_string\ParserImpl;
 use ChristianBudde\cbweb\controller\json\Type;
 use ChristianBudde\cbweb\controller\json\NullTargetImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
@@ -19,7 +19,7 @@ use PHPUnit_Framework_TestCase;
 class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
 {
 
-    /** @var  FunctionStringParserImpl */
+    /** @var  ParserImpl */
     private $parser;
 
     private $validName = "Some_name89";
@@ -28,7 +28,7 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->nullTarget = new NullTargetImpl();
-        $this->parser = new FunctionStringParserImpl();
+        $this->parser = new ParserImpl();
     }
 
 

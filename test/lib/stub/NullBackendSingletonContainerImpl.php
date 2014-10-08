@@ -44,7 +44,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * This will return an ajax register, and reuse it from time to time
-     * @return \ChristianBudde\cbweb\controller\ajax\AJAXServer
+     * @return \ChristianBudde\cbweb\controller\ajax\Server
      */
     public function getAJAXServerInstance()
     {

@@ -27,12 +27,12 @@ class TemplateTwigExtensionImpl extends  Twig_Extension{
 
     public function getTokenParsers()
     {
-        return array(new TemplatePageElementTwigTokenParserImpl(),
-                     new TemplateInitPageElementTwigTokenParserImpl(),
-                     new TemplatePageContentTwigTokenParserImpl(),
-                     new TemplateSiteContentTwigTokenParserImpl(),
-                     new TemplateSiteVariableTwigTokenParserImpl(),
-                     new TemplatePageVariableTwigTokenParserImpl());
+        return array(new PageElementTwigTokenParserImpl(),
+                     new InitPageElementTwigTokenParserImpl(),
+                     new PageContentTwigTokenParserImpl(),
+                     new SiteContentTwigTokenParserImpl(),
+                     new SiteVariableTwigTokenParserImpl(),
+                     new PageVariableTwigTokenParserImpl());
     }
 
 

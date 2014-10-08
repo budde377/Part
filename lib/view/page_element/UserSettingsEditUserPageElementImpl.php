@@ -2,8 +2,8 @@
 namespace ChristianBudde\cbweb\view\page_element;
 
 use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\view\html\HTMLFormElement;
-use ChristianBudde\cbweb\view\html\HTMLFormElementImpl;
+use ChristianBudde\cbweb\view\html\FormElement;
+use ChristianBudde\cbweb\view\html\FormElementImpl;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -33,7 +33,7 @@ class UserSettingsEditUserPageElementImpl extends PageElementImpl
         parent::generateContent();
         $output = "
         <h3>Rediger brugernavn og e-mail</h3>";
-        $userNameMailForm = new HTMLFormElementImpl(HTMLFormElement::FORM_METHOD_POST);
+        $userNameMailForm = new FormElementImpl(FormElement::FORM_METHOD_POST);
         if ($this->evaluateUsernameForm($status, $message)) {
             $userNameMailForm->setNotion($message, $status);
         }
@@ -46,7 +46,7 @@ class UserSettingsEditUserPageElementImpl extends PageElementImpl
         $output .= "
         <h3>Rediger kodeord</h3>";
 
-        $passwordForm = new HTMLFormElementImpl(HTMLFormElement::FORM_METHOD_POST);
+        $passwordForm = new FormElementImpl(FormElement::FORM_METHOD_POST);
         if ($this->evaluatePasswordForm($status, $message)) {
             $passwordForm->setNotion($message, $status);
         }
@@ -68,18 +68,18 @@ class UserSettingsEditUserPageElementImpl extends PageElementImpl
             $username = trim($_POST['username']);
             $mail = trim($_POST['mail']);
             if (!$this->currentUser->isValidMail($mail)) {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
                 $message = "Ugyldig E-mail";
                 return true;
             }
 
             if ($username != $this->currentUser->getUsername() && !$this->currentUser->isValidUsername($username)) {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
                 $message = "Ugyldig Brugernavn";
             } else {
                 $this->currentUser->setUsername($username);
                 $this->currentUser->setMail($mail);
-                $status = HTMLFormElement::NOTION_TYPE_SUCCESS;
+                $status = FormElement::NOTION_TYPE_SUCCESS;
                 $message = "Ændringerne er gemt";
             }
             return true;
@@ -95,22 +95,22 @@ class UserSettingsEditUserPageElementImpl extends PageElementImpl
             $newPassword = $_POST['new_password'];
             $newPasswordRepeat = $_POST['new_password_repeat'];
             if (!$this->currentUser->verifyLogin($oldPassword)) {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
                 $message = "Forkert gammelt kodeord";
                 return true;
             }
             if (!$this->currentUser->isValidPassword($newPassword)) {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
                 $message = "Dit nye kodeord er ugyldigt";
                 return true;
             }
 
             if ($newPassword == $newPasswordRepeat) {
                 $this->currentUser->setPassword($newPassword);
-                $status = HTMLFormElement::NOTION_TYPE_SUCCESS;
+                $status = FormElement::NOTION_TYPE_SUCCESS;
                 $message = "Dit kodeord er ændret";
             } else {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
                 $message = "Nye kodeord var ikke ens";
             }
 

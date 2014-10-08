@@ -8,7 +8,7 @@ use \Twig_Compiler;
  * Date: 10/23/13
  * Time: 7:57 PM
  */
-class TemplatePageElementTwigNodeImpl extends Twig_Node
+class PageElementTwigNodeImpl extends Twig_Node
 {
 
     /**

@@ -12,7 +12,7 @@ use \Twig_Token;
 use \Twig_Node;
 use \Twig_Error_Syntax;
 
-class TemplateSiteVariableTwigTokenParserImpl extends Twig_TokenParser{
+class SiteVariableTwigTokenParserImpl extends Twig_TokenParser{
 
     /**
      * Parses a token and returns a node.
@@ -28,7 +28,7 @@ class TemplateSiteVariableTwigTokenParserImpl extends Twig_TokenParser{
         $stream = $this->parser->getStream();
         $name = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
-        return new TemplateSiteVariableTwigNodeImpl($token->getLine(), $this->getTag(), $name);
+        return new SiteVariableTwigNodeImpl($token->getLine(), $this->getTag(), $name);
     }
 
     /**

@@ -7,10 +7,10 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\ajax\AJAXTypeHandler;
+use ChristianBudde\cbweb\controller\ajax\TypeHandler;
 use ChristianBudde\cbweb\controller\json\Element;
-use ChristianBudde\cbweb\controller\ajax\GenericObjectAJAXTypeHandlerImpl;
-use ChristianBudde\cbweb\controller\function_string\FunctionStringParserImpl;
+use ChristianBudde\cbweb\controller\ajax\GenericObjectTypeHandlerImpl;
+use ChristianBudde\cbweb\controller\function_string\ParserImpl;
 use ChristianBudde\cbweb\controller\json\Object;
 use ChristianBudde\cbweb\controller\json\ObjectImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
@@ -25,11 +25,11 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
 
     /** @var  Element */
     private $object;
-    /** @var  GenericObjectAJAXTypeHandlerImpl */
+    /** @var  GenericObjectTypeHandlerImpl */
     private $handler;
 
     private $nullAJAXServer;
-    /** @var  FunctionStringParserImpl */
+    /** @var  ParserImpl */
     private $parser;
     private $falseFunction;
     private $trueFunction;
@@ -38,9 +38,9 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
     {
 
         $this->object = new ObjectImpl('someObject');
-        $this->handler = new GenericObjectAJAXTypeHandlerImpl($this->object);
+        $this->handler = new GenericObjectTypeHandlerImpl($this->object);
         $this->nullAJAXServer = new stub\NullAJAXServerImpl();
-        $this->parser = new FunctionStringParserImpl();
+        $this->parser = new ParserImpl();
         $this->falseFunction = function () {
             return false;
         };
@@ -101,7 +101,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
     public function testWhitelistTypeOfExistingTypeDoesWhitelistMultipleFromConstructor()
     {
 
-        $handler = new GenericObjectAJAXTypeHandlerImpl($this->object, "Element", "Object");
+        $handler = new GenericObjectTypeHandlerImpl($this->object, "Element", "Object");
 
         $list = $handler->listTypes();
         $this->assertEquals(4, count($list));
@@ -367,7 +367,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleCallsWithRightArguments()
     {
-        $handler = new GenericObjectAJAXTypeHandlerImpl($h = new StubAJAXTypeHandlerImpl());
+        $handler = new GenericObjectTypeHandlerImpl($h = new StubAJAXTypeHandlerImpl());
         $handler->setUp(new NullAJAXServerImpl(), 'AJAXTypeHandler');
         /** @var JSONFunction $f */
         $f = $this->parser->parseFunctionString('AJAXTypeHandler.hasType("asd",123)');
@@ -548,7 +548,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
     public function testNonTypeStringToConstructorAddsNoFunctions()
     {
 
-        $handler = new GenericObjectAJAXTypeHandlerImpl("NotARealType");
+        $handler = new GenericObjectTypeHandlerImpl("NotARealType");
         $this->assertTrue($handler->hasType('NotARealType'));
         $this->assertEquals(0, count($handler->listFunctions('NotARealType')));
 
@@ -556,7 +556,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
 
     public function testStringToConstructorDoesNotAddDefaultInstance()
     {
-        $handler = new GenericObjectAJAXTypeHandlerImpl("ChristianBudde\\cbweb\\model\\user\\User");
+        $handler = new GenericObjectTypeHandlerImpl("ChristianBudde\\cbweb\\model\\user\\User");
         $this->assertTrue($handler->hasType("ChristianBudde\\cbweb\\model\\user\\User"));
         $this->assertTrue($handler->hasType("User"));
         $handler->setUp(new NullAJAXServerImpl(), 'User');
@@ -572,7 +572,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
 
     public function testStringToConstructorCanCallCustomFunctions()
     {
-        $handler = new GenericObjectAJAXTypeHandlerImpl("ChristianBudde\\cbweb\\model\\user\\User");
+        $handler = new GenericObjectTypeHandlerImpl("ChristianBudde\\cbweb\\model\\user\\User");
         $this->assertTrue($handler->hasType("User"));
         $handler->setUp(new NullAJAXServerImpl(), 'User');
         $args = [];
@@ -603,10 +603,10 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
 
     public function testStringOfActualTypeDoesAddTypesAndFunctions()
     {
-        $handler = new GenericObjectAJAXTypeHandlerImpl("ChristianBudde\\cbweb\\controller\\json\\Object");
+        $handler = new GenericObjectTypeHandlerImpl("ChristianBudde\\cbweb\\controller\\json\\Object");
         $this->assertTrue($handler->hasType("Element"));
 
-        $handler = new GenericObjectAJAXTypeHandlerImpl("ChristianBudde\\cbweb\\controller\\json\\Object");
+        $handler = new GenericObjectTypeHandlerImpl("ChristianBudde\\cbweb\\controller\\json\\Object");
         $this->assertTrue($handler->hasType("Element"));
 
 
@@ -614,7 +614,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
 
     public function testSetUpBogusElementIsOk()
     {
-        $handler = new GenericObjectAJAXTypeHandlerImpl("NonExistingObject");
+        $handler = new GenericObjectTypeHandlerImpl("NonExistingObject");
         $this->setUpHandler($handler);
 
     }
@@ -715,7 +715,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
     public function testCanCallFunctionOnObjectWithoutFunctions()
     {
 
-        $handler = new GenericObjectAJAXTypeHandlerImpl("JSONProgram");
+        $handler = new GenericObjectTypeHandlerImpl("JSONProgram");
         $this->setUpHandler($handler);
         $handler->addFunction('JSONProgram', 'custom', function (array $a) {
         });
@@ -726,7 +726,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
 
 
 
-    private function setUpHandler(AJAXTypeHandler $handler)
+    private function setUpHandler(TypeHandler $handler)
     {
         foreach ($handler->listTypes() as $type) {
             $handler->setUp($this->nullAJAXServer, $type);

@@ -2,8 +2,8 @@
 
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\ajax\AJAXServerImpl;
-use ChristianBudde\cbweb\controller\function_string\FunctionStringParserImpl;
+use ChristianBudde\cbweb\controller\ajax\ServerImpl;
+use ChristianBudde\cbweb\controller\function_string\ParserImpl;
 use ChristianBudde\cbweb\controller\json\ObjectImpl;
 use ChristianBudde\cbweb\controller\json\Response;
 use ChristianBudde\cbweb\controller\json\ResponseImpl;
@@ -25,7 +25,7 @@ use ChristianBudde\cbweb\test\stub\StubPageContentImpl;
  */
 class AJAXServerImplTest extends PHPUnit_Framework_TestCase
 {
-    /** @var  \ChristianBudde\cbweb\controller\ajax\AJAXServerImpl */
+    /** @var  \ChristianBudde\cbweb\controller\ajax\ServerImpl */
     private $server;
     /** @var  StubConfigImpl */
     private $config;
@@ -33,17 +33,17 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
     /** @var  \ChristianBudde\cbweb\test\stub\StubAJAXTypeHandlerImpl */
     private $handler1;
     private $handler2;
-    /** @var  FunctionStringParserImpl */
+    /** @var  ParserImpl */
     private $functionStringParser;
 
     protected function setUp()
     {
         $this->backendContainer = new StubBackendSingletonContainerImpl();
         $this->backendContainer->setConfigInstance($this->config = new StubConfigImpl());
-        $this->server = new AJAXServerImpl($this->backendContainer);
+        $this->server = new ServerImpl($this->backendContainer);
         $this->handler1 = new StubAJAXTypeHandlerImpl();
         $this->handler2 = new StubAJAXTypeHandlerImpl();
-        $this->functionStringParser = new FunctionStringParserImpl();
+        $this->functionStringParser = new ParserImpl();
     }
 
 

@@ -8,16 +8,16 @@ namespace ChristianBudde\cbweb\view\html;
  * Date: 31/08/12
  * Time: 21:46
  */
-class HTMLSelectElementImpl implements HTMLSelectElement
+class SelectElementImpl implements SelectElement
 {
 
-    /** @var  HTMLElement */
+    /** @var  Element */
     private $element;
     private $groups = array();
 
     public function __construct($name, $id, $multiple = false, $size = 1, $disabled = false)
     {
-        $this->element = new HTMLElementImpl('select',array('name'=>$name,'id'=>$id,'size'=>$size));
+        $this->element = new ElementImpl('select',array('name'=>$name,'id'=>$id,'size'=>$size));
         if($multiple){
             $this->element->setAttributes('multiple','multiple');
         }
@@ -56,10 +56,10 @@ class HTMLSelectElementImpl implements HTMLSelectElement
 
     /**
      * Inserts an XHTML Element
-     * @param HTMLElement $element
+     * @param Element $element
      * @return void
      */
-    public function insertHTMLElement(HTMLElement $element)
+    public function insertHTMLElement(Element $element)
     {
         $this->element->insertHTMLElement($element);
     }
@@ -88,13 +88,13 @@ class HTMLSelectElementImpl implements HTMLSelectElement
      * @param string $value
      * @param string $group_id
      * @param array $attributes
-     * @return HTMLOptionElement
+     * @return OptionElement
      */
     public function insertOption($text, $value, $group_id = null, array $attributes = array())
     {
-        $option = new HTMLOptionElementImpl($text,$value,$group_id,$attributes);	
+        $option = new OptionElementImpl($text,$value,$group_id,$attributes);
         if($group_id != null && isset($this->groups[$group_id])){
-            /** @var $group HTMLElement */
+            /** @var $group Element */
             $group = $this->groups[$group_id];
             $group->insertHTMLElement($option);
         } else {
@@ -106,11 +106,11 @@ class HTMLSelectElementImpl implements HTMLSelectElement
     /**
      * @param $id
      * @param string $label
-     * @return HTMLElement
+     * @return Element
      */
     public function insertOptionGroup($id, $label)
     {
-        $group = new HTMLElementImpl('optgroup',array('label'=>$label));
+        $group = new ElementImpl('optgroup',array('label'=>$label));
         $this->groups[$id] = $group;
         $this->element->insertHTMLElement($group);
         return $group;

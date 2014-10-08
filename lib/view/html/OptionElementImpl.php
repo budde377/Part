@@ -8,13 +8,13 @@ namespace ChristianBudde\cbweb\view\html;
  * Date: 19/01/13
  * Time: 17:00
  */
-class HTMLOptionElementImpl implements HTMLOptionElement
+class OptionElementImpl implements OptionElement
 {
     private $element;
 
     function __construct($text,$value,$group_id = null,$attributes = array())
     {
-        $this->element = new HTMLElementImpl("option",$attributes);
+        $this->element = new ElementImpl("option",$attributes);
         $this->element->setAttributes("value",$value);
         $this->element->insertString($text);
     }
@@ -49,10 +49,10 @@ class HTMLOptionElementImpl implements HTMLOptionElement
 
     /**
      * Inserts an XHTML Element
-     * @param HTMLElement $element
+     * @param Element $element
      * @return void
      */
-    public function insertHTMLElement(HTMLElement $element)
+    public function insertHTMLElement(Element $element)
     {
         $this->element->insertHTMLElement($element);
     }

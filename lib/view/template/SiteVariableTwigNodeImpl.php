@@ -9,7 +9,7 @@ namespace ChristianBudde\cbweb\view\template;
 use \Twig_Node;
 use \Twig_Compiler;
 
-class TemplateSiteVariableTwigNodeImpl extends Twig_Node{
+class SiteVariableTwigNodeImpl extends Twig_Node{
     /**
      * @param int $line
      * @param int $tag

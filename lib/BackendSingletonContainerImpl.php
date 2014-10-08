@@ -1,7 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb;
-use ChristianBudde\cbweb\controller\ajax\AJAXServer;
-use ChristianBudde\cbweb\controller\ajax\AJAXServerImpl;
+use ChristianBudde\cbweb\controller\ajax\Server;
+use ChristianBudde\cbweb\controller\ajax\ServerImpl;
 use ChristianBudde\cbweb\util\CacheControl;
 use ChristianBudde\cbweb\util\CacheControlImpl;
 use ChristianBudde\cbweb\util\file\CSSRegister;
@@ -51,7 +51,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $cssRegister = null;
     /** @var $jsRegister null | JSRegister */
     private $jsRegister;
-    /** @var null | AJAXServer */
+    /** @var null | Server */
     private $ajaxServer;
     /** @var $pageOrder null | PageOrder */
     private $pageOrder;
@@ -120,12 +120,12 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
 
     /**
      * This will return an ajax register, and reuse it from time to time
-     * @return AJAXServerImpl
+     * @return ServerImpl
      */
     public function getAJAXServerInstance()
     {
         if ($this->ajaxServer === null) {
-            $this->ajaxServer = new AJAXServerImpl($this);
+            $this->ajaxServer = new ServerImpl($this);
         }
         return $this->ajaxServer;
     }

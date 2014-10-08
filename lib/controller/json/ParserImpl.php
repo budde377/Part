@@ -8,7 +8,7 @@ namespace ChristianBudde\cbweb\controller\json;
  * Time: 2:00 PM
  */
 
-class JSONParserImpl implements JSONParser{
+class ParserImpl implements Parser{
 
     /**
      * @param string $input

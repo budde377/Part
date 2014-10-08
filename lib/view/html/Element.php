@@ -5,7 +5,7 @@ namespace ChristianBudde\cbweb\view\html;/**
  * Date: 25/07/12
  * Time: 14:52
  */
-interface HTMLElement
+interface Element
 {
     /**
      * @abstract
@@ -31,10 +31,10 @@ interface HTMLElement
     /**
      * @abstract
      * Inserts an XHTML Element
-     * @param HTMLElement $element
+     * @param Element $element
      * @return void
      */
-    public function insertHTMLElement(HTMLElement $element);
+    public function insertHTMLElement(Element $element);
 
     /**
      * @abstract
