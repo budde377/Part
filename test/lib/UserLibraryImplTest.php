@@ -188,6 +188,19 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue($loggedIn === $user, 'Did not return logged in user');
     }
 
+    public function testGetLoggedInWillReturnLoggedInWithUserLoggedInNotInInstance()
+    {
+        $user = new UserImpl('user1', $this->db);
+        $user->setPassword($password = "SomePass");
+        $this->assertTrue($user->login($password));
+        $this->assertTrue($user->exists());
+        $this->assertTrue($user->isLoggedIn());
+
+        $this->library = new UserLibraryImpl($this->db);
+        $loggedIn = $this->library->getUserLoggedIn();
+        $this->assertTrue($loggedIn->getUsername() == $user->getUsername(), 'Did not return logged in user');
+    }
+
 
     public function testGetLoggedInWillReturnNullWithUserLoggedOut()
     {

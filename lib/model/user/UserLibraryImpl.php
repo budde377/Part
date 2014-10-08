@@ -31,6 +31,7 @@ class UserLibraryImpl implements UserLibrary, Observer
         $this->connection = $database->getConnection();
         $this->initializeLibrary();
         $this->setUpIterator();
+        $this->setUpUserLoggedIn();
     }
 
 
@@ -114,6 +115,7 @@ class UserLibraryImpl implements UserLibrary, Observer
      */
     public function getUserLoggedIn()
     {
+
         if($this->userLoggedIn == null){
             return null;
         }
@@ -291,5 +293,16 @@ class UserLibraryImpl implements UserLibrary, Observer
     public function verifyUserSessionToken($token)
     {
         return ($t = $this->getUserSessionToken()) == null || $t == $token;
+    }
+
+    private function setUpUserLoggedIn()
+    {
+        foreach($this->userList as $user){
+            /** @var $user User */
+            if($user->isLoggedIn()){
+                $this->userLoggedIn = $user;
+                return;
+            }
+        }
     }
 }
