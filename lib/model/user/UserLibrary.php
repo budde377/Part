@@ -68,4 +68,22 @@ interface UserLibrary extends Iterator, JSONObjectSerializable
      * @return array Array containing children User instances. Empty array on no children or input not valid.
      */
     public function getChildren(User $user);
+
+
+    /**
+     * Returns the current user settings token.
+     * If no user is logged in, the token will be null.
+     *
+     * @return string
+     */
+    public function getUserSessionToken();
+
+
+    /**
+     * Will compare the tokens. If no user is logged in all tokens are equally valid. I.e. valid.
+     * @param string $token
+     * @return string
+     */
+    public function verifyUserSessionToken($token);
+
 }

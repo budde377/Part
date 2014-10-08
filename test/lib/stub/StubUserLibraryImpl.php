@@ -175,4 +175,23 @@ class StubUserLibraryImpl implements UserLibrary
     {
         return $this->jsonObjectSerialize()->jsonSerialize();
     }
+
+    /**
+     * Returns the current user settings token.
+     * If no user is logged in, the token will be null.
+     *
+     * @return string
+     */
+    public function getUserSessionToken()
+    {
+    }
+
+    /**
+     * Will compare the tokens. If no user is logged in all tokens are equally valid. I.e. valid.
+     * @param string $token
+     * @return string
+     */
+    public function verifyUserSessionToken($token)
+    {
+    }
 }

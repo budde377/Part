@@ -54,9 +54,11 @@ class WebsiteImpl implements Website
         $template->setTemplateFromConfig($currentPage->getTemplate(), "_main");
 
         $ajaxServer = $this->backendContainer->getAJAXServerInstance();
-        if (($id = $this->GETValueOfIndexIfSetElseDefault('ajax', null)) !== null &&
+        $id = null;
+        if (
             (!isset($_SESSION['user-login-token']) ||
-                $_SESSION['user-login-token'] == $this->GETValueOfIndexIfSetElseDefault('token', null))
+                $_SESSION['user-login-token'] == $this->GETValueOfIndexIfSetElseDefault('token', null)) &&
+            ($id = $this->GETValueOfIndexIfSetElseDefault('ajax', null)) !== null
         ) {
             $template->onlyInitialize();
             $ajaxServer->registerHandlersFromConfig();

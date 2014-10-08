@@ -268,4 +268,25 @@ class UserLibraryImpl implements UserLibrary, Observer
     {
         return $this->jsonObjectSerialize()->jsonSerialize();
     }
+
+    /**
+     * Returns the current user settings token.
+     * If no user is logged in, the token will be null.
+     *
+     * @return string
+     */
+    public function getUserSessionToken()
+    {
+        // TODO: Implement getUserSessionToken() method.
+    }
+
+    /**
+     * Will compare the tokens. If no user is logged in all tokens are equally valid. I.e. valid.
+     * @param string $token
+     * @return string
+     */
+    public function verifyUserSessionToken($token)
+    {
+        // TODO: Implement verifyUserSessionToken() method.
+    }
 }
