@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb;
+
 use ChristianBudde\cbweb\util\traits\RequestTrait;
 
 use ChristianBudde\cbweb\view\template\TemplateImpl;
@@ -53,7 +54,10 @@ class WebsiteImpl implements Website
         $template->setTemplateFromConfig($currentPage->getTemplate(), "_main");
 
         $ajaxServer = $this->backendContainer->getAJAXServerInstance();
-        if (($id = $this->GETValueOfIndexIfSetElseDefault('ajax', null)) !== null) {
+        if (($id = $this->GETValueOfIndexIfSetElseDefault('ajax', null)) !== null &&
+            (!isset($_SESSION['user-login-token']) ||
+                $_SESSION['user-login-token'] == $this->GETValueOfIndexIfSetElseDefault('token', null))
+        ) {
             $template->onlyInitialize();
             $ajaxServer->registerHandlersFromConfig();
         }

@@ -10,7 +10,7 @@ use \Twig_TokenParser;
 use \Twig_Token;
 use \Twig_Node;
 
-class TemplatePageContentTwigTokenParserImpl extends Twig_TokenParser
+class PageContentTwigTokenParserImpl extends Twig_TokenParser
 {
 
     /**
@@ -42,7 +42,7 @@ class TemplatePageContentTwigTokenParserImpl extends Twig_TokenParser
 
 
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
-        return new TemplatePageContentTwigNodeImpl($token->getLine(), $this->getTag(), $page_id, $id);
+        return new PageContentTwigNodeImpl($token->getLine(), $this->getTag(), $page_id, $id);
     }
 
     /**

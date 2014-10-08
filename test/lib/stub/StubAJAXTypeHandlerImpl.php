@@ -1,7 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde\cbweb\controller\ajax\AJAXServer;
-use ChristianBudde\cbweb\controller\ajax\AJAXTypeHandler;
+use ChristianBudde\cbweb\controller\ajax\Server;
+use ChristianBudde\cbweb\controller\ajax\TypeHandler;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
 
 /**
@@ -11,7 +11,7 @@ use ChristianBudde\cbweb\controller\json\JSONFunction;
  * Time: 3:46 PM
  */
 
-class StubAJAXTypeHandlerImpl implements AJAXTypeHandler
+class StubAJAXTypeHandlerImpl implements TypeHandler
 {
 
     public $calledMethods = [];
@@ -35,11 +35,11 @@ class StubAJAXTypeHandlerImpl implements AJAXTypeHandler
     /**
      * Sets up the type handler for provided type.
      * This should be called for each registered type.
-     * @param \ChristianBudde\cbweb\controller\ajax\AJAXServer $server The server which is setting-up the handler
+     * @param \ChristianBudde\cbweb\controller\ajax\Server $server The server which is setting-up the handler
      * @param string $type The type currently being set-up
      * @return void
      */
-    public function setUp(AJAXServer $server, $type)
+    public function setUp(Server $server, $type)
     {
         $this->calledMethods[] = ['method' => 'setUp', 'arguments' => func_get_args()];
     }

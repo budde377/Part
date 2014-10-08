@@ -1,6 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb;
-use ChristianBudde\cbweb\controller\ajax\AJAXServer;
+use ChristianBudde\cbweb\controller\ajax\Server;
 use ChristianBudde\cbweb\util\CacheControl;
 use ChristianBudde\cbweb\util\file\CSSRegister;
 use ChristianBudde\cbweb\util\file\DartRegister;
@@ -50,7 +50,7 @@ interface BackendSingletonContainer
     /**
      * @abstract
      * This will return an ajax register, and reuse it from time to time
-     * @return AJAXServer
+     * @return Server
      */
     public function getAJAXServerInstance();
 

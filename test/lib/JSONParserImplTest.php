@@ -1,7 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\json\JSONParserImpl;
+use ChristianBudde\cbweb\controller\json\ParserImpl;
 use ChristianBudde\cbweb\controller\json\TypeImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
 use ChristianBudde\cbweb\controller\json\ObjectImpl;
@@ -20,7 +20,7 @@ use PHPUnit_Framework_TestCase;
 class JSONParserImplTest extends PHPUnit_Framework_TestCase
 {
 
-    /** @var  JSONParserImpl */
+    /** @var  ParserImpl */
     private $parser;
 
     private $function1Name = "function1";
@@ -54,7 +54,7 @@ class JSONParserImplTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
 
-        $this->parser = new JSONParserImpl();
+        $this->parser = new ParserImpl();
         $this->function1Target = new TypeImpl("SomeTarget");
         $this->function1 = new JSONFunctionImpl($this->function1Name, $this->function1Target);
 

@@ -4,15 +4,16 @@ namespace ChristianBudde\cbweb\view\template;
  * Created by PhpStorm.
  * User: budde
  * Date: 10/23/13
- * Time: 9:13 PM
+ * Time: 7:48 PM
  */
 
 use \Twig_TokenParser;
 use \Twig_Token;
 use \Twig_Node;
 
-class TemplateSiteContentTwigTokenParserImpl extends Twig_TokenParser
-{
+class PageElementTwigTokenParserImpl extends Twig_TokenParser{
+
+
 
     /**
      * Parses a token and returns a node.
@@ -24,13 +25,14 @@ class TemplateSiteContentTwigTokenParserImpl extends Twig_TokenParser
     public function parse(Twig_Token $token)
     {
         $stream = $this->parser->getStream();
-        if($stream->getCurrent()->getType() == Twig_Token::BLOCK_END_TYPE){
-            $stream->expect(Twig_Token::BLOCK_END_TYPE);
-            return new TemplateSiteContentTwigNodeImpl($token->getLine(), $this->getTag());
+        $nameArray = [];
+        $nameArray[] = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
+        while($stream->getCurrent()->getType() == Twig_Token::PUNCTUATION_TYPE){
+            $stream->expect(Twig_Token::PUNCTUATION_TYPE);
+            $nameArray[] = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
         }
-        $name = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
-        return new TemplateSiteContentTwigNodeImpl( $token->getLine(), $this->getTag(), $name);
+        return new PageElementTwigNodeImpl($nameArray, $token->getLine(), $this->getTag());
     }
 
     /**
@@ -40,6 +42,6 @@ class TemplateSiteContentTwigTokenParserImpl extends Twig_TokenParser
      */
     public function getTag()
     {
-        return "site_content";
+        return "page_element";
     }
 }

@@ -8,7 +8,7 @@ namespace ChristianBudde\cbweb\view\html;
  * Date: 25/07/12
  * Time: 15:19
  */
-class HTMLElementImpl implements HTMLElement
+class ElementImpl implements Element
 {
     private $tagName;
     private $attributes;
@@ -31,8 +31,8 @@ class HTMLElementImpl implements HTMLElement
         }
         $contentString = '';
         foreach($this->content as $content){
-            /** @var $content HTMLElement|string */
-            if($content instanceof HTMLElement){
+            /** @var $content Element|string */
+            if($content instanceof Element){
                 $contentString .= $content->getHTMLString();
             } else {
                 $contentString .= $content;
@@ -74,10 +74,10 @@ class HTMLElementImpl implements HTMLElement
 
     /**
      * Inserts an XHTML Element
-     * @param HTMLElement $element
-     * @return HTMLElement
+     * @param Element $element
+     * @return Element
      */
-    public function insertHTMLElement(HTMLElement $element)
+    public function insertHTMLElement(Element $element)
     {
         $this->content[] = $element;
     }

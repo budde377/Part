@@ -12,7 +12,7 @@ use \Twig_Token;
 use \Twig_Node;
 use \Twig_Error_Syntax;
 
-class TemplatePageVariableTwigTokenParserImpl extends Twig_TokenParser{
+class PageVariableTwigTokenParserImpl extends Twig_TokenParser{
 
     /**
      * Parses a token and returns a node.
@@ -35,7 +35,7 @@ class TemplatePageVariableTwigTokenParserImpl extends Twig_TokenParser{
             $stream->expect(Twig_Token::PUNCTUATION_TYPE, "]");
         }
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
-        return new TemplatePageVariableTwigNodeImpl($token->getLine(), $this->getTag(), $id, $page_id);
+        return new PageVariableTwigNodeImpl($token->getLine(), $this->getTag(), $id, $page_id);
     }
 
     /**

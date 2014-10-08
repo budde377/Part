@@ -3,9 +3,9 @@ namespace ChristianBudde\cbweb\view\page_element;
 use ChristianBudde\cbweb\BackendSingletonContainer;
 use ChristianBudde\cbweb\model;
 use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\view\html\HTMLFormElement;
-use ChristianBudde\cbweb\view\html\HTMLFormElementImpl;
-use ChristianBudde\cbweb\view\html\HTMLSelectElement;
+use ChristianBudde\cbweb\view\html\FormElement;
+use ChristianBudde\cbweb\view\html\FormElementImpl;
+use ChristianBudde\cbweb\view\html\SelectElement;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -43,7 +43,7 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
         <h3>Rediger side egenskaber</h3>
         ";
 
-        $pageForm = new HTMLFormElementImpl(HTMLFormElement::FORM_METHOD_POST);
+        $pageForm = new FormElementImpl(FormElement::FORM_METHOD_POST);
         $pageForm->setAttributes("id", "EditPageForm");
         if ($this->evaluatePageForm($status, $message)) {
             $pageForm->setNotion($message, $status);
@@ -51,7 +51,7 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
         $pageForm->setAttributes("class", "justDistribution");
         $pageForm->insertInputText("title", "EditPageEditTitleField", $this->currentPage->getTitle(), "Titel");
         $pageForm->insertInputText("id", "EditPageEditIDField", $this->currentPage->getID(), "Side ID");
-        /** @var $select HTMLSelectElement */
+        /** @var $select SelectElement */
         $pageForm->insertSelect("template", "EditPageEditTemplateSelect", "Side type", $select);
 	foreach ($this->config->listTemplateNames() as $templateName) {
             if (substr($templateName, 0, 1) != "_") {
@@ -96,7 +96,7 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
         </ul>
         ";
 
-        $addUserAccessForm = new HTMLFormElementImpl(HTMLFormElement::FORM_METHOD_POST);
+        $addUserAccessForm = new FormElementImpl(FormElement::FORM_METHOD_POST);
         $this->evaluateAddUserAccess($possibleUsers);
         $addUserAccessForm->insertInputHidden("1", "addUserAccess");
         $addUserAccessForm->setAttributes("class", "oneLineForm");
@@ -144,18 +144,18 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
             $title = trim($_POST['title']);
 
             if ($this->currentPage->getID() != $id && !$this->currentPage->isValidId($id)) {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
                 $message = "Ugyldigt ID";
                 return true;
             }
 
             if (!$this->currentPage->isValidAlias($alias)) {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
                 $message = "Ugyldigt alias";
                 return true;
             }
             if (array_search($template, $this->config->listTemplateNames()) === false) {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
                 $message = "Ugyldig side type";
             }
             $this->currentPage->setID($id);
@@ -163,7 +163,7 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
             $this->currentPage->setAlias($alias);
             $this->currentPage->setTemplate($template);
 
-            $status = HTMLFormElement::NOTION_TYPE_SUCCESS;
+            $status = FormElement::NOTION_TYPE_SUCCESS;
             $message = "Dine ændringer er gemt";
             return true;
         }
@@ -181,9 +181,9 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
                 $user = $this->userLibrary->getUser($username);
                 $privileges = $user->getUserPrivileges();
                 $privileges->addPagePrivileges($this->currentPage);
-                $status = HTMLFormElement::NOTION_TYPE_SUCCESS;
+                $status = FormElement::NOTION_TYPE_SUCCESS;
             } else {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
             }
             return true;
         }
@@ -202,9 +202,9 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
                 $user = $this->userLibrary->getUser($username);
                 $privileges = $user->getUserPrivileges();
                 $privileges->revokePagePrivileges($this->currentPage);
-                $status = HTMLFormElement::NOTION_TYPE_SUCCESS;
+                $status = FormElement::NOTION_TYPE_SUCCESS;
             } else {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
             }
             return true;
         }

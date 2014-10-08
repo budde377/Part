@@ -2,7 +2,7 @@
 namespace ChristianBudde\cbweb\test\stub;
 use ChristianBudde\cbweb\BackendSingletonContainer;
 use ChristianBudde\cbweb\Config;
-use ChristianBudde\cbweb\controller\ajax\AJAXServer;
+use ChristianBudde\cbweb\controller\ajax\Server;
 use ChristianBudde\cbweb\log\Logger;
 use ChristianBudde\cbweb\model\page\CurrentPageStrategy;
 use ChristianBudde\cbweb\model\page\DefaultPageLibrary;
@@ -222,9 +222,9 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer
     }
 
     /**
-     * @param AJAXServer $AJAXServerInstance
+     * @param Server $AJAXServerInstance
      */
-    public function setJAXServerInstance(AJAXServer $AJAXServerInstance)
+    public function setJAXServerInstance(Server $AJAXServerInstance)
     {
         $this->AJAXServerInstance = $AJAXServerInstance;
     }

@@ -4,7 +4,7 @@ use ChristianBudde\cbweb\BackendSingletonContainer;
 
 use ChristianBudde\cbweb\util\file\File;
 use ChristianBudde\cbweb\util\file\FileImpl;
-use ChristianBudde\cbweb\controller\function_string\FunctionStringParserImpl;
+use ChristianBudde\cbweb\controller\function_string\ParserImpl;
 use ChristianBudde\cbweb\util\file\ImageFileImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
 use ChristianBudde\cbweb\controller\json\Response;
@@ -23,7 +23,7 @@ use ChristianBudde\cbweb\model\user\UserLibrary;
  * Date: 9/1/14
  * Time: 8:23 PM
  */
-class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
+class BackendTypeHandlerImpl implements TypeHandler
 {
 
     private $backend;
@@ -52,11 +52,11 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
     /**
      * Sets up the type handler for provided type.
      * This should be called for each registered type.
-     * @param AJAXServer $server The server which is setting-up the handler
+     * @param Server $server The server which is setting-up the handler
      * @param string $type The type currently being set-up
      * @return void
      */
-    public function setUp(AJAXServer $server, $type)
+    public function setUp(Server $server, $type)
     {
 
 
@@ -122,10 +122,10 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         return false;
     }
 
-    private function setUpUserLibraryHandler(AJAXServer $server)
+    private function setUpUserLibraryHandler(Server $server)
     {
 
-        $server->registerHandler($userLibraryHandler = new GenericObjectAJAXTypeHandlerImpl($this->userLibrary, 'UserLibrary'));
+        $server->registerHandler($userLibraryHandler = new GenericObjectTypeHandlerImpl($this->userLibrary, 'UserLibrary'));
 
 
         $userLibraryHandler->addAuthFunction(function ($type, $instance, $functionName) {
@@ -154,7 +154,8 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             }
 
             if ($user->login($password)) {
-                return $user;
+                $token = $_SESSION["user-login-token"] = uniqid('token', true);
+                return $token;
             }
             return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_LOGIN);
 
@@ -227,11 +228,11 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
     }
 
-    private function setUpUserHandler(AJAXServer $server)
+    private function setUpUserHandler(Server $server)
     {
 
         $server->registerHandler($userHandler =
-                new GenericObjectAJAXTypeHandlerImpl(($u = $this->userLibrary->getUserLoggedIn()) == null ? "ChristianBudde\\cbweb\\model\\user\\User" : $u),
+                new GenericObjectTypeHandlerImpl(($u = $this->userLibrary->getUserLoggedIn()) == null ? "ChristianBudde\\cbweb\\model\\user\\User" : $u),
             ' User');
         $userHandler->whitelistFunction("User",
             "getUsername",
@@ -282,9 +283,9 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         return in_array($user, $this->userLibrary->getChildren($this->userLibrary->getUserLoggedIn()));
     }
 
-    private function setUpPageOrderHandler(AJAXServer $server)
+    private function setUpPageOrderHandler(Server $server)
     {
-        $server->registerHandler($pageOrderHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getPageOrderInstance()), 'PageOrder');
+        $server->registerHandler($pageOrderHandler = new GenericObjectTypeHandlerImpl($this->backend->getPageOrderInstance()), 'PageOrder');
         $pageOrderHandler->addGetInstanceFunction('PageOrder');
 
         $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'deletePage', $this->sitePrivilegesFunction);
@@ -312,9 +313,9 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
     }
 
-    private function setUpPageHandler(AJAXServer $server)
+    private function setUpPageHandler(Server $server)
     {
-        $server->registerHandler($pageHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getPageOrderInstance()->getCurrentPage()), 'Page');
+        $server->registerHandler($pageHandler = new GenericObjectTypeHandlerImpl($this->backend->getPageOrderInstance()->getCurrentPage()), 'Page');
         $pageHandler->whitelistFunction('Page',
             'isHidden',
             'hide',
@@ -361,9 +362,9 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
 
     }
 
-    private function setUpLoggerHandler(AJAXServer $server)
+    private function setUpLoggerHandler(Server $server)
     {
-        $server->registerHandler($logHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getLoggerInstance()), 'Logger');
+        $server->registerHandler($logHandler = new GenericObjectTypeHandlerImpl($this->backend->getLoggerInstance()), 'Logger');
         $logHandler->addAuthFunction(function () {
             return $this->userLibrary->getUserLoggedIn() != null;
         });
@@ -373,53 +374,53 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         $logHandler->addFunctionAuthFunction("Logger", 'getContextAt', $this->sitePrivilegesFunction);
     }
 
-    private function setUpPageContentHandler(AJAXServer $server)
+    private function setUpPageContentHandler(Server $server)
     {
-        $server->registerHandler($contentHandler = new GenericObjectAJAXTypeHandlerImpl('ChristianBudde\cbweb\model\page\PageContent'));
+        $server->registerHandler($contentHandler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\page\PageContent'));
         $contentHandler->addFunctionAuthFunction("PageContent", "addContent", function ($type, PageContent $instance) {
             return ($current = $this->backend->getUserLibraryInstance()->getUserLoggedIn()) != null && $current->getUserPrivileges()->hasPagePrivileges($instance->getPage());
         });
         $contentHandler->addGetInstanceFunction('PageContent');
     }
 
-    private function setUpSiteContentHandler(AJAXServer $server)
+    private function setUpSiteContentHandler(Server $server)
     {
-        $server->registerHandler($siteContentHandler = new GenericObjectAJAXTypeHandlerImpl('ChristianBudde\cbweb\model\site\SiteContent'));
+        $server->registerHandler($siteContentHandler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\site\SiteContent'));
         $siteContentHandler->addFunctionAuthFunction("SiteContent", "addContent", $this->sitePrivilegesFunction);
         $siteContentHandler->addGetInstanceFunction('SiteContent');
     }
 
-    private function setUpPageContentLibraryHandler(AJAXServer $server)
+    private function setUpPageContentLibraryHandler(Server $server)
     {
         $contentLibrary = $this->backend->getPageOrderInstance()->getCurrentPage()->getContentLibrary();
-        $siteContentHandler = new GenericObjectAJAXTypeHandlerImpl($contentLibrary == null?"ChristianBudde\\cbweb\\model\\page\\PageContentLibrary":$contentLibrary);
+        $siteContentHandler = new GenericObjectTypeHandlerImpl($contentLibrary == null?"ChristianBudde\\cbweb\\model\\page\\PageContentLibrary":$contentLibrary);
         $server->registerHandler($siteContentHandler, "PageContentLibrary");
     }
 
-    private function setUpSiteContentLibraryHandler(AJAXServer $server)
+    private function setUpSiteContentLibraryHandler(Server $server)
     {
-        $server->registerHandler($siteContentHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getSiteInstance()->getContentLibrary(), "SiteContentLibrary"));
+        $server->registerHandler($siteContentHandler = new GenericObjectTypeHandlerImpl($this->backend->getSiteInstance()->getContentLibrary(), "SiteContentLibrary"));
     }
 
-    private function setUpUpdaterHandler(AJAXServer $server)
+    private function setUpUpdaterHandler(Server $server)
     {
-        $server->registerHandler($updaterHandler = new GenericObjectAJAXTypeHandlerImpl($this->backend->getUpdater(), "Updater"));
+        $server->registerHandler($updaterHandler = new GenericObjectTypeHandlerImpl($this->backend->getUpdater(), "Updater"));
         $updaterHandler->addFunctionAuthFunction('Updater', 'update', $this->sitePrivilegesFunction);
         $updaterHandler->addFunctionAuthFunction('Updater', 'checkForUpdates', $this->sitePrivilegesFunction);
     }
 
-    private function setUpArraysHandler(AJAXServer $server)
+    private function setUpArraysHandler(Server $server)
     {
-        $handler = new ArrayAccessAJAXTypeHandlerImpl();
+        $handler = new ArrayAccessTypeHandlerImpl();
         $handler->addArray("POST", $_POST);
         $handler->addArray("GET", $_GET);
         $handler->addArray("FILES", $_FILES);
         $server->registerHandler($handler);
     }
 
-    private function setUpFileHandler(AJAXServer $server)
+    private function setUpFileHandler(Server $server)
     {
-        $server->registerHandler($fileHandler = new GenericObjectAJAXTypeHandlerImpl('ChristianBudde\cbweb\util\file\ImageFile', 'File', 'ImageFile'));
+        $server->registerHandler($fileHandler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\util\file\ImageFile', 'File', 'ImageFile'));
         $fileHandler->whitelistFunction("File",
             'getContents',
             'getFilename',
@@ -597,9 +598,9 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
         };
     }
 
-    private function setUpParserHandler(AJAXServer $server)
+    private function setUpParserHandler(Server $server)
     {
-        $server->registerHandler($handler = new GenericObjectAJAXTypeHandlerImpl('Parser'));
+        $server->registerHandler($handler = new GenericObjectTypeHandlerImpl('Parser'));
         $handler->addFunction('Parser', 'parseJson', function($instance, $string){
             if(!is_string($string)){
                 return $string;
@@ -610,7 +611,7 @@ class BackendAJAXTypeHandlerImpl implements AJAXTypeHandler
             if(!is_string($string)){
                 return $string;
             }
-            $p = new FunctionStringParserImpl();
+            $p = new ParserImpl();
             $p->parseArray($string, $result);
             return $result;
         });

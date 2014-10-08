@@ -5,8 +5,8 @@ namespace ChristianBudde\cbweb\test;
 use ChristianBudde\cbweb\BackendSingletonContainer;
 use ChristianBudde\cbweb\BackendSingletonContainerImpl;
 use ChristianBudde\cbweb\ConfigImpl;
-use ChristianBudde\cbweb\controller\ajax\AJAXServerImpl;
-use ChristianBudde\cbweb\controller\ajax\BackendAJAXTypeHandlerImpl;
+use ChristianBudde\cbweb\controller\ajax\ServerImpl;
+use ChristianBudde\cbweb\controller\ajax\BackendTypeHandlerImpl;
 use ChristianBudde\cbweb\controller\json\Response;
 use ChristianBudde\cbweb\model\user\User;
 use ChristianBudde\cbweb\model\user\UserLibrary;
@@ -21,7 +21,7 @@ use ChristianBudde\cbweb\util\file\FolderImpl;
  */
 class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
 {
-    /** @var  AJAXServerImpl */
+    /** @var  ServerImpl */
     private $server;
     /** @var  BackendSingletonContainer */
     private $container;
@@ -89,7 +89,7 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
     <log path='$logFile' />
 </config>"), $tmpFolder);
         $this->container = new BackendSingletonContainerImpl($this->config);
-        $this->typeHandler = new BackendAJAXTypeHandlerImpl($this->container);
+        $this->typeHandler = new BackendTypeHandlerImpl($this->container);
         $this->setUpServer();
         $this->rootUser = $this->container->getUserLibraryInstance()->getUser('root');
         $this->rootUser->getUserPrivileges()->addRootPrivileges();
@@ -141,6 +141,28 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
         $this->assertSuccessResponse("UserLibrary.userLogin('$username', '$password')");
         $user->logout();
         $this->assertErrorResponse("UserLibrary.userLogin('$username', 'invalidPassword')", Response::ERROR_CODE_INVALID_LOGIN);
+    }
+
+    public function testUserLibraryUserLoginReturnsToken(){
+        $user = $this->setUpRootUserLogin($password = "password");
+        $user->logout();
+        $username = $user->getUsername();
+        $response = $this->assertSuccessResponse("UserLibrary.userLogin('$username', '$password')");
+        $this->assertTrue(isset($_SESSION["user-login-token"]));
+        $this->assertEquals($response->getPayload(), $_SESSION["user-login-token"]);
+
+    }
+
+    public function testUserLibraryLoginDoesNotReuseToken(){
+        $user = $this->setUpRootUserLogin($password = "password");
+        $user->logout();
+        $username = $user->getUsername();
+        $response1 = $this->assertSuccessResponse("UserLibrary.userLogin('$username', '$password')");
+        $user->logout();
+        $response2 = $this->assertSuccessResponse("UserLibrary.userLogin('$username', '$password')");
+        $this->assertNotEquals($response1->getPayload(), $response2->getPayload());
+        $this->assertEquals($response2->getPayload(), $_SESSION["user-login-token"]);
+
     }
 
     public function testUserLibraryCreateUser()
@@ -437,7 +459,7 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
 
     private function setUpServer()
     {
-        $this->server = new AJAXServerImpl($this->container);
+        $this->server = new ServerImpl($this->container);
         $this->server->registerHandler($this->typeHandler);
 
     }

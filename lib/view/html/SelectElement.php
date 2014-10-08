@@ -8,7 +8,7 @@ namespace ChristianBudde\cbweb\view\html;
  * Date: 31/08/12
  * Time: 21:22
  */
-interface HTMLSelectElement extends HTMLElement
+interface SelectElement extends Element
 {
     /**
      * @abstract
@@ -16,7 +16,7 @@ interface HTMLSelectElement extends HTMLElement
      * @param string $value
      * @param string $group_id
      * @param array $attributes
-     * @return HTMLOptionElement
+     * @return OptionElement
      */
     public function insertOption($text, $value, $group_id = null, array $attributes = array());
 
@@ -24,7 +24,7 @@ interface HTMLSelectElement extends HTMLElement
      * @abstract
      * @param $id
      * @param string $label
-     * @return HTMLElement
+     * @return Element
      */
     public function insertOptionGroup($id, $label);
 

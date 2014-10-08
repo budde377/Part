@@ -4,10 +4,10 @@ use ChristianBudde\cbweb\BackendSingletonContainer;
 use ChristianBudde\cbweb\exception\ClassNotDefinedException;
 use ChristianBudde\cbweb\exception\ClassNotInstanceOfException;
 use ChristianBudde\cbweb\exception\FileNotFoundException;
-use ChristianBudde\cbweb\controller\function_string\FunctionStringParserImpl;
+use ChristianBudde\cbweb\controller\function_string\ParserImpl;
 use ChristianBudde\cbweb\controller\json\CompositeFunction;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
-use ChristianBudde\cbweb\controller\json\JSONParserImpl;
+use ChristianBudde\cbweb\controller\json\ParserImpl as JSONParser;
 use ChristianBudde\cbweb\controller\json\Program;
 use ChristianBudde\cbweb\controller\json\Response;
 use ChristianBudde\cbweb\controller\json\ResponseImpl;
@@ -21,7 +21,7 @@ use ReflectionClass;
  * Date: 8/28/14
  * Time: 3:44 PM
  */
-class AJAXServerImpl implements AJAXServer
+class ServerImpl implements Server
 {
 
 
@@ -38,17 +38,17 @@ class AJAXServerImpl implements AJAXServer
     {
 
         $this->backendSingletonContainer = $backendSingletonContainer;
-        $this->jsonParser = new JSONParserImpl();
-        $this->functionStringParser = new FunctionStringParserImpl();
+        $this->jsonParser = new JSONParser();
+        $this->functionStringParser = new ParserImpl();
     }
 
 
     /**
      * Registers a AJAX type.
-     * @param AJAXTypeHandler $type
+     * @param TypeHandler $type
      * @return void
      */
-    public function registerHandler(AJAXTypeHandler $type)
+    public function registerHandler(TypeHandler $type)
     {
         $zeroLength = true;
         foreach ($type->listTypes() as $t) {
@@ -92,7 +92,7 @@ class AJAXServerImpl implements AJAXServer
             $handler = new $className($this->backendSingletonContainer);
 
 
-            if (!($handler instanceof AJAXTypeHandler)) {
+            if (!($handler instanceof TypeHandler)) {
                 throw new ClassNotInstanceOfException($className, 'AJAXTypeHandler');
             }
 
@@ -244,7 +244,7 @@ class AJAXServerImpl implements AJAXServer
                 continue;
             }
             foreach ($this->handlers[$type] as $h) {
-                /** @var $h AJAXTypeHandler */
+                /** @var $h TypeHandler */
                 if (!$h->canHandle($type, $function, $instance)) {
                     continue;
                 }

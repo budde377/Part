@@ -13,7 +13,7 @@ use ReflectionMethod;
  * Date: 8/31/14
  * Time: 7:32 PM
  */
-class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
+class GenericObjectTypeHandlerImpl implements TypeHandler
 {
 
 
@@ -296,11 +296,11 @@ class GenericObjectAJAXTypeHandlerImpl implements AJAXTypeHandler
     /**
      * Sets up the type handler for provided type.
      * This should be called for each registered type.
-     * @param AJAXServer $server The server which is setting-up the handler
+     * @param Server $server The server which is setting-up the handler
      * @param string $type The type currently being set-up
      * @return void
      */
-    public function setUp(AJAXServer $server, $type)
+    public function setUp(Server $server, $type)
     {
 
         if (in_array($type, $this->hasBeenSetUp)) {

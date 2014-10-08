@@ -9,7 +9,7 @@ namespace ChristianBudde\cbweb\controller\json;
  * Time: 12:01 PM
  */
 
-interface JSONParser {
+interface Parser {
 
 
 

@@ -78,7 +78,7 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
     public function testGetAJAXServerReturnsSameInstanceOfAJAXServer()
     {
         $ajax1 = $this->backContainer->getAJAXServerInstance();
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\ajax\AJAXServer', $ajax1, 'Did not return instance of AJAXServer');
+        $this->assertInstanceOf('ChristianBudde\cbweb\controller\ajax\Server', $ajax1, 'Did not return instance of AJAXServer');
         $this->config->setMysqlConnection(array('host' => 'lol', 'user' => 'lol', 'database' => '', 'password' => ''));
         $ajax2 = $this->backContainer->getAJAXServerInstance();
         $this->assertTrue($ajax1 === $ajax2, 'Did not reuse instance');

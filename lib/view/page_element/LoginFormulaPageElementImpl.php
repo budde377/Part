@@ -5,7 +5,7 @@ use ChristianBudde\cbweb\util\helper\HTTPHeaderHelper;
 use ChristianBudde\cbweb\model\user\User;
 use ChristianBudde\cbweb\model\user\UserImpl;
 
-use ChristianBudde\cbweb\view\html\HTMLFormElement;
+use ChristianBudde\cbweb\view\html\FormElement;
 
 
 /**
@@ -69,16 +69,16 @@ class LoginFormulaPageElementImpl extends PageElementImpl
         }
         if ($user == null) {
             $message = "Ugyldigt brugernavn";
-            $status = HTMLFormElement::NOTION_TYPE_ERROR;
+            $status = FormElement::NOTION_TYPE_ERROR;
             return true;
         }
         $password = trim($_POST['password']);
         if (!$user->login($password)) {
             $message = "Ugyldigt kodeord";
-            $status = HTMLFormElement::NOTION_TYPE_ERROR;
+            $status = FormElement::NOTION_TYPE_ERROR;
         } else {
             $message = "Du er nu logget ind";
-            $status = HTMLFormElement::NOTION_TYPE_SUCCESS;
+            $status = FormElement::NOTION_TYPE_SUCCESS;
         }
         return true;
     }

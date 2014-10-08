@@ -2,9 +2,9 @@
 namespace ChristianBudde\cbweb\view\page_element;
 use ChristianBudde\cbweb\BackendSingletonContainer;
 use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\view\html\HTMLFormElement;
-use ChristianBudde\cbweb\view\html\HTMLFormElementImpl;
-use ChristianBudde\cbweb\view\html\HTMLSelectElement;
+use ChristianBudde\cbweb\view\html\FormElement;
+use ChristianBudde\cbweb\view\html\FormElementImpl;
+use ChristianBudde\cbweb\view\html\SelectElement;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -65,7 +65,7 @@ class UserSettingsEditUsersPageElementImpl extends PageElementImpl
         <h3>Brugere</h3>";
 
         $list = $this->userToLi($this->currentUser);
-        $addUserForm = new HTMLFormElementImpl(HTMLFormElement::FORM_METHOD_POST);
+        $addUserForm = new FormElementImpl(FormElement::FORM_METHOD_POST);
         if ($this->evaluateAddUserForm($status, $message)) {
             $addUserForm->setNotion($message, $status);
         }
@@ -87,7 +87,7 @@ class UserSettingsEditUsersPageElementImpl extends PageElementImpl
             $addUserForm->setAttributes("class", "justDistribution");
             $addUserForm->insertInputText("mail", "AddUserMailField", "", "E-Mail");
             $addUserForm->insertSelect("level", "AddUserLevelSelect", "Rettigheder", $select);
-            /** @var $select HTMLSelectElement */
+            /** @var $select SelectElement */
             $select->insertOption("Side", "page");
             $select->insertOption("Website", "site");
             if ($this->currentUserPrivileges->hasRootPrivileges()) {
@@ -106,7 +106,7 @@ class UserSettingsEditUsersPageElementImpl extends PageElementImpl
         if (isset($_POST['level'], $_POST['mail'])) {
             $mail = trim($_POST['mail']);
             if (!$this->currentUser->isValidMail($mail)) {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
                 $message = "Ugyldig E-mail";
                 return true;
             }
@@ -120,14 +120,14 @@ class UserSettingsEditUsersPageElementImpl extends PageElementImpl
             $password = uniqid();
             $level = trim($_POST['level']);
             if ($level != "page" && $level != "site" && $level != "root") {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
                 $message = "Ugyldig privilegie";
                 return true;
             }
             $l1 = $this->privilegesToInt($this->currentUserPrivileges->hasRootPrivileges(), $this->currentUserPrivileges->hasSitePrivileges());
             $l2 = $this->privilegesToInt($level == "root", $level == "site");
             if ($l1 == 1 || $l1 < $l2) {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
                 $message = "Kunne ikke oprette bruger";
                 return true;
             }
@@ -143,7 +143,7 @@ class UserSettingsEditUsersPageElementImpl extends PageElementImpl
                     break;
             }
             $username = $uName;
-            $status = HTMLFormElement::NOTION_TYPE_SUCCESS;
+            $status = FormElement::NOTION_TYPE_SUCCESS;
             $message = "Brugeren er oprettet";
             return true;
         }
@@ -162,9 +162,9 @@ class UserSettingsEditUsersPageElementImpl extends PageElementImpl
             }
             if ($this->userLibrary->getUser($username) != null && $isChild) {
                 $this->userLibrary->getUser($username)->delete();
-                $status = HTMLFormElement::NOTION_TYPE_SUCCESS;
+                $status = FormElement::NOTION_TYPE_SUCCESS;
             } else {
-                $status = HTMLFormElement::NOTION_TYPE_ERROR;
+                $status = FormElement::NOTION_TYPE_ERROR;
             }
             return true;
         }

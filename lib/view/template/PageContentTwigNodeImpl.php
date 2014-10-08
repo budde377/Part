@@ -9,7 +9,7 @@ namespace ChristianBudde\cbweb\view\template;
 use \Twig_Node;
 use \Twig_Compiler;
 
-class TemplatePageContentTwigNodeImpl extends Twig_Node{
+class PageContentTwigNodeImpl extends Twig_Node{
 
 
     /**
