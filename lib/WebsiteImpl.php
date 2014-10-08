@@ -56,9 +56,8 @@ class WebsiteImpl implements Website
         $ajaxServer = $this->backendContainer->getAJAXServerInstance();
         $id = null;
         if (
-            (!isset($_SESSION['user-login-token']) ||
-                $_SESSION['user-login-token'] == $this->GETValueOfIndexIfSetElseDefault('token', null)) &&
-            ($id = $this->GETValueOfIndexIfSetElseDefault('ajax', null)) !== null
+            ($this->backendContainer->getUserLibraryInstance()->verifyUserSessionToken($this->GETValueOfIndexIfSetElseDefault('token', ''))) &&
+            ($id = $this->GETValueOfIndexIfSetElseDefault('ajax')) !== null
         ) {
             $template->onlyInitialize();
             $ajaxServer->registerHandlersFromConfig();

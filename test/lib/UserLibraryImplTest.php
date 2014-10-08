@@ -219,7 +219,6 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
     public function testDeleteOnObjectWillReflectInList()
     {
         $list = $this->library->listUsers();
-        /** @var $user \ChristianBudde\cbweb\model\user\User */
         $user = $list[2];
         $user->delete();
         $list = $this->library->listUsers();
@@ -283,16 +282,73 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
     public function testDeleteParentWillChangeParentOfChildren()
     {
         $list = $this->library->listUsers();
-        /** @var $user1 \ChristianBudde\cbweb\model\user\UserImpl */
         $user1 = $list[0];
-        /** @var $user2 \ChristianBudde\cbweb\model\user\UserImpl */
         $user2 = $list[1];
-        /** @var $user3 \ChristianBudde\cbweb\model\user\UserImpl */
         $user3 = $list[2];
 
         $ret = $this->library->deleteUser($user2);
         $this->assertTrue($ret, 'Did not return true');
         $this->assertEquals($user1->getUsername(), $user3->getParent(), 'Parent did not match');
+    }
+
+
+    public function testUserSessionTokenIsNullWithNoUser(){
+        $this->assertNull($this->library->getUserSessionToken());
+    }
+
+    public function testUserSessionTokenIsNotNullWithUserLoggedIn(){
+
+        $list = $this->library->listUsers();
+        $user = $list[0];
+        $user->setPassword($password = 'somePassword');
+        $this->assertTrue($user->login($password));
+        $this->assertNotNull($this->library->getUserSessionToken());
+    }
+    public function testUserSessionsTokenWillNotReuseToken(){
+
+        $list = $this->library->listUsers();
+        $user = $list[0];
+        $user->setPassword($password = 'somePassword');
+        $this->assertTrue($user->login($password));
+        $token = $this->library->getUserSessionToken();
+        $user->logout();
+        $this->assertTrue($user->login($password));
+        $this->assertNotNull($token2 = $this->library->getUserSessionToken());
+        $this->assertNotEquals($token, $token2);
+    }
+
+    public function testUserSessionTokenIsNullAfterLogout(){
+
+        $list = $this->library->listUsers();
+        $user = $list[0];
+        $user->setPassword($password = 'somePassword');
+        $this->assertTrue($user->login($password));
+        $user->logout();
+        $this->assertNull($this->library->getUserSessionToken());
+    }
+
+    public function testVerifyTokenIsTrueBeforeLogin(){
+        $this->assertTrue($this->library->verifyUserSessionToken("Arb. string"));
+    }
+
+    public function testVerifyTokenIsTrueWithRightTokenOnLogin(){
+        $list = $this->library->listUsers();
+        $user = $list[0];
+        $user->setPassword($password = 'somePassword');
+        $this->assertTrue($user->login($password));
+        $token = $this->library->getUserSessionToken();
+        $this->assertTrue($this->library->verifyUserSessionToken($token));
+        $this->assertFalse($this->library->verifyUserSessionToken($token."test"));
+    }
+
+    public function testVerifyTokenIsTrueAfterLogout(){
+
+        $list = $this->library->listUsers();
+        $user = $list[0];
+        $user->setPassword($password = 'somePassword');
+        $this->assertTrue($user->login($password));
+        $user->logout();
+        $this->assertTrue($this->library->verifyUserSessionToken("Arb. string"));
     }
 
     public function testLibraryIsJSONObjectSerializable()

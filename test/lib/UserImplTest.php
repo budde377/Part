@@ -478,6 +478,30 @@ class UserImplTest extends CustomDatabaseTestCase
         $this->assertEquals($observer->getLastCallType(), User::EVENT_DELETE, 'Event did not match');
     }
 
+    public function testLoginWillNotifyObserver()
+    {
+        $observer = new StubObserverImpl();
+        $user = new UserImpl('root', $this->db);
+        $user->attachObserver($observer);
+        $user->setPassword($pass = "pass");
+        $this->assertFalse($observer->hasBeenCalled(), 'Observer has been called');
+        $this->assertTrue($user->login($pass));
+        $this->assertTrue($observer->hasBeenCalled(), 'Observer has not been called');
+        $this->assertEquals($observer->getLastCallType(), User::EVENT_LOGIN, 'Event did not match');
+    }
+
+    public function testChangePasswordWillNotLogoutAndLogin()
+    {
+        $observer = new StubObserverImpl();
+        $user = new UserImpl('root', $this->db);
+        $user->setPassword($pass = "pass");
+        $user->login($pass);
+        $user->attachObserver($observer);
+        $user->setPassword($pass = "pass2");
+        $this->assertFalse($observer->hasBeenCalled(), 'Observer has been called');
+
+    }
+
     public function testChangeUsernameWillNotifyObserver()
     {
         $observer = new StubObserverImpl();

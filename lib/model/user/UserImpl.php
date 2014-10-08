@@ -102,16 +102,13 @@ class UserImpl implements User, Observable
         if ($this->setUsernameStatement === null) {
             $this->setUsernameStatement = $this->connection->prepare("UPDATE User SET username = ? WHERE username = ?");
         }
-
-        $wasLoggedIn = $this->logout();
+        $wasLoggedIn = $this->isLoggedIn();
 
         $this->setUsernameStatement->execute(array($username, $this->username));
         $this->username = $username;
-//        $this->setPassword($password);
 
         if ($wasLoggedIn) {
-            $_SESSION['loginUsername'] = $this->getUsername();
-            $_SESSION['loginPassword'] = $this->getPassword();
+            $this->updateLoginSession();
         }
         $this->notifyObservers(User::EVENT_USERNAME_UPDATE);
         return true;
@@ -154,14 +151,13 @@ class UserImpl implements User, Observable
             $this->setPasswordStatement->bindParam(1, $this->password);
             $this->setPasswordStatement->bindParam(2, $this->username);
         }
-
-        $wasLoggedIn = $this->logout();
-
+        $wasLoggedIn = $this->isLoggedIn();
         $this->password = $this->hashPassword($password);
         $this->setPasswordStatement->execute();
 
         if ($wasLoggedIn) {
-            $this->login($password);
+
+            $this->updateLoginSession($password);
         }
 
         return true;
@@ -250,8 +246,7 @@ class UserImpl implements User, Observable
     {
         if (!$this->exists() ||
             !$this->verifyLogin($password) ||
-            $this->SESSIONValueOfIndexIfSetElseDefault('loginUsername', false) !== false ||
-            $this->SESSIONValueOfIndexIfSetElseDefault('loginPassword', false) !== false
+            $this->someOneLoggedIn()
         ) {
             return false;
         }
@@ -265,8 +260,9 @@ class UserImpl implements User, Observable
         $this->lastLogin = time();
         $this->lastLoginStatement->execute();
 
-        $_SESSION['loginUsername'] = $this->getUsername();
-        $_SESSION['loginPassword'] = $this->getPassword();
+
+        $this->updateLoginSession();
+        $this->notifyObservers(User::EVENT_LOGIN);
         return true;
     }
 
@@ -276,8 +272,8 @@ class UserImpl implements User, Observable
      */
     public function isLoggedIn()
     {
-        return $this->SESSIONValueOfIndexIfSetElseDefault('loginUsername', false) == $this->getUsername() &&
-            $this->SESSIONValueOfIndexIfSetElseDefault('loginPassword', false) == $this->getPassword();
+        return $this->SESSIONValueOfIndexIfSetElseDefault('login-username', false) == $this->getUsername() &&
+            $this->SESSIONValueOfIndexIfSetElseDefault('login-password', false) == $this->getPassword();
     }
 
     /**
@@ -288,8 +284,8 @@ class UserImpl implements User, Observable
         if (!$this->isLoggedIn()) {
             return false;
         }
-        unset($_SESSION['loginUsername']);
-        unset($_SESSION['loginPassword']);
+        unset($_SESSION['login-username']);
+        unset($_SESSION['login-password']);
         return true;
     }
 
@@ -494,5 +490,17 @@ class UserImpl implements User, Observable
     public function jsonSerialize()
     {
         return $this->jsonObjectSerialize()->jsonSerialize();
+    }
+
+    private function updateLoginSession()
+    {
+        $_SESSION['login-password'] = $this->getPassword();
+        $_SESSION['login-username'] = $this->getUsername();
+    }
+
+    private function someOneLoggedIn()
+    {
+        return $this->SESSIONValueOfIndexIfSetElseDefault('login-username') ||
+        $this->SESSIONValueOfIndexIfSetElseDefault('login-password');
     }
 }

@@ -44,7 +44,7 @@ class UserLibraryImpl implements UserLibrary, Observer
 
     /**
      * Will list all users
-     * @return array
+     * @return User[]
      */
     public function listUsers()
     {
@@ -143,7 +143,9 @@ class UserLibraryImpl implements UserLibrary, Observer
                 }
                 /** @var $subject User */
                 $this->userList[$subject->getUsername()] = $subject;
-
+                break;
+            case User::EVENT_LOGIN:
+                $_SESSION['login-token'] = uniqid('token', true);
         }
     }
 
@@ -277,7 +279,12 @@ class UserLibraryImpl implements UserLibrary, Observer
      */
     public function getUserSessionToken()
     {
-        // TODO: Implement getUserSessionToken() method.
+        if($this->getUserLoggedIn() == null || !isset($_SESSION['login-token'])){
+            return null;
+        }
+
+        return $_SESSION['login-token'];
+
     }
 
     /**
@@ -287,6 +294,6 @@ class UserLibraryImpl implements UserLibrary, Observer
      */
     public function verifyUserSessionToken($token)
     {
-        // TODO: Implement verifyUserSessionToken() method.
+        return ($t = $this->getUserSessionToken()) == null || $t == $token;
     }
 }

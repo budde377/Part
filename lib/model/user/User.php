@@ -15,6 +15,7 @@ interface User extends JSONObjectSerializable
     const EVENT_USERNAME_UPDATE = 1;
     const EVENT_DELETE = 2;
     const EVENT_PARENT_UPDATE = 3;
+    const EVENT_LOGIN = 4;
     /**
      * @abstract
      * @return string Username as string
