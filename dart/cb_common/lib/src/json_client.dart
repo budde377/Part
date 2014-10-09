@@ -39,14 +39,15 @@ class AJAXJSONClient extends JSONClient {
     var request = new HttpRequest();
     var future = _setUpRequest(request);
     _registerProgressHandler(request, progress);
-
+    var token = window.sessionStorage['user-login-token'];
+    token = token != null?"&token="+token:"";
     if(form_data != null){
-      request.open("POST", urlPrefix + "?ajax=$function");
+      request.open("POST", urlPrefix + "?ajax=$function$token");
       request.send(form_data);
-      debug("POST: "+urlPrefix + "?ajax=$function");
+      debug("POST: "+urlPrefix + "?ajax=$function$token");
     } else {
-      request.open("GET", urlPrefix + "?ajax=$function");
-      debug("GET: "+urlPrefix + "?ajax=$function");
+      request.open("GET", urlPrefix + "?ajax=$function$token");
+      debug("GET: "+urlPrefix + "?ajax=$function$token");
       request.send();
     }
     return future;
