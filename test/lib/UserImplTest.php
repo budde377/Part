@@ -663,16 +663,26 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testGetTokenReturnsTokenEqualOnSameUser(){
         $this->assertEquals($this->user->getUserToken(), $this->user->getUserToken());
     }
+    public function testGetTokenDoesNotChangeOnUsernameChangeOrPasswordChange(){
+        $token = $this->user->getUserToken();
+        $this->user->setUsername("bob");
+        $token2 = $this->user->getUserToken();
+        $this->user->setPassword("new password");
+        $token3 = $this->user->getUserToken();
+        $this->assertEquals($token, $token2);
+        $this->assertEquals($token2, $token3);
+
+    }
 
     public function testGetTokenReturnsNewTokenAfterLogin(){
-        $h1 = $this->user2->getUserToken();
+        //$h1 = $this->user2->getUserToken();
         $this->user2->setPassword($password = "some super secret password");
         $h2 = $this->user2->getUserToken();
         $this->assertTrue($this->user2->login($password));
         $h3 = $this->user2->getUserToken();
-        $this->assertNotEquals($h1, $h2);
+        //$this->assertNotEquals($h1, $h2);
         $this->assertNotEquals($h2, $h3);
-        $this->assertNotEquals($h1, $h3);
+        //$this->assertNotEquals($h1, $h3);
 
     }
 

@@ -324,6 +324,17 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
         $this->assertNotEquals($token, $token2);
     }
 
+
+    public function testChangeUsernameWillNotChangeToken(){
+        $user = $this->library->listUsers()[0];
+        $user->setPassword($password = "SomePassword");
+        $this->assertTrue($user->login($password));
+        $token = $this->library->getUserSessionToken();
+        $user->setUsername("bob");
+        $token2 = $this->library->getUserSessionToken();
+        $this->assertEquals($token, $token2);
+    }
+
     public function testUserSessionTokenIsNullAfterLogout(){
 
         $list = $this->library->listUsers();

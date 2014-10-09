@@ -506,6 +506,6 @@ class UserImpl implements User, Observable
      */
     public function getUserToken()
     {
-        return sha1($this->getUsername().$this->getPassword().$this->getLastLogin());
+        return sha1($this->getUniqueId().$this->getLastLogin());
     }
 }
