@@ -60,7 +60,7 @@ class LoginFormulaInitializer implements Initializer {
           form.changeNotion("Ugyldigt login", FormHandler.NOTION_TYPE_ERROR);
         } else {
           form.changeNotion("Du er nu logget ind", FormHandler.NOTION_TYPE_SUCCESS);
-          window.sessionStorage['user-login-token'] = response.payload;
+          window.localStorage['user-login-token'] = response.payload;
           window.location.href = "/?" + new DateTime.now().millisecondsSinceEpoch.toString();
         }
 
