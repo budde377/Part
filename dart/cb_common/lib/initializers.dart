@@ -40,8 +40,6 @@ class TitleURLUpdateInitializer extends Initializer {
 
 
 
-
-
 class LoginFormulaInitializer implements Initializer {
   FormElement _loginForm = querySelector("form#UserLoginForm");
 
