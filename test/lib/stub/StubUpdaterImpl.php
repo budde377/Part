@@ -10,6 +10,7 @@ namespace ChristianBudde\cbweb\test\stub;
 
 
 use ChristianBudde\cbweb\model\updater\Updater;
+use ChristianBudde\cbweb\model\user\User;
 
 class StubUpdaterImpl implements Updater{
 
@@ -59,5 +60,34 @@ class StubUpdaterImpl implements Updater{
     public function getVersion()
     {
         return "v0";
+    }
+
+    /**
+     * Given a user it will enable update check on login
+     * @param User $user
+     * @return void
+     */
+    public function allowCheckOnLogin(User $user)
+    {
+    }
+
+    /**
+     * Given a user it will disable update check on login
+     * @param User $user
+     * @return void
+     */
+    public function disallowCheckOnLogin(User $user)
+    {
+    }
+
+    /**
+     * Given a user it will return true iff updates are enabled on login.
+     * Default is true.
+     * @param User $user
+     * @return bool
+     */
+    public function isCheckOnLoginAllowed(User $user)
+    {
+        return true;
     }
 }

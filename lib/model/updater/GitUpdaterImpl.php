@@ -2,6 +2,8 @@
 namespace ChristianBudde\cbweb\model\updater;
 use ChristianBudde\cbweb\model;
 use ChristianBudde\cbweb\model\site\Site;
+use ChristianBudde\cbweb\model\user\User;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -9,7 +11,7 @@ use ChristianBudde\cbweb\model\site\Site;
  * Time: 21:51
  * To change this template use File | Settings | File Templates.
  */
-class GitUpdaterImpl implements model\updater\Updater
+class GitUpdaterImpl implements Updater
 {
 
     private $path;
@@ -152,5 +154,37 @@ class GitUpdaterImpl implements model\updater\Updater
     {
 
         return $this->branch == null ? $this->branch = $this->exec("git branch | sed -n '/\\* /s///p'") : $this->branch;
+    }
+
+    /**
+     * Given a user it will enable update check on login
+     * @param User $user
+     * @return void
+     */
+    public function allowCheckOnLogin(User $user)
+    {
+        $user->getUserVariables()->removeKey('model-updater-disallow-check-on-login');
+
+    }
+
+    /**
+     * Given a user it will disable update check on login
+     * @param User $user
+     * @return void
+     */
+    public function disallowCheckOnLogin(User $user)
+    {
+        $user->getUserVariables()->setValue('model-updater-disallow-check-on-login', 1);
+    }
+
+    /**
+     * Given a user it will return true iff updates are enabled on login.
+     * Default is true.
+     * @param User $user
+     * @return bool
+     */
+    public function isCheckOnLoginAllowed(User $user)
+    {
+        return $user->getUserVariables()->getValue('model-updater-disallow-check-on-login') === null;
     }
 }

@@ -2,6 +2,7 @@
 namespace ChristianBudde\cbweb\controller\ajax;
 use ChristianBudde\cbweb\BackendSingletonContainer;
 
+use ChristianBudde\cbweb\model\updater\Updater;
 use ChristianBudde\cbweb\util\file\File;
 use ChristianBudde\cbweb\util\file\FileImpl;
 use ChristianBudde\cbweb\controller\function_string\ParserImpl;
@@ -32,6 +33,8 @@ class BackendTypeHandlerImpl implements TypeHandler
 
     private $sitePrivilegesFunction;
 
+    private $userLoggedInAuthFunction;
+
 
     function __construct(BackendSingletonContainer $backend)
     {
@@ -45,6 +48,10 @@ class BackendTypeHandlerImpl implements TypeHandler
             $privileges = $currentUser->getUserPrivileges();
             return $privileges->hasSitePrivileges();
 
+        };
+
+        $this->userLoggedInAuthFunction = function(){
+            return $this->userLibrary->getUserLoggedIn() != null;
         };
     }
 
@@ -407,6 +414,24 @@ class BackendTypeHandlerImpl implements TypeHandler
         $server->registerHandler($updaterHandler = new GenericObjectTypeHandlerImpl($this->backend->getUpdater(), "Updater"));
         $updaterHandler->addFunctionAuthFunction('Updater', 'update', $this->sitePrivilegesFunction);
         $updaterHandler->addFunctionAuthFunction('Updater', 'checkForUpdates', $this->sitePrivilegesFunction);
+        $updaterHandler->addFunctionAuthFunction('Updater', 'allowCheckOnLogin', $this->userLoggedInAuthFunction);
+        $updaterHandler->addFunctionAuthFunction('Updater', 'disallowCheckOnLogin', $this->userLoggedInAuthFunction);
+        $updaterHandler->addFunctionAuthFunction('Updater', 'isCheckOnLoginAllowed', $this->userLoggedInAuthFunction);
+
+        $updaterHandler->addFunction('Updater', 'allowCheckOnLogin', function(Updater $instance){
+            $user = $this->userLibrary->getUserLoggedIn();
+            $instance->allowCheckOnLogin($user);
+        });
+
+        $updaterHandler->addFunction('Updater', 'disallowCheckOnLogin', function(Updater $instance){
+            $user = $this->userLibrary->getUserLoggedIn();
+            $instance->disallowCheckOnLogin($user);
+        });
+
+        $updaterHandler->addFunction('Updater', 'isCheckOnLoginAllowed', function(Updater $instance){
+            $user = $this->userLibrary->getUserLoggedIn();
+            return $instance->isCheckOnLoginAllowed($user);
+        });
     }
 
     private function setUpArraysHandler(Server $server)

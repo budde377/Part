@@ -1,5 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\model\updater;
+use ChristianBudde\cbweb\model\user\User;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -41,4 +43,26 @@ interface Updater {
      * @return string This should return a string containing some representation for the version for support reference
      */
     public function getVersion();
+
+    /**
+     * Given a user it will enable update check on login
+     * @param User $user
+     * @return void
+     */
+    public function allowCheckOnLogin(User $user);
+
+    /**
+     * Given a user it will disable update check on login
+     * @param User $user
+     * @return void
+     */
+    public function disallowCheckOnLogin(User $user);
+
+    /**
+     * Given a user it will return true iff updates are enabled on login.
+     * Default is true.
+     * @param User $user
+     * @return bool
+     */
+    public function isCheckOnLoginAllowed(User $user);
 }
