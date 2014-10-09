@@ -51,7 +51,7 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
         $mHost = self::$mailMySQLOptions->getHost();
         $mUsername = self::$mailMySQLOptions->getUsername();
         $mDatabase = self::$mailMySQLOptions->getDatabase();
-        $tmpFolder = "/tmp/cbweb/test/" . uniqid();
+        $tmpFolder = "/tmp/cbweb-test/" . uniqid();
         $folder = new FolderImpl($tmpFolder);
         $folder->create(true);
         $logFile = $tmpFolder . "logFile";
@@ -148,8 +148,7 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
         $user->logout();
         $username = $user->getUsername();
         $response = $this->assertSuccessResponse("UserLibrary.userLogin('$username', '$password')");
-        $this->assertTrue(isset($_SESSION["user-login-token"]));
-        $this->assertEquals($response->getPayload(), $_SESSION["user-login-token"]);
+        $this->assertEquals($response->getPayload(), $this->userLibrary->getUserSessionToken());
 
     }
 
@@ -158,10 +157,10 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
         $user->logout();
         $username = $user->getUsername();
         $response1 = $this->assertSuccessResponse("UserLibrary.userLogin('$username', '$password')");
+        sleep(1);
         $user->logout();
         $response2 = $this->assertSuccessResponse("UserLibrary.userLogin('$username', '$password')");
         $this->assertNotEquals($response1->getPayload(), $response2->getPayload());
-        $this->assertEquals($response2->getPayload(), $_SESSION["user-login-token"]);
 
     }
 
@@ -398,7 +397,7 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
      */
     public function assertResponsePayloadEquals($functionString, $equals)
     {
-        $response = $this->server->handleFromFunctionString($functionString);
+        $response = $this->server->handleFromFunctionString($functionString, $this->userLibrary->getUserSessionToken());
         $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\Response', $response);
         $this->assertEquals($response->getResponseType(), Response::RESPONSE_TYPE_SUCCESS);
         $this->assertEquals($equals, $response->getPayload());
@@ -413,7 +412,7 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
      */
     public function assertErrorResponse($functionString, $errorCode = null)
     {
-        $response = $this->server->handleFromFunctionString($functionString);
+        $response = $this->server->handleFromFunctionString($functionString, $this->userLibrary->getUserSessionToken());
         $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\Response', $response);
         $this->assertEquals($response->getResponseType(), Response::RESPONSE_TYPE_ERROR);
         if ($errorCode != null) {
@@ -428,7 +427,8 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
      */
     public function assertSuccessResponse($functionString)
     {
-        $response = $this->server->handleFromFunctionString($functionString);
+
+        $response = $this->server->handleFromFunctionString($functionString, $this->userLibrary->getUserSessionToken());
         $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\Response', $response);
         $this->assertEquals($response->getResponseType(), Response::RESPONSE_TYPE_SUCCESS);
         return $response;

@@ -154,8 +154,8 @@ class BackendTypeHandlerImpl implements TypeHandler
             }
 
             if ($user->login($password)) {
-                $token = $_SESSION["user-login-token"] = uniqid('token', true);
-                return $token;
+                return $instance->getUserSessionToken();
+
             }
             return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_LOGIN);
 

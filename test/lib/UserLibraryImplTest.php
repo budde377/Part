@@ -109,6 +109,13 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue($ret->exists(), 'User does not exist');
     }
 
+    public function testLoggingInAfterCreatingIsOk()
+    {
+        $user = $this->library->createUser('user4', $password = 'password', 'user3@test.dk', $this->library->getUser('user1'));
+        $user->login($password);
+        $this->assertEquals($user, $this->library->getUserLoggedIn());
+    }
+
     public function testCreateExistingUserWillReturnFalse()
     {
         $ret = $this->library->createUser('user1', 'somePass', 'test@test.dk', $this->library->getUser('user1'));

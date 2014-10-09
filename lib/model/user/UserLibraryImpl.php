@@ -106,6 +106,7 @@ class UserLibraryImpl implements UserLibrary, Observer
             return false;
         }
         $this->userList[$user->getUsername()] = $user;
+        $user->attachObserver($this);
         $this->setUpIterator();
         return $user;
     }
