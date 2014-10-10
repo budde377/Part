@@ -64,9 +64,6 @@ class UserSettingsInitializer extends core.Initializer {
   bool get canBeSetUp => pageOrderAvailable && userLibraryAvailable;
 
   void setUp() {
-
-    new core.KeepAlive().start();
-
     var client = new AJAXJSONClient();
     var order = pageOrder, userLib = userLibrary;
 
