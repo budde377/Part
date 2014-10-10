@@ -1,5 +1,43 @@
+#OnlineOfflineIndicator{
+    display: block;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    background-color: #656565;
+    border-radius: 0 3px 0 0;
+    padding: 0 20px 0 0;
+    font-weight: bold;
+    color: #fff;
+    line-height: 26px;
+    font-size: 12px;
+    width: 70px;
+    text-align: right;
+    z-index: 500;
+}
+#OnlineOfflineIndicator::after{
+    content: "Online";
+}
+
+#OnlineOfflineIndicator::before{
+    background-color: #00A301;
+    box-shadow: 0 0 3px rgb(36, 76, 12);
+    float: left;
+    width: 10px;
+    height: 10px;
+    margin: 8px 10px 8px 5px;
+    content: "";
+    border-radius: 5px;
+}
+
+body.offline #OnlineOfflineIndicator::after{
+    content:  "Offline";
+}
 
 
+body.offline #OnlineOfflineIndicator::before{
+    background-color: #CF2D2D;
+    box-shadow: 0 0 5px #B90000;
+}
 #UserSettingsContainer {
     position: relative;
     top: 0;
@@ -342,7 +380,7 @@ form.oneLineForm > div {
     float: left;
 }
 
-form.oneLineForm > div.submit > input {
+form.oneLineForm > div.submit > input[type=submit]:not([type=radio]):not([type=checkbox]) {
     margin: 25px 0 0 4px;
 }
 
@@ -534,6 +572,7 @@ form.initial input.invalid {
     font-size: 14px;
     line-height: 20px;
     color: #3C3C3C;
+
 }
 
 #UserSettingsLogTable{

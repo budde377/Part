@@ -11,7 +11,7 @@ part "src/core_keep_alive.dart";
 part 'src/core_initializer.dart';
 part 'src/core_file_uploader.dart';
 part 'src/core_function_string_compiler.dart';
-
+part 'src/core_connection.dart';
 
 int parseNumber(String pxString) => int.parse(pxString.replaceAll(new RegExp("[^0-9]"), ""), onError:(_) => 0);
 
@@ -265,7 +265,7 @@ String quoteString(String string, [String quote = '"']) => quote+(string.replace
 
 
 
-abstract class Response<V>{
+class Response<V>{
   static const RESPONSE_TYPE_SUCCESS = "success";
   static const RESPONSE_TYPE_ERROR = "error";
 
@@ -295,6 +295,9 @@ abstract class Response<V>{
   static const ERROR_CODE_INVALID_MESSAGE = 24;
   static const ERROR_CODE_INVALID_INPUT = 25;
   static const ERROR_CODE_INVALID_LOGIN = 26;
+
+  static const ERROR_CODE_COULD_NOT_PARSE_RESPONSE = 100;
+  static const ERROR_CODE_NO_CONNECTION = 101;
 
   final String type;
   final int error_code;

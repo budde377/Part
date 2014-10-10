@@ -70,3 +70,22 @@ class LoginFormulaInitializer implements Initializer {
   }
 
 }
+
+class OnlineOfflineBodyClassInitializer implements Initializer{
+
+  void setUp() {
+    var f = (bool b){
+      if(b){
+        body.classes.remove('offline');
+      } else {
+        body.classes.add('offline');
+      }
+
+    };
+    f(connection.hasConnection);
+    connection.onHasConnectionChange.listen(f);
+  }
+
+  bool get canBeSetUp => true;
+
+}

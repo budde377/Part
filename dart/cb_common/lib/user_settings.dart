@@ -45,8 +45,12 @@ String _errorMessage(int error_code) {
       return "Forkert kodeord";
     case core.Response.ERROR_CODE_INVALID_PASSWORD:
       return "Ugyldigt kodeord";
+    case core.Response.ERROR_CODE_COULD_NOT_PARSE_RESPONSE:
+      return "Ugyldigt svar fra server";
+    case core.Response.ERROR_CODE_NO_CONNECTION:
+      return "Ingen forbindelse til serveren";
     default:
-      return null;
+      return "Ukendt fejl";
   }
 }
 

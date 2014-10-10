@@ -23,10 +23,16 @@ class AJAXJSONClient extends JSONClient {
         return;
       }
       debug(request.responseText);
-      Map responseObject = JSON.decode(request.responseText);
+      var responseObject;
+      try {
+        responseObject = JSON.decode(request.responseText);
+      } catch(e){
+        completer.complete(new Response.error(connection.hasConnection?Response.ERROR_CODE_COULD_NOT_PARSE_RESPONSE:Response.ERROR_CODE_NO_CONNECTION));
+        return;
+      }
       var response;
       if ((response = parseResponse(responseObject)) == null) {
-        completer.completeError(new Exception("Couldn't parse response"));
+        completer.complete(new Response.error(connection.hasConnection?Response.ERROR_CODE_COULD_NOT_PARSE_RESPONSE:Response.ERROR_CODE_NO_CONNECTION));
       } else {
         completer.complete(response);
       }
@@ -36,7 +42,11 @@ class AJAXJSONClient extends JSONClient {
   }
 
   Future<JSONResponse> callFunctionString(String function, {void progress(num pct), FormData form_data:null}) {
-    var request = new HttpRequest();
+    if(!connection.hasConnection){
+      return new Future(()=>new Response.error(Response.ERROR_CODE_NO_CONNECTION));
+    }
+
+    var request = connection.buildRequest();
     var future = _setUpRequest(request);
     _registerProgressHandler(request, progress);
     var token = window.localStorage['user-login-token'];
