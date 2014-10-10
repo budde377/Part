@@ -159,91 +159,7 @@ class Validator<E extends Element> {
     _validator = f;
   }
 }
-/*
 
-class FormValidator{
-  static final Map<FormElement, FormValidator> _cache = new Map<FormElement, FormValidator>();
-
-  Map<Element, InfoBox> _elementToInfoMap = new Map<Element, InfoBox>();
-
-  final FormElement element;
-
-  EventListener _eventListener = (_){};
-
-  factory FormValidator(FormElement element) => _cache.putIfAbsent(element, ()=>new FormValidator._internal(element));
-
-  FormValidator._internal(this.element){
-    validators.forEach((Validator v){
-      v.element.onInput.listen((_){
-        if(v.valid){
-          _validElement(v);
-        } else {
-          _invalidElement(v);
-        }
-
-        if(_candidates.every((Element elm)=>elm.classes.contains("valid"))){
-          element.classes.add("valid");
-        } else {
-          element.classes.remove("valid");
-        }
-      });
-    });
-    element.addEventListener("focus", (Event evt)=>_eventListener(evt), true);
-  }
-
-  void _validElement(Validator v) {
-    if(v.element.classes.contains("valid")){
-      return;
-    }
-    v.element.classes.add("valid");
-    if(!_elementToInfoMap.containsKey(v.element)){
-      return;
-    }
-    _elementToInfoMap[v.element].remove();
-
-  }
-
-  void _invalidElement(Validator v) {
-    var valid = v.element.classes.contains("valid");
-    v.element.classes.remove("valid");
-    if(v.errorMessage.trim() == ""){
-      return;
-    }
-    if(!_elementToInfoMap.containsKey(v.element)){
-      InfoBox b = _elementToInfoMap[v.element] = new InfoBox(v.errorMessage);
-      b.backgroundColor = InfoBox.COLOR_RED;
-      b.removeOnESC = b.removeOnMouseDownOutsideOfBox = true;
-
-
-    }
-    InfoBox i = _elementToInfoMap[v.element];
-    i.infoHtml = v.errorMessage;
-    i.showAboveCenterOfElement(v.element);
-    _eventListener = (Event evt){
-      _elementToInfoMap.forEach((Element k, InfoBox i){
-        if(k == evt.target){
-          if(k.classes.contains("valid")){
-            return;
-          }
-          i.showAboveCenterOfElement(k);
-          return;
-        }
-        i.remove();
-      });
-    };
-
-  }
-
-  List<Validator> get validators => _candidates.map((Element elm) => new Validator(elm));
-
-  List<Element> get _candidates => element.querySelectorAll("input:not([type=submit]), textarea, select");
-
-  bool get valid => element.classes.contains("valid");
-
-  FormHandler get formHandler => new FormHandler(element);
-
-}
-*/
 
 class ValidatingForm {
 
@@ -385,5 +301,7 @@ class ValidatingForm {
 
 
   FormHandler get formHandler => new FormHandler(element);
+
+  bool get valid => _validForm;
 
 }
