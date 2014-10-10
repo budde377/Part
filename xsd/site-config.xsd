@@ -38,12 +38,7 @@
                         <xs:field xpath="."/>
                     </xs:unique>
                 </xs:element>
-                <xs:element name="AJAXRegistrable" type="ajaxIdLinkedValClassSequence" minOccurs="0">
-                    <xs:unique name="AJAXRegistrableName">
-                        <xs:selector xpath="class"/>
-                        <xs:field xpath="."/>
-                    </xs:unique>
-                </xs:element>
+
                 <xs:element name="AJAXTypeHandlers" type="linkedValClassSequence" minOccurs="0">
                     <xs:unique name="AJAXTypeHandlersName">
                         <xs:selector xpath="class"/>
