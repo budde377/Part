@@ -140,7 +140,10 @@ class BackendTypeHandlerImpl implements TypeHandler
 
 
         $userLibraryHandler->addAuthFunction(function ($type, $instance, $functionName) {
-            if ($this->userLibrary->getUserLoggedIn() == null && $functionName != "userLogin") {
+            if ($this->userLibrary->getUserLoggedIn() == null &&
+                $functionName != "userLogin" &&
+                $functionName != "forgotPassword"
+            ) {
                 return false;
             }
             return true;
@@ -161,7 +164,26 @@ class BackendTypeHandlerImpl implements TypeHandler
         $userLibraryHandler->addGetInstanceFunction('UserLibrary');
 
         $userLibraryHandler->addFunction("UserLibrary", "userLogin", function (UserLibrary $instance, $username, $password) {
-            if (($user = $instance->getUser($username)) == null) {
+
+            if (($user = $instance->getUser($username)) == null && $this->validMail($username)) {
+                foreach($instance->listUsers() as $u){
+                    if($user != null){
+                        continue;
+                    }
+                    if($u->getMail() !== trim($username)){
+                        continue;
+                    }
+                    if(!$u->verifyLogin($password)){
+                        continue;
+                    }
+                    $user = $u;
+
+                }
+
+
+            }
+
+            if($user == null){
                 return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_LOGIN);
             }
 
@@ -246,9 +268,10 @@ class BackendTypeHandlerImpl implements TypeHandler
             }
             $domain = $this->backend->getConfigInstance()->getDomain();
 
-            foreach($this->userLibrary->listUsers() as $user){
+            foreach($instance->listUsers() as $user){
                 if($user->getMail() == $mail){
                     $password = uniqid();
+                    $user->setPassword($password);
                     $m = new MailImpl();
                     $m->addReceiver($user);
                     $m->setSender("no-reply@$domain");
