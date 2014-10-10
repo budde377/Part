@@ -272,7 +272,7 @@ class UserImpl implements User, Observable
      */
     public function isLoggedIn()
     {
-        return $this->SESSIONValueOfIndexIfSetElseDefault('model-user-login-token', false) == $this->getUserToken();
+        return $this->SESSIONValueOfIndexIfSetElseDefault('model-user-login-token', false) == $this->getUsernamePasswordHash();
     }
 
     /**
@@ -492,7 +492,7 @@ class UserImpl implements User, Observable
 
     private function updateLoginSession()
     {
-        $_SESSION['model-user-login-token'] = $this->getUserToken();
+        $_SESSION['model-user-login-token'] = $this->getUsernamePasswordHash();
     }
 
     private function someOneLoggedIn()
@@ -507,5 +507,10 @@ class UserImpl implements User, Observable
     public function getUserToken()
     {
         return sha1($this->getUniqueId().$this->getLastLogin());
+    }
+
+    private function getUsernamePasswordHash()
+    {
+        return sha1($this->getUsername().$this->getPassword());
     }
 }
