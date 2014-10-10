@@ -3,6 +3,7 @@ namespace ChristianBudde\cbweb\controller\ajax;
 use ChristianBudde\cbweb\BackendSingletonContainer;
 
 use ChristianBudde\cbweb\model\updater\Updater;
+use ChristianBudde\cbweb\test\JSONResponseImplTest;
 use ChristianBudde\cbweb\util\file\File;
 use ChristianBudde\cbweb\util\file\FileImpl;
 use ChristianBudde\cbweb\controller\function_string\ParserImpl;
@@ -17,6 +18,7 @@ use ChristianBudde\cbweb\model\page\PageContent;
 use ChristianBudde\cbweb\model\page\PageOrder;
 use ChristianBudde\cbweb\model\user\User;
 use ChristianBudde\cbweb\model\user\UserLibrary;
+use ChristianBudde\cbweb\util\traits\ValidationTrait;
 
 /**
  * Created by PhpStorm.
@@ -26,6 +28,8 @@ use ChristianBudde\cbweb\model\user\UserLibrary;
  */
 class BackendTypeHandlerImpl implements TypeHandler
 {
+
+    use ValidationTrait;
 
     private $backend;
     private $userLibrary;
@@ -146,6 +150,7 @@ class BackendTypeHandlerImpl implements TypeHandler
             'listUsers',
             'deleteUser',
             'userLogin',
+            'forgotPassword',
             'getUserLoggedIn',
             'getInstance',
             'getUser',
@@ -231,6 +236,39 @@ class BackendTypeHandlerImpl implements TypeHandler
 
             return $user;
 
+        });
+
+        $userLibraryHandler->addFunction('UserLibrary', 'forgotPassword', function(UserLibrary $instance, $mail){
+
+            $mail = trim($mail);
+            if(!$this->validMail($mail)){
+                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_MAIL);
+            }
+            $domain = $this->backend->getConfigInstance()->getDomain();
+
+            foreach($this->userLibrary->listUsers() as $user){
+                if($user->getMail() == $mail){
+                    $password = uniqid();
+                    $m = new MailImpl();
+                    $m->addReceiver($user);
+                    $m->setSender("no-reply@$domain");
+                    $m->setMailType(Mail::MAIL_TYPE_PLAIN);
+                    $m->setSubject("Kodeord nulstillet");
+                    $m->setMessage("Hej,\n" .
+                        "Dit kodeord på $domain er blevet nulstillet.\n" .
+                        "Du kan nu logge ind med følgende oplysninger:\n\n" .
+
+                        "    Brugernavn: {$user->getUsername()}\n" .
+                        "    Kodeord:    $password\n\n" .
+
+                        "Vh\n" .
+                        "Admin Jensen");
+                    $m->sendMail();
+
+                }
+            }
+
+            return new ResponseImpl();
         });
 
     }

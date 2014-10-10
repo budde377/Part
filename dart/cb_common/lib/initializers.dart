@@ -54,7 +54,7 @@ class LoginFormulaInitializer implements Initializer {
       var username = quoteString(data['username']);
       var password = quoteString(data['password']);
 
-      client.callFunctionString("UserLibrary.userLogin($username, $password)", progress:(double pct) => debug("PCT $pct")).then((Response<String> response) {
+      client.callFunctionString("UserLibrary.userLogin($username, $password)").then((Response<String> response) {
         if (response.type == Response.RESPONSE_TYPE_ERROR) {
           form.unBlur();
           form.changeNotion("Ugyldigt login", FormHandler.NOTION_TYPE_ERROR);
@@ -70,6 +70,41 @@ class LoginFormulaInitializer implements Initializer {
   }
 
 }
+
+
+
+class ForgotPasswordFormulaInitializer implements Initializer {
+  FormElement _forgotForm = querySelector("form#UserForgotPasswordForm");
+
+  bool get canBeSetUp => _forgotForm != null;
+
+  void setUp() {
+    var form = new FormHandler(_forgotForm);
+    var client = new AJAXJSONClient();
+    form.submitFunction = (Map<String, String> data) {
+      form.blur();
+
+      var mail = quoteString(data['mail']);
+
+      client.callFunctionString("UserLibrary.forgotPassword($mail)").then((Response<String> response) {
+        if (response.type == Response.RESPONSE_TYPE_ERROR) {
+          form.unBlur();
+          form.changeNotion("Fejl", FormHandler.NOTION_TYPE_ERROR);
+        } else {
+          form.changeNotion("Mail med nye oplysninger er sendt", FormHandler.NOTION_TYPE_SUCCESS);
+          TextInputElement i = _forgotForm.querySelector("input[name=mail]");
+          i.value = "";
+          i.blur();
+        }
+
+      });
+      return false;
+    };
+  }
+
+}
+
+
 
 class OnlineOfflineBodyClassInitializer implements Initializer{
 
