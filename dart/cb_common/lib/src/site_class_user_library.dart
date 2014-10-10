@@ -36,6 +36,11 @@ abstract class UserLibrary {
   Map<String, User> get pageUsers;
 
   User get userLoggedIn;
+
+  Future<String> userLogin(String username, String password);
+
+  Future<UserLibrary> forgotPassword(String password);
+
 }
 
 class JSONUserLibrary extends UserLibrary {
@@ -48,13 +53,6 @@ class JSONUserLibrary extends UserLibrary {
   StreamController<UserLibraryChangeEvent> _changeController = new StreamController<UserLibraryChangeEvent>();
 
 
-/*
-  factory JSONUserLibrary(PageOrder pageOrder){
-    var library = _retrieveInstance(pageOrder);
-    library._setUp();
-
-  }
-*/
 
   JSONUserLibrary(List<User> users, String currentUserName, PageOrder pageOrder) : this.pageOrder = pageOrder {
     _setUpFromLists(users, currentUserName);
@@ -77,26 +75,6 @@ class JSONUserLibrary extends UserLibrary {
 
   }
 
-/*
-  void _setUp() {
-    if (_hasBeenSetUp) {
-      return;
-    }
-    _hasBeenSetUp = true;
-
-    var function = new ListUsersJSONFunction();
-    var functionCallback = (JSONResponse response) {
-      if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
-        return;
-      }
-      _userLoggedInId = response.payload['user_logged_in'];
-
-      response.payload['users'].forEach((JSONObject o) => _addUserFromObjectToUsers(o,response.payload['page_privileges'].containsKey(o.variables['username'])?response.payload['page_privileges'][o.variables['username']]:[]));
-
-    };
-    ajaxClient.callFunction(function).then(functionCallback);
-  }
-*/
 
   String _addUserFromObjectToUsers(JSONObject o, List<String> page_ids) {
     var privilegesString = o.variables['privileges'];
@@ -191,5 +169,19 @@ class JSONUserLibrary extends UserLibrary {
     });
     return retMap;
   }
+
+
+  Future<String> userLogin(String username, String password){
+    var future = ajaxClient.callFunctionString('UserLibrary.userLogin(${quoteString(username)}, ${quoteString(password)})');
+    future.then((Response response){
+      if(response.type == Response.RESPONSE_TYPE_SUCCESS){
+        _userLoggedInId = username;
+      }
+    });
+    return future;
+  }
+
+  Future<UserLibrary> forgotPassword(String password) => ajaxClient.callFunctionString('UserLibrary.forgotPassword(${quoteString(password)})');
+
 
 }
