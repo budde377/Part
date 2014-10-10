@@ -37,9 +37,9 @@ abstract class UserLibrary {
 
   User get userLoggedIn;
 
-  Future<String> userLogin(String username, String password);
+  Future<Response<String>> userLogin(String username, String password);
 
-  Future<UserLibrary> forgotPassword(String password);
+  Future<Response> forgotPassword(String password);
 
 }
 
@@ -171,7 +171,7 @@ class JSONUserLibrary extends UserLibrary {
   }
 
 
-  Future<String> userLogin(String username, String password){
+  Future<Response<String>> userLogin(String username, String password){
     var future = ajaxClient.callFunctionString('UserLibrary.userLogin(${quoteString(username)}, ${quoteString(password)})');
     future.then((Response response){
       if(response.type == Response.RESPONSE_TYPE_SUCCESS){
@@ -181,7 +181,7 @@ class JSONUserLibrary extends UserLibrary {
     return future;
   }
 
-  Future<UserLibrary> forgotPassword(String password) => ajaxClient.callFunctionString('UserLibrary.forgotPassword(${quoteString(password)})');
+  Future<Response> forgotPassword(String password) => ajaxClient.callFunctionString('UserLibrary.forgotPassword(${quoteString(password)})');
 
 
 }

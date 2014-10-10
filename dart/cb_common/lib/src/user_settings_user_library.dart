@@ -53,9 +53,9 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
 
 //  UserSettingsJSONUserLibrary() : _userLibrary = new JSONUserLibrary(pageOrder);
 
-  Future<ChangeResponse<User>> createUser(String mail, String privileges) => _userLibrary.createUser(mail, privileges);
+  Future<core.Response<User>> createUser(String mail, String privileges) => _userLibrary.createUser(mail, privileges);
 
-  Future<ChangeResponse<User>> deleteUser(String username) => _userLibrary.deleteUser(username);
+  Future<core.Response<User>> deleteUser(String username) => _userLibrary.deleteUser(username);
 
   Stream<UserLibraryChangeEvent> get onChange => _userLibrary.onChange;
 
@@ -68,4 +68,9 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
   Map<String, User> get pageUsers => _userLibrary.pageUsers;
 
   User get userLoggedIn => _userLibrary.userLoggedIn;
+
+  Future<core.Response<String>> userLogin(String username, String password) => _userLibrary.userLogin(username, password);
+
+  Future<core.Response> forgotPassword(String password) => _userLibrary.forgotPassword(password);
+
 }
