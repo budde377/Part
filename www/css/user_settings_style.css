@@ -78,7 +78,7 @@
 
 }
 
-#UserSettingsContent input:not([type=submit]):not([type=radio]) {
+#UserSettingsContent input:not([type=submit]):not([type=radio]):not([type=checkbox]) {
     width: 250px;
 }
 
@@ -118,10 +118,12 @@
     width: 600px;
 }
 
-#UserSettingsContent div.update_site_container{
+#UserSettingsContent .container_box{
     float: left;
     width: 870px;
 }
+
+
 
 
 #ActiveListPath {

@@ -414,9 +414,9 @@ class BackendTypeHandlerImpl implements TypeHandler
         $server->registerHandler($updaterHandler = new GenericObjectTypeHandlerImpl($this->backend->getUpdater(), "Updater"));
         $updaterHandler->addFunctionAuthFunction('Updater', 'update', $this->sitePrivilegesFunction);
         $updaterHandler->addFunctionAuthFunction('Updater', 'checkForUpdates', $this->sitePrivilegesFunction);
-        $updaterHandler->addFunctionAuthFunction('Updater', 'allowCheckOnLogin', $this->userLoggedInAuthFunction);
-        $updaterHandler->addFunctionAuthFunction('Updater', 'disallowCheckOnLogin', $this->userLoggedInAuthFunction);
-        $updaterHandler->addFunctionAuthFunction('Updater', 'isCheckOnLoginAllowed', $this->userLoggedInAuthFunction);
+        $updaterHandler->addFunctionAuthFunction('Updater', 'allowCheckOnLogin', $this->sitePrivilegesFunction);
+        $updaterHandler->addFunctionAuthFunction('Updater', 'disallowCheckOnLogin', $this->sitePrivilegesFunction);
+        $updaterHandler->addFunctionAuthFunction('Updater', 'isCheckOnLoginAllowed', $this->sitePrivilegesFunction);
 
         $updaterHandler->addFunction('Updater', 'allowCheckOnLogin', function(Updater $instance){
             $user = $this->userLibrary->getUserLoggedIn();

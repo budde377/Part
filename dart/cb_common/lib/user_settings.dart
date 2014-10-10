@@ -166,6 +166,7 @@ class UserSettingsLoggerInitializer extends core.Initializer {
 
 class UserSettingsUpdateSiteInitializer extends core.Initializer {
   ButtonElement _checkButton = querySelector("#UserSettingsContent button.update_check");
+  CheckboxInputElement _autoCheckBox = querySelector("#UserSettingsContent #UserSettingsUpdaterEnableAutoUpdate");
 
   SpanElement _checkTime = querySelector("#UserSettingsContent .update_site span.check_time");
 
@@ -175,7 +176,7 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
 
   bool _canBeUpdated;
 
-  bool get canBeSetUp => _checkButton != null && _checkTime != null && _updateInformationMessage != null;
+  bool get canBeSetUp => _autoCheckBox != null && _checkButton != null && _checkTime != null && _updateInformationMessage != null;
 
   void setUp() {
     _canBeUpdated = !_updateInformationMessage.hidden;
@@ -214,6 +215,14 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
 
     });
     _updateInformationMessage.querySelector("a").onClick.listen((_) => _updateSite());
+
+
+
+
+
+    _autoCheckBox.onChange.listen((Event event){
+      core.debug(event);
+    });
   }
 
   void _updateCheckButton([bool searching = false]) {

@@ -60,6 +60,8 @@ class UserSettingsUpdateWebsitePageElementImpl extends PageElementImpl
         $msg2 = 'Check for opdateringer';
         $msg3 = $this->updater->checkForUpdates(true)?$msg1:$msg2;
 
+        $checked = $this->updater->isCheckOnLoginAllowed($this->container->getUserLibraryInstance()->getUserLoggedIn())?"checked":"";
+
         $return = "
 
         <p class='text update_site'>
@@ -67,13 +69,22 @@ class UserSettingsUpdateWebsitePageElementImpl extends PageElementImpl
         Da din hjemmeside understøtter opdateringer, vil du modtage opdateringer i takt med at de bliver udgivet. Denne service er en del af din hosting aftale, og du kan checke efter opdateringer ved at klikke på knappen herunder.<br />
         Der er sidst checket efter opdateringer <span class='check_time'>{$this->dateString($this->updater->lastChecked())}</span>.
         </p>
-        <div class='update_site_container'>
+        <div class='update_site_container container_box'>
                 <button class='update_check'
                     data-work-check-value='Undersøger'
                     data-work-update-value='Opdaterer'
                     data-update-value='$msg1'
                     data-check-value='$msg2'>$msg3</button>
         </div>
+        <p class='text'>
+        Som udgangspunkt checker systemet efter nye opdateringer når du logger på. Dette er anbefalet, da du dermed er sikret den seneste version af din hjemmeside.
+        Du kan ændre dette herunder.
+        </p>
+        <form class='container_box no_loader'>
+        <input type='checkbox' $checked class='on_off_checkbox' id='UserSettingsUpdaterEnableAutoUpdate'/>
+        <label for='UserSettingsUpdaterEnableAutoUpdate' class='fake_button'>
+        </label>
+        </form>
         ";
 
 

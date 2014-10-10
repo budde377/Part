@@ -183,7 +183,7 @@ form div.radio label {
     padding: 0;
 }
 
-input:not([type=radio]) {
+input:not([type=radio]):not([type=checkbox]) {
     background-color: #fff;
     border: 1px solid #aaa;
     line-height: 30px;
@@ -197,20 +197,75 @@ input:not([type=submit]).invalid {
     background-color: rgb(252, 239, 240);
 }
 
-input[type=submit], button {
+input[type=submit]:not([type=radio]):not([type=checkbox]), button {
     border: 1px solid #bbb;
     padding: 0 40px;
     width: auto;
     font-size: 10px;
     border-radius: 3px;
     margin-top: 20px;
-    background: #e8e8e8;
+    background-color: #e8e8e8;
     font-weight: bold;
     height: 32px;
     cursor: pointer;
 }
+/* On Off Checkbox */
+input[type=checkbox].on_off_checkbox{
+    display:none;
+}
 
-input:hover, .better_select:hover > .current_selection, button:hover {
+input[type=checkbox].on_off_checkbox + label{
+    text-align: left;
+    display:block;
+    float:left;
+    height:30px;
+    width:15px;
+    line-height:30px;
+    position:relative;
+    border: 1px solid #bbb;
+    padding: 0 20px 0 40px;
+    font-size: 10px;
+    border-radius: 3px;
+    margin-top: 20px;
+    background-color: #e8e8e8;
+    font-weight: bold;
+    cursor: pointer;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+input[type=checkbox].on_off_checkbox + label::after{
+    content: "";
+    position:absolute;
+    left:10px;
+    width:10px;
+    height:10px;
+    top:10px;
+    bottom:10px;
+    background-color: #032e04;
+    border-radius: 5px;
+    box-shadow: 0 0 5px #FFFFFF;
+}
+
+input[type=checkbox].on_off_checkbox:checked + label::after{
+    background-color: #00A301;
+    box-shadow: 0 0 3px rgb(36, 76, 12);
+}
+
+input[type=checkbox].on_off_checkbox + label::before{
+    content:"Fra";
+
+}
+input[type=checkbox].on_off_checkbox:checked + label::before{
+    content:"Til";
+}
+
+input:hover, .better_select:hover > .current_selection, button:hover, .fake_button:hover, input[type=checkbox].on_off_checkbox + label:hover{
     border-color: #ffaf33;
 }
 
@@ -223,7 +278,7 @@ input:focus, button:active, input[type=submit]:active {
     border-color: #aaa;
 }
 
-input[type=submit]:hover, button:hover {
+input[type=submit]:hover, button:hover, .fake_button:hover, input[type=checkbox].on_off_checkbox + label:hover{
     background-image: linear-gradient(bottom, rgb(232, 232, 232) 23%, rgb(255, 255, 255) 81%);
     background-image: -o-linear-gradient(bottom, rgb(232, 232, 232) 23%, rgb(255, 255, 255) 81%);
     background-image: -moz-linear-gradient(bottom, rgb(232, 232, 232) 23%, rgb(255, 255, 255) 81%);
@@ -394,7 +449,7 @@ select.better_select_select {
     position: relative;
 }
 
-.blur:before {
+.blur:not(.no_loader)::before {
     display: block;
     position: absolute;
     z-index: 201;
