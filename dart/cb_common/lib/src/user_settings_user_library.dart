@@ -51,8 +51,6 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
     return new JSONUserLibrary(users, currentUser, pageOrder);
   }
 
-//  UserSettingsJSONUserLibrary() : _userLibrary = new JSONUserLibrary(pageOrder);
-
   Future<core.Response<User>> createUser(String mail, String privileges) => _userLibrary.createUser(mail, privileges);
 
   Future<core.Response<User>> deleteUser(String username) => _userLibrary.deleteUser(username);
