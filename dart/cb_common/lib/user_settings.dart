@@ -221,7 +221,22 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
 
 
     _autoCheckBox.onChange.listen((Event event){
-      core.debug(event);
+      var checked = _autoCheckBox.checked;
+      _autoCheckBox.checked = !checked;
+      _autoCheckBox.parent.classes.add('blur');
+
+      var responseHandler = (core.Response r){
+        if(r.type == core.Response.RESPONSE_TYPE_SUCCESS){
+          _autoCheckBox.checked = checked;
+        }
+        _autoCheckBox.parent.classes.remove('blur');
+      };
+      if(checked){
+        updater.allowCheckOnLogin().then(responseHandler);
+      } else {
+        updater.disallowCheckOnLogin().then(responseHandler);
+      }
+
     });
   }
 

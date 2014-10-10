@@ -41,6 +41,11 @@ class UserLoginUpdateCheckPreScript implements  Script{
         }
 
         $updater = $this->backendContainer->getUpdater();
+
+        if(!$updater->isCheckOnLoginAllowed($user)){
+            return;
+        }
+
         $i = $user->getLastLogin();
         if($updater->lastChecked() >= $i){
             return;
