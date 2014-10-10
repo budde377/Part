@@ -18,7 +18,7 @@ body.no_scroll {
     overflow-y: scroll;
 }
 
-body.no_select {
+.no_select {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
