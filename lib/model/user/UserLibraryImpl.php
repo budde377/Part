@@ -150,6 +150,8 @@ class UserLibraryImpl implements UserLibrary, Observer
                 break;
             case User::EVENT_LOGIN:
                 $this->userLoggedIn = $subject;
+                unset($_SESSION['model-user-library-session-token']);
+
         }
     }
 
@@ -283,7 +285,11 @@ class UserLibraryImpl implements UserLibrary, Observer
      */
     public function getUserSessionToken()
     {
-        return ($u = $this->getUserLoggedIn()) == null?null:$u->getUserToken();
+        if(($u = $this->getUserLoggedIn()) == null){
+            return null;
+        }
+
+        return isset($_SESSION['model-user-library-session-token'])?$_SESSION['model-user-library-session-token']:$_SESSION['model-user-library-session-token'] = $u->getUserToken();
     }
 
     /**
