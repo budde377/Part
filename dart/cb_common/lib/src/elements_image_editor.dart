@@ -15,14 +15,23 @@ class ImageEditProperties {
     this._height = height;
   }
 
-  ImageEditProperties.fromUrlString(String src) {
-    var regexp = new RegExp(r"(_files/[^\-]+)(-[^\.]+)(\.[A-Za-z]+)$");
+  ImageEditProperties.fromUrlString(String src) => setUpFromUrlString(src);
+
+
+  void setUpFromUrlString(String src) {
+    var regexp = new RegExp(r"((_files/)(.+)(\.[A-Za-z]+))$");
     var match = regexp.firstMatch(src);
     if (match == null) {
       return;
     }
-    _url = match[1] + match[3];
-    var options = match[2];
+    _url = match[1];
+    var regexp2 = new RegExp(r"^([^\-]+)(-[^\.]+)$");
+    var match2 = regexp2.firstMatch(match[3]);
+    if(match2 == null){
+      return;
+    }
+    _url = match[2]+match2[1]+match[4];
+    var options = match2[2];
     var optRegexp = new RegExp(r"-([CSRM])([^-]+)");
     optRegexp.allMatches(options).forEach((Match m) {
       var vars = m[2].split("_");
@@ -50,7 +59,16 @@ class ImageEditProperties {
     });
   }
 
-  ImageEditProperties.fromImageElement(ImageElement element): this.fromUrlString(element.src);
+
+  ImageEditProperties.fromImageElement(ImageElement element){
+    this.setUpFromUrlString(element.src);
+    if(_width == null){
+      _width = element.width;
+    }
+    if(_height == null){
+      _height = element.width;
+    }
+  }
 
   bool _mirrorVertical = false, _mirrorHorizontal = false;
 

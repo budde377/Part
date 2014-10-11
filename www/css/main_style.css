@@ -192,7 +192,7 @@ input:not([type=radio]):not([type=checkbox]) {
     height: 30px;
 }
 
-input:not([type=submit]).invalid {
+input:not([type=submit]):not(.initial).invalid {
     border-color: #ca0000;
     background-color: rgb(252, 239, 240);
 }

@@ -159,93 +159,10 @@ class Validator<E extends Element> {
     _validator = f;
   }
 }
-/*
 
-class FormValidator{
-  static final Map<FormElement, FormValidator> _cache = new Map<FormElement, FormValidator>();
-
-  Map<Element, InfoBox> _elementToInfoMap = new Map<Element, InfoBox>();
-
-  final FormElement element;
-
-  EventListener _eventListener = (_){};
-
-  factory FormValidator(FormElement element) => _cache.putIfAbsent(element, ()=>new FormValidator._internal(element));
-
-  FormValidator._internal(this.element){
-    validators.forEach((Validator v){
-      v.element.onInput.listen((_){
-        if(v.valid){
-          _validElement(v);
-        } else {
-          _invalidElement(v);
-        }
-
-        if(_candidates.every((Element elm)=>elm.classes.contains("valid"))){
-          element.classes.add("valid");
-        } else {
-          element.classes.remove("valid");
-        }
-      });
-    });
-    element.addEventListener("focus", (Event evt)=>_eventListener(evt), true);
-  }
-
-  void _validElement(Validator v) {
-    if(v.element.classes.contains("valid")){
-      return;
-    }
-    v.element.classes.add("valid");
-    if(!_elementToInfoMap.containsKey(v.element)){
-      return;
-    }
-    _elementToInfoMap[v.element].remove();
-
-  }
-
-  void _invalidElement(Validator v) {
-    var valid = v.element.classes.contains("valid");
-    v.element.classes.remove("valid");
-    if(v.errorMessage.trim() == ""){
-      return;
-    }
-    if(!_elementToInfoMap.containsKey(v.element)){
-      InfoBox b = _elementToInfoMap[v.element] = new InfoBox(v.errorMessage);
-      b.backgroundColor = InfoBox.COLOR_RED;
-      b.removeOnESC = b.removeOnMouseDownOutsideOfBox = true;
-
-
-    }
-    InfoBox i = _elementToInfoMap[v.element];
-    i.infoHtml = v.errorMessage;
-    i.showAboveCenterOfElement(v.element);
-    _eventListener = (Event evt){
-      _elementToInfoMap.forEach((Element k, InfoBox i){
-        if(k == evt.target){
-          if(k.classes.contains("valid")){
-            return;
-          }
-          i.showAboveCenterOfElement(k);
-          return;
-        }
-        i.remove();
-      });
-    };
-
-  }
-
-  List<Validator> get validators => _candidates.map((Element elm) => new Validator(elm));
-
-  List<Element> get _candidates => element.querySelectorAll("input:not([type=submit]), textarea, select");
-
-  bool get valid => element.classes.contains("valid");
-
-  FormHandler get formHandler => new FormHandler(element);
-
-}
-*/
 
 class ValidatingForm {
+
   final FormElement element;
 
   static final Map<FormElement, ValidatingForm> _cache = new Map<FormElement, ValidatingForm>();
@@ -271,12 +188,11 @@ class ValidatingForm {
 
   void _setUp() {
     element.onSubmit.listen((Event e) {
-      if (element.classes.contains('invalid')) {
+      if (!_validForm) {
         e.preventDefault();
         e.stopImmediatePropagation();
       }
-    }); //There used to be a second parameter, properly for execution on the way back or something. That is missing
-
+    });
     var listener = (Element elm,bool h)=>(Event e){
       if(_infoBoxMap.containsKey(elm)){
         _infoBoxMap[elm].element.hidden=h;
@@ -286,9 +202,10 @@ class ValidatingForm {
 
     var inputs = element.querySelectorAll('input:not([type=submit]), textarea');
     inputs.forEach((InputElement elm) {
+      var v = new Validator(elm);
       elm.onBlur.listen(listener(elm,true));
       elm.onFocus.listen(listener(elm,false));
-      elm.classes.add('valid');
+      elm.classes..add(v.valid?'valid':'invalid')..add('initial');
       _valueMap[elm] = elm.value;
       elm.onKeyUp.listen((Event e) {
         if (_valueMap[elm] == elm.value) {
@@ -302,11 +219,13 @@ class ValidatingForm {
     selects.forEach((Element elm) {
       elm.onBlur.listen(listener(elm,true));
       elm.onFocus.listen(listener(elm,false));
-      elm.classes.add('valid');
+      var v = new Validator(elm);
+      elm.classes..add(v.valid?'valid':'invalid')..add('initial');
       elm.onChange.listen((Event e) => _checkElement(elm));
     });
 
     element.classes.add('initial');
+    _updateFormValidStatus();
   }
 
   void validate([bool initial = true]) {
@@ -332,6 +251,7 @@ class ValidatingForm {
   }
 
   void _checkElement(Element elm) {
+    elm.classes.remove('initial');
     element.classes.remove('initial');
     var v = new Validator(elm);
     if (v.valid && elm.classes.contains('invalid')) {
@@ -341,10 +261,7 @@ class ValidatingForm {
         _infoBoxMap[elm].remove();
         _infoBoxMap.remove(elm);
       }
-      if (!_validForm && element.querySelector('input:not([type=submit]).invalid, textarea.invalid, select.invalid') == null) {
-        _validForm = true;
-        _changeToValid();
-      }
+      _updateFormValidStatus();
     } else if (!v.valid && elm.classes.contains('valid')) {
       elm.classes.remove('valid');
       elm.classes.add('invalid');
@@ -354,13 +271,21 @@ class ValidatingForm {
         ..showAboveCenterOfElement(elm);
         _infoBoxMap[elm] = box;
       }
-      if (_validForm) {
-        _validForm = false;
-        _changeToInvalid();
-      }
+      _updateFormValidStatus();
     }
 
 
+  }
+
+
+  void _updateFormValidStatus() {
+    if (!_validForm && element.querySelector('input:not([type=submit]).invalid, textarea.invalid, select.invalid') == null) {
+      _validForm = true;
+      _changeToValid();
+    } else if(_validForm && element.querySelector('input:not([type=submit]).invalid, textarea.invalid, select.invalid') != null ){
+      _validForm = false;
+      _changeToInvalid();
+    }
   }
 
   void _changeToValid() {
@@ -371,8 +296,12 @@ class ValidatingForm {
   void _changeToInvalid() {
     element.classes.add('invalid');
     element.classes.remove('valid');
-
   }
+
+
+
   FormHandler get formHandler => new FormHandler(element);
+
+  bool get valid => _validForm;
 
 }
