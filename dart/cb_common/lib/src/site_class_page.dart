@@ -20,7 +20,7 @@ abstract class Page {
 
   bool get hidden;
 
- // bool get editable;
+  // bool get editable;
 
   Future<ChangeResponse<Page>> changeInfo({String id, String title, String template, String alias, bool hidden});
 
@@ -62,22 +62,22 @@ class JSONPage extends Page {
   }
 
   Future<ChangeResponse<Page>> changeInfo({String id:null, String title:null, String template:null, String alias:null, bool hidden:null}) {
-    id = id != null ? id : _id;
-    title = title != null ? title : _title;
-    template = template != null ? template : _template;
-    alias = alias != null ? alias : _alias;
-    var hideFunction = "";
-    if(hidden && !_hidden){
-      hideFunction = "..hide()";
-    } else if (!hidden && _hidden){
-      hideFunction = "..show()";
+    var functionString = "";
+    functionString += id == null ? "" : "..setId(${quoteString(id)})";
+    functionString += title == null ? "" : "..setTitle(${quoteString(title)})";
+    functionString += template == null ? "" : "..setTemplate(${quoteString(template)})";
+    functionString += alias == null ? "" : "..setAlias(${quoteString(alias)})";
+
+    if (hidden && !_hidden) {
+      functionString += "..hide()";
+    } else if (!hidden && _hidden) {
+      functionString += "..show()";
     }
-    hidden = hidden != null ? hidden : _hidden;
     var completer = new Completer<ChangeResponse<Page>>();
     var functionCallback = (JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         JSONObject payload = response.payload;
-        if(payload is JSONObject){
+        if (payload is JSONObject) {
           _id = payload.variables['id'];
           _template = payload.variables['template'];
           _title = payload.variables['title'];
@@ -91,7 +91,7 @@ class JSONPage extends Page {
         completer.complete(new ChangeResponse<Page>.error(response.error_code));
       }
     };
-    ajaxClient.callFunctionString("PageOrder.getPage(${quoteString(id)})..setId(${quoteString(id)})..setTitle(${quoteString(title)})..setTemplate(${quoteString(template)})..setAlias(${quoteString(alias)})$hideFunction..getInstance()").then(functionCallback);
+    ajaxClient.callFunctionString("PageOrder.getPage(${quoteString(id)})$functionString..getInstance()").then(functionCallback);
     return completer.future;
   }
 

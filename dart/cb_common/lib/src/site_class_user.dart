@@ -20,13 +20,13 @@ abstract class User {
 
   List<Page> get pages;
 
-  Future<ChangeResponse<User>> changeInfo({String username:null, String mail:null});
+  Future<Response<User>> changeInfo({String username:null, String mail:null});
 
-  Future<ChangeResponse<User>> changePassword(String currentPassword, String newPassword);
+  Future<Response<User>> changePassword(String currentPassword, String newPassword);
 
-  Future<ChangeResponse<User>> addPagePrivilege(Page page);
+  Future<Response<User>> addPagePrivilege(Page page);
 
-  Future<ChangeResponse<User>>revokePagePrivilege(Page page);
+  Future<Response<User>>revokePagePrivilege(Page page);
 
   bool get hasRootPrivileges;
   bool get hasSitePrivileges;
@@ -70,7 +70,7 @@ class JSONUser extends User {
 
   DateTime get lastLogin => _lastLogin;
 
-  Future<ChangeResponse<User>> changeInfo({String username:null, String mail:null}) {
+  Future<Response<User>> changeInfo({String username:null, String mail:null}) {
     var completer = new Completer<ChangeResponse<User>>();
 
     var functionString = "";
