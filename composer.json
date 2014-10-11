@@ -2,7 +2,7 @@
     "name": "christianbud.de/cbweb",
     "description": "A way better CMS",
     "require": {
-        "twig/twig": "1.16.*"
+        "twig/twig": "1.*"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",
