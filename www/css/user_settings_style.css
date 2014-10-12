@@ -385,6 +385,9 @@ form > span.notion {
 #UserSettingsContent .blur:after {
     background: rgba(206, 206, 206, 0.7);
 }
+#UserSettingsContent .blur:after , body.offline .disable_on_offline::after{
+    background: rgba(206, 206, 206, 0.7);
+}
 
 #UserSettingsContent .colorList > li.blur {
     background-color: #EEE;

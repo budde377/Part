@@ -445,7 +445,9 @@ select.better_select_select {
     font-style: italic;
 }
 
-.blur {
+
+
+.blur, body.offline .disable_on_offline{
     position: relative;
 }
 
@@ -463,11 +465,30 @@ select.better_select_select {
 
     background: transparent url(/_common/img/loader.svg) scroll no-repeat center center;
     background-size: 75px 75px;
-    padding: 10px;
+
+
+}
+body.offline .disable_on_offline::before {
+    display: block;
+    position: absolute;
+    z-index: 201;
+
+    height: 20px;
+    width: 100px;
+    margin-top: -50px;
+    margin-left: -50px;
+    top: 50%;
+    left: 50%;
+    background: transparent url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KCgo8IS0tIFRoZSBpY29uIGNhbiBiZSB1c2VkIGZyZWVseSBpbiBib3RoIHBlcnNvbmFsIGFuZCBjb21tZXJjaWFsIHByb2plY3RzIHdpdGggbm8gYXR0cmlidXRpb24gcmVxdWlyZWQsIGJ1dCBhbHdheXMgYXBwcmVjaWF0ZWQuIApZb3UgbWF5IE5PVCBzdWItbGljZW5zZSwgcmVzZWxsLCByZW50LCByZWRpc3RyaWJ1dGUgb3Igb3RoZXJ3aXNlIHRyYW5zZmVyIHRoZSBpY29uIHdpdGhvdXQgZXhwcmVzcyB3cml0dGVuIHBlcm1pc3Npb24gZnJvbSBpY29ubW9uc3RyLmNvbSAtLT4KCgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgoKPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoKCSB3aWR0aD0iNTEycHgiIGhlaWdodD0iNTEycHgiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA1MTIgNTEyIiB4bWw6c3BhY2U9InByZXNlcnZlIj4KCjxwYXRoIGZpbGw9IiNBQTM5MzkiIGlkPSJlcnJvci00LWljb24iIGQ9Ik0zMjQuNzYsOTBMNDIyLDE4Ny4yNHYxMzcuNTJMMzI0Ljc2LDQyMkgxODcuMjRMOTAsMzI0Ljc2VjE4Ny4yNEwxODcuMjQsOTBIMzI0Ljc2IE0zNDEuMzI4LDUwSDE3MC42NzIKCglMNTAsMTcwLjY3MnYxNzAuNjU2TDE3MC42NzIsNDYyaDE3MC42NTZMNDYyLDM0MS4zMjhWMTcwLjY3MkwzNDEuMzI4LDUwTDM0MS4zMjgsNTB6IE0yMjguNTUsMTM1LjgxMmg1NC45djE2Ni41aC01NC45VjEzNS44MTJ6CgoJIE0yNTYsMzg4LjE4OGMtMTYuMzYyLDAtMjkuNjI1LTEzLjI2NC0yOS42MjUtMjkuNjI1YzAtMTYuMzYyLDEzLjI2My0yOS42MjcsMjkuNjI1LTI5LjYyN2MxNi4zNjEsMCwyOS42MjUsMTMuMjY1LDI5LjYyNSwyOS42MjcKCglDMjg1LjYyNSwzNzQuOTI0LDI3Mi4zNjEsMzg4LjE4OCwyNTYsMzg4LjE4OHoiLz4KCjwvc3ZnPgoK) scroll no-repeat center 0;
+    background-size: 75px 75px;
+    content: "Ingen forbindelse";
+    text-align: center;
+    padding-top: 80px;
+    font-weight: bold;
 
 }
 
-.blur:after {
+.blur:after, body.offline .disable_on_offline::after {
     display: block;
     position: absolute;
     content: "";

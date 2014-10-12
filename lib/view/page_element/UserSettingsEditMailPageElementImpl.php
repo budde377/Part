@@ -20,7 +20,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         <li>christian-budde.dk</li>
         <li>christianbudde.dk</li>
         </ul>
-        <form id='UserSettingsEditMailAddDomainForm' class=' mail_form'>
+        <form id='UserSettingsEditMailAddDomainForm' class=' mail_form '>
             <input type='checkbox' class='enable_state_checkbox' id='UserSettingsEditMailAddDomainFormCheckbox'/>
             <label for='UserSettingsEditMailAddDomainFormCheckbox' class='no_select'></label>
             <div class='mail_form_container'>
