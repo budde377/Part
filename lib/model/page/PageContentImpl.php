@@ -21,15 +21,17 @@ class PageContentImpl implements PageContent
     private $page;
     private $id;
 
-    private $content;
-    private $time;
-    private $history;
+    private $latestContent;
+    private $latestTime;
+
 
     /** @var  PDOStatement */
     private $preparedAddStatement;
 
     /** @var  PDOStatement */
     private $preparedSearchStatement;
+    private $latestHasBeenSetUp;
+    private $getContentAtPreparedStatement;
 
 
     public function __construct(DB $database, Page $page, $id = "")
@@ -45,12 +47,9 @@ class PageContentImpl implements PageContent
      */
     public function latestContent()
     {
-        $this->initializeHistory();
-        if ($this->content == null && $this->history != null) {
-            $this->content = $this->history[count($this->history) - 1]['content'];
-        }
+        $this->initializeLatest();
 
-        return $this->content;
+        return $this->latestContent;
     }
 
     /**
@@ -59,31 +58,40 @@ class PageContentImpl implements PageContent
      */
     public function addContent($content)
     {
-        if (!$this->page->exists()) {
+
+        if(!$this->page->exists()){
             return null;
         }
-        $this->initializeHistory();
+
         if ($this->preparedAddStatement == null) {
             $this->preparedAddStatement = $this->db->getConnection()->prepare("
-            INSERT INTO PageContent (id,page_id,time, content)
-            VALUES (?, ?, ?, ?)");
+            INSERT INTO PageContent (id,page_id, `time`, content)
+            VALUES (?,?, ?, ?)");
         }
         $t = $this->page->modify();
-        $this->preparedAddStatement->execute(array($this->id, $this->page->getID(), date("Y-m-d H:i:s", $t), $content));
-        $this->content = $content;
-        $this->history[] = array('content' => $content, 'time' => $t);
+        $this->preparedAddStatement->execute([$this->id, $this->page->getID(), date("Y-m-d H:i:s", $t), $content]);
+        $this->latestContent = $content;
+        $this->latestTime = $t;
         return $t;
     }
 
-    private function initializeHistory()
+    private function initializeLatest()
     {
-        if ($this->history != null) {
+        if ($this->latestHasBeenSetUp) {
             return;
         }
+        $this->latestHasBeenSetUp = true;
+        $prep = $this->db->getConnection()->prepare("SELECT content, UNIX_TIMESTAMP(time) AS time FROM PageContent WHERE id=? AND page_id = ? ORDER BY time DESC LIMIT 1");
+        $prep->execute([$this->id, $this->page->getID()]);
+        $result = $prep->fetchAll(PDO::FETCH_ASSOC);
+        if (!count($result)) {
+            return;
+        }
+        $result = $result[0];
 
-        $prep = $this->db->getConnection()->prepare("SELECT content, UNIX_TIMESTAMP(time) AS time FROM PageContent WHERE id=? AND page_id = ? ORDER BY time ASC");
-        $prep->execute(array($this->id, $this->page->getID()));
-        $this->history = $prep->fetchAll(PDO::FETCH_ASSOC);
+        $this->latestContent = $result['content'];
+        $this->latestTime = $result['time'];
+
     }
 
     /**
@@ -91,11 +99,8 @@ class PageContentImpl implements PageContent
      */
     public function latestTime()
     {
-        $this->initializeHistory();
-        if ($this->time == null && $this->history != null) {
-            $this->time = $this->history[count($this->history) - 1]['time'];
-        }
-        return $this->time;
+        $this->initializeLatest();
+        return $this->latestTime;
     }
 
     /**
@@ -106,33 +111,21 @@ class PageContentImpl implements PageContent
      */
     public function listContentHistory($from = null, $to = null, $onlyTimestamps = false)
     {
-        $this->initializeHistory();
-        $result = $this->history;
-        if ($from != null) {
-            $result = array();
-            foreach ($this->history as $e) {
-                if ($e['time'] >= $from) {
-                    $result[] = $e;
-                }
-            }
-        }
-        if ($to != null) {
-            $r = $result;
-            $result = array();
-            foreach ($r as $e) {
-                if ($e['time'] <= $to) {
-                    $result[] = $e;
-                }
-            }
-        }
+        $from = $from == null?0:$from;
+        $to = $to == null?time():$to;
 
         if($onlyTimestamps){
-            foreach($result as $k=>$r){
-                $result[$k] = $r['time'];
-            }
-        }
+            $prep = $this->db->getConnection()
+                ->prepare("SELECT UNIX_TIMESTAMP(time) as time FROM PageContent WHERE page_id = ? AND id=? AND ? <= UNIX_TIMESTAMP(time) AND UNIX_TIMESTAMP(time) <= ?");
+        } else {
+            $prep = $this->db->getConnection()
+                ->prepare("SELECT content,UNIX_TIMESTAMP(time) as time  FROM PageContent WHERE page_id = ? AND  id=? AND ? <= UNIX_TIMESTAMP(time) AND UNIX_TIMESTAMP(time) <= ?");
 
-        return $result;
+        }
+        $prep->execute([$this->page->getID(),$this->id, $from, $to]);
+
+        return $onlyTimestamps?$prep->fetchAll(PDO::FETCH_COLUMN, 0):$prep->fetchAll(PDO::FETCH_ASSOC);
+
     }
 
     /**
@@ -141,16 +134,14 @@ class PageContentImpl implements PageContent
      */
     public function getContentAt($time)
     {
-        $this->initializeHistory();
-        $h = $this->history;
-        $found = false;
-        $e = null;
-        while (count($h) > 0 && !$found) {
-            $e = array_pop($h);
-            $found = $e['time'] <= $time;
+        if($this->getContentAtPreparedStatement == null){
+            $this->getContentAtPreparedStatement = $this->db->getConnection()
+                ->prepare("SELECT content,UNIX_TIMESTAMP(time) as time FROM PageContent WHERE id=? AND page_id = ? AND time <= FROM_UNIXTIME(?) ORDER BY time DESC LIMIT 1");
         }
 
-        return $found ? $e : null;
+        $this->getContentAtPreparedStatement->execute([$this->id, $this->page->getID(),$time]);
+
+        return count($r = $this->getContentAtPreparedStatement->fetchAll(PDO::FETCH_ASSOC))?$r[0]:null;
 
     }
 
@@ -159,7 +150,7 @@ class PageContentImpl implements PageContent
      */
     public function __toString()
     {
-        return ($c = $this->latestContent()) == null?"": $c;
+        return ($c = $this->latestContent()) == null ? "" : $c;
     }
 
     /**
@@ -175,10 +166,10 @@ class PageContentImpl implements PageContent
     {
         if ($this->preparedSearchStatement == null) {
             $this->preparedSearchStatement = $this->db->getConnection()->prepare("
-            SELECT time FROM PageContent WHERE content LIKE ? AND page_id = ? AND id = ? AND time >= ?
+            SELECT time FROM PageContent WHERE content LIKE ? AND id = ? AND page_id= ? AND time >= ?
             ");
         }
-        $this->preparedSearchStatement->execute(array("%".$string."%", $this->page->getID(), $this->id, date("Y-m-d H:i:s", $fromTime == null?0:$fromTime)));
+        $this->preparedSearchStatement->execute(array("%" . $string . "%", $this->id, $this->page->getID(), date("Y-m-d H:i:s", $fromTime == null ? 0 : $fromTime)));
         return $this->preparedSearchStatement->rowCount() > 0;
     }
 

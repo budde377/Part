@@ -35,6 +35,7 @@ class SiteContentImplTest extends CustomDatabaseTestCase
     function __construct()
     {
         parent::__construct(dirname(__FILE__) . '/../mysqlXML/SiteContentImplTest.xml');
+        date_default_timezone_set("Europe/Copenhagen");
     }
 
 
@@ -58,21 +59,21 @@ class SiteContentImplTest extends CustomDatabaseTestCase
     public function testListContentWillReturnArrayOfRightSize()
     {
 
-        $this->assertEquals(1, count($ar = $this->existingContent->listContentHistory()));
-        $this->assertEquals(2, count($ar[0]));
-        $this->assertEquals("Some Content", trim($ar[0]['content']));
-        $this->assertGreaterThan(0, trim($ar[0]['time']));
+        $this->assertEquals([['content'=>'Some Content', 'time'=>946681201]], $this->existingContent->listContentHistory());
+
     }
 
     public function testFromWillLimitList()
     {
-        $this->assertEquals(0, count($this->existingContent->listContentHistory(time())));
+
+        $this->assertEquals([], $this->existingContent->listContentHistory(time()));
     }
 
     public function testToWillLimitList()
     {
-        $this->existingContent->addContent("TEST!");
-        $this->assertEquals(1, count($this->existingContent->listContentHistory(null, time() - 100)));
+        $newT = $this->existingContent->addContent($c = "TEST!")-1;
+        $l = $this->existingContent->listContentHistory(null, $newT);
+        $this->assertEquals([['content'=>'Some Content', 'time'=>946681201]], $l);
 
     }
 
@@ -174,9 +175,12 @@ class SiteContentImplTest extends CustomDatabaseTestCase
 
     public function testContainsSubStringWillReturnTrueIfContainsString()
     {
+        $this->existingContent->addContent($s = "New String");
+
         $this->assertTrue($this->existingContent->containsSubString("Some"));
         $this->assertTrue($this->existingContent->containsSubString("Content"));
         $this->assertTrue($this->existingContent->containsSubString("Some Content"));
+        $this->assertTrue($this->existingContent->containsSubString($s));
     }
 
 

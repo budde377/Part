@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\model\site;
+
 use ChristianBudde\cbweb\controller\json\SiteContentObjectImpl;
 use ChristianBudde\cbweb\util\db\DB;
 
@@ -13,20 +14,23 @@ use PDO;
  */
 use PDOStatement;
 
-class SiteContentImpl implements SiteContent{
+class SiteContentImpl implements SiteContent
+{
 
     private $db;
     private $id;
     private $site;
 
-    private $content;
-    private $time;
-    private $history;
+    private $latestContent;
+    private $latestTime;
 
     /** @var  PDOStatement */
     private $preparedAddStatement;
     /** @var  PDOStatement */
     private $preparedSearchStatement;
+    private $latestHasBeenSetUp = false;
+    /** @var  PDOStatement */
+    private $getContentAtPreparedStatement;
 
 
     public function __construct(DB $database, Site $site, $id = "")
@@ -34,6 +38,7 @@ class SiteContentImpl implements SiteContent{
         $this->db = $database;
         $this->id = $id;
         $this->site = $site;
+
     }
 
 
@@ -42,12 +47,9 @@ class SiteContentImpl implements SiteContent{
      */
     public function latestContent()
     {
-        $this->initializeHistory();
-        if ($this->content == null && $this->history != null) {
-            $this->content = $this->history[count($this->history) - 1]['content'];
-        }
+        $this->initializeLatest();
 
-        return $this->content;
+        return $this->latestContent;
     }
 
     /**
@@ -56,7 +58,6 @@ class SiteContentImpl implements SiteContent{
      */
     public function addContent($content)
     {
-        $this->initializeHistory();
         if ($this->preparedAddStatement == null) {
             $this->preparedAddStatement = $this->db->getConnection()->prepare("
             INSERT INTO SiteContent (id, `time`, content)
@@ -64,20 +65,28 @@ class SiteContentImpl implements SiteContent{
         }
         $t = $this->site->modify();
         $this->preparedAddStatement->execute(array($this->id, date("Y-m-d H:i:s", $t), $content));
-        $this->content = $content;
-        $this->history[] = array('content' => $content, 'time' => $t);
+        $this->latestContent = $content;
+        $this->latestTime = $t;
         return $t;
     }
 
-    private function initializeHistory()
+    private function initializeLatest()
     {
-        if ($this->history != null) {
+        if ($this->latestHasBeenSetUp) {
             return;
         }
+        $this->latestHasBeenSetUp = true;
+        $prep = $this->db->getConnection()->prepare("SELECT content, UNIX_TIMESTAMP(time) AS time FROM SiteContent WHERE id=? ORDER BY time DESC LIMIT 1");
+        $prep->execute([$this->id]);
+        $result = $prep->fetchAll(PDO::FETCH_ASSOC);
+        if (!count($result)) {
+            return;
+        }
+        $result = $result[0];
 
-        $prep = $this->db->getConnection()->prepare("SELECT content, UNIX_TIMESTAMP(time) AS time FROM SiteContent WHERE id=? ORDER BY time ASC");
-        $prep->execute(array($this->id));
-        $this->history = $prep->fetchAll(PDO::FETCH_ASSOC);
+        $this->latestContent = $result['content'];
+        $this->latestTime = $result['time'];
+
     }
 
     /**
@@ -85,11 +94,8 @@ class SiteContentImpl implements SiteContent{
      */
     public function latestTime()
     {
-        $this->initializeHistory();
-        if ($this->time == null && $this->history != null) {
-            $this->time = $this->history[count($this->history) - 1]['time'];
-        }
-        return $this->time;
+        $this->initializeLatest();
+        return $this->latestTime;
     }
 
     /**
@@ -100,32 +106,20 @@ class SiteContentImpl implements SiteContent{
      */
     public function listContentHistory($from = null, $to = null, $onlyTimestamps = false)
     {
-        $this->initializeHistory();
-        $result = $this->history;
-        if ($from != null) {
-            $result = array();
-            foreach ($this->history as $e) {
-                if ($e['time'] >= $from) {
-                    $result[] = $e;
-                }
-            }
-        }
-        if ($to != null) {
-            $r = $result;
-            $result = array();
-            foreach ($r as $e) {
-                if ($e['time'] <= $to) {
-                    $result[] = $e;
-                }
-            }
-        }
+        $from = $from == null?0:$from;
+        $to = $to == null?time():$to;
 
         if($onlyTimestamps){
-            foreach($result as $k=>$r){
-                $result[$k] = $r['time'];
-            }
+            $prep = $this->db->getConnection()
+                ->prepare("SELECT UNIX_TIMESTAMP(time) as time FROM SiteContent WHERE id=? AND ? <= UNIX_TIMESTAMP(time) AND UNIX_TIMESTAMP(time) <= ?");
+        } else {
+            $prep = $this->db->getConnection()
+                ->prepare("SELECT content,UNIX_TIMESTAMP(time) as time  FROM SiteContent WHERE id=? AND ? <= UNIX_TIMESTAMP(time) AND UNIX_TIMESTAMP(time) <= ?");
         }
-        return $result;
+        $prep->execute([$this->id, $from, $to]);
+        return $onlyTimestamps?$prep->fetchAll(PDO::FETCH_COLUMN, 0):$prep->fetchAll(PDO::FETCH_ASSOC);
+
+
     }
 
     /**
@@ -134,16 +128,14 @@ class SiteContentImpl implements SiteContent{
      */
     public function getContentAt($time)
     {
-        $this->initializeHistory();
-        $h = $this->history;
-        $found = false;
-        $e = null;
-        while (count($h) > 0 && !$found) {
-            $e = array_pop($h);
-            $found = $e['time'] <= $time;
+        if($this->getContentAtPreparedStatement == null){
+            $this->getContentAtPreparedStatement = $this->db->getConnection()
+                ->prepare("SELECT content,UNIX_TIMESTAMP(time) as time FROM SiteContent WHERE id=? AND time <= FROM_UNIXTIME(?) ORDER BY time DESC LIMIT 1");
         }
 
-        return $found ? $e : null;
+        $this->getContentAtPreparedStatement->execute([$this->id, $time]);
+
+        return count($r = $this->getContentAtPreparedStatement->fetchAll(PDO::FETCH_ASSOC))?$r[0]:null;
 
     }
 
@@ -152,7 +144,7 @@ class SiteContentImpl implements SiteContent{
      */
     public function __toString()
     {
-        return ($c = $this->latestContent()) == null?"": $c;
+        return ($c = $this->latestContent()) == null ? "" : $c;
     }
 
     /**
@@ -168,11 +160,12 @@ class SiteContentImpl implements SiteContent{
     {
         if ($this->preparedSearchStatement == null) {
             $this->preparedSearchStatement = $this->db->getConnection()->prepare("
-            SELECT time FROM PageContent WHERE content LIKE ? AND id = ? AND time >= ?
+            SELECT time FROM SiteContent WHERE content LIKE ? AND id = ? AND time >= ?
             ");
         }
-        $this->preparedSearchStatement->execute(array("%".$string."%", $this->id, date("Y-m-d H:i:s", $fromTime == null?0:$fromTime)));
-        return $this->preparedSearchStatement->rowCount() > 0;    }
+        $this->preparedSearchStatement->execute(array("%" . $string . "%", $this->id, date("Y-m-d H:i:s", $fromTime == null ? 0 : $fromTime)));
+        return $this->preparedSearchStatement->rowCount() > 0;
+    }
 
     /**
      * Returns the id

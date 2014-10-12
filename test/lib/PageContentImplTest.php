@@ -40,6 +40,7 @@ class PageContentImplTest extends CustomDatabaseTestCase
     function __construct()
     {
         parent::__construct(dirname(__FILE__) . '/../mysqlXML/PageContentImplTest.xml');
+        date_default_timezone_set("Europe/Copenhagen");
     }
 
 
@@ -197,14 +198,15 @@ class PageContentImplTest extends CustomDatabaseTestCase
         $this->assertFalse($this->existingContent2->containsSubString("Some Content"));
     }
 
-
     public function testContainsSubStringWillReturnTrueIfContainsString()
     {
+        $this->existingContent->addContent($s = "New String");
+
         $this->assertTrue($this->existingContent->containsSubString("Some"));
         $this->assertTrue($this->existingContent->containsSubString("Content"));
         $this->assertTrue($this->existingContent->containsSubString("Some Content"));
+        $this->assertTrue($this->existingContent->containsSubString($s));
     }
-
 
     public function testContainsWillRespectTime()
     {
