@@ -2,6 +2,7 @@
 namespace ChristianBudde\cbweb\model\mail;
 
 use ChristianBudde\cbweb\Config;
+use ChristianBudde\cbweb\model\user\UserLibrary;
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\util\Observable;
 use ChristianBudde\cbweb\util\Observer;
@@ -26,9 +27,11 @@ class DomainLibraryImpl implements DomainLibrary, Observer
     private $listDomainStatement;
     /** @var  PDO */
     private $connection;
+    private $userLibrary;
 
-    function __construct(Config $config, DB $db)
+    function __construct(Config $config, DB $db, UserLibrary $userLibrary)
     {
+        $this->userLibrary = $userLibrary;
         $this->databaseName = $config->getMySQLConnection()['database'];
         $this->db = $db;
         $this->connection = $db->getConnection();
@@ -67,7 +70,7 @@ class DomainLibraryImpl implements DomainLibrary, Observer
     {
         $d = $this->getDomain($domain);
         if ($d == null) {
-            $d = ($this->domainList[$domain] = new DomainImpl($domain, $this->databaseName, $this->db, $this));
+            $d = ($this->domainList[$domain] = new DomainImpl($domain, $this->databaseName, $this->db, $this->userLibrary, $this));
             $d->attachObserver($this);
         }
 
@@ -122,7 +125,7 @@ class DomainLibraryImpl implements DomainLibrary, Observer
         $this->domainList = array();
         foreach ($this->listDomainStatement->fetchAll(PDO::FETCH_ASSOC) as $d) {
             $domain = $d['domain'];
-            $d = ($this->domainList[$domain] = new DomainImpl($domain, $this->databaseName, $this->db, $this));
+            $d = ($this->domainList[$domain] = new DomainImpl($domain, $this->databaseName, $this->db, $this->userLibrary, $this));
             $d->attachObserver($this);
         }
 

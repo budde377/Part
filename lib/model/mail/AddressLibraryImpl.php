@@ -6,6 +6,8 @@ namespace ChristianBudde\cbweb\model\mail;
  * Date: 7/7/14
  * Time: 11:17 PM
  */
+
+use ChristianBudde\cbweb\model\user\UserLibrary;
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\util\Observable;
 use ChristianBudde\cbweb\util\Observer;
@@ -19,12 +21,14 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
     private $domainName;
 
     private $setupStatement;
+    private $userLibrary;
 
-    function __construct(Domain $domain, DB $db)
+    function __construct(Domain $domain, UserLibrary $userLibrary, DB $db)
     {
         $this->db = $db;
         $this->domain = $domain;
         $this->domainName = $domain->getDomainName();
+        $this->userLibrary = $userLibrary;
 
     }
 
@@ -96,7 +100,7 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
         if($this->hasAddress($localPart)){
             return $this->getAddress($localPart);
         }
-        $a = new AddressImpl($localPart, $this->db, $this);
+        $a = new AddressImpl($localPart, $this->db, $this->userLibrary, $this);
         $a->create();
         $this->addInstance($a);
         return $a;
@@ -127,7 +131,7 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
         if($this->hasCatchallAddress()){
             return;
         }
-        $address = new AddressImpl('', $this->db, $this);
+        $address = new AddressImpl('', $this->db, $this->userLibrary, $this);
         $address->create();
         $this->addInstance($address);
     }
@@ -182,7 +186,7 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
         $this->setupStatement->execute();
 
         foreach($this->setupStatement->fetchAll(PDO::FETCH_ASSOC) as $row){
-            $a = new AddressImpl($row['name'], $this->db, $this);
+            $a = new AddressImpl($row['name'], $this->db,$this->userLibrary, $this);
             $this->addInstance($a);
         }
 

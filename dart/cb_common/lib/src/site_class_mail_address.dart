@@ -26,5 +26,7 @@ abstract class MailAddress{
 
   MailDomain get domain;
 
+  //TODO add owner
+
 }
 

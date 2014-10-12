@@ -1,6 +1,8 @@
 <?php
 namespace ChristianBudde\cbweb\model\mail;
 
+use ChristianBudde\cbweb\model\user\User;
+use ChristianBudde\cbweb\model\user\UserLibrary;
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\util\Observable;
 use ChristianBudde\cbweb\util\Observer;
@@ -48,14 +50,20 @@ class AddressImpl implements Address, Observer
     private $updateLastModifiedStatement;
     private $addTargetStatement;
     private $clearTargetsStatement;
+    private $setUpOwnerStatement;
+    private $addOwnerStatement;
+    private $removeOwnerStatement;
+    private $owners = [];
+    private $userLibrary;
 
-    function __construct($localPart, DB $db, AddressLibrary $addressLibrary)
+    function __construct($localPart, DB $db, UserLibrary $userLibrary, AddressLibrary $addressLibrary)
     {
         $this->observerLibrary = new ObserverLibraryImpl($this);
         $this->addressLibrary = $addressLibrary;
         $this->db = $db;
         $this->localPart = $localPart;
         $this->domainName = $addressLibrary->getDomain()->getDomainName();
+        $this->userLibrary = $userLibrary;
     }
 
 
@@ -156,8 +164,9 @@ class AddressImpl implements Address, Observer
         $this->deleteStatement->execute();
         $this->callObservers(Address::EVENT_DELETE);
 
+        $this->owners = [];
+        $this->aliasList = [];
     }
-
     /**
      * Creates an address
      * @return void
@@ -479,14 +488,14 @@ class AddressImpl implements Address, Observer
     public function onChange(Observable $subject, $changeType)
     {
 
-        if($subject instanceof MailMailbox){
-            if($this->mailbox !== $subject || $changeType != MailMailbox::EVENT_DELETE){
+        if($subject instanceof Mailbox){
+            if($this->mailbox !== $subject || $changeType != Mailbox::EVENT_DELETE){
                 return;
             }
             $this->mailbox->detachObserver($this);
             $this->mailbox = null;
 
-        } else if($subject instanceof User){
+        } else if($subject instanceof User ){
             if($changeType == User::EVENT_DELETE){
                 $subject->detachObserver($this);
             } else if($changeType == User::EVENT_USERNAME_UPDATE){

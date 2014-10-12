@@ -10,6 +10,7 @@ namespace ChristianBudde\cbweb\test;
 use ChristianBudde\cbweb\model\mail\AddressLibrary;
 use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
 use ChristianBudde\cbweb\model\mail\AddressImpl;
+use ChristianBudde\cbweb\test\stub\StubUserLibraryImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubConfigImpl;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
@@ -25,6 +26,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
     private $domainLibrary;
     private $domain;
     private $mailPass;
+    private $userLibrary;
 
     function __construct()
     {
@@ -51,7 +53,8 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db);
+        $this->userLibrary = new StubUserLibraryImpl();
+        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db, $this->userLibrary);
         $this->domain = $this->domainLibrary->getDomain('test.dk');
         $this->addressLibrary = $this->domain->getAddressLibrary();
     }
@@ -166,7 +169,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
     public function testDeleteFromInstanceNotInLibDoesNothing()
     {
-        $a = new AddressImpl('test', $this->db, $this->addressLibrary);
+        $a = new AddressImpl('test', $this->db, $this->userLibrary, $this->addressLibrary);
         $this->addressLibrary->deleteAddress($a);
         $this->assertTrue($a->exists());
     }

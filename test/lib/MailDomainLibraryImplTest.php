@@ -8,6 +8,7 @@
 namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\Config;
+use ChristianBudde\cbweb\test\stub\StubUserLibraryImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 
 use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
@@ -55,7 +56,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
         ));
         $this->db = new MySQLDBImpl($this->config);
         $this->userLibrary = new StubUserLibraryImpl();
-        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db);
+        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db, $this->userLibrary);
     }
 
 
@@ -102,7 +103,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
 
     public function testContainsDomainFailsOnDifferentDomain()
     {
-        $this->assertFalse($this->domainLibrary->containsDomain(new DomainImpl('test.dk', $this->databaseName, $this->db, $this->domainLibrary)));
+        $this->assertFalse($this->domainLibrary->containsDomain(new DomainImpl('test.dk', $this->databaseName, $this->db, $this->userLibrary, $this->domainLibrary)));
     }
 
     public function testContainsReturnsTrueIfContains()

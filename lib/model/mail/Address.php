@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\model\mail;
+use ChristianBudde\cbweb\model\user\User;
 use ChristianBudde\cbweb\util\Observable;
 
 

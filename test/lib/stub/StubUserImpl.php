@@ -11,6 +11,7 @@ use ChristianBudde\cbweb\model\user\User;
 use ChristianBudde\cbweb\model\user\UserPrivileges;
 use ChristianBudde\cbweb\model\Variables;
 use ChristianBudde\cbweb\controller\json\UserObjectImpl;
+use ChristianBudde\cbweb\util\Observer;
 
 class StubUserImpl implements User
 {
@@ -260,5 +261,13 @@ class StubUserImpl implements User
     public function getUserToken()
     {
         return "";
+    }
+
+    public function attachObserver(Observer $observer)
+    {
+    }
+
+    public function detachObserver(Observer $observer)
+    {
     }
 }

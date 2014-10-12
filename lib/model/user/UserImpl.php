@@ -3,7 +3,6 @@ namespace ChristianBudde\cbweb\model\user;
 use ChristianBudde\cbweb\controller\json\UserObjectImpl;
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\model\Variables;
-use ChristianBudde\cbweb\util\Observable;
 use ChristianBudde\cbweb\util\Observer;
 use ChristianBudde\cbweb\util\traits\RequestTrait;
 use ChristianBudde\cbweb\util\traits\ValidationTrait;

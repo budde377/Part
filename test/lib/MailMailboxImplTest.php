@@ -11,6 +11,7 @@ namespace ChristianBudde\cbweb\test;
 use ChristianBudde\cbweb\model\mail\MailboxImpl;
 use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
 use ChristianBudde\cbweb\model\mail\Mailbox;
+use ChristianBudde\cbweb\test\stub\StubUserLibraryImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubConfigImpl;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;

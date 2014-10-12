@@ -3,6 +3,7 @@ namespace ChristianBudde\cbweb\model\user;
 use ChristianBudde\cbweb\controller\json\JSONObjectSerializable;
 
 use ChristianBudde\cbweb\model\Variables;
+use ChristianBudde\cbweb\util\Observable;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -10,7 +11,7 @@ use ChristianBudde\cbweb\model\Variables;
  * Date: 22/07/12
  * Time: 14:25
  */
-interface User extends JSONObjectSerializable
+interface User extends JSONObjectSerializable, Observable
 {
     const EVENT_USERNAME_UPDATE = 1;
     const EVENT_DELETE = 2;

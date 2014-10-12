@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\model\mail;
+use ChristianBudde\cbweb\model\user\UserLibrary;
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\util\Observable;
 use ChristianBudde\cbweb\util\Observer;
@@ -44,10 +45,12 @@ class DomainImpl implements Domain, Observer
 
     private $hasBeenSetup = false;
     private $aliasHasBeenSetup = false;
+    private $userLibrary;
 
 
-    function __construct($domain, $database, DB $db, DomainLibrary $library )
+    function __construct($domain, $database, DB $db,  UserLibrary $userLibrary, DomainLibrary $library)
     {
+        $this->userLibrary = $userLibrary;
         $this->observerLibrary = new ObserverLibraryImpl($this);
         $this->db = $db;
         $this->domain = $domain;
@@ -256,7 +259,7 @@ class DomainImpl implements Domain, Observer
      */
     public function getAddressLibrary()
     {
-        return $this->addressLibrary == null? $this->addressLibrary = new AddressLibraryImpl($this, $this->db):$this->addressLibrary;
+        return $this->addressLibrary == null? $this->addressLibrary = new AddressLibraryImpl($this,$this->userLibrary, $this->db):$this->addressLibrary;
     }
 
     /**
