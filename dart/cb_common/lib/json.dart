@@ -5,7 +5,6 @@ import "dart:async";
 import 'core.dart';
 
 part "src/json_client.dart";
-part "src/json_function.dart";
 part "src/json_object.dart";
 part "src/json_response.dart";
 

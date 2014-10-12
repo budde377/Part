@@ -20,13 +20,13 @@ abstract class User {
 
   List<Page> get pages;
 
-  Future<ChangeResponse<User>> changeInfo({String username:null, String mail:null});
+  Future<Response<User>> changeInfo({String username:null, String mail:null});
 
-  Future<ChangeResponse<User>> changePassword(String currentPassword, String newPassword);
+  Future<Response<User>> changePassword(String currentPassword, String newPassword);
 
-  Future<ChangeResponse<User>> addPagePrivilege(Page page);
+  Future<Response<User>> addPagePrivilege(Page page);
 
-  Future<ChangeResponse<User>>revokePagePrivilege(Page page);
+  Future<Response<User>>revokePagePrivilege(Page page);
 
   bool get hasRootPrivileges;
   bool get hasSitePrivileges;
@@ -48,13 +48,11 @@ class JSONUser extends User {
   StreamController<User> _changeController = new StreamController<User>();
   Stream<User> _changeStream;
 
-  final JSONClient _client;
-
   int _privileges;
 
   List<Page> _pages;
 
-  JSONUser(String username, String mail, String parent, int lastLogin, int privileges, List<Page> pages, JSONClient client):_client = client {
+  JSONUser(String username, String mail, String parent, int lastLogin, int privileges, List<Page> pages) {
     _username = username;
     _mail = mail;
     _parent = parent;
@@ -72,16 +70,27 @@ class JSONUser extends User {
 
   DateTime get lastLogin => _lastLogin;
 
-  Future<ChangeResponse<User>> changeInfo({String username:null, String mail:null}) {
+  Future<Response<User>> changeInfo({String username:null, String mail:null}) {
     var completer = new Completer<ChangeResponse<User>>();
+
+    var functionString = "";
+
+    if(mail != null){
+      functionString += "..setMail(${quoteString(mail)})";
+    }
+
+    if(username != null){
+      functionString += "..setUsername(${quoteString(username)})";
+    }
+
     mail = mail != null ? mail : _mail;
     username = username != null ? username : _username;
 
-    var jsonFunction = new ChangeUserInfoJSONFunction(_username, username, mail);
-    _client.callFunction(jsonFunction).then( (JSONResponse response) {
+    ajaxClient.callFunctionString("UserLibrary.getUser(${quoteString(_username)})$functionString..getInstance()").then( (JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
-        _username = username;
-        _mail = mail;
+
+        _username = response.payload.variables["username"];
+        _mail = response.payload.variables["mail"];
         _callListeners();
         completer.complete(new ChangeResponse<User>.success(this));
       } else {
@@ -93,8 +102,7 @@ class JSONUser extends User {
 
   Future<ChangeResponse<User>> changePassword(String currentPassword, String newPassword) {
     var completer = new Completer<ChangeResponse<User>>();
-    var jsonFunction = new ChangeUserPasswordJSONFunction(_username, currentPassword, newPassword);
-    _client.callFunction(jsonFunction).then((JSONResponse response) {
+    ajaxClient.callFunctionString("UserLibrary.getUser(${quoteString(_username)}).setPassword(${quoteString(currentPassword)}, ${quoteString(newPassword)})").then((JSONResponse response) {
       if(response.type == Response.RESPONSE_TYPE_SUCCESS){
         completer.complete(new ChangeResponse<User>.success(this));
       } else {
@@ -119,8 +127,7 @@ class JSONUser extends User {
 
   Future<ChangeResponse<User>> addPagePrivilege(Page page) {
     var completer = new Completer<ChangeResponse<User>>();
-    var function = new AddUserPagePrivilegeJSONFunction(_username, page.id);
-    _client.callFunction(function).then( (JSONResponse response) {
+    ajaxClient.callFunctionString("UserLibrary.getUser().getUserPrivielges").then( (JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         _pages.add(page);
         completer.complete(new ChangeResponse<User>.success(this));
@@ -134,8 +141,7 @@ class JSONUser extends User {
 
   Future<ChangeResponse<User>> revokePagePrivilege(Page page) {
     var completer = new Completer<ChangeResponse<User>>();
-    var function = new RevokeUserPagePrivilegeJSONFunction(_username, page.id);
-    _client.callFunction(function).then((JSONResponse response) {
+    ajaxClient.callFunctionString("UserLibrary.getUser(${quoteString(username)}).getUserPrivileges().revokePagePrivileges(PageOrder.getPage(${quoteString(page.id)}))").then((JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         _pages.remove(page);
         _callListeners();

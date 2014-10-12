@@ -26,19 +26,19 @@
                         <div class='inactiveFilter' title='Du kan ikke redigere denne side'>&nbsp;</div>
                     {% endif %}
                     <h2>Rediger Side</h2>
-                    {% page_element UserSettingsEditPagePageElementImpl %}
+                    {% page_element ChristianBudde.cbweb.view.page_element.UserSettingsEditPagePageElementImpl %}
                 </li>
                 <li>
                     <h2>Administrer Sider</h2>
-                    {% page_element UserSettingsEditPagesPageElementImpl %}
+                    {% page_element ChristianBudde.cbweb.view.page_element.UserSettingsEditPagesPageElementImpl %}
                 </li>
                 <li>
                     <h2>Rediger Oplysninger</h2>
-                    {% page_element UserSettingsEditUserPageElementImpl %}
+                    {% page_element ChristianBudde.cbweb.view.page_element.UserSettingsEditUserPageElementImpl %}
                 </li>
                 <li>
                     <h2>Administrer Brugere</h2>
-                    {% page_element UserSettingsEditUsersPageElementImpl %}
+                    {% page_element ChristianBudde.cbweb.view.page_element.UserSettingsEditUsersPageElementImpl %}
                 </li>
                 <li>
                     <h2>Administrer Mailkonti</h2>
@@ -48,13 +48,13 @@
                 {% if config.updaterEnabled and  has_site_privileges %}
                     <li>
                         <h2>Opdater Website</h2>
-                        {% page_element UserSettingsUpdateWebsitePageElementImpl %}
+                        {% page_element ChristianBudde.cbweb.view.page_element.UserSettingsUpdateWebsitePageElementImpl %}
                     </li>
                 {% endif %}
                 {% if has_root_privileges %}
                     <li>
                         <h2>Log</h2>
-                        {% page_element UserSettingsEditLogPageElementImpl %}
+                        {% page_element ChristianBudde.cbweb.view.page_element.UserSettingsEditLogPageElementImpl %}
                     </li>
                 {% endif %}
                 {% block user_settings %}
@@ -70,5 +70,8 @@
     </div>
     <div id='LoginUserMessage'>
         Du er logget ind som <i>{{ current_user.username }}</i>, <a href='/logout'>log ud</a>.
+    </div>
+    <div id="OnlineOfflineIndicator" class="no_select">
+
     </div>
 {% endif %}

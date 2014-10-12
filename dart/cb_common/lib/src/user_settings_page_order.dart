@@ -5,14 +5,18 @@ String idFromAnchor(AnchorElement val) => val.href.substring(val.href.lastIndexO
 class UserSettingsJSONPageOrder implements PageOrder {
 
   final PageOrder _pageOrder;
+  static final  UserSettingsJSONPageOrder _cache = new UserSettingsJSONPageOrder._internal(querySelector("#ActivePageList"), querySelector("#InactivePageList"));
 
-  UserSettingsJSONPageOrder.initializeFromMenu(UListElement activePageList, UListElement inactivePageList) : _pageOrder = new JSONPageOrder.initializeFromLists( _listToPageOrder(activePageList), _listToPages(inactivePageList), (() {
+  factory UserSettingsJSONPageOrder() => _cache;
+
+  UserSettingsJSONPageOrder._internal(UListElement activePageList, UListElement inactivePageList) : _pageOrder = new JSONPageOrder( _listToPageOrder(activePageList), _listToPages(inactivePageList), (() {
     var v;
     return (v = activePageList.querySelector('li.current')) == null ?
           ((v = inactivePageList.querySelector('li.current')) == null ? null : v.dataset["id"]) : v.dataset["id"];
   })());
 
-  UserSettingsJSONPageOrder() : _pageOrder = new JSONPageOrder();
+
+
 
   static Map<String, List<Page>> _listToPageOrder(UListElement list) {
     var returnMap = {
@@ -44,7 +48,7 @@ class UserSettingsJSONPageOrder implements PageOrder {
       var template = li.dataset["template"];
       var alias = li.dataset["alias"];
       var hidden = li.dataset["hidden"] == "true";
-      var page = new JSONPage(id, title, template, alias, hidden, new AJAXJSONClient());
+      var page = new JSONPage(id, title, template, alias, hidden);
 
       returnList.add(page);
     });

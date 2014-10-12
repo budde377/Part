@@ -20,6 +20,8 @@ abstract class Page {
 
   bool get hidden;
 
+  // bool get editable;
+
   Future<ChangeResponse<Page>> changeInfo({String id, String title, String template, String alias, bool hidden});
 
   Stream<Page> get onChange;
@@ -33,7 +35,6 @@ class JSONPage extends Page {
 
   bool _hidden = false;
 
-  final JSONClient _client;
 
   Map<String, Content> _content = new Map<String, Content>();
 
@@ -47,35 +48,50 @@ class JSONPage extends Page {
 
   bool get hidden => _hidden;
 
+
   StreamController<Page> _changeController = new StreamController<Page>();
 
   Stream<Page> _changeStream;
 
-  JSONPage(String id, String title, String template, String alias, bool hidden, JSONClient client):_client = client, _id = id, _title = title, _template = template, _alias = alias, _hidden = hidden;
-
+  JSONPage(String id, String title, String template, String alias, bool hidden) {
+    _id = id;
+    _title = title;
+    _template = template;
+    _alias = alias;
+    _hidden = hidden;
+  }
 
   Future<ChangeResponse<Page>> changeInfo({String id:null, String title:null, String template:null, String alias:null, bool hidden:null}) {
-    id = id != null ? id : _id;
-    title = title != null ? title : _title;
-    template = template != null ? template : _template;
-    alias = alias != null ? alias : _alias;
-    hidden = hidden != null ? hidden : _hidden;
+    var functionString = "";
+    functionString += id == null ? "" : "..setId(${quoteString(id)})";
+    functionString += title == null ? "" : "..setTitle(${quoteString(title)})";
+    functionString += template == null ? "" : "..setTemplate(${quoteString(template)})";
+    functionString += alias == null ? "" : "..setAlias(${quoteString(alias)})";
+
+    if (hidden && !_hidden) {
+      functionString += "..hide()";
+    } else if (!hidden && _hidden) {
+      functionString += "..show()";
+    }
     var completer = new Completer<ChangeResponse<Page>>();
-    var function = new ChangePageInfoJSONFunction(_id, id, title, template, alias, hidden);
     var functionCallback = (JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
-        _id = id;
-        _template = template;
-        _title = title;
-        _alias = alias;
-        _hidden = hidden;
-        _callListeners();
+        JSONObject payload = response.payload;
+        if (payload is JSONObject) {
+          _id = payload.variables['id'];
+          _template = payload.variables['template'];
+          _title = payload.variables['title'];
+          _alias = payload.variables['alias'];
+          _hidden = payload.variables['hidden'];
+          _callListeners();
+        }
         completer.complete(new ChangeResponse<Page>.success(this));
       } else {
+
         completer.complete(new ChangeResponse<Page>.error(response.error_code));
       }
     };
-    _client.callFunction(function).then(functionCallback);
+    ajaxClient.callFunctionString("PageOrder.getPage(${quoteString(id)})$functionString..getInstance()").then(functionCallback);
     return completer.future;
   }
 
@@ -85,7 +101,7 @@ class JSONPage extends Page {
   }
 
 
-  Content operator [](String id) => _content.putIfAbsent(id, () => new JSONContent.page(this, id, _client));
+  Content operator [](String id) => _content.putIfAbsent(id, () => new JSONContent.page(this, id));
 
   Stream<Page> get onChange => _changeStream == null ? _changeStream = _changeController.stream.asBroadcastStream() : _changeStream;
 

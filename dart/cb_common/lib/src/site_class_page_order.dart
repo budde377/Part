@@ -49,7 +49,6 @@ abstract class PageOrder {
 
 class JSONPageOrder extends PageOrder {
 
-  JSONClient _client;
   bool _hasBeenSetUp = false;
 
   final Map<String, Page> _pages = new Map<String, Page>();
@@ -59,31 +58,28 @@ class JSONPageOrder extends PageOrder {
   StreamController<PageOrderChange> _streamController = new StreamController<PageOrderChange>();
   Stream<PageOrderChange> _stream;
 
-  static JSONPageOrder _cache = new JSONPageOrder._internal();
 
   String _currentPageId;
 
-  factory JSONPageOrder(){
+/*  factory JSONPageOrder(){
     _cache._setup();
     return _cache;
+  }*/
+
+  JSONPageOrder(Map<String, List<Page>> pageOrderMap, List<Page> inactivePages, String current_page_id){
+    _setUpFromLists(pageOrderMap, inactivePages, current_page_id);
+
   }
 
-  factory JSONPageOrder.initializeFromLists(Map<String, List<Page>> pageOrderMap, List<Page> inactivePages, String current_page_id){
-    _cache._setUpFromLists(pageOrderMap, inactivePages, current_page_id);
-    return _cache;
-  }
-
-  JSONPageOrder._internal();
-
+/*
   void _setup() {
     if (_hasBeenSetUp) {
       return;
     }
 
     _hasBeenSetUp = true;
-    _client = new AJAXJSONClient();
     var listFunction = new ListPagesJSONFunction();
-    _client.callFunction(listFunction).then((JSONResponse response) {
+    ajaxClient.callFunction(listFunction).then((JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         _currentPageId = response.payload['current_page_id'];
 
@@ -98,7 +94,6 @@ class JSONPageOrder extends PageOrder {
     });
 
   }
-
   void _pageOrderBuilder(List<Map> list, {String parent:null}) {
     if (list.length <= 0) {
       return;
@@ -111,12 +106,12 @@ class JSONPageOrder extends PageOrder {
     });
 
   }
+*/
 
   void _setUpFromLists(Map<String, List<Page>> pageOrder, List<Page> inactivePages, String current_page_id) {
     if (_hasBeenSetUp) {
       return;
     }
-    _client = new AJAXJSONClient();
     _hasBeenSetUp = true;
     _currentPageId = current_page_id;
 
@@ -134,7 +129,7 @@ class JSONPageOrder extends PageOrder {
   }
 
   String _addPageFromObject(JSONObject o) {
-    var page = new JSONPage(o.variables['id'], o.variables['title'], o.variables['template'], o.variables['alias'], o.variables['hidden'], _client);
+    var page = new JSONPage(o.variables['id'], o.variables['title'], o.variables['template'], o.variables['alias'], o.variables['hidden']);
     _addPageListener(page);
     _pages[page.id] = page;
     return page.id;
@@ -169,8 +164,7 @@ class JSONPageOrder extends PageOrder {
 
   Future<ChangeResponse<Page>> deactivatePage(String page_id) {
     var completer = new Completer<ChangeResponse<Page>>();
-    var function = new DeactivatePageJSONFunction(page_id);
-    _client.callFunction(function).then((JSONResponse response) {
+    ajaxClient.callFunctionString("PageOrder.deactivatePage(PageOrder.getPage(${quoteString(page_id)}))").then((JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         _removeFromPageOrder(page_id);
         _callListeners(PageOrderChange.PAGE_ORDER_CHANGE_DEACTIVATE, _pages[page_id]);
@@ -198,18 +192,39 @@ class JSONPageOrder extends PageOrder {
 
   Future<ChangeResponse<PageOrder>> changePageOrder(List<String> page_id_list, {String parent_id:null}) {
     var completer = new Completer<ChangeResponse<PageOrder>>();
-    var function = new SetPageOrderJSONFunction(parent_id == null ? "" : parent_id, page_id_list);
+    //var function = new SetPageOrderJSONFunction(parent_id == null ? "" : parent_id, page_id_list);
+    var function = "PageOrder";
+
+    var order = this.listPageOrder(parent_id:parent_id);
+
+    var index = 0;
+    var parentString = parent_id == null?"":", PageOrder.getPage(${quoteString(parent_id)})";
+    page_id_list.forEach((String element){
+
+      function += "..setPageOrder(PageOrder.getPage(${quoteString(element)}), $index $parentString)";
+      order.removeWhere((Page p)=>p.id == element);
+      index ++;
+    });
+
+    order.forEach((Page element){
+      function += "..deactivatePage(PageOrder.getPage(${quoteString(element.id)}))";
+    });
+
+    var p = (parent_id == null ? "":"PageOrder.getPage(${quoteString(parent_id)})");
+    function += "..getPageOrder($p)";
+
+    //TODO make smaller function
+
     var functionCallback = (JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
-        var p, parent = (p = response.payload['parent']).length <= 0 ? null : p;
-        _pageOrder[parent] = response.payload['order'];
+        _pageOrder[parent_id] = response.payload != null?response.payload.map((JSONObject m) => m.variables["id"]).toList():[];
         _callListeners(PageOrderChange.PAGE_ORDER_CHANGE_ACTIVATE);
         completer.complete(new ChangeResponse.success(this));
       } else {
         completer.complete(new ChangeResponse.error(response.error_code));
       }
     };
-    _client.callFunction(function).then(functionCallback);
+    ajaxClient.callFunctionString(function).then(functionCallback);
     return completer.future;
   }
 
@@ -283,7 +298,6 @@ class JSONPageOrder extends PageOrder {
 
   Future<ChangeResponse<Page>> createPage(String title) {
     var completer = new Completer<ChangeResponse<Page>>();
-    var function = new CreatePageJSONFunction(title);
     var functionCallback = (JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         String id = _addPageFromObject(response.payload);
@@ -293,13 +307,12 @@ class JSONPageOrder extends PageOrder {
         completer.complete(new ChangeResponse.error(response.error_code));
       }
     };
-    _client.callFunction(function).then(functionCallback);
+    ajaxClient.callFunctionString("PageOrder.createPage(${quoteString(title)})").then(functionCallback);
     return completer.future;
   }
 
   Future<ChangeResponse<Page>> deletePage(String id) {
     var completer = new Completer<ChangeResponse<Page>>();
-    var function = new DeletePageJSONFunction(id);
     var functionCallback = (JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         var page = _pages[id];
@@ -312,7 +325,7 @@ class JSONPageOrder extends PageOrder {
       }
 
     };
-    _client.callFunction(function).then(functionCallback);
+    ajaxClient.callFunctionString("PageOrder.deletePage(PageOrder.getPage(${quoteString(id)}))").then(functionCallback);
     return completer.future;
   }
 

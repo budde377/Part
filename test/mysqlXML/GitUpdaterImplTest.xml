@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <database name="cms2012testdb">
+        <table_data name="User">
+            <row>
+                <field name="username">root</field>
+                <field name="mail">root@root.com</field>
+                <field name="password">somePass</field>
+                <field name="lastLogin">1337-01-03 03:07:00</field>
+                <field name="id">12345678901234567890123</field>
+            </row>
+        </table_data>
+    </database>
+</mysqldump>

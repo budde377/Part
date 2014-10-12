@@ -23,9 +23,9 @@ bool get pageOrderAvailable => querySelector("#ActivePageList") != null && query
 bool get userLibraryAvailable => querySelector('#UserList') != null;
 
 
-PageOrder get pageOrder => pageOrderAvailable ? new UserSettingsJSONPageOrder.initializeFromMenu(querySelector("#ActivePageList"), querySelector("#InactivePageList")) : null;
+PageOrder get pageOrder => pageOrderAvailable ? new UserSettingsJSONPageOrder() : null;
 
-UserLibrary get userLibrary => userLibraryAvailable && pageOrderAvailable ? new UserSettingsJSONUserLibrary.initializeFromMenu(querySelector('#UserList')) : null;
+UserLibrary get userLibrary => userLibraryAvailable && pageOrderAvailable ? new UserSettingsJSONUserLibrary() : null;
 
 String _errorMessage(int error_code) {
   switch (error_code) {
@@ -45,8 +45,12 @@ String _errorMessage(int error_code) {
       return "Forkert kodeord";
     case core.Response.ERROR_CODE_INVALID_PASSWORD:
       return "Ugyldigt kodeord";
+    case core.Response.ERROR_CODE_COULD_NOT_PARSE_RESPONSE:
+      return "Ugyldigt svar fra server";
+    case core.Response.ERROR_CODE_NO_CONNECTION:
+      return "Ingen forbindelse til serveren";
     default:
-      return null;
+      return "Ukendt fejl";
   }
 }
 
@@ -60,9 +64,6 @@ class UserSettingsInitializer extends core.Initializer {
   bool get canBeSetUp => pageOrderAvailable && userLibraryAvailable;
 
   void setUp() {
-
-    new core.KeepAlive().start();
-
     var client = new AJAXJSONClient();
     var order = pageOrder, userLib = userLibrary;
 
@@ -123,16 +124,17 @@ class UserSettingsLoggerInitializer extends core.Initializer {
     _logTable.querySelectorAll(".dumpfile a").forEach((AnchorElement a) {
       a.onClick.listen((MouseEvent evt) {
         var loader = dialogContainer.loading("Henter log filen");
-        ajaxClient.callFunction(new GetDumpFileLogJSONFunction(int.parse(a.dataset["id"]))).then((JSONResponse resp) {
+        logger.contextAt(new DateTime.fromMillisecondsSinceEpoch(int.parse(a.dataset["id"])*1000)).then((ChangeResponse<Map> resp) {
           if (resp.type != core.Response.RESPONSE_TYPE_SUCCESS) {
             loader.close();
             return;
           }
+
           var button = new ButtonElement(), pre = new PreElement();
           button.text = "Luk";
           button.onClick.listen((_) => loader.close());
           pre.classes.add("code");
-          pre.text = resp.payload;
+          pre.text = resp.payload.toString();
           loader.element
             ..children.clear()
             ..append(pre)
@@ -148,7 +150,7 @@ class UserSettingsLoggerInitializer extends core.Initializer {
 
 
     _logLink.onClick.listen((MouseEvent evt) {
-      ajaxClient.callFunction(new ClearLogJSONFunction()).then((JSONResponse response) {
+      logger.clearLog().then((ChangeResponse<Logger> response) {
         if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
           _logTable.querySelectorAll("tr:not(.empty_row)").forEach((TableRowElement li) => li.remove());
           _logTable.classes.add("empty");
@@ -165,6 +167,7 @@ class UserSettingsLoggerInitializer extends core.Initializer {
 
 class UserSettingsUpdateSiteInitializer extends core.Initializer {
   ButtonElement _checkButton = querySelector("#UserSettingsContent button.update_check");
+  CheckboxInputElement _autoCheckBox = querySelector("#UserSettingsContent #UserSettingsUpdaterEnableAutoUpdate");
 
   SpanElement _checkTime = querySelector("#UserSettingsContent .update_site span.check_time");
 
@@ -174,7 +177,7 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
 
   bool _canBeUpdated;
 
-  bool get canBeSetUp => _checkButton != null && _checkTime != null && _updateInformationMessage != null;
+  bool get canBeSetUp => _autoCheckBox != null && _checkButton != null && _checkTime != null && _updateInformationMessage != null;
 
   void setUp() {
     _canBeUpdated = !_updateInformationMessage.hidden;
@@ -184,7 +187,7 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
       _updateCheckButton(true);
       if (!_canBeUpdated) {
 
-        _client.callFunction(new CheckForSiteUpdatesJSONFunction()).then((JSONResponse response) {
+        updater.checkForUpdates().then((core.Response<bool> response) {
           _checkTime.text = core.dateString(new DateTime.now());
           if (response.type != core.Response.RESPONSE_TYPE_SUCCESS) {
             _canBeUpdated = false;
@@ -213,6 +216,29 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
 
     });
     _updateInformationMessage.querySelector("a").onClick.listen((_) => _updateSite());
+
+
+
+
+
+    _autoCheckBox.onChange.listen((Event event){
+      var checked = _autoCheckBox.checked;
+      _autoCheckBox.checked = !checked;
+      _autoCheckBox.parent.classes.add('blur');
+
+      var responseHandler = (core.Response r){
+        if(r.type == core.Response.RESPONSE_TYPE_SUCCESS){
+          _autoCheckBox.checked = checked;
+        }
+        _autoCheckBox.parent.classes.remove('blur');
+      };
+      if(checked){
+        updater.allowCheckOnLogin().then(responseHandler);
+      } else {
+        updater.disallowCheckOnLogin().then(responseHandler);
+      }
+
+    });
   }
 
   void _updateCheckButton([bool searching = false]) {
@@ -247,7 +273,7 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
     });
 
     var loader = dialogContainer.loading("Opdaterer websitet.<br />Luk ikke din browser!");
-    _client.callFunction(new UpdateSiteJSONFunction()).then((JSONResponse response) {
+    updater.update().then((core.Response response) {
       if (response.type == core.Response.RESPONSE_TYPE_ERROR) {
         loader.close();
         _updateCheckButton();
@@ -431,7 +457,7 @@ class UserSettingsUserListInitializer extends core.Initializer {
     var infoBox = new InfoBox("Sidst set: $loginString");
     var time = li.querySelector('.time');
     infoBox.backgroundColor = InfoBox.COLOR_BLACK;
-    time.onMouseOver.listen((_)=>infoBox.showAboveCenterOfElement(time));
+    time.onMouseOver.listen((_) => infoBox.showAboveCenterOfElement(time));
     time.onMouseOut.listen((_)=>infoBox.remove());
 
     var delete = li.querySelector('.delete');
