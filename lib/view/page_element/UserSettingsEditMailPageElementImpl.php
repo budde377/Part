@@ -1,4 +1,7 @@
 <?php
+namespace ChristianBudde\cbweb\view\page_element;
+
+
 /**
  * Created by PhpStorm.
  * User: budde
