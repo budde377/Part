@@ -388,6 +388,11 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
         $this->assertResponsePayloadEquals("GET['test']", 2);
     }
 
+    public function  testMailDomainWorks(){
+
+        $this->assertResponsePayloadEquals('MailDomainLibrary.listDomains()', $this->container->getMailDomainLibraryInstance()->listDomains());
+    }
+
 
 
     /**

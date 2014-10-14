@@ -83,11 +83,19 @@ class BackendTypeHandlerImpl implements TypeHandler
         $this->setUpSiteContentHandler($server);
         $this->setUpSiteContentLibraryHandler($server);
 
+        // Setup mail
+        $this->setupMailDomainLibraryHandler($server);
+        $this->setupMailDomainHandler($server);
+        $this->setupMailAddressLibraryHandler($server);
+        $this->setupMailAddressHandler($server);
+        $this->setupMailMailboxHandler($server);
+
         $this->setUpParserHandler($server);
 
         $this->setUpFileHandler($server);
 
         $this->setUpArraysHandler($server);
+
 
     }
 
@@ -701,6 +709,31 @@ class BackendTypeHandlerImpl implements TypeHandler
             $p->parseArray($string, $result);
             return $result;
         });
+    }
+
+    private function setupMailDomainLibraryHandler(Server $server)
+    {
+        $handler = new GenericObjectTypeHandlerImpl($this->backend->getMailDomainLibraryInstance());
+        $handler->addAlias('MailDomainLibrary', ['DomainLibrary']);
+        $handler->whitelistType('MailDomainLibrary');
+        $server->registerHandler($handler);
+
+    }
+
+    private function setupMailDomainHandler(Server $server)
+    {
+    }
+
+    private function setupMailAddressLibraryHandler(Server $server)
+    {
+    }
+
+    private function setupMailAddressHandler(Server $server)
+    {
+    }
+
+    private function setupMailMailboxHandler(Server $server)
+    {
     }
 
 

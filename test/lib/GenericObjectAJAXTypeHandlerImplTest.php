@@ -725,6 +725,54 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    public function testCanAddAlias()
+    {
+        $handler = new GenericObjectTypeHandlerImpl("JSONProgram");
+        $handler->addAlias('ProgramAlias', ['JSONProgram']);
+        $this->setUpHandler($handler);
+        $handler->addFunction('JSONProgram', 'custom', function () {
+            return 1;
+        });
+
+        /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
+        $f = $this->parser->parseFunctionString("ProgramAlias . custom()");
+        $this->assertTrue($handler->canHandle('ProgramAlias', $f));
+        $this->assertEquals(1, $handler->handle('ProgramAlias', $f));
+    }
+
+     public function testWillNotOverwriteAlias()
+    {
+        $handler = new GenericObjectTypeHandlerImpl("JSONProgram");
+        $handler->addAlias('ProgramAlias', ['JSONProgram']);
+        $handler->addAlias('ProgramAlias', ['DifferentType']);
+        $this->setUpHandler($handler);
+        $handler->addFunction('JSONProgram', 'custom', function () {
+            return 1;
+        });
+
+        /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
+        $f = $this->parser->parseFunctionString("ProgramAlias . custom()");
+        $this->assertTrue($handler->canHandle('ProgramAlias', $f));
+        $this->assertEquals(1, $handler->handle('ProgramAlias', $f));
+    }
+
+     public function testAddedAliasIsInTypes()
+    {
+        $handler = new GenericObjectTypeHandlerImpl("JSONProgram");
+        $handler->addAlias('ProgramAlias', ['JSONProgram']);
+        $handler->addFunction('JSONProgram', 'custom', function () {
+            return 1;
+        });
+        $this->assertTrue(in_array('ProgramAlias',$handler->listTypes()));
+        $this->assertTrue(in_array('custom',$handler->listFunctions('ProgramAlias')));
+    }
+
+
+
+
+
+
+
 
     private function setUpHandler(TypeHandler $handler)
     {

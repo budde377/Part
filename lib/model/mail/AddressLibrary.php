@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\model\mail;
+use ChristianBudde\cbweb\controller\json\JSONObjectSerializable;
 
 
 /**
@@ -9,7 +10,7 @@ namespace ChristianBudde\cbweb\model\mail;
  * Time: 2:13 PM
  */
 
-interface AddressLibrary {
+interface AddressLibrary extends JSONObjectSerializable {
 
     /**
      * @return array An array containing selected entries.
