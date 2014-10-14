@@ -717,11 +717,36 @@ class BackendTypeHandlerImpl implements TypeHandler
         $handler->addAlias('MailDomainLibrary', ['DomainLibrary']);
         $handler->whitelistType('MailDomainLibrary');
         $server->registerHandler($handler);
-
+        $handler->addFunctionAuthFunction('MailDomainLibrary', 'deleteDomain', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomainLibrary', 'createDomain', $this->sitePrivilegesFunction);
+        $handler->addTypeAuthFunction('MailDomainLibrary', $this->userLoggedInAuthFunction);
     }
 
     private function setupMailDomainHandler(Server $server)
     {
+        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\Domain');
+        $handler->addAlias('MailDomain', ['Domain']);
+        $handler->whitelistType('MailDomain');
+        $handler->whitelistFunction('MailDomain',
+            'getDomainName',
+            'isActive',
+            'activate',
+            'deactivate',
+            'getDescription',
+            'setDescription',
+            'lastModified',
+            'getAddressLibrary',
+            'isAliasDomain',
+            'setAliasTarget',
+            'getAliasTarget',
+            'clearAliasTarget',
+            'getDomainLibrary');
+        $server->registerHandler($handler);
+
+        $handler->addFunctionAuthFunction('MailDomainLibrary', 'deleteDomain', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomainLibrary', 'createDomain', $this->sitePrivilegesFunction);
+        $handler->addTypeAuthFunction('MailDomainLibrary', $this->userLoggedInAuthFunction);
+
     }
 
     private function setupMailAddressLibraryHandler(Server $server)
