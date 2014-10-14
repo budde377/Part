@@ -671,6 +671,26 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->handler->canHandle('Element', $f));
     }
 
+    public function testOptionalTypedArgumentCanBeNull()
+    {
+        $this->setUpHandler($this->handler);
+        $this->handler->addFunction('Element', 'custom', function ($element, Object $a = null) {
+        });
+        /** @var JSONFunction $f */
+        $f = $this->parser->parseFunctionString("Element . custom(null)");
+        $this->assertTrue($this->handler->canHandle('Element', $f));
+    }
+
+    public function testOptionalTypedArgumentNotLastCanBeNull()
+    {
+        $this->setUpHandler($this->handler);
+        $this->handler->addFunction('Element', 'custom', function ($element, Object $a = null, $s) {
+        });
+        /** @var JSONFunction $f */
+        $f = $this->parser->parseFunctionString("Element . custom(null,'some string')");
+        $this->assertTrue($this->handler->canHandle('Element', $f));
+    }
+
     public function testCanHandleWithSomeMiddleArgumentsBeingOptional()
     {
         $this->setUpHandler($this->handler);
