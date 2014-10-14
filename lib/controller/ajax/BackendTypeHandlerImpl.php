@@ -2,6 +2,7 @@
 namespace ChristianBudde\cbweb\controller\ajax;
 use ChristianBudde\cbweb\BackendSingletonContainer;
 
+use ChristianBudde\cbweb\model\mail\Address;
 use ChristianBudde\cbweb\model\updater\Updater;
 use ChristianBudde\cbweb\test\JSONResponseImplTest;
 use ChristianBudde\cbweb\util\file\File;
@@ -714,7 +715,7 @@ class BackendTypeHandlerImpl implements TypeHandler
     private function setupMailDomainLibraryHandler(Server $server)
     {
         $handler = new GenericObjectTypeHandlerImpl($this->backend->getMailDomainLibraryInstance());
-        $handler->addAlias('MailDomainLibrary', ['DomainLibrary']);
+        $handler->addAlias('MailDomainLibrary', ['ChristianBudde\cbweb\model\mail\DomainLibrary']);
         $handler->whitelistType('MailDomainLibrary');
         $server->registerHandler($handler);
         $handler->addFunctionAuthFunction('MailDomainLibrary', 'deleteDomain', $this->sitePrivilegesFunction);
@@ -725,7 +726,7 @@ class BackendTypeHandlerImpl implements TypeHandler
     private function setupMailDomainHandler(Server $server)
     {
         $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\Domain');
-        $handler->addAlias('MailDomain', ['Domain']);
+        $handler->addAlias('MailDomain', ['ChristianBudde\cbweb\model\mail\Domain']);
         $handler->whitelistType('MailDomain');
         $handler->whitelistFunction('MailDomain',
             'getDomainName',
@@ -743,18 +744,74 @@ class BackendTypeHandlerImpl implements TypeHandler
             'getDomainLibrary');
         $server->registerHandler($handler);
 
-        $handler->addFunctionAuthFunction('MailDomainLibrary', 'deleteDomain', $this->sitePrivilegesFunction);
-        $handler->addFunctionAuthFunction('MailDomainLibrary', 'createDomain', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomain', 'clearAliasTarget', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomain', 'setAliasTarget', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomain', 'setDescription', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomain', 'activate', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomain', 'deactivate', $this->sitePrivilegesFunction);
+
         $handler->addTypeAuthFunction('MailDomainLibrary', $this->userLoggedInAuthFunction);
 
     }
 
     private function setupMailAddressLibraryHandler(Server $server)
     {
+        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\AddressLibrary');
+        $handler->addAlias('MailAddressLibrary', ['ChristianBudde\cbweb\model\mail\AddressLibrary']);
+        $handler->whitelistType('MailAddressLibrary');
+
+        $server->registerHandler($handler);
+
+        $handler->addFunctionAuthFunction('MailAddressLibrary', 'createAddress', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddressLibrary', 'deleteAddress', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddressLibrary', 'createCatchallAddress', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddressLibrary', 'deleteCatchallAddress', $this->sitePrivilegesFunction);
+
+        $handler->addTypeAuthFunction('MailAddressLibrary', $this->userLoggedInAuthFunction);
+
     }
 
     private function setupMailAddressHandler(Server $server)
     {
+        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\Address');
+        $handler->addAlias('MailAddress', ['ChristianBudde\cbweb\model\mail\Address']);
+        $handler->whitelistType('MailAddress');
+        $handler->whitelistFunction('MailAddress',
+            'getLocalPart',
+            'setLocalPart',
+            'isActive',
+            'lastModified',
+            'getDomain',
+            'getAddressLibrary',
+            'activate',
+            'deactivate',
+            'getTargets',
+            'addTarget',
+            'removeTarget',
+            'hasTarget',
+            'getMailbox',
+            'hasMailbox',
+            'createMailbox',
+            'deleteMailbox',
+            'getDomainLibrary',
+            'getId',
+            'addOwner',
+            'removeOwner',
+            'isOwner',
+            'listOwners');
+
+        $server->registerHandler($handler);
+
+        $handler->addFunctionAuthFunction('MailAddress', 'setLocalPart', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'addOwner', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'removeOwner', $this->sitePrivilegesFunction);
+
+        $isOwnerAuthFunction = function($type, Address $instance){
+            return false; //TODO add auth
+        };
+
+        $handler->addTypeAuthFunction('MailAddress', $this->userLoggedInAuthFunction);
+
     }
 
     private function setupMailMailboxHandler(Server $server)

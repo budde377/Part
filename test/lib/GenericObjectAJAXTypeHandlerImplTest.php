@@ -767,6 +767,20 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(in_array('custom',$handler->listFunctions('ProgramAlias')));
     }
 
+     public function testAddedAliasIsOnceInTypes()
+     {
+         $handler = new GenericObjectTypeHandlerImpl("JSONProgram");
+         $handler->addAlias('ProgramAlias', ['JSONProgram']);
+         $handler->addAlias('ProgramAlias', ['JSONProgram']);
+         $handler->addFunction('JSONProgram', 'custom', function () {
+             return 1;
+         });
+
+         $this->assertEquals(1, array_count_values($handler->listTypes())['ProgramAlias']);
+
+     }
+
+
 
 
 
