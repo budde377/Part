@@ -1,6 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\model\mail;
-
+use ChristianBudde\cbweb\controller\json\JSONObjectSerializable;
+use ChristianBudde\cbweb\util\Observable;
 
 
 /**
@@ -10,7 +11,7 @@ namespace ChristianBudde\cbweb\model\mail;
  * Time: 9:27 AM
  */
 
-interface DomainLibrary {
+interface DomainLibrary extends JSONObjectSerializable{
 
     /**
      * List the domains in the library as an assoc array

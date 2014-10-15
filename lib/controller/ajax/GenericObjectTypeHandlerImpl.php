@@ -645,4 +645,20 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         return true;
 
     }
+
+    /**
+     * Adds an alias.
+     * If the alias already exists the types are merged.
+     * @param string $alias
+     * @param array $target
+     */
+    public function addAlias($alias, array $target){
+        $this->alias[$alias] = isset($this->alias[$alias])?array_merge($this->alias[$alias], $target):$target;
+
+        if(in_array($alias, $this->types)){
+            return;
+        }
+        $this->types[] = $alias;
+
+    }
 }
