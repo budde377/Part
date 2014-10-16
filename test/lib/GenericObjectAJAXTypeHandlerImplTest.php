@@ -745,6 +745,8 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    //TODO: What if pre call functions modify the type. Will canHandle return true?
+
 
     private function setUpHandler(TypeHandler $handler)
     {
