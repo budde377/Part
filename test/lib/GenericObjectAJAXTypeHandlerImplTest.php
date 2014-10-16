@@ -492,10 +492,13 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([
             ['ChristianBudde\cbweb\controller\json\Element', $this->object, 'custom', [1]],
             ['ChristianBudde\cbweb\controller\json\Element', $this->object, 'custom', [1, 2]],
-            ['ChristianBudde\cbweb\controller\json\Element', $this->object, 'custom', [1, 2, 3]]
+            ['ChristianBudde\cbweb\controller\json\Element', $this->object, 'custom', [1, 2, 3]],
+            ['ChristianBudde\cbweb\controller\json\Element', $this->object, 'custom', [4]],
+            ['ChristianBudde\cbweb\controller\json\Element', $this->object, 'custom', [4, 5]],
+            ['ChristianBudde\cbweb\controller\json\Element', $this->object, 'custom', [4, 5, 6]],
 
         ], $a);
-        $this->assertEquals([$this->object, 1, 2, 3], $args);
+        $this->assertEquals([$this->object, 4, 5, 6], $args);
 
 
     }
@@ -722,6 +725,21 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->handler->canHandle('Element', $f));
     }
 
+    public function testCanHandleWhenInputIsConverted()
+    {
+        $this->setUpHandler($this->handler);
+        $this->handler->addFunction('Element', 'custom', function ($element, Object $a) {
+        });
+        $this->handler->addFunctionPreCallFunction('Element', 'custom', function($type, $instance, $functionName, &$arguments){
+            $arguments[0] = new ObjectImpl('someName');
+        });
+        /** @var JSONFunction $f */
+        $f = $this->parser->parseFunctionString("Element . custom('string')");
+
+
+        $this->assertTrue($this->handler->canHandle('Element', $f));
+    }
+
     public function testCanNotHandleWithWrongNullToTypedArgument()
     {
         $this->setUpHandler($this->handler);
@@ -745,7 +763,6 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    //TODO: What if pre call functions modify the type. Will canHandle return true?
 
 
     private function setUpHandler(TypeHandler $handler)
