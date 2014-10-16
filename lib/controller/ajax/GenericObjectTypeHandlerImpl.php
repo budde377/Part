@@ -627,13 +627,14 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
             }
             if ($c = $param->getClass()) {
                 if (isset($functionArgs[$k])) {
+
                     if (!is_a($functionArgs[$k], $c->getName())) {
                         return false;
                     } else {
                         continue;
                     }
                 }
-                if (!$param->isOptional()) {
+                if (!$param->isDefaultValueAvailable()) {
                     return false;
                 }
 

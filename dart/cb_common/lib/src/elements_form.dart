@@ -207,13 +207,15 @@ class ValidatingForm {
       elm.onFocus.listen(listener(elm,false));
       elm.classes..add(v.valid?'valid':'invalid')..add('initial');
       _valueMap[elm] = elm.value;
-      elm.onKeyUp.listen((Event e) {
+      var l = (Event e) {
         if (_valueMap[elm] == elm.value) {
           return;
         }
         _checkElement(elm);
         _valueMap[elm] = elm.value;
-      });
+      };
+      elm.onChange.listen(l);
+      elm.onKeyUp.listen(l);
     });
     var selects = element.querySelectorAll('select');
     selects.forEach((Element elm) {
