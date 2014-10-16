@@ -20,10 +20,8 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         <li>christian-budde.dk</li>
         <li>christianbudde.dk</li>
         </ul>
-        <form id='UserSettingsEditMailAddDomainForm' class=' mail_form '>
-            <input type='checkbox' class='enable_state_checkbox' id='UserSettingsEditMailAddDomainFormCheckbox'/>
-            <label for='UserSettingsEditMailAddDomainFormCheckbox' class='no_select'></label>
-            <div class='mail_form_container'>
+        <form id='UserSettingsEditMailAddDomainForm' class=' mail_form expandable'>
+            <div>
             <label>
                 Domæne
                 <input type='text' />
@@ -51,10 +49,8 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
                 </div>
             </li>
         </ul>
-        <form id=\"UserSettingsEditMailAddDomainAliasForm\" class=' mail_form'>
-            <input type='checkbox' class='enable_state_checkbox' id='UserSettingsEditMailAddDomainAliasFormCheckbox'/>
-            <label for='UserSettingsEditMailAddDomainAliasFormCheckbox' class='no_select'></label>
-            <div class='mail_form_container'>
+        <form id=\"UserSettingsEditMailAddDomainAliasForm\" class=' mail_form expandable'>
+            <div>
             <label>
                 Domæne
                 <select>
@@ -90,13 +86,9 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             <li>bob@christianbudde.dk</li>
             <li>bob1@christianbudde.dk</li>
             <li>bob2@christianbudde.dk</li>
-
         </ul>
-        <form id='UserSettingsEditMailAddAddressForm' class='mail_form'>
-
-            <input type='checkbox' class='enable_state_checkbox' id='UserSettingsEditMailAddAddressFormCheckbox'/>
-            <label for='UserSettingsEditMailAddAddressFormCheckbox' class='no_select'></label>
-            <div class='mail_form_container'>
+        <form id='UserSettingsEditMailAddAddressForm' class='mail_form expandable'>
+            <div>
             <label>
                 Navn
                 <input type='text'>
@@ -131,9 +123,9 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
                 Vidersend til (komma separeret liste)
                 <input type='text' />
             </label>
-            <input type='checkbox' id='UserSettingsEditMailAddAddressAddMailboxCheckbox'/>
+            <input type='checkbox' class='pretty_checkbox' id='UserSettingsEditMailAddAddressAddMailboxCheckbox'/>
             <label for='UserSettingsEditMailAddAddressAddMailboxCheckbox' class='long_input'>
-                Opret mailbox:
+                Opret mailbox
             </label>
             <div>
             <label>
@@ -149,8 +141,8 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             <div class='submit'>
                 <input type='submit' value='Opret adresse' />
 
-            </div>
 
+            </div>
             </div>
 
         </form>

@@ -37,6 +37,20 @@ class TitleURLUpdateInitializer extends Initializer {
 
 }
 
+class ExpandableElementInitializer extends Initializer{
+
+
+  bool get canBeSetUp => true;
+
+  void setUp() {
+    querySelectorAll(".expandable").forEach((Element e){
+      new ExpanderElementHandler(e);
+    });
+  }
+
+}
+
+
 
 
 

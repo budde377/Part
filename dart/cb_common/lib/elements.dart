@@ -67,3 +67,50 @@ class FloatingElementHandler{
 
 }
 
+
+class ExpanderElementHandler{
+  final Element element;
+  final Element expanderLink = new DivElement();
+  static final _cache = new Map<Element, ExpanderElementHandler>();
+  Function _contractFunction = (){};
+
+  factory ExpanderElementHandler(Element element) => _cache.putIfAbsent(element, ()=>new ExpanderElementHandler._internal(element));
+
+  ExpanderElementHandler._internal(this.element){
+    expanderLink.classes.add('expander_link');
+    element.insertAdjacentElement("afterBegin", expanderLink);
+    expanderLink.onClick.listen((_)=>toggle());
+  }
+
+  bool get expanded => element.classes.contains('expanded');
+
+  void expand(){
+    var contracted = false;
+    _contractFunction = (){
+      contracted = true;
+    };
+    element.classes.add('expanded');
+
+    core.escQueue.add((){
+      if(contracted){
+        return false;
+      }
+      contract();
+      return true;
+    });
+  }
+
+  void contract(){
+    element.classes.remove('expanded');
+    _contractFunction();
+  }
+
+  void toggle(){
+    if(expanded){
+      contract();
+    } else {
+      expand();
+    }
+  }
+
+}
