@@ -34,31 +34,31 @@ int maxChildrenHeight(Element element) {
 }
 
 
-class FloatingElementHandler{
-  static final Map<Element,FloatingElementHandler> _cache = new Map<Element, FloatingElementHandler>();
+class FloatingElementHandler {
+  static final Map<Element, FloatingElementHandler> _cache = new Map<Element, FloatingElementHandler>();
   final Element element;
   var _initPosition;
 
-  factory FloatingElementHandler(element) => _cache.putIfAbsent(element, ()=> new FloatingElementHandler._internal(element));
+  factory FloatingElementHandler(element) => _cache.putIfAbsent(element, () => new FloatingElementHandler._internal(element));
 
 
   FloatingElementHandler._internal(this.element){
-    window.onScroll.listen((_)=>_update());
-    window.onResize.listen((_)=>_update());
+    window.onScroll.listen((_) => _update());
+    window.onResize.listen((_) => _update());
   }
 
 
-  void _update(){
+  void _update() {
 
-    if(element.offsetHeight > window.innerHeight){
+    if (element.offsetHeight > window.innerHeight) {
       element.classes.remove("floating");
       return;
     }
 
     _initPosition = element.parent.documentOffset.y;
 
-    var position = window.scrollY-_initPosition;
-    if(position < 0){
+    var position = window.scrollY - _initPosition;
+    if (position < 0) {
       element.classes.remove("floating");
       return;
     }
@@ -68,49 +68,63 @@ class FloatingElementHandler{
 }
 
 
-class ExpanderElementHandler{
+class ExpanderElementHandler {
   final Element element;
   final Element expanderLink = new DivElement();
   static final _cache = new Map<Element, ExpanderElementHandler>();
-  Function _contractFunction = (){};
+  Function _contractFunction = () {
+  };
 
-  factory ExpanderElementHandler(Element element) => _cache.putIfAbsent(element, ()=>new ExpanderElementHandler._internal(element));
+  StreamController<ExpanderElementHandler> _onChangeController = new StreamController<ExpanderElementHandler>(),
+  _onContractController = new StreamController<ExpanderElementHandler>(),
+  _onExpandController = new StreamController<ExpanderElementHandler>();
+
+
+  factory ExpanderElementHandler(Element element) => _cache.putIfAbsent(element, () => new ExpanderElementHandler._internal(element));
 
   ExpanderElementHandler._internal(this.element){
     expanderLink.classes.add('expander_link');
     element.insertAdjacentElement("afterBegin", expanderLink);
-    expanderLink.onClick.listen((_)=>toggle());
+    expanderLink.onClick.listen((_) => toggle());
+    onExpand.listen(_onContractController.add);
+    onContract.listen(_onContractController.add);
   }
 
   bool get expanded => element.classes.contains('expanded');
 
-  void expand(){
+  void expand() {
     var contracted = false;
-    _contractFunction = (){
+    _contractFunction = () {
       contracted = true;
     };
     element.classes.add('expanded');
 
-    core.escQueue.add((){
-      if(contracted){
+    core.escQueue.add(() {
+      if (contracted) {
         return false;
       }
       contract();
       return true;
     });
+    _onExpandController.add(this);
   }
 
-  void contract(){
+  void contract() {
     element.classes.remove('expanded');
     _contractFunction();
+    _onContractController.add(this);
   }
 
-  void toggle(){
-    if(expanded){
+  void toggle() {
+    if (expanded) {
       contract();
     } else {
       expand();
     }
   }
+
+  Stream<ExpanderElementHandler> get onChange => _onChangeController.stream.asBroadcastStream();
+  Stream<ExpanderElementHandler> get onExpand => _onExpandController.stream.asBroadcastStream();
+  Stream<ExpanderElementHandler> get onContract => _onChangeController.stream.asBroadcastStream();
 
 }
