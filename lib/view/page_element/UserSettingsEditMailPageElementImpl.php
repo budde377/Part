@@ -16,9 +16,9 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         $out = "
         <h3>Domæner</h3>
         <ul class='floating_list'>
-        <li>christianbud.de</li>
-        <li>christian-budde.dk</li>
-        <li>christianbudde.dk</li>
+        <li>christianbud.de<div class='delete'></div></li>
+        <li>christian-budde.dk<div class='delete'></div></li>
+        <li>christianbudde.dk<div class='delete'></div></li>
         </ul>
         <form id='UserSettingsEditMailAddDomainForm' class=' mail_form expandable'>
             <div>
@@ -36,7 +36,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             </div>
         </form>
         <h3>Domæne alias</h3>
-        <ul class='floating_list points_to'>
+        <ul class='floating_list points_to has_deletable'>
             <li>
                 <div>
                     christianbud.de
@@ -47,7 +47,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
                 <div>
                     christianbudde.dk
                 </div>
-            </li>
+            <div class='delete'></div></li>
         </ul>
         <form id=\"UserSettingsEditMailAddDomainAliasForm\" class=' mail_form expandable'>
             <div>
@@ -72,20 +72,20 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             </div>
         </form>
         <h3>Adresser</h3>
-        <ul class='floating_list'>
-            <li>test@christian-budde.dk</li>
-            <li>test1@christian-budde.dk</li>
-            <li>test2@christian-budde.dk</li>
-            <li>test3@christian-budde.dk</li>
-            <li>test4@christian-budde.dk</li>
-            <li>test5@christian-budde.dk</li>
-            <li>test6@christian-budde.dk</li>
-            <li>test7@christian-budde.dk</li>
+        <ul class='floating_list has_deletable'>
+            <li>test@christian-budde.dk<div class='delete'></div></li>
+            <li>test1@christian-budde.dk<div class='delete'></div></li>
+            <li>test2@christian-budde.dk<div class='delete'></div></li>
+            <li>test3@christian-budde.dk<div class='delete'></div></li>
+            <li>test4@christian-budde.dk<div class='delete'></div></li>
+            <li>test5@christian-budde.dk<div class='delete'></div></li>
+            <li>test6@christian-budde.dk<div class='delete'></div></li>
+            <li>test7@christian-budde.dk<div class='delete'></div></li>
         </ul>
-        <ul class='floating_list'>
-            <li>bob@christianbudde.dk</li>
-            <li>bob1@christianbudde.dk</li>
-            <li>bob2@christianbudde.dk</li>
+        <ul class='floating_list has_deletable'>
+            <li>bob@christianbudde.dk<div class='delete'></div></li>
+            <li>bob1@christianbudde.dk<div class='delete'></div></li>
+            <li>bob2@christianbudde.dk<div class='delete'></div></li>
         </ul>
         <form id='UserSettingsEditMailAddAddressForm' class='mail_form expandable'>
             <div>

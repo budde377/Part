@@ -669,7 +669,7 @@ form.initial input.invalid {
     border-radius: 3px;
 }
 
-#UserSettingsContent .floating_list > li:not(.add) {
+#UserSettingsContent .floating_list > li {
     padding: 3px 15px;
     border: 1px solid #aaa;
     margin: 0 10px 10px 0;
@@ -678,26 +678,26 @@ form.initial input.invalid {
 
 }
 
-#UserSettingsContent .floating_list.points_to > li:not(.add) {
-    padding: 0 !important;
+#UserSettingsContent .floating_list.points_to > li {
+    padding: 0;
 }
 
-#UserSettingsContent .floating_list.points_to > li:not(.add) > div {
+#UserSettingsContent .floating_list.points_to > li > div {
     float: left;
     padding: 3px 15px;
 }
 
-#UserSettingsContent .floating_list.points_to > li:not(.add) > div:first-child {
+#UserSettingsContent .floating_list.points_to > li > div:first-child {
     padding-right: 10px;
     background: #e0e0e0;
     border-radius: 3px 0 0 3px;
 }
 
-#UserSettingsContent .floating_list.points_to > li:not(.add) > div:last-child {
+#UserSettingsContent .floating_list.points_to > li > div:not(.delete):last-of-type{
     padding-left: 10px;
 }
 
-#UserSettingsContent .floating_list.points_to > li:not(.add) > div.arrow {
+#UserSettingsContent .floating_list.points_to > li > div.arrow {
     width: 0;
     height: 0;
     border-top: 13px solid transparent;
@@ -706,6 +706,48 @@ form.initial input.invalid {
     border-left: 6px solid #e0e0e0;
     padding: 0;
 }
+#UserSettingsContent .has_deletable.floating_list > li{
+    position:relative;
+}
+
+
+#UserSettingsContent .has_deletable.floating_list > li > .delete::after{
+    background: url(/_common/img/redx.png) no-repeat center center;
+    width: 100%;
+    height: 100%;
+    content: "";
+    position: absolute;
+
+}
+#UserSettingsContent .has_deletable.floating_list > li > .delete {
+    cursor: pointer;
+    opacity: 0;
+    padding:0;
+    position:absolute;
+    right:0;
+    top: 0;
+    height:26px;
+    width:30px;
+    transition: 0.2s opacity;
+    z-index: 150;
+    background: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 10%, rgba(255,255,255,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0)), color-stop(10%,rgba(255,255,255,1)), color-stop(100%,rgba(255,255,255,1)));
+    background: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 10%,rgba(255,255,255,1) 100%);
+    background: -o-linear-gradient(top, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 10%,rgba(255,255,255,1) 100%);
+    background: -ms-linear-gradient(top, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 10%,rgba(255,255,255,1) 100%);
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 10%,rgba(255,255,255,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#ffffff',GradientType=0 );
+}
+
+#UserSettingsContent .has_deletable.floating_list > li:hover > .delete{
+    opacity: 0.7;
+    display: block;
+}
+
+#UserSettingsContent .has_deletable.floating_list > li:hover > .delete:hover{
+    opacity: 1;
+}
+
 
 /*#UserSettingsContent .floating_list > li.add {
     border: 1px solid transparent;
