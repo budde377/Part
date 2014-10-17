@@ -98,6 +98,11 @@ interface Config
     public function getMailMySQLConnection();
 
     /**
+     * Returns true if mail support is enabled. Else false.
+     * @return bool
+     */
+    public function isMailManagementEnabled();
+    /**
      * @return bool
      */
     public function isDebugMode();

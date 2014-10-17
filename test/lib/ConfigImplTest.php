@@ -567,6 +567,28 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     }
 
+    public function testIsMailManagementIsSupportedReflectsConnection()
+    {
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+            <MailMySQLConnection>
+                <host>someHost</host>
+                <database>someDatabase</database>
+                <username>someUser</username>
+            </MailMySQLConnection>
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertTrue($config->isMailManagementEnabled());
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertFalse($config->isMailManagementEnabled());
+
+    }
+
 
     public function testGetMailMySQLConnectionWillReturnRightArrayAfterReturningMySQL()
     {

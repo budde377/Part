@@ -424,4 +424,13 @@ class ConfigImpl implements Config
         }
         return $this->ajaxRegistrable;
     }
+
+    /**
+     * Returns true if mail support is enabled. Else false.
+     * @return bool
+     */
+    public function isMailManagementEnabled()
+    {
+        return $this->getMailMySQLConnection() != null;
+    }
 }
