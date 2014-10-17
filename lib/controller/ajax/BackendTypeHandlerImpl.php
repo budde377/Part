@@ -4,6 +4,7 @@ use ChristianBudde\cbweb\BackendSingletonContainer;
 
 use ChristianBudde\cbweb\model\mail\Address;
 use ChristianBudde\cbweb\model\updater\Updater;
+use ChristianBudde\cbweb\model\user\UserPrivileges;
 use ChristianBudde\cbweb\test\JSONResponseImplTest;
 use ChristianBudde\cbweb\util\file\File;
 use ChristianBudde\cbweb\util\file\FileImpl;
@@ -74,6 +75,7 @@ class BackendTypeHandlerImpl implements TypeHandler
 
         $this->setUpUserLibraryHandler($server);
         $this->setUpUserHandler($server);
+        $this->setUpUserPrivilegesHandler($server);
         $this->setUpPageOrderHandler($server);
         $this->setUpPageHandler($server);
         $this->setUpLoggerHandler($server);
@@ -350,6 +352,58 @@ class BackendTypeHandlerImpl implements TypeHandler
         });
 
     }
+
+    private function setUpUserPrivilegesHandler(Server $server)
+    {
+        $server->registerHandler($userHandler =
+                new GenericObjectTypeHandlerImpl(($u = $this->userLibrary->getUserLoggedIn()) == null ? "ChristianBudde\\cbweb\\model\\user\\UserPrivileges" : $u->getUserPrivileges()),
+            ' UserPrivileges');
+
+        $userHandler->addGetInstanceFunction("UserPrivileges");
+
+        $userHandler->addTypePreCallFunction('UserPrivileges', function($type, $instance, $functionName, &$arguments){
+
+            if($functionName != 'addPagePrivileges' || $functionName != 'hasPagePrivileges'){
+                return;
+            }
+
+            if(!isset($arguments[0])){
+                return;
+            }
+
+            if($arguments[0] instanceof Page){
+                return;
+            }
+
+            $arguments[0] = $this->backend->getPageOrderInstance()->getPage($arguments[0]);
+        });
+
+        $userHandler->addTypeAuthFunction('UserPrivileges', function($type, UserPrivileges $instance, $functionName, array $args){
+
+            if(in_array($functionName, [
+                'hasRootPrivileges',
+                'hasSitePrivileges',
+                'hasPagePrivileges',
+                'listPagePrivileges',
+                'getUser'])){
+                return true;
+            }
+
+            $currentUser = $this->userLibrary->getUserLoggedIn();
+            if($currentUser == null){
+                return false;
+            }
+
+            $user = $instance->getUser();
+            if(!$this->isChildOfUser($user)){
+                return false;
+            }
+
+            return true;
+        });
+
+    }
+
 
     /**
      * @param User $user

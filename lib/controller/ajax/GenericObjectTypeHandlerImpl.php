@@ -420,6 +420,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         $args = $function->getArgs();
         /** @var \ReflectionParameter[] $parameters */
         $parameters = null;
+        $this->callPreCallFunctions($type, $instance, $name, $args);
 
         if (isset($this->customFunctions[$type][$name])) {
             $f = new \ReflectionFunction($this->customFunctions[$type][$name]);
@@ -432,6 +433,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         if ($parameters === null) {
             return false;
         }
+
         return $this->parametersCheck($args, $parameters);
     }
 
