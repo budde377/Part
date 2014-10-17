@@ -438,7 +438,7 @@ class UserSettingsUserListInitializer extends core.Initializer {
   void _setDataset(LIElement li, User user) {
     li.dataset["username"] = user.username;
     li.dataset["privileges"] = _userPrivilegeString(user, true);
-    li.dataset["lastLogin"] = user.lastLogin == null ? "" : user.lastLogin.millisecondsSinceEpoch ~/ 1000;
+    li.dataset["lastLogin"] = user.lastLogin == null ? "" : (user.lastLogin.millisecondsSinceEpoch ~/ 1000).toString();
     li.dataset["mail"] = user.mail;
     li.dataset["pages"] = user.pages.map((Page p) => p.id).join(" ");
   }
