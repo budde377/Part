@@ -2,7 +2,9 @@
 namespace ChristianBudde\cbweb\controller\ajax;
 use ChristianBudde\cbweb\BackendSingletonContainer;
 
+use ChristianBudde\cbweb\model\mail\Address;
 use ChristianBudde\cbweb\model\updater\Updater;
+use ChristianBudde\cbweb\model\user\UserPrivileges;
 use ChristianBudde\cbweb\test\JSONResponseImplTest;
 use ChristianBudde\cbweb\util\file\File;
 use ChristianBudde\cbweb\util\file\FileImpl;
@@ -73,6 +75,7 @@ class BackendTypeHandlerImpl implements TypeHandler
 
         $this->setUpUserLibraryHandler($server);
         $this->setUpUserHandler($server);
+        $this->setUpUserPrivilegesHandler($server);
         $this->setUpPageOrderHandler($server);
         $this->setUpPageHandler($server);
         $this->setUpLoggerHandler($server);
@@ -83,11 +86,19 @@ class BackendTypeHandlerImpl implements TypeHandler
         $this->setUpSiteContentHandler($server);
         $this->setUpSiteContentLibraryHandler($server);
 
+        // Setup mail
+        $this->setupMailDomainLibraryHandler($server);
+        $this->setupMailDomainHandler($server);
+        $this->setupMailAddressLibraryHandler($server);
+        $this->setupMailAddressHandler($server);
+        $this->setupMailMailboxHandler($server);
+
         $this->setUpParserHandler($server);
 
         $this->setUpFileHandler($server);
 
         $this->setUpArraysHandler($server);
+
 
     }
 
@@ -341,6 +352,58 @@ class BackendTypeHandlerImpl implements TypeHandler
         });
 
     }
+
+    private function setUpUserPrivilegesHandler(Server $server)
+    {
+        $server->registerHandler($userHandler =
+                new GenericObjectTypeHandlerImpl(($u = $this->userLibrary->getUserLoggedIn()) == null ? "ChristianBudde\\cbweb\\model\\user\\UserPrivileges" : $u->getUserPrivileges()),
+            ' UserPrivileges');
+
+        $userHandler->addGetInstanceFunction("UserPrivileges");
+
+        $userHandler->addTypePreCallFunction('UserPrivileges', function($type, $instance, $functionName, &$arguments){
+
+            if($functionName != 'addPagePrivileges' || $functionName != 'hasPagePrivileges'){
+                return;
+            }
+
+            if(!isset($arguments[0])){
+                return;
+            }
+
+            if($arguments[0] instanceof Page){
+                return;
+            }
+
+            $arguments[0] = $this->backend->getPageOrderInstance()->getPage($arguments[0]);
+        });
+
+        $userHandler->addTypeAuthFunction('UserPrivileges', function($type, UserPrivileges $instance, $functionName, array $args){
+
+            if(in_array($functionName, [
+                'hasRootPrivileges',
+                'hasSitePrivileges',
+                'hasPagePrivileges',
+                'listPagePrivileges',
+                'getUser'])){
+                return true;
+            }
+
+            $currentUser = $this->userLibrary->getUserLoggedIn();
+            if($currentUser == null){
+                return false;
+            }
+
+            $user = $instance->getUser();
+            if(!$this->isChildOfUser($user)){
+                return false;
+            }
+
+            return true;
+        });
+
+    }
+
 
     /**
      * @param User $user
@@ -703,5 +766,110 @@ class BackendTypeHandlerImpl implements TypeHandler
         });
     }
 
+    private function setupMailDomainLibraryHandler(Server $server)
+    {
+        $handler = new GenericObjectTypeHandlerImpl($this->backend->getMailDomainLibraryInstance());
+        $handler->addAlias('MailDomainLibrary', ['ChristianBudde\cbweb\model\mail\DomainLibrary']);
+        $handler->whitelistType('MailDomainLibrary');
+        $server->registerHandler($handler);
+        $handler->addFunctionAuthFunction('MailDomainLibrary', 'deleteDomain', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomainLibrary', 'createDomain', $this->sitePrivilegesFunction);
+        $handler->addTypeAuthFunction('MailDomainLibrary', $this->userLoggedInAuthFunction);
+    }
+
+    private function setupMailDomainHandler(Server $server)
+    {
+        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\Domain');
+        $handler->addAlias('MailDomain', ['ChristianBudde\cbweb\model\mail\Domain']);
+        $handler->whitelistType('MailDomain');
+        $handler->whitelistFunction('MailDomain',
+            'getDomainName',
+            'isActive',
+            'activate',
+            'deactivate',
+            'getDescription',
+            'setDescription',
+            'lastModified',
+            'getAddressLibrary',
+            'isAliasDomain',
+            'setAliasTarget',
+            'getAliasTarget',
+            'clearAliasTarget',
+            'getDomainLibrary');
+        $server->registerHandler($handler);
+
+        $handler->addFunctionAuthFunction('MailDomain', 'clearAliasTarget', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomain', 'setAliasTarget', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomain', 'setDescription', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomain', 'activate', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomain', 'deactivate', $this->sitePrivilegesFunction);
+
+        $handler->addTypeAuthFunction('MailDomainLibrary', $this->userLoggedInAuthFunction);
+
+    }
+
+    private function setupMailAddressLibraryHandler(Server $server)
+    {
+        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\AddressLibrary');
+        $handler->addAlias('MailAddressLibrary', ['ChristianBudde\cbweb\model\mail\AddressLibrary']);
+        $handler->whitelistType('MailAddressLibrary');
+
+        $server->registerHandler($handler);
+
+        $handler->addFunctionAuthFunction('MailAddressLibrary', 'createAddress', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddressLibrary', 'deleteAddress', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddressLibrary', 'createCatchallAddress', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddressLibrary', 'deleteCatchallAddress', $this->sitePrivilegesFunction);
+
+        $handler->addTypeAuthFunction('MailAddressLibrary', $this->userLoggedInAuthFunction);
+
+    }
+
+    private function setupMailAddressHandler(Server $server)
+    {
+        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\Address');
+        $handler->addAlias('MailAddress', ['ChristianBudde\cbweb\model\mail\Address']);
+        $handler->whitelistType('MailAddress');
+        $handler->whitelistFunction('MailAddress',
+            'getLocalPart',
+            'setLocalPart',
+            'isActive',
+            'lastModified',
+            'getDomain',
+            'getAddressLibrary',
+            'activate',
+            'deactivate',
+            'getTargets',
+            'addTarget',
+            'removeTarget',
+            'hasTarget',
+            'getMailbox',
+            'hasMailbox',
+            'createMailbox',
+            'deleteMailbox',
+            'getDomainLibrary',
+            'getId',
+            'addOwner',
+            'removeOwner',
+            'isOwner',
+            'listOwners');
+
+        $server->registerHandler($handler);
+
+        $handler->addFunctionAuthFunction('MailAddress', 'setLocalPart', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'addOwner', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'removeOwner', $this->sitePrivilegesFunction);
+
+        $isOwnerAuthFunction = function($type, Address $instance){
+            return false; //TODO add auth
+        };
+
+        $handler->addTypeAuthFunction('MailAddress', $this->userLoggedInAuthFunction);
+
+    }
+
+    private function setupMailMailboxHandler(Server $server)
+    {
+    }
 
 }
