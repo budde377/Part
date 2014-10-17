@@ -36,7 +36,7 @@ class BackendTypeHandlerImpl implements TypeHandler
     private $backend;
     private $userLibrary;
 
-
+    /** @var callable  */
     private $sitePrivilegesFunction;
 
     private $userLoggedInAuthFunction;
@@ -861,8 +861,25 @@ class BackendTypeHandlerImpl implements TypeHandler
         $handler->addFunctionAuthFunction('MailAddress', 'removeOwner', $this->sitePrivilegesFunction);
 
         $isOwnerAuthFunction = function($type, Address $instance){
-            return false; //TODO add auth
+            $f = $this->sitePrivilegesFunction;
+            if($f()){
+                return true;
+            }
+            $user = $this->userLibrary->getUserLoggedIn();
+            if($user == null) {
+                return false;
+            }
+
+
+            return $instance->isOwner($user);
         };
+
+        $handler->addFunctionAuthFunction('MailAddress', 'activate', $isOwnerAuthFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'deactivate', $isOwnerAuthFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'addTarget', $isOwnerAuthFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'removeTarget', $isOwnerAuthFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'createMailbox', $isOwnerAuthFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'deleteMailbox', $isOwnerAuthFunction);
 
         $handler->addTypeAuthFunction('MailAddress', $this->userLoggedInAuthFunction);
 
@@ -870,6 +887,7 @@ class BackendTypeHandlerImpl implements TypeHandler
 
     private function setupMailMailboxHandler(Server $server)
     {
+        // TODO setup handler
     }
 
 
