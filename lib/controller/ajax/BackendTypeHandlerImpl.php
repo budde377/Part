@@ -3,6 +3,7 @@ namespace ChristianBudde\cbweb\controller\ajax;
 use ChristianBudde\cbweb\BackendSingletonContainer;
 
 use ChristianBudde\cbweb\model\mail\Address;
+use ChristianBudde\cbweb\model\mail\Mailbox;
 use ChristianBudde\cbweb\model\updater\Updater;
 use ChristianBudde\cbweb\model\user\UserPrivileges;
 use ChristianBudde\cbweb\test\JSONResponseImplTest;
@@ -887,7 +888,37 @@ class BackendTypeHandlerImpl implements TypeHandler
 
     private function setupMailMailboxHandler(Server $server)
     {
-        // TODO setup handler
+        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\Mailbox', 'Mailbox');
+        $handler->whitelistFunction('Mailbox',
+            'setName',
+            'getName',
+            'setPassword',
+            'checkPassword',
+            'getAddress',
+            'getAddressLibrary',
+            'getDomain',
+            'getDomainLibrary',
+            'lastModified'
+            );
+        $server->registerHandler($handler);
+        $handler->addTypeAuthFunction('Mailbox', $this->userLoggedInAuthFunction);
+        $isOwnerAuthFunction = function($type, Mailbox $instance){
+            $f = $this->sitePrivilegesFunction;
+            if($f()){
+                return true;
+            }
+            $user = $this->userLibrary->getUserLoggedIn();
+            if($user == null) {
+                return false;
+            }
+
+
+            return $instance->getAddress()->isOwner($user);
+        };
+
+        $handler->addFunctionAuthFunction('Mailbox', 'setName', $isOwnerAuthFunction);
+        $handler->addFunctionAuthFunction('Mailbox', 'setPassword', $isOwnerAuthFunction);
+
     }
 
 
