@@ -14,26 +14,30 @@ abstract class MailAddressLibrary{
 
   Future<Response<MailAddressLibrary>> deleteCatchallAddress();
 
+  MailDomain get domain;
+
+  MailDomainLibrary get domainLibrary;
 
 }
 
 
-class AJAXMailAddressLibrary{
+class AJAXMailAddressLibrary extends MailAddressLibrary{
 
 
-  final MailDomainLibrary _domainLibrary;
+  final MailDomainLibrary domainLibrary;
 
-  final MailDomain _domain;
+  final MailDomain domain;
 
   final Map<String, MailAddress> _addresses;
 
   MailAddress _catchallAddress;
 
-  AJAXMailAddressLibrary(this._addresses, this._domain, this._domainLibrary, [this._catchallAddress=null]);
+  AJAXMailAddressLibrary(this._addresses, this.domain, [this._catchallAddress=null]): domainLibrary = domain.domainLibrary;
 
-  AJAXMailAddressLibrary.fromJSONObject(JSONObject object, this._domain, this._domainLibrary):
-  _catchallAddress = object.variables['catchall_address'] == null?null:new AJAXMailAddress.fromJSONObject(object.variables['catchall_address'], this, _domain, _domainLibrary),
-  _addresses = new Map.fromIterable(object.variables['addresses'], key:(JSONObject object)=>object.variables['local_part'], value:(JSONObject object) => new AJAXMailAddress.fromJSONObject(object, this, _domain, _domainLibrary));
+  AJAXMailAddressLibrary.fromJSONObject(JSONObject object, this.domain):
+  domainLibrary = domain.domainLibrary,
+  _catchallAddress = object.variables['catchall_address'] == null?null:new AJAXMailAddress.fromJSONObject(object.variables['catchall_address'], this),
+  _addresses = new Map.fromIterable(object.variables['addresses'], key:(JSONObject object)=>object.variables['local_part'], value:(JSONObject object) => new AJAXMailAddress.fromJSONObject(object, this));
 
 
 }

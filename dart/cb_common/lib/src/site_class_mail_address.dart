@@ -38,27 +38,45 @@ abstract class MailAddress{
 
   DateTime get lastModified;
 
+  bool get active;
+
+  Future<Response<MailAddress>> deactivate();
+
+  Future<Response<MailAddress>> activate();
+
+  Future<Response<MailAddress>> toggleActive();
+
+
 }
 
 class AJAXMailAddress extends MailAddress{
 
-  final MailDomainLibrary _domainLibrary;
+  final MailDomainLibrary domainLibrary;
 
-  final MailDomain _domain;
+  final MailDomain domain;
 
-  final MailAddressLibrary _addressLibrary;
+  final MailAddressLibrary addressLibrary;
 
   String _localPart;
 
   MailMailbox _mailbox;
 
-  AJAXMailAddress(this._localPart, this._addressLibrary, this._domain, this._domainLibrary, [this._mailbox = null]);
+  AJAXMailAddress(this._localPart, this.addressLibrary, [this._mailbox = null]):
+  this.domainLibrary = addressLibrary.domainLibrary,
+  this.domain = addressLibrary.domain;
 
-  AJAXMailAddress.fromJSONObject(JSONObject object, this._addressLibrary, this._domain, this._domainLibrary) :
+  AJAXMailAddress.fromJSONObject(JSONObject object, this.addressLibrary) :
+    this.domainLibrary = addressLibrary.domainLibrary,
+    this.domain = addressLibrary.domain,
     this._localPart = object.variables['local_part'],
-    this._mailbox = object.variables['mailbox'] == null?null:new AJAXMailMailbox.fromJSONObject(object.variables['mailbox']);
+    this._mailbox = object.variables['mailbox'] == null?null:new AJAXMailMailbox.fromJSONObject(object.variables['mailbox'], this);
 
-
+/*
+        $this->setVariable('active', $address->isActive());
+        $this->setVariable('last_modified', $address->lastModified());
+        $this->setVariable('targets', $address->getTargets());
+        $this->setVariable('mailbox', $address->getMailbox());
+ */
 
   String get localPart;
 
@@ -80,11 +98,6 @@ class AJAXMailAddress extends MailAddress{
 
   Future<Response<MailAddress>> delete();
 
-  MailDomain get domain;
-
-  MailDomainLibrary get domainLibrary;
-
-  MailAddressLibrary get addressLibrary;
 
   List<User> get owners;
 
@@ -93,5 +106,15 @@ class AJAXMailAddress extends MailAddress{
   Future<Response<User>> removeOwner(User user);
 
   DateTime get lastModified;
+
+  bool get active;
+
+  Future<Response<MailAddress>> deactivate();
+
+  Future<Response<MailAddress>> activate();
+
+  Future<Response<MailAddress>> toggleActive();
+
+
 
 }

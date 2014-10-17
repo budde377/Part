@@ -16,8 +16,13 @@ abstract class MailMailbox{
 
 
 
-class JSONMailMailbox extends MailMailbox{
+class AJAXMailMailbox extends MailMailbox{
 
+  final MailDomain domain;
+
+  final MailDomain domainLibrary;
+
+  final MailDomain addressLibrary;
 
   final MailAddress address;
 
@@ -26,7 +31,11 @@ class JSONMailMailbox extends MailMailbox{
   JSONClient _client = new AJAXJSONClient();
 
 
-  JSONMailMailbox(MailAddress this.address, [this._name = ""]);
+  AJAXMailMailbox(MailAddress this.address, [this._name = ""]): domainLibrary = address.domainLibrary, domain = address.domain, addressLibrary = address.addressLibrary;
+
+  AJAXMailMailbox.fromJSONObject(JSONObject, this.address): domainLibrary = address.domainLibrary, domain = address.domain, addressLibrary = address.addressLibrary;
+
+
 
   String get name => _name;
 

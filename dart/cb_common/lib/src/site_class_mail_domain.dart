@@ -14,9 +14,18 @@ abstract class MailDomain{
 
   Future<Response<MailDomain>> delete(String password);
 
-  MailDomainLibrary get library;
 
   DateTime get lastModified;
+
+  bool get active;
+
+  Future<Response<MailAddress>> deactivate();
+
+  Future<Response<MailAddress>> activate();
+
+  Future<Response<MailAddress>> toggleActive();
+
+  MailDomainLibrary get domainLibrary;
 
 }
 
@@ -24,11 +33,12 @@ abstract class MailDomain{
 
 class AJAXMailDomain extends MailDomain{
 
+  final MailDomainLibrary domainLibrary;
+
   String _domainName;
 
   MailAddressLibrary _addressLibrary;
 
-  MailDomainLibrary _library;
 
   String _description = "";
 
@@ -38,7 +48,7 @@ class AJAXMailDomain extends MailDomain{
   AJAXMailDomain.fromJSONObject(JSONObject object, this._library):
     this._domainName = object.variables['domain_name'],
     this._description = object.variables['description'],
-    _addressLibrary = new AJAXMailAddressLibrary.fromJSONObject(object.variables['addresses_library'], this, _library);
+    _addressLibrary = new AJAXMailAddressLibrary.fromJSONObject(object.variables['addresses_library'], this);
 
   String get domainName => _domainName;
 
@@ -46,19 +56,25 @@ class AJAXMailDomain extends MailDomain{
 
   Future<Response<MailDomain>> delete(String password){
     var completer = new Completer();
-    _library.deleteDomain(this, password).then((Response response) =>
+    domainLibrary.deleteDomain(this, password).then((Response response) =>
     completer.complete(response.type == Response.RESPONSE_TYPE_SUCCESS?new Response.success(this):response));
 
     return completer.future;
   }
 
-  MailDomainLibrary get library => _library;
 
   String get description;
 
   Future<Response<String>> changeDescription(String description);
 
 
+  bool get active;
+
+  Future<Response<MailAddress>> deactivate();
+
+  Future<Response<MailAddress>> activate();
+
+  Future<Response<MailAddress>> toggleActive();
 
 
 }
