@@ -127,7 +127,7 @@ class JSONUser extends User {
 
   Future<ChangeResponse<User>> addPagePrivilege(Page page) {
     var completer = new Completer<ChangeResponse<User>>();
-    ajaxClient.callFunctionString("UserLibrary.getUser().getUserPrivielges").then( (JSONResponse response) {
+    ajaxClient.callFunctionString("UserLibrary.getUser().getUserPrivielges()").then( (JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         _pages.add(page);
         completer.complete(new ChangeResponse<User>.success(this));
