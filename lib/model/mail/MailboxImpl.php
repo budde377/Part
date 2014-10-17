@@ -6,6 +6,7 @@ namespace ChristianBudde\cbweb\model\mail;
  * Date: 7/8/14
  * Time: 6:02 PM
  */
+use ChristianBudde\cbweb\controller\json\MailMailboxObjectImpl;
 use ChristianBudde\cbweb\util\db\DB;
 
 use ChristianBudde\cbweb\util\Observer;
@@ -269,7 +270,7 @@ class MailboxImpl implements Mailbox{
      */
     public function jsonObjectSerialize()
     {
-        // TODO: Implement jsonObjectSerialize() method.
+        return new MailMailboxObjectImpl($this);
     }
 
     /**
@@ -281,6 +282,6 @@ class MailboxImpl implements Mailbox{
      */
     function jsonSerialize()
     {
-        // TODO: Implement jsonSerialize() method.
+        return $this->jsonObjectSerialize()->jsonSerialize();
     }
 }

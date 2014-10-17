@@ -14,9 +14,11 @@ use ChristianBudde\cbweb\util\Observer;
 class StubMailDomainImpl implements Domain
 {
 
-    private $active;
-    private $domainName;
-    private $description;
+    public $active;
+    public $domainName;
+    public $description;
+    public $aliasDomain;
+    public $lastModified = 0;
 
     function __construct($active, $domainName)
     {
@@ -82,7 +84,7 @@ class StubMailDomainImpl implements Domain
      */
     public function lastModified()
     {
-        return 0;
+        return $this->lastModified;
     }
 
     /**
@@ -136,7 +138,7 @@ class StubMailDomainImpl implements Domain
      */
     public function isAliasDomain()
     {
-
+        return $this->aliasDomain != null;
     }
 
     /**
@@ -145,7 +147,7 @@ class StubMailDomainImpl implements Domain
      */
     public function setAliasTarget(Domain $domain)
     {
-
+        $this->aliasDomain = $domain;
     }
 
     /**
@@ -153,7 +155,7 @@ class StubMailDomainImpl implements Domain
      */
     public function getAliasTarget()
     {
-
+        return $this->aliasDomain;
     }
 
     /**
@@ -161,7 +163,7 @@ class StubMailDomainImpl implements Domain
      */
     public function clearAliasTarget()
     {
-
+        $this->aliasDomain = null;
     }
 
     /**
@@ -180,5 +182,24 @@ class StubMailDomainImpl implements Domain
     public function detachObserver(Observer $observer)
     {
 
+    }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return Object
+     */
+    public function jsonObjectSerialize()
+    {
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.4.0)<br/>
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     */
+    function jsonSerialize()
+    {
     }
 }

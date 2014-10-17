@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\model\mail;
+use ChristianBudde\cbweb\controller\json\MailDomainObjectImpl;
 use ChristianBudde\cbweb\model\user\UserLibrary;
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\util\Observable;
@@ -450,7 +451,7 @@ class DomainImpl implements Domain, Observer
      */
     public function jsonObjectSerialize()
     {
-        // TODO: Implement jsonObjectSerialize() method.
+        return new MailDomainObjectImpl($this);
     }
 
     /**
@@ -460,8 +461,8 @@ class DomainImpl implements Domain, Observer
      * @return mixed data which can be serialized by <b>json_encode</b>,
      * which is a value of any type other than a resource.
      */
-    function jsonSerialize()
+    public function jsonSerialize()
     {
-        // TODO: Implement jsonSerialize() method.
+        return $this->jsonObjectSerialize()->jsonSerialize();
     }
 }

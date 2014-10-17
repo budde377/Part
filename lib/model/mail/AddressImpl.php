@@ -1,6 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\model\mail;
 
+use ChristianBudde\cbweb\controller\json\MailAddressObjectImpl;
 use ChristianBudde\cbweb\model\user\User;
 use ChristianBudde\cbweb\model\user\UserLibrary;
 use ChristianBudde\cbweb\util\db\DB;
@@ -629,7 +630,7 @@ class AddressImpl implements Address, Observer
      */
     public function jsonObjectSerialize()
     {
-        // TODO: Implement jsonObjectSerialize() method.
+        return new MailAddressObjectImpl($this);
     }
 
     /**
@@ -641,6 +642,6 @@ class AddressImpl implements Address, Observer
      */
     function jsonSerialize()
     {
-        // TODO: Implement jsonSerialize() method.
+        return $this->jsonObjectSerialize()->jsonSerialize();
     }
 }

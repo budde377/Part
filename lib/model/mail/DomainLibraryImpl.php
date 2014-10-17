@@ -2,6 +2,7 @@
 namespace ChristianBudde\cbweb\model\mail;
 
 use ChristianBudde\cbweb\Config;
+use ChristianBudde\cbweb\controller\json\MailDomainLibraryObjectImpl;
 use ChristianBudde\cbweb\model\user\UserLibrary;
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\util\Observable;
@@ -149,7 +150,7 @@ class DomainLibraryImpl implements DomainLibrary, Observer
      */
     public function jsonObjectSerialize()
     {
-        // TODO: Implement jsonObjectSerialize() method.
+        return new MailDomainLibraryObjectImpl($this);
     }
 
     /**
@@ -161,6 +162,6 @@ class DomainLibraryImpl implements DomainLibrary, Observer
      */
     function jsonSerialize()
     {
-        // TODO: Implement jsonSerialize() method.
+        return $this->jsonObjectSerialize()->jsonSerialize();
     }
 }

@@ -7,6 +7,7 @@ namespace ChristianBudde\cbweb\model\mail;
  * Time: 11:17 PM
  */
 
+use ChristianBudde\cbweb\controller\json\MailAddressLibraryObjectImpl;
 use ChristianBudde\cbweb\model\user\UserLibrary;
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\util\Observable;
@@ -230,7 +231,7 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      */
     public function jsonObjectSerialize()
     {
-        // TODO: Implement jsonObjectSerialize() method.
+        return new MailAddressLibraryObjectImpl($this);
     }
 
     /**
@@ -242,6 +243,6 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      */
     function jsonSerialize()
     {
-        // TODO: Implement jsonSerialize() method.
+        return $this->jsonObjectSerialize()->jsonSerialize();
     }
 }

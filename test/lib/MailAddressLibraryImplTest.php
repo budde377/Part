@@ -7,7 +7,9 @@
  */
 namespace ChristianBudde\cbweb\test;
 
+use ChristianBudde\cbweb\controller\json\MailAddressLibraryObjectImpl;
 use ChristianBudde\cbweb\model\mail\AddressLibrary;
+use ChristianBudde\cbweb\model\mail\AddressLibraryImpl;
 use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
 use ChristianBudde\cbweb\model\mail\AddressImpl;
 use ChristianBudde\cbweb\test\stub\StubUserLibraryImpl;
@@ -20,7 +22,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
 
     private $config;
-    /** @var  AddressLibrary */
+    /** @var  AddressLibraryImpl */
     private $addressLibrary;
     private $db;
     private $domainLibrary;
@@ -220,5 +222,8 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
         $this->assertTrue($this->addressLibrary->hasAddress('test '));
     }
-
+    public function testReturnsRightJSONObject(){
+        $this->assertEquals($o = new MailAddressLibraryObjectImpl($this->addressLibrary), $this->addressLibrary->jsonObjectSerialize());
+        $this->assertEquals($o->jsonSerialize(), $this->addressLibrary->jsonSerialize());
+    }
 }

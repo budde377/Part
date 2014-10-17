@@ -8,6 +8,7 @@
 namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\Config;
+use ChristianBudde\cbweb\controller\json\MailDomainLibraryObjectImpl;
 use ChristianBudde\cbweb\test\stub\StubUserLibraryImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 
@@ -155,4 +156,8 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue($d->exists());
     }
 
+    public function testReturnsRightJSONObject(){
+        $this->assertEquals($o = new MailDomainLibraryObjectImpl($this->domainLibrary), $this->domainLibrary->jsonObjectSerialize());
+        $this->assertEquals($o->jsonSerialize(), $this->domainLibrary->jsonSerialize());
+    }
 }

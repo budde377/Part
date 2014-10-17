@@ -7,6 +7,7 @@
  */
 namespace ChristianBudde\cbweb\test;
 
+use ChristianBudde\cbweb\controller\json\MailDomainObjectImpl;
 use ChristianBudde\cbweb\model\mail\DomainImpl;
 use ChristianBudde\cbweb\Config;
 use ChristianBudde\cbweb\test\stub\StubConfigImpl;
@@ -403,6 +404,10 @@ class MailDomainImplTest extends CustomDatabaseTestCase
         $this->assertTrue($this->domain->getAddressLibrary()->getDomainLibrary() === $this->domainLib);
     }
 
+    public function testReturnsRightJSONObject(){
+        $this->assertEquals($o = new MailDomainObjectImpl($this->domain), $this->domain->jsonObjectSerialize());
+        $this->assertEquals($o->jsonSerialize(), $this->domain->jsonSerialize());
+    }
 
     /**
      * @param DomainImpl $domain

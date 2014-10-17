@@ -8,6 +8,7 @@
 namespace ChristianBudde\cbweb\test;
 
 
+use ChristianBudde\cbweb\controller\json\MailMailboxObjectImpl;
 use ChristianBudde\cbweb\model\mail\MailboxImpl;
 use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
 use ChristianBudde\cbweb\model\mail\Mailbox;
@@ -216,5 +217,8 @@ class MailMailboxImplTest extends CustomDatabaseTestCase
         $this->assertFalse($ob->hasBeenCalled());
 
     }
-
+    public function testReturnsRightJSONObject(){
+        $this->assertEquals($o = new MailMailboxObjectImpl($this->mailbox), $this->mailbox->jsonObjectSerialize());
+        $this->assertEquals($o->jsonSerialize(), $this->mailbox->jsonSerialize());
+    }
 }

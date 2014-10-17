@@ -544,7 +544,10 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
     private function cloneAddress(Address $address){
         return $this->createAddress($address->getLocalPart());
     }
-
+    public function testReturnsRightJSONObject(){
+        $this->assertEquals($o = new \ChristianBudde\cbweb\controller\json\MailAddressObjectImpl($this->address), $this->address->jsonObjectSerialize());
+        $this->assertEquals($o->jsonSerialize(), $this->address->jsonSerialize());
+    }
     /**
      * @param string $string
      * @return AddressImpl
