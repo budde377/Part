@@ -233,5 +233,8 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
         $this->assertEquals(new UserPrivilegesObjectImpl($this->userPrivileges), $o);
     }
 
+    public function testGetUserIsUser(){
+        $this->assertTrue($this->userPrivileges->getUser() === $this->user);
+    }
 
 }

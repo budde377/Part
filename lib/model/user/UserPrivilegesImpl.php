@@ -242,4 +242,12 @@ class UserPrivilegesImpl implements UserPrivileges
     {
         return $this->jsonObjectSerialize()->jsonSerialize();
     }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
 }

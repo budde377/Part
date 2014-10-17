@@ -11,6 +11,7 @@ namespace ChristianBudde\cbweb\test\stub;
 use ChristianBudde\cbweb\model\page\Page;
 use ChristianBudde\cbweb\model\page\PageOrder;
 use ChristianBudde\cbweb\controller\json\UserPrivilegesObjectImpl;
+use ChristianBudde\cbweb\model\user\User;
 use ChristianBudde\cbweb\model\user\UserPrivileges;
 
 
@@ -149,5 +150,13 @@ class StubUserPrivilegesImpl implements UserPrivileges
     public function jsonSerialize()
     {
         return $this->jsonObjectSerialize()->jsonSerialize();
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+
     }
 }
