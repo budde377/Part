@@ -88,6 +88,7 @@ class BackendTypeHandlerImpl implements TypeHandler
         $this->setUpSiteContentLibraryHandler($server);
 
         // Setup mail
+        //TODO: Don't set up if mail not enabled.
         $this->setupMailDomainLibraryHandler($server);
         $this->setupMailDomainHandler($server);
         $this->setupMailAddressLibraryHandler($server);
