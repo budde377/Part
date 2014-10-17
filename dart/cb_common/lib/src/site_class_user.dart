@@ -127,8 +127,9 @@ class JSONUser extends User {
 
   Future<ChangeResponse<User>> addPagePrivilege(Page page) {
     var completer = new Completer<ChangeResponse<User>>();
-    ajaxClient.callFunctionString("UserLibrary.getUser().getUserPrivielges()").then( (JSONResponse response) {
-      if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
+    var pageIdString = quoteString(page.id);
+    ajaxClient.callFunctionString("UserLibrary.getUser(${quoteString(username)}).getUserPrivileges()..addPagePrivileges($pageIdString)..hasPagePrivileges($pageIdString)").then( (JSONResponse response) {
+      if (response.type == Response.RESPONSE_TYPE_SUCCESS && response.payload) {
         _pages.add(page);
         completer.complete(new ChangeResponse<User>.success(this));
         _callListeners();
@@ -140,9 +141,11 @@ class JSONUser extends User {
   }
 
   Future<ChangeResponse<User>> revokePagePrivilege(Page page) {
+    var pageIdString = quoteString(page.id);
+
     var completer = new Completer<ChangeResponse<User>>();
-    ajaxClient.callFunctionString("UserLibrary.getUser(${quoteString(username)}).getUserPrivileges().revokePagePrivileges(PageOrder.getPage(${quoteString(page.id)}))").then((JSONResponse response) {
-      if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
+    ajaxClient.callFunctionString("UserLibrary.getUser(${quoteString(username)}).getUserPrivileges()..revokePagePrivileges($pageIdString)..hasPagePrivileges($pageIdString)").then((JSONResponse response) {
+      if (response.type == Response.RESPONSE_TYPE_SUCCESS && !response.payload) {
         _pages.remove(page);
         _callListeners();
         completer.complete(new ChangeResponse<User>.success(this));

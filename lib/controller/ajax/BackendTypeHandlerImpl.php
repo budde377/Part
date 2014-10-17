@@ -363,7 +363,7 @@ class BackendTypeHandlerImpl implements TypeHandler
 
         $userHandler->addTypePreCallFunction('UserPrivileges', function($type, $instance, $functionName, &$arguments){
 
-            if($functionName != 'addPagePrivileges' || $functionName != 'hasPagePrivileges'){
+            if($functionName != 'addPagePrivileges' && $functionName != 'hasPagePrivileges' && $functionName != 'revokePagePrivileges'){
                 return;
             }
 
