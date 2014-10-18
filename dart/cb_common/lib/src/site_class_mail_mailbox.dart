@@ -3,13 +3,19 @@ part of site_classes;
 
 abstract class MailMailbox{
 
+  MailDomain get domain;
+
+  MailDomainLibrary get domainLibrary;
+
+  MailAddressLibrary get addressLibrary;
+
+  MailAddress get address;
+
   String get name;
 
   Future<ChangeResponse<MailMailbox>> changeInfo ({String name, String password});
 
   Future<ChangeResponse<MailMailbox>> delete ();
-
-  MailAddress get address;
 
 
 }
@@ -20,9 +26,9 @@ class AJAXMailMailbox extends MailMailbox{
 
   final MailDomain domain;
 
-  final MailDomain domainLibrary;
+  final MailDomainLibrary domainLibrary;
 
-  final MailDomain addressLibrary;
+  final MailAddressLibrary addressLibrary;
 
   final MailAddress address;
 
@@ -31,10 +37,18 @@ class AJAXMailMailbox extends MailMailbox{
   JSONClient _client = new AJAXJSONClient();
 
 
-  AJAXMailMailbox(MailAddress this.address, [this._name = ""]): domainLibrary = address.domainLibrary, domain = address.domain, addressLibrary = address.addressLibrary;
+  AJAXMailMailbox(MailAddress address, [this._name = ""]):
+  this.address = address,
+  domainLibrary = address.domainLibrary,
+  domain = address.domain,
+  addressLibrary = address.addressLibrary;
 
-  AJAXMailMailbox.fromJSONObject(JSONObject, this.address): domainLibrary = address.domainLibrary, domain = address.domain, addressLibrary = address.addressLibrary;
-
+  AJAXMailMailbox.fromJSONObject(JSONObject object, MailAddress address):
+  this.address = address,
+  domainLibrary = address.domainLibrary,
+  domain = address.domain,
+  addressLibrary = address.addressLibrary,
+  _name = object.variables['name'];
 
 
   String get name => _name;

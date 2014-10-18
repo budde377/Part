@@ -6,6 +6,8 @@ abstract class MailDomain{
 
   MailAddressLibrary get addressLibrary;
 
+  MailDomainLibrary get domainLibrary;
+
   String get description;
 
   Future<Response<String>> changeDescription(String description);
@@ -19,13 +21,12 @@ abstract class MailDomain{
 
   bool get active;
 
-  Future<Response<MailAddress>> deactivate();
+  Future<Response<MailDomain>> deactivate();
 
-  Future<Response<MailAddress>> activate();
+  Future<Response<MailDomain>> activate();
 
-  Future<Response<MailAddress>> toggleActive();
+  Future<Response<MailDomain>> toggleActive();
 
-  MailDomainLibrary get domainLibrary;
 
 }
 
@@ -35,24 +36,31 @@ class AJAXMailDomain extends MailDomain{
 
   final MailDomainLibrary domainLibrary;
 
-  String _domainName;
-
   MailAddressLibrary _addressLibrary;
 
+  final String domainName;
 
-  String _description = "";
+  bool _active;
 
-  AJAXMailDomain(this._domainName, this._addressLibrary, this._library);
+  DateTime _lastModified;
+
+  String _description;
+
+  AJAXMailDomain(this.domainName, this._addressLibrary, this.domainLibrary, {String description:"", bool active:true, DateTime last_modified: null}) :
+  _description = description,
+  _active = active,
+  _lastModified = last_modified == null? new DateTime.fromMillisecondsSinceEpoch(0):last_modified;
 
 
-  AJAXMailDomain.fromJSONObject(JSONObject object, this._library):
-    this._domainName = object.variables['domain_name'],
+  AJAXMailDomain.fromJSONObject(JSONObject object, this.domainLibrary):
+    this.domainName = object.variables['domain_name'],
+    this._active = object.variables['active'],
     this._description = object.variables['description'],
-    _addressLibrary = new AJAXMailAddressLibrary.fromJSONObject(object.variables['addresses_library'], this);
+    this._lastModified = new DateTime.fromMillisecondsSinceEpoch(object.variables['last_modifed']*1000){
+    this._addressLibrary = new AJAXMailAddressLibrary.fromJSONObject(object.variables['addresses_library'], this);
 
-  String get domainName => _domainName;
+  }
 
-  MailAddressLibrary get addressLibrary => _addressLibrary;
 
   Future<Response<MailDomain>> delete(String password){
     var completer = new Completer();
@@ -63,18 +71,22 @@ class AJAXMailDomain extends MailDomain{
   }
 
 
-  String get description;
+  String get description => _description;
 
   Future<Response<String>> changeDescription(String description);
 
 
-  bool get active;
+  bool get active => _active;
 
-  Future<Response<MailAddress>> deactivate();
+  Future<Response<MailDomain>> deactivate();
 
-  Future<Response<MailAddress>> activate();
+  Future<Response<MailDomain>> activate();
 
-  Future<Response<MailAddress>> toggleActive();
+  Future<Response<MailDomain>> toggleActive();
+
+  DateTime get lastModified;
+
+  MailAddressLibrary get addressLibrary => _addressLibrary;
 
 
 }
