@@ -18,6 +18,11 @@ abstract class MailAddressLibrary {
 
   Future<Response<MailAddressLibrary>> deleteCatchallAddress();
 
+  Stream<MailAddress> get onCatchallChange;
+
+  Stream<MailAddress> get onCreate;
+
+  Stream<MailAddress> get onDelete;
 
 }
 
@@ -48,13 +53,6 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
 
   Map<String, MailAddress> get addresses => new Map<String, MailAddress>.from(_addresses);
 
-  Future<Response<MailAddress>> createAddress(String localPart);
-
-  Future<Response<MailAddressLibrary>> deleteAddress(MailAddress address);
-
-  Future<Response<MailAddress>> createCatchallAddress();
-
-  Future<Response<MailAddressLibrary>> deleteCatchallAddress();
 
 
 }

@@ -774,6 +774,7 @@ class BackendTypeHandlerImpl implements TypeHandler
         $handler = new GenericObjectTypeHandlerImpl($this->backend->getMailDomainLibraryInstance());
         $handler->addAlias('MailDomainLibrary', ['ChristianBudde\cbweb\model\mail\DomainLibrary']);
         $handler->whitelistType('MailDomainLibrary');
+        $handler->addGetInstanceFunction('MailDomainLibrary');
         $server->registerHandler($handler);
         $handler->addFunctionAuthFunction('MailDomainLibrary', 'deleteDomain', $this->sitePrivilegesFunction);
         $handler->addFunctionAuthFunction('MailDomainLibrary', 'createDomain', $this->sitePrivilegesFunction);
@@ -796,11 +797,12 @@ class BackendTypeHandlerImpl implements TypeHandler
             'getAddressLibrary',
             'isAliasDomain',
             'setAliasTarget',
+            'getInstance',
             'getAliasTarget',
             'clearAliasTarget',
             'getDomainLibrary');
         $server->registerHandler($handler);
-
+        $handler->addGetInstanceFunction('MailDomain');
         $handler->addFunctionAuthFunction('MailDomain', 'clearAliasTarget', $this->sitePrivilegesFunction);
         $handler->addFunctionAuthFunction('MailDomain', 'setAliasTarget', $this->sitePrivilegesFunction);
         $handler->addFunctionAuthFunction('MailDomain', 'setDescription', $this->sitePrivilegesFunction);
@@ -816,6 +818,7 @@ class BackendTypeHandlerImpl implements TypeHandler
         $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\AddressLibrary');
         $handler->addAlias('MailAddressLibrary', ['ChristianBudde\cbweb\model\mail\AddressLibrary']);
         $handler->whitelistType('MailAddressLibrary');
+        $handler->addGetInstanceFunction('MailAddressLibrary');
 
         $server->registerHandler($handler);
 
@@ -849,6 +852,7 @@ class BackendTypeHandlerImpl implements TypeHandler
             'getMailbox',
             'hasMailbox',
             'createMailbox',
+            'getInstance',
             'deleteMailbox',
             'getDomainLibrary',
             'getId',
@@ -856,7 +860,7 @@ class BackendTypeHandlerImpl implements TypeHandler
             'removeOwner',
             'isOwner',
             'listOwners');
-
+        $handler->addGetInstanceFunction('MailAddress');
         $server->registerHandler($handler);
 
         $handler->addFunctionAuthFunction('MailAddress', 'setLocalPart', $this->sitePrivilegesFunction);
@@ -899,9 +903,11 @@ class BackendTypeHandlerImpl implements TypeHandler
             'getAddress',
             'getAddressLibrary',
             'getDomain',
+            'getInstance',
             'getDomainLibrary',
             'lastModified'
             );
+        $handler->addGetInstanceFunction('Mailbox');
         $server->registerHandler($handler);
         $handler->addTypeAuthFunction('Mailbox', $this->userLoggedInAuthFunction);
         $isOwnerAuthFunction = function($type, Mailbox $instance){

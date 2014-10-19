@@ -1,6 +1,6 @@
 part of site_classes;
 
-abstract class MailAddress{
+abstract class MailAddress {
 
   String get localPart;
 
@@ -47,10 +47,25 @@ abstract class MailAddress{
 
   Future<Response<MailAddress>> toggleActive();
 
+  Stream<MailAddress> get onLocalPartChange;
+
+  Stream<MailMailbox> get onMailboxChange;
+
+  Stream<String> get onAddTarget;
+
+  Stream<String> get onRemoveTarget;
+
+  Stream<User> get onAddOwner;
+
+  Stream<User> get onRemoveOwner;
+
+  Stream<bool> get onActiveChange;
+
+  Stream<MailAddress> get onDelete;
 
 }
 
-class AJAXMailAddress extends MailAddress{
+class AJAXMailAddress extends MailAddress {
 
   final MailDomainLibrary domainLibrary;
 
@@ -74,21 +89,20 @@ class AJAXMailAddress extends MailAddress{
   this.addressLibrary = addressLibrary,
   this.domainLibrary = addressLibrary.domainLibrary,
   this.domain = addressLibrary.domain,
-  this._targets = targets == null?[]:null,
-  this._lastModified = (last_modified==null?new DateTime.fromMillisecondsSinceEpoch(0):last_modified);
+  this._targets = targets == null ? [] : null,
+  this._lastModified = (last_modified == null ? new DateTime.fromMillisecondsSinceEpoch(0) : last_modified);
 
   AJAXMailAddress.fromJSONObject(JSONObject object, MailAddressLibrary addressLibrary) :
-    this.addressLibrary = addressLibrary,
-    this.domainLibrary = addressLibrary.domainLibrary,
-    this.domain = addressLibrary.domain,
-    this._active = object.variables['active'],
-    this._localPart = object.variables['local_part'],
-    this._targets = object.variables['targets'],
-    this._lastModified = new DateTime.fromMillisecondsSinceEpoch(object.variables['last_modified']*1000){
-    _mailbox = object.variables['mailbox'] == null?null:new AJAXMailMailbox.fromJSONObject(object.variables['mailbox'], this);
+  this.addressLibrary = addressLibrary,
+  this.domainLibrary = addressLibrary.domainLibrary,
+  this.domain = addressLibrary.domain,
+  this._active = object.variables['active'],
+  this._localPart = object.variables['local_part'],
+  this._targets = object.variables['targets'],
+  this._lastModified = new DateTime.fromMillisecondsSinceEpoch(object.variables['last_modified'] * 1000){
+    _mailbox = object.variables['mailbox'] == null ? null : new AJAXMailMailbox.fromJSONObject(object.variables['mailbox'], this);
 
-}
-
+  }
 
 
 }
