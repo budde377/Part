@@ -216,6 +216,8 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
     public function onChange(Observable $subject, $changeType)
     {
         if(!($subject instanceof Address) || !$this->contains($subject)){
+         //todo fix
+         return;
         }
 
         if($changeType == Address::EVENT_DELETE){
