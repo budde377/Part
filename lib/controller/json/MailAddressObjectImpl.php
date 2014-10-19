@@ -20,6 +20,6 @@ class MailAddressObjectImpl extends ObjectImpl{
         $this->setVariable('last_modified', $address->lastModified());
         $this->setVariable('targets', $address->getTargets());
         $this->setVariable('mailbox', $address->getMailbox());
-
+        $this->setVariable('owners', $address->listOwners(false));
     }
 } 

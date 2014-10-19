@@ -85,6 +85,11 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      */
     public function deleteAddress(Address $address)
     {
+        if($address === $this->getCatchallAddress()){
+            $this->deleteCatchallAddress();
+            return;
+        }
+
         if(!$this->contains($address)){
             return;
         }

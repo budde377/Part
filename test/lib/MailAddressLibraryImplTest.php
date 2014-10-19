@@ -203,6 +203,14 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
         $this->assertFalse($catchAll->exists());
     }
 
+    public function testDeleteCatchallAddressDeletesTheAddressWithDeleteAddressFunction()
+    {
+        $catchAll = $this->addressLibrary->getCatchallAddress();
+        $this->addressLibrary->deleteAddress($catchAll);
+        $this->assertFalse($this->addressLibrary->hasCatchallAddress());
+        $this->assertFalse($catchAll->exists());
+    }
+
     public function testCreateCatchallAddressCreates()
     {
         $c1 = $this->addressLibrary->getCatchallAddress();

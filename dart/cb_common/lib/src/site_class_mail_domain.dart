@@ -45,6 +45,8 @@ class AJAXMailDomain extends MailDomain {
 
   final String domainName;
 
+  final UserLibrary userLibrary;
+
   bool _active;
 
   DateTime _lastModified;
@@ -56,18 +58,18 @@ class AJAXMailDomain extends MailDomain {
   _onActiveChangeController = new StreamController<bool>(),
   _onDescriptionChangeController = new StreamController<String>();
 
-  AJAXMailDomain(this.domainName, this._addressLibrary, this.domainLibrary, {String description:"", bool active:true, DateTime last_modified: null}) :
+  AJAXMailDomain(this.domainName, this._addressLibrary, this.domainLibrary, this.userLibrary, {String description:"", bool active:true, DateTime last_modified: null}) :
   _description = description,
   _active = active,
   _lastModified = last_modified == null ? new DateTime.fromMillisecondsSinceEpoch(0) : last_modified;
 
 
-  AJAXMailDomain.fromJSONObject(JSONObject object, this.domainLibrary):
+  AJAXMailDomain.fromJSONObject(JSONObject object, this.domainLibrary, this.userLibrary):
   this.domainName = object.variables['domain_name'],
   this._active = object.variables['active'],
   this._description = object.variables['description'],
   this._lastModified = new DateTime.fromMillisecondsSinceEpoch(object.variables['last_modifed'] * 1000){
-    this._addressLibrary = new AJAXMailAddressLibrary.fromJSONObject(object.variables['addresses_library'], this);
+    this._addressLibrary = new AJAXMailAddressLibrary.fromJSONObject(object.variables['addresses_library'], this, userLibrary);
 
   }
 

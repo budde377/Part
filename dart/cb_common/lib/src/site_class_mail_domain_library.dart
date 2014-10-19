@@ -19,6 +19,10 @@ abstract class MailDomainLibrary{
 
 
 class AJAXMailDomainLibrary implements MailDomainLibrary{
+
+  final UserLibrary userLibrary;
+
+  // TODO update map when domain change name
   Map<String, MailDomain> _domains;
 
   StreamController<MailDomain>
@@ -26,12 +30,12 @@ class AJAXMailDomainLibrary implements MailDomainLibrary{
   _onDeleteController = new StreamController<MailDomain>();
 
 
-  AJAXMailDomainLibrary(this._domains);
+  AJAXMailDomainLibrary(this._domains, this.userLibrary);
 
-  AJAXMailDomainLibrary.fromJSONObject(JSONObject object){
+  AJAXMailDomainLibrary.fromJSONObject(JSONObject object, this.userLibrary){
     _domains = new Map<String, MailDomain>.fromIterable(object.variables['domains'],
     key:(JSONObject obj) => obj.variables['domain_name'],
-    value:(JSONObject obj) => new AJAXMailDomain.fromJSONObject(obj, this));
+    value:(JSONObject obj) => new AJAXMailDomain.fromJSONObject(obj, this, userLibrary));
 
   }
 
@@ -48,7 +52,7 @@ class AJAXMailDomainLibrary implements MailDomainLibrary{
         return;
       }
 
-      var domain = new AJAXMailDomain.fromJSONObject(response.payload, this);
+      var domain = new AJAXMailDomain.fromJSONObject(response.payload, this, userLibrary);
       _domains[domain.domainName] = domain;
       completer.complete(new Response.success(domain));
       _onCreateController.add(domain);
@@ -68,7 +72,7 @@ class AJAXMailDomainLibrary implements MailDomainLibrary{
         return;
       }
 
-      var domain = new AJAXMailDomain.fromJSONObject(response.payload, this);
+      var domain = new AJAXMailDomain.fromJSONObject(response.payload, this, userLibrary);
       _domains.remove(domain.domainName);
       completer.complete(new Response.success(domain));
       _onDeleteController.add(domain);
