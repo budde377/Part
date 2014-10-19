@@ -19,9 +19,9 @@ class UserLibraryChangeEvent {
 
 abstract class UserLibrary {
 
-  Future<ChangeResponse<User>> createUser(String mail, String privileges);
+  FutureResponse<User> createUser(String mail, String privileges);
 
-  Future<ChangeResponse<User>> deleteUser(String username);
+  FutureResponse<User> deleteUser(String username);
 
 
   Stream<UserLibraryChangeEvent> get onChange;
@@ -37,13 +37,13 @@ abstract class UserLibrary {
 
   User get userLoggedIn;
 
-  Future<Response<String>> userLogin(String username, String password);
+  FutureResponse<String> userLogin(String username, String password);
 
-  Future<Response> forgotPassword(String password);
+  FutureResponse forgotPassword(String password);
 
 }
 
-class JSONUserLibrary extends UserLibrary {
+class AJAXUserLibrary extends UserLibrary {
   final PageOrder pageOrder;
   String _userLoggedInId;
   Map<String, User> _users = <String, User>{
@@ -53,8 +53,7 @@ class JSONUserLibrary extends UserLibrary {
   StreamController<UserLibraryChangeEvent> _changeController = new StreamController<UserLibraryChangeEvent>();
 
 
-
-  JSONUserLibrary(List<User> users, String currentUserName, PageOrder pageOrder) : this.pageOrder = pageOrder {
+  AJAXUserLibrary(List<User> users, String currentUserName, PageOrder pageOrder) : this.pageOrder = pageOrder {
     _setUpFromLists(users, currentUserName);
 
   }
@@ -80,7 +79,7 @@ class JSONUserLibrary extends UserLibrary {
     var privilegesString = o.variables['privileges'];
     var pages = page_ids.map((String id) => pageOrder.pages[id]);
     var privileges = privilegesString == 'root' ? User.PRIVILEGE_ROOT : (privilegesString == 'site' ? User.PRIVILEGE_SITE : User.PRIVILEGE_PAGE);
-    var user = new JSONUser(o.variables['username'], o.variables['mail'], o.variables['parent'], o.variables['last-login'], privileges, pages);
+    var user = new AJAXUser(o.variables['username'], o.variables['mail'], o.variables['parent'], o.variables['last-login'], privileges, pages);
     _addUserListener(user);
     _users[user.username] = user;
     return user.username;
@@ -106,8 +105,8 @@ class JSONUserLibrary extends UserLibrary {
     });
   }
 
-  Future<ChangeResponse<User>>createUser(String mail, String privileges) {
-    var completer = new Completer<ChangeResponse<User>>();
+  FutureResponse<User> createUser(String mail, String privileges) {
+    var completer = new Completer<Response<User>>();
     var functionCallback = (JSONResponse response) {
 
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
@@ -115,9 +114,9 @@ class JSONUserLibrary extends UserLibrary {
         var username = _addUserFromObjectToUsers(o, []);
         var user = _users[username];
         _callListeners(UserLibraryChangeEvent.CHANGE_CREATE, user);
-        completer.complete(new ChangeResponse<User>.success(user));
+        completer.complete(new Response<User>.success(user));
       } else {
-        completer.complete(new ChangeResponse<User>.error(response.error_code));
+        completer.complete(new Response<User>.error(response.error_code));
       }
 
     };
@@ -125,17 +124,17 @@ class JSONUserLibrary extends UserLibrary {
     return completer.future;
   }
 
-  Future<ChangeResponse<User>> deleteUser(String username) {
-    var completer = new Completer<ChangeResponse<User>>();
+  FutureResponse<User> deleteUser(String username) {
+    var completer = new Completer<Response<User>>();
     var functionCallback = (JSONResponse response) {
 
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         var user = _users[username];
         _users.remove(username);
         _callListeners(USER_LIBRARY_CHANGE_DELETE, user);
-        completer.complete(new ChangeResponse<User>.success(user));
+        completer.complete(new Response<User>.success(user));
       } else {
-        completer.complete(new ChangeResponse<User>.error(response.error_code));
+        completer.complete(new Response<User>.error(response.error_code));
       }
 
     };
@@ -171,17 +170,15 @@ class JSONUserLibrary extends UserLibrary {
   }
 
 
-  Future<Response<String>> userLogin(String username, String password){
+  FutureResponse<String> userLogin(String username, String password) {
     var future = ajaxClient.callFunctionString('UserLibrary.userLogin(${quoteString(username)}, ${quoteString(password)})');
-    future.then((Response response){
-      if(response.type == Response.RESPONSE_TYPE_SUCCESS){
-        _userLoggedInId = username;
-      }
+    future.thenResponse(onSuccess:(Response response) {
+      _userLoggedInId = username;
     });
     return future;
   }
 
-  Future<Response> forgotPassword(String password) => ajaxClient.callFunctionString('UserLibrary.forgotPassword(${quoteString(password)})');
+  FutureResponse forgotPassword(String password) => ajaxClient.callFunctionString('UserLibrary.forgotPassword(${quoteString(password)})');
 
 
 }

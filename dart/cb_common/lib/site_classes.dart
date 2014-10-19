@@ -20,15 +20,6 @@ part "src/site_class_mail_address_library.dart";
 part "src/site_class_mail_address.dart";
 part "src/site_class_mail_mailbox.dart";
 
-
-class ChangeResponse<V> extends Response<V>{
-
-
-  ChangeResponse.success([V payload = null]): super.success(payload);
-  ChangeResponse.error(int error_code): super.error(error_code);
-
-}
-
 Logger get logger => new AJAXLogger();
 Updater get updater => new AJAXUpdater();
 

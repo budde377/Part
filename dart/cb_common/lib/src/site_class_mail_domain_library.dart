@@ -5,9 +5,9 @@ abstract class MailDomainLibrary{
 
   Map<String,MailDomain> get domains;
 
-  Future<Response<MailDomain>> createDomain(String domainName, String password);
+  FutureResponse<MailDomain> createDomain(String domainName, String password);
 
-  Future<Response<MailDomain>> deleteDomain(MailDomain domain, String password);
+  FutureResponse<MailDomain> deleteDomain(MailDomain domain, String password);
 
   Stream<MailDomain> get onCreate;
 
@@ -43,7 +43,7 @@ class AJAXMailDomainLibrary implements MailDomainLibrary{
 
   Map<String,MailDomain> get domains => new Map<String, MailDomain>.from(_domains);
 
-  Future<Response<MailDomain>> createDomain(String domainName, String password){
+  FutureResponse<MailDomain> createDomain(String domainName, String password){
     var completer = new Completer();
 
     ajaxClient.callFunctionString("MailDomainLibrary.createDomain(${quoteString(domainName)}, ${quoteString(password)})").then((Response<JSONObject> response){
@@ -59,10 +59,10 @@ class AJAXMailDomainLibrary implements MailDomainLibrary{
 
     });
 
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
-  Future<Response<MailDomain>> deleteDomain(MailDomain domain, String password){
+  FutureResponse<MailDomain> deleteDomain(MailDomain domain, String password){
     var completer = new Completer();
     var domainName = domain.domainName;
 
@@ -78,7 +78,7 @@ class AJAXMailDomainLibrary implements MailDomainLibrary{
       _onDeleteController.add(domain);
     });
 
-    return completer.future;
+    return new FutureResponse(completer.future);
 
   }
 

@@ -112,7 +112,7 @@ abstract class UploadStrategy {
   Pattern filter;
 
 
-  Future<Response<String>> uploadFile(FileProgress fileProgress, {void progress(num pct):null});
+  FutureResponse<String> uploadFile(FileProgress fileProgress, {void progress(num pct):null});
 
 
   static const Pattern FILTER_IMAGE = "image/";
@@ -135,7 +135,7 @@ class AJAXImageUploadStrategy extends UploadStrategy {
 
   }
 
-  Future<Response<String>> uploadFile(FileProgress fileProgress, {void progress(num pct):null}) {
+  FutureResponse<String> uploadFile(FileProgress fileProgress, {void progress(num pct):null}) {
     var completer = new Completer();
     var reader = new FileReader();
     reader.onLoadEnd.listen((_) {
@@ -177,7 +177,7 @@ class AJAXFileUploadStrategy extends UploadStrategy {
 
   AJAXFileUploadStrategy() ;
 
-  Future<Response<String>>  uploadFile(FileProgress fileProgress, { void progress(num pct):null}) {
+  FutureResponse<String>  uploadFile(FileProgress fileProgress, { void progress(num pct):null}) {
     var completer = new Completer();
     var formData = new FormData();
     formData.appendBlob("file", fileProgress.file, fileProgress.file.name);

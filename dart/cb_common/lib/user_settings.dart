@@ -124,7 +124,7 @@ class UserSettingsLoggerInitializer extends core.Initializer {
     _logTable.querySelectorAll(".dumpfile a").forEach((AnchorElement a) {
       a.onClick.listen((MouseEvent evt) {
         var loader = dialogContainer.loading("Henter log filen");
-        logger.contextAt(new DateTime.fromMillisecondsSinceEpoch(int.parse(a.dataset["id"])*1000)).then((ChangeResponse<Map> resp) {
+        logger.contextAt(new DateTime.fromMillisecondsSinceEpoch(int.parse(a.dataset["id"])*1000)).then((core.Response<Map> resp) {
           if (resp.type != core.Response.RESPONSE_TYPE_SUCCESS) {
             loader.close();
             return;
@@ -150,7 +150,7 @@ class UserSettingsLoggerInitializer extends core.Initializer {
 
 
     _logLink.onClick.listen((MouseEvent evt) {
-      logger.clearLog().then((ChangeResponse<Logger> response) {
+      logger.clearLog().then((core.Response<Logger> response) {
         if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
           _logTable.querySelectorAll("tr:not(.empty_row)").forEach((TableRowElement li) => li.remove());
           _logTable.classes.add("empty");
@@ -339,7 +339,7 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
           return;
         }
         var i = savingBar.startJob();
-        user.revokePagePrivilege(_order.currentPage).then((ChangeResponse response) {
+        user.revokePagePrivilege(_order.currentPage).then((core.Response response) {
           if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
             li.remove();
             var opt = new OptionElement();
@@ -403,7 +403,7 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
       }
       deco.blur();
       var user = _userLib.users[data['username']];
-      user.addPagePrivilege(_order.currentPage).then((ChangeResponse response) {
+      user.addPagePrivilege(_order.currentPage).then((core.Response response) {
         if (response.type == core.Response.RESPONSE_TYPE_ERROR) {
           deco.unBlur();
           return false;
@@ -535,7 +535,7 @@ class UserSettingsAddUserFormInitializer extends core.Initializer {
         return false;
       }
       decoration.blur();
-      _userLib.createUser(data['mail'], data['level']).then( (ChangeResponse response) {
+      _userLib.createUser(data['mail'], data['level']).then( (core.Response response) {
         if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
           userMailField.value = "";
           validatingForm.validate();
@@ -571,7 +571,7 @@ class UserSettingsAddPageFormInitializer extends core.Initializer {
       }
 
       decoration.blur();
-      _order.createPage(data['title']).then((ChangeResponse response) {
+      _order.createPage(data['title']).then((core.Response response) {
         if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
           input.value = "";
           input.blur();
@@ -614,7 +614,7 @@ class UserSettingsChangeUserInfoFormInitializer extends core.Initializer {
         return false;
       }
       decoForm.blur();
-      userLibrary.userLoggedIn.changeInfo(username:data['username'], mail:data['mail']).then((ChangeResponse response) {
+      userLibrary.userLoggedIn.changeInfo(username:data['username'], mail:data['mail']).then((core.Response response) {
         if (response.type == core.Response.RESPONSE_TYPE_ERROR) {
           var m;
           decoForm.changeNotion((m = _errorMessage(response.error_code)) != null ? m : "Ukendt fejl", FormHandler.NOTION_TYPE_ERROR);
@@ -645,7 +645,7 @@ class UserSettingsChangeUserInfoFormInitializer extends core.Initializer {
         return false;
       }
       decoPassForm.blur();
-      userLibrary.userLoggedIn.changePassword(data['old_password'], data['new_password']).then((ChangeResponse response) {
+      userLibrary.userLoggedIn.changePassword(data['old_password'], data['new_password']).then((core.Response response) {
         if (response.type == core.Response.RESPONSE_TYPE_ERROR) {
           var m;
           decoPassForm.changeNotion((m = _errorMessage(response.error_code)) != null ? m : "Ukendt fejl", FormHandler.NOTION_TYPE_ERROR);
@@ -706,7 +706,7 @@ class UserSettingsEditPageFormInitializer extends core.Initializer {
       }
       formDecoration.blur();
       var template = _order.currentPage.template;
-      _order.currentPage.changeInfo(title:data['title'], id:data['id'], template:data['template'], alias:data['alias']).then((ChangeResponse<Page> response) {
+      _order.currentPage.changeInfo(title:data['title'], id:data['id'], template:data['template'], alias:data['alias']).then((core.Response<Page> response) {
         if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
           formDecoration.changeNotion("Ændringerne er gemt", FormHandler.NOTION_TYPE_SUCCESS);
           editTitleField.blur();

@@ -40,7 +40,7 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
       var pageStringList = privilege == User.PRIVILEGE_PAGE && pagesString != null? pagesString.trim().split(" ") : [];
       var pageList = pageStringList.map((String id) => pageOrder.pages[id]).toList();
       pageList.removeWhere((e)=>!(e is Page));
-      var user = new JSONUser(username, mail, parent, lastLogin, privilege, pageList);
+      var user = new AJAXUser(username, mail, parent, lastLogin, privilege, pageList);
       users.add(user);
       if (li.classes.contains('current')) {
         currentUser = username;
@@ -48,7 +48,7 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
 
     });
 
-    return new JSONUserLibrary(users, currentUser, pageOrder);
+    return new AJAXUserLibrary(users, currentUser, pageOrder);
   }
 
   Future<core.Response<User>> createUser(String mail, String privileges) => _userLibrary.createUser(mail, privileges);

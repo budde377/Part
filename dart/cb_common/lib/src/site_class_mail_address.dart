@@ -10,42 +10,42 @@ abstract class MailAddress {
 
   MailAddressLibrary get addressLibrary;
 
-  Future<Response<String>> changeLocalPart(String localPart);
+  FutureResponse<String> changeLocalPart(String localPart);
 
   bool get hasMailbox;
 
   MailMailbox get mailbox;
 
-  Future<Response<MailMailbox>> createMailbox(String name, String password);
+  FutureResponse<MailMailbox> createMailbox(String name, String password);
 
-  Future<Response<MailMailbox>> deleteMailbox();
+  FutureResponse<MailMailbox> deleteMailbox();
 
   List<String> get targets;
 
-  Future<Response<String>> addTarget(String target);
+  FutureResponse<String> addTarget(String target);
 
-  Future<Response<String>> removeTarget(String target);
+  FutureResponse<String> removeTarget(String target);
 
   String toString() => "$localPart@$domain";
 
-  Future<Response<MailAddress>> delete();
+  FutureResponse<MailAddress> delete();
 
 
   List<User> get owners;
 
-  Future<Response<User>> addOwner(User user);
+  FutureResponse<User> addOwner(User user);
 
-  Future<Response<User>> removeOwner(User user);
+  FutureResponse<User> removeOwner(User user);
 
   DateTime get lastModified;
 
   bool get active;
 
-  Future<Response<MailAddress>> deactivate();
+  FutureResponse<MailAddress> deactivate();
 
-  Future<Response<MailAddress>> activate();
+  FutureResponse<MailAddress> activate();
 
-  Future<Response<MailAddress>> toggleActive();
+  FutureResponse<MailAddress> toggleActive();
 
   Stream<MailAddress> get onLocalPartChange;
 
@@ -117,8 +117,8 @@ class AJAXMailAddress extends MailAddress {
   this._active = object.variables['active'],
   this._localPart = object.variables['local_part'],
   this._targets = object.variables['targets'],
-  this._owners = object.variables['owners'].map((String s) => userLibrary.users[s]).toList(),
   this._lastModified = new DateTime.fromMillisecondsSinceEpoch(object.variables['last_modified'] * 1000){
+    _owners = object.variables['owners'].map((String s) => userLibrary.users[s]).toList();
     _mailbox = object.variables['mailbox'] == null ? null : new AJAXMailMailbox.fromJSONObject(object.variables['mailbox'], this);
   }
 
@@ -132,7 +132,7 @@ class AJAXMailAddress extends MailAddress {
 
   String get _functionStringSelector => "MailDomainLibrary.getDomain(${quoteString(domain.domainName)}).getAddressLibrary().getAddress(${quoteString(localPart)})";
 
-  Future<Response<String>> changeLocalPart(String localPart){
+  FutureResponse<String> changeLocalPart(String localPart){
     var completer = new Completer();
     ajaxClient.callFunctionString(_functionStringSelector+"..setLocalPart(${quoteString(localPart)})..getInstance()").then((Response<JSONObject> response){
       if(response.type != Response.RESPONSE_TYPE_SUCCESS){
@@ -148,14 +148,14 @@ class AJAXMailAddress extends MailAddress {
 
     });
 
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
   void set _lastChangeInSeconds(int time){
     _lastModified = new DateTime.fromMillisecondsSinceEpoch(time*1000);
   }
 
-  Future<Response<MailMailbox>> createMailbox(String name, String password){
+  FutureResponse<MailMailbox> createMailbox(String name, String password){
     if(hasMailbox){
       return new Future(() => new Response.success(mailbox));
     }
@@ -174,10 +174,10 @@ class AJAXMailAddress extends MailAddress {
 
     });
 
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
-  Future<Response<MailMailbox>> deleteMailbox(){
+  FutureResponse<MailMailbox> deleteMailbox(){
     if(hasMailbox){
       return new Future(() => new Response.success(mailbox));
     }
@@ -197,32 +197,32 @@ class AJAXMailAddress extends MailAddress {
 
     });
 
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
   List<String> get targets => new List.from(_targets, growable:false);
 
-  Future<Response<String>> addTarget(String target);
+  FutureResponse<String> addTarget(String target);
 
-  Future<Response<String>> removeTarget(String target);
+  FutureResponse<String> removeTarget(String target);
 
-  Future<Response<MailAddress>> delete();
+  FutureResponse<MailAddress> delete();
 
   List<User> get owners => new List.from(_owners);
 
-  Future<Response<User>> addOwner(User user);
+  FutureResponse<User> addOwner(User user);
 
-  Future<Response<User>> removeOwner(User user);
+  FutureResponse<User> removeOwner(User user);
 
   DateTime get lastModified;
 
   bool get active;
 
-  Future<Response<MailAddress>> deactivate();
+  FutureResponse<MailAddress> deactivate();
 
-  Future<Response<MailAddress>> activate();
+  FutureResponse<MailAddress> activate();
 
-  Future<Response<MailAddress>> toggleActive();
+  FutureResponse<MailAddress> toggleActive();
 
   Stream<MailAddress> get onLocalPartChange => _onLocalPartChangeController.stream.asBroadcastStream();
 

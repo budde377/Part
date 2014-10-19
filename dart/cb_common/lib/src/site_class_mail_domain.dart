@@ -10,22 +10,22 @@ abstract class MailDomain {
 
   String get description;
 
-  Future<Response<String>> changeDescription(String description);
+  FutureResponse<String> changeDescription(String description);
 
   String toString() => domainName;
 
-  Future<Response<MailDomain>> delete(String password);
+  FutureResponse<MailDomain> delete(String password);
 
 
   DateTime get lastModified;
 
   bool get active;
 
-  Future<Response<bool>> deactivate();
+  FutureResponse<bool> deactivate();
 
-  Future<Response<bool>> activate();
+  FutureResponse<bool> activate();
 
-  Future<Response<bool>> toggleActive();
+  FutureResponse<bool> toggleActive();
 
 
   Stream<String> get onDescriptionChange;
@@ -75,7 +75,7 @@ class AJAXMailDomain extends MailDomain {
 
   String get _domainLibraryGetter => "MailDomainLibrary.getDomain(${quoteString(domainName)})";
 
-  Future<Response<MailDomain>> delete(String password) => domainLibrary.deleteDomain(this, password);
+  FutureResponse<MailDomain> delete(String password) => domainLibrary.deleteDomain(this, password);
 
 
   String get description => _description;
@@ -84,7 +84,7 @@ class AJAXMailDomain extends MailDomain {
 
   MailAddressLibrary get addressLibrary => _addressLibrary;
 
-  Future<Response<String>> changeDescription(String description) {
+  FutureResponse<String> changeDescription(String description) {
     var completer = new Completer<Response<String>>();
 
     ajaxClient.callFunctionString(_domainLibraryGetter + ".setDescription(${quoteString(description)}).getInstance()").then((Response<JSONObject> response) {
@@ -100,13 +100,13 @@ class AJAXMailDomain extends MailDomain {
     });
 
 
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
 
   DateTime get lastModified => _lastModified;
 
-  Future<Response<bool>> deactivate() {
+  FutureResponse<bool> deactivate() {
     if (!active) {
       return new Future(() => active);
     }
@@ -128,10 +128,10 @@ class AJAXMailDomain extends MailDomain {
     });
 
 
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
-  Future<Response<bool>> activate() {
+  FutureResponse<bool> activate() {
     if (active) {
       return new Future(() => active);
     }
@@ -151,10 +151,10 @@ class AJAXMailDomain extends MailDomain {
     });
 
 
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
-  Future<Response<bool>> toggleActive() => active?deactivate():activate();
+  FutureResponse<bool> toggleActive() => active?deactivate():activate();
 
   Stream<String> get onDescriptionChange => _onDescriptionChangeController.stream;
 

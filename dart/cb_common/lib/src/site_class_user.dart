@@ -20,13 +20,13 @@ abstract class User {
 
   List<Page> get pages;
 
-  Future<Response<User>> changeInfo({String username:null, String mail:null});
+  FutureResponse<User> changeInfo({String username:null, String mail:null});
 
-  Future<Response<User>> changePassword(String currentPassword, String newPassword);
+  FutureResponse<User> changePassword(String currentPassword, String newPassword);
 
-  Future<Response<User>> addPagePrivilege(Page page);
+  FutureResponse<User> addPagePrivilege(Page page);
 
-  Future<Response<User>>revokePagePrivilege(Page page);
+  FutureResponse<User>revokePagePrivilege(Page page);
 
   bool get hasRootPrivileges;
   bool get hasSitePrivileges;
@@ -40,7 +40,7 @@ abstract class User {
 }
 
 
-class JSONUser extends User {
+class AJAXUser extends User {
   String _username, _mail, _parent;
 
   DateTime _lastLogin;
@@ -52,7 +52,7 @@ class JSONUser extends User {
 
   List<Page> _pages;
 
-  JSONUser(String username, String mail, String parent, int lastLogin, int privileges, List<Page> pages) {
+  AJAXUser(String username, String mail, String parent, int lastLogin, int privileges, List<Page> pages) {
     _username = username;
     _mail = mail;
     _parent = parent;
@@ -70,8 +70,8 @@ class JSONUser extends User {
 
   DateTime get lastLogin => _lastLogin;
 
-  Future<Response<User>> changeInfo({String username:null, String mail:null}) {
-    var completer = new Completer<ChangeResponse<User>>();
+  FutureResponse<User> changeInfo({String username:null, String mail:null}) {
+    var completer = new Completer<Response<User>>();
 
     var functionString = "";
 
@@ -92,25 +92,25 @@ class JSONUser extends User {
         _username = response.payload.variables["username"];
         _mail = response.payload.variables["mail"];
         _callListeners();
-        completer.complete(new ChangeResponse<User>.success(this));
+        completer.complete(new Response<User>.success(this));
       } else {
-        completer.complete(new ChangeResponse<User>.error(response.error_code));
+        completer.complete(new Response<User>.error(response.error_code));
       }
     });
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
-  Future<ChangeResponse<User>> changePassword(String currentPassword, String newPassword) {
-    var completer = new Completer<ChangeResponse<User>>();
+  FutureResponse<User> changePassword(String currentPassword, String newPassword) {
+    var completer = new Completer<Response<User>>();
     ajaxClient.callFunctionString("UserLibrary.getUser(${quoteString(_username)}).setPassword(${quoteString(currentPassword)}, ${quoteString(newPassword)})").then((JSONResponse response) {
       if(response.type == Response.RESPONSE_TYPE_SUCCESS){
-        completer.complete(new ChangeResponse<User>.success(this));
+        completer.complete(new Response<User>.success(this));
       } else {
-        completer.complete(new ChangeResponse<User>.error(response.error_code));
+        completer.complete(new Response<User>.error(response.error_code));
       }
 
     });
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
   Stream<User> get onChange => _changeStream == null? _changeStream = _changeController.stream.asBroadcastStream():_changeStream;
@@ -125,35 +125,35 @@ class JSONUser extends User {
   List<Page> get pages => new List<Page>.from(_pages);
 
 
-  Future<ChangeResponse<User>> addPagePrivilege(Page page) {
-    var completer = new Completer<ChangeResponse<User>>();
+  FutureResponse<User> addPagePrivilege(Page page) {
+    var completer = new Completer<Response<User>>();
     var pageIdString = quoteString(page.id);
     ajaxClient.callFunctionString("UserLibrary.getUser(${quoteString(username)}).getUserPrivileges()..addPagePrivileges($pageIdString)..hasPagePrivileges($pageIdString)").then( (JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS && response.payload) {
         _pages.add(page);
-        completer.complete(new ChangeResponse<User>.success(this));
+        completer.complete(new Response<User>.success(this));
         _callListeners();
       } else {
-        completer.complete(new ChangeResponse<User>.error(response.error_code));
+        completer.complete(new Response<User>.error(response.error_code));
       }
     });
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
-  Future<ChangeResponse<User>> revokePagePrivilege(Page page) {
+  FutureResponse<User> revokePagePrivilege(Page page) {
     var pageIdString = quoteString(page.id);
 
-    var completer = new Completer<ChangeResponse<User>>();
+    var completer = new Completer<Response<User>>();
     ajaxClient.callFunctionString("UserLibrary.getUser(${quoteString(username)}).getUserPrivileges()..revokePagePrivileges($pageIdString)..hasPagePrivileges($pageIdString)").then((JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS && !response.payload) {
         _pages.remove(page);
         _callListeners();
-        completer.complete(new ChangeResponse<User>.success(this));
+        completer.complete(new Response<User>.success(this));
       } else {
-        completer.complete(new ChangeResponse<User>.error(response.error_code));
+        completer.complete(new Response<User>.error(response.error_code));
       }
     });
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
   bool get hasRootPrivileges => privileges == User.PRIVILEGE_ROOT;

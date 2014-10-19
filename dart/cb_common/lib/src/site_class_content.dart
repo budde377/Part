@@ -17,11 +17,11 @@ abstract class Content {
 }
 
 
-abstract class JSONContentFunctionGenerator{
+abstract class AJAXContentFunctionGenerator{
 
   final String contentLibrary, id;
 
-  JSONContentFunctionGenerator(this.contentLibrary, this.id);
+  AJAXContentFunctionGenerator(this.contentLibrary, this.id);
 
   String generateListContentFunction({int from:null, int to: null, bool includeContent:false}) => contentLibrary+".listContentHistory($from, $to, ${!includeContent})";
   String generateContentAtTimeFunction(num time) => contentLibrary+".getContentAt($time)";
@@ -34,29 +34,29 @@ abstract class JSONContentFunctionGenerator{
 }
 
 
-class JSONContentPageFunctionGenerator extends JSONContentFunctionGenerator{
+class JSONContentPageFunctionGenerator extends AJAXContentFunctionGenerator{
   final Page page;
 
   JSONContentPageFunctionGenerator (Page page, String id) : super("PageOrder.getPage(${quoteString(page.id)}).getContent(${quoteString(id)})", id), this.page = page;
 
 }
 
-class JSONContentSiteFunctionGenerator extends JSONContentFunctionGenerator{
+class JSONContentSiteFunctionGenerator extends AJAXContentFunctionGenerator{
 
   JSONContentSiteFunctionGenerator(String id) : super("SiteContentLibrary.getContent(${quoteString(id)})",id);
 
 
 }
 
-class JSONContent extends Content {
+class AJAXContent extends Content {
 
-  final JSONContentFunctionGenerator contentStrategy;
+  final AJAXContentFunctionGenerator contentStrategy;
 
-  JSONContent(JSONContentFunctionGenerator contentStrategy): super(contentStrategy.id), this.contentStrategy = contentStrategy;
+  AJAXContent(AJAXContentFunctionGenerator contentStrategy): super(contentStrategy.id), this.contentStrategy = contentStrategy;
 
-  JSONContent.page(Page page, String id) : this(new JSONContentPageFunctionGenerator(page, id));
+  AJAXContent.page(Page page, String id) : this(new JSONContentPageFunctionGenerator(page, id));
 
-  JSONContent.site(String id) : this(new JSONContentSiteFunctionGenerator(id));
+  AJAXContent.site(String id) : this(new JSONContentSiteFunctionGenerator(id));
 
   Map<DateTime, Revision> _revisions = new Map<DateTime, Revision>();
 

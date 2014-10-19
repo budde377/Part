@@ -13,9 +13,9 @@ abstract class MailMailbox{
 
   String get name;
 
-  Future<ChangeResponse<MailMailbox>> changeInfo ({String name, String password});
+  FutureResponse<MailMailbox> changeInfo ({String name, String password});
 
-  Future<ChangeResponse<MailMailbox>> delete ();
+  FutureResponse<MailMailbox> delete ();
 
   Stream<MailMailbox> get onDelete;
 
@@ -56,9 +56,9 @@ class AJAXMailMailbox extends MailMailbox{
 
   String get name => _name;
 
-  Future<ChangeResponse<MailMailbox>> changeInfo ({String name, String password});
+  FutureResponse<MailMailbox> changeInfo ({String name, String password});
 
-  Future<ChangeResponse<MailMailbox>> delete ();
+  FutureResponse<MailMailbox> delete ();
 
 
   Stream<MailMailbox> get onDelete;

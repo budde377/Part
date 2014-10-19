@@ -33,21 +33,21 @@ abstract class PageOrder {
 
   bool pageExists(String page_id);
 
-  Future<ChangeResponse<Page>> deactivatePage(String page_id);
+  FutureResponse<Page> deactivatePage(String page_id);
 
-  Future<ChangeResponse<PageOrder>> changePageOrder(List<String> page_id_list, {String parent_id:null});
+  FutureResponse<PageOrder> changePageOrder(List<String> page_id_list, {String parent_id:null});
 
   Stream<PageOrderChange> get onUpdate;
 
-  Future<ChangeResponse<Page>> createPage(String title);
+  FutureResponse<Page> createPage(String title);
 
-  Future<ChangeResponse<Page>> deletePage(String id);
+  FutureResponse<Page> deletePage(String id);
 
   Page operator [](String id);
 
 }
 
-class JSONPageOrder extends PageOrder {
+class AJAXPageOrder extends PageOrder {
 
   bool _hasBeenSetUp = false;
 
@@ -61,52 +61,13 @@ class JSONPageOrder extends PageOrder {
 
   String _currentPageId;
 
-/*  factory JSONPageOrder(){
-    _cache._setup();
-    return _cache;
-  }*/
 
-  JSONPageOrder(Map<String, List<Page>> pageOrderMap, List<Page> inactivePages, String current_page_id){
+  AJAXPageOrder(Map<String, List<Page>> pageOrderMap, List<Page> inactivePages, String current_page_id){
     _setUpFromLists(pageOrderMap, inactivePages, current_page_id);
 
   }
 
-/*
-  void _setup() {
-    if (_hasBeenSetUp) {
-      return;
-    }
 
-    _hasBeenSetUp = true;
-    var listFunction = new ListPagesJSONFunction();
-    ajaxClient.callFunction(listFunction).then((JSONResponse response) {
-      if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
-        _currentPageId = response.payload['current_page_id'];
-
-        response.payload['inactive_pages'].forEach((JSONObject o) {
-          _addPageFromObject(o);
-        });
-        _pageOrderBuilder(response.payload['page_order']);
-        _callListeners(PageOrderChange.PAGE_ORDER_CHANGE_ACTIVATE);
-      } else {
-        throw "Could not load PageOrder. Returned response of type ${response.type}";
-      }
-    });
-
-  }
-  void _pageOrderBuilder(List<Map> list, {String parent:null}) {
-    if (list.length <= 0) {
-      return;
-    }
-    _pageOrder[parent] = [];
-    list.forEach((Map m) {
-      var n = _addPageFromObject(m['page']);
-      _pageOrder[parent].add(n);
-      _pageOrderBuilder(m['subpages'], parent:n);
-    });
-
-  }
-*/
 
   void _setUpFromLists(Map<String, List<Page>> pageOrder, List<Page> inactivePages, String current_page_id) {
     if (_hasBeenSetUp) {
@@ -129,7 +90,7 @@ class JSONPageOrder extends PageOrder {
   }
 
   String _addPageFromObject(JSONObject o) {
-    var page = new JSONPage(o.variables['id'], o.variables['title'], o.variables['template'], o.variables['alias'], o.variables['hidden']);
+    var page = new AJAXPage(o.variables['id'], o.variables['title'], o.variables['template'], o.variables['alias'], o.variables['hidden']);
     _addPageListener(page);
     _pages[page.id] = page;
     return page.id;
@@ -162,18 +123,18 @@ class JSONPageOrder extends PageOrder {
 
   }
 
-  Future<ChangeResponse<Page>> deactivatePage(String page_id) {
-    var completer = new Completer<ChangeResponse<Page>>();
+  FutureResponse<Page> deactivatePage(String page_id) {
+    var completer = new Completer<Response<Page>>();
     ajaxClient.callFunctionString("PageOrder.deactivatePage(PageOrder.getPage(${quoteString(page_id)}))").then((JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         _removeFromPageOrder(page_id);
         _callListeners(PageOrderChange.PAGE_ORDER_CHANGE_DEACTIVATE, _pages[page_id]);
-        completer.complete(new ChangeResponse<Page>.success(_pages[page_id]));
+        completer.complete(new Response<Page>.success(_pages[page_id]));
       } else {
-        completer.complete(new ChangeResponse<Page>.error(response.error_code));
+        completer.complete(new Response<Page>.error(response.error_code));
       }
     });
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
   void _removeFromPageOrder(String id) {
@@ -190,8 +151,8 @@ class JSONPageOrder extends PageOrder {
     });
   }
 
-  Future<ChangeResponse<PageOrder>> changePageOrder(List<String> page_id_list, {String parent_id:null}) {
-    var completer = new Completer<ChangeResponse<PageOrder>>();
+  FutureResponse<PageOrder> changePageOrder(List<String> page_id_list, {String parent_id:null}) {
+    var completer = new Completer<Response<PageOrder>>();
     //var function = new SetPageOrderJSONFunction(parent_id == null ? "" : parent_id, page_id_list);
     var function = "PageOrder";
 
@@ -219,13 +180,13 @@ class JSONPageOrder extends PageOrder {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         _pageOrder[parent_id] = response.payload != null?response.payload.map((JSONObject m) => m.variables["id"]).toList():[];
         _callListeners(PageOrderChange.PAGE_ORDER_CHANGE_ACTIVATE);
-        completer.complete(new ChangeResponse.success(this));
+        completer.complete(new Response.success(this));
       } else {
-        completer.complete(new ChangeResponse.error(response.error_code));
+        completer.complete(new Response.error(response.error_code));
       }
     };
     ajaxClient.callFunctionString(function).then(functionCallback);
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
   List<Page> listPageOrder({String parent_id:null}) => _pageOrder[parent_id] == null ? [] : _pageOrder[parent_id].map((String id) => _pages[id]).toList();
@@ -296,37 +257,37 @@ class JSONPageOrder extends PageOrder {
     _streamController.add(new PageOrderChange(changeType, page));
   }
 
-  Future<ChangeResponse<Page>> createPage(String title) {
-    var completer = new Completer<ChangeResponse<Page>>();
+  FutureResponse<Page> createPage(String title) {
+    var completer = new Completer<Response<Page>>();
     var functionCallback = (JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         String id = _addPageFromObject(response.payload);
         _callListeners(PageOrderChange.PAGE_ORDER_CHANGE_CREATE_PAGE, _pages[id]);
-        completer.complete(new ChangeResponse.success(_pages[id]));
+        completer.complete(new Response.success(_pages[id]));
       } else {
-        completer.complete(new ChangeResponse.error(response.error_code));
+        completer.complete(new Response.error(response.error_code));
       }
     };
     ajaxClient.callFunctionString("PageOrder.createPage(${quoteString(title)})").then(functionCallback);
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
-  Future<ChangeResponse<Page>> deletePage(String id) {
-    var completer = new Completer<ChangeResponse<Page>>();
+  FutureResponse<Page> deletePage(String id) {
+    var completer = new Completer<Response<Page>>();
     var functionCallback = (JSONResponse response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         var page = _pages[id];
         _pages.remove(id);
         _removeFromPageOrder(id);
         _callListeners(PageOrderChange.PAGE_ORDER_CHANGE_DELETE_PAGE, page);
-        completer.complete(new ChangeResponse.success(page));
+        completer.complete(new Response.success(page));
       } else {
-        completer.complete(new ChangeResponse.error(response.error_code));
+        completer.complete(new Response.error(response.error_code));
       }
 
     };
     ajaxClient.callFunctionString("PageOrder.deletePage(PageOrder.getPage(${quoteString(id)}))").then(functionCallback);
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
   bool pageExists(String page_id) => _pages[page_id] != null;

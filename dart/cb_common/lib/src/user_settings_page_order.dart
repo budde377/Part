@@ -9,7 +9,7 @@ class UserSettingsJSONPageOrder implements PageOrder {
 
   factory UserSettingsJSONPageOrder() => _cache;
 
-  UserSettingsJSONPageOrder._internal(UListElement activePageList, UListElement inactivePageList) : _pageOrder = new JSONPageOrder( _listToPageOrder(activePageList), _listToPages(inactivePageList), (() {
+  UserSettingsJSONPageOrder._internal(UListElement activePageList, UListElement inactivePageList) : _pageOrder = new AJAXPageOrder( _listToPageOrder(activePageList), _listToPages(inactivePageList), (() {
     var v;
     return (v = activePageList.querySelector('li.current')) == null ?
           ((v = inactivePageList.querySelector('li.current')) == null ? null : v.dataset["id"]) : v.dataset["id"];
@@ -48,7 +48,7 @@ class UserSettingsJSONPageOrder implements PageOrder {
       var template = li.dataset["template"];
       var alias = li.dataset["alias"];
       var hidden = li.dataset["hidden"] == "true";
-      var page = new JSONPage(id, title, template, alias, hidden);
+      var page = new AJAXPage(id, title, template, alias, hidden);
 
       returnList.add(page);
     });
@@ -74,15 +74,15 @@ class UserSettingsJSONPageOrder implements PageOrder {
 
   bool pageExists(String page_id) => _pageOrder.pageExists(page_id);
 
-  Future<ChangeResponse<Page>> deactivatePage(String page_id) => _pageOrder.deactivatePage(page_id);
+  Future<core.Response<Page>> deactivatePage(String page_id) => _pageOrder.deactivatePage(page_id);
 
-  Future<ChangeResponse<PageOrder>> changePageOrder(List<String> page_id_list, {String parent_id:null}) => _pageOrder.changePageOrder(page_id_list, parent_id:parent_id);
+  Future<core.Response<PageOrder>> changePageOrder(List<String> page_id_list, {String parent_id:null}) => _pageOrder.changePageOrder(page_id_list, parent_id:parent_id);
 
-  Future<ChangeResponse<Page>> createPage(String title) => _pageOrder.createPage(title);
+  Future<core.Response<Page>> createPage(String title) => _pageOrder.createPage(title);
 
   Stream<PageOrderChange> get onUpdate => _pageOrder.onUpdate;
 
-  Future<ChangeResponse<Page>> deletePage(String id) => _pageOrder.deletePage(id);
+  Future<core.Response<Page>> deletePage(String id) => _pageOrder.deletePage(id);
 
   Page operator [](String id) => _pageOrder[id];
 

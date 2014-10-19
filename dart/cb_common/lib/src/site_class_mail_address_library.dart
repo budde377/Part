@@ -10,13 +10,13 @@ abstract class MailAddressLibrary {
 
   Map<String, MailAddress> get addresses;
 
-  Future<Response<MailAddress>> createAddress(String localPart);
+  FutureResponse<MailAddress> createAddress(String localPart);
 
-  Future<Response<MailAddressLibrary>> deleteAddress(MailAddress address);
+  FutureResponse<MailAddressLibrary> deleteAddress(MailAddress address);
 
-  Future<Response<MailAddress>> createCatchallAddress();
+  FutureResponse<MailAddress> createCatchallAddress();
 
-  Future<Response<MailAddressLibrary>> deleteCatchallAddress();
+  FutureResponse<MailAddressLibrary> deleteCatchallAddress();
 
   bool get hasCatchallAddress;
 
@@ -68,7 +68,7 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
   Map<String, MailAddress> get addresses => new Map<String, MailAddress>.from(_addresses);
 
 
-  Future<Response<MailAddress>> createAddress(String localPart){
+  FutureResponse<MailAddress> createAddress(String localPart){
     var completer = new Completer();
 
     ajaxClient.callFunctionString(_getLibraryFunctionString+".createAddress(${quoteString(localPart)})").then((Response<JSONObject> response){
@@ -84,13 +84,13 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
 
     });
 
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
   String get _getLibraryFunctionString =>  "MailDomainLibrary.getDomain(${quoteString(domain.domainName)}).getAddressLibrary()";
 
 
-  Future<Response<MailAddressLibrary>> deleteAddress(MailAddress address){
+  FutureResponse<MailAddressLibrary> deleteAddress(MailAddress address){
     var completer = new Completer();
 
     ajaxClient.callFunctionString(_getLibraryFunctionString+".deleteAddress(${_getLibraryFunctionString}.getAddress(${quoteString(address.localPart)}))").then((Response<JSONObject> response){
@@ -105,10 +105,10 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
 
     });
 
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
-  Future<Response<MailAddress>> createCatchallAddress(){
+  FutureResponse<MailAddress> createCatchallAddress(){
     if(hasCatchallAddress){
       return new Future(()=>new Response.success(catchallAddress));
     }
@@ -129,10 +129,10 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
 
     });
 
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
-  Future<Response<MailAddressLibrary>> deleteCatchallAddress(){
+  FutureResponse<MailAddressLibrary> deleteCatchallAddress(){
     if(!hasCatchallAddress){
       return new Future(()=>new Response.error(Response.ERROR_CODE_INVALID_INPUT));
     }
@@ -150,7 +150,7 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
 
     });
 
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
   Stream<MailAddress> get onCatchallChange => _onCatchallChangeController.stream.asBroadcastStream();

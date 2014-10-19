@@ -4,7 +4,7 @@ abstract class JSONClient {
   String urlPrefix = "";
 
 
-  Future<Response> callFunctionString(String function, {void progress(double pct), FormData form_data:null});
+  FutureResponse callFunctionString(String function, {void progress(double pct), FormData form_data:null});
 }
 
 
@@ -16,7 +16,7 @@ class AJAXJSONClient extends JSONClient {
 
   AJAXJSONClient._internal();
 
-  Future<Response> _setUpRequest(HttpRequest request) {
+  FutureResponse _setUpRequest(HttpRequest request) {
     var completer = new Completer();
     request.onReadyStateChange.listen((Event e) {
       if (request.readyState != 4) {
@@ -38,12 +38,12 @@ class AJAXJSONClient extends JSONClient {
       }
 
     });
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
-  Future<Response> callFunctionString(String function, {void progress(num pct), FormData form_data:null}) {
+  FutureResponse callFunctionString(String function, {void progress(num pct), FormData form_data:null}) {
     if(!connection.hasConnection){
-      return new Future(()=>new Response.error(Response.ERROR_CODE_NO_CONNECTION));
+      return new FutureResponse.error(Response.ERROR_CODE_NO_CONNECTION);
     }
 
     var request = connection.buildRequest();
