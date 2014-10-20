@@ -15,6 +15,7 @@ import 'pcre_syntax_checker.dart' as PCRE;
 
 part 'src/user_settings_page_order.dart';
 part 'src/user_settings_user_library.dart';
+part 'src/user_settings_mail.dart';
 part 'src/user_settings_decoration.dart';
 part 'src/user_settings_page_li.dart';
 
