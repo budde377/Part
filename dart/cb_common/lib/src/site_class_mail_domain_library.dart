@@ -22,7 +22,6 @@ class AJAXMailDomainLibrary implements MailDomainLibrary{
 
   final UserLibrary userLibrary;
 
-  // TODO update map when domain change name
   Map<String, MailDomain> _domains;
 
   StreamController<MailDomain>
@@ -36,7 +35,6 @@ class AJAXMailDomainLibrary implements MailDomainLibrary{
     _domains = new Map<String, MailDomain>.fromIterable(object.variables['domains'],
     key:(JSONObject obj) => obj.variables['domain_name'],
     value:(JSONObject obj) => new AJAXMailDomain.fromJSONObject(obj, this, userLibrary));
-
   }
 
 

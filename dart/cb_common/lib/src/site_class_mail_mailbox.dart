@@ -1,7 +1,7 @@
 part of site_classes;
 
 
-abstract class MailMailbox{
+abstract class MailMailbox {
 
   MailDomain get domain;
 
@@ -13,9 +13,9 @@ abstract class MailMailbox{
 
   String get name;
 
-  FutureResponse<MailMailbox> changeInfo ({String name, String password});
+  FutureResponse<MailMailbox> changeInfo({String name, String password});
 
-  FutureResponse<MailMailbox> delete ();
+  FutureResponse<MailMailbox> delete();
 
   Stream<MailMailbox> get onDelete;
 
@@ -24,8 +24,7 @@ abstract class MailMailbox{
 }
 
 
-
-class AJAXMailMailbox extends MailMailbox{
+class AJAXMailMailbox extends MailMailbox {
 
   final MailDomain domain;
 
@@ -38,6 +37,10 @@ class AJAXMailMailbox extends MailMailbox{
   String _name;
 
   JSONClient _client = new AJAXJSONClient();
+
+  StreamController
+  _onDeleteController = new StreamController(),
+  _onNameChangeController = new StreamController();
 
 
   AJAXMailMailbox(MailAddress address, [this._name = ""]):
@@ -56,12 +59,49 @@ class AJAXMailMailbox extends MailMailbox{
 
   String get name => _name;
 
-  FutureResponse<MailMailbox> changeInfo ({String name, String password});
+  String get _functionStringSelector => "MailDomainLibrary.getDomain(${quoteString(domain.domainName)}).getAddressLibrary().getAddress(${quoteString(address.localPart)}).getMailbox()";
 
-  FutureResponse<MailMailbox> delete ();
+  FutureResponse<MailMailbox> changeInfo({String name, String password}) {
 
+    var completer = new Completer<Response<MailMailbox>>();
 
-  Stream<MailMailbox> get onDelete;
+    String functionString = _functionStringSelector;
+    if (name != null && name != _name) {
+      functionString += "..setName(${quoteString(name)})";
+    }
 
-  Stream<String> get onNameChange;
+    if (password != null) {
+      functionString += "..setPassword(${quoteString(password)})";
+    }
+
+    functionString += "..getName()";
+
+    ajaxClient.callFunctionString(functionString).thenResponse(onSuccess:(Response<String> response) {
+      if (_name != response.payload) {
+        _name = response.payload;
+        completer.complete(this);
+        _onNameChangeController.add(this);
+      } else {
+        completer.complete(this);
+      }
+
+    }, onError:completer.complete);
+
+    return new FutureResponse(completer.future);
+  }
+
+  FutureResponse<MailMailbox> delete() {
+    var completer = new Completer();
+    address.deleteMailbox().thenResponse(onSuccess:(Response<MailMailbox> r){
+      completer.complete(r.payload);
+      _onDeleteController.add(r.payload);
+    }, onError: completer.complete);
+
+    return new FutureResponse(completer.future);
+  }
+
+  Stream<MailMailbox> get onDelete => _onDeleteController.stream;
+
+  Stream<String> get onNameChange => _onNameChangeController.stream;
+
 }
