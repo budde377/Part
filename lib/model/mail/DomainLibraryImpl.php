@@ -71,13 +71,22 @@ class DomainLibraryImpl implements DomainLibrary, Observer
     {
         $d = $this->getDomain($domain);
         if ($d == null) {
-            $d = ($this->domainList[$domain] = new DomainImpl($domain, $this->databaseName, $this->db, $this->userLibrary, $this));
-            $d->attachObserver($this);
+            $d = new DomainImpl($domain, $this->databaseName, $this->db, $this->userLibrary, $this);
+
+            if($d->create($password)){
+                $this->domainList[$domain] =$d;
+                $d->attachObserver($this);
+                return $d;
+            }
+
+        } else {
+            if($d->create($password)){
+                return $d;
+            }
         }
 
-        $d->create($password);
 
-        return $d;
+        return null;
     }
 
     /**
