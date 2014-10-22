@@ -132,6 +132,10 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
 
     }
 
+    public function testCreateDomainReturnsNullOnError(){
+        $this->assertNull($this->domainLibrary->createDomain('test2.dk', "notRealPass"));
+    }
+
 
     public function testDeleteDomainDoesThat()
     {
@@ -160,4 +164,6 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
         $this->assertEquals($o = new MailDomainLibraryObjectImpl($this->domainLibrary), $this->domainLibrary->jsonObjectSerialize());
         $this->assertEquals($o->jsonSerialize(), $this->domainLibrary->jsonSerialize());
     }
+
+
 }
