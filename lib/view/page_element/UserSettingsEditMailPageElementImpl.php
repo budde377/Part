@@ -124,6 +124,8 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         </form>
         ";
 
+        //TODO: hide user option if no users in last form.
+        //TODO: style empty lists
 
         return $out;
 
