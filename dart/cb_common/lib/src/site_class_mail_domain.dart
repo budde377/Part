@@ -16,6 +16,14 @@ abstract class MailDomain {
 
   FutureResponse<MailDomain> delete(String password);
 
+  FutureResponse<MailDomain> changeAliasTarget(MailDomain domain);
+
+  FutureResponse<MailDomain> removeAliasTarget();
+
+  bool get isDomainAlias;
+
+  MailDomain get aliasTarget;
+
 
   DateTime get lastModified;
 
@@ -27,6 +35,7 @@ abstract class MailDomain {
 
   FutureResponse<bool> toggleActive();
 
+  Stream<MailDomain> get onAliasTargetChange;
 
   Stream<String> get onDescriptionChange;
 
@@ -53,14 +62,18 @@ class AJAXMailDomain extends MailDomain {
 
   String _description;
 
+  MailDomain _aliasTarget;
+
   StreamController
   _onDeleteController,
+  _onAliasTargetChange = new StreamController<bool>(),
   _onActiveChangeController = new StreamController<bool>(),
   _onDescriptionChangeController = new StreamController<String>();
 
-  AJAXMailDomain(this.domainName, this._addressLibrary, this.domainLibrary, this.userLibrary, {String description:"", bool active:true, DateTime last_modified: null}) :
+  AJAXMailDomain(this.domainName, this._addressLibrary, this.domainLibrary, this.userLibrary, {String description:"", bool active:true, DateTime last_modified: null, MailDomain alias_target}) :
   _description = description,
   _active = active,
+  _aliasTarget = alias_target,
   _lastModified = last_modified == null ? new DateTime.fromMillisecondsSinceEpoch(0) : last_modified;
 
 
@@ -70,12 +83,48 @@ class AJAXMailDomain extends MailDomain {
   this._description = object.variables['description'],
   this._lastModified = new DateTime.fromMillisecondsSinceEpoch(object.variables['last_modifed'] * 1000){
     this._addressLibrary = new AJAXMailAddressLibrary.fromJSONObject(object.variables['addresses_library'], this, userLibrary);
-
+    this._aliasTarget = object.variables['alias_target'] == null?null:domainLibrary.domains[object.variables['alias_target'].variables['domain_name']];
   }
 
   String get _domainLibraryGetter => "MailDomainLibrary.getDomain(${quoteString(domainName)})";
 
   FutureResponse<MailDomain> delete(String password) => domainLibrary.deleteDomain(this, password);
+
+
+  FutureResponse<MailDomain> changeAliasTarget(MailDomain domain){
+    var completer = new Completer();
+    ajaxClient.callFunctionString(_domainLibraryGetter+"..setAliasTarget(MailDomainLibrary.getDomain(${quoteString(domain.domainName)}))..getInstance()")
+    .thenResponse(onError:completer.complete, onSuccess:(Response r){
+      _aliasTarget = domain;
+      _lastModified = new DateTime.fromMillisecondsSinceEpoch(r.payload.variables['last_modified'] * 1000);
+      completer.complete(new Response.success(_aliasTarget));
+      _onAliasTargetChange.add(_aliasTarget);
+    });
+
+
+    return completer.future;
+  }
+
+  FutureResponse<MailDomain> removeAliasTarget(){
+    if(!isDomainAlias){
+      return new FutureResponse.success(null);
+    }
+    var completer = new Completer();
+    ajaxClient.callFunctionString(_domainLibraryGetter+"..removeAliasTarget(MailDomainLibrary.getDomain(${quoteString(_aliasTarget.domainName)}))..getInstance()")
+    .thenResponse(onError:completer.complete, onSuccess:(Response r){
+      _aliasTarget = null;
+      _lastModified = new DateTime.fromMillisecondsSinceEpoch(r.payload.variables['last_modified'] * 1000);
+      completer.complete(new Response.success(_aliasTarget));
+      _onAliasTargetChange.add(_aliasTarget);
+    });
+
+
+    return completer.future;
+  }
+
+  bool get isDomainAlias => _aliasTarget != null;
+
+  MailDomain get aliasTarget => _aliasTarget;
 
 
   String get description => _description;
@@ -172,6 +221,7 @@ class AJAXMailDomain extends MailDomain {
 
     return _onDeleteController.stream;
   }
+  Stream<MailDomain> get onAliasTargetChange => _onAliasTargetChange.stream;
 
   Stream<bool> get onActiveChange => _onActiveChangeController.stream;
 }

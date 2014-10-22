@@ -10,7 +10,7 @@ abstract class MailAddressLibrary {
 
   Map<String, MailAddress> get addresses;
 
-  FutureResponse<MailAddress> createAddress(String localPart);
+  FutureResponse<MailAddress> createAddress(String localPart, {List<User> owners, List<String> target});
 
   FutureResponse<MailAddress> deleteAddress(MailAddress address);
 
@@ -88,10 +88,19 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
   Map<String, MailAddress> get addresses => new Map<String, MailAddress>.from(_addresses);
 
 
-  FutureResponse<MailAddress> createAddress(String localPart){
+  FutureResponse<MailAddress> createAddress(String localPart, {List<User> owners, List<String> target}){
     var completer = new Completer();
 
-    ajaxClient.callFunctionString(_getLibraryFunctionString+".createAddress(${quoteString(localPart)})").then((Response<JSONObject> response){
+    var fs = "";
+    if(owners != null){
+      fs += owners.fold("", (String prev, User u)=>prev+"..addOwner(${quoteString(u.username)})");
+    }
+
+    if(target == null){
+      fs += target.reduce((String v, String e) => v+"..addTarget(${quoteString(e)})");
+    }
+
+    ajaxClient.callFunctionString(_getLibraryFunctionString+".createAddress(${quoteString(localPart)})$fs}").then((Response<JSONObject> response){
       if(response.type != Response.RESPONSE_TYPE_SUCCESS){
         completer.complete(response);
         return;

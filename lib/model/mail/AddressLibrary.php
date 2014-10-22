@@ -13,7 +13,7 @@ use ChristianBudde\cbweb\controller\json\JSONObjectSerializable;
 interface AddressLibrary extends JSONObjectSerializable {
 
     /**
-     * @return array An array containing selected entries.
+     * @return Address[] An array containing selected entries.
      */
     public function listAddresses();
 

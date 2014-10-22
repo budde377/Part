@@ -15,7 +15,7 @@ interface DomainLibrary extends JSONObjectSerializable{
 
     /**
      * List the domains in the library as an assoc array
-     * @return array An array of PostfixDomain s
+     * @return Domain[] An array of PostfixDomain s
      */
     public function listDomains();
 
