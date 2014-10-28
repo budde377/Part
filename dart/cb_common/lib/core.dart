@@ -13,6 +13,7 @@ part 'src/core_file_uploader.dart';
 part 'src/core_function_string_compiler.dart';
 part 'src/core_connection.dart';
 part 'src/core_response.dart';
+part 'src/core_lazy_map.dart';
 
 int parseNumber(String pxString) => int.parse(pxString.replaceAll(new RegExp("[^0-9]"), ""), onError:(_) => 0);
 

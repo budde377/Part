@@ -29,6 +29,18 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
 
     public function generateContent()
     {
+
+        $userForm = $this->getPageUserList();
+
+        $userForm = $userForm ==""?"":"
+            <label>
+                Vælg brugere
+            </label>
+            <ul class='owner_check_list'>
+                $userForm
+            </ul>";
+
+
         $out = "
         <h3>Domæner</h3>
         <ul class='floating_list has_deletable'>
@@ -89,12 +101,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
                     {$this->getDomainOptions()}
                 </select>
             </label>
-            <label>
-                Vælg brugere
-            </label>
-            <ul class='owner_check_list'>
-                {$this->getPageUserList()}
-            </ul>
+            $userForm
             <label class='long_input'>
                 Vidersend til (komma separeret liste)
                 <input type='text' name='targets' />
@@ -124,7 +131,6 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         </form>
         ";
 
-        //TODO: hide user option if no users in last form.
         //TODO: style empty lists
 
         return $out;

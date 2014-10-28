@@ -59,7 +59,10 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
   this.domain = domain,
   domainLibrary = domain.domainLibrary{
     _catchallAddress = object.variables['catchall_address'] == null ? null : new AJAXMailAddress.fromJSONObject(object.variables['catchall_address'], this, userLibrary);
-    _addresses = new Map.fromIterable(object.variables['addresses'], key:(JSONObject object) => object.variables['local_part'], value:(JSONObject object) => new AJAXMailAddress.fromJSONObject(object, this, userLibrary));
+    _addresses = new LazyMap.fromFunctionMap(
+        new Map.fromIterable(object.variables['addresses'],
+        key:(JSONObject object) => object.variables['local_part'],
+        value:(JSONObject object) => () => new AJAXMailAddress.fromJSONObject(object, this, userLibrary)));
     _setUpListeners();
   }
   void _setUpListeners() {

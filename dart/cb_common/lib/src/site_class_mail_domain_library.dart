@@ -32,9 +32,9 @@ class AJAXMailDomainLibrary implements MailDomainLibrary{
   AJAXMailDomainLibrary(this._domains, this.userLibrary);
 
   AJAXMailDomainLibrary.fromJSONObject(JSONObject object, this.userLibrary){
-    _domains = new Map<String, MailDomain>.fromIterable(object.variables['domains'],
+    _domains = new LazyMap.fromFunctionMap(new Map<String, Function>.fromIterable(object.variables['domains'],
     key:(JSONObject obj) => obj.variables['domain_name'],
-    value:(JSONObject obj) => new AJAXMailDomain.fromJSONObject(obj, this, userLibrary));
+    value:(JSONObject obj) => () => new AJAXMailDomain.fromJSONObject(obj, this, userLibrary)));
   }
 
 
