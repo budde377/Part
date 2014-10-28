@@ -749,6 +749,16 @@ form.initial input.invalid {
 }
 
 
+#UserSettingsContent .floating_list > li.empty_list{
+    width: 530px;
+    padding: 10px;
+    text-align: center;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    margin: 0;
+}
+
 /*#UserSettingsContent .floating_list > li.add {
     border: 1px solid transparent;
     height: 26px;
@@ -982,6 +992,9 @@ form.initial input.invalid {
     overflow: hidden;
     height: 0;
 }
+#UserSettingsEditMailAddAddressAddMailboxCheckbox + label + div > label:nth-of-type(3){
+    float: right;
+}
 
 #UserSettingsEditMailAddAddressAddMailboxCheckbox + label + div > label:first-of-type {
     padding-right: 26px;
@@ -999,7 +1012,7 @@ form.initial input.invalid {
 }
 
 #UserSettingsEditMailAddAddressAddMailboxCheckbox:checked + label + div {
-    height: 57px;
+    height: 114px;
 }
 
 #UserSettingsEditMailAddAddressAddMailboxCheckbox:checked + label + div::after {

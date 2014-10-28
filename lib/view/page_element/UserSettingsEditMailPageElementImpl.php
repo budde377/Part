@@ -46,15 +46,15 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         <ul class='floating_list has_deletable'>
             {$this->getDomainList()}
         </ul>
-        <form id='UserSettingsEditMailAddDomainForm' class='mail_form expandable' data-function-string='MailDomainLibrary.createDomain(name,password)'>
+        <form id='UserSettingsEditMailAddDomainForm' class='mail_form expandable' data-function-string='MailDomainLibrary.createDomain(domain_name,super_password)'>
             <div>
             <label>
                 Domæne
-                <input type='text' name='name'/>
+                <input type='text' name='domain_name'/>
             </label>
             <label>
                 Super-kodeord
-                <input type='password' name='password'/>
+                <input type='password' name='super_password'/>
             </label>
 
             <div class='submit'>
@@ -91,7 +91,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         <form id='UserSettingsEditMailAddAddressForm' class='mail_form expandable' data-function-string='MailDomainLibrary.domains[domain].aliasLibrary.createAlias(local_part)'>
             <div>
             <label>
-                Navn
+                Navn (tom for catchall addresse)
                 <input type='text' name='local_part'>
             </label>
             <span class='at'>@</span>
@@ -112,12 +112,16 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             </label>
             <div>
             <label>
+            Navn
+            <input type='text' name='mailbox_owner_name' />
+            </label>
+            <label>
             Mailbox kodeord
-            <input type='password' name='mailbox_password'>
+            <input type='password' name='mailbox_password' />
             </label>
             <label>
             Bekræft kodeord
-            <input type='password' name='mailbox_password_2'>
+            <input type='password' name='mailbox_password_2' />
             </label>
 
             </div>
@@ -219,7 +223,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
 
         $hideNoResult = $result == ""?"":"hidden";
 
-        $result .= "<ul $hideNoResult><li class='empty_list'>Der er ingen addresser</li> </ul>";
+        $result .= "<ul class='floating_list' $hideNoResult><li class='empty_list'>Der er ingen addresser</li> </ul>";
 
         return $result;
     }
@@ -239,9 +243,9 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         $deleteElement = $this->currentUser != null && ($address->isOwner($this->currentUser) || $this->currentUser->getUserPrivileges()->hasSitePrivileges()) ?
             "<div class='delete'></div>" : "";
 
-
+        $lp = $address->getLocalPart() == ""?"<span class='asterisk'>*</span>":$address->getLocalPart();
         return "<li $attributes>
-                    {$address->getLocalPart()}@{$domain->getDomainName()}$deleteElement
+                    {$lp}@{$domain->getDomainName()}$deleteElement
                             </li>";
     }
 
