@@ -67,7 +67,7 @@ class ImageEditProperties {
       _width = element.width;
     }
     if (_height == null) {
-      _height = element.width;
+      _height = element.height;
     }
   }
 
