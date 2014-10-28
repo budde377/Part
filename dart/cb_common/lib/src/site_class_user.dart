@@ -75,11 +75,11 @@ class AJAXUser extends User {
 
     var functionString = "";
 
-    if(mail != null){
+    if(mail != null && mail != _mail){
       functionString += "..setMail(${quoteString(mail)})";
     }
 
-    if(username != null){
+    if(username != null && username != _username){
       functionString += "..setUsername(${quoteString(username)})";
     }
 

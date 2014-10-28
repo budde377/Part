@@ -63,10 +63,10 @@ class AJAXPage extends Page {
 
   FutureResponse<Page> changeInfo({String id:null, String title:null, String template:null, String alias:null, bool hidden:null}) {
     var functionString = "";
-    functionString += id == null ? "" : "..setId(${quoteString(id)})";
-    functionString += title == null ? "" : "..setTitle(${quoteString(title)})";
-    functionString += template == null ? "" : "..setTemplate(${quoteString(template)})";
-    functionString += alias == null ? "" : "..setAlias(${quoteString(alias)})";
+    functionString += id == null || id == _id? "" : "..setId(${quoteString(id)})";
+    functionString += title == null || title == _title? "" : "..setTitle(${quoteString(title)})";
+    functionString += template == null || template == _template? "" : "..setTemplate(${quoteString(template)})";
+    functionString += alias == null || alias == _alias? "" : "..setAlias(${quoteString(alias)})";
 
     if (hidden && !_hidden) {
       functionString += "..hide()";
