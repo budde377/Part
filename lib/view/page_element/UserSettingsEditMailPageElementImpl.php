@@ -43,7 +43,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
 
         $out = "
         <h3>Domæner</h3>
-        <ul class='floating_list has_deletable'>
+        <ul class='floating_list has_deletable' id='UserSettingsEditMailDomainList'>
             {$this->getDomainList()}
         </ul>
         <form id='UserSettingsEditMailAddDomainForm' class='mail_form expandable' data-function-string='MailDomainLibrary.createDomain(domain_name,super_password)'>
@@ -63,7 +63,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             </div>
         </form>
         <h3>Domæne alias</h3>
-        <ul class='floating_list points_to has_deletable'>
+        <ul class='floating_list points_to has_deletable' id='UserSettingsEditMailDomainAliasList'>
             {$this->getMailAliasList()}
         </ul>
         <form id=\"UserSettingsEditMailAddDomainAliasForm\" class=' mail_form expandable'  data-function-string='MailDomainLibrary.domains[from].addAliasTarget(to)'>
@@ -208,7 +208,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             if (!count($addresses)) {
                 continue;
             }
-            $result .= "<ul class='floating_list has_deletable' data-domain='{$domain->getDomainName()}'>";
+            $result .= "<ul id='UserSettingsEditMailAddressList{$domain->getDomainName()}' class='floating_list has_deletable' data-domain='{$domain->getDomainName()}'>";
             foreach ($addresses as $address) {
                 $result .= $this->getAddressElement($address, $domain);
 

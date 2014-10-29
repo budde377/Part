@@ -1,44 +1,78 @@
 part of core;
 
-class LazyMap<K,V> implements Map{
+class LazyMap<K, V> implements Map<K, V> {
 
-  Map<K,Function > _internMap = new Map();
 
-  LazyMap.fromFunctionMap(this._internMap);
+  Map<K, V> _cache = new Map<K, V>();
+  List<K> _keys;
+  Function _generator;
 
-  bool containsValue(Object value)  => _internMap.containsValue(() => value);
 
-  bool containsKey(Object key) => _internMap.containsKey(key);
+  LazyMap.fromGenerator(List<K> keys, V generator(K)): _keys = keys, _generator = generator;
 
-  V putIfAbsent(K key, V ifAbsent()) => _internMap.putIfAbsent(key, ()=>()=>ifAbsent())();
 
-  void addAll(Map<K, V> other) {
-    _internMap.addAll(new Map<K, Function>.fromIterables(other.keys, other.values.map((V v) => () => v)));
+  bool containsValue(Object value) {
+    return _cache.containsValue(value) || _keys.fold(false, (bool prev, String key) => prev || this[key] == value);
   }
 
-  V remove(Object key)  => _internMap.remove(key)();
+  bool containsKey(Object key) => _keys.contains(key);
+
+  V putIfAbsent(K key, V ifAbsent()) => _cache.putIfAbsent(key, ifAbsent);
+
+  void addAll(Map<K, V> other) => _cache.addAll(other);
+
+  V remove(Object key) {
+    _generate(key);
+    _keys.remove(key);
+    return _cache.remove(key);
+  }
 
   void clear() {
-    _internMap.clear();
+    _keys.clear();
+    _cache.clear();
+
   }
 
   void forEach(void f(K key, V value)) {
-    _internMap.forEach((K key, Function v) => f(key, v()));
+    keys.forEach((K e){
+      f(e, this[e]);
+    });
+
   }
 
-  Iterable<K> get keys => _internMap.keys;
+  Iterable<K> get keys => new List.from(_keys).addAll(_cache.keys);
 
-  Iterable<V> get values => _internMap.values.map((Function f) => f());
+  Iterable<V> get values {
+    var l = new List<V>();
+    forEach((_, V v) => l.add(v));
+    return l;
+  }
 
-  int get length => _internMap.length;
+  V _generate(Object object) {
+    if(_cache.containsKey(object)){
+      return _cache[object];
+    }
+    if(!_keys.contains(object)){
+      return null;
+    }
+    return _cache[object] = _generator(object);
+  }
 
-  bool get isEmpty => _internMap.isEmpty;
+  int get length => keys.length;
 
-  bool get isNotEmpty => _internMap.isNotEmpty;
+  bool get isEmpty => keys.length == 0;
 
+  bool get isNotEmpty => !isEmpty;
 
-  operator [](K key) => _internMap[key];
+  V operator [] (K key) => _generate(key);
 
-  operator []=(K key, V value) => _internMap[key] = ()=>value;
+  void operator []= (K key, V value) {
+    _cache[key] = value;
+  }
 
+  LazyMap<K,V> clone(){
+    var m = new LazyMap.fromGenerator(keys, _generator);
+    m.addAll(_cache);
+    return m;
+  }
 }

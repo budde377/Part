@@ -13,6 +13,7 @@ abstract class MailDomainLibrary{
 
   Stream<MailDomain> get onDelete;
 
+  operator [] (String key);
 
 }
 
@@ -22,24 +23,25 @@ class AJAXMailDomainLibrary implements MailDomainLibrary{
 
   final UserLibrary userLibrary;
 
-  Map<String, MailDomain> _domains;
+  LazyMap<String, MailDomain> _domains;
 
   StreamController<MailDomain>
   _onCreateController = new StreamController<MailDomain>(),
   _onDeleteController = new StreamController<MailDomain>();
 
 
-  AJAXMailDomainLibrary(this._domains, this.userLibrary);
+  AJAXMailDomainLibrary(List<String> domainNames, MailDomain domainGenerator(MailDomainLibrary, String), this.userLibrary){
+    _domains = new LazyMap<String, MailDomain>.fromGenerator(domainNames, (String dn) => domainGenerator(this, dn));
+  }
 
   AJAXMailDomainLibrary.fromJSONObject(JSONObject object, this.userLibrary){
-    _domains = new LazyMap.fromFunctionMap(new Map<String, Function>.fromIterable(object.variables['domains'],
-    key:(JSONObject obj) => obj.variables['domain_name'],
-    value:(JSONObject obj) => () => new AJAXMailDomain.fromJSONObject(obj, this, userLibrary)));
+    Map<String, JSONObject> objectDomains = object.variables['domains'];
+    _domains = new LazyMap<String, MailDomain>.fromGenerator(objectDomains.keys, (String k) => new AJAXMailAddress.fromJSONObject(objectDomains[k], this, userLibrary));
   }
 
 
 
-  Map<String,MailDomain> get domains => new Map<String, MailDomain>.from(_domains);
+  Map<String,MailDomain> get domains => _domains.clone();
 
   FutureResponse<MailDomain> createDomain(String domainName, String password){
     var completer = new Completer();
@@ -83,4 +85,7 @@ class AJAXMailDomainLibrary implements MailDomainLibrary{
   Stream<MailDomain> get onCreate => _onCreateController.stream.asBroadcastStream();
 
   Stream<MailDomain> get onDelete => _onDeleteController.stream.asBroadcastStream();
+
+  operator [] (String key) => domains[key];
+
 }
