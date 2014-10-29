@@ -72,7 +72,7 @@ class AJAXMailDomain extends MailDomain {
   _onActiveChangeController = new StreamController<bool>(),
   _onDescriptionChangeController = new StreamController<String>();
 
-  AJAXMailDomain(this.domainName, MailAddressLibrary addressLibraryGenerator (MailDomain) , this.domainLibrary, this.userLibrary, {String description:"", bool active:true, DateTime last_modified: null, MailDomain alias_target}) :
+  AJAXMailDomain(this.domainName, MailAddressLibrary addressLibraryGenerator (MailDomain) , this.domainLibrary, this.userLibrary, {String description:"", bool active:true, DateTime last_modified: null, MailDomain alias_target: null}) :
   _description = description,
   _addressLibraryGenerator = addressLibraryGenerator,
   _active = active,

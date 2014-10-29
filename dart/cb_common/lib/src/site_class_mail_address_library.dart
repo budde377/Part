@@ -48,7 +48,7 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
   _onCatchallChangeController = new StreamController();
 
 
-  AJAXMailAddressLibrary(List<String> localParts, MailAddress addressGenerator(MailAddressLibrary, String), MailDomain domain, this.userLibrary):
+  AJAXMailAddressLibrary(Iterable<String> localParts, MailAddress addressGenerator(MailAddressLibrary, String), MailDomain domain, this.userLibrary):
   this.domain = domain,
   domainLibrary = domain.domainLibrary {
     _addresses = new LazyMap.fromGenerator(localParts, _wrapAndTransformGenerator(addressGenerator));

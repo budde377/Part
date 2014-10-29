@@ -8,7 +8,7 @@ class LazyMap<K, V> implements Map<K, V> {
   Function _generator;
 
 
-  LazyMap.fromGenerator(List<K> keys, V generator(K)): _keys = keys, _generator = generator;
+  LazyMap.fromGenerator(Iterable<K> keys, V generator(K)): _keys = keys.toList(), _generator = generator;
 
 
   bool containsValue(Object value) {

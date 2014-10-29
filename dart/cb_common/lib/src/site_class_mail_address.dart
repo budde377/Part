@@ -100,13 +100,13 @@ class AJAXMailAddress extends MailAddress {
   _onDeleteController;
 
 
-  AJAXMailAddress(this._localPart, MailAddressLibrary addressLibrary, this.userLibrary, {MailMailbox mailboxGenerator(MailAddress), bool active: true, List<String> targets:null, DateTime last_modified:null, List<User> owners:null}):
+  AJAXMailAddress(this._localPart, MailAddressLibrary addressLibrary, this.userLibrary, {MailMailbox mailboxGenerator(MailAddress), bool active: true, Iterable<String> targets:null, DateTime last_modified:null, Iterable<User> owners:null}):
   this._active = active,
   this.addressLibrary = addressLibrary,
   this.domainLibrary = addressLibrary.domainLibrary,
   this.domain = addressLibrary.domain,
-  this._targets = targets == null ? [] : targets,
-  this._owners = owners == null? [] : owners,
+  this._targets = targets == null ? [] : targets.toList(),
+  this._owners = owners == null? [] : owners.toList(),
   this._lastModified = (last_modified == null ? new DateTime.fromMillisecondsSinceEpoch(0) : last_modified){
     _mailbox = mailboxGenerator(this);
   }

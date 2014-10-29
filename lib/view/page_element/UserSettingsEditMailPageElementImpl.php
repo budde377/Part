@@ -148,7 +148,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         foreach ($this->mailDomainLibrary->listDomains() as $domain) {
 
             $result .= "
-            <li data-last-modified='{$domain->lastModified()}' data-description='{$domain->getDescription()}' data-active='{$domain->isActive()}' data-domain-name='{$domain->getDomainName()}'>
+            <li data-last-modified='{$domain->lastModified()}' data-description='{$domain->getDescription()}' data-active='".($domain->isActive()?'true':'false')."' data-domain-name='{$domain->getDomainName()}'>
                 {$domain->getDomainName()}$deleteElement
             </li>
             ";
@@ -235,7 +235,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         $attributes .= ' data-last-modified="' . $address->lastModified() . '"';
         $attributes .= ' data-owners="' . implode(" ", $address->listOwners()) . '"';
         $attributes .= ' data-active="' . ($address->isActive() ? "true" : "false") . '"';
-        $attributes .= ' data-active="' . ($address->hasMailbox() ? "true" : "false") . '"';
+        $attributes .= ' data-has-mailbox="' . ($address->hasMailbox() ? "true" : "false") . '"';
         if ($address->hasMailbox()) {
             $attributes .= ' data-mailbox-name="' . $address->getMailbox()->getName() . '"';
             $attributes .= ' data-mailbox-last-modified="' . $address->getMailbox()->lastModified() . '"';
