@@ -26,6 +26,8 @@ abstract class MailAddressLibrary {
 
   Stream<MailAddress> get onDelete;
 
+  operator [] (String key);
+
 }
 
 
@@ -38,9 +40,7 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
 
   final UserLibrary userLibrary;
 
-  Map<String, MailAddress> _addresses;
-
-  MailAddress _catchallAddress;
+  LazyMap<String, MailAddress> _addresses;
 
   StreamController
   _onDeleteController = new StreamController(),
@@ -48,63 +48,68 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
   _onCatchallChangeController = new StreamController();
 
 
-
-  AJAXMailAddressLibrary(this._addresses, MailDomain domain, this.userLibrary, [this._catchallAddress=null]):
+  AJAXMailAddressLibrary(Iterable<String> localParts, MailAddress addressGenerator(MailAddressLibrary, String), MailDomain domain, this.userLibrary):
   this.domain = domain,
-  domainLibrary = domain.domainLibrary{
-    _setUpListeners();
+  domainLibrary = domain.domainLibrary {
+    _addresses = new LazyMap.fromGenerator(localParts, _wrapAndTransformGenerator(addressGenerator));
   }
 
-  AJAXMailAddressLibrary.fromJSONObject(JSONObject object, MailDomain domain, this.userLibrary):
-  this.domain = domain,
-  domainLibrary = domain.domainLibrary{
-    _catchallAddress = object.variables['catchall_address'] == null ? null : new AJAXMailAddress.fromJSONObject(object.variables['catchall_address'], this, userLibrary);
-    _addresses = new LazyMap.fromFunctionMap(
-        new Map.fromIterable(object.variables['addresses'],
-        key:(JSONObject object) => object.variables['local_part'],
-        value:(JSONObject object) => () => new AJAXMailAddress.fromJSONObject(object, this, userLibrary)));
-    _setUpListeners();
-  }
-  void _setUpListeners() {
-    _addresses.forEach((_, MailAddress value){
-      _addListener(value);
-    });
+  factory AJAXMailAddressLibrary.fromJSONObject(JSONObject object, MailDomain domain, UserLibrary userLibrary){
+    Map<String, JSONObject> objectAddresses = object.variables['addresses'];
+    var localParts = objectAddresses.keys;
+    if (object.variables['catchall_address'] != null) {
+      localParts.add("");
+    }
+    var addressGenerator = (MailAddressLibrary library, String localPart) {
+      if (localPart.trim().length == 0) {
+        return object.variables['catchall_address'] == null ? null : new AJAXMailAddress.fromJSONObject(object.variables['catchall_address'], library, userLibrary);
+      }
+      return new AJAXMailAddress.fromJSONObject(objectAddresses[localPart], library, userLibrary);
+    };
+
+    return new AJAXMailAddressLibrary(localParts, addressGenerator, domain, userLibrary);
   }
 
-  void _addListener(MailAddress m){
+  Function _wrapAndTransformGenerator(MailAddress g(MailAddressLibrary, String)) => (String localPart) => _addListener(g(this, localPart));
+
+
+  MailAddress _addListener(MailAddress m) {
     var key = m.localPart;
-    var s1 = m.onLocalPartChange.listen((_){
+    var s1 = m.onLocalPartChange.listen((_) {
+      if (!_addresses.containsValue(m)) {
+        return;
+      }
       _addresses.remove(key);
       _addresses[key = m.localPart] = m;
+
     });
 
-    m.onDelete.listen((_){
+    m.onDelete.listen((_) {
       s1.cancel();
     });
-
+    return m;
   }
 
-  MailAddress get catchallAddress => _catchallAddress;
+  MailAddress get catchallAddress => _addresses[""];
 
-  bool get hasCatchallAddress => _catchallAddress != null;
+  bool get hasCatchallAddress => _addresses.containsKey("");
 
-  Map<String, MailAddress> get addresses => new Map<String, MailAddress>.from(_addresses);
+  Map<String, MailAddress> get addresses => _addresses.clone().remove("");
 
-
-  FutureResponse<MailAddress> createAddress(String localPart, {List<User> owners, List<String> target}){
+  FutureResponse<MailAddress> createAddress(String localPart, {List<User> owners, List<String> target}) {
     var completer = new Completer();
 
     var fs = "";
-    if(owners != null){
-      fs += owners.fold("", (String prev, User u)=>prev+"..addOwner(${quoteString(u.username)})");
+    if (owners != null) {
+      fs += owners.fold("", (String prev, User u) => prev + "..addOwner(${quoteString(u.username)})");
     }
 
-    if(target == null){
-      fs += target.reduce((String v, String e) => v+"..addTarget(${quoteString(e)})");
+    if (target == null) {
+      fs += target.reduce((String v, String e) => v + "..addTarget(${quoteString(e)})");
     }
 
-    ajaxClient.callFunctionString(_getLibraryFunctionString+".createAddress(${quoteString(localPart)})$fs}").then((Response<JSONObject> response){
-      if(response.type != Response.RESPONSE_TYPE_SUCCESS){
+    ajaxClient.callFunctionString(_getLibraryFunctionString + ".createAddress(${quoteString(localPart)})$fs}").then((Response<JSONObject> response) {
+      if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         completer.complete(response);
         return;
       }
@@ -120,18 +125,17 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
     return new FutureResponse(completer.future);
   }
 
-  String get _getLibraryFunctionString =>  "MailDomainLibrary.getDomain(${quoteString(domain.domainName)}).getAddressLibrary()";
+  String get _getLibraryFunctionString => "MailDomainLibrary.getDomain(${quoteString(domain.domainName)}).getAddressLibrary()";
 
 
-  FutureResponse<MailAddress> deleteAddress(MailAddress address){
+  FutureResponse<MailAddress> deleteAddress(MailAddress address) {
     var completer = new Completer();
 
-    ajaxClient.callFunctionString(_getLibraryFunctionString+".deleteAddress(${_getLibraryFunctionString}.getAddress(${quoteString(address.localPart)}))").then((Response<JSONObject> response){
-      if(response.type != Response.RESPONSE_TYPE_SUCCESS){
+    ajaxClient.callFunctionString(_getLibraryFunctionString + ".deleteAddress(${_getLibraryFunctionString}.getAddress(${quoteString(address.localPart)}))").then((Response<JSONObject> response) {
+      if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         completer.complete(response);
         return;
       }
-
       _addresses.remove(address.localPart);
       completer.complete(new Response.success(address));
       _onCreateController.add(address);
@@ -141,21 +145,21 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
     return new FutureResponse(completer.future);
   }
 
-  FutureResponse<MailAddress> createCatchallAddress(){
-    if(hasCatchallAddress){
-      return new Future(()=>new Response.success(catchallAddress));
+  FutureResponse<MailAddress> createCatchallAddress() {
+    if (hasCatchallAddress) {
+      return new Future(() => new Response.success(catchallAddress));
     }
     var completer = new Completer();
 
-    ajaxClient.callFunctionString(_getLibraryFunctionString+".createCatchallAddress()").then((Response<JSONObject> response){
-      if(response.type != Response.RESPONSE_TYPE_SUCCESS){
+    ajaxClient.callFunctionString(_getLibraryFunctionString + ".createCatchallAddress()").then((Response<JSONObject> response) {
+      if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         completer.complete(response);
         return;
       }
 
       var address = new AJAXMailAddress.fromJSONObject(response.payload, this, userLibrary);
       _addListener(address);
-      _catchallAddress = address;
+      _addresses[""] = address;
       completer.complete(new Response.success(address));
       _onCatchallChangeController.add(address);
       _onCreateController.add(address);
@@ -166,18 +170,18 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
     return new FutureResponse(completer.future);
   }
 
-  FutureResponse<MailAddressLibrary> deleteCatchallAddress(){
-    if(!hasCatchallAddress){
-      return new Future(()=>new Response.error(Response.ERROR_CODE_INVALID_INPUT));
+  FutureResponse<MailAddressLibrary> deleteCatchallAddress() {
+    if (!hasCatchallAddress) {
+      return new Future(() => new Response.error(Response.ERROR_CODE_INVALID_INPUT));
     }
     var completer = new Completer();
-    ajaxClient.callFunctionString(_getLibraryFunctionString+".deleteCatchallAddress()").then((Response<JSONObject> response){
-      if(response.type != Response.RESPONSE_TYPE_SUCCESS){
+    ajaxClient.callFunctionString(_getLibraryFunctionString + ".deleteCatchallAddress()").then((Response<JSONObject> response) {
+      if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         completer.complete(response);
         return;
       }
       var c = catchallAddress;
-      _catchallAddress = null;
+      _addresses.remove("");
       completer.complete(new Response.success(c));
       _onCatchallChangeController.add(c);
       _onDeleteController.add(c);
@@ -193,5 +197,6 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
 
   Stream<MailAddress> get onDelete => _onDeleteController.stream.asBroadcastStream();
 
+  operator [] (String key) => addresses[key];
 
 }

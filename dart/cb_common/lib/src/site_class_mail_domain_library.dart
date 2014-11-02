@@ -1,9 +1,9 @@
 part of site_classes;
 
 
-abstract class MailDomainLibrary{
+abstract class MailDomainLibrary {
 
-  Map<String,MailDomain> get domains;
+  Map<String, MailDomain> get domains;
 
   FutureResponse<MailDomain> createDomain(String domainName, String password);
 
@@ -13,39 +13,42 @@ abstract class MailDomainLibrary{
 
   Stream<MailDomain> get onDelete;
 
+  operator [] (String key);
 
 }
 
 
-
-class AJAXMailDomainLibrary implements MailDomainLibrary{
+class AJAXMailDomainLibrary implements MailDomainLibrary {
 
   final UserLibrary userLibrary;
 
-  Map<String, MailDomain> _domains;
+  LazyMap<String, MailDomain> _domains;
 
   StreamController<MailDomain>
   _onCreateController = new StreamController<MailDomain>(),
   _onDeleteController = new StreamController<MailDomain>();
 
 
-  AJAXMailDomainLibrary(this._domains, this.userLibrary);
+  AJAXMailDomainLibrary(Iterable<String> domainNames, MailDomain domainGenerator(MailDomainLibrary, String), this.userLibrary) {
+    _domains = new LazyMap<String, MailDomain>.fromGenerator(domainNames, (String dn) => domainGenerator(this, dn));
+  }
 
-  AJAXMailDomainLibrary.fromJSONObject(JSONObject object, this.userLibrary){
-    _domains = new LazyMap.fromFunctionMap(new Map<String, Function>.fromIterable(object.variables['domains'],
-    key:(JSONObject obj) => obj.variables['domain_name'],
-    value:(JSONObject obj) => () => new AJAXMailDomain.fromJSONObject(obj, this, userLibrary)));
+  factory AJAXMailDomainLibrary.fromJSONObject(JSONObject object, this.userLibrary){
+    Map<String, JSONObject> objectDomains = object.variables['domains'];
+    return new AJAXMailDomainLibrary(
+        objectDomains.keys,
+        (MailDomainLibrary library, String name) => new AJAXMailAddress.fromJSONObject(objectDomains[name], library, userLibrary),
+        userLibrary);
   }
 
 
+  Map<String, MailDomain> get domains => _domains.clone();
 
-  Map<String,MailDomain> get domains => new Map<String, MailDomain>.from(_domains);
-
-  FutureResponse<MailDomain> createDomain(String domainName, String password){
+  FutureResponse<MailDomain> createDomain(String domainName, String password) {
     var completer = new Completer();
 
-    ajaxClient.callFunctionString("MailDomainLibrary.createDomain(${quoteString(domainName)}, ${quoteString(password)})").then((Response<JSONObject> response){
-      if(response.type != Response.RESPONSE_TYPE_SUCCESS){
+    ajaxClient.callFunctionString("MailDomainLibrary.createDomain(${quoteString(domainName)}, ${quoteString(password)})").then((Response<JSONObject> response) {
+      if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         completer.complete(response);
         return;
       }
@@ -60,12 +63,12 @@ class AJAXMailDomainLibrary implements MailDomainLibrary{
     return new FutureResponse(completer.future);
   }
 
-  FutureResponse<MailDomain> deleteDomain(MailDomain domain, String password){
+  FutureResponse<MailDomain> deleteDomain(MailDomain domain, String password) {
     var completer = new Completer();
     var domainName = domain.domainName;
 
-    ajaxClient.callFunctionString("MailDomainLibrary.deleteDomain(${quoteString(domainName)}, ${quoteString(password)})").then((Response<JSONObject> response){
-      if(response.type != Response.RESPONSE_TYPE_SUCCESS){
+    ajaxClient.callFunctionString("MailDomainLibrary.deleteDomain(${quoteString(domainName)}, ${quoteString(password)})").then((Response<JSONObject> response) {
+      if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         completer.complete(response);
         return;
       }
@@ -83,4 +86,7 @@ class AJAXMailDomainLibrary implements MailDomainLibrary{
   Stream<MailDomain> get onCreate => _onCreateController.stream.asBroadcastStream();
 
   Stream<MailDomain> get onDelete => _onDeleteController.stream.asBroadcastStream();
+
+  operator [] (String key) => domains[key];
+
 }

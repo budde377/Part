@@ -50,6 +50,8 @@ class AJAXMailDomain extends MailDomain {
 
   final MailDomainLibrary domainLibrary;
 
+  Function _addressLibraryGenerator;
+
   MailAddressLibrary _addressLibrary;
 
   final String domainName;
@@ -70,8 +72,9 @@ class AJAXMailDomain extends MailDomain {
   _onActiveChangeController = new StreamController<bool>(),
   _onDescriptionChangeController = new StreamController<String>();
 
-  AJAXMailDomain(this.domainName, this._addressLibrary, this.domainLibrary, this.userLibrary, {String description:"", bool active:true, DateTime last_modified: null, MailDomain alias_target}) :
+  AJAXMailDomain(this.domainName, MailAddressLibrary addressLibraryGenerator (MailDomain) , this.domainLibrary, this.userLibrary, {String description:"", bool active:true, DateTime last_modified: null, MailDomain alias_target: null}) :
   _description = description,
+  _addressLibraryGenerator = addressLibraryGenerator,
   _active = active,
   _aliasTarget = alias_target,
   _lastModified = last_modified == null ? new DateTime.fromMillisecondsSinceEpoch(0) : last_modified;
@@ -82,7 +85,7 @@ class AJAXMailDomain extends MailDomain {
   this._active = object.variables['active'],
   this._description = object.variables['description'],
   this._lastModified = new DateTime.fromMillisecondsSinceEpoch(object.variables['last_modifed'] * 1000){
-    this._addressLibrary = new AJAXMailAddressLibrary.fromJSONObject(object.variables['addresses_library'], this, userLibrary);
+    _addressLibraryGenerator = (MailDomain d ) => new AJAXMailAddressLibrary.fromJSONObject(object.variables['addresses_library'], d, userLibrary);
     this._aliasTarget = object.variables['alias_target'] == null?null:domainLibrary.domains[object.variables['alias_target'].variables['domain_name']];
   }
 
@@ -131,7 +134,7 @@ class AJAXMailDomain extends MailDomain {
 
   bool get active => _active;
 
-  MailAddressLibrary get addressLibrary => _addressLibrary;
+  MailAddressLibrary get addressLibrary => _addressLibrary == null?_addressLibrary = _addressLibraryGenerator(this): _addressLibrary;
 
   FutureResponse<String> changeDescription(String description) {
     var completer = new Completer<Response<String>>();
