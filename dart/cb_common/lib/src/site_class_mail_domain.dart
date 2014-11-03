@@ -68,15 +68,22 @@ class AJAXMailDomain extends MailDomain {
 
   StreamController
   _onDeleteController,
-  _onAliasTargetChange = new StreamController<bool>(),
+  _onAliasTargetChangeController = new StreamController<bool>(),
   _onActiveChangeController = new StreamController<bool>(),
   _onDescriptionChangeController = new StreamController<String>();
 
-  AJAXMailDomain(this.domainName, MailAddressLibrary addressLibraryGenerator (MailDomain) , this.domainLibrary, this.userLibrary, {String description:"", bool active:true, DateTime last_modified: null, MailDomain alias_target: null}) :
+  Stream
+  _onDeleteStream,
+  _onAliasTargetChangeStream,
+  _onActiveChangeStream,
+  _onDescriptionChangeStream ;
+
+  AJAXMailDomain(this.domainName, MailAddressLibrary addressLibraryGenerator (MailDomain) , MailDomainLibrary domainLibrary, this.userLibrary, {String description:"", bool active:true, DateTime last_modified: null, String alias_target: null}) :
   _description = description,
   _addressLibraryGenerator = addressLibraryGenerator,
   _active = active,
-  _aliasTarget = alias_target,
+  _aliasTarget = domainLibrary.domains[alias_target],
+  this.domainLibrary = domainLibrary,
   _lastModified = last_modified == null ? new DateTime.fromMillisecondsSinceEpoch(0) : last_modified;
 
 
@@ -84,7 +91,7 @@ class AJAXMailDomain extends MailDomain {
   this.domainName = object.variables['domain_name'],
   this._active = object.variables['active'],
   this._description = object.variables['description'],
-  this._lastModified = new DateTime.fromMillisecondsSinceEpoch(object.variables['last_modifed'] * 1000){
+  this._lastModified = new DateTime.fromMillisecondsSinceEpoch(object.variables['last_modified'] * 1000){
     _addressLibraryGenerator = (MailDomain d ) => new AJAXMailAddressLibrary.fromJSONObject(object.variables['addresses_library'], d, userLibrary);
     this._aliasTarget = object.variables['alias_target'] == null?null:domainLibrary.domains[object.variables['alias_target'].variables['domain_name']];
   }
@@ -101,7 +108,7 @@ class AJAXMailDomain extends MailDomain {
       _aliasTarget = domain;
       _lastModified = new DateTime.fromMillisecondsSinceEpoch(r.payload.variables['last_modified'] * 1000);
       completer.complete(new Response.success(_aliasTarget));
-      _onAliasTargetChange.add(_aliasTarget);
+      _onAliasTargetChangeController.add(_aliasTarget);
     });
 
 
@@ -118,7 +125,7 @@ class AJAXMailDomain extends MailDomain {
       _aliasTarget = null;
       _lastModified = new DateTime.fromMillisecondsSinceEpoch(r.payload.variables['last_modified'] * 1000);
       completer.complete(new Response.success(_aliasTarget));
-      _onAliasTargetChange.add(_aliasTarget);
+      _onAliasTargetChangeController.add(_aliasTarget);
     });
 
 
@@ -208,7 +215,8 @@ class AJAXMailDomain extends MailDomain {
 
   FutureResponse<bool> toggleActive() => active?deactivate():activate();
 
-  Stream<String> get onDescriptionChange => _onDescriptionChangeController.stream;
+  Stream<String> get onDescriptionChange =>
+  _onDescriptionChangeStream == null?_onDescriptionChangeStream = _onDescriptionChangeController.stream.asBroadcastStream():_onDescriptionChangeStream;
 
   Stream<MailDomain> get onDelete {
     if (_onDeleteController == null) {
@@ -222,9 +230,15 @@ class AJAXMailDomain extends MailDomain {
 
     }
 
-    return _onDeleteController.stream;
-  }
-  Stream<MailDomain> get onAliasTargetChange => _onAliasTargetChange.stream;
+    if(_onDeleteStream == null){
+        _onDeleteStream = _onDeleteController.stream.asBroadcastStream();
+    }
 
-  Stream<bool> get onActiveChange => _onActiveChangeController.stream;
+    return _onDeleteStream;
+  }
+  Stream<MailDomain> get onAliasTargetChange =>
+  _onAliasTargetChangeStream == null?_onAliasTargetChangeStream = _onAliasTargetChangeController.stream.asBroadcastStream():_onAliasTargetChangeStream;
+
+  Stream<bool> get onActiveChange =>
+  _onActiveChangeStream == null?_onActiveChangeStream = _onActiveChangeController.stream.asBroadcastStream():_onActiveChangeStream;
 }

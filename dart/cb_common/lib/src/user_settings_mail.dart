@@ -34,14 +34,26 @@ class UserSettingsMailDomainLibrary implements MailDomainLibrary{
 
         var ownersStrings = obj.dataset['owners'].split(" ");
         ownersStrings.removeWhere((String s) => s.isEmpty);
+
         var owners = ownersStrings.map((String s)=> userLibrary.users[s]);
+
+        var mailboxGenerator = (MailAddress address){
+          if(obj.dataset['has-mailbox'] == "false"){
+            return null;
+          }
+
+          return new AJAXMailMailbox(address,
+          name:obj.dataset['mailbox-name'],
+          lastModified:new DateTime.fromMillisecondsSinceEpoch(int.parse(obj.dataset['mailbox-last-modifed'])*1000));
+
+        };
 
         return new AJAXMailAddress(localPart, lib, userLibrary,
         active: obj.dataset['active'] == "true",
         targets: targets,
         last_modified:new DateTime.fromMillisecondsSinceEpoch(int.parse(obj.dataset['last-modified'])*1000),
-        owners:owners
-        //TODO: add mailbox generator
+        owners:owners,
+        mailboxGenerator: mailboxGenerator
         );
       };
 
@@ -57,7 +69,8 @@ class UserSettingsMailDomainLibrary implements MailDomainLibrary{
           library,
           userLibrary,
           description:obj.dataset['description'],
-          active: obj.dataset['active'] == "true", // TODO: add alias target
+          active: obj.dataset['active'] == "true",
+          alias_target: obj.dataset['alias-target'],
           last_modified: new DateTime.fromMillisecondsSinceEpoch(int.parse(obj.dataset['last-modified']) * 1000)
       );
     };
@@ -66,5 +79,20 @@ class UserSettingsMailDomainLibrary implements MailDomainLibrary{
 
   }
 
+  Stream<MailDomain> get onDelete => domainLibrary.onDelete;
+
+
+  Stream<MailDomain> get onCreate => domainLibrary.onCreate;
+
+
+  core.FutureResponse<MailDomain> deleteDomain(MailDomain domain, String password) => domainLibrary.deleteDomain(domain, password);
+
+
+  core.FutureResponse<MailDomain> createDomain(String domainName, String password) => domainLibrary.createDomain(domainName, password);
+
+
+  Map<String, MailDomain> get domains => domainLibrary.domains;
+
+  operator [](String key) => domainLibrary[key];
 
 }

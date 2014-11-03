@@ -75,10 +75,13 @@ class ExpanderElementHandler {
   Function _contractFunction = () {
   };
 
-  StreamController<ExpanderElementHandler> _onChangeController = new StreamController<ExpanderElementHandler>(),
+  StreamController<ExpanderElementHandler>
+  _onChangeController = new StreamController<ExpanderElementHandler>(),
   _onContractController = new StreamController<ExpanderElementHandler>(),
   _onExpandController = new StreamController<ExpanderElementHandler>();
 
+  Stream<ExpanderElementHandler>
+  _onChangeStream, _onContractStream, _onExpandStream;
 
   factory ExpanderElementHandler(Element element) => _cache.putIfAbsent(element, () => new ExpanderElementHandler._internal(element));
 
@@ -86,8 +89,12 @@ class ExpanderElementHandler {
     expanderLink.classes.add('expander_link');
     element.insertAdjacentElement("afterBegin", expanderLink);
     expanderLink.onClick.listen((_) => toggle());
-    onExpand.listen(_onContractController.add);
-    onContract.listen(_onContractController.add);
+    _onChangeStream = _onChangeController.stream.asBroadcastStream();
+    _onContractStream = _onContractController.stream.asBroadcastStream();
+    _onExpandStream = _onExpandController.stream.asBroadcastStream();
+    onExpand.listen(_onChangeController.add);
+    onContract.listen(_onChangeController.add);
+
   }
 
   bool get expanded => element.classes.contains('expanded');
@@ -123,8 +130,8 @@ class ExpanderElementHandler {
     }
   }
 
-  Stream<ExpanderElementHandler> get onChange => _onChangeController.stream.asBroadcastStream();
-  Stream<ExpanderElementHandler> get onExpand => _onExpandController.stream.asBroadcastStream();
-  Stream<ExpanderElementHandler> get onContract => _onChangeController.stream.asBroadcastStream();
+  Stream<ExpanderElementHandler> get onChange => _onChangeStream;
+  Stream<ExpanderElementHandler> get onExpand => _onExpandStream;
+  Stream<ExpanderElementHandler> get onContract => _onContractStream;
 
 }

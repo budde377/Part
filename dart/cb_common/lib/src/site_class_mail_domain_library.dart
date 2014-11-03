@@ -28,16 +28,20 @@ class AJAXMailDomainLibrary implements MailDomainLibrary {
   _onCreateController = new StreamController<MailDomain>(),
   _onDeleteController = new StreamController<MailDomain>();
 
+  Stream<MailDomain>
+  _onCreateStream,
+  _onDeleteStream;
+
 
   AJAXMailDomainLibrary(Iterable<String> domainNames, MailDomain domainGenerator(MailDomainLibrary, String), this.userLibrary) {
     _domains = new LazyMap<String, MailDomain>.fromGenerator(domainNames, (String dn) => domainGenerator(this, dn));
   }
 
-  factory AJAXMailDomainLibrary.fromJSONObject(JSONObject object, this.userLibrary){
+  factory AJAXMailDomainLibrary.fromJSONObject(JSONObject object, UserLibrary userLibrary){
     Map<String, JSONObject> objectDomains = object.variables['domains'];
     return new AJAXMailDomainLibrary(
         objectDomains.keys,
-        (MailDomainLibrary library, String name) => new AJAXMailAddress.fromJSONObject(objectDomains[name], library, userLibrary),
+        (MailDomainLibrary library, String name) => new AJAXMailDomain.fromJSONObject(objectDomains[name], library, userLibrary),
         userLibrary);
   }
 
@@ -50,6 +54,11 @@ class AJAXMailDomainLibrary implements MailDomainLibrary {
     ajaxClient.callFunctionString("MailDomainLibrary.createDomain(${quoteString(domainName)}, ${quoteString(password)})").then((Response<JSONObject> response) {
       if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         completer.complete(response);
+        return;
+      }
+
+      if(response.payload == null){
+        completer.complete(new Response.error(Response.ERROR_CODE_UNKNOWN_ERROR));
         return;
       }
 
@@ -67,14 +76,13 @@ class AJAXMailDomainLibrary implements MailDomainLibrary {
     var completer = new Completer();
     var domainName = domain.domainName;
 
-    ajaxClient.callFunctionString("MailDomainLibrary.deleteDomain(${quoteString(domainName)}, ${quoteString(password)})").then((Response<JSONObject> response) {
+    ajaxClient.callFunctionString("MailDomainLibrary.deleteDomain(MailDomainLibrary.getDomain(${quoteString(domainName)}), ${quoteString(password)})").then((Response<JSONObject> response) {
       if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         completer.complete(response);
         return;
       }
 
-      var domain = new AJAXMailDomain.fromJSONObject(response.payload, this, userLibrary);
-      _domains.remove(domain.domainName);
+      _domains.remove(domainName);
       completer.complete(new Response.success(domain));
       _onDeleteController.add(domain);
     });
@@ -83,9 +91,9 @@ class AJAXMailDomainLibrary implements MailDomainLibrary {
 
   }
 
-  Stream<MailDomain> get onCreate => _onCreateController.stream.asBroadcastStream();
+  Stream<MailDomain> get onCreate => _onCreateStream == null?_onCreateStream = _onCreateController.stream.asBroadcastStream():_onCreateStream;
 
-  Stream<MailDomain> get onDelete => _onDeleteController.stream.asBroadcastStream();
+  Stream<MailDomain> get onDelete => _onDeleteStream == null?_onDeleteStream = _onDeleteController.stream.asBroadcastStream():_onDeleteStream;
 
   operator [] (String key) => domains[key];
 

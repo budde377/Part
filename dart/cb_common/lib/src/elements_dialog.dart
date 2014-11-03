@@ -69,9 +69,9 @@ class TextInputDialogBox extends DialogBox {
 
   Completer<String> _completer = new Completer<String>();
 
-  TextInputDialogBox(String message, {String value:""}) : super(new DivElement()) {
+  TextInputDialogBox(String message, {String value:"", bool password:false}) : super(new DivElement()) {
     element.classes..add('dialog')..add('text');
-    _textInput..type = "text"..value = value;
+    _textInput..type = (password?"password":"text")..value = value;
     _doneButton..onClick.listen((_) {
       _completer.complete(_textInput.value);
       close();
@@ -169,6 +169,12 @@ class DialogContainer {
 
   TextInputDialogBox text(String message, {String value:""}) {
     var dialog = new TextInputDialogBox(message, value:value);
+    addDialogBox(dialog);
+    return dialog;
+  }
+
+  TextInputDialogBox password(String message, {String value:""}) {
+    var dialog = new TextInputDialogBox(message, value:value, password:true);
     addDialogBox(dialog);
     return dialog;
   }

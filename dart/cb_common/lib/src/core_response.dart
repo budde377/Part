@@ -33,6 +33,7 @@ class Response<V>{
 
   static const ERROR_CODE_COULD_NOT_PARSE_RESPONSE = 100;
   static const ERROR_CODE_NO_CONNECTION = 101;
+  static const ERROR_CODE_UNKNOWN_ERROR = 102;
 
   final String type;
   final int error_code;

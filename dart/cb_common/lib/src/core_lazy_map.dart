@@ -12,7 +12,7 @@ class LazyMap<K, V> implements Map<K, V> {
 
 
   bool containsValue(Object value) {
-    return _cache.containsValue(value) || _keys.fold(false, (bool prev, String key) => prev || this[key] == value);
+    return _cache.containsValue(value) || _keys.fold(false, (bool prev, K key) => prev || this[key] == value);
   }
 
   bool containsKey(Object key) => _keys.contains(key);
@@ -40,7 +40,11 @@ class LazyMap<K, V> implements Map<K, V> {
 
   }
 
-  Iterable<K> get keys => new List.from(_keys).addAll(_cache.keys);
+  Iterable<K> get keys {
+    var l = new Set<K>.from(_keys);
+    l.addAll(_cache.keys);
+    return l;
+  }
 
   Iterable<V> get values {
     var l = new List<V>();
