@@ -328,7 +328,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         }
 
         foreach ($this->functionWhitelist[$type] as $k => $fn) {
-            if (in_array($fn, $this->functions[$type])) {
+            if (in_array($fn, $this->functions[$type]) || (isset($this->customFunctions[$type], $this->customFunctions[$type][$fn]))) {
                 continue;
             }
             unset($this->functionWhitelist[$type][$k]);

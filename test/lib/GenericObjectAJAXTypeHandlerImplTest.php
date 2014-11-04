@@ -603,6 +603,29 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this === $r);
     }
 
+    public function testAddCustomFunctionWithWhitelistIsOk()
+    {
+        $this->handler->addGetInstanceFunction("Element");
+        $this->handler->whitelistFunction('Element', 'getInstance', 'getAsJSONString');
+        $this->handler->setUp(new NullAJAXServerImpl(), "Element");
+        $list = $this->handler->listFunctions("Element");
+        $this->assertContains("getInstance", $list);
+        /** @var JSONFunction $function */
+        $function = $this->parser->parseFunctionString("Element.getInstance()");
+        $r = $this->handler->handle("Element", $function, $this);
+        $this->assertTrue($this === $r);
+    }
+
+    public function testCustomFunctionNotWhiteListedIsNotOk()
+    {
+        $this->handler->addGetInstanceFunction("Element");
+        $this->handler->whitelistFunction('Element', 'getAsJSONString');
+        $this->handler->setUp(new NullAJAXServerImpl(), "Element");
+        $list = $this->handler->listFunctions("Element");
+        $this->assertNotContains("getInstance", $list);
+
+    }
+
 
     public function testStringOfActualTypeDoesAddTypesAndFunctions()
     {
