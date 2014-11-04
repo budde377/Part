@@ -96,7 +96,7 @@ class AJAXMailDomain extends MailDomain {
     _addressLibraryGenerator = (MailDomain d ) => new AJAXMailAddressLibrary.fromJSONObject(object.variables['addresses_library'], d, userLibrary);
     var alias_target = object.variables['alias_target'];
     if(alias_target != null){
-      this._aliasTarget = alias_target == domainName?this:domainLibrary.domains[object.variables['alias_target'].variables['domain_name']];
+      this._aliasTarget = alias_target == domainName?this:domainLibrary.domains[alias_target];
 
     }
   }
@@ -110,8 +110,8 @@ class AJAXMailDomain extends MailDomain {
     var completer = new Completer();
     ajaxClient.callFunctionString(_domainLibraryGetter+"..setAliasTarget(MailDomainLibrary.getDomain(${quoteString(domain.domainName)}))..getInstance()")
     .thenResponse(onError:completer.complete, onSuccess:(Response<JSONObject> r){
-      JSONObject newTarget = r.payload.variables['alias_target'];
-      if(newTarget == null || newTarget.variables['domain_name'] != domain.domainName){
+      var newTarget = r.payload.variables['alias_target'];
+      if(newTarget == null || newTarget != domain.domainName){
         completer.complete(new FutureResponse.error(Response.ERROR_CODE_UNKNOWN_ERROR));
         return;
       }
