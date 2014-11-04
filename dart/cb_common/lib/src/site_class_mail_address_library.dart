@@ -94,7 +94,11 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
 
   bool get hasCatchallAddress => _addresses.containsKey("");
 
-  Map<String, MailAddress> get addresses => _addresses.clone().remove("");
+  Map<String, MailAddress> get addresses {
+    var addresses = _addresses.clone();
+    addresses.remove("");
+    return addresses;
+  }
 
   FutureResponse<MailAddress> createAddress(String localPart, {List<User> owners, List<String> target}) {
     var completer = new Completer();

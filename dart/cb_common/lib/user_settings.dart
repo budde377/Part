@@ -21,12 +21,16 @@ part 'src/user_settings_page_li.dart';
 
 bool get pageOrderAvailable => querySelector("#ActivePageList") != null && querySelector("#InactivePageList") != null;
 
-bool get userLibraryAvailable => querySelector('#UserList') != null;
+bool get userLibraryAvailable => pageOrderAvailable && querySelector('#UserList') != null;
 
+bool get mailDomainLibraryAvailable => userLibraryAvailable && querySelector('#UserSettingsContent #UserSettingsEditMailDomainList') != null;
 
 PageOrder get pageOrder => pageOrderAvailable ? new UserSettingsJSONPageOrder() : null;
 
-UserLibrary get userLibrary => userLibraryAvailable && pageOrderAvailable ? new UserSettingsJSONUserLibrary() : null;
+UserLibrary get userLibrary => userLibraryAvailable ? new UserSettingsJSONUserLibrary() : null;
+
+MailDomainLibrary get mailDomainLibrary => mailDomainLibraryAvailable ? new UserSettingsMailDomainLibrary() : null;
+
 
 String _errorMessage(int error_code) {
   switch (error_code) {
@@ -79,14 +83,145 @@ class UserSettingsInitializer extends core.Initializer {
     _initLib.registerInitializer(new UserSettingsPageUserListFormInitializer(userLib, order));
     _initLib.registerInitializer(new UserSettingsUpdateSiteInitializer());
     _initLib.registerInitializer(new UserSettingsLoggerInitializer());
+    _initLib.registerInitializer(new UserSettingsMailInitializer());
 
-/* SET UP LOGIN USER MESSAGE*/
+    /* SET UP LOGIN USER MESSAGE*/
     var loginUserMessage = querySelector('#LoginUserMessage');
     var i = loginUserMessage.querySelector('i');
     userLibrary.userLoggedIn.onChange.listen((User u) {
       i.text = u.username;
     });
 
+  }
+
+}
+
+
+class UserSettingsMailInitializer extends core.Initializer {
+
+  Map<MailDomain, LIElement> _domainLIMap = new Map<MailDomain, LIElement>();
+
+  UListElement mailDomainList = querySelector("#UserSettingsEditMailDomainList");
+
+  UListElement domainAliasList = querySelector("#UserSettingsEditMailDomainAliasList");
+
+  FormElement addDomainForm = querySelector("#UserSettingsEditMailAddDomainForm");
+
+
+  bool get canBeSetUp => mailDomainLibraryAvailable && mailDomainList != null && domainAliasList != null && mailDomainLibrary.domains.length == addressList.length;
+
+  ElementList<UListElement> get addressList => querySelectorAll("#UserSettingsContent > ul > li > ul.address_list");
+
+  void setUp() {
+
+    setUpMailDomainList();
+
+    setUpAddDomainForm();
+  }
+
+  void setUpAddDomainForm(){
+    if(addDomainForm == null){
+      return;
+    }
+    var validatingForm = new ValidatingForm(addDomainForm);
+    var expander = new ExpanderElementHandler(addDomainForm);
+    expander.onContract.listen((_){
+      validatingForm.formHandler.removeNotion();
+    });
+    validatingForm.formHandler.submitFunction = (Map<String, String >  data){
+      validatingForm.formHandler.blur();
+      mailDomainLibrary.createDomain(data['domain_name'], data['super_password']).thenResponse(onSuccess:(core.Response<MailDomain> response){
+        validatingForm.formHandler.changeNotion("Domænet blev oprettet", FormHandler.NOTION_TYPE_SUCCESS);
+        validatingForm.formHandler.clearForm();
+        validatingForm.formHandler.unBlur();
+      }, onError:(core.Response<MailDomain> response){
+        validatingForm.formHandler.changeNotion("Domænet blev ikke oprettet", FormHandler.NOTION_TYPE_ERROR);
+        validatingForm.formHandler.unBlur();
+      });
+
+
+      return true;
+    };
+
+  }
+
+  void setUpMailDomainList() {
+
+
+    mailDomainList.children.forEach((LIElement li) {
+      if (li.classes.contains('empty_list')) {
+        return;
+      }
+      var name = li.dataset['domain-name'];
+      var domain = mailDomainLibrary.domains[name];
+      addDomainLiListener(domain, li);
+      _domainLIMap[domain] = li;
+
+    });
+
+    mailDomainLibrary.onCreate.listen((MailDomain domain) {
+      _domainLIMap[domain] = liFromDomain(domain);
+      rebuildDomainList();
+    });
+  }
+
+  LIElement liFromDomain(MailDomain domain) {
+    var li = new LIElement();
+    setLiDataSet(li, domain);
+    li.text = domain.domainName;
+    var delete = new DivElement();
+    delete.classes.add('delete');
+    li.append(delete);
+    addDomainLiListener(domain, li);
+    return li;
+  }
+
+  void setLiDataSet(LIElement li, MailDomain domain) {
+    li
+      ..dataset['last-modified'] = (domain.lastModified.millisecondsSinceEpoch ~/ 1000).toString()
+      ..dataset['description'] = domain.description
+      ..dataset['active'] = domain.active ? "true" : "false"
+      ..dataset['domain-name'] = domain.domainName
+      ..dataset['alias-target'] = domain.aliasTarget == null ? "" : domain.aliasTarget.domainName;
+  }
+
+  void addDomainLiListener(MailDomain domain, LIElement li) {
+    var listener = (_){
+      setLiDataSet(li, domain);
+    };
+
+    domain..onActiveChange.listen(listener)
+          ..onAliasTargetChange.listen(listener)
+          ..onDescriptionChange.listen(listener);
+    domain.onDelete.listen((_){
+      _domainLIMap.remove(domain);
+      rebuildDomainList();
+    });
+
+    li.querySelector('.delete').onClick.listen((_){
+      var c = dialogContainer.password("Er du sikker på at du vil slette?");
+      c.result.then((String s){
+        mailDomainList.classes.add('blur');
+        domain.delete(s).then((_){
+          mailDomainList.classes.remove('blur');
+        });
+      });
+    });
+
+  }
+
+  void rebuildDomainList() {
+    if (_domainLIMap.isEmpty) {
+      mailDomainList.querySelector('.empty_list').hidden = false;
+      return;
+    }
+    mailDomainList.querySelector('.empty_list').hidden = true;
+    mailDomainList.children.removeWhere((Element elm) => !elm.classes.contains('empty_list'));
+    var l = _domainLIMap.keys.toList();
+    l.sort((MailDomain d1, MailDomain d2) => d1.domainName.compareTo(d2.domainName));
+    l.forEach((MailDomain d) {
+      mailDomainList.append(_domainLIMap[d]);
+    });
   }
 
 }
@@ -98,7 +233,6 @@ class UserSettingsLoggerInitializer extends core.Initializer {
   AnchorElement _logLink = querySelector("#ClearLogLink");
 
   ParagraphElement _pElm = querySelector("#LogInfoParagraph");
-
 
   DivElement _numDiv = new DivElement();
 
@@ -125,7 +259,7 @@ class UserSettingsLoggerInitializer extends core.Initializer {
     _logTable.querySelectorAll(".dumpfile a").forEach((AnchorElement a) {
       a.onClick.listen((MouseEvent evt) {
         var loader = dialogContainer.loading("Henter log filen");
-        logger.contextAt(new DateTime.fromMillisecondsSinceEpoch(int.parse(a.dataset["id"])*1000)).then((core.Response<Map> resp) {
+        logger.contextAt(new DateTime.fromMillisecondsSinceEpoch(int.parse(a.dataset["id"]) * 1000)).then((core.Response<Map> resp) {
           if (resp.type != core.Response.RESPONSE_TYPE_SUCCESS) {
             loader.close();
             return;
@@ -219,21 +353,18 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
     _updateInformationMessage.querySelector("a").onClick.listen((_) => _updateSite());
 
 
-
-
-
-    _autoCheckBox.onChange.listen((Event event){
+    _autoCheckBox.onChange.listen((Event event) {
       var checked = _autoCheckBox.checked;
       _autoCheckBox.checked = !checked;
       _autoCheckBox.parent.classes.add('blur');
 
-      var responseHandler = (core.Response r){
-        if(r.type == core.Response.RESPONSE_TYPE_SUCCESS){
+      var responseHandler = (core.Response r) {
+        if (r.type == core.Response.RESPONSE_TYPE_SUCCESS) {
           _autoCheckBox.checked = checked;
         }
         _autoCheckBox.parent.classes.remove('blur');
       };
-      if(checked){
+      if (checked) {
         updater.allowCheckOnLogin().then(responseHandler);
       } else {
         updater.disallowCheckOnLogin().then(responseHandler);
@@ -454,12 +585,12 @@ class UserSettingsUserListInitializer extends core.Initializer {
       privileges.text = "(${_userPrivilegeString(u)} Administrator)";
       _setDataset(li, u);
     });
-    var loginString = user.lastLogin == null?"Aldrig":core.dateString(user.lastLogin);
+    var loginString = user.lastLogin == null ? "Aldrig" : core.dateString(user.lastLogin);
     var infoBox = new InfoBox("Sidst set: $loginString");
     var time = li.querySelector('.time');
     infoBox.backgroundColor = InfoBox.COLOR_BLACK;
     time.onMouseOver.listen((_) => infoBox.showAboveCenterOfElement(time));
-    time.onMouseOut.listen((_)=>infoBox.remove());
+    time.onMouseOut.listen((_) => infoBox.remove());
 
     var delete = li.querySelector('.delete');
     if (delete == null) {
@@ -536,7 +667,7 @@ class UserSettingsAddUserFormInitializer extends core.Initializer {
         return false;
       }
       decoration.blur();
-      _userLib.createUser(data['mail'], data['level']).then( (core.Response response) {
+      _userLib.createUser(data['mail'], data['level']).then((core.Response response) {
         if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
           userMailField.value = "";
           validatingForm.validate();

@@ -50,11 +50,11 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             <div>
             <label>
                 Domæne
-                <input type='text' name='domain_name'/>
+                <input type='text' name='domain_name' data-validator-method='pattern' data-pattern='[a-z0-9-_\\.]+\\.[a-z]{2,}' data-error-message='Ugyldig domæne'/>
             </label>
             <label>
                 Super-kodeord
-                <input type='password' name='super_password'/>
+                <input type='password' name='super_password' data-validator-method='non-empty' data-error-message='Ugyldig kodeord'/>
             </label>
 
             <div class='submit'>
@@ -148,7 +148,12 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         foreach ($this->mailDomainLibrary->listDomains() as $domain) {
 
             $result .= "
-            <li data-last-modified='{$domain->lastModified()}' data-description='{$domain->getDescription()}' data-active='".($domain->isActive()?'true':'false')."' data-domain-name='{$domain->getDomainName()}'>
+            <li
+            data-last-modified='{$domain->lastModified()}'
+            data-description='{$domain->getDescription()}'
+            data-active='".($domain->isActive()?'true':'false')."'
+            data-domain-name='{$domain->getDomainName()}'
+            data-alias-target='".($domain->isAliasDomain()?$domain->getAliasTarget()->getDomainName():"")."'>
                 {$domain->getDomainName()}$deleteElement
             </li>
             ";
@@ -201,17 +206,17 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
     {
 
         $result = "";
+        $addressesFound = false;
 
         foreach ($this->mailDomainLibrary->listDomains() as $domain) {
             $addressLibrary = $domain->getAddressLibrary();
             $addresses = $addressLibrary->listAddresses();
-            if (!count($addresses)) {
-                continue;
-            }
-            $result .= "<ul id='UserSettingsEditMailAddressList{$domain->getDomainName()}' class='floating_list has_deletable' data-domain='{$domain->getDomainName()}'>";
+
+            $hidden = count($addresses)?"":"hidden";
+            $result .= "<ul id='UserSettingsEditMailAddressList{$domain->getDomainName()}' class='floating_list has_deletable address_list' data-domain='{$domain->getDomainName()}' $hidden>";
             foreach ($addresses as $address) {
                 $result .= $this->getAddressElement($address, $domain);
-
+                $addressesFound = true;
             }
 
             if ($addressLibrary->hasCatchallAddress()) {
@@ -221,7 +226,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             $result .= "</ul>";
         }
 
-        $hideNoResult = $result == ""?"":"hidden";
+        $hideNoResult = !$addressesFound?"":"hidden";
 
         $result .= "<ul class='floating_list' $hideNoResult><li class='empty_list'>Der er ingen addresser</li> </ul>";
 

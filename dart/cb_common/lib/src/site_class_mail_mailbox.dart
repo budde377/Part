@@ -21,6 +21,8 @@ abstract class MailMailbox {
 
   Stream<String> get onNameChange;
 
+  DateTime get lastModified;
+
 }
 
 
@@ -34,6 +36,8 @@ class AJAXMailMailbox extends MailMailbox {
 
   final MailAddress address;
 
+  DateTime _lastModified;
+
   String _name;
 
   JSONClient _client = new AJAXJSONClient();
@@ -43,7 +47,9 @@ class AJAXMailMailbox extends MailMailbox {
   _onNameChangeController = new StreamController();
 
 
-  AJAXMailMailbox(MailAddress address, [this._name = ""]):
+  AJAXMailMailbox(MailAddress address, {String name, DateTime lastModified}):
+  _name = name,
+  _lastModified = lastModified,
   this.address = address,
   domainLibrary = address.domainLibrary,
   domain = address.domain,
@@ -54,7 +60,8 @@ class AJAXMailMailbox extends MailMailbox {
   domainLibrary = address.domainLibrary,
   domain = address.domain,
   addressLibrary = address.addressLibrary,
-  _name = object.variables['name'];
+  _name = object.variables['name'],
+  _lastModified = new DateTime.fromMillisecondsSinceEpoch(int.parse(object.variables['last_modified']) * 1000);
 
 
   String get name => _name;
@@ -74,11 +81,13 @@ class AJAXMailMailbox extends MailMailbox {
       functionString += "..setPassword(${quoteString(password)})";
     }
 
-    functionString += "..getName()";
+    functionString += "..getInstance()";
 
-    ajaxClient.callFunctionString(functionString).thenResponse(onSuccess:(Response<String> response) {
-      if (_name != response.payload) {
-        _name = response.payload;
+    ajaxClient.callFunctionString(functionString).thenResponse(onSuccess:(Response<JSONObject> response) {
+      var n = response.payload.variables['name'];
+      if (_name != n) {
+        _name = n;
+        _lastModified = new DateTime.fromMillisecondsSinceEpoch(int.parse(response.payload.variables['last_modified']) * 1000);
         completer.complete(this);
         _onNameChangeController.add(this);
       } else {
@@ -103,5 +112,9 @@ class AJAXMailMailbox extends MailMailbox {
   Stream<MailMailbox> get onDelete => _onDeleteController.stream;
 
   Stream<String> get onNameChange => _onNameChangeController.stream;
+
+
+  DateTime get lastModified => _lastModified;
+
 
 }
