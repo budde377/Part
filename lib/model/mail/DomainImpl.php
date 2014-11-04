@@ -279,6 +279,11 @@ class DomainImpl implements Domain, Observer
     public function setAliasTarget(Domain $domain)
     {
         $this->setupAlias();
+
+        if($this === $domain){
+            return;
+        }
+
         if(!$domain->exists()){
             return;
         }
@@ -286,6 +291,15 @@ class DomainImpl implements Domain, Observer
         if(!$this->library->containsDomain($domain)){
             return;
         }
+
+        $t = $domain->getAliasTarget();
+        while($t != null){
+            if($t === $this){
+                return;
+            }
+            $t = $t->getAliasTarget();
+        }
+
 
         $this->aliasTarget = $domain;
         $domain->attachObserver($this);

@@ -73,6 +73,7 @@ class MailDomainImplTest extends CustomDatabaseTestCase
         $this->userLibrary = $userLibrary = new StubUserLibraryImpl();
         $this->domain = new DomainImpl('test.dk', $this->databaseName, $this->db, $userLibrary, $this->domainLib);
         $this->domain2 = new DomainImpl('test2.dk', $this->databaseName, $this->db, $userLibrary, $this->domainLib);
+        $this->domainLib->setDomainList(['test.dk'=>$this->domain, 'test2.dk'=>$this->domain2]);
         $this->modTime = strtotime("2000-01-01 13:00:00");
         $this->creaTime = strtotime("2000-01-01 12:00:00");
         $this->nonCreatedDomain = new DomainImpl('non-existing.dk', $this->databaseName, $this->db, $userLibrary, $this->domainLib);
@@ -255,6 +256,18 @@ class MailDomainImplTest extends CustomDatabaseTestCase
         $this->domain->setAliasTarget($this->nonCreatedDomain);
         $this->domain->clearAliasTarget();
         $this->assertFalse($this->domain->isAliasDomain());
+    }
+
+    public function testCantSetUpCircularAliasTarget(){
+        $this->domain->setAliasTarget($this->domain2);
+        $this->assertFalse($this->domain->isAliasDomain());
+        $this->assertNull($this->domain->getAliasTarget());
+    }
+
+    public function testCantSetUpTargetToSelf(){
+        $this->domain->setAliasTarget($this->domain);
+        $this->assertFalse($this->domain->isAliasDomain());
+        $this->assertNull($this->domain->getAliasTarget());
     }
 
     public function testDeleteCallsObservers()
