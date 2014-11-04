@@ -46,7 +46,7 @@ class AJAXMailDomainLibrary implements MailDomainLibrary {
   }
 
 
-  Map<String, MailDomain> get domains => _domains.clone();
+  Map<String, MailDomain> get domains => _domains;
 
   FutureResponse<MailDomain> createDomain(String domainName, String password) {
     var completer = new Completer();

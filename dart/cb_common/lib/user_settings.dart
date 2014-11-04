@@ -129,35 +129,61 @@ class UserSettingsMailInitializer extends core.Initializer {
     }
 
     var vForm = new ValidatingForm(addDomainAliasForm);
-    var eForm = new ExpanderElementHandler(addDomainAliasForm);
     var formH = vForm.formHandler;
 
     SelectElement selectFrom = addDomainAliasForm.querySelector("select[name=from]");
     SelectElement selectTo = addDomainAliasForm.querySelector("select[name=to]");
 
     selectFrom.onChange.listen((_) {
-      if(selectFrom.value == selectTo.value){
+      var resetTo = (String v){
+        if (v != selectTo.value){
+          return;
+        }
         selectTo.value = "";
         selectTo.dispatchEvent(new Event("change"));
+      };
 
-      }
+      resetTo(selectFrom.value);
 
       selectTo.children.forEach((OptionElement o) {
-        o.hidden = o.value == selectFrom.value && o.value != "";
+        var to = mailDomainLibrary[o.value], from = mailDomainLibrary[selectFrom.value];
+        to = mailDomainLibrary[o.value];
+        from = mailDomainLibrary[selectFrom.value];
+        if(from == null || to == null){
+          o.hidden = false;
+          return;
+        }
+
+        if(from == to){
+          resetTo(o.value);
+          o.hidden = true;
+          return;
+        }
+
+        var t = to.aliasTarget;
+        while(t != null){
+          if(t == from){
+            resetTo(o.value);
+            o.hidden = true;
+            return;
+          }
+          t = t.aliasTarget;
+        }
+        o.hidden = false;
       });
     });
 
-    formH.submitFunction = (Map<String,String> map){
+    formH.submitFunction = (Map<String, String> map) {
       var domain = mailDomainLibrary[selectFrom.value];
       var domainTarget = mailDomainLibrary[selectTo.value];
-      if(domain == null || domainTarget == null){
+      if (domain == null || domainTarget == null) {
         return true;
       }
       formH.blur();
-      domain.changeAliasTarget(domainTarget).thenResponse(onSuccess:(_){
+      domain.changeAliasTarget(domainTarget).thenResponse(onSuccess:(_) {
         formH.changeNotion("Alias er oprettet", FormHandler.NOTION_TYPE_SUCCESS);
         formH.unBlur();
-      }, onError:(core.Response response){
+      }, onError:(core.Response response) {
         formH.changeNotion(_errorMessage(response.error_code), FormHandler.NOTION_TYPE_ERROR);
         formH.unBlur();
       });
@@ -171,13 +197,10 @@ class UserSettingsMailInitializer extends core.Initializer {
       return;
     }
     var validatingForm = new ValidatingForm(addDomainForm);
-    var expander = new ExpanderElementHandler(addDomainForm);
-    expander.onContract.listen((_) {
-      validatingForm.formHandler
-        ..removeNotion()
-        ..clearForm();
+    var domainNameInput = addDomainForm.querySelector("input[name=domain_name]");
+    new Validator<InputElement>(domainNameInput)
+      ..addValueValidator((String value) => !mailDomainLibrary.domains.containsKey(value));
 
-    });
     validatingForm.formHandler.submitFunction = (Map<String, String > data) {
       validatingForm.formHandler.blur();
       mailDomainLibrary.createDomain(data['domain_name'], data['super_password']).thenResponse(onSuccess:(core.Response<MailDomain> response) {
@@ -577,7 +600,7 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
     if (_addUserToPageForm == null) {
       return;
     }
-    new Validator(_pageUserSelect).validator = (SelectElement e) => core.nonEmpty(e.value);
+    new Validator(_pageUserSelect).addNonEmptyValueValidator();
     new ValidatingForm(_addUserToPageForm).validate();
     var deco = new FormHandler(_addUserToPageForm);
     deco.submitFunction = (Map<String, String> data) {
@@ -707,9 +730,9 @@ class UserSettingsAddUserFormInitializer extends core.Initializer {
   void setUp() {
     var userMailField = _addUserForm.querySelector('#AddUserMailField'), userLevelSelect = _addUserForm.querySelector('#AddUserLevelSelect');
     var v = new Validator(userMailField);
-    v.validator = (InputElement e) => core.validMail(e.value);
+    v.addValidMailValueValidator();
     v.errorMessage = "Skal være gyldig E-mail";
-    new Validator(userLevelSelect).validator = (SelectElement e) => core.nonEmpty(e.value);
+    new Validator(userLevelSelect).addNonEmptyValueValidator();
     var validatingForm = new ValidatingForm(_addUserForm);
     validatingForm.validate();
     var decoration = new FormHandler(_addUserForm);
@@ -742,9 +765,11 @@ class UserSettingsAddPageFormInitializer extends core.Initializer {
   bool get canBeSetUp => _addPageForm != null;
 
   void setUp() {
-    var input = querySelector('#EditPagesAddPage'), v;
-    (v = new Validator(input)).validator = (InputElement e) => core.nonEmpty(e.value);
-    v.errorMessage = "Titlen må ikke være tom";
+    var input = querySelector('#EditPagesAddPage');
+
+    new Validator(input)
+      ..addNonEmptyValueValidator()
+      ..errorMessage = "Titlen må ikke være tom";
     var validatingForm = new ValidatingForm(_addPageForm);
     validatingForm.validate();
     var decoration = new FormHandler(_addPageForm);
@@ -783,10 +808,12 @@ class UserSettingsChangeUserInfoFormInitializer extends core.Initializer {
   void setUp() {
     var userNameInput = _userMailForm.querySelector('#EditUserEditUsernameField'), userMailInput = _userMailForm.querySelector('#EditUserEditMailField');
     var v1 = new Validator(userNameInput), v2 = new Validator(userMailInput);
-    v1.validator = (InputElement e) => core.nonEmpty(e.value) && (e.value == userLibrary.userLoggedIn.username || userLibrary.users[e.value] == null);
+    v1
+      ..addNonEmptyValueValidator()
+      ..addValueValidator((String value) => (value == userLibrary.userLoggedIn.username || userLibrary.users[value] == null));
     v1.errorMessage = "Brugernavn må ikke være tomt og skal være unikt";
 
-    v2.validator = (InputElement e) => core.validMail(e.value);
+    v2.addValidMailValueValidator();
     v2.errorMessage = "Skal være gyldig E-mail adresse";
 
     var validatingForm = new ValidatingForm(_userMailForm);
@@ -815,10 +842,12 @@ class UserSettingsChangeUserInfoFormInitializer extends core.Initializer {
 
     var userOldPassword = _userPasswordForm.querySelector('#EditUserEditPasswordOldField'), userNewPassword = _userPasswordForm.querySelector('#EditUserEditPasswordNewField'), userNewPasswordRepeat = _userPasswordForm.querySelector('#EditUserEditPasswordNewRepField');
     var v3 = new Validator(userOldPassword), v4 = new Validator(userNewPassword), v5 = new Validator(userNewPasswordRepeat);
-    v3.validator = (InputElement e) => core.nonEmpty(e.value);
+    v3.addNonEmptyValueValidator();
     v3.errorMessage = v4.errorMessage = "Kodeord må ikke være tomt";
-    v4.validator = (InputElement e) => core.nonEmpty(e.value);
-    v5.validator = (InputElement e) => core.nonEmpty(e.value) && e.value == userNewPassword.value;
+    v4.addNonEmptyValueValidator();
+    v5
+      ..addNonEmptyValueValidator()
+      ..addValueValidator((String value) => value == userNewPassword.value);
     v5.errorMessage = "Kodeordet skal gentages korrekt";
     var valPassForm = new ValidatingForm(_userPasswordForm);
     valPassForm.validate();
@@ -869,14 +898,17 @@ class UserSettingsEditPageFormInitializer extends core.Initializer {
     var editIdField = _editPageForm.querySelector('#EditPageEditIDField'), editAliasField = _editPageForm.querySelector('#EditPageEditAliasField'), editTitleField = _editPageForm.querySelector('#EditPageEditTitleField'), editTemplateSelect = _editPageForm.querySelector('#EditPageEditTemplateSelect');
 
 /* SET UP VALIDATOR */
-    var v1, v2, v3;
-    (v1 = new Validator(editTitleField)).validator = (InputElement e) => core.nonEmpty(e.value);
-    (v2 = new Validator(editIdField)).validator = (InputElement e) => (_order.currentPage != null && e.value == _order.currentPage.id) || (new RegExp(r'^[0-9a-z\-_]+$', caseSensitive:false).hasMatch(e.value) && !_order.pageExists(e.value));
-    (v3 = new Validator(editAliasField)).validator = (InputElement e) => e.value == "" || PCRE.checkPCRE(e.value);
 
-    v1.errorMessage = "Titlen kan ikke være tom";
-    v2.errorMessage = "ID kan kun indeholde symbolder a-z, 0-9, - eller _";
-    v3.errorMessage = "Alias skal være et gyldig <i>PCRE</i>";
+    new Validator(editTitleField)
+      ..addNonEmptyValueValidator()
+      ..errorMessage = "Titlen kan ikke være tom";
+
+    new Validator(editIdField)
+      ..addValueValidator((String value) => (_order.currentPage != null && value == _order.currentPage.id) || (new RegExp(r'^[0-9a-z\-_]+$', caseSensitive:false).hasMatch(value) && !_order.pageExists(value)))
+      ..errorMessage = "ID kan kun indeholde symbolder a-z, 0-9, - eller _";
+    new Validator(editAliasField)
+      ..addValueValidator((String value) => value == "" || PCRE.checkPCRE(value))
+      ..errorMessage = "Alias skal være et gyldig <i>PCRE</i>";
 
     validatingForm.validate();
 

@@ -32,7 +32,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
 
         $userForm = $this->getPageUserList();
 
-        $userForm = $userForm ==""?"":"
+        $userForm = $userForm == "" ? "" : "
             <label>
                 Vælg brugere
             </label>
@@ -46,8 +46,8 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         <ul class='floating_list has_deletable' id='UserSettingsEditMailDomainList'>
             {$this->getDomainList()}
         </ul>
-        <form id='UserSettingsEditMailAddDomainForm' class='mail_form expandable' data-function-string='MailDomainLibrary.createDomain(domain_name,super_password)'>
-            <div>
+        <div class='mail_form expandable'>
+        <form id='UserSettingsEditMailAddDomainForm'  data-function-string='MailDomainLibrary.createDomain(domain_name,super_password)'>
             <label>
                 Domæne
                 <input type='text' name='domain_name' data-validator-method='pattern' data-pattern='[a-z0-9-_\\.]+\\.[a-z]{2,}' data-error-message='Ugyldig domæne'/>
@@ -58,16 +58,17 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             </label>
 
             <div class='submit'>
-            <input type='submit' value='Opret Alias'/>
-            </div>
+            <input type='submit' value='Opret Domæne'/>
             </div>
         </form>
+        </div>
         <h3>Domæne alias</h3>
         <ul class='floating_list points_to has_deletable' id='UserSettingsEditMailDomainAliasList'>
             {$this->getMailAliasList()}
         </ul>
-        <form id=\"UserSettingsEditMailAddDomainAliasForm\" class=' mail_form expandable'  data-function-string='MailDomainLibrary.domains[from].addAliasTarget(to)'>
-            <div>
+                <div class='mail_form expandable'>
+
+        <form id=\"UserSettingsEditMailAddDomainAliasForm\"  data-function-string='MailDomainLibrary.domains[from].addAliasTarget(to)'>
             <label>
                 Domæne
                 <select name='from' data-validator-method='non-empty'>
@@ -85,12 +86,12 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             <div class='submit'>
             <input type='submit' value='Opret Alias'/>
             </div>
-            </div>
         </form>
+        </div>
         <h3>Adresser</h3>
         {$this->getAddressList()}
-        <form id='UserSettingsEditMailAddAddressForm' class='mail_form expandable' data-function-string='MailDomainLibrary.domains[domain].aliasLibrary.createAlias(local_part)'>
-            <div>
+        <div class='mail_form expandable'>
+        <form id='UserSettingsEditMailAddAddressForm'  data-function-string='MailDomainLibrary.domains[domain].aliasLibrary.createAlias(local_part)'>
             <label>
                 Navn (tom for catchall addresse)
                 <input type='text' name='local_part'>
@@ -131,12 +132,11 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
 
 
             </div>
-            </div>
 
         </form>
+        </div>
         ";
 
-        //TODO: style empty lists
 
         return $out;
 
@@ -152,9 +152,9 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             <li
             data-last-modified='{$domain->lastModified()}'
             data-description='{$domain->getDescription()}'
-            data-active='".($domain->isActive()?'true':'false')."'
+            data-active='" . ($domain->isActive() ? 'true' : 'false') . "'
             data-domain-name='{$domain->getDomainName()}'
-            data-alias-target='".($domain->isAliasDomain()?$domain->getAliasTarget()->getDomainName():"")."'>
+            data-alias-target='" . ($domain->isAliasDomain() ? $domain->getAliasTarget()->getDomainName() : "") . "'>
                 {$domain->getDomainName()}$deleteElement
             </li>
             ";
@@ -213,7 +213,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             $addressLibrary = $domain->getAddressLibrary();
             $addresses = $addressLibrary->listAddresses();
 
-            $hidden = count($addresses)?"":"hidden";
+            $hidden = count($addresses) ? "" : "hidden";
             $result .= "<ul id='UserSettingsEditMailAddressList{$domain->getDomainName()}' class='floating_list has_deletable address_list' data-domain='{$domain->getDomainName()}' $hidden>";
             foreach ($addresses as $address) {
                 $result .= $this->getAddressElement($address, $domain);
@@ -227,7 +227,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             $result .= "</ul>";
         }
 
-        $hideNoResult = !$addressesFound?"":"hidden";
+        $hideNoResult = !$addressesFound ? "" : "hidden";
 
         $result .= "<ul class='floating_list' $hideNoResult><li class='empty_list'>Der er ingen addresser</li> </ul>";
 
@@ -249,7 +249,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         $deleteElement = $this->currentUser != null && ($address->isOwner($this->currentUser) || $this->currentUser->getUserPrivileges()->hasSitePrivileges()) ?
             "<div class='delete'></div>" : "";
 
-        $lp = $address->getLocalPart() == ""?"<span class='asterisk'>*</span>":$address->getLocalPart();
+        $lp = $address->getLocalPart() == "" ? "<span class='asterisk'>*</span>" : $address->getLocalPart();
         return "<li $attributes>
                     {$lp}@{$domain->getDomainName()}$deleteElement
                             </li>";
@@ -258,8 +258,8 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
     private function getDomainOptions($from = false)
     {
         $result = "";
-        foreach($this->mailDomainLibrary->listDomains() as $domain){
-            if($from && $domain->isAliasDomain()){
+        foreach ($this->mailDomainLibrary->listDomains() as $domain) {
+            if ($from && $domain->isAliasDomain()) {
                 continue;
             }
             $result .= "
@@ -279,10 +279,10 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         $result = "";
         $i = 0;
 
-        foreach($this->backendContainer->getUserLibraryInstance()->listUsers() as $user){
+        foreach ($this->backendContainer->getUserLibraryInstance()->listUsers() as $user) {
             $privileges = $user->getUserPrivileges();
-            if($privileges->hasSitePrivileges()){
-               continue;
+            if ($privileges->hasSitePrivileges()) {
+                continue;
             }
             $result .= "
                        <li>

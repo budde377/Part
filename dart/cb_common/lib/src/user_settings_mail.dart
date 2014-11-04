@@ -14,7 +14,6 @@ class UserSettingsMailDomainLibrary implements MailDomainLibrary{
 
 
   static AJAXMailDomainLibrary _generateLibrary(){
-
     var domainElementList = querySelectorAll("#UserSettingsContent #UserSettingsEditMailDomainList > li:not(.empty_list)");
     var domainNameList = domainElementList.map((LIElement li) => li.dataset['domain-name']);
     var domainElementMap = new Map<String, LIElement>.fromIterables(domainNameList, domainElementList);
@@ -74,6 +73,7 @@ class UserSettingsMailDomainLibrary implements MailDomainLibrary{
           last_modified: new DateTime.fromMillisecondsSinceEpoch(int.parse(obj.dataset['last-modified']) * 1000)
       );
     };
+
     return new AJAXMailDomainLibrary(domainNameList, domainGenerator , userLibrary);
 
 

@@ -803,12 +803,12 @@ form.initial input.invalid {
     transition: 0.5s max-height;
 }
 
-#UserSettingsContent .mail_form > div:not(.expander_link) {
+#UserSettingsContent .mail_form > form  {
     transition: 0.3s opacity;
     opacity: 1;
 }
 
-#UserSettingsContent .mail_form:not(.expanded) > div:not(.expander_link) {
+#UserSettingsContent .mail_form:not(.expanded)  > form  {
     opacity: 0;
 }
 
@@ -851,7 +851,7 @@ form.initial input.invalid {
     opacity: 1;
 }
 
-#UserSettingsContent .mail_form > div:not(.expander_link) {
+#UserSettingsContent .mail_form > form   {
     float: left;
     padding: 20px 10px;
     width: 530px;

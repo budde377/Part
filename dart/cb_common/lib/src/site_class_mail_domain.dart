@@ -43,6 +43,7 @@ abstract class MailDomain {
 
   Stream<bool> get onActiveChange;
 
+
 }
 
 
