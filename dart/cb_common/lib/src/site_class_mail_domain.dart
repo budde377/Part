@@ -82,9 +82,10 @@ class AJAXMailDomain extends MailDomain {
   _description = description,
   _addressLibraryGenerator = addressLibraryGenerator,
   _active = active,
-  _aliasTarget = domainLibrary.domains[alias_target],
   this.domainLibrary = domainLibrary,
-  _lastModified = last_modified == null ? new DateTime.fromMillisecondsSinceEpoch(0) : last_modified;
+  _lastModified = last_modified == null ? new DateTime.fromMillisecondsSinceEpoch(0) : last_modified{
+    _aliasTarget = alias_target == domainName?this:domainLibrary.domains[alias_target];
+  }
 
 
   AJAXMailDomain.fromJSONObject(JSONObject object, this.domainLibrary, this.userLibrary):
@@ -93,7 +94,11 @@ class AJAXMailDomain extends MailDomain {
   this._description = object.variables['description'],
   this._lastModified = new DateTime.fromMillisecondsSinceEpoch(object.variables['last_modified'] * 1000){
     _addressLibraryGenerator = (MailDomain d ) => new AJAXMailAddressLibrary.fromJSONObject(object.variables['addresses_library'], d, userLibrary);
-    this._aliasTarget = object.variables['alias_target'] == null?null:domainLibrary.domains[object.variables['alias_target'].variables['domain_name']];
+    var alias_target = object.variables['alias_target'];
+    if(alias_target != null){
+      this._aliasTarget = alias_target == domainName?this:domainLibrary.domains[object.variables['alias_target'].variables['domain_name']];
+
+    }
   }
 
   String get _domainLibraryGetter => "MailDomainLibrary.getDomain(${quoteString(domainName)})";
@@ -104,15 +109,20 @@ class AJAXMailDomain extends MailDomain {
   FutureResponse<MailDomain> changeAliasTarget(MailDomain domain){
     var completer = new Completer();
     ajaxClient.callFunctionString(_domainLibraryGetter+"..setAliasTarget(MailDomainLibrary.getDomain(${quoteString(domain.domainName)}))..getInstance()")
-    .thenResponse(onError:completer.complete, onSuccess:(Response r){
+    .thenResponse(onError:completer.complete, onSuccess:(Response<JSONObject> r){
+      JSONObject newTarget = r.payload.variables['alias_target'];
+      if(newTarget == null || newTarget.variables['domain_name'] != domain.domainName){
+        completer.complete(new FutureResponse.error(Response.ERROR_CODE_UNKNOWN_ERROR));
+        return;
+      }
       _aliasTarget = domain;
       _lastModified = new DateTime.fromMillisecondsSinceEpoch(r.payload.variables['last_modified'] * 1000);
-      completer.complete(new Response.success(_aliasTarget));
+      completer.complete(new FutureResponse.success(_aliasTarget));
       _onAliasTargetChangeController.add(_aliasTarget);
     });
 
 
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
   FutureResponse<MailDomain> removeAliasTarget(){
@@ -129,7 +139,7 @@ class AJAXMailDomain extends MailDomain {
     });
 
 
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
   bool get isDomainAlias => _aliasTarget != null;

@@ -93,6 +93,6 @@ class UserSettingsMailDomainLibrary implements MailDomainLibrary{
 
   Map<String, MailDomain> get domains => domainLibrary.domains;
 
-  operator [](String key) => domainLibrary[key];
+  MailDomain operator [](String key) => domainLibrary[key];
 
 }

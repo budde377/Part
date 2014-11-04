@@ -26,7 +26,7 @@ abstract class MailAddressLibrary {
 
   Stream<MailAddress> get onDelete;
 
-  operator [] (String key);
+  MailAddress operator [] (String key);
 
 }
 
@@ -201,6 +201,6 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
 
   Stream<MailAddress> get onDelete => _onDeleteController.stream.asBroadcastStream();
 
-  operator [] (String key) => addresses[key];
+  MailAddress operator [] (String key) => addresses[key];
 
 }

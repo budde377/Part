@@ -70,14 +70,15 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             <div>
             <label>
                 Domæne
-                <select name='from'>
+                <select name='from' data-validator-method='non-empty'>
+                    <option value=''>--Domæne--</option>
                     {$this->getDomainOptions(true)}
                 </select>
             </label>
             <label>
                 Peger på
-                <select  name='to'>
-
+                <select  name='to' data-validator-method='non-empty'>
+                    <option value=''>--Domæne--</option>
                     {$this->getDomainOptions()}
                 </select>
             </label>

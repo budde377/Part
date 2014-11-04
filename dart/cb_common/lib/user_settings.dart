@@ -107,6 +107,8 @@ class UserSettingsMailInitializer extends core.Initializer {
 
   FormElement addDomainForm = querySelector("#UserSettingsEditMailAddDomainForm");
 
+  FormElement addDomainAliasForm = querySelector("#UserSettingsEditMailAddDomainAliasForm");
+
 
   bool get canBeSetUp => mailDomainLibraryAvailable && mailDomainList != null && domainAliasList != null && mailDomainLibrary.domains.length == addressList.length;
 
@@ -115,26 +117,74 @@ class UserSettingsMailInitializer extends core.Initializer {
   void setUp() {
 
     setUpMailDomainList();
-
     setUpAddDomainForm();
+    setUpAddDomainAliasForm();
+
+
   }
 
-  void setUpAddDomainForm(){
-    if(addDomainForm == null){
+  void setUpAddDomainAliasForm() {
+    if (addDomainAliasForm == null) {
+      return;
+    }
+
+    var vForm = new ValidatingForm(addDomainAliasForm);
+    var eForm = new ExpanderElementHandler(addDomainAliasForm);
+    var formH = vForm.formHandler;
+
+    SelectElement selectFrom = addDomainAliasForm.querySelector("select[name=from]");
+    SelectElement selectTo = addDomainAliasForm.querySelector("select[name=to]");
+
+    selectFrom.onChange.listen((_) {
+      if(selectFrom.value == selectTo.value){
+        selectTo.value = "";
+        selectTo.dispatchEvent(new Event("change"));
+
+      }
+
+      selectTo.children.forEach((OptionElement o) {
+        o.hidden = o.value == selectFrom.value && o.value != "";
+      });
+    });
+
+    formH.submitFunction = (Map<String,String> map){
+      var domain = mailDomainLibrary[selectFrom.value];
+      var domainTarget = mailDomainLibrary[selectTo.value];
+      if(domain == null || domainTarget == null){
+        return true;
+      }
+      formH.blur();
+      domain.changeAliasTarget(domainTarget).thenResponse(onSuccess:(_){
+        formH.changeNotion("Alias er oprettet", FormHandler.NOTION_TYPE_SUCCESS);
+        formH.unBlur();
+      }, onError:(core.Response response){
+        formH.changeNotion(_errorMessage(response.error_code), FormHandler.NOTION_TYPE_ERROR);
+        formH.unBlur();
+      });
+      return true;
+    };
+
+  }
+
+  void setUpAddDomainForm() {
+    if (addDomainForm == null) {
       return;
     }
     var validatingForm = new ValidatingForm(addDomainForm);
     var expander = new ExpanderElementHandler(addDomainForm);
-    expander.onContract.listen((_){
-      validatingForm.formHandler.removeNotion();
+    expander.onContract.listen((_) {
+      validatingForm.formHandler
+        ..removeNotion()
+        ..clearForm();
+
     });
-    validatingForm.formHandler.submitFunction = (Map<String, String >  data){
+    validatingForm.formHandler.submitFunction = (Map<String, String > data) {
       validatingForm.formHandler.blur();
-      mailDomainLibrary.createDomain(data['domain_name'], data['super_password']).thenResponse(onSuccess:(core.Response<MailDomain> response){
+      mailDomainLibrary.createDomain(data['domain_name'], data['super_password']).thenResponse(onSuccess:(core.Response<MailDomain> response) {
         validatingForm.formHandler.changeNotion("Domænet blev oprettet", FormHandler.NOTION_TYPE_SUCCESS);
         validatingForm.formHandler.clearForm();
         validatingForm.formHandler.unBlur();
-      }, onError:(core.Response<MailDomain> response){
+      }, onError:(core.Response<MailDomain> response) {
         validatingForm.formHandler.changeNotion("Domænet blev ikke oprettet", FormHandler.NOTION_TYPE_ERROR);
         validatingForm.formHandler.unBlur();
       });
@@ -186,23 +236,24 @@ class UserSettingsMailInitializer extends core.Initializer {
   }
 
   void addDomainLiListener(MailDomain domain, LIElement li) {
-    var listener = (_){
+    var listener = (_) {
       setLiDataSet(li, domain);
     };
 
-    domain..onActiveChange.listen(listener)
-          ..onAliasTargetChange.listen(listener)
-          ..onDescriptionChange.listen(listener);
-    domain.onDelete.listen((_){
+    domain
+      ..onActiveChange.listen(listener)
+      ..onAliasTargetChange.listen(listener)
+      ..onDescriptionChange.listen(listener);
+    domain.onDelete.listen((_) {
       _domainLIMap.remove(domain);
       rebuildDomainList();
     });
 
-    li.querySelector('.delete').onClick.listen((_){
+    li.querySelector('.delete').onClick.listen((_) {
       var c = dialogContainer.password("Er du sikker på at du vil slette?");
-      c.result.then((String s){
+      c.result.then((String s) {
         mailDomainList.classes.add('blur');
-        domain.delete(s).then((_){
+        domain.delete(s).then((_) {
           mailDomainList.classes.remove('blur');
         });
       });
