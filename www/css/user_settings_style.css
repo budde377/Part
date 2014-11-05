@@ -642,6 +642,10 @@ form.initial input.invalid {
     display: none;
 }
 
+#LogInfoParagraph{
+    float: left;
+}
+
 #UpdateInformationMessage {
     text-align: center;
     background: #FF7100;

@@ -18,24 +18,24 @@ class LogFileImpl extends FileImpl implements LogFile
      * Will log a message and write to file.
      * @param string $message
      * @param int $level
-     * @param bool $createDumpFile
-     * @return null | DumpFile
+     * @param bool|DumpFile $createDumpFile
+     * @return int
      */
-    public function log($message, $level, $createDumpFile = false)
+    public function log($message, $level, &$createDumpFile = false)
     {
 
         $this->create();
-        $array = array($level, time(), $message);
-        $ret = null;
-        if($createDumpFile){
-            $ret = new DumpFileImpl($this->getParentFolder()->getAbsolutePath()."/dump-".uniqid());
-            $this->dumparray[$array[] = $ret->getFilename()] = $ret;
+        $array = array($level, $t = time(), $message);
+
+        if($createDumpFile !== false){
+            $createDumpFile = new DumpFileImpl($this->getParentFolder()->getAbsolutePath()."/dump-".uniqid());
+            $this->dumparray[$array[] = $createDumpFile->getFilename()] = $createDumpFile;
         }
 
         fputcsv($r = $this->getResource(), $array);
         fclose($r);
 
-        return $ret;
+        return $t;
     }
 
     /**

@@ -99,8 +99,6 @@ class UserSettingsInitializer extends core.Initializer {
 
 class UserSettingsMailInitializer extends core.Initializer {
 
-  Map<MailDomain, LIElement> _domainLIMap = new Map<MailDomain, LIElement>();
-
   UListElement mailDomainList = querySelector("#UserSettingsEditMailDomainList");
 
   UListElement domainAliasList = querySelector("#UserSettingsEditMailDomainAliasList");
@@ -114,34 +112,191 @@ class UserSettingsMailInitializer extends core.Initializer {
 
   ElementList<UListElement> get addressList => querySelectorAll("#UserSettingsContent > ul > li > ul.address_list");
 
+  /** Functions  that should be called on every domain, now and in the future **/
+  List<Function> domainFunctions = [];
+  List<Function> domainCreateFunctions = [];
+  List<Function> domainDeleteFunctions = [];
+
   void setUp() {
 
     setUpMailDomainList();
     setUpAddDomainForm();
     setUpAddDomainAliasForm();
+    setUpDomainAliasList();
+
+    setUpListeners();
+
+
+  }
+
+  void setUpListeners() {
+    var cdf = (List<Function> l) => (MailDomain d) => l.forEach((Function f) {
+      f(d);
+    });
+    var df = cdf(domainFunctions);
+
+    mailDomainLibrary.domains.forEach((_, MailDomain domain) => df(domain));
+
+    domainCreateFunctions.add(df);
+
+    mailDomainLibrary.onCreate.listen(cdf(domainCreateFunctions));
+    mailDomainLibrary.onDelete.listen(cdf(domainDeleteFunctions));
+
+  }
+
+  void setUpDomainAliasList() {
+
+    var attachDeleteListener = (MailDomain domain, LIElement li, [DivElement delete = null]) {
+
+      if (delete == null && (delete = li.querySelector('.delete')) == null) {
+        return;
+      }
+
+      delete.onClick.listen((_) {
+        dialogContainer.confirm("Er du sikker på at du vil slette?").result.then((bool v) {
+          if (!v) {
+            return;
+          }
+          blurElement(domainAliasList);
+          domain.clearAliasTarget().then((_) {
+            unBlurElement(domainAliasList);
+          });
+        });
+      });
+      var targetDomain = domain.aliasTarget;
+
+      domain.onAliasTargetChange.listen((_) {
+        if (domain.aliasTarget == null) {
+          return;
+        }
+        li.children[2].text = li.dataset['to-domain'] = domain.aliasTarget.domainName;
+      });
+
+    };
+
+    var createLi = (MailDomain d) {
+      var li = domainAliasList.children.firstWhere((LIElement li) => li.dataset['from-domain'] == d.domainName, orElse:() => null);
+      if (li != null) {
+        attachDeleteListener(d, li);
+        return li;
+      }
+
+      li = new LIElement();
+
+      var divFrom = new DivElement();
+
+
+      var divArrow = new DivElement();
+      divArrow.classes.add('arrow');
+
+      var divTo = new DivElement();
+
+      var delete = new DivElement();
+      delete.classes.add('delete');
+
+      li
+        ..append(divFrom)
+        ..append(divArrow)
+        ..append(divTo)
+        ..append(delete);
+
+      li
+        ..dataset['from-domain'] = divFrom.text = d.domainName
+        ..dataset['to-domain'] = divTo.text = d.aliasTarget == null ? "" : d.aliasTarget.domainName;
+
+      attachDeleteListener(d, li, delete);
+      return li;
+    };
+
+
+    domainFunctions.add((MailDomain d) {
+      var li = createLi(d);
+      d.onAliasTargetChange.listen((_) {
+        if (d.aliasTarget == null) {
+          li.remove();
+        } else {
+          domainAliasList.append(li);
+          sortListFromDataSet(domainAliasList, 'from-domain');
+        }
+      });
+
+      d.onDelete.listen((_) {
+        li.remove();
+        domainAliasList.children.removeWhere((LIElement li) => li.dataset['to-domain'] == d.domainName);
+        sortListFromDataSet(domainAliasList, 'from-domain');
+      });
+
+    });
 
 
   }
 
   void setUpAddDomainAliasForm() {
+
     if (addDomainAliasForm == null) {
       return;
     }
 
     var vForm = new ValidatingForm(addDomainAliasForm);
     var formH = vForm.formHandler;
+    var domainOptionCheck = (MailDomain domain) => (OptionElement elm) => elm.value == domain.domainName;
+    var optionFromDomain = (MailDomain domain) {
+      var option = new OptionElement();
+      option
+        ..text = domain.domainName
+        ..value = domain.domainName;
+      return option;
+    };
+
 
     SelectElement selectFrom = addDomainAliasForm.querySelector("select[name=from]");
     SelectElement selectTo = addDomainAliasForm.querySelector("select[name=to]");
 
-    selectFrom.onChange.listen((_) {
-      var resetTo = (String v){
-        if (v != selectTo.value){
-          return;
+    var resetSelect = (SelectElement select) => ([String v = null]) {
+      if (v != null && v != select.value) {
+        return;
+      }
+      select.value = "";
+      select.dispatchEvent(new Event("change"));
+    };
+
+    var resetFrom = resetSelect(selectFrom);
+    var resetTo = resetSelect(selectTo);
+
+    var optionSorter = (OptionElement o1, OptionElement o2) => o1.value.compareTo(o2.value);
+
+    domainFunctions.add((MailDomain domain) {
+      core.debug(domain);
+      domain.onAliasTargetChange.listen((_) {
+        if (domain.aliasTarget != null) {
+          selectFrom.children.removeWhere(domainOptionCheck(domain));
+          resetFrom();
+
+        } else {
+          selectFrom.append(optionFromDomain(domain));
+          sortChildren(selectFrom, optionSorter);
         }
-        selectTo.value = "";
-        selectTo.dispatchEvent(new Event("change"));
-      };
+      });
+    });
+
+    domainCreateFunctions.add((MailDomain domain) {
+      selectTo.append(optionFromDomain(domain));
+      sortChildren(selectTo, optionSorter);
+      if (domain.aliasTarget != null) {
+        return;
+      }
+
+      selectFrom.append(optionFromDomain(domain));
+      sortChildren(selectFrom, optionSorter);
+
+    });
+
+    domainDeleteFunctions.add((MailDomain domain) {
+      selectFrom.children.removeWhere(domainOptionCheck(domain));
+      selectTo.children.removeWhere(domainOptionCheck(domain));
+    });
+
+    selectFrom.onChange.listen((_) {
 
       resetTo(selectFrom.value);
 
@@ -149,20 +304,20 @@ class UserSettingsMailInitializer extends core.Initializer {
         var to = mailDomainLibrary[o.value], from = mailDomainLibrary[selectFrom.value];
         to = mailDomainLibrary[o.value];
         from = mailDomainLibrary[selectFrom.value];
-        if(from == null || to == null){
+        if (from == null || to == null) {
           o.hidden = false;
           return;
         }
 
-        if(from == to){
+        if (from == to) {
           resetTo(o.value);
           o.hidden = true;
           return;
         }
 
         var t = to.aliasTarget;
-        while(t != null){
-          if(t == from){
+        while (t != null) {
+          if (t == from) {
             resetTo(o.value);
             o.hidden = true;
             return;
@@ -192,6 +347,35 @@ class UserSettingsMailInitializer extends core.Initializer {
 
   }
 
+  void sortListFromDataSet(UListElement ul, String key) {
+    var emptyListElement = ul.querySelector('.empty_list');
+
+    if (emptyListElement != null) {
+      if (ul.children.length == 1) {
+        emptyListElement.hidden = false;
+        return;
+      }
+      emptyListElement.hidden = true;
+    } else if (ul.children.isEmpty) {
+      return;
+    }
+
+    sortChildren(ul,
+        (Element e1, Element e2) =>
+    (e1.dataset.containsKey(key) ? e1.dataset[key] : "").compareTo(e2.dataset.containsKey(key) ? e2.dataset[key] : ""));
+
+
+  }
+
+  void sortChildren(Element element, int sort(Element e1, Element e2)) {
+    var l = element.children.toList();
+    l.sort(sort);
+    l.forEach((Element opt) {
+      element.append(opt);
+    });
+
+  }
+
   void setUpAddDomainForm() {
     if (addDomainForm == null) {
       return;
@@ -218,8 +402,58 @@ class UserSettingsMailInitializer extends core.Initializer {
 
   }
 
+  void blurElement(Element elm) {
+    elm.classes.add('blur');
+  }
+
+  void unBlurElement(Element elm) {
+    elm.classes.remove('blur');
+  }
+
   void setUpMailDomainList() {
 
+
+    var setLiDataSet = (LIElement li, MailDomain domain) {
+      li
+        ..dataset['last-modified'] = (domain.lastModified.millisecondsSinceEpoch ~/ 1000).toString()
+        ..dataset['description'] = domain.description
+        ..dataset['active'] = domain.active ? "true" : "false"
+        ..dataset['domain-name'] = domain.domainName
+        ..dataset['alias-target'] = domain.aliasTarget == null ? "" : domain.aliasTarget.domainName;
+    };
+
+    var addDomainLiListener = (MailDomain domain, LIElement li) {
+      var listener = (_) {
+        setLiDataSet(li, domain);
+      };
+
+      domain
+        ..onActiveChange.listen(listener)
+        ..onAliasTargetChange.listen(listener)
+        ..onDescriptionChange.listen(listener);
+
+      li.querySelector('.delete').onClick.listen((_) {
+        var c = dialogContainer.password("Er du sikker på at du vil slette?");
+        c.result.then((String s) {
+          blurElement(mailDomainList);
+          domain.delete(s).then((_) {
+            unBlurElement(mailDomainList);
+          });
+        });
+      });
+
+    };
+
+    var liFromDomain = (MailDomain domain) {
+      var li = new LIElement();
+      setLiDataSet(li, domain);
+      li.text = domain.domainName;
+      var delete = new DivElement();
+      delete.classes.add('delete');
+      li.append(delete);
+      addDomainLiListener(domain, li);
+      return li;
+    };
 
     mailDomainList.children.forEach((LIElement li) {
       if (li.classes.contains('empty_list')) {
@@ -228,75 +462,19 @@ class UserSettingsMailInitializer extends core.Initializer {
       var name = li.dataset['domain-name'];
       var domain = mailDomainLibrary.domains[name];
       addDomainLiListener(domain, li);
-      _domainLIMap[domain] = li;
-
     });
 
-    mailDomainLibrary.onCreate.listen((MailDomain domain) {
-      _domainLIMap[domain] = liFromDomain(domain);
-      rebuildDomainList();
+
+    domainDeleteFunctions.add((MailDomain domain) {
+      mailDomainList.children.removeWhere((LIElement li) => li.dataset['domain-name'] == domain.domainName);
+      sortListFromDataSet(mailDomainList, 'domain-name');
+    });
+    domainCreateFunctions.add((MailDomain domain) {
+      mailDomainList.append(liFromDomain(domain));
+      sortListFromDataSet(mailDomainList, 'domain-name');
     });
   }
 
-  LIElement liFromDomain(MailDomain domain) {
-    var li = new LIElement();
-    setLiDataSet(li, domain);
-    li.text = domain.domainName;
-    var delete = new DivElement();
-    delete.classes.add('delete');
-    li.append(delete);
-    addDomainLiListener(domain, li);
-    return li;
-  }
-
-  void setLiDataSet(LIElement li, MailDomain domain) {
-    li
-      ..dataset['last-modified'] = (domain.lastModified.millisecondsSinceEpoch ~/ 1000).toString()
-      ..dataset['description'] = domain.description
-      ..dataset['active'] = domain.active ? "true" : "false"
-      ..dataset['domain-name'] = domain.domainName
-      ..dataset['alias-target'] = domain.aliasTarget == null ? "" : domain.aliasTarget.domainName;
-  }
-
-  void addDomainLiListener(MailDomain domain, LIElement li) {
-    var listener = (_) {
-      setLiDataSet(li, domain);
-    };
-
-    domain
-      ..onActiveChange.listen(listener)
-      ..onAliasTargetChange.listen(listener)
-      ..onDescriptionChange.listen(listener);
-    domain.onDelete.listen((_) {
-      _domainLIMap.remove(domain);
-      rebuildDomainList();
-    });
-
-    li.querySelector('.delete').onClick.listen((_) {
-      var c = dialogContainer.password("Er du sikker på at du vil slette?");
-      c.result.then((String s) {
-        mailDomainList.classes.add('blur');
-        domain.delete(s).then((_) {
-          mailDomainList.classes.remove('blur');
-        });
-      });
-    });
-
-  }
-
-  void rebuildDomainList() {
-    if (_domainLIMap.isEmpty) {
-      mailDomainList.querySelector('.empty_list').hidden = false;
-      return;
-    }
-    mailDomainList.querySelector('.empty_list').hidden = true;
-    mailDomainList.children.removeWhere((Element elm) => !elm.classes.contains('empty_list'));
-    var l = _domainLIMap.keys.toList();
-    l.sort((MailDomain d1, MailDomain d2) => d1.domainName.compareTo(d2.domainName));
-    l.forEach((MailDomain d) {
-      mailDomainList.append(_domainLIMap[d]);
-    });
-  }
 
 }
 
@@ -330,7 +508,8 @@ class UserSettingsLoggerInitializer extends core.Initializer {
 
   void setUp() {
     _updateNum();
-    _logTable.querySelectorAll(".dumpfile a").forEach((AnchorElement a) {
+
+    var addDumpListener = (AnchorElement a) {
       a.onClick.listen((MouseEvent evt) {
         var loader = dialogContainer.loading("Henter log filen");
         logger.contextAt(new DateTime.fromMillisecondsSinceEpoch(int.parse(a.dataset["id"]) * 1000)).then((core.Response<Map> resp) {
@@ -355,11 +534,39 @@ class UserSettingsLoggerInitializer extends core.Initializer {
           });
         });
       });
+    };
+
+    logger.onLog.listen((LogEntry entry) {
+      var row = _logTable.insertRow(0);
+      var levelStrings = entry.levelStrings;
+      row.classes.addAll(levelStrings);
+
+      var c1 = row.addCell();
+      c1.title = levelStrings.map((String s) => s.toUpperCase()).join(" ");
+      var c2 = row.addCell();
+      c2.text = entry.message;
+      var c3 = row.addCell();
+      c3.classes.add("dumpfile");
+      if (entry.context != null) {
+        var a = new AnchorElement();
+        a.dataset['id'] = entry.id.toString();
+        addDumpListener(a);
+        c3.append(a);
+      }
+      var c4 = row.addCell();
+      c4
+        ..classes.add('date')
+        ..text = core.dateString(entry.time);
+      _updateNum();
     });
+
+    _logTable.querySelectorAll(".dumpfile a").forEach(addDumpListener);
 
 
     _logLink.onClick.listen((MouseEvent evt) {
+      _logTable.classes.add('blur');
       logger.clearLog().then((core.Response<Logger> response) {
+        _logTable.classes.remove('blur');
         if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
           _logTable.querySelectorAll("tr:not(.empty_row)").forEach((TableRowElement li) => li.remove());
           _logTable.classes.add("empty");

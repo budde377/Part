@@ -19,15 +19,15 @@ class StubLogFileImpl extends FileImpl implements LogFile{
      * Will log a message and write to file.
      * @param string $message
      * @param int $level
-     * @param bool $createDumpFile
-     * @return null | DumpFile
+     * @param bool | DumpFile $createDumpFile
+     * @return int
      */
-    public function log($message, $level, $createDumpFile = false)
+    public function log($message, $level, &$createDumpFile = false)
     {
-        if($createDumpFile){
-            return new StubDumpFileImpl();
+        if($createDumpFile !== false){
+            $createDumpFile = new StubDumpFileImpl();
         }
-        return null;
+        return 0;
     }
 
     /**

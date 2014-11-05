@@ -18,7 +18,7 @@ abstract class MailDomain {
 
   FutureResponse<MailDomain> changeAliasTarget(MailDomain domain);
 
-  FutureResponse<MailDomain> removeAliasTarget();
+  FutureResponse<MailDomain> clearAliasTarget();
 
   bool get isDomainAlias;
 
@@ -126,13 +126,18 @@ class AJAXMailDomain extends MailDomain {
     return new FutureResponse(completer.future);
   }
 
-  FutureResponse<MailDomain> removeAliasTarget(){
+  FutureResponse<MailDomain> clearAliasTarget(){
     if(!isDomainAlias){
       return new FutureResponse.success(null);
     }
     var completer = new Completer();
-    ajaxClient.callFunctionString(_domainLibraryGetter+"..removeAliasTarget(MailDomainLibrary.getDomain(${quoteString(_aliasTarget.domainName)}))..getInstance()")
-    .thenResponse(onError:completer.complete, onSuccess:(Response r){
+    ajaxClient.callFunctionString(_domainLibraryGetter+"..clearAliasTarget()..getInstance()")
+    .thenResponse(onError:completer.complete, onSuccess:(Response<JSONObject> r){
+      if(r.payload.variables['alias_target'] != null){
+
+        completer.complete(new Response.error(Response.ERROR_CODE_UNKNOWN_ERROR));
+        return;
+      }
       _aliasTarget = null;
       _lastModified = new DateTime.fromMillisecondsSinceEpoch(r.payload.variables['last_modified'] * 1000);
       completer.complete(new Response.success(_aliasTarget));
