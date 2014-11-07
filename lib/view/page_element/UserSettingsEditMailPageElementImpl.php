@@ -30,16 +30,8 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
     public function generateContent()
     {
 
-        $userForm = $this->getPageUserList();
-
-        $userForm = $userForm == "" ? "" : "
-            <label>
-                Vælg brugere
-            </label>
-            <ul class='owner_check_list'>
-                $userForm
-            </ul>";
-
+        $ownerCheckList = $this->getPageUserList();
+        $ownerCheckListHidden = $ownerCheckList == ""?"hidden":"";
 
         $out = "
         <h3>Domæner</h3>
@@ -48,9 +40,13 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         </ul>
         <div class='mail_form expandable'>
         <form id='UserSettingsEditMailAddDomainForm'  data-function-string='MailDomainLibrary.createDomain(domain_name,super_password)'>
+            <div hidden>
+                <input type='text' />
+                <input type='password'/>
+            </div>
             <label>
                 Domæne
-                <input type='text' name='domain_name' data-validator-method='pattern' data-pattern='[a-z0-9-_\\.]+\\.[a-z]{2,}' data-error-message='Ugyldig domæne'/>
+                <input type='text' name='domain_name' data-validator-method='pattern' data-pattern='^[a-z0-9-_\\.]+\\.[a-z]{2,}$' data-error-message='Ugyldig domæne'/>
             </label>
             <label>
                 Super-kodeord
@@ -92,21 +88,30 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         {$this->getAddressList()}
         <div class='mail_form expandable'>
         <form id='UserSettingsEditMailAddAddressForm'  data-function-string='MailDomainLibrary.domains[domain].aliasLibrary.createAlias(local_part)'>
-            <label>
+            <div hidden>
+                <input type='text' />
+                <input type='password'/>
+            </div>            <label>
                 Navn (tom for catchall addresse)
-                <input type='text' name='local_part'>
+                <input type='text' name='local_part' data-validator-method='pattern' data-pattern='^[a-z0-9\\._-]*$' data-error-message='Ugyldig addresse'>
             </label>
             <span class='at'>@</span>
             <label>
                 Domæne
-                <select name='domain'>
+                <select name='domain' data-validator-method='non-empty'>
+                    <option value=''>--Domæne--</option>
                     {$this->getDomainOptions()}
                 </select>
             </label>
-            $userForm
+            <label>
+                Vælg brugere
+            </label>
+            <ul class='owner_check_list' id='UserSettingsEditMailAddAddressUserCheckList' $ownerCheckListHidden>
+                $ownerCheckList
+            </ul>
             <label class='long_input'>
-                Vidersend til (komma separeret liste)
-                <input type='text' name='targets' />
+                Vidersend til (mellemrums separeret liste)
+                <input type='text' name='targets' data-error-message='Skal være liste af gyldige email addresser'/>
             </label>
             <input type='checkbox' class='pretty_checkbox' id='UserSettingsEditMailAddAddressAddMailboxCheckbox' name='add_mailbox' value='1'/>
             <label for='UserSettingsEditMailAddAddressAddMailboxCheckbox' class='long_input'>
@@ -115,15 +120,15 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             <div>
             <label>
             Navn
-            <input type='text' name='mailbox_owner_name' />
+            <input type='text' name='mailbox_owner_name' data-error-message='Der skal angives et navn' />
             </label>
             <label>
             Mailbox kodeord
-            <input type='password' name='mailbox_password' />
+            <input type='password' name='mailbox_password'  data-error-message='Kodeordet må ikke være tomt'/>
             </label>
             <label>
             Bekræft kodeord
-            <input type='password' name='mailbox_password_2' />
+            <input type='password' name='mailbox_password_2' data-error-message='Kodeordet skal gengives korrekt'/>
             </label>
 
             </div>
@@ -285,9 +290,9 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
                 continue;
             }
             $result .= "
-                       <li>
-                    <input type='checkbox' id='UserSettingsEditMailAddAddressFormAddUserCheck$i' data-function-string='.addOwner(_this)' name='user_$i' value='{$user->getUsername()}'/>
-                    <label for='UserSettingsEditMailAddAddressFormAddUserCheck$i'>
+                       <li  data-user-name='{$user->getUsername()}' >
+                    <input type='checkbox' id='UserSettingsEditMailAddAddressFormAddUserCheck{$user->getUsername()}' data-function-string='.addOwner(_this)' name='user_{$user->getUsername()}' value='{$user->getUsername()}'/>
+                    <label for='UserSettingsEditMailAddAddressFormAddUserCheck{$user->getUsername()}'>
                         {$user->getUsername()}
                     </label>
                 </li>";

@@ -120,8 +120,14 @@ class FormHandler {
 
 
 class Validator<E extends Element> {
+
   final E element;
   String errorMessage = "";
+
+  final FormElement form;
+
+  ValidatingForm _validatingForm;
+
   static final Map<Element, Validator> _cache = new Map<Element, Validator>();
   Function _validator = (_) {
     return true;
@@ -129,7 +135,8 @@ class Validator<E extends Element> {
 
   factory Validator(E element) => _cache.putIfAbsent(element, () => new Validator._internal(element));
 
-  Validator._internal(this.element){
+  Validator._internal(E element) : this.form = (element is InputElement || element is TextAreaElement || element is SelectElement)?element.form:null, this.element = element {
+    _validatingForm = hasForm? new ValidatingForm(form):null;
     if (element.dataset.containsKey("error-message")) {
       errorMessage = element.dataset["error-message"];
     }
@@ -157,6 +164,11 @@ class Validator<E extends Element> {
 
   }
 
+  ValidatingForm get validatingForm => _validatingForm;
+
+  bool get hasForm => form != null;
+
+
   bool get valid => _validator(element);
 
 
@@ -165,7 +177,7 @@ class Validator<E extends Element> {
     _validator = (Element e) => v(e) && f(e);
   }
 
-  void addValueValidator(bool f(String)){
+  void addValueValidator(bool f(String)) {
     addValidator((elm) => f(elm.value));
   }
 
@@ -177,12 +189,19 @@ class Validator<E extends Element> {
     addValueValidator(core.validUrl);
   }
 
-  void addValidMailValueValidator(){
+  void addValidMailValueValidator() {
     addValueValidator(core.validMail);
   }
 
-  void addValidRegExpPatternValueValidator(RegExp pattern){
+  void addValidRegExpPatternValueValidator(RegExp pattern) {
     addValueValidator(pattern.hasMatch);
+  }
+
+  void check(){
+    if(!hasForm){
+      return;
+    }
+    validatingForm.checkElement(element);
   }
 }
 
@@ -195,13 +214,13 @@ class ValidatingForm {
 
   bool _validForm = true;
 
-  factory ValidatingForm(FormElement form) {
+  factory ValidatingForm(FormElement form, [bool initial = true]) {
     if (_cache.containsKey(form)) {
       return _cache[form];
     } else {
       var f = new ValidatingForm._internal(form);
       _cache[form] = f;
-      f._setUp();
+      f._setUp(initial);
       return f;
     }
   }
@@ -212,7 +231,16 @@ class ValidatingForm {
 
   final Map<Element, InfoBox> _infoBoxMap = new Map<Element, InfoBox>();
 
-  void _setUp() {
+  String _valueFromInput(InputElement i) {
+    if (i.type == "checkbox" || i.type == "radio") {
+      return i.checked ? i.value : "";
+    }
+
+    return i.value;
+
+  }
+
+  void _setUp(bool initial) {
     element.onSubmit.listen((Event e) {
       if (!_validForm) {
         e.preventDefault();
@@ -234,13 +262,13 @@ class ValidatingForm {
       elm.classes
         ..add(v.valid ? 'valid' : 'invalid')
         ..add('initial');
-      _valueMap[elm] = elm.value;
+      _valueMap[elm] = _valueFromInput(elm);
       var l = (Event e) {
-        if (_valueMap[elm] == elm.value) {
+        if (_valueMap[elm] == _valueFromInput(elm)) {
           return;
         }
-        _checkElement(elm);
-        _valueMap[elm] = elm.value;
+        checkElement(elm);
+        _valueMap[elm] = _valueFromInput(elm);
       };
       elm.onChange.listen(l);
       elm.onKeyUp.listen(l);
@@ -253,10 +281,12 @@ class ValidatingForm {
       elm.classes
         ..add(v.valid ? 'valid' : 'invalid')
         ..add('initial');
-      elm.onChange.listen((Event e) => _checkElement(elm));
+      elm.onChange.listen((Event e) => checkElement(elm));
     });
 
-    element.classes.add('initial');
+    if (initial) {
+      element.classes.add('initial');
+    }
     _updateFormValidStatus();
   }
 
@@ -264,13 +294,13 @@ class ValidatingForm {
     var inputs = element.querySelectorAll('input:not([type=submit]), textarea');
     inputs.forEach((InputElement elm) {
       if (_valueMap[elm] != elm.value) {
-        _checkElement(elm);
+        checkElement(elm);
       }
       _valueMap[elm] = elm.value;
     });
     var selects = element.querySelectorAll('select');
-    selects.forEach(_checkElement);
-    _checkElement(element);
+    selects.forEach(checkElement);
+    checkElement(element);
     if (initial) {
       _infoBoxMap.forEach((Element e, InfoBox i) {
         i.remove();
@@ -283,7 +313,7 @@ class ValidatingForm {
     }
   }
 
-  void _checkElement(Element elm) {
+  void checkElement(Element elm) {
     elm.classes.remove('initial');
     element.classes.remove('initial');
     var v = new Validator(elm);
