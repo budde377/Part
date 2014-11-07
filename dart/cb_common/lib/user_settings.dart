@@ -235,6 +235,27 @@ class UserSettingsMailInitializer extends core.Initializer {
       return li;
     };
 
+    var domainSelect = addAddressForm.querySelector("select[name=domain]");
+
+    new Validator(domainSelect).addValueValidator((String s) => mailDomainLibrary[s] != null);
+
+    domainCreateFunctions.add((MailDomain d){
+      var o = new OptionElement();
+      o.text = o.value = d.domainName;
+      domainSelect.append(o);
+      sortSelectOptionsByValue(domainSelect);
+    });
+
+
+    domainDeleteFunctions.add((MailDomain d){
+      if(d.domainName == domainSelect.value){
+        domainSelect.value = "";
+        domainSelect.dispatchEvent(new Event("change"));
+      }
+     domainSelect.children.removeWhere((OptionElement o) => o.value == d.domainName);
+    });
+
+
 
     var updateUserListHidden = () => userList.hidden = userList.children.length == 0;
 
@@ -402,7 +423,6 @@ class UserSettingsMailInitializer extends core.Initializer {
     var resetFrom = resetSelect(selectFrom);
     var resetTo = resetSelect(selectTo);
 
-    var optionSorter = (OptionElement o1, OptionElement o2) => o1.value.compareTo(o2.value);
 
     domainFunctions.add((MailDomain domain) {
 
@@ -413,20 +433,20 @@ class UserSettingsMailInitializer extends core.Initializer {
 
         } else {
           selectFrom.append(optionFromDomain(domain));
-          sortChildren(selectFrom, optionSorter);
+          sortSelectOptionsByValue(selectFrom);
         }
       });
     });
 
     domainCreateFunctions.add((MailDomain domain) {
       selectTo.append(optionFromDomain(domain));
-      sortChildren(selectTo, optionSorter);
+      sortSelectOptionsByValue(selectTo);
       if (domain.aliasTarget != null) {
         return;
       }
 
       selectFrom.append(optionFromDomain(domain));
-      sortChildren(selectFrom, optionSorter);
+      sortSelectOptionsByValue(selectFrom);
 
     });
 
@@ -504,6 +524,10 @@ class UserSettingsMailInitializer extends core.Initializer {
     (e1.dataset.containsKey(key) ? e1.dataset[key] : "").compareTo(e2.dataset.containsKey(key) ? e2.dataset[key] : ""));
 
 
+  }
+
+  void sortSelectOptionsByValue(SelectElement s){
+    sortChildren(s, (OptionElement o1, OptionElement o2) => o1.value.compareTo(o2.value) );
   }
 
   void sortChildren(Element element, int sort(Element e1, Element e2)) {

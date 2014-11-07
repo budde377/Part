@@ -111,7 +111,7 @@ class AJAXLogger extends Logger {
 
   Stream<LogEntry> get onLog => _onLogStream;
 
-  FutureResponse<Logger> log(int level, String message, [Map context = null]) {
+  FutureResponse<DateTime> log(int level, String message, [Map context = null]) {
     context = context == null ? [] : context;
     var c = new Completer<Response<DateTime>>();
     var fd = new FormData();
