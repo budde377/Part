@@ -21,7 +21,7 @@ interface AddressLibrary extends JSONObjectSerializable {
      * @param string $localPart
      * @return bool
      */
-    public function hasAddress($localPart);
+    public function hasAddressWithLocalPart($localPart);
 
     /**
      * Gets a address from the given address. Null if not found.

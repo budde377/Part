@@ -1,6 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\test;
 
+use ChristianBudde\cbweb\util\file\DumpFile;
 use ChristianBudde\cbweb\util\file\LogFileImpl;
 
 use ChristianBudde\cbweb\util\file\FolderImpl;
@@ -111,7 +112,7 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testLogWillReturnNull()
     {
-        $this->assertNull($this->logFile->log("SOME MSG", 2));
+        $this->assertLessThanOrEqual(time(), $this->logFile->log("SOME MSG", 2));
     }
 
     public function testLogWillReturnDumpFile()
@@ -185,12 +186,13 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testClearWillDeleteDumpFiles()
     {
-        $f = $this->logFile->log("SOME MSG", 1, $d);
+        /** @var $d DumpFile */
+        $this->logFile->log("SOME MSG", 1, $d);
         $this->dumpFile = $d;
-            $f->writeSerialized([1, 2, 3]);
-        $this->assertTrue($f->exists());
+        $d->writeSerialized([1, 2, 3]);
+        $this->assertTrue($d->exists());
         $this->logFile->clearLog();
-        $this->assertFalse($f->exists());
+        $this->assertFalse($d->exists());
     }
 
 
@@ -200,13 +202,15 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
         $this->dumpFile = $d;
         $logfile = new LogFileImpl($this->logFile->getAbsoluteFilePath());
         $dl = $logfile->listLog();
-        /** @var \ChristianBudde\cbweb\util\file\DumpFile $d2 */
+        /** @var DumpFile $d2 */
+        /** @var DumpFile $d */
         $d2 = $dl[0]["dumpfile"];
         $this->assertEquals($d->getAbsoluteFilePath(), $d2->getAbsoluteFilePath());
     }
 
     public function testClearLogWithNewInstanceOfLogFile()
     {
+        /** @var DumpFile $d */
         $this->logFile->log("LOL", 4, $d);
         $logfile = new LogFileImpl($this->logFile->getAbsoluteFilePath());
         $logfile->clearLog();

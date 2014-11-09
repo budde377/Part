@@ -123,8 +123,8 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
     public function testHasAddressWillReturnRightBool()
     {
-        $this->assertTrue($this->addressLibrary->hasAddress('test'));
-        $this->assertFalse($this->addressLibrary->hasAddress('non-existing'));
+        $this->assertTrue($this->addressLibrary->hasAddressWithLocalPart('test'));
+        $this->assertFalse($this->addressLibrary->hasAddressWithLocalPart('non-existing'));
 
     }
 
@@ -180,8 +180,8 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
     {
         $a = $this->addressLibrary->getAddress('test');
         $a->setLocalPart('test3');
-        $this->assertTrue($this->addressLibrary->hasAddress('test3'));
-        $this->assertFalse($this->addressLibrary->hasAddress('test'));
+        $this->assertTrue($this->addressLibrary->hasAddressWithLocalPart('test3'));
+        $this->assertFalse($this->addressLibrary->hasAddressWithLocalPart('test'));
     }
 
     public function testRenameIsOkWRTList()
@@ -228,7 +228,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
     public function testHasAddressLocalPartWillBeTrimmed()
     {
 
-        $this->assertTrue($this->addressLibrary->hasAddress('test '));
+        $this->assertTrue($this->addressLibrary->hasAddressWithLocalPart('test '));
     }
     public function testReturnsRightJSONObject(){
         $this->assertEquals($o = new MailAddressLibraryObjectImpl($this->addressLibrary), $this->addressLibrary->jsonObjectSerialize());
