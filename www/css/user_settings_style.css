@@ -763,20 +763,6 @@ form.initial input.invalid {
     margin: 0;
 }
 
-/*#UserSettingsContent .floating_list > li.add {
-    border: 1px solid transparent;
-    height: 26px;
-    width: 26px;
-    background: #fff url("/_common/img/add_icon_16.png") scroll no-repeat center center;
-    opacity: 0;
-    -webkit-transition: opacity 0.3s;
-    -moz-transition: opacity 0.3s;
-    -ms-transition: opacity 0.3s;
-    -o-transition: opacity 0.3s;
-    transition: opacity 0.3s;
-    cursor: pointer;
-}
-*/
 #UserSettingsContent .floating_list:hover > li.add {
     opacity: 0.5;
 }
@@ -970,3 +956,7 @@ form.initial input.invalid {
 }
 
 
+#UserSettingsEditMailAddressLists{
+    float: left;
+    list-style-type: none;
+}

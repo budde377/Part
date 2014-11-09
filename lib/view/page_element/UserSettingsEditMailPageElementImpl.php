@@ -85,7 +85,9 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         </form>
         </div>
         <h3>Adresser</h3>
-        {$this->getAddressList()}
+        <ul id='UserSettingsEditMailAddressLists'>
+            {$this->getAddressList()}
+        </ul>
         <div class='mail_form expandable'>
         <form id='UserSettingsEditMailAddAddressForm'  data-function-string='MailDomainLibrary.domains[domain].aliasLibrary.createAlias(local_part)'>
             <div hidden>
@@ -219,7 +221,9 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             $addresses = $addressLibrary->listAddresses();
 
             $hidden = count($addresses) ? "" : "hidden";
-            $result .= "<ul id='UserSettingsEditMailAddressList{$domain->getDomainName()}' class='floating_list has_deletable address_list' data-domain='{$domain->getDomainName()}' $hidden>";
+            $result .= "
+            <li>
+                <ul data-domain-name='{$domain->getDomainName()}' class='floating_list has_deletable address_list' data-domain='{$domain->getDomainName()}' $hidden>";
             foreach ($addresses as $address) {
                 $result .= $this->getAddressElement($address, $domain);
                 $addressesFound = true;
@@ -229,12 +233,19 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
                 $result .= $this->getAddressElement($addressLibrary->getCatchallAddress(), $domain, " class='catchall'");
             }
 
-            $result .= "</ul>";
+            $result .= "
+                </ul>
+            </li>";
         }
 
         $hideNoResult = !$addressesFound ? "" : "hidden";
 
-        $result .= "<ul class='floating_list' $hideNoResult><li class='empty_list'>Der er ingen addresser</li> </ul>";
+        $result .= "
+        <li>
+            <ul class='floating_list' $hideNoResult>
+                <li class='empty_list'>Der er ingen addresser</li>
+            </ul>
+        </li>";
 
         return $result;
     }
