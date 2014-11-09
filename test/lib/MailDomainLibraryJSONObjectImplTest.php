@@ -8,6 +8,7 @@
 namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\controller\json\MailDomainLibraryObjectImpl;
+use ChristianBudde\cbweb\test\stub\StubMailDomainImpl;
 use ChristianBudde\cbweb\test\stub\StubMailDomainLibraryImpl;
 use PHPUnit_Framework_TestCase;
 
@@ -19,7 +20,7 @@ class MailDomainLibraryJSONObjectImplTest extends PHPUnit_Framework_TestCase
     {
 
         $domain = new StubMailDomainLibraryImpl();
-        $domain->setDomainList($l = [1,2,3]);
+        $domain->setDomainList($l = ["test" => new StubMailDomainImpl(true, "test")]);
         $o = new MailDomainLibraryObjectImpl($domain);
         $this->assertEquals('mail_domain_library', $o->getName());
         $this->assertEquals($l, $o->getVariable('domains'));
