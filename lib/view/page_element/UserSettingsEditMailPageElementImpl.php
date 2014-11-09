@@ -30,27 +30,23 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
     public function generateContent()
     {
 
-        $userForm = $this->getPageUserList();
-
-        $userForm = $userForm ==""?"":"
-            <label>
-                Vælg brugere
-            </label>
-            <ul class='owner_check_list'>
-                $userForm
-            </ul>";
-
+        $ownerCheckList = $this->getPageUserList();
+        $ownerCheckListHidden = $ownerCheckList == ""?"hidden":"";
 
         $out = "
         <h3>Domæner</h3>
         <ul class='floating_list has_deletable' id='UserSettingsEditMailDomainList'>
             {$this->getDomainList()}
         </ul>
-        <form id='UserSettingsEditMailAddDomainForm' class='mail_form expandable' data-function-string='MailDomainLibrary.createDomain(domain_name,super_password)'>
-            <div>
+        <div class='mail_form expandable'>
+        <form id='UserSettingsEditMailAddDomainForm'  data-function-string='MailDomainLibrary.createDomain(domain_name,super_password)'>
+            <div hidden>
+                <input type='text' />
+                <input type='password'/>
+            </div>
             <label>
                 Domæne
-                <input type='text' name='domain_name' data-validator-method='pattern' data-pattern='[a-z0-9-_\\.]+\\.[a-z]{2,}' data-error-message='Ugyldig domæne'/>
+                <input type='text' name='domain_name' data-validator-method='pattern' data-pattern='^[a-z0-9-_\\.]+\\.[a-z]{2,}$' data-error-message='Ugyldig domæne'/>
             </label>
             <label>
                 Super-kodeord
@@ -58,53 +54,64 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             </label>
 
             <div class='submit'>
-            <input type='submit' value='Opret Alias'/>
-            </div>
+            <input type='submit' value='Opret Domæne'/>
             </div>
         </form>
+        </div>
         <h3>Domæne alias</h3>
         <ul class='floating_list points_to has_deletable' id='UserSettingsEditMailDomainAliasList'>
             {$this->getMailAliasList()}
         </ul>
-        <form id=\"UserSettingsEditMailAddDomainAliasForm\" class=' mail_form expandable'  data-function-string='MailDomainLibrary.domains[from].addAliasTarget(to)'>
-            <div>
+                <div class='mail_form expandable'>
+
+        <form id=\"UserSettingsEditMailAddDomainAliasForm\"  data-function-string='MailDomainLibrary.domains[from].addAliasTarget(to)'>
             <label>
                 Domæne
-                <select name='from'>
+                <select name='from' data-validator-method='non-empty'>
+                    <option value=''>--Domæne--</option>
                     {$this->getDomainOptions(true)}
                 </select>
             </label>
             <label>
                 Peger på
-                <select  name='to'>
-
+                <select  name='to' data-validator-method='non-empty'>
+                    <option value=''>--Domæne--</option>
                     {$this->getDomainOptions()}
                 </select>
             </label>
             <div class='submit'>
             <input type='submit' value='Opret Alias'/>
             </div>
-            </div>
         </form>
+        </div>
         <h3>Adresser</h3>
         {$this->getAddressList()}
-        <form id='UserSettingsEditMailAddAddressForm' class='mail_form expandable' data-function-string='MailDomainLibrary.domains[domain].aliasLibrary.createAlias(local_part)'>
-            <div>
-            <label>
+        <div class='mail_form expandable'>
+        <form id='UserSettingsEditMailAddAddressForm'  data-function-string='MailDomainLibrary.domains[domain].aliasLibrary.createAlias(local_part)'>
+            <div hidden>
+                <input type='text' />
+                <input type='password'/>
+            </div>            <label>
                 Navn (tom for catchall addresse)
-                <input type='text' name='local_part'>
+                <input type='text' name='local_part' data-validator-method='pattern' data-pattern='^[a-z0-9\\._-]*$' data-error-message='Ugyldig addresse'>
             </label>
             <span class='at'>@</span>
             <label>
                 Domæne
-                <select name='domain'>
+                <select name='domain' data-validator-method='non-empty'>
+                    <option value=''>--Domæne--</option>
                     {$this->getDomainOptions()}
                 </select>
             </label>
-            $userForm
+            <label>
+                Vælg brugere
+            </label>
+            <ul class='owner_check_list' id='UserSettingsEditMailAddAddressUserCheckList' $ownerCheckListHidden>
+                $ownerCheckList
+            </ul>
             <label class='long_input'>
-                Vidersend til (komma separeret liste)
-                <input type='text' name='targets' />
+                Vidersend til (mellemrums separeret liste)
+                <input type='text' name='targets' data-error-message='Skal være liste af gyldige email addresser'/>
             </label>
             <input type='checkbox' class='pretty_checkbox' id='UserSettingsEditMailAddAddressAddMailboxCheckbox' name='add_mailbox' value='1'/>
             <label for='UserSettingsEditMailAddAddressAddMailboxCheckbox' class='long_input'>
@@ -113,15 +120,15 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             <div>
             <label>
             Navn
-            <input type='text' name='mailbox_owner_name' />
+            <input type='text' name='mailbox_owner_name' data-error-message='Der skal angives et navn' />
             </label>
             <label>
             Mailbox kodeord
-            <input type='password' name='mailbox_password' />
+            <input type='password' name='mailbox_password'  data-error-message='Kodeordet må ikke være tomt'/>
             </label>
             <label>
             Bekræft kodeord
-            <input type='password' name='mailbox_password_2' />
+            <input type='password' name='mailbox_password_2' data-error-message='Kodeordet skal gengives korrekt'/>
             </label>
 
             </div>
@@ -130,12 +137,11 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
 
 
             </div>
-            </div>
 
         </form>
+        </div>
         ";
 
-        //TODO: style empty lists
 
         return $out;
 
@@ -151,9 +157,9 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             <li
             data-last-modified='{$domain->lastModified()}'
             data-description='{$domain->getDescription()}'
-            data-active='".($domain->isActive()?'true':'false')."'
+            data-active='" . ($domain->isActive() ? 'true' : 'false') . "'
             data-domain-name='{$domain->getDomainName()}'
-            data-alias-target='".($domain->isAliasDomain()?$domain->getAliasTarget()->getDomainName():"")."'>
+            data-alias-target='" . ($domain->isAliasDomain() ? $domain->getAliasTarget()->getDomainName() : "") . "'>
                 {$domain->getDomainName()}$deleteElement
             </li>
             ";
@@ -212,7 +218,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             $addressLibrary = $domain->getAddressLibrary();
             $addresses = $addressLibrary->listAddresses();
 
-            $hidden = count($addresses)?"":"hidden";
+            $hidden = count($addresses) ? "" : "hidden";
             $result .= "<ul id='UserSettingsEditMailAddressList{$domain->getDomainName()}' class='floating_list has_deletable address_list' data-domain='{$domain->getDomainName()}' $hidden>";
             foreach ($addresses as $address) {
                 $result .= $this->getAddressElement($address, $domain);
@@ -226,7 +232,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             $result .= "</ul>";
         }
 
-        $hideNoResult = !$addressesFound?"":"hidden";
+        $hideNoResult = !$addressesFound ? "" : "hidden";
 
         $result .= "<ul class='floating_list' $hideNoResult><li class='empty_list'>Der er ingen addresser</li> </ul>";
 
@@ -248,7 +254,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         $deleteElement = $this->currentUser != null && ($address->isOwner($this->currentUser) || $this->currentUser->getUserPrivileges()->hasSitePrivileges()) ?
             "<div class='delete'></div>" : "";
 
-        $lp = $address->getLocalPart() == ""?"<span class='asterisk'>*</span>":$address->getLocalPart();
+        $lp = $address->getLocalPart() == "" ? "<span class='asterisk'>*</span>" : $address->getLocalPart();
         return "<li $attributes>
                     {$lp}@{$domain->getDomainName()}$deleteElement
                             </li>";
@@ -257,8 +263,8 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
     private function getDomainOptions($from = false)
     {
         $result = "";
-        foreach($this->mailDomainLibrary->listDomains() as $domain){
-            if($from && $domain->isAliasDomain()){
+        foreach ($this->mailDomainLibrary->listDomains() as $domain) {
+            if ($from && $domain->isAliasDomain()) {
                 continue;
             }
             $result .= "
@@ -278,15 +284,15 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         $result = "";
         $i = 0;
 
-        foreach($this->backendContainer->getUserLibraryInstance()->listUsers() as $user){
+        foreach ($this->backendContainer->getUserLibraryInstance()->listUsers() as $user) {
             $privileges = $user->getUserPrivileges();
-            if($privileges->hasSitePrivileges()){
-               continue;
+            if ($privileges->hasSitePrivileges()) {
+                continue;
             }
             $result .= "
-                       <li>
-                    <input type='checkbox' id='UserSettingsEditMailAddAddressFormAddUserCheck$i' data-function-string='.addOwner(_this)' name='user_$i' value='{$user->getUsername()}'/>
-                    <label for='UserSettingsEditMailAddAddressFormAddUserCheck$i'>
+                       <li  data-user-name='{$user->getUsername()}' >
+                    <input type='checkbox' id='UserSettingsEditMailAddAddressFormAddUserCheck{$user->getUsername()}' data-function-string='.addOwner(_this)' name='user_{$user->getUsername()}' value='{$user->getUsername()}'/>
+                    <label for='UserSettingsEditMailAddAddressFormAddUserCheck{$user->getUsername()}'>
                         {$user->getUsername()}
                     </label>
                 </li>";

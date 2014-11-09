@@ -27,11 +27,11 @@ class LoggerImpl implements Logger
      *
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function emergency($message, array $context = array())
     {
-        $this->log(Logger::LOG_LEVEL_EMERGENCY, $message, $context);
+        return $this->log(Logger::LOG_LEVEL_EMERGENCY, $message, $context);
     }
 
     /**
@@ -42,11 +42,11 @@ class LoggerImpl implements Logger
      *
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function alert($message, array $context = array())
     {
-        $this->log(Logger::LOG_LEVEL_ALERT, $message, $context);
+        return $this->log(Logger::LOG_LEVEL_ALERT, $message, $context);
     }
 
     /**
@@ -56,11 +56,11 @@ class LoggerImpl implements Logger
      *
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function critical($message, array $context = array())
     {
-        $this->log(Logger::LOG_LEVEL_CRITICAL, $message, $context);
+        return $this->log(Logger::LOG_LEVEL_CRITICAL, $message, $context);
     }
 
     /**
@@ -69,11 +69,11 @@ class LoggerImpl implements Logger
      *
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function error($message, array $context = array())
     {
-        $this->log(Logger::LOG_LEVEL_ERROR, $message, $context);
+        return $this->log(Logger::LOG_LEVEL_ERROR, $message, $context);
     }
 
     /**
@@ -84,11 +84,11 @@ class LoggerImpl implements Logger
      *
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function warning($message, array $context = array())
     {
-        $this->log(Logger::LOG_LEVEL_WARNING, $message, $context);
+        return $this->log(Logger::LOG_LEVEL_WARNING, $message, $context);
     }
 
     /**
@@ -96,11 +96,11 @@ class LoggerImpl implements Logger
      *
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function notice($message, array $context = array())
     {
-        $this->log(Logger::LOG_LEVEL_NOTICE, $message, $context);
+        return $this->log(Logger::LOG_LEVEL_NOTICE, $message, $context);
     }
 
     /**
@@ -110,11 +110,11 @@ class LoggerImpl implements Logger
      *
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function info($message, array $context = array())
     {
-        $this->log(Logger::LOG_LEVEL_INFO, $message, $context);
+        return $this->log(Logger::LOG_LEVEL_INFO, $message, $context);
     }
 
     /**
@@ -122,11 +122,11 @@ class LoggerImpl implements Logger
      *
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function debug($message, array $context = array())
     {
-        $this->log(Logger::LOG_LEVEL_DEBUG, $message, $context);
+        return $this->log(Logger::LOG_LEVEL_DEBUG, $message, $context);
     }
 
     /**
@@ -135,14 +135,19 @@ class LoggerImpl implements Logger
      * @param mixed $level
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function log($level, $message, array $context = array())
     {
-        $dumpFile = $this->logFile->log($message, $level, $context != []);
-        if ($dumpFile != null) {
+        if($context != []){
+            $t = $this->logFile->log($message, $level, $dumpFile);
             $dumpFile->writeSerialized($context);
+        } else {
+            $t = $this->logFile->log($message, $level);
         }
+
+        return $t;
+
     }
 
     /**

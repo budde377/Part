@@ -7,21 +7,24 @@ class LazyMap<K, V> implements Map<K, V> {
   List<K> _keys;
   Function _generator;
 
+  bool _frozen = false;
+
 
   LazyMap.fromGenerator(Iterable<K> keys, V generator(K)): _keys = keys.toList(), _generator = generator;
 
 
-  bool containsValue(Object value) {
-    return _cache.containsValue(value) || _keys.fold(false, (bool prev, K key) => prev || this[key] == value);
-  }
+  bool containsValue(Object value) => _cache.containsValue(value) || _keys.fold(false, (bool prev, K key) => prev || _generate(key) == value);
 
-  bool containsKey(Object key) => _keys.contains(key);
+  bool containsKey(Object key) => keys.contains(key);
 
   V putIfAbsent(K key, V ifAbsent()) => _cache.putIfAbsent(key, ifAbsent);
 
-  void addAll(Map<K, V> other) => _cache.addAll(other);
+  void addAll(Map<K, V> other) {
+    _cache.addAll(other);
+  }
 
   V remove(Object key) {
+
     _generate(key);
     _keys.remove(key);
     return _cache.remove(key);
@@ -34,8 +37,8 @@ class LazyMap<K, V> implements Map<K, V> {
   }
 
   void forEach(void f(K key, V value)) {
-    keys.forEach((K e){
-      f(e, this[e]);
+    keys.forEach((K e) {
+      f(e, _generate(e));
     });
 
   }
@@ -53,10 +56,10 @@ class LazyMap<K, V> implements Map<K, V> {
   }
 
   V _generate(Object object) {
-    if(_cache.containsKey(object)){
+    if (_cache.containsKey(object)) {
       return _cache[object];
     }
-    if(!_keys.contains(object)){
+    if (!_keys.contains(object)) {
       return null;
     }
     return _cache[object] = _generator(object);
@@ -74,9 +77,5 @@ class LazyMap<K, V> implements Map<K, V> {
     _cache[key] = value;
   }
 
-  LazyMap<K,V> clone(){
-    var m = new LazyMap.fromGenerator(keys, _generator);
-    m.addAll(_cache);
-    return m;
-  }
 }
+

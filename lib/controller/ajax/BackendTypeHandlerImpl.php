@@ -6,7 +6,6 @@ use ChristianBudde\cbweb\model\mail\Address;
 use ChristianBudde\cbweb\model\mail\Mailbox;
 use ChristianBudde\cbweb\model\updater\Updater;
 use ChristianBudde\cbweb\model\user\UserPrivileges;
-use ChristianBudde\cbweb\test\JSONResponseImplTest;
 use ChristianBudde\cbweb\util\file\File;
 use ChristianBudde\cbweb\util\file\FileImpl;
 use ChristianBudde\cbweb\controller\function_string\ParserImpl;
@@ -801,8 +800,10 @@ class BackendTypeHandlerImpl implements TypeHandler
             'getAliasTarget',
             'clearAliasTarget',
             'getDomainLibrary');
-        $server->registerHandler($handler);
+
         $handler->addGetInstanceFunction('MailDomain');
+
+        $server->registerHandler($handler);
         $handler->addFunctionAuthFunction('MailDomain', 'clearAliasTarget', $this->sitePrivilegesFunction);
         $handler->addFunctionAuthFunction('MailDomain', 'setAliasTarget', $this->sitePrivilegesFunction);
         $handler->addFunctionAuthFunction('MailDomain', 'setDescription', $this->sitePrivilegesFunction);

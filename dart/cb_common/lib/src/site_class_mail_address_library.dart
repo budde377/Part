@@ -26,7 +26,7 @@ abstract class MailAddressLibrary {
 
   Stream<MailAddress> get onDelete;
 
-  operator [] (String key);
+  MailAddress operator [] (String key);
 
 }
 
@@ -94,11 +94,7 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
 
   bool get hasCatchallAddress => _addresses.containsKey("");
 
-  Map<String, MailAddress> get addresses {
-    var addresses = _addresses.clone();
-    addresses.remove("");
-    return addresses;
-  }
+  Map<String, MailAddress> get addresses => _addresses;
 
   FutureResponse<MailAddress> createAddress(String localPart, {List<User> owners, List<String> target}) {
     var completer = new Completer();
@@ -201,6 +197,6 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
 
   Stream<MailAddress> get onDelete => _onDeleteController.stream.asBroadcastStream();
 
-  operator [] (String key) => addresses[key];
+  MailAddress operator [] (String key) => addresses[key];
 
 }

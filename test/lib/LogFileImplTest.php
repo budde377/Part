@@ -116,14 +116,14 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testLogWillReturnDumpFile()
     {
-        $this->dumpFile = $this->logFile->log("MSG", 2, true);
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\util\\file\\DumpFileImpl", $this->dumpFile);
-
+        $this->logFile->log("MSG", 2, $dumpFile);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\util\\file\\DumpFileImpl", $dumpFile);
+        $this->dumpFile = $dumpFile;
     }
 
     public function testListLogWillContainDumpFile()
     {
-        $d = $this->logFile->log("Some msg", 2, true);
+        $this->logFile->log("Some msg", 2, $d);
         $ar = $this->logFile->listLog();
         $ar1 = $ar[0];
         $this->assertArrayHasKey("dumpfile", $ar1);
@@ -135,7 +135,7 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testListLogDumpFileAndReuseInstance()
     {
-        $d = $this->logFile->log("Some msg", 2, true);
+        $this->logFile->log("Some msg", 2, $d);
         $ar = $this->logFile->listLog();
         $ar1 = $ar[0];
         $this->assertTrue($d === $ar1["dumpfile"]);
@@ -185,8 +185,9 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testClearWillDeleteDumpFiles()
     {
-        $this->dumpFile = $f = $this->logFile->log("SOME MSG", 1, true);
-        $f->writeSerialized([1, 2, 3]);
+        $f = $this->logFile->log("SOME MSG", 1, $d);
+        $this->dumpFile = $d;
+            $f->writeSerialized([1, 2, 3]);
         $this->assertTrue($f->exists());
         $this->logFile->clearLog();
         $this->assertFalse($f->exists());
@@ -195,7 +196,7 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testAbsolutePathIsTheSameWithNewInstanceOfLogFile()
     {
-        $d = $this->logFile->log("LOL", 4, true);
+        $this->logFile->log("LOL", 4, $d);
         $this->dumpFile = $d;
         $logfile = new LogFileImpl($this->logFile->getAbsoluteFilePath());
         $dl = $logfile->listLog();
@@ -206,10 +207,11 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testClearLogWithNewInstanceOfLogFile()
     {
-        $d = $this->logFile->log("LOL", 4, true);
+        $this->logFile->log("LOL", 4, $d);
         $logfile = new LogFileImpl($this->logFile->getAbsoluteFilePath());
         $logfile->clearLog();
         $this->assertFalse($d->exists());
+        $this->dumpFile = $d;
 
     }
 

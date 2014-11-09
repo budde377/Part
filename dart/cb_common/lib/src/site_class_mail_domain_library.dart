@@ -13,7 +13,7 @@ abstract class MailDomainLibrary {
 
   Stream<MailDomain> get onDelete;
 
-  operator [] (String key);
+  MailDomain operator [] (String key);
 
 }
 
@@ -46,7 +46,7 @@ class AJAXMailDomainLibrary implements MailDomainLibrary {
   }
 
 
-  Map<String, MailDomain> get domains => _domains.clone();
+  Map<String, MailDomain> get domains => _domains;
 
   FutureResponse<MailDomain> createDomain(String domainName, String password) {
     var completer = new Completer();
@@ -95,6 +95,6 @@ class AJAXMailDomainLibrary implements MailDomainLibrary {
 
   Stream<MailDomain> get onDelete => _onDeleteStream == null?_onDeleteStream = _onDeleteController.stream.asBroadcastStream():_onDeleteStream;
 
-  operator [] (String key) => domains[key];
+  MailDomain operator [] (String key) => domains[key];
 
 }

@@ -99,42 +99,462 @@ class UserSettingsInitializer extends core.Initializer {
 
 class UserSettingsMailInitializer extends core.Initializer {
 
-  Map<MailDomain, LIElement> _domainLIMap = new Map<MailDomain, LIElement>();
-
   UListElement mailDomainList = querySelector("#UserSettingsEditMailDomainList");
 
   UListElement domainAliasList = querySelector("#UserSettingsEditMailDomainAliasList");
 
   FormElement addDomainForm = querySelector("#UserSettingsEditMailAddDomainForm");
 
+  FormElement addDomainAliasForm = querySelector("#UserSettingsEditMailAddDomainAliasForm");
+
+  FormElement addAddressForm = querySelector("#UserSettingsEditMailAddAddressForm");
+
 
   bool get canBeSetUp => mailDomainLibraryAvailable && mailDomainList != null && domainAliasList != null && mailDomainLibrary.domains.length == addressList.length;
 
   ElementList<UListElement> get addressList => querySelectorAll("#UserSettingsContent > ul > li > ul.address_list");
 
+  /** Functions  that should be called on every domain, now and in the future **/
+  List<Function> domainFunctions = [];
+  List<Function> domainCreateFunctions = [];
+  List<Function> domainDeleteFunctions = [];
+
   void setUp() {
 
     setUpMailDomainList();
-
     setUpAddDomainForm();
+    setUpAddDomainAliasForm();
+    setUpDomainAliasList();
+
+    setUpAddAddressForm();
+
+    setUpListeners();
+
+
   }
 
-  void setUpAddDomainForm(){
-    if(addDomainForm == null){
+  void setUpAddAddressForm() {
+    if (addAddressForm == null) {
+      return;
+    }
+
+    var vForm = new ValidatingForm(addAddressForm);
+    var formH = vForm.formHandler;
+
+    InputElement local_part = addAddressForm.querySelector('input[name=local_part]');
+
+    new Validator(local_part).addValueValidator((String s) => !mailDomainLibrary.domains.containsKey(s));
+
+    InputElement target_input = addAddressForm.querySelector('input[name=targets]');
+    var v = new Validator<InputElement>(target_input);
+    v
+      ..addValidator((InputElement e) => e.value.split(" ").fold(true, (bool prev, String s) => prev && (s == "" || core.validMail(s.trim()))));
+
+    target_input.onChange.listen((_) {
+      if (!v.valid) {
+        return;
+      }
+      var values = target_input.value.split(" ");
+      values.removeWhere((String s) => s.isEmpty);
+      target_input.value = values.join(" ");
+    });
+
+    CheckboxInputElement mailbox_checkbox = addAddressForm.querySelector('#UserSettingsEditMailAddAddressAddMailboxCheckbox');
+    TextInputElement mailbox_name = addAddressForm.querySelector('input[name=mailbox_owner_name]');
+    PasswordInputElement mailbox_password_input_1 = addAddressForm.querySelector('input[name=mailbox_password]');
+    PasswordInputElement mailbox_password_input_2 = addAddressForm.querySelector('input[name=mailbox_password_2]');
+
+
+    var v1 = new Validator<TextInputElement>(mailbox_name);
+    v1.addValueValidator((String s) => !mailbox_checkbox.checked || s != "");
+    var v2 = new Validator<PasswordInputElement>(mailbox_password_input_1);
+    v2.addValueValidator((String s) => !mailbox_checkbox.checked || s != "");
+    var v3 = new Validator<PasswordInputElement>(mailbox_password_input_2);
+    v3.addValueValidator((String s) => !mailbox_checkbox.checked || s == mailbox_password_input_1.value);
+    new Validator<CheckboxInputElement>(mailbox_checkbox).addValidator((_) => !mailbox_checkbox.checked || (v1.valid && v2.valid && v3.valid));
+    mailbox_checkbox.onChange.listen((_) {
+      if(mailbox_checkbox.checked){
+        return;
+      }
+      v1.check();
+      v2.check();
+      v3.check();
+    });
+
+    var userList = querySelector("#UserSettingsEditMailAddAddressUserCheckList");
+
+    var updateUserLI = (User u, LIElement li, LabelElement label, CheckboxInputElement checkbox) {
+      li.dataset['user-name'] = u.username;
+      checkbox
+        ..id = label.attributes['for'] = "UserSettingsEditMailAddAddressFormAddUserCheck" + u.username
+        ..name = "user_${u.username}"
+        ..value = label.text = u.username;
+    };
+
+    var addUserLiCheckboxListener = (User u, LIElement li, [LabelElement label = null, CheckboxInputElement checkbox=null]) {
+      label = label == null ? li.querySelector("label") : label;
+      checkbox = checkbox == null ? li.querySelector("input[type=checkbox]") : checkbox;
+
+      u.onChange.listen((_) {
+        if (u.privileges != User.PRIVILEGE_PAGE) {
+          li.remove();
+          return;
+        }
+        updateUserLI(u, li, label, checkbox);
+        if (li.parent == null) {
+          userList.append(li);
+          sortListFromDataSet(userList, 'user-name');
+        }
+
+      });
+
+    };
+
+    var userLICheckBox = (User u) {
+
+      var li = userList.children.firstWhere((LIElement li) => li.dataset['user-name'] == u.username, orElse:() => null);
+
+      if (li != null) {
+
+        return li;
+      }
+
+
+      li = new LIElement();
+      li.dataset['user-name'] = u.username;
+      var checkbox = new CheckboxInputElement();
+      var label = new LabelElement();
+      li
+        ..append(checkbox)
+        ..append(label);
+
+      updateUserLI(u, li, label, checkbox);
+
+      addUserLiCheckboxListener(u, li, checkbox);
+
+      return li;
+    };
+
+    var domainSelect = addAddressForm.querySelector("select[name=domain]");
+
+    new Validator(domainSelect).addValueValidator((String s) => mailDomainLibrary[s] != null);
+
+    domainCreateFunctions.add((MailDomain d){
+      var o = new OptionElement();
+      o.text = o.value = d.domainName;
+      domainSelect.append(o);
+      sortSelectOptionsByValue(domainSelect);
+    });
+
+
+    domainDeleteFunctions.add((MailDomain d){
+      if(d.domainName == domainSelect.value){
+        domainSelect.value = "";
+        domainSelect.dispatchEvent(new Event("change"));
+      }
+     domainSelect.children.removeWhere((OptionElement o) => o.value == d.domainName);
+    });
+
+
+
+    var updateUserListHidden = () => userList.hidden = userList.children.length == 0;
+
+    userLibrary.users.forEach((_, User u) {
+      addUserLiCheckboxListener(u, userLICheckBox(u));
+    });
+
+    userLibrary.onChange.listen((UserLibraryChangeEvent evt) {
+      switch (evt.type) {
+        case UserLibraryChangeEvent.CHANGE_CREATE:
+          if (evt.user.hasSitePrivileges) {
+            break;
+          }
+          userList.append(userLICheckBox(evt.user));
+          sortListFromDataSet(userList, 'user-name');
+          updateUserListHidden();
+
+          break;
+        case UserLibraryChangeEvent.CHANGE_DELETE:
+
+
+          userLICheckBox(evt.user).remove();
+          updateUserListHidden();
+          break;
+      }
+
+    }
+
+    );
+
+
+  }
+
+  void setUpListeners() {
+    var cdf = (List<Function> l) => (MailDomain d) => l.forEach((Function f) {
+      f(d);
+    });
+    var df = cdf(domainFunctions);
+
+    mailDomainLibrary.domains.forEach((_, MailDomain domain) => df(domain));
+
+    domainCreateFunctions.add(df);
+
+    mailDomainLibrary.onCreate.listen(cdf(domainCreateFunctions));
+    mailDomainLibrary.onDelete.listen(cdf(domainDeleteFunctions));
+
+  }
+
+  void setUpDomainAliasList() {
+
+    var attachDeleteListener = (MailDomain domain, LIElement li, [DivElement delete = null]) {
+
+      if (delete == null && (delete = li.querySelector('.delete')) == null) {
+        return;
+      }
+
+      delete.onClick.listen((_) {
+        dialogContainer.confirm("Er du sikker på at du vil slette?").result.then((bool v) {
+          if (!v) {
+            return;
+          }
+          blurElement(domainAliasList);
+          domain.clearAliasTarget().then((_) {
+            unBlurElement(domainAliasList);
+          });
+        });
+      });
+      var targetDomain = domain.aliasTarget;
+
+      domain.onAliasTargetChange.listen((_) {
+        if (domain.aliasTarget == null) {
+          return;
+        }
+        li.children[2].text = li.dataset['to-domain'] = domain.aliasTarget.domainName;
+      });
+
+    };
+
+    var createLi = (MailDomain d) {
+      var li = domainAliasList.children.firstWhere((LIElement li) => li.dataset['from-domain'] == d.domainName, orElse:() => null);
+      if (li != null) {
+        attachDeleteListener(d, li);
+        return li;
+      }
+
+      li = new LIElement();
+
+      var divFrom = new DivElement();
+
+
+      var divArrow = new DivElement();
+      divArrow.classes.add('arrow');
+
+      var divTo = new DivElement();
+
+      var delete = new DivElement();
+      delete.classes.add('delete');
+
+      li
+        ..append(divFrom)
+        ..append(divArrow)
+        ..append(divTo)
+        ..append(delete);
+
+      li
+        ..dataset['from-domain'] = divFrom.text = d.domainName
+        ..dataset['to-domain'] = divTo.text = d.aliasTarget == null ? "" : d.aliasTarget.domainName;
+
+      attachDeleteListener(d, li, delete);
+      return li;
+    };
+
+
+    domainFunctions.add((MailDomain d) {
+      var li = createLi(d);
+      d.onAliasTargetChange.listen((_) {
+        if (d.aliasTarget == null) {
+          li.remove();
+        } else {
+          domainAliasList.append(li);
+          sortListFromDataSet(domainAliasList, 'from-domain');
+        }
+      });
+
+      d.onDelete.listen((_) {
+        li.remove();
+        domainAliasList.children.removeWhere((LIElement li) => li.dataset['to-domain'] == d.domainName);
+        sortListFromDataSet(domainAliasList, 'from-domain');
+      });
+
+    });
+
+
+  }
+
+  void setUpAddDomainAliasForm() {
+
+    if (addDomainAliasForm == null) {
+      return;
+    }
+
+    var vForm = new ValidatingForm(addDomainAliasForm);
+    var formH = vForm.formHandler;
+    var domainOptionCheck = (MailDomain domain) => (OptionElement elm) => elm.value == domain.domainName;
+    var optionFromDomain = (MailDomain domain) {
+      var option = new OptionElement();
+      option
+        ..text = domain.domainName
+        ..value = domain.domainName;
+      return option;
+    };
+
+
+    SelectElement selectFrom = addDomainAliasForm.querySelector("select[name=from]");
+    SelectElement selectTo = addDomainAliasForm.querySelector("select[name=to]");
+
+    var resetSelect = (SelectElement select) => ([String v = null]) {
+      if (v != null && v != select.value) {
+        return;
+      }
+      select.value = "";
+      select.dispatchEvent(new Event("change"));
+    };
+
+    var resetFrom = resetSelect(selectFrom);
+    var resetTo = resetSelect(selectTo);
+
+
+    domainFunctions.add((MailDomain domain) {
+
+      domain.onAliasTargetChange.listen((_) {
+        if (domain.aliasTarget != null) {
+          selectFrom.children.removeWhere(domainOptionCheck(domain));
+          resetFrom();
+
+        } else {
+          selectFrom.append(optionFromDomain(domain));
+          sortSelectOptionsByValue(selectFrom);
+        }
+      });
+    });
+
+    domainCreateFunctions.add((MailDomain domain) {
+      selectTo.append(optionFromDomain(domain));
+      sortSelectOptionsByValue(selectTo);
+      if (domain.aliasTarget != null) {
+        return;
+      }
+
+      selectFrom.append(optionFromDomain(domain));
+      sortSelectOptionsByValue(selectFrom);
+
+    });
+
+    domainDeleteFunctions.add((MailDomain domain) {
+      selectFrom.children.removeWhere(domainOptionCheck(domain));
+      selectTo.children.removeWhere(domainOptionCheck(domain));
+    });
+
+    selectFrom.onChange.listen((_) {
+
+      resetTo(selectFrom.value);
+
+      selectTo.children.forEach((OptionElement o) {
+        var to = mailDomainLibrary[o.value], from = mailDomainLibrary[selectFrom.value];
+        to = mailDomainLibrary[o.value];
+        from = mailDomainLibrary[selectFrom.value];
+        if (from == null || to == null) {
+          o.hidden = false;
+          return;
+        }
+
+        if (from == to) {
+          resetTo(o.value);
+          o.hidden = true;
+          return;
+        }
+
+        var t = to.aliasTarget;
+        while (t != null) {
+          if (t == from) {
+            resetTo(o.value);
+            o.hidden = true;
+            return;
+          }
+          t = t.aliasTarget;
+        }
+        o.hidden = false;
+      });
+    });
+
+    formH.submitFunction = (Map<String, String> map) {
+      var domain = mailDomainLibrary[selectFrom.value];
+      var domainTarget = mailDomainLibrary[selectTo.value];
+      if (domain == null || domainTarget == null) {
+        return true;
+      }
+      formH.blur();
+      domain.changeAliasTarget(domainTarget).thenResponse(onSuccess:(_) {
+        formH.changeNotion("Alias er oprettet", FormHandler.NOTION_TYPE_SUCCESS);
+        formH.unBlur();
+      }, onError:(core.Response response) {
+        formH.changeNotion(_errorMessage(response.error_code), FormHandler.NOTION_TYPE_ERROR);
+        formH.unBlur();
+      });
+      return true;
+    };
+
+  }
+
+  void sortListFromDataSet(UListElement ul, String key) {
+    var emptyListElement = ul.querySelector('.empty_list');
+
+    if (emptyListElement != null) {
+      if (ul.children.length == 1) {
+        emptyListElement.hidden = false;
+        return;
+      }
+      emptyListElement.hidden = true;
+    } else if (ul.children.isEmpty) {
+      return;
+    }
+
+    sortChildren(ul,
+        (Element e1, Element e2) =>
+    (e1.dataset.containsKey(key) ? e1.dataset[key] : "").compareTo(e2.dataset.containsKey(key) ? e2.dataset[key] : ""));
+
+
+  }
+
+  void sortSelectOptionsByValue(SelectElement s){
+    sortChildren(s, (OptionElement o1, OptionElement o2) => o1.value.compareTo(o2.value) );
+  }
+
+  void sortChildren(Element element, int sort(Element e1, Element e2)) {
+    var l = element.children.toList();
+    l.sort(sort);
+    l.forEach((Element opt) {
+      element.append(opt);
+    });
+
+  }
+
+  void setUpAddDomainForm() {
+    if (addDomainForm == null) {
       return;
     }
     var validatingForm = new ValidatingForm(addDomainForm);
-    var expander = new ExpanderElementHandler(addDomainForm);
-    expander.onContract.listen((_){
-      validatingForm.formHandler.removeNotion();
-    });
-    validatingForm.formHandler.submitFunction = (Map<String, String >  data){
+    var domainNameInput = addDomainForm.querySelector("input[name=domain_name]");
+    new Validator<InputElement>(domainNameInput)
+      ..addValueValidator((String value) => !mailDomainLibrary.domains.containsKey(value));
+
+    validatingForm.formHandler.submitFunction = (Map<String, String > data) {
       validatingForm.formHandler.blur();
-      mailDomainLibrary.createDomain(data['domain_name'], data['super_password']).thenResponse(onSuccess:(core.Response<MailDomain> response){
+      mailDomainLibrary.createDomain(data['domain_name'], data['super_password']).thenResponse(onSuccess:(core.Response<MailDomain> response) {
         validatingForm.formHandler.changeNotion("Domænet blev oprettet", FormHandler.NOTION_TYPE_SUCCESS);
         validatingForm.formHandler.clearForm();
         validatingForm.formHandler.unBlur();
-      }, onError:(core.Response<MailDomain> response){
+      }, onError:(core.Response<MailDomain> response) {
         validatingForm.formHandler.changeNotion("Domænet blev ikke oprettet", FormHandler.NOTION_TYPE_ERROR);
         validatingForm.formHandler.unBlur();
       });
@@ -145,8 +565,58 @@ class UserSettingsMailInitializer extends core.Initializer {
 
   }
 
+  void blurElement(Element elm) {
+    elm.classes.add('blur');
+  }
+
+  void unBlurElement(Element elm) {
+    elm.classes.remove('blur');
+  }
+
   void setUpMailDomainList() {
 
+
+    var setLiDataSet = (LIElement li, MailDomain domain) {
+      li
+        ..dataset['last-modified'] = (domain.lastModified.millisecondsSinceEpoch ~/ 1000).toString()
+        ..dataset['description'] = domain.description
+        ..dataset['active'] = domain.active ? "true" : "false"
+        ..dataset['domain-name'] = domain.domainName
+        ..dataset['alias-target'] = domain.aliasTarget == null ? "" : domain.aliasTarget.domainName;
+    };
+
+    var addDomainLiListener = (MailDomain domain, LIElement li) {
+      var listener = (_) {
+        setLiDataSet(li, domain);
+      };
+
+      domain
+        ..onActiveChange.listen(listener)
+        ..onAliasTargetChange.listen(listener)
+        ..onDescriptionChange.listen(listener);
+
+      li.querySelector('.delete').onClick.listen((_) {
+        var c = dialogContainer.password("Er du sikker på at du vil slette?");
+        c.result.then((String s) {
+          blurElement(mailDomainList);
+          domain.delete(s).then((_) {
+            unBlurElement(mailDomainList);
+          });
+        });
+      });
+
+    };
+
+    var liFromDomain = (MailDomain domain) {
+      var li = new LIElement();
+      setLiDataSet(li, domain);
+      li.text = domain.domainName;
+      var delete = new DivElement();
+      delete.classes.add('delete');
+      li.append(delete);
+      addDomainLiListener(domain, li);
+      return li;
+    };
 
     mailDomainList.children.forEach((LIElement li) {
       if (li.classes.contains('empty_list')) {
@@ -155,74 +625,19 @@ class UserSettingsMailInitializer extends core.Initializer {
       var name = li.dataset['domain-name'];
       var domain = mailDomainLibrary.domains[name];
       addDomainLiListener(domain, li);
-      _domainLIMap[domain] = li;
-
     });
 
-    mailDomainLibrary.onCreate.listen((MailDomain domain) {
-      _domainLIMap[domain] = liFromDomain(domain);
-      rebuildDomainList();
+
+    domainDeleteFunctions.add((MailDomain domain) {
+      mailDomainList.children.removeWhere((LIElement li) => li.dataset['domain-name'] == domain.domainName);
+      sortListFromDataSet(mailDomainList, 'domain-name');
+    });
+    domainCreateFunctions.add((MailDomain domain) {
+      mailDomainList.append(liFromDomain(domain));
+      sortListFromDataSet(mailDomainList, 'domain-name');
     });
   }
 
-  LIElement liFromDomain(MailDomain domain) {
-    var li = new LIElement();
-    setLiDataSet(li, domain);
-    li.text = domain.domainName;
-    var delete = new DivElement();
-    delete.classes.add('delete');
-    li.append(delete);
-    addDomainLiListener(domain, li);
-    return li;
-  }
-
-  void setLiDataSet(LIElement li, MailDomain domain) {
-    li
-      ..dataset['last-modified'] = (domain.lastModified.millisecondsSinceEpoch ~/ 1000).toString()
-      ..dataset['description'] = domain.description
-      ..dataset['active'] = domain.active ? "true" : "false"
-      ..dataset['domain-name'] = domain.domainName
-      ..dataset['alias-target'] = domain.aliasTarget == null ? "" : domain.aliasTarget.domainName;
-  }
-
-  void addDomainLiListener(MailDomain domain, LIElement li) {
-    var listener = (_){
-      setLiDataSet(li, domain);
-    };
-
-    domain..onActiveChange.listen(listener)
-          ..onAliasTargetChange.listen(listener)
-          ..onDescriptionChange.listen(listener);
-    domain.onDelete.listen((_){
-      _domainLIMap.remove(domain);
-      rebuildDomainList();
-    });
-
-    li.querySelector('.delete').onClick.listen((_){
-      var c = dialogContainer.password("Er du sikker på at du vil slette?");
-      c.result.then((String s){
-        mailDomainList.classes.add('blur');
-        domain.delete(s).then((_){
-          mailDomainList.classes.remove('blur');
-        });
-      });
-    });
-
-  }
-
-  void rebuildDomainList() {
-    if (_domainLIMap.isEmpty) {
-      mailDomainList.querySelector('.empty_list').hidden = false;
-      return;
-    }
-    mailDomainList.querySelector('.empty_list').hidden = true;
-    mailDomainList.children.removeWhere((Element elm) => !elm.classes.contains('empty_list'));
-    var l = _domainLIMap.keys.toList();
-    l.sort((MailDomain d1, MailDomain d2) => d1.domainName.compareTo(d2.domainName));
-    l.forEach((MailDomain d) {
-      mailDomainList.append(_domainLIMap[d]);
-    });
-  }
 
 }
 
@@ -256,7 +671,8 @@ class UserSettingsLoggerInitializer extends core.Initializer {
 
   void setUp() {
     _updateNum();
-    _logTable.querySelectorAll(".dumpfile a").forEach((AnchorElement a) {
+
+    var addDumpListener = (AnchorElement a) {
       a.onClick.listen((MouseEvent evt) {
         var loader = dialogContainer.loading("Henter log filen");
         logger.contextAt(new DateTime.fromMillisecondsSinceEpoch(int.parse(a.dataset["id"]) * 1000)).then((core.Response<Map> resp) {
@@ -281,11 +697,39 @@ class UserSettingsLoggerInitializer extends core.Initializer {
           });
         });
       });
+    };
+
+    logger.onLog.listen((LogEntry entry) {
+      var row = _logTable.insertRow(0);
+      var levelStrings = entry.levelStrings;
+      row.classes.addAll(levelStrings);
+
+      var c1 = row.addCell();
+      c1.title = levelStrings.map((String s) => s.toUpperCase()).join(" ");
+      var c2 = row.addCell();
+      c2.text = entry.message;
+      var c3 = row.addCell();
+      c3.classes.add("dumpfile");
+      if (entry.context != null) {
+        var a = new AnchorElement();
+        a.dataset['id'] = entry.id.toString();
+        addDumpListener(a);
+        c3.append(a);
+      }
+      var c4 = row.addCell();
+      c4
+        ..classes.add('date')
+        ..text = core.dateString(entry.time);
+      _updateNum();
     });
+
+    _logTable.querySelectorAll(".dumpfile a").forEach(addDumpListener);
 
 
     _logLink.onClick.listen((MouseEvent evt) {
+      _logTable.classes.add('blur');
       logger.clearLog().then((core.Response<Logger> response) {
+        _logTable.classes.remove('blur');
         if (response.type == core.Response.RESPONSE_TYPE_SUCCESS) {
           _logTable.querySelectorAll("tr:not(.empty_row)").forEach((TableRowElement li) => li.remove());
           _logTable.classes.add("empty");
@@ -526,7 +970,7 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
     if (_addUserToPageForm == null) {
       return;
     }
-    new Validator(_pageUserSelect).validator = (SelectElement e) => core.nonEmpty(e.value);
+    new Validator(_pageUserSelect).addNonEmptyValueValidator();
     new ValidatingForm(_addUserToPageForm).validate();
     var deco = new FormHandler(_addUserToPageForm);
     deco.submitFunction = (Map<String, String> data) {
@@ -656,9 +1100,9 @@ class UserSettingsAddUserFormInitializer extends core.Initializer {
   void setUp() {
     var userMailField = _addUserForm.querySelector('#AddUserMailField'), userLevelSelect = _addUserForm.querySelector('#AddUserLevelSelect');
     var v = new Validator(userMailField);
-    v.validator = (InputElement e) => core.validMail(e.value);
+    v.addValidMailValueValidator();
     v.errorMessage = "Skal være gyldig E-mail";
-    new Validator(userLevelSelect).validator = (SelectElement e) => core.nonEmpty(e.value);
+    new Validator(userLevelSelect).addNonEmptyValueValidator();
     var validatingForm = new ValidatingForm(_addUserForm);
     validatingForm.validate();
     var decoration = new FormHandler(_addUserForm);
@@ -691,9 +1135,11 @@ class UserSettingsAddPageFormInitializer extends core.Initializer {
   bool get canBeSetUp => _addPageForm != null;
 
   void setUp() {
-    var input = querySelector('#EditPagesAddPage'), v;
-    (v = new Validator(input)).validator = (InputElement e) => core.nonEmpty(e.value);
-    v.errorMessage = "Titlen må ikke være tom";
+    var input = querySelector('#EditPagesAddPage');
+
+    new Validator(input)
+      ..addNonEmptyValueValidator()
+      ..errorMessage = "Titlen må ikke være tom";
     var validatingForm = new ValidatingForm(_addPageForm);
     validatingForm.validate();
     var decoration = new FormHandler(_addPageForm);
@@ -732,10 +1178,12 @@ class UserSettingsChangeUserInfoFormInitializer extends core.Initializer {
   void setUp() {
     var userNameInput = _userMailForm.querySelector('#EditUserEditUsernameField'), userMailInput = _userMailForm.querySelector('#EditUserEditMailField');
     var v1 = new Validator(userNameInput), v2 = new Validator(userMailInput);
-    v1.validator = (InputElement e) => core.nonEmpty(e.value) && (e.value == userLibrary.userLoggedIn.username || userLibrary.users[e.value] == null);
+    v1
+      ..addNonEmptyValueValidator()
+      ..addValueValidator((String value) => (value == userLibrary.userLoggedIn.username || userLibrary.users[value] == null));
     v1.errorMessage = "Brugernavn må ikke være tomt og skal være unikt";
 
-    v2.validator = (InputElement e) => core.validMail(e.value);
+    v2.addValidMailValueValidator();
     v2.errorMessage = "Skal være gyldig E-mail adresse";
 
     var validatingForm = new ValidatingForm(_userMailForm);
@@ -764,10 +1212,12 @@ class UserSettingsChangeUserInfoFormInitializer extends core.Initializer {
 
     var userOldPassword = _userPasswordForm.querySelector('#EditUserEditPasswordOldField'), userNewPassword = _userPasswordForm.querySelector('#EditUserEditPasswordNewField'), userNewPasswordRepeat = _userPasswordForm.querySelector('#EditUserEditPasswordNewRepField');
     var v3 = new Validator(userOldPassword), v4 = new Validator(userNewPassword), v5 = new Validator(userNewPasswordRepeat);
-    v3.validator = (InputElement e) => core.nonEmpty(e.value);
+    v3.addNonEmptyValueValidator();
     v3.errorMessage = v4.errorMessage = "Kodeord må ikke være tomt";
-    v4.validator = (InputElement e) => core.nonEmpty(e.value);
-    v5.validator = (InputElement e) => core.nonEmpty(e.value) && e.value == userNewPassword.value;
+    v4.addNonEmptyValueValidator();
+    v5
+      ..addNonEmptyValueValidator()
+      ..addValueValidator((String value) => value == userNewPassword.value);
     v5.errorMessage = "Kodeordet skal gentages korrekt";
     var valPassForm = new ValidatingForm(_userPasswordForm);
     valPassForm.validate();
@@ -818,14 +1268,17 @@ class UserSettingsEditPageFormInitializer extends core.Initializer {
     var editIdField = _editPageForm.querySelector('#EditPageEditIDField'), editAliasField = _editPageForm.querySelector('#EditPageEditAliasField'), editTitleField = _editPageForm.querySelector('#EditPageEditTitleField'), editTemplateSelect = _editPageForm.querySelector('#EditPageEditTemplateSelect');
 
 /* SET UP VALIDATOR */
-    var v1, v2, v3;
-    (v1 = new Validator(editTitleField)).validator = (InputElement e) => core.nonEmpty(e.value);
-    (v2 = new Validator(editIdField)).validator = (InputElement e) => (_order.currentPage != null && e.value == _order.currentPage.id) || (new RegExp(r'^[0-9a-z\-_]+$', caseSensitive:false).hasMatch(e.value) && !_order.pageExists(e.value));
-    (v3 = new Validator(editAliasField)).validator = (InputElement e) => e.value == "" || PCRE.checkPCRE(e.value);
 
-    v1.errorMessage = "Titlen kan ikke være tom";
-    v2.errorMessage = "ID kan kun indeholde symbolder a-z, 0-9, - eller _";
-    v3.errorMessage = "Alias skal være et gyldig <i>PCRE</i>";
+    new Validator(editTitleField)
+      ..addNonEmptyValueValidator()
+      ..errorMessage = "Titlen kan ikke være tom";
+
+    new Validator(editIdField)
+      ..addValueValidator((String value) => (_order.currentPage != null && value == _order.currentPage.id) || (new RegExp(r'^[0-9a-z\-_]+$', caseSensitive:false).hasMatch(value) && !_order.pageExists(value)))
+      ..errorMessage = "ID kan kun indeholde symbolder a-z, 0-9, - eller _";
+    new Validator(editAliasField)
+      ..addValueValidator((String value) => value == "" || PCRE.checkPCRE(value))
+      ..errorMessage = "Alias skal være et gyldig <i>PCRE</i>";
 
     validatingForm.validate();
 
