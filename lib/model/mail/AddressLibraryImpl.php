@@ -54,10 +54,19 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      * @param string $localPart
      * @return bool
      */
-    public function hasAddress($localPart)
+    public function hasAddressWithLocalPart($localPart)
     {
         $this->setUpLibrary();
         return isset($this->addressList[trim($localPart)]);
+    }
+
+    /**
+     * @param Address $address
+     * @return bool
+     */
+    public function hasAddress(Address $address)
+    {
+        return array_search($address, $this->addressList, true ) !== false;
     }
 
     /**
@@ -103,7 +112,7 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      */
     public function createAddress($localPart)
     {
-        if($this->hasAddress($localPart)){
+        if($this->hasAddressWithLocalPart($localPart)){
             return $this->getAddress($localPart);
         }
         $a = new AddressImpl($localPart, $this->db, $this->userLibrary, $this);
@@ -204,7 +213,7 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      */
     public function contains(Address $address)
     {
-        return $this->hasAddress($l = $address->getLocalPart()) && $this->getAddress($l) === $address;
+        return $this->hasAddress($address);
     }
 
     private function addInstance(AddressImpl $instance)
