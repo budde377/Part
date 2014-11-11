@@ -46,6 +46,10 @@ class AJAXMailMailbox extends MailMailbox {
   _onDeleteController = new StreamController(),
   _onNameChangeController = new StreamController();
 
+  Stream
+  _onDeleteStream ,
+  _onNameChangeStream ;
+
 
   AJAXMailMailbox(MailAddress address, {String name, DateTime lastModified}):
   _name = name,
@@ -109,9 +113,9 @@ class AJAXMailMailbox extends MailMailbox {
     return new FutureResponse(completer.future);
   }
 
-  Stream<MailMailbox> get onDelete => _onDeleteController.stream;
+  Stream<MailMailbox> get onDelete => _onDeleteStream == null?_onDeleteStream = _onDeleteController.stream.asBroadcastStream(): _onDeleteStream;
 
-  Stream<String> get onNameChange => _onNameChangeController.stream;
+  Stream<MailMailbox> get onNameChange => _onNameChangeStream == null?_onNameChangeStream = _onNameChangeController.stream.asBroadcastStream(): _onNameChangeStream;
 
 
   DateTime get lastModified => _lastModified;

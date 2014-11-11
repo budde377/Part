@@ -144,11 +144,12 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
     public function createCatchallAddress()
     {
         if($this->hasCatchallAddress()){
-            return;
+            return $this->getCatchallAddress();
         }
         $address = new AddressImpl('', $this->db, $this->userLibrary, $this);
         $address->create();
         $this->addInstance($address);
+        return $address;
     }
 
     /**

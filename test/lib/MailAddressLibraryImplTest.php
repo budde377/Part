@@ -216,12 +216,20 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
         $c1 = $this->addressLibrary->getCatchallAddress();
         $this->addressLibrary->deleteCatchallAddress();
         $this->assertNull($this->addressLibrary->getCatchallAddress());
-        $this->addressLibrary->createCatchallAddress();
+        $c3 = $this->addressLibrary->createCatchallAddress();
         $this->assertTrue($this->addressLibrary->hasCatchallAddress());
         $c2 = $this->addressLibrary->getCatchallAddress();
         $this->assertEquals('', $c2->getLocalPart());
         $this->assertFalse($c1 === $c2);
+        $this->assertTrue($c3 === $c2);
         $this->assertTrue($c2->exists());
+    }
+
+    public function testCreateCatchallAddressWhileExistingReturnsOldInstance()
+    {
+        $c1 = $this->addressLibrary->createCatchallAddress();
+        $c2 = $this->addressLibrary->createCatchallAddress();
+        $this->assertTrue($c1 === $c2);
     }
 
 

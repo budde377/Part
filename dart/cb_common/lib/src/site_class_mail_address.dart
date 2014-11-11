@@ -61,6 +61,8 @@ abstract class MailAddress {
 
   Stream<User> get onRemoveOwner;
 
+  Stream<User> get onOwnerChange;
+
   Stream<bool> get onActiveChange;
 
   Stream<MailAddress> get onDelete;
@@ -89,15 +91,29 @@ class AJAXMailAddress extends MailAddress {
 
   final UserLibrary userLibrary;
 
-  StreamController _onLocalPartChangeController = new StreamController(),
+  StreamController
+  _onLocalPartChangeController = new StreamController(),
   _onMailboxChangeController = new StreamController(),
   _onAddTargetController = new StreamController(),
   _onRemoveTargetController = new StreamController(),
   _onTargetChangeController = new StreamController(),
   _onAddOwnerController = new StreamController(),
+  _onOwnerChangeController = new StreamController(),
   _onRemoveOwnerController = new StreamController(),
   _onActiveChangeController = new StreamController(),
   _onDeleteController;
+
+  Stream
+  _onLocalPartChangeStream ,
+  _onMailboxChangeStream ,
+  _onAddTargetStream ,
+  _onRemoveTargetStream ,
+  _onTargetChangeStream ,
+  _onAddOwnerStream ,
+  _onOwnerChangeStream ,
+  _onRemoveOwnerStream ,
+  _onActiveChangeStream ,
+  _onDeleteStream;
 
 
   AJAXMailAddress(this._localPart, MailAddressLibrary addressLibrary, this.userLibrary, {MailMailbox mailboxGenerator(MailAddress), bool active: true, Iterable<String> targets:null, DateTime last_modified:null, Iterable<User> owners:null}):
@@ -264,6 +280,7 @@ class AJAXMailAddress extends MailAddress {
       _lastChangeInSeconds = r.payload.variables['last_modified'];
       completer.complete(new Response.success(user));
       _onAddOwnerController.add(user);
+      _onOwnerChangeController.add(user);
 
 
     }, onError:completer.complete);
@@ -284,6 +301,7 @@ class AJAXMailAddress extends MailAddress {
       _lastChangeInSeconds = r.payload.variables['last_modified'];
       completer.complete(new Response.success(user));
       _onRemoveOwnerController.add(user);
+      _onOwnerChangeController.add(user);
 
     }, onError:completer.complete);
 
@@ -327,25 +345,29 @@ class AJAXMailAddress extends MailAddress {
 
   FutureResponse<MailAddress> toggleActive() => active?deactivate():activate();
 
-  Stream<MailAddress> get onLocalPartChange => _onLocalPartChangeController.stream.asBroadcastStream();
+  Stream<MailAddress> get onLocalPartChange => _onLocalPartChangeStream == null?_onLocalPartChangeStream = _onLocalPartChangeController.stream.asBroadcastStream(): _onLocalPartChangeStream;
 
-  Stream<MailMailbox> get onMailboxChange => _onMailboxChangeController.stream.asBroadcastStream();
+  Stream<MailMailbox> get onMailboxChange => _onMailboxChangeStream == null?_onMailboxChangeStream = _onMailboxChangeController.stream.asBroadcastStream(): _onMailboxChangeStream;
 
-  Stream<String> get onAddTarget => _onAddTargetController.stream.asBroadcastStream();
+  Stream<String> get onAddTarget => _onAddTargetStream == null?_onAddTargetStream = _onAddTargetController.stream.asBroadcastStream(): _onAddTargetStream;
 
-  Stream<String> get onRemoveTarget => _onRemoveTargetController.stream.asBroadcastStream();
+  Stream<String> get onRemoveTarget => _onRemoveTargetStream == null?_onRemoveTargetStream = _onRemoveTargetController.stream.asBroadcastStream(): _onRemoveTargetStream;
 
-  Stream<User> get onAddOwner => _onAddOwnerController.stream.asBroadcastStream();
+  Stream<User> get onAddOwner => _onAddOwnerStream == null?_onAddOwnerStream = _onAddOwnerController.stream.asBroadcastStream(): _onAddOwnerStream;
 
-  Stream<User> get onRemoveOwner => _onRemoveOwnerController.stream.asBroadcastStream();
+  Stream<User> get onRemoveOwner => _onRemoveOwnerStream == null?_onRemoveOwnerStream = _onRemoveOwnerController.stream.asBroadcastStream(): _onRemoveOwnerStream;
 
-  Stream<bool> get onActiveChange => _onActiveChangeController.stream.asBroadcastStream();
+  Stream<bool> get onActiveChange => _onActiveChangeStream == null?_onActiveChangeStream = _onActiveChangeController.stream.asBroadcastStream(): _onActiveChangeStream;
 
-  Stream<String> get onTargetChange=> _onTargetChangeController.stream.asBroadcastStream();
+  Stream<String> get onTargetChange=> _onTargetChangeStream == null?_onTargetChangeStream = _onTargetChangeController.stream.asBroadcastStream(): _onTargetChangeStream;
+
+  Stream<User> get onOwnerChange => _onOwnerChangeStream == null?_onOwnerChangeStream = _onOwnerChangeController.stream.asBroadcastStream():_onOwnerChangeStream;
+
 
   Stream<MailAddress> get onDelete{
     if(_onDeleteController == null){
       _onDeleteController = new StreamController();
+      _onDeleteStream = _onDeleteController.stream.asBroadcastStream();
       addressLibrary.onDelete.listen((MailAddress address){
         if(address != this){
           return;
@@ -354,7 +376,7 @@ class AJAXMailAddress extends MailAddress {
       });
     }
 
-    return _onDeleteController.stream.asBroadcastStream();
+    return _onDeleteStream;
   }
 
 }

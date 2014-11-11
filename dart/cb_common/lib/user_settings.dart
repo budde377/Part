@@ -121,6 +121,10 @@ class UserSettingsMailInitializer extends core.Initializer {
   List<Function> domainCreateFunctions = [];
   List<Function> domainDeleteFunctions = [];
 
+  List<Function> addressFunctions = [];
+  List<Function> addressDeleteFunctions = [];
+  List<Function> addressCreateFunctions = [];
+
   void setUp() {
 
     setUpMailDomainList();
@@ -148,8 +152,8 @@ class UserSettingsMailInitializer extends core.Initializer {
         ..dataset['owners'] = address.owners.map((User u) => u.username).join(" ")
         ..dataset['active'] = address.active.toString()
         ..dataset['has-mailbox'] = address.hasMailbox.toString()
-        ..innerHtml = "${address.localPart == "" ? "<span class='asterisk'>*</span>" : address.localPart}@${address.domain.domainName}"
-        ..innerHtml+= address.owners.contains(userLibrary.userLoggedIn) || userLibrary.userLoggedIn.hasSitePrivileges ? "<div class='delete'></div>" : "";
+        ..innerHtml = "${address.localPart == "" ? "<span class='asterisk'></span>" : address.localPart}@${address.domain.domainName}"
+        ..innerHtml += address.owners.contains(userLibrary.userLoggedIn) || userLibrary.userLoggedIn.hasSitePrivileges ? "<div class='delete'></div>" : "";
 
       if (address.hasMailbox) {
         li.dataset['mailbox-name'] = address.mailbox.name;
@@ -166,21 +170,6 @@ class UserSettingsMailInitializer extends core.Initializer {
         return li;
       }
 
-      li = new Element.html("""
-      <li data-local-part="${address.localPart}"
-          data-targets="${address.targets.join(" ")}"
-          data-last-modified="${address.lastModified.millisecondsSinceEpoch ~/ 1000}"
-          data-owners="${address.owners.map((User u) => u.username).join(" ")}"
-          data-active="${address.active ? "true" : "false"}"
-          data-has-mailbox="${address.hasMailbox ? "true" : "false"}">
-        ${address.localPart == "" ? "<span class='asterisk'>*</span>" : address.localPart}@${address.domain.domainName}
-        ${address.owners.contains(userLibrary.userLoggedIn) || userLibrary.userLoggedIn.hasSitePrivileges ? "<div class='delete'></div>" : ""}
-      </li>
-      """);
-      if (address.hasMailbox) {
-        li.dataset['mailbox-name'] = address.mailbox.name;
-        li.dataset['mailbox-last-modified'] = (address.mailbox.lastModified.millisecondsSinceEpoch ~/ 1000).toString();
-      }
       li = new LIElement();
       addressUpdateLi(li, address);
       return li;
@@ -190,12 +179,14 @@ class UserSettingsMailInitializer extends core.Initializer {
       var ul = domainToUl(d);
 
       if (ul != null) {
-        return ul;
+        return ul.parent;
       }
 
       var li = new LIElement();
 
       ul = new UListElement();
+
+      ul.dataset['domain-name'] = d.domainName;
 
       d.addressLibrary.addresses.forEach((String s, MailAddress ma) {
         if (ma == d.addressLibrary.catchallAddress) {
@@ -212,13 +203,75 @@ class UserSettingsMailInitializer extends core.Initializer {
 
 
       li.append(ul);
-      mailAddressLists.append(li);
-      sortChildren(ul, (LIElement li1, LIElement li2) =>
-      li1.children[0].dataset['domain-name'].compareTo(li2.children[0].dataset['domain-name']));
-      return ul;
+      return li;
+    };
+
+    var updateAddressListHidden = () {
+      mailAddressLists.querySelector('li ul.empty').hidden = mailAddressLists.querySelector('li ul:not(.empty) li') != null;
+      mailAddressLists.querySelectorAll('li ul:not(.empty)').forEach((UListElement ul) {
+        ul.hidden = ul.children.length == 0;
+      });
     };
 
 
+    addressFunctions.add((MailAddress a) {
+      var l = (_) => addressUpdateLi(addressLi(a), a);
+      a
+        ..onActiveChange.listen(l)
+        ..onOwnerChange.listen(l)
+        ..onTargetChange.listen(l)
+        ..onLocalPartChange.listen(l)
+        ..onMailboxChange.listen(l);
+    });
+
+    domainCreateFunctions.add((MailDomain d) {
+      var li = addressDomainLi(d);
+      mailAddressLists.append(li);
+      sortChildren(mailAddressLists, (LIElement li1, LIElement li2) =>
+      li1.children[0].dataset['domain-name'].compareTo(li2.children[0].dataset['domain-name']));
+
+    });
+
+    domainDeleteFunctions.add((MailDomain d) {
+      var li = addressDomainLi(d);
+      li.remove();
+    });
+
+    addressFunctions.add((MailAddress a) {
+      var li = addressLi(a);
+      var delete = li.querySelector('.delete');
+
+      if (delete == null) {
+        return;
+      }
+
+      delete.onClick.listen((_) {
+        a.delete();
+      });
+
+    });
+
+    addressCreateFunctions.add((MailAddress a) {
+      var li = addressLi(a);
+      var ul = addressDomainLi(a.domain).children[0];
+      ul.append(li);
+      sortChildren(ul, (LIElement li1, LIElement li2) => (li1.dataset['local-part'] == "" || li2.dataset['local-part'] == "" ? -1 : 1) * li1.dataset['local-part'].compareTo(li2.dataset['local-part']));
+      updateAddressListHidden();
+    });
+
+    addressDeleteFunctions.add((MailAddress a) {
+      addressLi(a).remove();
+      updateAddressListHidden();
+    });
+
+
+  }
+
+  void _hideInfoboxesOnContract(ValidatingForm form) {
+    var e = new ExpanderElementHandler(form.element.parent);
+    e.onContract.listen((_) {
+      form.hideInfoBoxes();
+    });
   }
 
   void setUpAddAddressForm() {
@@ -228,18 +281,69 @@ class UserSettingsMailInitializer extends core.Initializer {
 
     var vForm = new ValidatingForm(addAddressForm);
     var formH = vForm.formHandler;
+    _hideInfoboxesOnContract(vForm);
+
+    formH.submitFunction = (Map<String, String> m) {
+      var addressLibrary = mailDomainLibrary.domains[m['domain']].addressLibrary;
+
+      core.debug(m);
+
+      var mailbox_name, mailbox_password;
+      if (m.containsKey('add_mailbox')) {
+        mailbox_name = m['mailbox_owner_name'];
+        mailbox_password = m['mailbox_password'];
+      }
+
+      var owners = [];
+
+      m.forEach((String key, String value){
+        if(!key.startsWith("user_")){
+          return;
+        }
+        owners.add(userLibrary.users[value]);
+      });
+
+
+
+      var targets = m['targets'].split(" ");
+      targets.removeWhere((String s) => s.isEmpty);
+
+      core.debug(targets);
+      core.debug(owners);
+
+      if (m['local_part'] == "") {
+        addressLibrary.createCatchallAddress(owners: owners, targets:targets, mailbox_name: mailbox_name, mailbox_password: mailbox_password );
+      } else {
+        addressLibrary.createAddress(m['local_part'], owners: owners, targets:targets, mailbox_name: mailbox_name, mailbox_password: mailbox_password);
+      }
+
+      return true;
+    };
+
+    var domainSelect = addAddressForm.querySelector("select[name=domain]");
 
     InputElement local_part = addAddressForm.querySelector('input[name=local_part]');
 
-    new Validator(local_part).addValueValidator((String s) => !mailDomainLibrary.domains.containsKey(s));
+    var v_local_part = new Validator(local_part);
+    v_local_part.addValueValidator((String s) => !mailDomainLibrary.domains.containsKey(domainSelect.value) || (!mailDomainLibrary.domains[domainSelect.value].addressLibrary.addresses.containsKey(s)));
+
+    domainSelect.onChange.listen((_) {
+      v_local_part.check();
+    });
+    CheckboxInputElement mailbox_checkbox = addAddressForm.querySelector('#UserSettingsEditMailAddAddressAddMailboxCheckbox');
+    var v_mailbox_checkbox = new Validator(mailbox_checkbox);
 
     InputElement target_input = addAddressForm.querySelector('input[name=targets]');
-    var v = new Validator<InputElement>(target_input);
-    v
-      ..addValidator((InputElement e) => e.value.split(" ").fold(true, (bool prev, String s) => prev && (s == "" || core.validMail(s.trim()))));
+    var v_target_input = new Validator<InputElement>(target_input);
+    v_target_input
+      ..addValueValidator((String v) => v.split(" ").fold(true, (bool prev, String s) => prev && (s == "" || core.validMail(s.trim()))))
+      ..addValueValidator((String v) {
+      return mailbox_checkbox.checked || core.nonEmpty(v);
+
+    });
 
     target_input.onChange.listen((_) {
-      if (!v.valid) {
+      if (!v_target_input.valid) {
         return;
       }
       var values = target_input.value.split(" ");
@@ -247,7 +351,6 @@ class UserSettingsMailInitializer extends core.Initializer {
       target_input.value = values.join(" ");
     });
 
-    CheckboxInputElement mailbox_checkbox = addAddressForm.querySelector('#UserSettingsEditMailAddAddressAddMailboxCheckbox');
     TextInputElement mailbox_name = addAddressForm.querySelector('input[name=mailbox_owner_name]');
     PasswordInputElement mailbox_password_input_1 = addAddressForm.querySelector('input[name=mailbox_password]');
     PasswordInputElement mailbox_password_input_2 = addAddressForm.querySelector('input[name=mailbox_password_2]');
@@ -258,17 +361,17 @@ class UserSettingsMailInitializer extends core.Initializer {
     var v2 = new Validator<PasswordInputElement>(mailbox_password_input_1);
     v2.addValueValidator((String s) => !mailbox_checkbox.checked || s != "");
     var v3 = new Validator<PasswordInputElement>(mailbox_password_input_2);
-    v3.addValueValidator((String s) => !mailbox_checkbox.checked || s == mailbox_password_input_1.value);
-    new Validator<CheckboxInputElement>(mailbox_checkbox).addValidator((_) => !mailbox_checkbox.checked || (v1.valid && v2.valid && v3.valid));
-    mailbox_checkbox.onChange.listen((_) {
-      if (mailbox_checkbox.checked) {
-        return;
-      }
-      v1.check();
-      v2.check();
-      v3.check();
-    });
+    v3
+      ..addValueValidator((String s) => !mailbox_checkbox.checked || s == mailbox_password_input_1.value)
+      ..dependOn(v2);
 
+    v_target_input.dependOn(v_mailbox_checkbox);
+    v1.dependOn(v_mailbox_checkbox);
+    v2.dependOn(v_mailbox_checkbox);
+    v3.dependOn(v_mailbox_checkbox);
+
+
+    var userListLabel = querySelector("#UserSettingsEditMailAddAddressUserCheckListLabel");
     var userList = querySelector("#UserSettingsEditMailAddAddressUserCheckList");
 
     var updateUserLI = (User u, LIElement li, LabelElement label, CheckboxInputElement checkbox) {
@@ -323,7 +426,6 @@ class UserSettingsMailInitializer extends core.Initializer {
       return li;
     };
 
-    var domainSelect = addAddressForm.querySelector("select[name=domain]");
 
     new Validator(domainSelect).addValueValidator((String s) => mailDomainLibrary[s] != null);
 
@@ -344,7 +446,7 @@ class UserSettingsMailInitializer extends core.Initializer {
     });
 
 
-    var updateUserListHidden = () => userList.hidden = userList.children.length == 0;
+    var updateUserListHidden = () => userListLabel.hidden = userList.hidden = userList.children.length == 0;
 
     userLibrary.users.forEach((_, User u) {
       addUserLiCheckboxListener(u, userLICheckBox(u));
@@ -373,14 +475,29 @@ class UserSettingsMailInitializer extends core.Initializer {
 
     );
 
-
   }
 
   void setUpListeners() {
+    var caf = (List<Function> l) => (MailAddress d) => l.forEach((Function f) {
+      f(d);
+    });
+
+    domainFunctions.add((MailDomain d) {
+      var af = caf(addressFunctions);
+      addressCreateFunctions.add(af);
+      d.addressLibrary
+        ..addresses.forEach((_, MailAddress a) => af(a))
+        ..onCreate.listen(caf(addressCreateFunctions))
+        ..onDelete.listen(caf(addressDeleteFunctions));
+
+    });
+
+
     var cdf = (List<Function> l) => (MailDomain d) => l.forEach((Function f) {
       f(d);
     });
     var df = cdf(domainFunctions);
+
 
     mailDomainLibrary.domains.forEach((_, MailDomain domain) => df(domain));
 
@@ -486,6 +603,9 @@ class UserSettingsMailInitializer extends core.Initializer {
 
     var vForm = new ValidatingForm(addDomainAliasForm);
     var formH = vForm.formHandler;
+
+    _hideInfoboxesOnContract(vForm);
+
     var domainOptionCheck = (MailDomain domain) => (OptionElement elm) => elm.value == domain.domainName;
     var optionFromDomain = (MailDomain domain) {
       var option = new OptionElement();
@@ -630,8 +750,12 @@ class UserSettingsMailInitializer extends core.Initializer {
     if (addDomainForm == null) {
       return;
     }
+
     var validatingForm = new ValidatingForm(addDomainForm);
     var domainNameInput = addDomainForm.querySelector("input[name=domain_name]");
+
+    _hideInfoboxesOnContract(validatingForm);
+
     new Validator<InputElement>(domainNameInput)
       ..addValueValidator((String value) => !mailDomainLibrary.domains.containsKey(value));
 

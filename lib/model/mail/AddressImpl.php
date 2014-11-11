@@ -228,7 +228,7 @@ class AddressImpl implements Address, Observer
     public function getTargets()
     {
         $this->setUpAlias();
-        return $this->aliasList;
+        return array_values($this->aliasList);
     }
 
     /**

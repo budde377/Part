@@ -37,6 +37,7 @@ a:hover {
     text-decoration: underline;
 }
 
+
 h1, h1 * {
     font-size: 20px;
     line-height: 40px;
@@ -143,6 +144,12 @@ label {
     display: block;
     padding-top: 5px;
 }
+
+label[hidden] {
+    display: none;
+}
+
+
 
 form > .notion {
     overflow: hidden;

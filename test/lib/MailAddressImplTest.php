@@ -289,12 +289,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
 
     public function testGetTargetsReturnArrayOfTargets(){
         $ar = $this->address2->getTargets();
-        $this->assertTrue(is_array($ar));
-        $this->assertEquals(2, count($ar));
-        $this->assertArrayHasKey('test2@example.org', $ar);
-        $this->assertArrayHasKey('test@example.org', $ar);
-        $this->assertEquals('test@example.org', $ar['test@example.org']);
-        $this->assertEquals('test2@example.org', $ar['test2@example.org']);
+        $this->assertEquals(['test@example.org','test2@example.org'], $ar);
 
     }
 

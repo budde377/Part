@@ -3,8 +3,6 @@ part of elements;
 class FormHandler {
   final FormElement form;
 
-  //final SpanElement filter = new SpanElement();
-
   Function _submitFunction;
 
 
@@ -16,9 +14,7 @@ class FormHandler {
 
   factory FormHandler(FormElement form) => _cache.putIfAbsent(form, () => new FormHandler._internal(form));
 
-  FormHandler._internal(FormElement form):this.form = form{
-    //filter.classes.add('filter');
-  }
+  FormHandler._internal(FormElement form):this.form = form;
 
   set submitFunction(bool f(Map<String, String> data)) {
     _submitFunction = f;
@@ -27,13 +23,22 @@ class FormHandler {
       e.stopImmediatePropagation();
       var data = <String, String>{
       };
-      form.querySelectorAll('input:not([type=submit]), textarea, select').forEach((Element e) {
+      form.querySelectorAll('input:not([type=submit]), textarea, select').forEach((e) {
+        if(e.name == ""){
+          return;
+        }
         if (e is SelectElement) {
           SelectElement ee = e;
           data[ee.name] = ee.value;
         } else if (e is InputElement) {
           InputElement ee = e;
-          data[ee.name] = ee.value;
+          if(ee.type =="radio" || ee.type == "checkbox"){
+            if(e.checked){
+              data[ee.name] = ee.value;
+            }
+          } else {
+            data[ee.name] = ee.value;
+          }
         } else if (e is TextAreaElement) {
           TextAreaElement ee = e;
           data[ee.name] = ee.value;
@@ -124,6 +129,8 @@ class Validator<E extends Element> {
   final E element;
   String errorMessage = "";
 
+  bool _initial = true;
+
   final FormElement form;
 
   ValidatingForm _validatingForm;
@@ -142,6 +149,7 @@ class Validator<E extends Element> {
     }
 
     if (!element.dataset.containsKey("validator-method") || !(element is InputElement || element is SelectElement || element is TextAreaElement)) {
+      _initial = false;
       return;
     }
     switch (element.dataset["validator-method"]) {
@@ -161,7 +169,7 @@ class Validator<E extends Element> {
         addNonEmptyValueValidator();
         break;
     }
-
+    _initial = false;
   }
 
   ValidatingForm get validatingForm => _validatingForm;
@@ -175,6 +183,10 @@ class Validator<E extends Element> {
   void addValidator(bool f(E)) {
     var v = _validator;
     _validator = (Element e) => v(e) && f(e);
+    if(_initial){
+      return;
+    }
+    check(true);
   }
 
   void addValueValidator(bool f(String)) {
@@ -197,12 +209,20 @@ class Validator<E extends Element> {
     addValueValidator(pattern.hasMatch);
   }
 
-  void check(){
+  void check([bool ignore_initial=false]){
     if(!hasForm){
       return;
     }
-    validatingForm.checkElement(element);
+    validatingForm.checkElement(element, ignore_initial);
   }
+
+  void dependOn(Validator v){
+    v.addValidator((_){
+      check(true);
+      return true;
+    });
+  }
+
 }
 
 
@@ -247,10 +267,16 @@ class ValidatingForm {
         e.stopImmediatePropagation();
       }
     });
-    var listener = (Element elm, bool h) => (Event e) {
-      if (_infoBoxMap.containsKey(elm)) {
-        _infoBoxMap[elm].element.hidden = h;
+    var listener = (Element elm, bool h) => (_) {
+      if (!_infoBoxMap.containsKey(elm)) {
+        return;
       }
+      if(h){
+        _infoBoxMap[elm].remove();
+      } else {
+        _infoBoxMap[elm].showAboveCenterOfElement(elm);
+      }
+
     };
 
 
@@ -313,9 +339,11 @@ class ValidatingForm {
     }
   }
 
-  void checkElement(Element elm) {
-    elm.classes.remove('initial');
-    element.classes.remove('initial');
+  void checkElement(Element elm, [bool ignore_initial = false]) {
+    if(!ignore_initial){
+      elm.classes.remove('initial');
+      element.classes.remove('initial');
+    }
     var v = new Validator(elm);
     if (v.valid && elm.classes.contains('invalid')) {
       elm.classes.add('valid');
@@ -328,7 +356,7 @@ class ValidatingForm {
     } else if (!v.valid && elm.classes.contains('valid')) {
       elm.classes.remove('valid');
       elm.classes.add('invalid');
-      if (v.errorMessage.length > 0) {
+      if (v.errorMessage.length > 0 && !elm.classes.contains('initial')) {
         var box = new InfoBox(v.errorMessage);
         box
           ..backgroundColor = InfoBox.COLOR_RED
@@ -341,6 +369,11 @@ class ValidatingForm {
 
   }
 
+  void hideInfoBoxes(){
+    _infoBoxMap.forEach((_,InfoBox b){
+      b.remove();
+    });
+  }
 
   void _updateFormValidStatus() {
     if (!_validForm && element.querySelector('input:not([type=submit]).invalid, textarea.invalid, select.invalid') == null) {

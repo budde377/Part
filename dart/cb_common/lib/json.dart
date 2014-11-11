@@ -22,12 +22,7 @@ JSONObject parseObject(Map map) {
   }
   var object = new JSONObject(name);
   variables.forEach((String key, value) {
-    JSONObject o;
-    if (value is num || value is String || value is bool || value == null) {
-      object.variables[key] = value;
-    } else if (value is Map && (o = parseObject(value)) != null) {
-      object.variables[key] = o;
-    }
+    object.variables[key] = recursiveParsePayload(value);
   });
 
   return object;

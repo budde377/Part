@@ -105,7 +105,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
                     {$this->getDomainOptions()}
                 </select>
             </label>
-            <label>
+            <label id='UserSettingsEditMailAddAddressUserCheckListLabel' $ownerCheckListHidden>
                 Vælg brugere
             </label>
             <ul class='owner_check_list' id='UserSettingsEditMailAddAddressUserCheckList' $ownerCheckListHidden>
@@ -220,10 +220,10 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             $addressLibrary = $domain->getAddressLibrary();
             $addresses = $addressLibrary->listAddresses();
 
-            $hidden = count($addresses) ? "" : "hidden";
+            $hidden = count($addresses) || $addressLibrary->hasCatchallAddress()? "" : "hidden";
             $result .= "
             <li>
-                <ul data-domain-name='{$domain->getDomainName()}' class='floating_list has_deletable address_list' data-domain='{$domain->getDomainName()}' $hidden>";
+                <ul data-domain-name='{$domain->getDomainName()}' class='floating_list has_deletable address_list' $hidden>";
             foreach ($addresses as $address) {
                 $result .= $this->getAddressElement($address, $domain);
                 $addressesFound = true;
@@ -231,6 +231,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
 
             if ($addressLibrary->hasCatchallAddress()) {
                 $result .= $this->getAddressElement($addressLibrary->getCatchallAddress(), $domain, " class='catchall'");
+                $addressesFound = true;
             }
 
             $result .= "
@@ -242,7 +243,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
 
         $result .= "
         <li>
-            <ul class='floating_list' $hideNoResult>
+            <ul class='floating_list empty' $hideNoResult>
                 <li class='empty_list'>Der er ingen addresser</li>
             </ul>
         </li>";
@@ -265,7 +266,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         $deleteElement = $this->currentUser != null && ($address->isOwner($this->currentUser) || $this->currentUser->getUserPrivileges()->hasSitePrivileges()) ?
             "<div class='delete'></div>" : "";
 
-        $lp = $address->getLocalPart() == "" ? "<span class='asterisk'>*</span>" : $address->getLocalPart();
+        $lp = $address->getLocalPart() == "" ? "<span class='asterisk'></span>" : $address->getLocalPart();
         return "<li $attributes>
                     {$lp}@{$domain->getDomainName()}$deleteElement
                             </li>";
