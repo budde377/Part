@@ -10,9 +10,9 @@ use ChristianBudde\cbweb\util\Observer;
 use ChristianBudde\cbweb\util\ObserverLibrary;
 use ChristianBudde\cbweb\util\ObserverLibraryImpl;
 use ChristianBudde\cbweb\util\traits\ValidationTrait;
-use PDOStatement;
 use PDO;
 use PDOException;
+use PDOStatement;
 
 /**
  * Created by PhpStorm.
@@ -228,7 +228,7 @@ class AddressImpl implements Address, Observer
     public function getTargets()
     {
         $this->setUpAlias();
-        return $this->aliasList;
+        return array_values($this->aliasList);
     }
 
     /**
