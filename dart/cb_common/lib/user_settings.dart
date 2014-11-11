@@ -207,7 +207,13 @@ class UserSettingsMailInitializer extends core.Initializer {
     };
 
     var updateAddressListHidden = () {
-      mailAddressLists.querySelector('li ul.empty').hidden = mailAddressLists.querySelector('li ul:not(.empty) li') != null;
+      mailAddressLists.querySelector('li ul.empty').hidden = mailAddressLists.children.fold(false,(bool b, LIElement li){
+        if(b){
+          return b;
+        }
+        var ul = li.children[0];
+        return !ul.classes.contains('empty') && ul.children.length > 0;
+      });
       mailAddressLists.querySelectorAll('li ul:not(.empty)').forEach((UListElement ul) {
         ul.hidden = ul.children.length == 0;
       });
@@ -240,7 +246,6 @@ class UserSettingsMailInitializer extends core.Initializer {
     addressFunctions.add((MailAddress a) {
       LIElement li = addressLi(a);
       var delete = li.querySelector('.delete');
-
       if (delete == null) {
         return;
       }
@@ -250,9 +255,10 @@ class UserSettingsMailInitializer extends core.Initializer {
           if(!b){
             return;
           }
-          li.parent.classes.add('blur');
+          var ul = li.parent;
+          ul.classes.add('blur');
           a.delete().then((_){
-            li.parent.classes.remove('blur');
+            ul.classes.remove('blur');
           });
         });
 
@@ -294,8 +300,6 @@ class UserSettingsMailInitializer extends core.Initializer {
 
     formH.submitFunction = (Map<String, String> m) {
       var addressLibrary = mailDomainLibrary.domains[m['domain']].addressLibrary;
-
-      core.debug(m);
 
       var mailbox_name, mailbox_password;
       if (m.containsKey('add_mailbox')) {
@@ -496,10 +500,10 @@ class UserSettingsMailInitializer extends core.Initializer {
     var caf = (List<Function> l) => (MailAddress d) => l.forEach((Function f) {
       f(d);
     });
+    var af = caf(addressFunctions);
+    addressCreateFunctions.add(af);
 
     domainFunctions.add((MailDomain d) {
-      var af = caf(addressFunctions);
-      addressCreateFunctions.add(af);
       d.addressLibrary
         ..addresses.forEach((_, MailAddress a) => af(a))
         ..onCreate.listen(caf(addressCreateFunctions))
