@@ -10,9 +10,9 @@ use ChristianBudde\cbweb\util\Observer;
 use ChristianBudde\cbweb\util\ObserverLibrary;
 use ChristianBudde\cbweb\util\ObserverLibraryImpl;
 use ChristianBudde\cbweb\util\traits\ValidationTrait;
-use PDOStatement;
 use PDO;
 use PDOException;
+use PDOStatement;
 
 /**
  * Created by PhpStorm.

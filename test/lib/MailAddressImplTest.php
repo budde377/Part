@@ -5,10 +5,10 @@
  * Date: 7/8/14
  * Time: 6:08 PM
  */
-use ChristianBudde\cbweb\model\mail\AddressLibrary;
-use ChristianBudde\cbweb\model\mail\AddressImpl;
-use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
 use ChristianBudde\cbweb\model\mail\Address;
+use ChristianBudde\cbweb\model\mail\AddressImpl;
+use ChristianBudde\cbweb\model\mail\AddressLibrary;
+use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
 use ChristianBudde\cbweb\model\user\User;
 use ChristianBudde\cbweb\model\user\UserLibrary;
 use ChristianBudde\cbweb\model\user\UserLibraryImpl;
@@ -289,7 +289,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
 
     public function testGetTargetsReturnArrayOfTargets(){
         $ar = $this->address2->getTargets();
-        $this->assertEquals(['test@example.org','test2@example.org'], $ar);
+        $this->assertEquals(['test2@example.org', 'test@example.org'], $ar);
 
     }
 
@@ -336,8 +336,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
 
     public function testAddTargetAddsATarget(){
         $this->address->addTarget($t = 'test@test.dk');
-        $this->assertArrayHasKey($t, $ta = $this->address->getTargets());
-        $this->assertEquals($t, $ta[$t]);
+        $this->assertContains($t, $this->address->getTargets());
     }
 
     public function testAddTargetWillDoNothingIfTargetExists(){
@@ -354,8 +353,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
 
     public function testAddTargetWillTrim(){
         $this->address->addTarget(($t = 'test@test.dk').' ');
-        $this->assertArrayHasKey($t, $ta = $this->address->getTargets());
-        $this->assertEquals($t, $ta[$t]);
+        $this->assertContains($t, $this->address->getTargets());
     }
 
 
