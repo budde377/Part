@@ -238,7 +238,7 @@ class UserSettingsMailInitializer extends core.Initializer {
     });
 
     addressFunctions.add((MailAddress a) {
-      var li = addressLi(a);
+      LIElement li = addressLi(a);
       var delete = li.querySelector('.delete');
 
       if (delete == null) {
@@ -246,7 +246,16 @@ class UserSettingsMailInitializer extends core.Initializer {
       }
 
       delete.onClick.listen((_) {
-        a.delete();
+        dialogContainer.confirm("Er du sikker på at du vil slette? <br /> Hvis der er tilknyttet en mailbox vil den også blive slettet ugenopretteligt").result.then((bool b){
+          if(!b){
+            return;
+          }
+          li.parent.classes.add('blur');
+          a.delete().then((_){
+            li.parent.classes.remove('blur');
+          });
+        });
+
       });
 
     });
@@ -267,7 +276,7 @@ class UserSettingsMailInitializer extends core.Initializer {
 
   }
 
-  void _hideInfoboxesOnContract(ValidatingForm form) {
+  void _hideInfoBoxesOnContract(ValidatingForm form) {
     var e = new ExpanderElementHandler(form.element.parent);
     e.onContract.listen((_) {
       form.hideInfoBoxes();
@@ -281,7 +290,7 @@ class UserSettingsMailInitializer extends core.Initializer {
 
     var vForm = new ValidatingForm(addAddressForm);
     var formH = vForm.formHandler;
-    _hideInfoboxesOnContract(vForm);
+    _hideInfoBoxesOnContract(vForm);
 
     formH.submitFunction = (Map<String, String> m) {
       var addressLibrary = mailDomainLibrary.domains[m['domain']].addressLibrary;
@@ -308,14 +317,20 @@ class UserSettingsMailInitializer extends core.Initializer {
       var targets = m['targets'].split(" ");
       targets.removeWhere((String s) => s.isEmpty);
 
-      core.debug(targets);
-      core.debug(owners);
+
+      core.FutureResponse<MailAddress> f;
 
       if (m['local_part'] == "") {
-        addressLibrary.createCatchallAddress(owners: owners, targets:targets, mailbox_name: mailbox_name, mailbox_password: mailbox_password );
+        f = addressLibrary.createCatchallAddress(owners: owners, targets:targets, mailbox_name: mailbox_name, mailbox_password: mailbox_password );
       } else {
-        addressLibrary.createAddress(m['local_part'], owners: owners, targets:targets, mailbox_name: mailbox_name, mailbox_password: mailbox_password);
+        f = addressLibrary.createAddress(m['local_part'], owners: owners, targets:targets, mailbox_name: mailbox_name, mailbox_password: mailbox_password);
       }
+      formH.blur();
+      f..then((_){
+        formH.unBlur();
+      })..thenResponse(onSuccess:(_){
+        formH.clearForm();
+      });
 
       return true;
     };
@@ -536,6 +551,7 @@ class UserSettingsMailInitializer extends core.Initializer {
         li.children[2].text = li.dataset['to-domain'] = domain.aliasTarget.domainName;
       });
 
+
     };
 
     var createLi = (MailDomain d) {
@@ -580,8 +596,8 @@ class UserSettingsMailInitializer extends core.Initializer {
           li.remove();
         } else {
           domainAliasList.append(li);
-          sortListFromDataSet(domainAliasList, 'from-domain');
         }
+        sortListFromDataSet(domainAliasList, 'from-domain');
       });
 
       d.onDelete.listen((_) {
@@ -604,7 +620,7 @@ class UserSettingsMailInitializer extends core.Initializer {
     var vForm = new ValidatingForm(addDomainAliasForm);
     var formH = vForm.formHandler;
 
-    _hideInfoboxesOnContract(vForm);
+    _hideInfoBoxesOnContract(vForm);
 
     var domainOptionCheck = (MailDomain domain) => (OptionElement elm) => elm.value == domain.domainName;
     var optionFromDomain = (MailDomain domain) {
@@ -702,10 +718,8 @@ class UserSettingsMailInitializer extends core.Initializer {
       }
       formH.blur();
       domain.changeAliasTarget(domainTarget).thenResponse(onSuccess:(_) {
-        formH.changeNotion("Alias er oprettet", FormHandler.NOTION_TYPE_SUCCESS);
         formH.unBlur();
       }, onError:(core.Response response) {
-        formH.changeNotion(_errorMessage(response.error_code), FormHandler.NOTION_TYPE_ERROR);
         formH.unBlur();
       });
       return true;
@@ -754,7 +768,7 @@ class UserSettingsMailInitializer extends core.Initializer {
     var validatingForm = new ValidatingForm(addDomainForm);
     var domainNameInput = addDomainForm.querySelector("input[name=domain_name]");
 
-    _hideInfoboxesOnContract(validatingForm);
+    _hideInfoBoxesOnContract(validatingForm);
 
     new Validator<InputElement>(domainNameInput)
       ..addValueValidator((String value) => !mailDomainLibrary.domains.containsKey(value));
@@ -762,11 +776,9 @@ class UserSettingsMailInitializer extends core.Initializer {
     validatingForm.formHandler.submitFunction = (Map<String, String > data) {
       validatingForm.formHandler.blur();
       mailDomainLibrary.createDomain(data['domain_name'], data['super_password']).thenResponse(onSuccess:(core.Response<MailDomain> response) {
-        validatingForm.formHandler.changeNotion("Domænet blev oprettet", FormHandler.NOTION_TYPE_SUCCESS);
         validatingForm.formHandler.clearForm();
         validatingForm.formHandler.unBlur();
       }, onError:(core.Response<MailDomain> response) {
-        validatingForm.formHandler.changeNotion("Domænet blev ikke oprettet", FormHandler.NOTION_TYPE_ERROR);
         validatingForm.formHandler.unBlur();
       });
 

@@ -35,7 +35,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
 
         $out = "
         <h3>Domæner</h3>
-        <ul class='floating_list has_deletable' id='UserSettingsEditMailDomainList'>
+        <ul class='floating_list has_deletable no_loader ' id='UserSettingsEditMailDomainList'>
             {$this->getDomainList()}
         </ul>
         <div class='mail_form expandable'>
@@ -59,7 +59,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         </form>
         </div>
         <h3>Domæne alias</h3>
-        <ul class='floating_list points_to has_deletable' id='UserSettingsEditMailDomainAliasList'>
+        <ul class='floating_list points_to has_deletable no_loader ' id='UserSettingsEditMailDomainAliasList'>
             {$this->getMailAliasList()}
         </ul>
                 <div class='mail_form expandable'>
@@ -223,7 +223,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             $hidden = count($addresses) || $addressLibrary->hasCatchallAddress()? "" : "hidden";
             $result .= "
             <li>
-                <ul data-domain-name='{$domain->getDomainName()}' class='floating_list has_deletable address_list' $hidden>";
+                <ul data-domain-name='{$domain->getDomainName()}' class='no_loader floating_list has_deletable address_list' $hidden>";
             foreach ($addresses as $address) {
                 $result .= $this->getAddressElement($address, $domain);
                 $addressesFound = true;

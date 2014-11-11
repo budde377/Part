@@ -14,6 +14,8 @@ class FormHandler {
 
   factory FormHandler(FormElement form) => _cache.putIfAbsent(form, () => new FormHandler._internal(form));
 
+  Map<Element, Function > _clearFunctions = new Map<Element, Function>();
+
   FormHandler._internal(FormElement form):this.form = form;
 
   set submitFunction(bool f(Map<String, String> data)) {
@@ -24,7 +26,7 @@ class FormHandler {
       var data = <String, String>{
       };
       form.querySelectorAll('input:not([type=submit]), textarea, select').forEach((e) {
-        if(e.name == ""){
+        if (e.name == "") {
           return;
         }
         if (e is SelectElement) {
@@ -32,8 +34,8 @@ class FormHandler {
           data[ee.name] = ee.value;
         } else if (e is InputElement) {
           InputElement ee = e;
-          if(ee.type =="radio" || ee.type == "checkbox"){
-            if(e.checked){
+          if (ee.type == "radio" || ee.type == "checkbox") {
+            if (e.checked) {
               data[ee.name] = ee.value;
             }
           } else {
@@ -91,16 +93,31 @@ class FormHandler {
   }
 
   void clearForm() {
-    List<Element> elements = form.querySelectorAll("textarea, input:not([type=submit])");
+    List<Element> elements = form.querySelectorAll("textarea, input:not([type=submit])").toList();
+    elements.removeWhere((Element e) => _clearFunctions.containsKey(e));
+
+    _clearFunctions.forEach((Element elm, void c(Element e)) {
+      c(elm);
+    });
+
     elements.forEach((Element elm) {
       if (elm is InputElement) {
         InputElement elm2 = elm;
-        elm2.value = "";
+        if (elm2.type == "checkbox" || elm2.type == "radio") {
+          elm2.checked = false;
+        } else {
+          elm2.value = "";
+        }
       } else if (elm is TextAreaElement) {
         TextAreaElement elm2 = elm;
         elm2.value = "";
       }
     });
+  }
+
+
+  void overrideClear(Element e, void c(Element e)) {
+    _clearFunctions[e] = c;
   }
 
   void removeNotion() {
@@ -142,8 +159,8 @@ class Validator<E extends Element> {
 
   factory Validator(E element) => _cache.putIfAbsent(element, () => new Validator._internal(element));
 
-  Validator._internal(E element) : this.form = (element is InputElement || element is TextAreaElement || element is SelectElement)?element.form:null, this.element = element {
-    _validatingForm = hasForm? new ValidatingForm(form):null;
+  Validator._internal(E element) : this.form = (element is InputElement || element is TextAreaElement || element is SelectElement) ? element.form : null, this.element = element {
+    _validatingForm = hasForm ? new ValidatingForm(form) : null;
     if (element.dataset.containsKey("error-message")) {
       errorMessage = element.dataset["error-message"];
     }
@@ -183,7 +200,7 @@ class Validator<E extends Element> {
   void addValidator(bool f(E)) {
     var v = _validator;
     _validator = (Element e) => v(e) && f(e);
-    if(_initial){
+    if (_initial) {
       return;
     }
     check(true);
@@ -209,15 +226,15 @@ class Validator<E extends Element> {
     addValueValidator(pattern.hasMatch);
   }
 
-  void check([bool ignore_initial=false]){
-    if(!hasForm){
+  void check([bool ignore_initial=false]) {
+    if (!hasForm) {
       return;
     }
     validatingForm.checkElement(element, ignore_initial);
   }
 
-  void dependOn(Validator v){
-    v.addValidator((_){
+  void dependOn(Validator v) {
+    v.addValidator((_) {
       check(true);
       return true;
     });
@@ -271,7 +288,7 @@ class ValidatingForm {
       if (!_infoBoxMap.containsKey(elm)) {
         return;
       }
-      if(h){
+      if (h) {
         _infoBoxMap[elm].remove();
       } else {
         _infoBoxMap[elm].showAboveCenterOfElement(elm);
@@ -340,7 +357,7 @@ class ValidatingForm {
   }
 
   void checkElement(Element elm, [bool ignore_initial = false]) {
-    if(!ignore_initial){
+    if (!ignore_initial) {
       elm.classes.remove('initial');
       element.classes.remove('initial');
     }
@@ -369,8 +386,8 @@ class ValidatingForm {
 
   }
 
-  void hideInfoBoxes(){
-    _infoBoxMap.forEach((_,InfoBox b){
+  void hideInfoBoxes() {
+    _infoBoxMap.forEach((_, InfoBox b) {
       b.remove();
     });
   }
