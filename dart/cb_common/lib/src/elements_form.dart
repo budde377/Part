@@ -333,7 +333,7 @@ class ValidatingForm {
     _updateFormValidStatus();
   }
 
-  void validate([bool initial = true]) {
+  bool validate([bool initial = true]) {
     var inputs = element.querySelectorAll('input:not([type=submit]), textarea');
     inputs.forEach((InputElement elm) {
       if (_valueMap[elm] != elm.value) {
@@ -354,6 +354,7 @@ class ValidatingForm {
       _infoBoxMap.clear();
       element.classes.add('initial');
     }
+    return valid;
   }
 
   void checkElement(Element elm, [bool ignore_initial = false]) {
