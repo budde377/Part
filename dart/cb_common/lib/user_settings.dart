@@ -227,8 +227,7 @@ class UserSettingsMailInitializer extends core.Initializer {
     domainCreateFunctions.add((MailDomain d) {
       var li = addressDomainLi(d);
       mailAddressLists.append(li);
-      sortChildren(mailAddressLists, (LIElement li1, LIElement li2) =>
-      li1.children[0].dataset['domain-name'].compareTo(li2.children[0].dataset['domain-name']));
+      sortListFromDataSet(mailAddressLists, 'domain-name');
 
     });
 
@@ -246,12 +245,12 @@ class UserSettingsMailInitializer extends core.Initializer {
       }
 
       delete.onClick.listen((_) {
-        dialogContainer.confirm("Er du sikker på at du vil slette? <br /> Hvis der er tilknyttet en mailbox vil den også blive slettet ugenopretteligt").result.then((bool b){
-          if(!b){
+        dialogContainer.confirm("Er du sikker på at du vil slette? <br /> Hvis der er tilknyttet en mailbox vil den også blive slettet ugenopretteligt").result.then((bool b) {
+          if (!b) {
             return;
           }
           li.parent.classes.add('blur');
-          a.delete().then((_){
+          a.delete().then((_) {
             li.parent.classes.remove('blur');
           });
         });
@@ -305,13 +304,12 @@ class UserSettingsMailInitializer extends core.Initializer {
 
       var owners = [];
 
-      m.forEach((String key, String value){
-        if(!key.startsWith("user_")){
+      m.forEach((String key, String value) {
+        if (!key.startsWith("user_")) {
           return;
         }
         owners.add(userLibrary.users[value]);
       });
-
 
 
       var targets = m['targets'].split(" ");
@@ -321,14 +319,16 @@ class UserSettingsMailInitializer extends core.Initializer {
       core.FutureResponse<MailAddress> f;
 
       if (m['local_part'] == "") {
-        f = addressLibrary.createCatchallAddress(owners: owners, targets:targets, mailbox_name: mailbox_name, mailbox_password: mailbox_password );
+        f = addressLibrary.createCatchallAddress(owners: owners, targets:targets, mailbox_name: mailbox_name, mailbox_password: mailbox_password);
       } else {
         f = addressLibrary.createAddress(m['local_part'], owners: owners, targets:targets, mailbox_name: mailbox_name, mailbox_password: mailbox_password);
       }
       formH.blur();
-      f..then((_){
+      f
+        ..then((_) {
         formH.unBlur();
-      })..thenResponse(onSuccess:(_){
+      })
+        ..thenResponse(onSuccess:(_) {
         formH.clearForm();
       });
 
@@ -923,19 +923,24 @@ class UserSettingsLoggerInitializer extends core.Initializer {
     };
 
     logger.onLog.listen((LogEntry entry) {
+      _logTable.classes.remove('empty');
       var row = _logTable.insertRow(0);
       var levelStrings = entry.levelStrings;
       row.classes.addAll(levelStrings);
 
       var c1 = row.addCell();
-      c1.title = levelStrings.map((String s) => s.toUpperCase()).join(" ");
+      c1
+        ..title = levelStrings.map(core.upperCaseWords).join(" ")
+        ..classes.add("level");
       var c2 = row.addCell();
       c2.text = entry.message;
       var c3 = row.addCell();
       c3.classes.add("dumpfile");
       if (entry.context != null) {
         var a = new AnchorElement();
-        a.dataset['id'] = entry.id.toString();
+        a
+          ..dataset['id'] = entry.id.toString()
+          ..href = "#";
         addDumpListener(a);
         c3.append(a);
       }

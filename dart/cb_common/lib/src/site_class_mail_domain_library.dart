@@ -76,9 +76,14 @@ class AJAXMailDomainLibrary implements MailDomainLibrary {
     var completer = new Completer();
     var domainName = domain.domainName;
 
-    ajaxClient.callFunctionString("MailDomainLibrary.deleteDomain(MailDomainLibrary.getDomain(${quoteString(domainName)}), ${quoteString(password)})").then((Response<JSONObject> response) {
+    ajaxClient.callFunctionString("MailDomainLibrary..deleteDomain(MailDomainLibrary.getDomain(${quoteString(domainName)}), ${quoteString(password)})..getDomain(${quoteString(domainName)})").then((Response<JSONObject> response) {
       if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         completer.complete(response);
+        return;
+      }
+
+      if(response.payload != null){
+        completer.complete(new FutureResponse.error(Response.ERROR_CODE_UNKNOWN_ERROR));
         return;
       }
 

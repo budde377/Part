@@ -94,7 +94,7 @@ class AJAXMailDomain extends MailDomain {
   this._active = object.variables['active'],
   this._description = object.variables['description'],
   this._lastModified = new DateTime.fromMillisecondsSinceEpoch(object.variables['last_modified'] * 1000){
-    _addressLibraryGenerator = (MailDomain d ) => new AJAXMailAddressLibrary.fromJSONObject(object.variables['addresses_library'], d, userLibrary);
+    _addressLibraryGenerator = (MailDomain d ) => new AJAXMailAddressLibrary.fromJSONObject(object.variables['address_library'], d, userLibrary);
     var alias_target = object.variables['alias_target'];
     if(alias_target != null){
       this._aliasTarget = alias_target == domainName?this:domainLibrary.domains[alias_target];

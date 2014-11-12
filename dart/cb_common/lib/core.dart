@@ -265,3 +265,4 @@ String dateString(DateTime dt) {
 String quoteString(String string, [String quote = '"']) => quote+(string.replaceAll(quote, r"\"+quote))+quote;
 
 
+String upperCaseWords(String str) => str.replaceAllMapped(new RegExp("^([a-z\u00E0-\u00FC])|\\s([a-z\u00E0-\u00FC])"), (Match m) => m[0].toUpperCase());

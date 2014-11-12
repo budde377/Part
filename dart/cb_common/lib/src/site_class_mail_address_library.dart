@@ -60,7 +60,7 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
   }
 
   factory AJAXMailAddressLibrary.fromJSONObject(JSONObject object, MailDomain domain, UserLibrary userLibrary){
-    Map<String, JSONObject> objectAddresses = object.variables['addresses'];
+    Map<String, JSONObject> objectAddresses = object.variables['addresses'] is Iterable ?{}:object.variables['addresses'];
     var localParts = objectAddresses.keys;
     if (object.variables['catchall_address'] != null) {
       localParts.add("");
