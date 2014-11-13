@@ -266,14 +266,14 @@ class UserSettingsMailInitializer extends core.Initializer {
         }
 
         if (li.classes.contains('active')) {
-          new ExpanderElementHandler(addAddressForm.parent).contract();
+          _contractAddAddressForm();
         } else {
           _showAddressInForm(a, li);
         }
       });
 
       var delete = li.querySelector('.delete');
-
+      core.debug(a);
       delete.onClick.listen((_) {
         dialogContainer.confirm("Er du sikker på at du vil slette? <br /> Hvis der er tilknyttet en mailbox vil den også blive slettet ugenopretteligt").result.then((bool b) {
           if (!b) {
@@ -300,12 +300,20 @@ class UserSettingsMailInitializer extends core.Initializer {
     addressDeleteFunctions.add((MailAddress a) {
       addressLi(a).remove();
       updateAddressListHidden();
+      if(a == _currently_editing){
+        _contractAddAddressForm();
+      }
     });
 
 
   }
 
+  void _contractAddAddressForm(){
+    new ExpanderElementHandler(addAddressForm.parent).contract();
+  }
+
   void _restoreForm() {
+
     if (_currently_editing == null) {
       return;
     }
@@ -375,7 +383,6 @@ class UserSettingsMailInitializer extends core.Initializer {
   void _hideInfoBoxesOnContract(ValidatingForm form) {
     var e = new ExpanderElementHandler(form.element.parent);
     e.onContract.listen((_) {
-      form.hideInfoBoxes();
       form.validate();
       form.formHandler.clearForm();
     });
@@ -484,7 +491,7 @@ class UserSettingsMailInitializer extends core.Initializer {
         formH.unBlur();
       })
         ..thenResponse(onSuccess:(_) {
-        formH.clearForm();
+        _contractAddAddressForm();
       });
 
       return true;
