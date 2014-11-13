@@ -216,7 +216,13 @@ class UserSettingsMailInitializer extends core.Initializer {
     };
 
     var updateAddressListHidden = () {
-      mailAddressLists.querySelector('li ul.empty').hidden = mailAddressLists.querySelector('li ul:not(.empty) li') != null;
+      mailAddressLists.querySelector('li ul.empty').hidden = mailAddressLists.children.fold(false,(bool b, LIElement li){
+        if(b){
+          return b;
+        }
+        var ul = li.children[0];
+        return !ul.classes.contains('empty') && ul.children.length > 0;
+      });
       mailAddressLists.querySelectorAll('li ul:not(.empty)').forEach((UListElement ul) {
         ul.hidden = ul.children.length == 0;
       });
@@ -666,10 +672,10 @@ class UserSettingsMailInitializer extends core.Initializer {
     var caf = (List<Function> l) => (MailAddress d) => l.forEach((Function f) {
       f(d);
     });
+    var af = caf(addressFunctions);
+    addressCreateFunctions.add(af);
 
     domainFunctions.add((MailDomain d) {
-      var af = caf(addressFunctions);
-      addressCreateFunctions.add(af);
       d.addressLibrary
         ..addresses.forEach((_, MailAddress a) => af(a))
         ..onCreate.listen(caf(addressCreateFunctions))
