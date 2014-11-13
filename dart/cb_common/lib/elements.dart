@@ -100,25 +100,26 @@ class ExpanderElementHandler {
   bool get expanded => element.classes.contains('expanded');
 
   void expand() {
-    var contracted = false;
-    _contractFunction = () {
-      contracted = true;
-    };
+    if(expanded){
+      return;
+    }
     element.classes.add('expanded');
 
     core.escQueue.add(() {
-      if (contracted) {
+      if (!expanded) {
         return false;
       }
       contract();
-      return true;
+      return !expanded;
     });
     _onExpandController.add(this);
   }
 
   void contract() {
+    if(!expanded){
+      return;
+    }
     element.classes.remove('expanded');
-    _contractFunction();
     _onContractController.add(this);
   }
 
