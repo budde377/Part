@@ -734,13 +734,7 @@ form.initial input.invalid {
     width:30px;
     transition: 0.2s opacity;
     z-index: 150;
-    background: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 10%, rgba(255,255,255,1) 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0)), color-stop(10%,rgba(255,255,255,1)), color-stop(100%,rgba(255,255,255,1)));
-    background: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 10%,rgba(255,255,255,1) 100%);
-    background: -o-linear-gradient(top, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 10%,rgba(255,255,255,1) 100%);
-    background: -ms-linear-gradient(top, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 10%,rgba(255,255,255,1) 100%);
-    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 10%,rgba(255,255,255,1) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#ffffff',GradientType=0 );
+    background-color: rgb(255,255,255);
 }
 
 #UserSettingsContent .has_deletable.floating_list > li:hover > .delete{
@@ -959,4 +953,29 @@ form.initial input.invalid {
 #UserSettingsEditMailAddressLists{
     float: left;
     list-style-type: none;
+}
+
+
+#UserSettingsEditMailAddressLists li.can_edit{
+    cursor: pointer;
+}
+
+
+#UserSettingsEditMailAddressLists li.active{
+    background-color: #4F8FA8 ;
+    color: #fff ;
+    border-color: #025C6D ;
+
+}
+#UserSettingsContent #UserSettingsEditMailAddressLists  .has_deletable.floating_list > li.active > .delete{
+    background-color: #4F8FA8 ;
+
+}
+
+#UserSettingsEditMailAddAddressForm.editing .submit.create{
+    display: none;
+}
+
+#UserSettingsEditMailAddAddressForm:not(.editing) .submit.edit{
+    display: none;
 }

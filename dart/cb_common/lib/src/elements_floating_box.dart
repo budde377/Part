@@ -10,9 +10,10 @@ abstract class FloatingBox{
     element.classes.add('floating_box');
   }
 
-  bool get _inDom => element.parent != null;
+  bool get visible => element.parent != null;
+
   Function _changeListener (void f()) => (_) {
-    if(_inDom){
+    if(visible){
       f();
     }
   };
@@ -159,7 +160,7 @@ abstract class FloatingBox{
 
 
   void remove(){
-    if(!_inDom){
+    if(!visible){
       return;
     }
     _removeController.add(new Event("remove", canBubble:false, cancelable:false));

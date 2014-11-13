@@ -125,6 +125,9 @@ class UserSettingsMailInitializer extends core.Initializer {
   List<Function> addressDeleteFunctions = [];
   List<Function> addressCreateFunctions = [];
 
+  MailAddress _currently_editing;
+  LIElement _currently_editing_li;
+
   void setUp() {
 
     setUpMailDomainList();
@@ -144,7 +147,7 @@ class UserSettingsMailInitializer extends core.Initializer {
     var domainToUl = (MailDomain d) => addressLists.firstWhere((UListElement ul) => ul.dataset['domain-name'] == d.domainName, orElse:() => null);
 
     var addressUpdateLi = (LIElement li, MailAddress address) {
-
+      var can_edit = userLibrary.userLoggedIn.hasSitePrivileges || address.owners.contains(userLibrary.userLoggedIn);
       li
         ..dataset['local-part'] = address.localPart
         ..dataset['targets'] = address.targets.join(" ")
@@ -153,7 +156,13 @@ class UserSettingsMailInitializer extends core.Initializer {
         ..dataset['active'] = address.active.toString()
         ..dataset['has-mailbox'] = address.hasMailbox.toString()
         ..innerHtml = "${address.localPart == "" ? "<span class='asterisk'></span>" : address.localPart}@${address.domain.domainName}"
-        ..innerHtml += address.owners.contains(userLibrary.userLoggedIn) || userLibrary.userLoggedIn.hasSitePrivileges ? "<div class='delete'></div>" : "";
+        ..innerHtml += can_edit ? "<div class='delete'></div>" : "";
+
+      if (can_edit) {
+        li.classes.add('can_edit');
+      } else {
+        li.classes.remove('can_edit');
+      }
 
       if (address.hasMailbox) {
         li.dataset['mailbox-name'] = address.mailbox.name;
@@ -221,7 +230,14 @@ class UserSettingsMailInitializer extends core.Initializer {
         ..onOwnerChange.listen(l)
         ..onTargetChange.listen(l)
         ..onLocalPartChange.listen(l)
-        ..onMailboxChange.listen(l);
+        ..onMailboxChange.listen((MailMailbox m) {
+        l(m);
+        if (m != null) {
+          m.onNameChange.listen(l);
+        }
+
+      });
+
     });
 
     domainCreateFunctions.add((MailDomain d) {
@@ -236,13 +252,27 @@ class UserSettingsMailInitializer extends core.Initializer {
       li.remove();
     });
 
+
     addressFunctions.add((MailAddress a) {
       LIElement li = addressLi(a);
-      var delete = li.querySelector('.delete');
 
-      if (delete == null) {
+      if (!li.classes.contains('can_edit')) {
         return;
       }
+
+      li.onClick.listen((MouseEvent evt) {
+        if (evt.target != li) {
+          return;
+        }
+
+        if (li.classes.contains('active')) {
+          new ExpanderElementHandler(addAddressForm.parent).contract();
+        } else {
+          _showAddressInForm(a, li);
+        }
+      });
+
+      var delete = li.querySelector('.delete');
 
       delete.onClick.listen((_) {
         dialogContainer.confirm("Er du sikker på at du vil slette? <br /> Hvis der er tilknyttet en mailbox vil den også blive slettet ugenopretteligt").result.then((bool b) {
@@ -275,10 +305,79 @@ class UserSettingsMailInitializer extends core.Initializer {
 
   }
 
+  void _restoreForm() {
+    if (_currently_editing == null) {
+      return;
+    }
+    mailAddressLists.querySelectorAll('li.active').forEach((LIElement li) => li.classes.remove('active'));
+    addAddressForm.classes.remove('editing');
+    _currently_editing = _currently_editing_li = null;
+    var better_select = new BetterSelect(addAddressForm.querySelector("select[name=domain]"));
+    better_select.disabled = false;
+    var fh = new ValidatingForm(addAddressForm);
+    fh
+      ..formHandler.clearForm()
+      ..validate(true);
+
+  }
+
+  void _showAddressInForm(MailAddress a, LIElement li) {
+    if (addAddressForm == null) {
+      return;
+    }
+    _restoreForm();
+    li.classes.add('active');
+    addAddressForm.classes.add('editing');
+
+
+    var expander = new ExpanderElementHandler(addAddressForm.parent);
+    expander.expand();
+    var s;
+    s = expander.onContract.listen((_) {
+      _restoreForm();
+      s.cancel();
+    });
+
+    _currently_editing = a;
+    _currently_editing_li = li;
+
+    var better_select = new BetterSelect(addAddressForm.querySelector("select[name=domain]"));
+    better_select.disabled = true;
+
+    better_select.value = a.domain.domainName;
+
+    InputElement local_part = addAddressForm.querySelector("input[name=local_part]");
+    local_part.value = a.localPart;
+
+    InputElement targets = addAddressForm.querySelector("input[name=targets]");
+    targets.value = a.targets.join(" ");
+
+    a.owners.forEach((User u) {
+      CheckboxInputElement c = addAddressForm.querySelector('input[name=user_${u.username}');
+      c.checked = true;
+    });
+
+    CheckboxInputElement add_mailbox = addAddressForm.querySelector("input[name=add_mailbox]");
+    add_mailbox.checked = a.hasMailbox;
+
+    if (a.hasMailbox) {
+      InputElement mailbox_owner = addAddressForm.querySelector("input[name=mailbox_owner_name]");
+      mailbox_owner.value = a.mailbox.name;
+
+    }
+    new ValidatingForm(addAddressForm).validate(true);
+
+
+  }
+
+  bool get _isShowingAddressInForm => addAddressForm.classes.contains('editing');
+
   void _hideInfoBoxesOnContract(ValidatingForm form) {
     var e = new ExpanderElementHandler(form.element.parent);
     e.onContract.listen((_) {
       form.hideInfoBoxes();
+      form.validate();
+      form.formHandler.clearForm();
     });
   }
 
@@ -294,10 +393,9 @@ class UserSettingsMailInitializer extends core.Initializer {
     formH.submitFunction = (Map<String, String> m) {
       var addressLibrary = mailDomainLibrary.domains[m['domain']].addressLibrary;
 
-      core.debug(m);
-
       var mailbox_name, mailbox_password;
-      if (m.containsKey('add_mailbox')) {
+      var has_mailbox = m.containsKey('add_mailbox');
+      if (has_mailbox) {
         mailbox_name = m['mailbox_owner_name'];
         mailbox_password = m['mailbox_password'];
       }
@@ -315,14 +413,71 @@ class UserSettingsMailInitializer extends core.Initializer {
       var targets = m['targets'].split(" ");
       targets.removeWhere((String s) => s.isEmpty);
 
+      var local_part = m['local_part'];
+
+
+      if (_isShowingAddressInForm) {
+        var results = [];
+
+        if (local_part != _currently_editing.localPart) {
+          results.add(_currently_editing.changeLocalPart(local_part));
+        }
+
+        var current_owners = _currently_editing.owners;
+
+        current_owners.forEach((User o) {
+          if (owners.contains(o)) {
+            owners.remove(o);
+          } else {
+            results.add(_currently_editing.removeOwner(o));
+          }
+        });
+
+        owners.forEach((User u) {
+          results.add(_currently_editing.addOwner(u));
+        });
+
+        if (has_mailbox) {
+          if (!_currently_editing.hasMailbox) {
+            results.add(_currently_editing.createMailbox(mailbox_name, mailbox_password));
+          } else {
+            var c1 = mailbox_name != _currently_editing.mailbox.name ? mailbox_name : null;
+            var c2 = mailbox_password != "" ? mailbox_password : null;
+            if (c1 != null || c2 != null) {
+              results.add(_currently_editing.mailbox.changeInfo(name:c1, password:c2));
+            }
+
+          }
+        } else if (_currently_editing.hasMailbox) {
+          results.add(_currently_editing.deleteMailbox());
+        }
+
+        formH.blur();
+        int completed = 0;
+        results.forEach((Future f) =>
+        ((int i) =>
+        f.then((_) {
+          completed ++;
+          savingBar.endJob(i);
+          if(completed == results.length){
+            formH.unBlur();
+            _showAddressInForm(_currently_editing, _currently_editing_li);
+          }
+        }))(savingBar.startJob()));
+
+        return true;
+      }
+
 
       core.FutureResponse<MailAddress> f;
 
-      if (m['local_part'] == "") {
+      if (local_part == "") {
         f = addressLibrary.createCatchallAddress(owners: owners, targets:targets, mailbox_name: mailbox_name, mailbox_password: mailbox_password);
       } else {
-        f = addressLibrary.createAddress(m['local_part'], owners: owners, targets:targets, mailbox_name: mailbox_name, mailbox_password: mailbox_password);
+        f = addressLibrary.createAddress(local_part, owners: owners, targets:targets, mailbox_name: mailbox_name, mailbox_password: mailbox_password);
       }
+
+
       formH.blur();
       f
         ..then((_) {
@@ -335,27 +490,39 @@ class UserSettingsMailInitializer extends core.Initializer {
       return true;
     };
 
-    var domainSelect = addAddressForm.querySelector("select[name=domain]");
+    var domain_select = addAddressForm.querySelector("select[name=domain]");
+    var v_domain_select = new Validator(domain_select);
+    v_domain_select.addValueValidator((String s) => mailDomainLibrary[s] != null);
 
     InputElement local_part = addAddressForm.querySelector('input[name=local_part]');
 
     var v_local_part = new Validator(local_part);
-    v_local_part.addValueValidator((String s) => !mailDomainLibrary.domains.containsKey(domainSelect.value) || (!mailDomainLibrary.domains[domainSelect.value].addressLibrary.addresses.containsKey(s)));
+    v_local_part
+      ..addValueValidator((String s) => !(
+        mailDomainLibrary.domains.containsKey(domain_select.value) &&
+        mailDomainLibrary.domains[domain_select.value].addressLibrary.addresses.containsKey(s) &&
+        mailDomainLibrary.domains[domain_select.value].addressLibrary.addresses[s] != _currently_editing))
+      ..dependOn(v_domain_select);
 
-    domainSelect.onChange.listen((_) {
-      v_local_part.check();
-    });
+
     CheckboxInputElement mailbox_checkbox = addAddressForm.querySelector('#UserSettingsEditMailAddAddressAddMailboxCheckbox');
     var v_mailbox_checkbox = new Validator(mailbox_checkbox);
+
+    mailbox_checkbox.onChange.listen((_){
+      if(!_isShowingAddressInForm ||  mailbox_checkbox.checked){
+        return;
+      }
+      dialogContainer.confirm("Er du sikker på at du vil fjerne mailboxen? <br /> Dette kan ikke fortrydes!").result.then((bool b){
+        mailbox_checkbox.checked = !b;
+      });
+    });
 
     InputElement target_input = addAddressForm.querySelector('input[name=targets]');
     var v_target_input = new Validator<InputElement>(target_input);
     v_target_input
       ..addValueValidator((String v) => v.split(" ").fold(true, (bool prev, String s) => prev && (s == "" || core.validMail(s.trim()))))
-      ..addValueValidator((String v) {
-      return mailbox_checkbox.checked || core.nonEmpty(v);
-
-    });
+      ..addValueValidator((String v) => mailbox_checkbox.checked || core.nonEmpty(v))
+      ..dependOn(v_mailbox_checkbox);
 
     target_input.onChange.listen((_) {
       if (!v_target_input.valid) {
@@ -374,13 +541,12 @@ class UserSettingsMailInitializer extends core.Initializer {
     var v1 = new Validator<TextInputElement>(mailbox_name);
     v1.addValueValidator((String s) => !mailbox_checkbox.checked || s != "");
     var v2 = new Validator<PasswordInputElement>(mailbox_password_input_1);
-    v2.addValueValidator((String s) => !mailbox_checkbox.checked || s != "");
+    v2.addValueValidator((String s) => !mailbox_checkbox.checked || s != "" || (_currently_editing != null && _currently_editing.hasMailbox)) ;
     var v3 = new Validator<PasswordInputElement>(mailbox_password_input_2);
     v3
       ..addValueValidator((String s) => !mailbox_checkbox.checked || s == mailbox_password_input_1.value)
       ..dependOn(v2);
 
-    v_target_input.dependOn(v_mailbox_checkbox);
     v1.dependOn(v_mailbox_checkbox);
     v2.dependOn(v_mailbox_checkbox);
     v3.dependOn(v_mailbox_checkbox);
@@ -442,22 +608,19 @@ class UserSettingsMailInitializer extends core.Initializer {
     };
 
 
-    new Validator(domainSelect).addValueValidator((String s) => mailDomainLibrary[s] != null);
-
     domainCreateFunctions.add((MailDomain d) {
       var o = new OptionElement();
       o.text = o.value = d.domainName;
-      domainSelect.append(o);
-      sortSelectOptionsByValue(domainSelect);
+      domain_select.append(o);
+      sortSelectOptionsByValue(domain_select);
     });
 
 
     domainDeleteFunctions.add((MailDomain d) {
-      if (d.domainName == domainSelect.value) {
-        domainSelect.value = "";
-        domainSelect.dispatchEvent(new Event("change"));
+      if (d.domainName == domain_select.value) {
+        new BetterSelect(domain_select).value = "";
       }
-      domainSelect.children.removeWhere((OptionElement o) => o.value == d.domainName);
+      domain_select.children.removeWhere((OptionElement o) => o.value == d.domainName);
     });
 
 
@@ -639,8 +802,7 @@ class UserSettingsMailInitializer extends core.Initializer {
       if (v != null && v != select.value) {
         return;
       }
-      select.value = "";
-      select.dispatchEvent(new Event("change"));
+      new BetterSelect(select).value = "";
     };
 
     var resetFrom = resetSelect(selectFrom);
@@ -1213,7 +1375,7 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
           return false;
         }
         _pageUserSelect.selectedOptions.first.remove();
-        _pageUserSelect.dispatchEvent(new Event('change'));
+        new BetterSelect(_pageUserSelect).update();
         var newLi = createUserLi(user);
         _pageUserList.append(newLi);
         pageUserLis = _pageUserList.querySelectorAll('li');

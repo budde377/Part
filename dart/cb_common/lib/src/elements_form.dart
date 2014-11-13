@@ -93,7 +93,7 @@ class FormHandler {
   }
 
   void clearForm() {
-    List<Element> elements = form.querySelectorAll("textarea, input:not([type=submit])").toList();
+    List<Element> elements = form.querySelectorAll("textarea, input:not([type=submit]), select").toList();
     elements.removeWhere((Element e) => _clearFunctions.containsKey(e));
 
     _clearFunctions.forEach((Element elm, void c(Element e)) {
@@ -111,6 +111,18 @@ class FormHandler {
       } else if (elm is TextAreaElement) {
         TextAreaElement elm2 = elm;
         elm2.value = "";
+      } else if (elm is SelectElement) {
+        SelectElement elm2 = elm;
+        if (elm2.options.length == 0) {
+          return;
+        }
+        if (BetterSelect.isHandling(elm2)) {
+          new BetterSelect(elm2).value = elm2.options[0].value;
+        } else {
+          elm2.value = elm2.options[0].value;
+        }
+
+
       }
     });
   }
@@ -157,6 +169,9 @@ class Validator<E extends Element> {
     return true;
   };
 
+  Function _dependency = () {
+  };
+
   factory Validator(E element) => _cache.putIfAbsent(element, () => new Validator._internal(element));
 
   Validator._internal(E element) : this.form = (element is InputElement || element is TextAreaElement || element is SelectElement) ? element.form : null, this.element = element {
@@ -194,10 +209,13 @@ class Validator<E extends Element> {
   bool get hasForm => form != null;
 
 
-  bool get valid => _validator(element);
+  bool get valid {
+    _dependency();
+    return _validator(element);
+  }
 
 
-  void addValidator(bool f(E)) {
+  void addValidator(bool f(Element E)) {
     var v = _validator;
     _validator = (Element e) => v(e) && f(e);
     if (_initial) {
@@ -233,11 +251,16 @@ class Validator<E extends Element> {
     validatingForm.checkElement(element, ignore_initial);
   }
 
+  void _addDependency(void f()) {
+    var d = _dependency;
+    _dependency = () {
+      d();
+      f();
+    };
+  }
+
   void dependOn(Validator v) {
-    v.addValidator((_) {
-      check(true);
-      return true;
-    });
+    v._addDependency(() => check(true));
   }
 
 }
@@ -277,6 +300,30 @@ class ValidatingForm {
 
   }
 
+  void _listener(Element elm, bool h) {
+    var v = new Validator(elm);
+    if (v.errorMessage.length == 0) {
+      return;
+    }
+    var box = _infoBoxMap[elm];
+    if (box == null) {
+      box = new InfoBox(v.errorMessage);
+      box.backgroundColor = InfoBox.COLOR_RED;
+      _infoBoxMap[elm] = box;
+    }
+
+    if (h == !box.visible) {
+      return;
+    }
+
+    if (h) {
+      box.remove();
+    } else if (!v.valid && !elm.classes.contains('initial')) {
+      box.showAboveCenterOfElement(elm);
+    }
+
+  }
+
   void _setUp(bool initial) {
     element.onSubmit.listen((Event e) {
       if (!_validForm) {
@@ -284,73 +331,65 @@ class ValidatingForm {
         e.stopImmediatePropagation();
       }
     });
-    var listener = (Element elm, bool h) => (_) {
-      if (!_infoBoxMap.containsKey(elm)) {
-        return;
-      }
-      if (h) {
-        _infoBoxMap[elm].remove();
-      } else {
-        _infoBoxMap[elm].showAboveCenterOfElement(elm);
-      }
-
-    };
 
 
     var inputs = element.querySelectorAll('input:not([type=submit]), textarea');
     inputs.forEach((InputElement elm) {
       var v = new Validator(elm);
-      elm.onBlur.listen(listener(elm, true));
-      elm.onFocus.listen(listener(elm, false));
+      elm.onBlur.listen((_) => _listener(elm, true));
+      elm.onFocus.listen((_) => _listener(elm, false));
       elm.classes
         ..add(v.valid ? 'valid' : 'invalid')
         ..add('initial');
       _valueMap[elm] = _valueFromInput(elm);
-      var l = (Event e) {
+      var l = (_) {
         if (_valueMap[elm] == _valueFromInput(elm)) {
           return;
         }
         checkElement(elm);
+        _listener(elm, false);
         _valueMap[elm] = _valueFromInput(elm);
       };
-      elm.onChange.listen(l);
-      elm.onKeyUp.listen(l);
+      elm.onChange
+        ..listen(l);
+      elm.onKeyUp
+        ..listen(l);
     });
     var selects = element.querySelectorAll('select');
     selects.forEach((Element elm) {
-      elm.onBlur.listen(listener(elm, true));
-      elm.onFocus.listen(listener(elm, false));
+      var l = (_) {
+        checkElement(elm);
+        _listener(elm, false);
+      };
+
       var v = new Validator(elm);
+      elm
+        ..onBlur.listen((_) => _listener(elm, true))
+        ..onFocus.listen((_) => _listener(elm, false));
       elm.classes
         ..add(v.valid ? 'valid' : 'invalid')
         ..add('initial');
-      elm.onChange.listen((Event e) => checkElement(elm));
+      elm
+        ..onChange.listen(l)
+        ..on['update'].listen(l);
     });
 
     if (initial) {
-      element.classes.add('initial');
+      validate();
     }
     _updateFormValidStatus();
   }
 
   bool validate([bool initial = true]) {
-    var inputs = element.querySelectorAll('input:not([type=submit]), textarea');
+    var inputs = element.querySelectorAll('input:not([type=submit]), textarea, select');
     inputs.forEach((InputElement elm) {
-      if (_valueMap[elm] != elm.value) {
-        checkElement(elm);
+      checkElement(elm, initial);
+      _valueMap[elm] = _valueFromInput(elm);
+      if (initial) {
+        elm.classes.add('initial');
       }
-      _valueMap[elm] = elm.value;
     });
-    var selects = element.querySelectorAll('select');
-    selects.forEach(checkElement);
-    checkElement(element);
     if (initial) {
-      _infoBoxMap.forEach((Element e, InfoBox i) {
-        i.remove();
-        e.classes
-          ..remove('invalid')
-          ..add('valid');
-      });
       _infoBoxMap.clear();
       element.classes.add('initial');
     }
@@ -366,21 +405,12 @@ class ValidatingForm {
     if (v.valid && elm.classes.contains('invalid')) {
       elm.classes.add('valid');
       elm.classes.remove('invalid');
-      if (_infoBoxMap.containsKey(elm)) {
-        _infoBoxMap[elm].remove();
-        _infoBoxMap.remove(elm);
-      }
+      _listener(elm, true);
       _updateFormValidStatus();
     } else if (!v.valid && elm.classes.contains('valid')) {
       elm.classes.remove('valid');
       elm.classes.add('invalid');
-      if (v.errorMessage.length > 0 && !elm.classes.contains('initial')) {
-        var box = new InfoBox(v.errorMessage);
-        box
-          ..backgroundColor = InfoBox.COLOR_RED
-          ..showAboveCenterOfElement(elm);
-        _infoBoxMap[elm] = box;
-      }
+      _listener(elm, false);
       _updateFormValidStatus();
     }
 
@@ -394,10 +424,11 @@ class ValidatingForm {
   }
 
   void _updateFormValidStatus() {
-    if (!_validForm && element.querySelector('input:not([type=submit]).invalid, textarea.invalid, select.invalid') == null) {
+    var q = element.querySelector('input:not([type=submit]).invalid, textarea.invalid, select.invalid') == null;
+    if (!_validForm && q) {
       _validForm = true;
       _changeToValid();
-    } else if (_validForm && element.querySelector('input:not([type=submit]).invalid, textarea.invalid, select.invalid') != null) {
+    } else if (_validForm && !q) {
       _validForm = false;
       _changeToInvalid();
     }

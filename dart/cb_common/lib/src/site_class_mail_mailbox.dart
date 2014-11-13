@@ -19,7 +19,7 @@ abstract class MailMailbox {
 
   Stream<MailMailbox> get onDelete;
 
-  Stream<String> get onNameChange;
+  Stream<MailMailbox> get onNameChange;
 
   DateTime get lastModified;
 
@@ -65,7 +65,7 @@ class AJAXMailMailbox extends MailMailbox {
   domain = address.domain,
   addressLibrary = address.addressLibrary,
   _name = object.variables['name'],
-  _lastModified = new DateTime.fromMillisecondsSinceEpoch(int.parse(object.variables['last_modified']) * 1000);
+  _lastModified = new DateTime.fromMillisecondsSinceEpoch(object.variables['last_modified'] * 1000);
 
 
   String get name => _name;
@@ -91,7 +91,7 @@ class AJAXMailMailbox extends MailMailbox {
       var n = response.payload.variables['name'];
       if (_name != n) {
         _name = n;
-        _lastModified = new DateTime.fromMillisecondsSinceEpoch(int.parse(response.payload.variables['last_modified']) * 1000);
+        _lastModified = new DateTime.fromMillisecondsSinceEpoch(response.payload.variables['last_modified'] * 1000);
         completer.complete(this);
         _onNameChangeController.add(this);
       } else {

@@ -272,7 +272,7 @@ input[type=checkbox].on_off_checkbox:checked + label::before{
     content:"Til";
 }
 
-input:hover, .better_select:hover > .current_selection, button:hover, .fake_button:hover, input[type=checkbox].on_off_checkbox + label:hover{
+input:hover, .better_select:not(.disabled):hover > .current_selection, button:hover, .fake_button:hover, input[type=checkbox].on_off_checkbox + label:hover{
     border-color: #ffaf33;
 }
 
@@ -406,6 +406,14 @@ body > .mouseShadow {
     width: 150px;
     z-index: 102;
     display: inline-block;
+}
+
+.better_select.disabled{
+    opacity: 0.5;
+}
+
+.better_select.disabled select{
+    cursor: default;
 }
 
 .better_select > .current_selection {

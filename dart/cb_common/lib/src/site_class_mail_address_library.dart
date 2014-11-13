@@ -16,7 +16,7 @@ abstract class MailAddressLibrary {
 
   FutureResponse<MailAddress> createCatchallAddress({List<User> owners, List<String> targets, String mailbox_name, String mailbox_password});
 
-  FutureResponse<MailAddressLibrary> deleteCatchallAddress();
+  FutureResponse<MailAddress> deleteCatchallAddress();
 
   bool get hasCatchallAddress;
 
@@ -106,7 +106,7 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
 
     var fs = "";
     if (owners != null) {
-      fs += owners.fold("", (String prev, User u) => prev + "..addOwner(${quoteString(u.username)})");
+      fs += owners.fold("", (String prev, User u) => prev + "..addOwner(UserLibrary.getUser(${quoteString(u.username)}))");
     }
 
     if (targets != null) {
@@ -167,7 +167,7 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
 
     var fs = "";
     if (owners != null) {
-      fs += owners.fold("", (String prev, User u) => prev + "..addOwner(${quoteString(u.username)})");
+      fs += owners.fold("", (String prev, User u) => prev + "..addOwner(UserLibrary.getUser(${quoteString(u.username)}))");
     }
 
     if (targets != null) {
@@ -196,7 +196,7 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
     return new FutureResponse(completer.future);
   }
 
-  FutureResponse<MailAddressLibrary> deleteCatchallAddress() {
+  FutureResponse<MailAddress> deleteCatchallAddress() {
     if (!hasCatchallAddress) {
       return new Future(() => new Response.error(Response.ERROR_CODE_INVALID_INPUT));
     }

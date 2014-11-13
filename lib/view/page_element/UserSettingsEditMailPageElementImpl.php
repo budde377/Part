@@ -134,10 +134,11 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             </label>
 
             </div>
-            <div class='submit'>
+            <div class='submit create'>
                 <input type='submit' value='Opret adresse' />
-
-
+            </div>
+            <div class='submit edit'>
+                <input type='submit' value='Gem ændringer' />
             </div>
 
         </form>
@@ -152,6 +153,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
     private function getDomainList()
     {
         $result = "";
+
         $deleteElement = $this->backendContainer->getUserLibraryInstance()->getUserLoggedIn()->getUserPrivileges()->hasSitePrivileges() ? "<div class='delete'></div>" : "";
         foreach ($this->mailDomainLibrary->listDomains() as $domain) {
 
@@ -263,10 +265,16 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             $attributes .= ' data-mailbox-name="' . $address->getMailbox()->getName() . '"';
             $attributes .= ' data-mailbox-last-modified="' . $address->getMailbox()->lastModified() . '"';
         }
-        $deleteElement = $this->currentUser != null && ($address->isOwner($this->currentUser) || $this->currentUser->getUserPrivileges()->hasSitePrivileges()) ?
-            "<div class='delete'></div>" : "";
+        $deleteElement = "";
+        if($this->currentUser != null && ($address->isOwner($this->currentUser) || $this->currentUser->getUserPrivileges()->hasSitePrivileges())){
+            $deleteElement =
+                "<div class='delete'></div>";
+            $attributes .= " class='can_edit'";
+
+        }
 
         $lp = $address->getLocalPart() == "" ? "<span class='asterisk'></span>" : $address->getLocalPart();
+
         return "<li $attributes>
                     {$lp}@{$domain->getDomainName()}$deleteElement
                             </li>";

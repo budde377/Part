@@ -39,10 +39,9 @@ class UserSettingsMailDomainLibrary implements MailDomainLibrary {
           if (obj.dataset['has-mailbox'] == "false") {
             return null;
           }
-
           return new AJAXMailMailbox(address,
           name:obj.dataset['mailbox-name'],
-          lastModified:new DateTime.fromMillisecondsSinceEpoch(int.parse(obj.dataset['mailbox-last-modifed']) * 1000));
+          lastModified:new DateTime.fromMillisecondsSinceEpoch(int.parse(obj.dataset['mailbox-last-modified']) * 1000));
 
         };
 
