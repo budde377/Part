@@ -497,6 +497,14 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
 
     }
 
+    public function testAddUserIsPersistentAndInList(){
+        $this->address->addOwner($this->owner1);
+        $address = $this->cloneAddress($this->address);
+        $this->assertContains($this->owner1, $address->listOwners(true));
+        $this->assertContains($this->owner1->getUsername(), $address->listOwners());
+
+    }
+
     public function testAddUserIsPersistentAndUsernameUpdateOk(){
         $this->address->addOwner($this->owner1);
         $address = $this->cloneAddress($this->address);
