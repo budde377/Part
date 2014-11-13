@@ -216,8 +216,8 @@ class UserSettingsMailInitializer extends core.Initializer {
     };
 
     var updateAddressListHidden = () {
-      mailAddressLists.querySelector('li ul.empty').hidden = mailAddressLists.children.fold(false,(bool b, LIElement li){
-        if(b){
+      mailAddressLists.querySelector('li ul.empty').hidden = mailAddressLists.children.fold(false, (bool b, LIElement li) {
+        if (b) {
           return b;
         }
         var ul = li.children[0];
@@ -306,7 +306,7 @@ class UserSettingsMailInitializer extends core.Initializer {
     addressDeleteFunctions.add((MailAddress a) {
       addressLi(a).remove();
       updateAddressListHidden();
-      if(a == _currently_editing){
+      if (a == _currently_editing) {
         _contractAddAddressForm();
       }
     });
@@ -314,13 +314,17 @@ class UserSettingsMailInitializer extends core.Initializer {
 
   }
 
-  void _contractAddAddressForm(){
+  void _contractAddAddressForm() {
     new ExpanderElementHandler(addAddressForm.parent).contract();
   }
 
   void _restoreForm() {
+    var fh = new ValidatingForm(addAddressForm);
 
     if (_currently_editing == null) {
+      fh
+        ..formHandler.clearForm()
+        ..validate(true);
       return;
     }
     mailAddressLists.querySelectorAll('li.active').forEach((LIElement li) => li.classes.remove('active'));
@@ -328,7 +332,6 @@ class UserSettingsMailInitializer extends core.Initializer {
     _currently_editing = _currently_editing_li = null;
     var better_select = new BetterSelect(addAddressForm.querySelector("select[name=domain]"));
     better_select.disabled = false;
-    var fh = new ValidatingForm(addAddressForm);
     fh
       ..formHandler.clearForm()
       ..validate(true);
@@ -472,7 +475,7 @@ class UserSettingsMailInitializer extends core.Initializer {
         f.then((_) {
           completed ++;
           savingBar.endJob(i);
-          if(completed == results.length){
+          if (completed == results.length) {
             formH.unBlur();
             _showAddressInForm(_currently_editing, _currently_editing_li);
           }
@@ -521,11 +524,11 @@ class UserSettingsMailInitializer extends core.Initializer {
     CheckboxInputElement mailbox_checkbox = addAddressForm.querySelector('#UserSettingsEditMailAddAddressAddMailboxCheckbox');
     var v_mailbox_checkbox = new Validator(mailbox_checkbox);
 
-    mailbox_checkbox.onChange.listen((_){
-      if(!_isShowingAddressInForm ||  mailbox_checkbox.checked){
+    mailbox_checkbox.onChange.listen((_) {
+      if (!_isShowingAddressInForm || mailbox_checkbox.checked) {
         return;
       }
-      dialogContainer.confirm("Er du sikker på at du vil fjerne mailboxen? <br /> Dette kan ikke fortrydes!").result.then((bool b){
+      dialogContainer.confirm("Er du sikker på at du vil fjerne mailboxen? <br /> Dette kan ikke fortrydes!").result.then((bool b) {
         mailbox_checkbox.checked = !b;
       });
     });
