@@ -279,7 +279,7 @@ class UserSettingsMailInitializer extends core.Initializer {
       });
 
       var delete = li.querySelector('.delete');
-      core.debug(a);
+
       delete.onClick.listen((_) {
         dialogContainer.confirm("Er du sikker på at du vil slette? <br /> Hvis der er tilknyttet en mailbox vil den også blive slettet ugenopretteligt").result.then((bool b) {
           if (!b) {
