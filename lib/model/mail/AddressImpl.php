@@ -594,6 +594,8 @@ class AddressImpl implements Address, Observer
      */
     public function listOwners($instances = false)
     {
+
+        $this->setUpOwners();
         $returnArray = array();
         if($instances){
             foreach($this->owners as $key=>$val){
