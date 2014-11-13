@@ -390,7 +390,8 @@ class ValidatingForm {
       }
     });
     if (initial) {
-      _infoBoxMap.clear();
+      hideInfoBoxes();
+     _infoBoxMap.clear();
       element.classes.add('initial');
     }
     return valid;
