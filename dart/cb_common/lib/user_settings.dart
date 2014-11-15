@@ -96,6 +96,29 @@ class UserSettingsInitializer extends core.Initializer {
 
 }
 
+abstract class Generator<K,V>{
+
+  Generator(V generator(K), Map<K,V> cache);
+
+  void addUpdater(V updater(K,V));
+
+  void addHandler(void handler(K,V));
+
+  void update(K);
+
+  V operator[](K);
+
+  void remove(K);
+
+}
+
+
+abstract class ListElementGenerator<K, V extends HtmlElement> implements Generator<K, V>{
+
+  ListElementGenerator();
+
+}
+
 
 class UserSettingsMailInitializer extends core.Initializer {
 
