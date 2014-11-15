@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\view\page_element;
+
 use ChristianBudde\cbweb\BackendSingletonContainer;
 use ChristianBudde\cbweb\model;
 use ChristianBudde\cbweb\model\user\User;
@@ -45,15 +46,13 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
 
         $pageForm = new FormElementImpl(FormElement::FORM_METHOD_POST);
         $pageForm->setAttributes("id", "EditPageForm");
-        if ($this->evaluatePageForm($status, $message)) {
-            $pageForm->setNotion($message, $status);
-        }
+
         $pageForm->setAttributes("class", "justDistribution");
         $pageForm->insertInputText("title", "EditPageEditTitleField", $this->currentPage->getTitle(), "Titel");
         $pageForm->insertInputText("id", "EditPageEditIDField", $this->currentPage->getID(), "Side ID");
         /** @var $select SelectElement */
         $pageForm->insertSelect("template", "EditPageEditTemplateSelect", "Side type", $select);
-	foreach ($this->config->listTemplateNames() as $templateName) {
+        foreach ($this->config->listTemplateNames() as $templateName) {
             if (substr($templateName, 0, 1) != "_") {
                 $option = $select->insertOption($templateName, $templateName);
                 if ($templateName == $this->currentPage->getTemplate()) {
@@ -69,7 +68,7 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
 
         $output .= $pageForm->getHTMLString();
         $p = $this->currentUser->getUserPrivileges();
-        if(!$p->hasSitePrivileges() && !$p->hasRootPrivileges()){
+        if (!$p->hasSitePrivileges() && !$p->hasRootPrivileges()) {
             return $output;
         }
 
@@ -77,11 +76,9 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
         <h3>Administrer Brugerrettigheder</h3>
         ";
         $userList = "";
+        $nonDeletableUsers = $deletableUsers = $possibleUsers = array();
         $this->generateUserList($nonDeletableUsers, $deletableUsers, $possibleUsers);
-        if ($this->evaluateRemoveUser($deletableUsers)) {
-            $nonDeletableUsers = $deletableUsers = $possibleUsers = array();
-            $this->generateUserList($nonDeletableUsers, $deletableUsers, $possibleUsers);
-        }
+
         foreach ($nonDeletableUsers as $user) {
             /** @var $user \ChristianBudde\cbweb\model\user\User */
             $userList .= "<li>{$user->getUsername()}</li>";
@@ -97,12 +94,11 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
         ";
 
         $addUserAccessForm = new FormElementImpl(FormElement::FORM_METHOD_POST);
-        $this->evaluateAddUserAccess($possibleUsers);
         $addUserAccessForm->insertInputHidden("1", "addUserAccess");
         $addUserAccessForm->setAttributes("class", "oneLineForm");
         $addUserAccessForm->setAttributes("id", "AddUserToPageForm");
         $addUserAccessForm->insertSelect("username", "EditPageAddUserSelect", "Vælg bruger", $select);
-        $select->insertOption('-- Bruger --'," ");
+        $select->insertOption('-- Bruger --', " ");
         foreach ($possibleUsers as $user) {
             /** @var $user User */
             $select->insertOption($user->getUsername(), $user->getUsername());
@@ -114,11 +110,8 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
         return $output;
     }
 
-    private function generateUserList(&$nonDeletableUsers = array(), &$deletableUsers = array(), &$possibleUsers = array())
+    private function generateUserList(array &$nonDeletableUsers = array(), array &$deletableUsers = array(), array &$possibleUsers = array())
     {
-        $possibleUsers = is_array($possibleUsers) ? $possibleUsers : array();
-        $nonDeletableUsers = is_array($nonDeletableUsers) ? $nonDeletableUsers : array();
-        $deletableUsers = is_array($nonDeletableUsers) ? $nonDeletableUsers : array();
         $users = $this->userLibrary->getChildren($this->currentUser);
         foreach ($users as $user) {
             /** @var $user \ChristianBudde\cbweb\model\user\User */
@@ -135,80 +128,5 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
         }
     }
 
-    private function evaluatePageForm(&$status, &$message)
-    {
-        if (isset($_POST['title'], $_POST['id'], $_POST['template'], $_POST['alias'])) {
-            $alias = trim($_POST['alias']);
-            $id = trim($_POST['id']);
-            $template = trim($_POST['template']);
-            $title = trim($_POST['title']);
-
-            if ($this->currentPage->getID() != $id && !$this->currentPage->isValidId($id)) {
-                $status = FormElement::NOTION_TYPE_ERROR;
-                $message = "Ugyldigt ID";
-                return true;
-            }
-
-            if (!$this->currentPage->isValidAlias($alias)) {
-                $status = FormElement::NOTION_TYPE_ERROR;
-                $message = "Ugyldigt alias";
-                return true;
-            }
-            if (array_search($template, $this->config->listTemplateNames()) === false) {
-                $status = FormElement::NOTION_TYPE_ERROR;
-                $message = "Ugyldig side type";
-            }
-            $this->currentPage->setID($id);
-            $this->currentPage->setTitle($title);
-            $this->currentPage->setAlias($alias);
-            $this->currentPage->setTemplate($template);
-
-            $status = FormElement::NOTION_TYPE_SUCCESS;
-            $message = "Dine ændringer er gemt";
-            return true;
-        }
-        return false;
-    }
-
-    private function evaluateAddUserAccess($possibleUsers, &$status = null)
-    {
-        if (isset($_POST['username'], $_POST['addUserAccess'])) {
-            $username = $_POST['username'];
-            if (array_search($username, array_map(function (model\user\User $u) {
-                return $u->getUsername();
-            }, $possibleUsers)) !== false
-            ) {
-                $user = $this->userLibrary->getUser($username);
-                $privileges = $user->getUserPrivileges();
-                $privileges->addPagePrivileges($this->currentPage);
-                $status = FormElement::NOTION_TYPE_SUCCESS;
-            } else {
-                $status = FormElement::NOTION_TYPE_ERROR;
-            }
-            return true;
-        }
-        return false;
-    }
-
-
-    private function evaluateRemoveUser($deletableUsers, &$status = null)
-    {
-        if (isset($_POST['username'], $_POST['removeUserAccess'])) {
-            $username = trim($_POST['username']);
-            $delUsers = array_map(function (model\user\User $u) {
-                return $u->getUsername();
-            }, $deletableUsers);
-            if (array_search($username, $delUsers) !== false) {
-                $user = $this->userLibrary->getUser($username);
-                $privileges = $user->getUserPrivileges();
-                $privileges->revokePagePrivileges($this->currentPage);
-                $status = FormElement::NOTION_TYPE_SUCCESS;
-            } else {
-                $status = FormElement::NOTION_TYPE_ERROR;
-            }
-            return true;
-        }
-        return false;
-    }
 
 }

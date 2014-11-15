@@ -304,7 +304,8 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         $result = "";
         $i = 0;
 
-        foreach ($this->backendContainer->getUserLibraryInstance()->listUsers() as $user) {
+        $userLibrary = $this->backendContainer->getUserLibraryInstance();
+        foreach ($userLibrary->getChildren($userLibrary->getUserLoggedIn()) as $user) {
             $privileges = $user->getUserPrivileges();
             if ($privileges->hasSitePrivileges()) {
                 continue;
