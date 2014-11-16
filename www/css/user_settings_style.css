@@ -682,7 +682,7 @@ form.initial input.invalid {
 
 }
 
-#UserSettingsContent .floating_list.points_to > li {
+#UserSettingsContent .floating_list.points_to > li:not(.empty_list){
     padding: 0;
 }
 
@@ -747,7 +747,10 @@ form.initial input.invalid {
 }
 
 
-#UserSettingsContent .floating_list > li.empty_list{
+
+
+#UserSettingsContent ul > li.empty_list{
+    display: none;
     width: 530px;
     padding: 10px;
     text-align: center;
@@ -755,6 +758,10 @@ form.initial input.invalid {
     border-radius: 0;
     background: transparent;
     margin: 0;
+}
+
+#UserSettingsContent ul.empty > li.empty_list{
+    display: block;
 }
 
 #UserSettingsContent .floating_list:hover > li.add {

@@ -2,7 +2,6 @@ library elements;
 
 import "dart:async";
 import "dart:html";
-import "dart:convert";
 import "dart:math" as Math;
 
 import 'core.dart' as core;
@@ -25,6 +24,7 @@ part "src/elements_progressbar.dart";
 part "src/elements_move_background_handler.dart";
 part "src/elements_file_drop_area_handler.dart";
 part "src/elements_dias.dart";
+part "src/elements_children_generator.dart";
 
 
 int maxChildrenHeight(Element element) {

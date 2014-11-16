@@ -31,13 +31,11 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
     {
 
         $ownerCheckList = $this->getPageUserList();
-        $ownerCheckListHidden = $ownerCheckList == ""?"hidden":"";
+        $ownerCheckListHidden = $ownerCheckList == "" ? "hidden" : "";
 
         $out = "
         <h3>Domæner</h3>
-        <ul class='floating_list has_deletable no_loader ' id='UserSettingsEditMailDomainList'>
             {$this->getDomainList()}
-        </ul>
         <div class='mail_form expandable'>
         <form id='UserSettingsEditMailAddDomainForm'  data-function-string='MailDomainLibrary.createDomain(domain_name,super_password)'>
             <div hidden>
@@ -59,9 +57,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         </form>
         </div>
         <h3>Domæne alias</h3>
-        <ul class='floating_list points_to has_deletable no_loader ' id='UserSettingsEditMailDomainAliasList'>
             {$this->getMailAliasList()}
-        </ul>
                 <div class='mail_form expandable'>
 
         <form id=\"UserSettingsEditMailAddDomainAliasForm\"  data-function-string='MailDomainLibrary.domains[from].addAliasTarget(to)'>
@@ -85,9 +81,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         </form>
         </div>
         <h3>Adresser</h3>
-        <ul id='UserSettingsEditMailAddressLists'>
             {$this->getAddressList()}
-        </ul>
         <div class='mail_form expandable'>
         <form id='UserSettingsEditMailAddAddressForm'  data-function-string='MailDomainLibrary.domains[domain].aliasLibrary.createAlias(local_part)'>
             <div hidden>
@@ -169,9 +163,13 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             ";
         }
 
-        $hiddenEmpty = $result == "" ? "" : "hidden";
-        $result .= "<li class='empty_list' $hiddenEmpty>Der er ingen domæner</li>";
+        $emptyClass = $result != "" ? "" : "empty";
 
+        $result = "
+        <ul class='floating_list has_deletable no_loader $emptyClass' id='UserSettingsEditMailDomainList'>
+            $result
+            <li class='empty_list'>Der er ingen domæner</li>
+        </ul>";
         return $result;
 
     }
@@ -205,15 +203,21 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             ";
         }
 
-        $hiddenEmpty = $result == "" ? "" : "hidden";
-        $result .= "<li class='empty_list' $hiddenEmpty>Der er ingen domæne alias</li>";
+        $emptyClass = $result != "" ? "" : "empty";
 
+
+        $result = "
+        <ul class='floating_list points_to has_deletable no_loader $emptyClass' id='UserSettingsEditMailDomainAliasList'>
+            $result
+            <li class='empty_list' >Der er ingen domæne alias</li>
+        </ul>";
         return $result;
 
     }
 
     private function getAddressList()
     {
+
 
         $result = "";
         $addressesFound = false;
@@ -222,7 +226,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             $addressLibrary = $domain->getAddressLibrary();
             $addresses = $addressLibrary->listAddresses();
 
-            $hidden = count($addresses) || $addressLibrary->hasCatchallAddress()? "" : "hidden";
+            $hidden = count($addresses) || $addressLibrary->hasCatchallAddress() ? "" : "hidden";
             $result .= "
             <li>
                 <ul data-domain-name='{$domain->getDomainName()}' class='no_loader floating_list has_deletable address_list' $hidden>";
@@ -241,14 +245,15 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             </li>";
         }
 
-        $hideNoResult = !$addressesFound ? "" : "hidden";
+        $emptyClass = $addressesFound ? "" : "empty";
 
-        $result .= "
-        <li>
-            <ul class='floating_list empty' $hideNoResult>
+
+        $result = "
+        <ul id='UserSettingsEditMailAddressLists' class='$emptyClass'>
+                $result
                 <li class='empty_list'>Der er ingen addresser</li>
-            </ul>
-        </li>";
+        </ul>
+        ";
 
         return $result;
     }
@@ -266,7 +271,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             $attributes .= ' data-mailbox-last-modified="' . $address->getMailbox()->lastModified() . '"';
         }
         $deleteElement = "";
-        if($this->currentUser != null && ($address->isOwner($this->currentUser) || $this->currentUser->getUserPrivileges()->hasSitePrivileges())){
+        if ($this->currentUser != null && ($address->isOwner($this->currentUser) || $this->currentUser->getUserPrivileges()->hasSitePrivileges())) {
             $deleteElement =
                 "<div class='delete'></div>";
             $attributes .= " class='can_edit'";
@@ -284,11 +289,10 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
     {
         $result = "";
         foreach ($this->mailDomainLibrary->listDomains() as $domain) {
-            if ($from && $domain->isAliasDomain()) {
-                continue;
-            }
+            $hidden = $from && $domain->isAliasDomain()?"hidden":"";
+
             $result .= "
-            <option value='{$domain->getDomainName()}'>
+            <option value='{$domain->getDomainName()}' $hidden>
                 {$domain->getDomainName()}
             </option>
             ";
