@@ -16,13 +16,21 @@ class FormHandler {
 
   Map<Element, Function > _clearFunctions = new Map<Element, Function>();
 
-  FormHandler._internal(FormElement form):this.form = form;
-
-  set submitFunction(bool f(Map<String, String> data)) {
-    _submitFunction = f;
+  FormHandler._internal(FormElement form):this.form = form{
     form.onSubmit.listen((Event e) {
+      if(_submitFunction == null){
+        return;
+      }
+
+
       e.preventDefault();
       e.stopImmediatePropagation();
+
+      if(ValidatingForm.hasValidator(form) && !validatingForm.valid){
+        return;
+      }
+
+
       var data = <String, String>{
       };
       form.querySelectorAll('input:not([type=submit]), textarea, select').forEach((e) {
@@ -46,36 +54,18 @@ class FormHandler {
           data[ee.name] = ee.value;
         }
       });
-      if (!f(data)) {
+      if (!_submitFunction(data)) {
         e.preventDefault();
         e.stopImmediatePropagation();
       }
     });
   }
 
-  void setUpAJAXSubmit(String AJAXId, [void callbackSuccess(Map map), void callbackError()]) {
-    HttpRequest req = new HttpRequest();
-    req.onReadyStateChange.listen((Event e) {
-      if (req.readyState == 4) {
-        unBlur();
-        try {
-          Map responseData = JSON.decode(req.responseText);
-          callbackSuccess(responseData);
-
-        } catch (e) {
-          callbackError();
-        }
-
-      }
-    });
-    form.onSubmit.listen((Event event) {
-      blur();
-      List<Element> elements = form.querySelectorAll("textarea, input:not([type=submit]), select");
-      req.open(form.method.toUpperCase(), "?ajax=${Uri.encodeComponent(AJAXId)}");
-      req.send(new FormData(form));
-      event.preventDefault();
-    });
+  set submitFunction(bool f(Map<String, String> data)) {
+    _submitFunction = f;
   }
+
+
 
   void changeNotion(String message, String notion_type) {
 
@@ -141,14 +131,13 @@ class FormHandler {
 
   void blur() {
     form.classes.add("blur");
-    //form.insertAdjacentElement("afterBegin", filter);
-
   }
 
   void unBlur() {
     form.classes.remove("blur");
-    //filter.remove();
   }
+
+  ValidatingForm get validatingForm => new ValidatingForm(this.form);
 
 }
 
@@ -274,6 +263,9 @@ class ValidatingForm {
 
   bool _validForm = true;
 
+
+  static bool hasValidator(FormElement form) => _cache.containsKey(form);
+
   factory ValidatingForm(FormElement form, [bool initial = true]) {
     if (_cache.containsKey(form)) {
       return _cache[form];
@@ -325,12 +317,6 @@ class ValidatingForm {
   }
 
   void _setUp(bool initial) {
-    element.onSubmit.listen((Event e) {
-      if (!_validForm) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-      }
-    });
 
 
     var inputs = element.querySelectorAll('input:not([type=submit]), textarea');

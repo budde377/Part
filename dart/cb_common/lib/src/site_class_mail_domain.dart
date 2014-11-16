@@ -117,6 +117,13 @@ class AJAXMailDomain extends MailDomain {
         return;
       }
       _aliasTarget = domain;
+      domain.onDelete.listen((_) {
+        if(domain != _aliasTarget){
+          return;
+        }
+        _aliasTarget = null;
+        _onAliasTargetChangeController.add(_aliasTarget);
+      });
       _lastModified = new DateTime.fromMillisecondsSinceEpoch(r.payload.variables['last_modified'] * 1000);
       completer.complete(new FutureResponse.success(_aliasTarget));
       _onAliasTargetChangeController.add(_aliasTarget);
