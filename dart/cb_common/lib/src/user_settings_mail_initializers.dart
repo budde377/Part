@@ -40,6 +40,23 @@ class UserSettingsMailInitializer extends core.Initializer {
 
     var gas = [];
 
+    var deleteListener = (MailAddress a, LIElement li){
+      var delete = li.querySelector('.delete');
+
+      delete.onClick.listen((_) {
+        dialogContainer.confirm("Er du sikker på at du vil slette? <br /> Hvis der er tilknyttet en mailbox vil den også blive slettet ugenopretteligt").result.then((bool b) {
+          if (!b) {
+            return;
+          }
+          li.parent.classes.add('blur');
+          a.delete().then((_) {
+            li.parent.classes.remove('blur');
+          });
+        });
+
+      });
+    };
+
     var g = new ElementChildrenGenerator<MailDomain, LIElement>((MailDomain d) {
       var li = new LIElement();
       var ul = new UListElement();
@@ -58,12 +75,12 @@ class UserSettingsMailInitializer extends core.Initializer {
 
 
     g.addHandler((MailDomain d, LIElement domain_li) {
-      var sort = (_) => sortChildren(g.element, (LIElement li1, LIElement li2) => (li1.dataset['local-part'] == "" || li2.dataset['local-part'] == "" ? -1 : 1) * li1.dataset['local-part'].compareTo(li2.dataset['local-part']));
       var ul = domain_li.children[0];
       var ga = new ElementChildrenGenerator<MailAddress, LIElement>(
               (_) => new LIElement(),
           ul,
               (LIElement li, _) => d.addressLibrary[li.dataset['local-part']]);
+      var sort = (_) => sortChildren(ga.element, (LIElement li1, LIElement li2) => (li1.dataset['local-part'] == "" || li2.dataset['local-part'] == "" ? -1 : 1) * li1.dataset['local-part'].compareTo(li2.dataset['local-part']));
 
       ga.addUpdater((MailAddress address, LIElement li) {
         var can_edit = userLibrary.userLoggedIn.hasSitePrivileges || address.owners.contains(userLibrary.userLoggedIn);
@@ -77,6 +94,7 @@ class UserSettingsMailInitializer extends core.Initializer {
           ..innerHtml = "${address.localPart == "" ? "<span class='asterisk'></span>" : address.localPart}@${address.domain.domainName}"
           ..innerHtml += can_edit ? "<div class='delete'></div>" : "";
 
+        deleteListener(address, li);
         if (can_edit) {
           li.classes.add('can_edit');
         } else {
@@ -126,20 +144,7 @@ class UserSettingsMailInitializer extends core.Initializer {
           }
         });
 
-        var delete = li.querySelector('.delete');
-
-        delete.onClick.listen((_) {
-          dialogContainer.confirm("Er du sikker på at du vil slette? <br /> Hvis der er tilknyttet en mailbox vil den også blive slettet ugenopretteligt").result.then((bool b) {
-            if (!b) {
-              return;
-            }
-            li.parent.classes.add('blur');
-            a.delete().then((_) {
-              li.parent.classes.remove('blur');
-            });
-          });
-
-        });
+        deleteListener(a, li);
 
       });
 
