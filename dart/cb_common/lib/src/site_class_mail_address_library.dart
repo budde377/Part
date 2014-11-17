@@ -22,10 +22,6 @@ abstract class MailAddressLibrary extends GeneratorDependable<MailAddress>{
 
   Stream<MailAddress> get onCatchallChange;
 
-  Stream<MailAddress> get onCreate;
-
-  Stream<MailAddress> get onDelete;
-
   MailAddress operator [] (String key);
 
 }
@@ -43,14 +39,11 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
   LazyMap<String, MailAddress> _addresses;
 
   StreamController
-  _onDeleteController = new StreamController(),
-  _onCreateController = new StreamController(),
-  _onCatchallChangeController = new StreamController();
+  _onRemoveController = new StreamController.broadcast(),
+  _onAddController = new StreamController.broadcast(),
+  _onUpdateController = new StreamController.broadcast(),
+  _onCatchallChangeController = new StreamController.broadcast();
 
-  Stream
-  _onDeleteStream ,
-  _onCreateStream ,
-  _onCatchallChangeStream;
 
 
   AJAXMailAddressLibrary(Iterable<String> localParts, MailAddress addressGenerator(MailAddressLibrary, String), MailDomain domain, this.userLibrary):
@@ -79,6 +72,11 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
 
 
   MailAddress _addListener(MailAddress m) {
+
+    var l = (_) {
+      _onUpdateController.add(m);
+    };
+
     var key = m.localPart;
     var s1 = m.onLocalPartChange.listen((_) {
       if (!_addresses.containsValue(m)) {
@@ -88,6 +86,13 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
       _addresses[key = m.localPart] = m;
 
     });
+
+    m
+      ..onLocalPartChange.listen(l)
+      ..onMailboxChange.listen(l)
+      ..onTargetChange.listen(l)
+      ..onActiveChange.listen(l);
+
 
     m.onDelete.listen((_) {
       s1.cancel();
@@ -127,7 +132,7 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
       _addListener(address);
       _addresses[address.localPart] = address;
       completer.complete(new Response.success(address));
-      _onCreateController.add(address);
+      _onAddController.add(address);
 
     });
 
@@ -152,7 +157,7 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
       }
       _addresses.remove(address.localPart);
       completer.complete(new Response.success(address));
-      _onDeleteController.add(address);
+      _onRemoveController.add(address);
 
     });
 
@@ -188,7 +193,7 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
       _addresses[""] = address;
       completer.complete(new Response.success(address));
       _onCatchallChangeController.add(address);
-      _onCreateController.add(address);
+      _onAddController.add(address);
 
 
     });
@@ -210,18 +215,20 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
       _addresses.remove("");
       completer.complete(new Response.success(c));
       _onCatchallChangeController.add(c);
-      _onDeleteController.add(c);
+      _onRemoveController.add(c);
 
     });
 
     return new FutureResponse(completer.future);
   }
 
-  Stream<MailAddress> get onCatchallChange => _onCatchallChangeStream == null?_onCatchallChangeStream = _onCatchallChangeController.stream.asBroadcastStream():_onCatchallChangeStream;
+  Stream<MailAddress> get onCatchallChange => _onCatchallChangeController.stream;
 
-  Stream<MailAddress> get onCreate => _onCreateStream == null? _onCreateStream = _onCreateController.stream.asBroadcastStream():_onCreateStream;
+  Stream<MailAddress> get onAdd => _onAddController.stream;
 
-  Stream<MailAddress> get onDelete => _onDeleteStream == null? _onDeleteStream = _onDeleteController.stream.asBroadcastStream(): _onDeleteStream;
+  Stream<MailAddress> get onRemove => _onRemoveController.stream;
+
+  Stream<MailAddress> get onUpdate => _onUpdateController.stream;
 
   MailAddress operator [] (String key) => addresses[key];
 

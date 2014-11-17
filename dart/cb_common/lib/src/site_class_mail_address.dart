@@ -368,7 +368,7 @@ class AJAXMailAddress extends MailAddress {
     if(_onDeleteController == null){
       _onDeleteController = new StreamController();
       _onDeleteStream = _onDeleteController.stream.asBroadcastStream();
-      addressLibrary.onDelete.listen((MailAddress address){
+      addressLibrary.onRemove.listen((MailAddress address){
         if(address != this){
           return;
         }

@@ -47,8 +47,10 @@ class AJAXUserLibrary extends UserLibrary {
   Map<String, User> _users = <String, User>{
   };
   bool _hasBeenSetUp = false;
-  Stream<UserLibraryChangeEvent> _changeStream;
-  StreamController<UserLibraryChangeEvent> _changeController = new StreamController<UserLibraryChangeEvent>();
+  StreamController<UserLibraryChangeEvent> _changeController = new StreamController<UserLibraryChangeEvent>.broadcast();
+
+  StreamController<User>
+  _onUpdateController = new StreamController<User>.broadcast();
 
 
   AJAXUserLibrary(List<User> users, String currentUserName, PageOrder pageOrder) : this.pageOrder = pageOrder {
@@ -101,6 +103,7 @@ class AJAXUserLibrary extends UserLibrary {
       _users.remove(removeKey);
       _users[u.username] = u;
     });
+    user.onChange.listen((_) => _onUpdateController.add(user));
   }
 
   FutureResponse<User> createUser(String mail, String privileges) {
@@ -140,7 +143,7 @@ class AJAXUserLibrary extends UserLibrary {
     return completer.future;
   }
 
-  Stream<UserLibraryChangeEvent> get onChange => _changeStream == null ? _changeStream = _changeController.stream.asBroadcastStream() : _changeStream;
+  Stream<UserLibraryChangeEvent> get onChange => _changeController.stream;
 
   void _callListeners(int changeType, User user) {
     _changeController.add(new UserLibraryChangeEvent(user, changeType));
@@ -178,5 +181,11 @@ class AJAXUserLibrary extends UserLibrary {
 
   FutureResponse forgotPassword(String password) => ajaxClient.callFunctionString('UserLibrary.forgotPassword(${quoteString(password)})');
 
+
+  Stream<User> get onAdd => onChange.where((UserLibraryChangeEvent evt)=>evt.type == UserLibraryChangeEvent.CHANGE_CREATE).map((UserLibraryChangeEvent evt) => evt.user);
+
+  Stream<User> get onRemove => onChange.where((UserLibraryChangeEvent evt)=>evt.type == UserLibraryChangeEvent.CHANGE_DELETE).map((UserLibraryChangeEvent evt) => evt.user);
+
+  Stream<User> get onUpdate => _onUpdateController.stream;
 
 }

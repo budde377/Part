@@ -37,7 +37,11 @@ abstract class PageOrder extends GeneratorDependable<Page>{
 
   FutureResponse<PageOrder> changePageOrder(List<String> page_id_list, {String parent_id:null});
 
-  Stream<PageOrderChange> get onUpdate;
+  Stream<PageOrderChange> get onChange;
+
+  Stream<Page> get onDeactivate;
+
+  Stream<Page> get onActivate;
 
   FutureResponse<Page> createPage(String title);
 
@@ -55,11 +59,13 @@ class AJAXPageOrder extends PageOrder {
 
   Map<String, List<String>> _pageOrder = new Map<String, List<String>>();
 
-  StreamController<PageOrderChange> _streamController = new StreamController<PageOrderChange>();
-  Stream<PageOrderChange> _stream;
+  StreamController<PageOrderChange> _streamChangeController = new StreamController<PageOrderChange>.broadcast();
+  StreamController<Page>
+  _onUpdateController = new StreamController<Page>.broadcast();
 
 
   String _currentPageId;
+
 
 
   AJAXPageOrder(Map<String, List<Page>> pageOrderMap, List<Page> inactivePages, String current_page_id){
@@ -121,6 +127,8 @@ class AJAXPageOrder extends PageOrder {
       _pages[p.id] = p;
     });
 
+    page.onChange.listen((_)=>_onUpdateController.add(page));
+
   }
 
   FutureResponse<Page> deactivatePage(String page_id) {
@@ -153,7 +161,6 @@ class AJAXPageOrder extends PageOrder {
 
   FutureResponse<PageOrder> changePageOrder(List<String> page_id_list, {String parent_id:null}) {
     var completer = new Completer<Response<PageOrder>>();
-    //var function = new SetPageOrderJSONFunction(parent_id == null ? "" : parent_id, page_id_list);
     var function = "PageOrder";
 
     var order = this.listPageOrder(parent_id:parent_id);
@@ -254,7 +261,7 @@ class AJAXPageOrder extends PageOrder {
   Page get currentPage => _pages[_currentPageId];
 
   void _callListeners(int changeType, [Page page = null]) {
-    _streamController.add(new PageOrderChange(changeType, page));
+    _streamChangeController.add(new PageOrderChange(changeType, page));
   }
 
   FutureResponse<Page> createPage(String title) {
@@ -292,9 +299,19 @@ class AJAXPageOrder extends PageOrder {
 
   bool pageExists(String page_id) => _pages[page_id] != null;
 
-  Stream<PageOrderChange> get onUpdate => _stream == null ? _stream = _streamController.stream.asBroadcastStream() : _stream;
+  Stream<PageOrderChange> get onChange => _streamChangeController.stream;
 
   Page operator [](String id) => pages[id];
+
+  Stream<Page> get onAdd => onChange.where((PageOrderChange evt)=>evt.type == PageOrderChange.PAGE_ORDER_CHANGE_CREATE_PAGE).map((PageOrderChange evt) => evt.page);
+
+  Stream<Page> get onRemove => onChange.where((PageOrderChange evt)=>evt.type == PageOrderChange.PAGE_ORDER_CHANGE_DELETE_PAGE).map((PageOrderChange evt) => evt.page);
+
+  Stream<Page> get onUpdate => _onUpdateController.stream;
+
+  Stream<Page> get onDeactivate => onChange.where((PageOrderChange evt)=>evt.type == PageOrderChange.PAGE_ORDER_CHANGE_DEACTIVATE).map((PageOrderChange evt) => evt.page);
+
+  Stream<Page> get onActivate => onChange.where((PageOrderChange evt)=>evt.type == PageOrderChange.PAGE_ORDER_CHANGE_ACTIVATE).map((PageOrderChange evt) => evt.page);
 
 
 }

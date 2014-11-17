@@ -1,17 +1,13 @@
 part of site_classes;
 
 
-abstract class MailDomainLibrary extends GeneratorDependable<MailDomain>{
+abstract class MailDomainLibrary extends GeneratorDependable<MailDomain> {
 
   Map<String, MailDomain> get domains;
 
   FutureResponse<MailDomain> createDomain(String domainName, String password);
 
   FutureResponse<MailDomain> deleteDomain(MailDomain domain, String password);
-
-  Stream<MailDomain> get onCreate;
-
-  Stream<MailDomain> get onDelete;
 
   MailDomain operator [] (String key);
 
@@ -25,24 +21,35 @@ class AJAXMailDomainLibrary implements MailDomainLibrary {
   LazyMap<String, MailDomain> _domains;
 
   StreamController<MailDomain>
-  _onCreateController = new StreamController<MailDomain>(),
-  _onDeleteController = new StreamController<MailDomain>();
-
-  Stream<MailDomain>
-  _onCreateStream,
-  _onDeleteStream;
+  _onAddController = new StreamController<MailDomain>.broadcast(),
+  _onUpdateController = new StreamController<MailDomain>.broadcast(),
+  _onRemoveController = new StreamController<MailDomain>.broadcast();
 
 
   AJAXMailDomainLibrary(Iterable<String> domainNames, MailDomain domainGenerator(MailDomainLibrary, String), this.userLibrary) {
-    _domains = new LazyMap<String, MailDomain>.fromGenerator(domainNames, (String dn) => domainGenerator(this, dn));
+    _domains = new LazyMap<String, MailDomain>.fromGenerator(domainNames, (String dn) => _generator_wrapper(domainGenerator(this, dn)));
   }
 
   factory AJAXMailDomainLibrary.fromJSONObject(JSONObject object, UserLibrary userLibrary){
     Map<String, JSONObject> objectDomains = object.variables['domains'];
     return new AJAXMailDomainLibrary(
         objectDomains.keys,
-        (MailDomainLibrary library, String name) => new AJAXMailDomain.fromJSONObject(objectDomains[name], library, userLibrary),
+            (MailDomainLibrary library, String name) => new AJAXMailDomain.fromJSONObject(objectDomains[name], library, userLibrary),
         userLibrary);
+  }
+
+
+  MailDomain _generator_wrapper(MailDomain domain) {
+
+    var l = (_) => _onUpdateController.add(domain);
+
+    domain
+      ..onActiveChange.listen(l)
+      ..onDescriptionChange.listen(l)
+      ..onAliasTargetChange.listen(l);
+
+
+    return domain;
   }
 
 
@@ -57,15 +64,15 @@ class AJAXMailDomainLibrary implements MailDomainLibrary {
         return;
       }
 
-      if(response.payload == null){
+      if (response.payload == null) {
         completer.complete(new Response.error(Response.ERROR_CODE_UNKNOWN_ERROR));
         return;
       }
 
-      var domain = new AJAXMailDomain.fromJSONObject(response.payload, this, userLibrary);
+      var domain = _generator_wrapper(new AJAXMailDomain.fromJSONObject(response.payload, this, userLibrary));
       _domains[domain.domainName] = domain;
       completer.complete(new Response.success(domain));
-      _onCreateController.add(domain);
+      _onAddController.add(domain);
 
     });
 
@@ -82,23 +89,25 @@ class AJAXMailDomainLibrary implements MailDomainLibrary {
         return;
       }
 
-      if(response.payload != null){
+      if (response.payload != null) {
         completer.complete(new FutureResponse.error(Response.ERROR_CODE_UNKNOWN_ERROR));
         return;
       }
 
       _domains.remove(domainName);
       completer.complete(new Response.success(domain));
-      _onDeleteController.add(domain);
+      _onRemoveController.add(domain);
     });
 
     return new FutureResponse(completer.future);
 
   }
 
-  Stream<MailDomain> get onCreate => _onCreateStream == null?_onCreateStream = _onCreateController.stream.asBroadcastStream():_onCreateStream;
+  Stream<MailDomain> get onAdd => _onAddController.stream;
 
-  Stream<MailDomain> get onDelete => _onDeleteStream == null?_onDeleteStream = _onDeleteController.stream.asBroadcastStream():_onDeleteStream;
+  Stream<MailDomain> get onRemove => _onRemoveController.stream;
+
+  Stream<MailDomain> get onUpdate => _onUpdateController.stream;
 
   MailDomain operator [] (String key) => domains[key];
 

@@ -244,7 +244,7 @@ class AJAXMailDomain extends MailDomain {
   Stream<MailDomain> get onDelete {
     if (_onDeleteController == null) {
       _onDeleteController = new StreamController();
-      domainLibrary.onDelete.listen((MailDomain d) {
+      domainLibrary.onRemove.listen((MailDomain d) {
         if (d != this) {
           return;
         }

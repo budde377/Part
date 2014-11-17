@@ -91,7 +91,7 @@ class UserSettingsPageListsInitializer extends core.Initializer {
     _activeList.onChange.listen(ULChangeListener(_activeList, null));
     _activeList.querySelectorAll('ul').forEach((UListElement ul) => ul.onChange.listen(ULChangeListener(ul, new UserSettingsPageLi(ul.parent).page.id)));
 
-    _order.onUpdate.listen((PageOrderChange change) {
+    _order.onChange.listen((PageOrderChange change) {
       var page = change.page, changeType = change.type;
       switch (changeType) {
         case PageOrderChange.PAGE_ORDER_CHANGE_CREATE_PAGE:

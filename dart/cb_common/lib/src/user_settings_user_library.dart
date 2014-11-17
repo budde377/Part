@@ -56,6 +56,9 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
   Future<core.Response<User>> deleteUser(String username) => _userLibrary.deleteUser(username);
 
   Stream<UserLibraryChangeEvent> get onChange => _userLibrary.onChange;
+  Stream<User> get onUpdate => _userLibrary.onUpdate;
+  Stream<User> get onAdd => _userLibrary.onAdd;
+  Stream<User> get onRemove => _userLibrary.onRemove;
 
   Map<String, User> get users => _userLibrary.users;
 

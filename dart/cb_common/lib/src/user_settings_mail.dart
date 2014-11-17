@@ -77,10 +77,12 @@ class UserSettingsMailDomainLibrary implements MailDomainLibrary {
 
   }
 
-  Stream<MailDomain> get onDelete => domainLibrary.onDelete;
+  Stream<MailDomain> get onRemove => domainLibrary.onRemove;
 
 
-  Stream<MailDomain> get onCreate => domainLibrary.onCreate;
+  Stream<MailDomain> get onAdd => domainLibrary.onAdd;
+
+  Stream<MailDomain> get onUpdate => domainLibrary.onUpdate;
 
 
   core.FutureResponse<MailDomain> deleteDomain(MailDomain domain, String password) => domainLibrary.deleteDomain(domain, password);

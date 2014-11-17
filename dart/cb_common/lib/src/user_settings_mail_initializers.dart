@@ -167,8 +167,8 @@ class UserSettingsMailInitializer extends core.Initializer {
         _contractAddAddressForm();
       });
 
-      d.addressLibrary.onCreate.listen(ga.add);
-      d.addressLibrary.onDelete.listen(ga.remove);
+      d.addressLibrary.onAdd.listen(ga.add);
+      d.addressLibrary.onRemove.listen(ga.remove);
 
 
     });
@@ -490,7 +490,7 @@ class UserSettingsMailInitializer extends core.Initializer {
         g.update(u);
       });
     });
-
+    // TODO better depend
     g
       ..onAdd.listen((_) => sortListFromDataSet(g.element, 'user-name'))
       ..onUpdate.listen((_) => sortListFromDataSet(g.element, 'user-name'))
@@ -778,11 +778,6 @@ class UserSettingsMailInitializer extends core.Initializer {
     }, mailDomainList, (LIElement v, _) => mailDomainLibrary[v.dataset['domain-name']]);
 
     domainListGenerator.addHandler((MailDomain domain, LIElement li) {
-      var listener = (_) => domainListGenerator.update(domain);
-      domain
-        ..onActiveChange.listen(listener)
-        ..onAliasTargetChange.listen(listener)
-        ..onDescriptionChange.listen(listener);
 
       li.querySelector('.delete').onClick.listen((_) {
         var c = dialogContainer.password("Er du sikker på at du vil slette?");
@@ -810,10 +805,7 @@ class UserSettingsMailInitializer extends core.Initializer {
 
     domainListGenerator.onAdd.listen((_) => sortListFromDataSet(domainListGenerator.element, 'domain-name'));
 
-    mailDomainLibrary
-      ..onCreate.listen(domainListGenerator.add)
-      ..onDelete.listen(domainListGenerator.remove);
-
+    domainListGenerator.dependsOn(mailDomainLibrary);
   }
 
 

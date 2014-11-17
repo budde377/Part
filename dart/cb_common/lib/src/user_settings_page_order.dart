@@ -5,17 +5,15 @@ String idFromAnchor(AnchorElement val) => val.href.substring(val.href.lastIndexO
 class UserSettingsJSONPageOrder implements PageOrder {
 
   final PageOrder _pageOrder;
-  static final  UserSettingsJSONPageOrder _cache = new UserSettingsJSONPageOrder._internal(querySelector("#ActivePageList"), querySelector("#InactivePageList"));
+  static final UserSettingsJSONPageOrder _cache = new UserSettingsJSONPageOrder._internal(querySelector("#ActivePageList"), querySelector("#InactivePageList"));
 
   factory UserSettingsJSONPageOrder() => _cache;
 
-  UserSettingsJSONPageOrder._internal(UListElement activePageList, UListElement inactivePageList) : _pageOrder = new AJAXPageOrder( _listToPageOrder(activePageList), _listToPages(inactivePageList), (() {
+  UserSettingsJSONPageOrder._internal(UListElement activePageList, UListElement inactivePageList) : _pageOrder = new AJAXPageOrder(_listToPageOrder(activePageList), _listToPages(inactivePageList), (() {
     var v;
     return (v = activePageList.querySelector('li.current')) == null ?
-          ((v = inactivePageList.querySelector('li.current')) == null ? null : v.dataset["id"]) : v.dataset["id"];
+    ((v = inactivePageList.querySelector('li.current')) == null ? null : v.dataset["id"]) : v.dataset["id"];
   })());
-
-
 
 
   static Map<String, List<Page>> _listToPageOrder(UListElement list) {
@@ -80,7 +78,17 @@ class UserSettingsJSONPageOrder implements PageOrder {
 
   Future<core.Response<Page>> createPage(String title) => _pageOrder.createPage(title);
 
-  Stream<PageOrderChange> get onUpdate => _pageOrder.onUpdate;
+  Stream<PageOrderChange> get onChange => _pageOrder.onChange;
+
+  Stream<Page> get onUpdate => _pageOrder.onUpdate;
+
+  Stream<Page> get onAdd => _pageOrder.onAdd;
+
+  Stream<Page> get onRemove => _pageOrder.onRemove;
+
+  Stream<Page> get onDeactivate => _pageOrder.onDeactivate;
+
+  Stream<Page> get onActivate => _pageOrder.onActivate;
 
   Future<core.Response<Page>> deletePage(String id) => _pageOrder.deletePage(id);
 
