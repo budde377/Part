@@ -13,7 +13,7 @@ class PageOrderChange {
 
 }
 
-abstract class PageOrder {
+abstract class PageOrder extends GeneratorDependable<Page>{
 
   Page get currentPage;
 

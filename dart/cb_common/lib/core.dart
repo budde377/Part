@@ -263,6 +263,16 @@ String dateString(DateTime dt) {
   return returnString.trim();
 }
 
+
+
+class Pair<K, V> {
+  final K k;
+  final V v;
+
+  Pair(this.k, this.v);
+
+}
+
 String quoteString(String string, [String quote = '"']) => quote+(string.replaceAll(quote, r"\"+quote))+quote;
 
 

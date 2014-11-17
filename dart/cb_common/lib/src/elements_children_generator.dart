@@ -9,8 +9,8 @@ class ElementChildrenGenerator<K, V extends Element> extends core.Generator<K, V
     l.removeWhere((Element e) => selector(e, elm) == null);
     return l;
   }(), key:(V k) => selector(k, elm), value:(V v) => v)) {
-    onInternalRemoveController.stream.listen((core.GeneratorPair<K, V> pair) => pair.v.remove());
-    onInternalAddController.stream.listen((core.GeneratorPair<K, V> pair) => element.append(pair.v));
+    onBeforeRemove.listen((core.Pair<K, V> pair) => pair.v.remove());
+    onBeforeAdd.listen((core.Pair<K, V> pair) => element.append(pair.v));
   }
 
 

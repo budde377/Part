@@ -1,16 +1,54 @@
 part of core;
 
+abstract class GeneratorDependable<K> {
 
+  Stream<K> get onAdd;
 
-class GeneratorPair<K, V> {
-  final K k;
-  final V v;
+  Stream<K> get onUpdate;
 
-  GeneratorPair(this.k, this.v);
+  Stream<K> get onRemove;
+
 
 }
 
-class Generator<K, V> {
+abstract class PairGeneratorDependable<K, V> implements GeneratorDependable<Pair<K, V>> {
+  GeneratorDependable<K> get firstOfPairDependable => new FirstOfPairGeneratorDependableTransformer<K, V>(this);
+
+  GeneratorDependable<V> get secondOfPairDependable => new SecondOfPairGeneratorDependableTransformer<K, V>(this);
+
+}
+
+
+class FirstOfPairGeneratorDependableTransformer<K, V> extends GeneratorDependableTransformer<Pair<K, V>, K> {
+
+  FirstOfPairGeneratorDependableTransformer(GeneratorDependable<Pair<K, V>> dependable) : super(dependable, (Pair<K, V> p) => p.k);
+
+}
+
+class SecondOfPairGeneratorDependableTransformer<K, V> extends GeneratorDependableTransformer<Pair<K, V>, V> {
+
+  SecondOfPairGeneratorDependableTransformer(GeneratorDependable<Pair<K, V>> dependable) : super(dependable, (Pair<K, V> p) => p.v);
+
+}
+
+class GeneratorDependableTransformer<K, T> implements GeneratorDependable<T> {
+
+  final GeneratorDependable<K> dependable;
+  final Function transformer;
+
+  GeneratorDependableTransformer(GeneratorDependable<K> dependable, T transformer(K)): this.dependable = dependable, this.transformer = transformer;
+
+  Stream<T> get onAdd => dependable.onAdd.map(transformer);
+
+  Stream<T> get onUpdate => dependable.onUpdate.map(transformer);
+
+  Stream<T> get onRemove => dependable.onRemove.map(transformer);
+
+
+}
+
+
+class Generator<K, V> extends PairGeneratorDependable<K, V> {
 
   Map<K, V> _cache;
   Function _generator;
@@ -19,14 +57,15 @@ class Generator<K, V> {
 
   List<Function> _handlers = <Function>[];
 
-  final StreamController<GeneratorPair<K, V>>
-  onInternalAddController = new StreamController<GeneratorPair<K, V>>.broadcast(),
-  onInternalRemoveController = new StreamController<GeneratorPair<K, V>>.broadcast(),
-  onAddController = new StreamController<GeneratorPair<K, V>>.broadcast(),
-  onUpdateController = new StreamController<GeneratorPair<K, V>>.broadcast(),
-  onRemoveController = new StreamController<GeneratorPair<K, V>>.broadcast(),
-  onEmptyController = new StreamController<GeneratorPair<K, V>>.broadcast(),
-  onNotEmptyController = new StreamController<GeneratorPair<K, V>>.broadcast();
+  final StreamController<Pair<K, V>>
+  _onBeforeAddController = new StreamController<Pair<K, V>>.broadcast(),
+  _onBeforeRemoveController = new StreamController<Pair<K, V>>.broadcast(),
+  _onEmptyController = new StreamController<Pair<K, V>>.broadcast(),
+  _onNotEmptyController = new StreamController<Pair<K, V>>.broadcast(),
+  _onAddController = new StreamController<Pair<K, V>>.broadcast(),
+  _onUpdateController = new StreamController<Pair<K, V>>.broadcast(),
+  _onRemoveController = new StreamController<Pair<K, V>>.broadcast();
+
 
   Generator(V generator(K), Map<K, V> cache) : _cache = cache, _generator = generator;
 
@@ -40,15 +79,20 @@ class Generator<K, V> {
     _handlers.add(handler);
   }
 
-  Stream<GeneratorPair<K, V>> get onAdd => onAddController.stream;
 
-  Stream<GeneratorPair<K, V>> get onUpdate => onUpdateController.stream;
+  Stream<Pair<K, V>> get onEmpty => onRemove.where((_) => size == 0);
 
-  Stream<GeneratorPair<K, V>> get onRemove => onRemoveController.stream;
+  Stream<Pair<K, V>> get onNotEmpty => onAdd.where((_) => size == 1);
 
-  Stream<GeneratorPair<K, V>> get onEmpty => onRemove.where((_) => size == 0);
+  Stream<Pair<K, V>> get onAdd => _onAddController.stream;
 
-  Stream<GeneratorPair<K, V>> get onNotEmpty => onAdd.where((_) => size == 1);
+  Stream<Pair<K, V>> get onBeforeAdd => _onBeforeAddController.stream;
+
+  Stream<Pair<K, V>> get onUpdate => _onUpdateController.stream;
+
+  Stream<Pair<K, V>> get onRemove => _onRemoveController.stream;
+
+  Stream<Pair<K, V>> get onBeforeRemove => _onBeforeRemoveController.stream;
 
   int get size => _cache.length;
 
@@ -58,7 +102,7 @@ class Generator<K, V> {
     }
     var v = this[k];
     _callUpdaters(k, v);
-    onUpdateController.add(new GeneratorPair(k, v));
+    _onUpdateController.add(new Pair(k, v));
 
   }
 
@@ -79,8 +123,8 @@ class Generator<K, V> {
     }
     var v = _cache[k] = _generator(k);
     _callHandlers(k, v);
-    onInternalAddController.add(new GeneratorPair<K, V>(k, v));
-    onAddController.add(new GeneratorPair<K, V>(k, v));
+    _onBeforeAddController.add(new Pair<K, V>(k, v));
+    _onAddController.add(new Pair<K, V>(k, v));
   }
 
   void remove(K k) {
@@ -89,18 +133,25 @@ class Generator<K, V> {
     }
     var v = this[k];
     _cache.remove(k);
-    onInternalRemoveController.add(new GeneratorPair<K, V>(k, v));
-    onRemoveController.add(new GeneratorPair<K, V>(k, v));
+    _onBeforeRemoveController.add(new Pair<K, V>(k, v));
+    _onRemoveController.add(new Pair<K, V>(k, v));
   }
 
 
   bool contains(K k) => _cache.containsKey(k);
 
 
-  void dependsOn(Generator<K, dynamic> generator) {
-    generator.onAdd.listen((GeneratorPair p) => add(p.k));
-    generator.onRemove.listen((GeneratorPair p) => remove(p.k));
-    generator.onUpdate.listen((GeneratorPair p) => update(p.k));
+  void dependsOn(GeneratorDependable<K> generator, {bool whenAdd(K), bool whenRemove(K), bool whenUpdate(K)}) {
+    var action = (bool when(K), void f(K))=>(K k){
+      if(when != null && !when(k)){
+        return;
+      }
+      f(k);
+    };
+
+    generator.onAdd.listen(action(whenAdd, add));
+    generator.onRemove.listen(action(whenRemove, remove));
+    generator.onUpdate.listen(action(whenUpdate, update));
 
   }
 

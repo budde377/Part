@@ -1,6 +1,6 @@
 part of site_classes;
 
-abstract class MailAddressLibrary {
+abstract class MailAddressLibrary extends GeneratorDependable<MailAddress>{
 
   MailAddress get catchallAddress;
 

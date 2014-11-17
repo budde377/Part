@@ -1,7 +1,7 @@
 part of site_classes;
 
 
-abstract class MailDomainLibrary {
+abstract class MailDomainLibrary extends GeneratorDependable<MailDomain>{
 
   Map<String, MailDomain> get domains;
 

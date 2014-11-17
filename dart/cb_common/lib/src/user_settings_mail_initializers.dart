@@ -160,7 +160,7 @@ class UserSettingsMailInitializer extends core.Initializer {
       ga.onNotEmpty.listen((_) => g.element.classes.remove('empty'));
       ga.onAdd.listen(sort);
 
-      ga.onRemove.listen((core.GeneratorPair p) {
+      ga.onRemove.listen((core.Pair p) {
         if (p.k != _currently_editing) {
           return;
         }
@@ -173,7 +173,7 @@ class UserSettingsMailInitializer extends core.Initializer {
 
     });
 
-    g.dependsOn(domainListGenerator);
+    g.dependsOn(domainListGenerator.firstOfPairDependable);
 
     g.onAdd.listen((_) => sortListFromDataSet(mailAddressLists, 'domain-name'));
 
@@ -394,14 +394,14 @@ class UserSettingsMailInitializer extends core.Initializer {
             (OptionElement o, _) => mailDomainLibrary[o.value]);
 
     domain_select_generator.onAdd.listen((_) => sortSelectOptionsByValue(domain_select));
-    domain_select_generator.onRemove.listen((core.GeneratorPair<MailDomain, OptionElement> pair) {
+    domain_select_generator.onRemove.listen((core.Pair<MailDomain, OptionElement> pair) {
       if (pair.k.domainName != domain_select.value) {
         return;
       }
       new BetterSelect(domain_select).value = "";
 
     });
-    domain_select_generator.dependsOn(domainListGenerator);
+    domain_select_generator.dependsOn(domainListGenerator.firstOfPairDependable);
 
 
     CheckboxInputElement mailbox_checkbox = addAddressForm.querySelector('#UserSettingsEditMailAddAddressAddMailboxCheckbox');
@@ -647,7 +647,7 @@ class UserSettingsMailInitializer extends core.Initializer {
         selectTo,
             (OptionElement o, _) => mailDomainLibrary[o.value]);
 
-    select_from_generator.dependsOn(domainListGenerator);
+    select_from_generator.dependsOn(domainListGenerator.firstOfPairDependable);
 
     select_from_generator.addUpdater((MailDomain d, OptionElement o) {
       if (o.hidden == d.isDomainAlias) {
@@ -660,7 +660,7 @@ class UserSettingsMailInitializer extends core.Initializer {
     select_from_generator.onAdd.listen((_) => sortSelectOptionsByValue(selectFrom));
     select_to_generator.onAdd.listen((_) => sortSelectOptionsByValue(selectTo));
 
-    select_to_generator.dependsOn(domainListGenerator);
+    select_to_generator.dependsOn(domainListGenerator.firstOfPairDependable);
 
     selectFrom.onChange.listen((_) {
 

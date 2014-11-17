@@ -4,8 +4,6 @@ const USER_LIBRARY_CHANGE_DELETE = 1;
 const USER_LIBRARY_CHANGE_CREATE = 2;
 
 
-typedef void UserLibraryChangeListener(int changeType, User user);
-
 class UserLibraryChangeEvent {
   static const CHANGE_DELETE = 1;
   static const CHANGE_CREATE = 2;
@@ -17,7 +15,7 @@ class UserLibraryChangeEvent {
 
 }
 
-abstract class UserLibrary {
+abstract class UserLibrary extends GeneratorDependable<User>{
 
   FutureResponse<User> createUser(String mail, String privileges);
 
