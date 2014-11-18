@@ -152,6 +152,8 @@ class AJAXUserLibrary extends UserLibrary {
 
   Map<String, User> get users => new Map.from(_users);
 
+  Iterable<User> get elements => _users.values;
+
   Map<String, User> get rootUsers => _generateUserList(User.PRIVILEGE_ROOT);
 
   Map<String, User> get siteUsers => _generateUserList(User.PRIVILEGE_SITE);

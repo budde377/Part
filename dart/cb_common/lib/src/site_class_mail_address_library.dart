@@ -106,6 +106,8 @@ class AJAXMailAddressLibrary extends MailAddressLibrary {
 
   Map<String, MailAddress> get addresses => _addresses;
 
+  Iterable<MailAddress> get elements => _addresses.values;
+
   FutureResponse<MailAddress> createAddress(String localPart, {List<User> owners, List<String> targets, String mailbox_name, String mailbox_password}) {
     var completer = new Completer();
 

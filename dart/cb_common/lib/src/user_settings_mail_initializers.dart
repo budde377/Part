@@ -22,7 +22,6 @@ class UserSettingsMailInitializer extends core.Initializer {
   MailAddress _currently_editing;
   LIElement _currently_editing_li;
 
-  ElementChildrenGenerator domainListGenerator;
 
   void setUp() {
 
@@ -565,7 +564,7 @@ class UserSettingsMailInitializer extends core.Initializer {
       ..onNotEmpty.listen((_) => g.element.classes.remove('empty'))
       ..onAdd.listen((_) => sortListFromDataSet(domainAliasList, 'from-domain'));
 
-    domainListGenerator.addHandler((MailDomain d, _) {
+    mailDomainLibrary.every((MailDomain d) {
       d.onAliasTargetChange.listen((MailDomain target) {
         if (target == null) {
           g.remove(d);
@@ -748,7 +747,7 @@ class UserSettingsMailInitializer extends core.Initializer {
   void setUpMailDomainList() {
 
 
-    domainListGenerator = new ElementChildrenGenerator<MailDomain, LIElement>((MailDomain domain) {
+    var domainListGenerator = new ElementChildrenGenerator<MailDomain, LIElement>((MailDomain domain) {
       var li = new LIElement();
       var delete = new DivElement();
       li.text = domain.domainName;

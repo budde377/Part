@@ -14,7 +14,7 @@ abstract class MailDomainLibrary extends GeneratorDependable<MailDomain> {
 }
 
 
-class AJAXMailDomainLibrary implements MailDomainLibrary {
+class AJAXMailDomainLibrary extends MailDomainLibrary {
 
   final UserLibrary userLibrary;
 
@@ -54,6 +54,8 @@ class AJAXMailDomainLibrary implements MailDomainLibrary {
 
 
   Map<String, MailDomain> get domains => _domains;
+
+  Iterable<MailDomain> get elements => _domains.values;
 
   FutureResponse<MailDomain> createDomain(String domainName, String password) {
     var completer = new Completer();

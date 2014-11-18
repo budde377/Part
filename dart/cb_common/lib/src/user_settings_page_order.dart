@@ -90,6 +90,10 @@ class UserSettingsJSONPageOrder implements PageOrder {
 
   Stream<Page> get onActivate => _pageOrder.onActivate;
 
+  Iterable<Page> get elements => _pageOrder.elements;
+
+  void every(void f(User)) => _pageOrder.every(f);
+
   Future<core.Response<Page>> deletePage(String id) => _pageOrder.deletePage(id);
 
   Page operator [](String id) => _pageOrder[id];

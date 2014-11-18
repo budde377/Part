@@ -62,6 +62,10 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
 
   Map<String, User> get users => _userLibrary.users;
 
+  Iterable<User> get elements => _userLibrary.elements;
+
+  void every(void f(User)) => _userLibrary.every(f);
+
   Map<String, User> get rootUsers => _userLibrary.rootUsers;
 
   Map<String, User> get siteUsers => _userLibrary.siteUsers;

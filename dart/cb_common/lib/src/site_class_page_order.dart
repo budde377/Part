@@ -201,6 +201,8 @@ class AJAXPageOrder extends PageOrder {
 
   Map<String, Page> get pages => new Map<String, Page>.from(_pages);
 
+  Iterable<Page> get elements => _pages.values;
+
   List<Page> get activePages {
     var l = pages.values.toList();
     l.add(null);

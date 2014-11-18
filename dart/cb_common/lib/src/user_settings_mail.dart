@@ -90,6 +90,9 @@ class UserSettingsMailDomainLibrary implements MailDomainLibrary {
 
   core.FutureResponse<MailDomain> createDomain(String domainName, String password) => domainLibrary.createDomain(domainName, password);
 
+  Iterable<MailDomain> get elements => domainLibrary.elements;
+
+  void every(void f(User)) => domainLibrary.every(f);
 
   Map<String, MailDomain> get domains => domainLibrary.domains;
 

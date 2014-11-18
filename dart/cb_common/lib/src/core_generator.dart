@@ -8,10 +8,16 @@ abstract class GeneratorDependable<K> {
 
   Stream<K> get onRemove;
 
+  Iterable<K> get elements;
+
+  void every(void f(K)) {
+    elements.forEach(f);
+    onAdd.listen(f);
+  }
 
 }
 
-abstract class PairGeneratorDependable<K, V> implements GeneratorDependable<Pair<K, V>> {
+abstract class PairGeneratorDependable<K, V> extends GeneratorDependable<Pair<K, V>> {
   GeneratorDependable<K> get firstOfPairDependable => new FirstOfPairGeneratorDependableTransformer<K, V>(this);
 
   GeneratorDependable<V> get secondOfPairDependable => new SecondOfPairGeneratorDependableTransformer<K, V>(this);
@@ -43,6 +49,10 @@ class GeneratorDependableTransformer<K, T> extends GeneratorDependable<T> {
   Stream<T> get onUpdate => dependable.onUpdate.map(transformer);
 
   Stream<T> get onRemove => dependable.onRemove.map(transformer);
+
+  Iterable<T> get elements => dependable.elements.map(transformer);
+
+  void every(void f(T)) => dependable.every((K k) => f(transformer(k)));
 
 
 }
@@ -156,6 +166,11 @@ class Generator<K, V> extends PairGeneratorDependable<K,V>{
     generator.onUpdate.listen(action(whenUpdate, update));
 
   }
+
+
+  Iterable<Pair<K,V>> get elements => _cache.keys.map((K k) => new Pair<K,V>(k, _cache[k]));
+
+
 
 
 }
