@@ -173,7 +173,7 @@ class UserSettingsMailInitializer extends core.Initializer {
 
     });
 
-    g.dependsOn(domainListGenerator.firstOfPairDependable);
+    g.dependsOn(mailDomainLibrary);
 
     g.onAdd.listen((_) => sortListFromDataSet(mailAddressLists, 'domain-name'));
 
@@ -401,7 +401,7 @@ class UserSettingsMailInitializer extends core.Initializer {
       new BetterSelect(domain_select).value = "";
 
     });
-    domain_select_generator.dependsOn(domainListGenerator.firstOfPairDependable);
+    domain_select_generator.dependsOn(mailDomainLibrary);
 
 
     CheckboxInputElement mailbox_checkbox = addAddressForm.querySelector('#UserSettingsEditMailAddAddressAddMailboxCheckbox');
@@ -468,6 +468,13 @@ class UserSettingsMailInitializer extends core.Initializer {
         (LIElement li, _) => userLibrary.users[li.dataset['user-name']]);
 
     g.addUpdater((User u, LIElement li) {
+      if(u.hasSitePrivileges){
+        li.remove();
+        return;
+      }
+
+      g.add(u);
+
       var checkbox = li.querySelector('input[type=checkbox]');
       var label = li.querySelector('label');
       li.dataset['user-name'] = u.username;
@@ -477,20 +484,6 @@ class UserSettingsMailInitializer extends core.Initializer {
         ..value = label.text = u.username;
     });
 
-    g.addHandler((User u, LIElement li) {
-
-      var label = li.querySelector("label");
-      var checkbox = li.querySelector("input[type=checkbox]");
-
-      u.onChange.listen((_) {
-        if (u.privileges != User.PRIVILEGE_PAGE) {
-          g.remove(u);
-          return;
-        }
-        g.update(u);
-      });
-    });
-    // TODO better depend
     g
       ..onAdd.listen((_) => sortListFromDataSet(g.element, 'user-name'))
       ..onUpdate.listen((_) => sortListFromDataSet(g.element, 'user-name'))
@@ -498,20 +491,7 @@ class UserSettingsMailInitializer extends core.Initializer {
       ..onNotEmpty.listen((_) => userListLabel.hidden = g.element.hidden = false);
 
 
-    userLibrary.onChange.listen((UserLibraryChangeEvent evt) {
-      switch (evt.type) {
-        case UserLibraryChangeEvent.CHANGE_CREATE:
-          if (evt.user.hasSitePrivileges) {
-            break;
-          }
-          g.add(evt.user);
-          break;
-        case UserLibraryChangeEvent.CHANGE_DELETE:
-          g.remove(evt.user);
-          break;
-      }
-
-    });
+    g.dependsOn(userLibrary, whenAdd:(User u) => !u.hasSitePrivileges, whenUpdate: (User u)=>g.contains(u) || !u.hasSitePrivileges);
 
 
   }
@@ -647,7 +627,7 @@ class UserSettingsMailInitializer extends core.Initializer {
         selectTo,
             (OptionElement o, _) => mailDomainLibrary[o.value]);
 
-    select_from_generator.dependsOn(domainListGenerator.firstOfPairDependable);
+    select_from_generator.dependsOn(mailDomainLibrary);
 
     select_from_generator.addUpdater((MailDomain d, OptionElement o) {
       if (o.hidden == d.isDomainAlias) {
@@ -660,7 +640,7 @@ class UserSettingsMailInitializer extends core.Initializer {
     select_from_generator.onAdd.listen((_) => sortSelectOptionsByValue(selectFrom));
     select_to_generator.onAdd.listen((_) => sortSelectOptionsByValue(selectTo));
 
-    select_to_generator.dependsOn(domainListGenerator.firstOfPairDependable);
+    select_to_generator.dependsOn(mailDomainLibrary);
 
     selectFrom.onChange.listen((_) {
 

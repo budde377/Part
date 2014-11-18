@@ -75,10 +75,10 @@ class AJAXUserLibrary extends UserLibrary {
   }
 
 
-  String _addUserFromObjectToUsers(JSONObject o, List<String> page_ids) {
-    var privilegesString = o.variables['privileges'];
-    var pages = page_ids.map((String id) => pageOrder.pages[id]);
-    var privileges = privilegesString == 'root' ? User.PRIVILEGE_ROOT : (privilegesString == 'site' ? User.PRIVILEGE_SITE : User.PRIVILEGE_PAGE);
+  String _addUserFromObjectToUsers(JSONObject o) {
+    JSONObject privilegesObject = o.variables['privileges'];
+    var pages = privilegesObject.variables['page_privileges'].map((String id) => pageOrder.pages[id]);
+    var privileges = privilegesObject.variables['root_privileges'] ? User.PRIVILEGE_ROOT : (privilegesObject.variables['site_privileges'] ? User.PRIVILEGE_SITE : User.PRIVILEGE_PAGE);
     var user = new AJAXUser(o.variables['username'], o.variables['mail'], o.variables['parent'], o.variables['last-login'], privileges, pages);
     _addUserListener(user);
     _users[user.username] = user;
@@ -112,7 +112,7 @@ class AJAXUserLibrary extends UserLibrary {
 
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         var o = response.payload;
-        var username = _addUserFromObjectToUsers(o, []);
+        var username = _addUserFromObjectToUsers(o);
         var user = _users[username];
         _callListeners(UserLibraryChangeEvent.CHANGE_CREATE, user);
         completer.complete(new Response<User>.success(user));

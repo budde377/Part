@@ -31,7 +31,7 @@ class SecondOfPairGeneratorDependableTransformer<K, V> extends GeneratorDependab
 
 }
 
-class GeneratorDependableTransformer<K, T> implements GeneratorDependable<T> {
+class GeneratorDependableTransformer<K, T> extends GeneratorDependable<T> {
 
   final GeneratorDependable<K> dependable;
   final Function transformer;
@@ -48,7 +48,9 @@ class GeneratorDependableTransformer<K, T> implements GeneratorDependable<T> {
 }
 
 
-class Generator<K, V> extends PairGeneratorDependable<K, V> {
+class Generator<K, V> extends PairGeneratorDependable<K,V>{
+
+
 
   Map<K, V> _cache;
   Function _generator;
@@ -67,7 +69,10 @@ class Generator<K, V> extends PairGeneratorDependable<K, V> {
   _onRemoveController = new StreamController<Pair<K, V>>.broadcast();
 
 
-  Generator(V generator(K), Map<K, V> cache) : _cache = cache, _generator = generator;
+  Generator(V generator(K), Map<K, V> cache) : _cache = cache, _generator = generator {
+    onUpdate.listen(_callUpdaters);
+    onAdd.listen(_callHandlers);
+  }
 
   void addUpdater(void updater(K, V)) {
     _handlers.insert(_updaters.length, updater);
@@ -78,7 +83,6 @@ class Generator<K, V> extends PairGeneratorDependable<K, V> {
     _cache.forEach(handler);
     _handlers.add(handler);
   }
-
 
   Stream<Pair<K, V>> get onEmpty => onRemove.where((_) => size == 0);
 
@@ -101,14 +105,13 @@ class Generator<K, V> extends PairGeneratorDependable<K, V> {
       return;
     }
     var v = this[k];
-    _callUpdaters(k, v);
     _onUpdateController.add(new Pair(k, v));
 
   }
 
-  void _callUpdaters(K k, V v) => _callFunctions(_updaters, k, v);
+  void _callUpdaters(Pair<K, V> p) => _callFunctions(_updaters, p.k, p.v);
 
-  void _callHandlers(K k, V v) => _callFunctions(_handlers, k, v);
+  void _callHandlers(Pair<K, V> p) => _callFunctions(_handlers, p.k, p.v);
 
   void _callFunctions(List<Function> fs, K k, V v) => fs.forEach((Function f) => f(k, v));
 
@@ -122,7 +125,6 @@ class Generator<K, V> extends PairGeneratorDependable<K, V> {
       return;
     }
     var v = _cache[k] = _generator(k);
-    _callHandlers(k, v);
     _onBeforeAddController.add(new Pair<K, V>(k, v));
     _onAddController.add(new Pair<K, V>(k, v));
   }
@@ -142,8 +144,8 @@ class Generator<K, V> extends PairGeneratorDependable<K, V> {
 
 
   void dependsOn(GeneratorDependable<K> generator, {bool whenAdd(K), bool whenRemove(K), bool whenUpdate(K)}) {
-    var action = (bool when(K), void f(K))=>(K k){
-      if(when != null && !when(k)){
+    var action = (bool when(K), void f(K)) => (K k) {
+      if (when != null && !when(k)) {
         return;
       }
       f(k);

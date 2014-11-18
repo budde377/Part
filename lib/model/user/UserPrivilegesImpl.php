@@ -144,7 +144,7 @@ class UserPrivilegesImpl implements UserPrivileges
             $this->revokeSiteStatement->bindParam(1,$this->user->getUsername());
         }
         $this->revokeSiteStatement->execute();
-        $this->sitePrivilege = false;
+        $this->sitePrivilege = 0;
     }
 
     /**

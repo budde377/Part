@@ -18,7 +18,7 @@ class UserPrivilegesObjectImpl extends ObjectImpl
     {
         parent::__construct("user_privileges");
         $this->setVariable('root_privileges', $privileges->hasRootPrivileges());
-        $this->setVariable('site_privileges', $privileges->hasRootPrivileges());
+        $this->setVariable('site_privileges', $privileges->hasSitePrivileges());
         $this->setVariable('page_privileges', $privileges->listPagePrivileges());
     }
 }
