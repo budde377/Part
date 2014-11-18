@@ -14,6 +14,6 @@ class StandardMySQLConstantsImpl extends MySQLConstantsImpl
 
     function __construct()
     {
-        parent::__construct('10.8.0.1', 'cms2012testdb', 'cms2012', 'plovMand50');
+        parent::__construct('localhost', 'test_cms', 'test', 'x8Hp32vG4YEJwdK6');
     }
 }

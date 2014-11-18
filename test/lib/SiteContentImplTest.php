@@ -1,12 +1,12 @@
 <?php
 namespace ChristianBudde\cbweb\test;
 
+use ChristianBudde\cbweb\controller\json\SiteContentObjectImpl;
 use ChristianBudde\cbweb\model\site\SiteContentImpl;
 use ChristianBudde\cbweb\model\site\SiteImpl;
-use ChristianBudde\cbweb\controller\json\SiteContentObjectImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
 use ChristianBudde\cbweb\test\stub\StubSiteImpl;
+use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\util\db\DB;
 
 /**
@@ -35,7 +35,6 @@ class SiteContentImplTest extends CustomDatabaseTestCase
     function __construct()
     {
         parent::__construct(dirname(__FILE__) . '/../mysqlXML/SiteContentImplTest.xml');
-        date_default_timezone_set("Europe/Copenhagen");
     }
 
 
@@ -58,8 +57,11 @@ class SiteContentImplTest extends CustomDatabaseTestCase
 
     public function testListContentWillReturnArrayOfRightSize()
     {
-
-        $this->assertEquals([['content'=>'Some Content', 'time'=>946681201]], $this->existingContent->listContentHistory());
+        $list = $this->existingContent->listContentHistory();
+        $this->assertGreaterThan(0, $list[0]['time']);
+        $this->assertLessThan(time(), $list[0]['time']);
+        unset($list[0]['time']);
+        $this->assertEquals([['content'=>'Some Content']], $list);
 
     }
 
@@ -73,23 +75,27 @@ class SiteContentImplTest extends CustomDatabaseTestCase
     {
         $newT = $this->existingContent->addContent($c = "TEST!")-1;
         $l = $this->existingContent->listContentHistory(null, $newT);
-        $this->assertEquals([['content'=>'Some Content', 'time'=>946681201]], $l);
+        unset($l[0]['time']);
+        $this->assertEquals([['content'=>'Some Content']], $l);
 
     }
 
     public function testFromToWillBeAccurate()
     {
+        $this->assertEquals(2, count($this->existingContent2->listContentHistory()));
         $this->existingContent2->addContent("3");
-        $this->assertEquals(3, count($this->existingContent2->listContentHistory()));
-        $this->assertEquals(1, count($this->existingContent2->listContentHistory(1356994000, 1356995000)));
+        $history = $this->existingContent2->listContentHistory(null, null, true);
+        $this->assertEquals(3, count($history));
+        $this->assertEquals([$history[0]], $this->existingContent2->listContentHistory($history[0], $history[0], true));
     }
 
 
     public function testOnlyTimestampWillListTimestamps()
     {
 
-        $list = $this->existingContent2->listContentHistory(null, null, true);
-        $this->assertEquals([946681201, 1356994801], $list);
+        $list1 = $this->existingContent2->listContentHistory(null, null);
+        $list2 = $this->existingContent2->listContentHistory(null, null, true);
+        $this->assertEquals([$list1[0]['time'], $list1[1]['time']], $list2);
     }
 
     public function testAddContentWillAddContent()

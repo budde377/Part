@@ -13,6 +13,6 @@ class MailMySQLConstantsImpl extends MySQLConstantsImpl
 {
     function __construct()
     {
-        parent::__construct('10.8.0.1', 'postfix_test', 'postfixtestadmin', 'tMt86cqdzqQfB8tJ');
+        parent::__construct('localhost', 'test_postfix', 'test', 'x8Hp32vG4YEJwdK6');
     }
 }
