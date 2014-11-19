@@ -4,11 +4,9 @@ namespace ChristianBudde\cbweb\controller\function_string;
 use ChristianBudde\cbweb\controller\json\CompositeFunctionImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
 use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
-
-
+use ChristianBudde\cbweb\controller\json\NullTargetImpl;
 use ChristianBudde\cbweb\controller\json\TypeImpl;
 
-use ChristianBudde\cbweb\controller\json\NullTargetImpl;
 
 /**
  * Created by PhpStorm.
@@ -19,13 +17,11 @@ use ChristianBudde\cbweb\controller\json\NullTargetImpl;
 class ParserImpl implements Parser
 {
 
-    private $lNumPattern;
     private $dNumPattern;
 
     function __construct()
     {
-        $this->lNumPattern = "[0-9]+";
-        $this->dNumPattern = "([0-9]*[\.]{$this->lNumPattern})|({$this->lNumPattern}[\.][0-9]*)";
+        $this->dNumPattern = "[0-9]*[\.][0-9]*";
     }
 
 
@@ -39,14 +35,22 @@ class ParserImpl implements Parser
      * <function_call>              = <target>.<function> | <target>\[<scalar>\]
      * <function>                   = <name>([<arg>, ...])
      * <target>                     = <function_call> | <type>
-     * <type>                       = *name w. backslash *
+     * <type>                       = <name> | [a-zA-Z_][A-Za-z0-9_\]+[a-zA-Z_]
      * <arg>                        = <scalar> | <array> | <program>
      * <array>                      = \[ <array_index>, ... \]
      * <array_index>                = <scalar> => <arg> | <arg>
-     * <scalar>                     = true | false | null | <num> | *string*
+     * <scalar>                     = true | false | null | <num> | <string>
+     * <name>                       = [a-zA-Z_][A-Za-z0-9_]*
      * <num>                        = [+-]? <integer> | <float>
-     * <integer>                    = *decimal* | *hexadecimal* | *octal* | *binary*
-     * <float>                      = *double_number* | *exp_double_number*
+     * <integer>                    = <octal> | <decimal> | <hexadecimal> | <binary>
+     * <float>                      = <double_number> | <exp_double_number>
+     * <string>                     = *single-quoted-string* | *double-quoted-string*
+     * <decimal>                    = [0-9]+
+     * <hexadecimal>                = 0x[0-9A-Fa-f]
+     * <octal>                      = 0[0-7]+
+     * <binary>                     = 0b[0-1]+
+     * <double_number>              = [0-9]*[\.][0-9]*
+     * <exp_double_number>          = ([0-9]+|[0-9]*[\.][0-9]*)[eE][+-]?[0-9]+
      * @param string $input
      * @return \ChristianBudde\cbweb\controller\json\Program
      */
@@ -271,7 +275,7 @@ class ParserImpl implements Parser
     public function parseName($input, &$result)
     {
         $input = trim($input);
-        if ($r = preg_match('/^[a-z0-9_]+$/i', $input)) {
+        if ($r = preg_match('/^[a-z_][a-z0-9_]*$/i', $input)) {
             $result = $input;
         }
 
@@ -282,10 +286,14 @@ class ParserImpl implements Parser
      * @param $result
      * @return bool
      */
-    private function parseNamespaceName($input, &$result)
+    public  function parseNamespaceName($input, &$result)
     {
+        if($this->parseName($input, $result)){
+            return true;
+        }
+
         $input = trim($input);
-        if ($r = preg_match('/^[a-z0-9_\\\\]+$/i', $input)) {
+        if ($r = preg_match('/^[a-z_][a-z0-9_\\\\]+[a-z_]$/i', $input)) {
             $result = $input;
         }
 
@@ -456,7 +464,7 @@ class ParserImpl implements Parser
     {
         $input = trim($input);
 
-        if (preg_match("/^(({$this->lNumPattern}|{$this->dNumPattern})[eE][+-]?{$this->lNumPattern})$/", $input)) {
+        if (preg_match("/^(([0-9]+|{$this->dNumPattern})[eE][+-]?[0-9]+)$/", $input)) {
             $result = floatval($input);
             return true;
         }
@@ -474,9 +482,9 @@ class ParserImpl implements Parser
     public function parseInteger($input, &$result)
     {
 
-        return $this->parseDecimal($input, $result) ||
+        return $this->parseOctal($input, $result) ||
+        $this->parseDecimal($input, $result) ||
         $this->parseHexadecimal($input, $result) ||
-        $this->parseOctal($input, $result) ||
         $this->parseBinary($input, $result);
     }
 
@@ -488,7 +496,7 @@ class ParserImpl implements Parser
     public function parseDecimal($input, &$result)
     {
         $input = trim($input);
-        if ($input == '0' || preg_match('/^[1-9][0-9]*$/', $input)) {
+        if (preg_match('/^[0-9]+$/', $input)) {
             $result = intval($input);
             return true;
         }

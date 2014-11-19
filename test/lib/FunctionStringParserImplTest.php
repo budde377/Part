@@ -2,12 +2,12 @@
 namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\controller\function_string\ParserImpl;
-use ChristianBudde\cbweb\controller\json\Type;
-use ChristianBudde\cbweb\controller\json\NullTargetImpl;
-use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
-use ChristianBudde\cbweb\controller\json\TypeImpl;
 use ChristianBudde\cbweb\controller\json\CompositeFunctionImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
+use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
+use ChristianBudde\cbweb\controller\json\NullTargetImpl;
+use ChristianBudde\cbweb\controller\json\Type;
+use ChristianBudde\cbweb\controller\json\TypeImpl;
 use PHPUnit_Framework_TestCase;
 
 /**
@@ -86,6 +86,33 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->validName, $result);
         $this->assertFalse($this->parser->parseName('Some-Invalid Name', $result));
         $this->assertFalse($this->parser->parseName(' ', $result));
+        $this->assertTrue($this->parser->parseName('_asd', $result));
+        $this->assertTrue($this->parser->parseName('_', $result));
+        $this->assertTrue($this->parser->parseName('a', $result));
+        $this->assertTrue($this->parser->parseName('a0', $result));
+        $this->assertFalse($this->parser->parseName('0asd', $result));
+    }
+
+
+    public function testParseNamespaceName()
+    {
+        $this->assertTrue($this->parser->parseNamespaceName($this->validName, $result));
+        $this->assertEquals($this->validName, $result);
+        $this->assertTrue($this->parser->parseNamespaceName(" " . $this->validName . " ", $result));
+        $this->assertEquals($this->validName, $result);
+        $this->assertFalse($this->parser->parseNamespaceName('Some-Invalid Name', $result));
+        $this->assertFalse($this->parser->parseNamespaceName(' ', $result));
+        $this->assertTrue($this->parser->parseNamespaceName('_Asd', $result));
+        $this->assertTrue($this->parser->parseNamespaceName('_', $result));
+        $this->assertTrue($this->parser->parseNamespaceName('a', $result));
+        $this->assertTrue($this->parser->parseNamespaceName('A', $result));
+        $this->assertTrue($this->parser->parseNamespaceName('a0', $result));
+        $this->assertFalse($this->parser->parseNamespaceName('0asd', $result));
+        $this->assertFalse($this->parser->parseNamespaceName('\asd', $result));
+        $this->assertTrue($this->parser->parseNamespaceName('asd\\asd', $result));
+        $this->assertFalse($this->parser->parseNamespaceName('\\', $result));
+        $this->assertFalse($this->parser->parseNamespaceName('asd\\', $result));
+        $this->assertFalse($this->parser->parseNamespaceName('0', $result));
     }
 
     public function testParseDoubleNumber()
@@ -119,10 +146,19 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->parser->parseExponentDoubleNum(" 1  E 123 ", $result));
         $this->assertFalse($this->parser->parseExponentDoubleNum("+1E123", $result));
         $this->assertFalse($this->parser->parseExponentDoubleNum("-1E123", $result));
+        $this->assertFalse($this->parser->parseExponentDoubleNum("-1E123", $result));
     }
 
     public function testParseNumeric()
     {
+
+
+        $this->assertTrue($this->parser->parseNumeric("00123", $result));
+        $this->assertEquals(0123, $result);
+
+        $this->assertTrue($this->parser->parseNumeric("00129", $result));
+        $this->assertEquals(129, $result);
+
         $this->assertTrue($this->parser->parseNumeric("+1.1", $result));
         $this->assertEquals(+1.1, $result);
         $this->assertTrue($this->parser->parseNumeric("+  1.1", $result));
@@ -148,6 +184,12 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1.123e10, $result);
         $this->assertTrue($this->parser->parseFloat("1.123", $result));
         $this->assertEquals(1.123, $result);
+        $this->assertTrue($this->parser->parseFloat(".123e123", $result));
+        $this->assertEquals(.123e123, $result);
+        $this->assertTrue($this->parser->parseFloat(".123e-123", $result));
+        $this->assertEquals(.123e-123, $result);
+        $this->assertTrue($this->parser->parseFloat("0e-0", $result));
+        $this->assertEquals(0, $result);
     }
 
     public function testParseDecimal()
@@ -156,11 +198,12 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(123, $result);
         $this->assertTrue($this->parser->parseDecimal(" 123 ", $result));
         $this->assertEquals(123, $result);
+        $this->assertTrue($this->parser->parseDecimal(" 0123 ", $result));
+        $this->assertEquals(123, $result);
         $this->assertFalse($this->parser->parseDecimal(" 123.1 ", $result));
         $this->assertFalse($this->parser->parseDecimal(" 123 1 ", $result));
         $this->assertFalse($this->parser->parseDecimal(" 123a1 ", $result));
         $this->assertFalse($this->parser->parseDecimal(" +123 ", $result));
-        $this->assertFalse($this->parser->parseDecimal(" 0123 ", $result));
     }
 
     public function testParseInteger()
