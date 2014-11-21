@@ -28,7 +28,7 @@ import "dart:math" as Math;
  * <num>                        = [+-]? <integer> | <float>
  * <integer>                    = <octal> | <decimal> | <hexadecimal> | <binary>
  * <float>                      = <double_number> | <exp_double_number>
- * <string>                     = *single-quoted-string* | *double-quoted-string*
+ * <string>                     = *single-quoted-php-string* | *double-quoted-php-string*
  * <decimal>                    = [0-9]+
  * <hexadecimal>                = 0x[0-9A-Fa-f]
  * <octal>                      = 0[0-7]+
@@ -42,13 +42,13 @@ Function _firstNotNull(Iterable<Function> l) => (String s) => l.fold(null, (prev
 
 _matchFirstNotNull(Pattern p, String s, f(Match, String)) => _firstNotNull(p.allMatches(s).map((Match m) => (String s) => f(m, s)))(s);
 
-FSProgram parseFS(String s) => _parseFSProgram(s.trim());
+_FSProgram _parseFS(String s) => _parseFSProgram(s.trim());
 
-FSProgram _parseFSProgram(String s) =>
+_FSProgram _parseFSProgram(String s) =>
 _firstNotNull([_parseFSCompositeFunctionCall, _parseFSFunctionCall])(s);
 
 
-FSCompositeFunctionCall _parseFSCompositeFunctionCall(String s) =>
+_FSCompositeFunctionCall _parseFSCompositeFunctionCall(String s) =>
 _matchFirstNotNull(new RegExp(r"\.[\[\.]"), s, (Match m, String s) {
   var t = _parseFSTarget(s.substring(0, m.start).trim());
   if (t == null) {
@@ -58,16 +58,16 @@ _matchFirstNotNull(new RegExp(r"\.[\[\.]"), s, (Match m, String s) {
   if (f == null) {
     return null;
   }
-  return new FSCompositeFunctionCall(t, f);
+  return new _FSCompositeFunctionCall(t, f);
 });
 
-FSTarget _parseFSTarget(String string) =>
+_FSTarget _parseFSTarget(String string) =>
 _firstNotNull([_parseFSType, _parseFSFunctionCall])(string);
 
 /*
  * <type>                       = <name> | [a-zA-Z_][A-Za-z0-9_\]+[a-zA-Z_]
  */
-FSType _parseFSType(String string) {
+_FSType _parseFSType(String string) {
 
   var n = _parseFSName(string);
   if (n != null) {
@@ -86,14 +86,14 @@ FSType _parseFSType(String string) {
       return null;
     }
 
-    return new FSTypeBackslashName(t, n);
+    return new _FSTypeBackslashName(t, n);
   });
 
 }
 
-FSName _parseFSName(String string) => new RegExp(r"^[a-zA-Z_][A-Za-z0-9_]*$", caseSensitive:false).hasMatch(string) ? new FSName(string) : null;
+_FSName _parseFSName(String string) => new RegExp(r"^[a-zA-Z_][A-Za-z0-9_]*$", caseSensitive:false).hasMatch(string) ? new _FSName(string) : null;
 
-FSNotStartingWithUnderscoreName _parseFSNotStartingWithUnderscoreName(String string) {
+_FSNotStartingWithUnderscoreName _parseFSNotStartingWithUnderscoreName(String string) {
   if (string.isEmpty) {
     return null;
   }
@@ -101,27 +101,27 @@ FSNotStartingWithUnderscoreName _parseFSNotStartingWithUnderscoreName(String str
     return null;
   }
   if (string.length == 1) {
-    return new FSNotStartingWithUnderscoreName(string);
+    return new _FSNotStartingWithUnderscoreName(string);
   }
 
   if (_parseFSName(string.substring(1)) == null) {
     return null;
   }
 
-  return new FSNotStartingWithUnderscoreName(string);
+  return new _FSNotStartingWithUnderscoreName(string);
 
 }
 /*
   * <composite_function>         = .<function_chain> | <composite_function>.<function_chain>
 */
-FSCompositeFunction _parseFSCompositeFunction(String string) =>
+_FSCompositeFunction _parseFSCompositeFunction(String string) =>
 _matchFirstNotNull(new RegExp(r"\.[\[\.]"), string, (Match m, String s) {
   var c = _parseFSFunctionChain(s.substring(m.start + 1).trim());
   if (c == null) {
     return null;
   }
   if (m.start == 0) {
-    return new FSFunctionChainCompositeFunction(c);
+    return new _FSFunctionChainCompositeFunction(c);
   }
 
   var cf = _parseFSCompositeFunction(s.substring(0, m.start).trim());
@@ -129,7 +129,7 @@ _matchFirstNotNull(new RegExp(r"\.[\[\.]"), string, (Match m, String s) {
   if (cf == null) {
     return null;
   }
-  return new FSFunctionCompositeFunction(cf, c);
+  return new _FSFunctionCompositeFunction(cf, c);
 
 });
 
@@ -138,7 +138,7 @@ _matchFirstNotNull(new RegExp(r"\.[\[\.]"), string, (Match m, String s) {
  * <function_chain>             = <function_chain><function> | <function>
  */
 
-FSFunctionChain _parseFSFunctionChain(String s) {
+_FSFunctionChain _parseFSFunctionChain(String s) {
   var f = _parseFSFunction(s);
   if (f != null) {
     return f;
@@ -154,7 +154,7 @@ FSFunctionChain _parseFSFunctionChain(String s) {
     if (fc == null) {
       return null;
     }
-    return new FSChainFunctionChain(fc, f);
+    return new _FSChainFunctionChain(fc, f);
 
   });
 
@@ -166,7 +166,7 @@ FSFunctionChain _parseFSFunctionChain(String s) {
  * <function_call>              = <target><function>
  */
 
-FSFunctionCall _parseFSFunctionCall(String s) =>
+_FSFunctionCall _parseFSFunctionCall(String s) =>
 _matchFirstNotNull(new RegExp(r"[\.\[]"), s, (Match m, String s) {
   var t = _parseFSTarget(s.substring(0, m.start).trim());
   if (t == null) {
@@ -177,25 +177,25 @@ _matchFirstNotNull(new RegExp(r"[\.\[]"), s, (Match m, String s) {
   if (f == null) {
     return null;
   }
-  return new FSFunctionCall(t, f);
+  return new _FSFunctionCall(t, f);
 
 });
 
 /*
  * <scalar>                     = true | false | null | <num> | <string>
  */
-FSScalar _parseFSScalar(String s) => _firstNotNull([_parseFSBool, _parseFSNull, _parseFSNum, _parseFSString])(s);
+_FSScalar _parseFSScalar(String s) => _firstNotNull([_parseFSBool, _parseFSNull, _parseFSNum, _parseFSString])(s);
 
 
-FSBoolScalar _parseFSBool(String s) => s.toLowerCase() == "true" ? new FSBoolScalar(true) : s.toLowerCase() == "false" ? new FSBoolScalar(false) : null;
+_FSBoolScalar _parseFSBool(String s) => s.toLowerCase() == "true" ? new _FSBoolScalar(true) : s.toLowerCase() == "false" ? new _FSBoolScalar(false) : null;
 
 
-FSNullScalar _parseFSNull(String s) => s.toLowerCase() == "null" ? new FSNullScalar() : null;
+_FSNullScalar _parseFSNull(String s) => s.toLowerCase() == "null" ? new _FSNullScalar() : null;
 
 /*
  * <num>                        = [+-]? <integer> | <float>
  */
-FSNumScalar _parseFSNum(String s) {
+_FSNumScalar _parseFSNum(String s) {
   var sign = 1;
   if (s.startsWith("+")) {
     s = s.substring(1).trim();
@@ -204,7 +204,7 @@ FSNumScalar _parseFSNum(String s) {
     sign = -1;
   }
 
-  FSNumScalar n = _firstNotNull([_parseFSInteger, _parseFSFloat])(s);
+  _FSNumScalar n = _firstNotNull([_parseFSInteger, _parseFSFloat])(s);
   if (n == null) {
     return null;
   }
@@ -213,65 +213,65 @@ FSNumScalar _parseFSNum(String s) {
 /*
  * <integer>                    = <octal> | <decimal> | <hexadecimal> | <binary>
  */
-FSNumScalar _parseFSInteger(String s) => _firstNotNull([_parseFSOctal, _parseFSDecimal, _parseFSHexadecimal, _parseFSBinary])(s);
+_FSNumScalar _parseFSInteger(String s) => _firstNotNull([_parseFSOctal, _parseFSDecimal, _parseFSHexadecimal, _parseFSBinary])(s);
 
 /*
  * <float>                      = <double_number> | <exp_double_number>
  */
-FSNumScalar _parseFSFloat(String s) => _firstNotNull([_parseFSDouble, _parseFSExpDouble])(s);
+_FSNumScalar _parseFSFloat(String s) => _firstNotNull([_parseFSDouble, _parseFSExpDouble])(s);
 
 /*
  * <double_number>              = [0-9]*[\.][0-9]*
  */
-FSDoubleNumScalar _parseFSDouble(String s) {
+_FSDoubleNumScalar _parseFSDouble(String s) {
   var m = new RegExp(r"^[0-9]*[\.][0-9]*$").firstMatch(s);
   if (m == null) {
     return null;
   }
 
-  return new FSDoubleNumScalar(double.parse(m[0]));
+  return new _FSDoubleNumScalar(double.parse(m[0]));
 }
 
 
 /*
  * <exp_double_number>          = ([0-9]+|[0-9]*[\.][0-9]*)[eE][+-]?[0-9]+
  */
-FSDoubleNumScalar _parseFSExpDouble(String s) {
+_FSDoubleNumScalar _parseFSExpDouble(String s) {
   var m = new RegExp(r"^([0-9]+|[0-9]*[\.][0-9]*)[eE][+-]?[0-9]+$").firstMatch(s);
   if (m == null) {
     return null;
   }
 
-  return new FSDoubleNumScalar(double.parse(m[0]));
+  return new _FSDoubleNumScalar(double.parse(m[0]));
 }
 
-FSNumScalar _parseBase(String s, RegExp p, int base) {
+_FSNumScalar _parseBase(String s, RegExp p, int base) {
   var m = p.firstMatch(s);
   if (m == null) {
     return null;
   }
 
-  return new FSIntNumScalar(int.parse(m[1], radix:base));
+  return new _FSIntNumScalar(int.parse(m[1], radix:base));
 }
 
 /*
  * <octal>                      = 0[0-7]+
  */
-FSNumScalar _parseFSOctal(String s) => _parseBase(s, new RegExp(r"^0([0-7]+)$"), 8);
+_FSNumScalar _parseFSOctal(String s) => _parseBase(s, new RegExp(r"^0([0-7]+)$"), 8);
 /*
  * <decimal>                    = [0-9]+
  */
-FSNumScalar _parseFSDecimal(String s) => _parseBase(s, new RegExp(r"^([0-9]+)$"), 10);
+_FSNumScalar _parseFSDecimal(String s) => _parseBase(s, new RegExp(r"^([0-9]+)$"), 10);
 /*
  * <hexadecimal>                = 0x[0-9A-Fa-f]
  */
-FSNumScalar _parseFSHexadecimal(String s) => _parseBase(s, new RegExp(r"^0x([0-9a-f]+)$", caseSensitive:false), 16);
+_FSNumScalar _parseFSHexadecimal(String s) => _parseBase(s, new RegExp(r"^0x([0-9a-f]+)$", caseSensitive:false), 16);
 /*
  * <binary>                     = 0b[0-1]+
  */
-FSNumScalar _parseFSBinary(String s) => _parseBase(s, new RegExp(r"^0b([0-1]+)$"), 2);
+_FSNumScalar _parseFSBinary(String s) => _parseBase(s, new RegExp(r"^0b([0-1]+)$"), 2);
 
-FSStringScalar _parseFSString(String s) {
+_FSStringScalar _parseFSString(String s) {
   if (!s.startsWith("'") && !s.startsWith('"')) {
     return null;
   }
@@ -307,17 +307,17 @@ FSStringScalar _parseFSString(String s) {
   }
   s = s.replaceAllMapped(new RegExp(r"([^\\])\\\\" + divider), (Match m) => "${m[1]}$divider");
   s = s.replaceAll(r"\\", r"\");
-  return new FSStringScalar(s.substring(1, s.length - 1));
+  return new _FSStringScalar(s.substring(1, s.length - 1));
 }
 
 /*
  * <function>                   = .<name>(<arg_list>) | .<name> () | \[<scalar>\]
  */
-FSFunction _parseFSFunction(String s) {
+_FSFunction _parseFSFunction(String s) {
 
   var scalar;
   if (s.startsWith("[") && s.endsWith("]") && (scalar = _parseFSScalar(s.substring(1, s.length - 1).trim())) != null) {
-    return new FSArrayAccessFunction(scalar);
+    return new _FSArrayAccessFunction(scalar);
   }
 
 
@@ -342,7 +342,7 @@ FSFunction _parseFSFunction(String s) {
 
   var a = s.substring(first + 1, s.length - 1).trim();
   if (a.isEmpty) {
-    return new FSNoArgumentFunction(n);
+    return new _FSNoArgumentFunction(n);
   }
 
   var args = _parseFSArguments(s.substring(first + 1, s.length - 1).trim());
@@ -351,7 +351,7 @@ FSFunction _parseFSFunction(String s) {
     return null;
   }
 
-  return new FSArgumentFunction(n, args);
+  return new _FSArgumentFunction(n, args);
 
 
 }
@@ -359,10 +359,10 @@ FSFunction _parseFSFunction(String s) {
 /*
  * <arg_list>                   = <sap> | <sap>, <arg_list> | <named_arg_list>
  */
-FSArgument _parseFSArguments(String s) {
+_FSArgument _parseFSArguments(String s) {
   var sap = _parseFSScalarArrayProgram(s);
   if (sap != null) {
-    return new FSArgument(sap);
+    return new _FSArgument(sap);
   }
 
   var nal = _parseFSNamedArguments(s);
@@ -381,7 +381,7 @@ FSArgument _parseFSArguments(String s) {
     if (args == null) {
       return null;
     }
-    return new FSArguments(sap, args);
+    return new _FSArguments(sap, args);
 
   });
 
@@ -390,7 +390,7 @@ FSArgument _parseFSArguments(String s) {
 /*
  * <named_arg_list>             = <named_arg> | <named_arg>, <named_arg_list>
  */
-FSNamedArgument _parseFSNamedArguments(String s) {
+_FSNamedArgument _parseFSNamedArguments(String s) {
   var arg = _parseFSNamedArgument(s);
   if (arg != null) {
     return arg;
@@ -407,7 +407,7 @@ FSNamedArgument _parseFSNamedArguments(String s) {
     if (args == null) {
       return null;
     }
-    return new FSNamedArguments(arg.name, arg.value, args);
+    return new _FSNamedArguments(arg.name, arg.value, args);
   });
 
 }
@@ -415,7 +415,7 @@ FSNamedArgument _parseFSNamedArguments(String s) {
 /*
  * <named_arg>                  = <name_nswu> : <sap>
  */
-FSNamedArgument _parseFSNamedArgument(String s) {
+_FSNamedArgument _parseFSNamedArgument(String s) {
   var first_pos = s.indexOf(":");
   if (first_pos < 0) {
     return null;
@@ -431,19 +431,19 @@ FSNamedArgument _parseFSNamedArgument(String s) {
     return null;
   }
 
-  return new FSNamedArgument(name, sap);
+  return new _FSNamedArgument(name, sap);
 
 }
 
 /*
  * <sap>                        = <scalar> | <array> | <program>
  */
-FSScalarArrayProgram _parseFSScalarArrayProgram(String s) => _firstNotNull([_parseFSScalar, _parseFSArray, _parseFSProgram])(s);
+_FSScalarArrayProgram _parseFSScalarArrayProgram(String s) => _firstNotNull([_parseFSScalar, _parseFSArray, _parseFSProgram])(s);
 
 /*
  * <array>                      = \[ <array_entries>\]
  */
-FSArray _parseFSArray(String s) {
+_FSArray _parseFSArray(String s) {
   if (!s.startsWith("[") || !s.endsWith("]")) {
     return null;
   }
@@ -454,21 +454,21 @@ FSArray _parseFSArray(String s) {
     return null;
   }
 
-  return new FSArray(entries);
+  return new _FSArray(entries);
 
 }
 /*
  * <all_array_entries>          = <array_entries> | <named_array_entries>
  */
-FSArrayEntry _parseFSAllArrayEntries(String s) => _firstNotNull([_parseFSArrayEntries, _parseFSNamedArrayEntries])(s);
+_FSArrayEntry _parseFSAllArrayEntries(String s) => _firstNotNull([_parseFSArrayEntries, _parseFSNamedArrayEntries])(s);
 
 /*
  * <array_entries>              = <sap> | <sap>, <all_array_entries>
  */
-FSArrayEntry _parseFSArrayEntries(String s) {
+_FSArrayEntry _parseFSArrayEntries(String s) {
   var sap = _parseFSScalarArrayProgram(s);
   if (sap != null) {
-    return new FSArrayEntry(sap);
+    return new _FSArrayEntry(sap);
   }
 
   return _matchFirstNotNull(",", s, (Match m, String s) {
@@ -481,14 +481,14 @@ FSArrayEntry _parseFSArrayEntries(String s) {
     if (entries == null) {
       return null;
     }
-    return new FSArrayEntries(sap, entries);
+    return new _FSArrayEntries(sap, entries);
   });
 
 }
 /*
  * <named_array_entries>        = <array_named_entry> | <array_named_entry>, <all_array_entries>
  */
-FSNamedArrayEntry _parseFSNamedArrayEntries(String s) {
+_FSNamedArrayEntry _parseFSNamedArrayEntries(String s) {
   var ne = _parseFSNamedArrayEntry(s);
   if (ne != null) {
     return ne;
@@ -504,13 +504,13 @@ FSNamedArrayEntry _parseFSNamedArrayEntries(String s) {
     if (entries == null) {
       return null;
     }
-    return new FSNamedArrayEntries(ne.key, ne.value, entries);
+    return new _FSNamedArrayEntries(ne.key, ne.value, entries);
   });
 }
 /*
  * <array_named_entry>          = <scalar> => <sap>
  */
-FSNamedArrayEntry _parseFSNamedArrayEntry(String s) {
+_FSNamedArrayEntry _parseFSNamedArrayEntry(String s) {
   var first_index = s.indexOf("=>");
   if (first_index < 0) {
     return null;
@@ -526,17 +526,17 @@ FSNamedArrayEntry _parseFSNamedArrayEntry(String s) {
   if (sap == null) {
     return null;
   }
-  return new FSNamedArrayEntry(scalar, sap);
+  return new _FSNamedArrayEntry(scalar, sap);
 
 }
 
-abstract class FSTarget {
+abstract class _FSTarget {
 
 
 }
 
 
-abstract class FSType extends FSTarget {
+abstract class _FSType extends _FSTarget {
 
   String get value;
 
@@ -545,50 +545,50 @@ abstract class FSType extends FSTarget {
 /*
  * <type>                       = <name> | <type>\<name>
  */
-class FSTypeBackslashName extends FSType {
+class _FSTypeBackslashName extends _FSType {
 
-  final FSType type;
-  final FSName name;
+  final _FSType type;
+  final _FSName name;
 
   String get value => type.value + r"\" + name.value;
 
-  FSTypeBackslashName(this.type, this.name);
+  _FSTypeBackslashName(this.type, this.name);
 
 
   String toString() => type.toString() + "\\" + name.toString();
 }
 
-abstract class FSProgram extends FSScalarArrayProgram {
-  final FSTarget target;
+abstract class _FSProgram extends _FSScalarArrayProgram {
+  final _FSTarget target;
 
-  FSProgram(this.target);
+  _FSProgram(this.target);
 
-  List<FSFunctionCall> toFunctionCalls();
+  List<_FSFunctionCall> toFunctionCalls();
 
-  dynamic compute(dynamic computer(FSProgram)) => computer(this);
+  dynamic compute(dynamic computer(_FSProgram)) => computer(this);
 
 }
 
-class FSCompositeFunctionCall extends FSProgram implements FSTarget {
-  final FSCompositeFunction function;
+class _FSCompositeFunctionCall extends _FSProgram implements _FSTarget {
+  final _FSCompositeFunction function;
 
-  List<FSFunctionCall> toFunctionCalls() => function.toFunctionCalls(this.target);
+  List<_FSFunctionCall> toFunctionCalls() => function.toFunctionCalls(this.target);
 
-  FSCompositeFunctionCall(FSTarget target, this.function) : super(target);
+  _FSCompositeFunctionCall(_FSTarget target, this.function) : super(target);
 
   String toString() => target.toString() + function.toString();
 
 }
 
-class FSFunctionCall extends FSProgram implements FSTarget {
+class _FSFunctionCall extends _FSProgram implements _FSTarget {
 
-  final FSFunction function;
+  final _FSFunction function;
 
-  FSFunctionCall(FSTarget target, this.function) : super(target);
+  _FSFunctionCall(_FSTarget target, this.function) : super(target);
 
   String toString() => target.toString() + function.toString();
 
-  List<FSFunctionCall> toFunctionCalls() => [this];
+  List<_FSFunctionCall> toFunctionCalls() => [this];
 
 }
 
@@ -596,21 +596,21 @@ class FSFunctionCall extends FSProgram implements FSTarget {
  <composite_function>         = .<function_chain> | <composite_function>.<function_chain>
  */
 
-abstract class FSCompositeFunction {
+abstract class _FSCompositeFunction {
 
-  List<FSFunctionCall> toFunctionCalls(FSTarget target);
+  List<_FSFunctionCall> toFunctionCalls(_FSTarget target);
 
 }
 
-class FSFunctionCompositeFunction extends FSCompositeFunction {
-  final FSFunctionChain function;
-  final FSCompositeFunction composite;
+class _FSFunctionCompositeFunction extends _FSCompositeFunction {
+  final _FSFunctionChain function;
+  final _FSCompositeFunction composite;
 
-  FSFunctionCompositeFunction(this.composite, this.function);
+  _FSFunctionCompositeFunction(this.composite, this.function);
 
   String toString() => composite.toString() + "." + function.toString();
 
-  List<FSFunctionCall> toFunctionCalls(FSTarget target) {
+  List<_FSFunctionCall> toFunctionCalls(_FSTarget target) {
     var l = composite.toFunctionCalls(target);
     l.add(function.toFunctionCall(target));
     return l;
@@ -619,229 +619,229 @@ class FSFunctionCompositeFunction extends FSCompositeFunction {
 }
 
 
-class FSFunctionChainCompositeFunction extends FSCompositeFunction {
-  final FSFunctionChain function;
+class _FSFunctionChainCompositeFunction extends _FSCompositeFunction {
+  final _FSFunctionChain function;
 
-  FSFunctionChainCompositeFunction(this.function);
+  _FSFunctionChainCompositeFunction(this.function);
 
   String toString() => "." + function.toString();
 
-  List<FSFunctionCall> toFunctionCalls(FSTarget target) => [function.toFunctionCall(target)];
+  List<_FSFunctionCall> toFunctionCalls(_FSTarget target) => [function.toFunctionCall(target)];
 
 }
 
-abstract class FSFunctionChain {
+abstract class _FSFunctionChain {
 
-  FSFunctionCall toFunctionCall(FSTarget target);
+  _FSFunctionCall toFunctionCall(_FSTarget target);
 
 }
 
-class FSChainFunctionChain extends FSFunctionChain {
-  final FSChainFunctionChain chain;
-  final FSFunction function;
+class _FSChainFunctionChain extends _FSFunctionChain {
+  final _FSChainFunctionChain chain;
+  final _FSFunction function;
 
-  FSChainFunctionChain(this.chain, this.function);
+  _FSChainFunctionChain(this.chain, this.function);
 
   String toString() => chain.toString() + function.toString();
 
-  FSFunctionCall toFunctionCall(FSTarget target) => new FSFunctionCall(chain.toFunctionCall(target), function);
+  _FSFunctionCall toFunctionCall(_FSTarget target) => new _FSFunctionCall(chain.toFunctionCall(target), function);
 
 }
 
-abstract class FSFunction extends FSFunctionChain {
+abstract class _FSFunction extends _FSFunctionChain {
 
-  FSFunctionCall toFunctionCall(FSTarget target) => new FSFunctionCall(target, this);
+  _FSFunctionCall toFunctionCall(_FSTarget target) => new _FSFunctionCall(target, this);
 
 }
 
-abstract class FSNamedFunction extends FSFunction {
+abstract class _FSNamedFunction extends _FSFunction {
 
-  final FSName name;
+  final _FSName name;
 
-  FSNamedFunction(this.name);
+  _FSNamedFunction(this.name);
 
   String toString() => "." + name.toString();
 
-  List<FSArgument> get argumentList;
+  List<_FSArgument> get argumentList;
 
-  List<FSArgument> get positionalArgumentList;
+  List<_FSArgument> get positionalArgumentList;
 
-  Map<String, FSArgument> get namedArgumentMap;
+  Map<String, _FSArgument> get namedArgumentMap;
 
-  List<dynamic> computedPositionalArgumentList(dynamic converter(FSProgram));
+  List<dynamic> computedPositionalArgumentList(dynamic converter(_FSProgram));
 
-  Map<String, dynamic> computedNamedArgumentMap(dynamic converter(FSProgram));
+  Map<String, dynamic> computedNamedArgumentMap(dynamic converter(_FSProgram));
 
 }
 
-class FSNoArgumentFunction extends FSNamedFunction {
+class _FSNoArgumentFunction extends _FSNamedFunction {
 
-  FSNoArgumentFunction(FSName name) : super(name);
+  _FSNoArgumentFunction(_FSName name) : super(name);
 
   String toString() => super.toString() + "()";
 
-  List<FSArgument> get argumentList => [];
+  List<_FSArgument> get argumentList => [];
 
-  List<FSArgument> get positionalArgumentList => [];
+  List<_FSArgument> get positionalArgumentList => [];
 
-  Map<String, FSArgument> get namedArgumentMap => {
+  Map<String, _FSArgument> get namedArgumentMap => {
   };
 
-  List<dynamic> computedPositionalArgumentList(dynamic converter(FSProgram)) => positionalArgumentList;
+  List<dynamic> computedPositionalArgumentList(dynamic converter(_FSProgram)) => positionalArgumentList;
 
-  Map<String, dynamic> computedNamedArgumentMap(dynamic converter(FSProgram)) => namedArgumentMap;
+  Map<String, dynamic> computedNamedArgumentMap(dynamic converter(_FSProgram)) => namedArgumentMap;
 }
 
-class FSArgumentFunction extends FSNamedFunction {
+class _FSArgumentFunction extends _FSNamedFunction {
 
-  final FSArgument argument;
+  final _FSArgument argument;
 
-  FSArgumentFunction(FSName name, this.argument) : super(name);
+  _FSArgumentFunction(_FSName name, this.argument) : super(name);
 
   String toString() => super.toString() + "(" + argument.toString() + ")";
 
-  List<FSArgument> get argumentList => argument.toArgumentList();
+  List<_FSArgument> get argumentList => argument.toArgumentList();
 
-  List<FSArgument> get positionalArgumentList {
+  List<_FSArgument> get positionalArgumentList {
     var l = argumentList;
-    l.removeWhere((FSArgument a) => a is FSNamedArgument);
-    l.map((FSArgument a) => a.value);
+    l.removeWhere((_FSArgument a) => a is _FSNamedArgument);
+    l.map((_FSArgument a) => a.value);
     return l;
   }
 
-  Map<String, FSArgument> get namedArgumentMap {
+  Map<String, _FSArgument> get namedArgumentMap {
     var l = argumentList;
-    l.removeWhere((FSArgument a) => a is! FSNamedArgument);
-    var m = new Map.fromIterable(l, key:(FSNamedArgument a) => a.name.value, value:(FSNamedArgument a) => a.value);
+    l.removeWhere((_FSArgument a) => a is! _FSNamedArgument);
+    var m = new Map.fromIterable(l, key:(_FSNamedArgument a) => a.name.value, value:(_FSNamedArgument a) => a.value);
 
     return m;
 
   }
 
 
-  List<dynamic> computedPositionalArgumentList(dynamic converter(FSProgram)) => positionalArgumentList.map((FSArgument a) => a.value.compute(converter)).toList();
+  List<dynamic> computedPositionalArgumentList(dynamic converter(_FSProgram)) => positionalArgumentList.map((_FSArgument a) => a.value.compute(converter)).toList();
 
-  Map<String, dynamic> computedNamedArgumentMap(dynamic converter(FSProgram)) {
+  Map<String, dynamic> computedNamedArgumentMap(dynamic converter(_FSProgram)) {
     var m = namedArgumentMap;
-    return new Map.fromIterables(m.keys, m.values.map((FSArgument a) => a.value.compute(converter)));
+    return new Map.fromIterables(m.keys, m.values.map((_FSArgument a) => a.value.compute(converter)));
   }
 }
 
 
-class FSArrayAccessFunction extends FSFunction {
+class _FSArrayAccessFunction extends _FSFunction {
 
-  final FSScalar scalar;
+  final _FSScalar scalar;
 
 
-  FSArrayAccessFunction(this.scalar);
+  _FSArrayAccessFunction(this.scalar);
 
   String toString() => "[" + scalar.toString() + "]";
 
 }
 
-class FSArgument {
+class _FSArgument {
 
-  final FSScalarArrayProgram value;
+  final _FSScalarArrayProgram value;
 
-  FSArgument(this.value);
+  _FSArgument(this.value);
 
   String toString() => value.toString();
 
-  List<FSArgument> toArgumentList() => [this];
+  List<_FSArgument> toArgumentList() => [this];
 
 }
 
-class FSArguments extends FSArgument {
+class _FSArguments extends _FSArgument {
 
-  final FSArgument argument;
+  final _FSArgument argument;
 
-  FSArguments(FSScalarArrayProgram value, this.argument) : super(value);
+  _FSArguments(_FSScalarArrayProgram value, this.argument) : super(value);
 
   String toString() => super.toString() + ", " + argument.toString();
 
-  List<FSArgument> toArgumentList() {
+  List<_FSArgument> toArgumentList() {
     var l = argument.toArgumentList();
-    l.insert(0, new FSArgument(this.value));
+    l.insert(0, new _FSArgument(this.value));
     return l;
   }
 
 }
 
-class FSNamedArgument extends FSArgument {
-  final FSNotStartingWithUnderscoreName name;
+class _FSNamedArgument extends _FSArgument {
+  final _FSNotStartingWithUnderscoreName name;
 
-  FSNamedArgument(this.name, FSScalarArrayProgram value) : super(value);
+  _FSNamedArgument(this.name, _FSScalarArrayProgram value) : super(value);
 
   String toString() => name.toString() + " : " + value.toString();
 
-  List<FSArgument> toArgumentList() => [this];
+  List<_FSArgument> toArgumentList() => [this];
 
 }
 
-class FSNamedArguments extends FSNamedArgument implements FSArguments {
-  final FSNamedArgument argument;
+class _FSNamedArguments extends _FSNamedArgument implements _FSArguments {
+  final _FSNamedArgument argument;
 
-  FSNamedArguments(FSNotStartingWithUnderscoreName name, FSScalarArrayProgram value, this.argument) : super(name, value);
+  _FSNamedArguments(_FSNotStartingWithUnderscoreName name, _FSScalarArrayProgram value, this.argument) : super(name, value);
 
   String toString() => super.toString() + ", " + argument.toString();
 
-  List<FSArgument> toArgumentList() {
+  List<_FSArgument> toArgumentList() {
     var l = argument.toArgumentList();
-    l.insert(0, new FSNamedArgument(this.name, this.value));
+    l.insert(0, new _FSNamedArgument(this.name, this.value));
     return l;
   }
 }
 
 
-class FSName extends FSType {
+class _FSName extends _FSType {
 
   final String value;
 
-  FSName(this.value);
+  _FSName(this.value);
 
   String toString() => "n{$value}";
 }
 
-class FSNotStartingWithUnderscoreName {
+class _FSNotStartingWithUnderscoreName {
   final String value;
 
-  FSNotStartingWithUnderscoreName(this.value) ;
+  _FSNotStartingWithUnderscoreName(this.value) ;
 
   String toString() => "nwou{$value}";
 }
 
 
-abstract class FSScalarArrayProgram {
+abstract class _FSScalarArrayProgram {
 
-  dynamic compute(dynamic computer(FSProgram));
+  dynamic compute(dynamic computer(_FSProgram));
 
 }
 
-class FSArray extends FSScalarArrayProgram {
-  final FSArrayEntry entry;
+class _FSArray extends _FSScalarArrayProgram {
+  final _FSArrayEntry entry;
 
-  List<FSArrayEntry> get entries => entry.toEntryList();
+  List<_FSArrayEntry> get entries => entry.toEntryList();
 
-  bool get isList => entries.every((FSArrayEntry e) => e is! FSNamedArrayEntry);
+  bool get isList => entries.every((_FSArrayEntry e) => e is! _FSNamedArrayEntry);
 
   bool get isMap => !isList;
 
-  Map computeMap(dynamic computer(FSProgram)) {
+  Map computeMap(dynamic computer(_FSProgram)) {
 
     var resultMap = {
     };
 
     var i = 0;
 
-    entries.forEach((FSArrayEntry entry) {
-      if (entry is FSNamedArrayEntry) {
-        FSNamedArrayEntry e = entry;
-        if (e.key is FSIntNumScalar) {
+    entries.forEach((_FSArrayEntry entry) {
+      if (entry is _FSNamedArrayEntry) {
+        _FSNamedArrayEntry e = entry;
+        if (e.key is _FSIntNumScalar) {
           i = Math.max(i, e.key.value);
         }
         resultMap[e.key.value] = e.value.compute(computer);
       } else {
-        FSArrayEntry e = entry;
+        _FSArrayEntry e = entry;
         resultMap[i] = e.value.compute(computer);
         i++;
       }
@@ -851,205 +851,205 @@ class FSArray extends FSScalarArrayProgram {
     return resultMap;
   }
 
-  List computeList(dynamic computer(FSProgram)) => computeMap(computer).values;
+  List computeList(dynamic computer(_FSProgram)) => computeMap(computer).values.toList();
 
-  dynamic compute(dynamic computer(FSProgram)) => isList ? computeList(computer) : computeMap(computer);
+  dynamic compute(dynamic computer(_FSProgram)) => isList ? computeList(computer) : computeMap(computer);
 
-  FSArray(this.entry);
+  _FSArray(this.entry);
 
   String toString() => "[" + entry.toString() + "]";
 
 }
 
-class FSArrayEntry {
+class _FSArrayEntry {
 
-  final FSScalarArrayProgram value;
+  final _FSScalarArrayProgram value;
 
-  FSArrayEntry(this.value);
+  _FSArrayEntry(this.value);
 
   String toString() => value.toString();
 
-  List<FSArrayEntry> toEntryList() => [this];
+  List<_FSArrayEntry> toEntryList() => [this];
 
 }
 
-class FSArrayEntries extends FSArrayEntry {
+class _FSArrayEntries extends _FSArrayEntry {
 
-  FSArrayEntry entry;
+  _FSArrayEntry entry;
 
-  FSArrayEntries(FSScalarArrayProgram value, this.entry): super(value);
+  _FSArrayEntries(_FSScalarArrayProgram value, this.entry): super(value);
 
   String toString() => super.toString() + ", " + entry.toString();
 
-  List<FSArrayEntry> toEntryList() {
+  List<_FSArrayEntry> toEntryList() {
     var l = entry.toEntryList();
-    l.insert(0, new FSArrayEntry(value));
+    l.insert(0, new _FSArrayEntry(value));
     return l;
   }
 
 }
 
 
-class FSNamedArrayEntry extends FSArrayEntry {
-  final FSScalar key;
+class _FSNamedArrayEntry extends _FSArrayEntry {
+  final _FSScalar key;
 
-  FSNamedArrayEntry(this.key, FSScalarArrayProgram value) : super(value);
+  _FSNamedArrayEntry(this.key, _FSScalarArrayProgram value) : super(value);
 
   String toString() => key.toString() + " : " + super.toString();
 
 }
 
-class FSNamedArrayEntries extends FSNamedArrayEntry implements FSArrayEntries {
-  FSArrayEntry entry;
+class _FSNamedArrayEntries extends _FSNamedArrayEntry implements _FSArrayEntries {
+  _FSArrayEntry entry;
 
-  FSNamedArrayEntries(FSScalar key, FSScalarArrayProgram value, this.entry) : super(key, value);
+  _FSNamedArrayEntries(_FSScalar key, _FSScalarArrayProgram value, this.entry) : super(key, value);
 
   String toString() => super.toString() + ", " + entry.toString();
 
-  List<FSArrayEntry> toEntryList() {
+  List<_FSArrayEntry> toEntryList() {
     var l = entry.toEntryList();
-    l.insert(0, new FSNamedArrayEntry(key, value));
+    l.insert(0, new _FSNamedArrayEntry(key, value));
     return l;
   }
 }
 
-abstract class FSScalar extends FSScalarArrayProgram {
+abstract class _FSScalar extends _FSScalarArrayProgram {
 
   get value;
 
 }
 
 
-class FSBoolScalar extends FSScalar {
+class _FSBoolScalar extends _FSScalar {
   final bool value;
 
-  FSBoolScalar(this.value);
+  _FSBoolScalar(this.value);
 
   String toString() => "b{$value}";
 
-  bool compute(dynamic computer(FSProgram)) => value;
+  bool compute(dynamic computer(_FSProgram)) => value;
 
 }
 
-class FSNullScalar extends FSScalar {
+class _FSNullScalar extends _FSScalar {
 
   final value = null;
 
-  compute(dynamic computer(FSProgram)) => null;
+  compute(dynamic computer(_FSProgram)) => null;
 }
 
-abstract class FSNumScalar extends FSScalar {
+abstract class _FSNumScalar extends _FSScalar {
   final num value;
 
-  FSNumScalar(this.value);
+  _FSNumScalar(this.value);
 
-  FSNumScalar mul(int);
+  _FSNumScalar mul(int);
 
 }
 
 
-class FSIntNumScalar implements FSNumScalar {
+class _FSIntNumScalar implements _FSNumScalar {
 
   final int value;
 
-  FSIntNumScalar(this.value);
+  _FSIntNumScalar(this.value);
 
   String toString() => "int{$value}";
 
-  FSIntNumScalar mul(int) => new FSIntNumScalar(int * value);
+  _FSIntNumScalar mul(int) => new _FSIntNumScalar(int * value);
 
-  int compute(dynamic computer(FSProgram)) => value;
+  int compute(dynamic computer(_FSProgram)) => value;
 }
 
 
-class FSDoubleNumScalar implements FSNumScalar {
+class _FSDoubleNumScalar implements _FSNumScalar {
 
   final double value;
 
-  FSDoubleNumScalar(this.value);
+  _FSDoubleNumScalar(this.value);
 
   String toString() => "float{$value}";
 
-  FSDoubleNumScalar mul(int) => new FSDoubleNumScalar(int * value);
+  _FSDoubleNumScalar mul(int) => new _FSDoubleNumScalar(int * value);
 
-  double compute(dynamic computer(FSProgram)) => value;
+  double compute(dynamic computer(_FSProgram)) => value;
 
 }
 
-class FSStringScalar extends FSScalar {
+class _FSStringScalar extends _FSScalar {
   final String value;
 
-  FSStringScalar(this.value);
+  _FSStringScalar(this.value);
 
   String toString() => "str{$value}";
 
-  String compute(dynamic computer(FSProgram)) => value;
+  String compute(dynamic computer(_FSProgram)) => value;
 
 }
 
-abstract class FSRegisterFunction {
+abstract class _RegisterFunction {
 
 }
 
-class FSRegisterNamedFunction implements FSRegisterFunction {
+class _RegisterNamedFunction implements _RegisterFunction {
 
 
   final String name;
   final List positionalArguments;
   final Map<Symbol, dynamic> namedArguments;
 
-  FSRegisterNamedFunction(this.name, this.positionalArguments, this.namedArguments);
+  _RegisterNamedFunction(this.name, this.positionalArguments, this.namedArguments);
 
-  FSRegisterNamedFunction.from(FSNamedFunction f, dynamic convert(FSProgram)) : this(f.name.value, f.computedPositionalArgumentList(convert), () {
+  _RegisterNamedFunction.from(_FSNamedFunction f, dynamic convert(_FSProgram)) : this(f.name.value, f.computedPositionalArgumentList(convert), () {
     var m = f.computedNamedArgumentMap(convert);
     return new Map.fromIterable(m.keys, key:MirrorSystem.getSymbol, value:(String s) => m[s]);
   }());
 
 }
 
-class FSRegisterArrayAccessFunction implements FSRegisterFunction {
+class _RegisterArrayAccessFunction implements _RegisterFunction {
 
   final key;
 
-  FSRegisterArrayAccessFunction(this.key);
+  _RegisterArrayAccessFunction(this.key);
 
-  FSRegisterArrayAccessFunction.from(FSArrayAccessFunction f) : this(f.scalar.value);
+  _RegisterArrayAccessFunction.from(_FSArrayAccessFunction f) : this(f.scalar.value);
 
 }
 
 
-abstract class FSRegisterHandler {
+abstract class RegisterHandler {
 
   final Object instance;
 
-  final FSRegister register;
+  final Register register;
 
-  bool canRunFunction(String type, FSRegisterFunction f, [instance= null]);
+  bool canRunFunction(String type, _RegisterFunction f, [instance= null]);
 
-  dynamic runFunction(String type, FSRegisterFunction f, [instance= null]);
+  dynamic runFunction(String type, _RegisterFunction f, [instance= null]);
 
   void remove() {
     register.handlers.remove(this);
   }
 
-  FSRegisterHandler(this.register, this.instance);
+  RegisterHandler(this.register, this.instance);
 
 
 }
 
-class TypeFSRegisterHandler extends FSRegisterHandler {
+class TypeRegisterHandler extends RegisterHandler {
 
   final Type type;
   final ClassMirror mirror;
 
 
-  TypeFSRegisterHandler(FSRegister register, Type type, [Object instance = null]) : super(register, instance), this.type = type, this.mirror = reflectType(type);
+  TypeRegisterHandler(Register register, Type type, [Object instance = null]) : super(register, instance), this.type = type, this.mirror = reflectType(type);
 
 
-  bool _isGetterSetter(FSRegisterNamedFunction f) => _getterSetterSymbol(f) != null;
+  bool _isGetterSetter(_RegisterNamedFunction f) => _getterSetterSymbol(f) != null;
 
 
-  Symbol _getterSetterSymbol(FSRegisterNamedFunction f) {
+  Symbol _getterSetterSymbol(_RegisterNamedFunction f) {
 
     if (f.name.length <= 3) {
       return null;
@@ -1093,7 +1093,7 @@ class TypeFSRegisterHandler extends FSRegisterHandler {
     return setter?(MirrorSystem.getSymbol((s == s1?string[0].toUpperCase():string[0].toLowerCase()) + string.substring(1))):s;
   }
 
-  bool canRunFunction(String type, FSRegisterFunction function, [instance=null]) {
+  bool canRunFunction(String type, _RegisterFunction function, [instance=null]) {
 
     instance = instance == null ? this.instance : instance;
 
@@ -1108,14 +1108,14 @@ class TypeFSRegisterHandler extends FSRegisterHandler {
     }
 
 
-    if (function is FSRegisterArrayAccessFunction) {
+    if (function is _RegisterArrayAccessFunction) {
       return mirror.instanceMembers.containsKey(MirrorSystem.getSymbol("[]"));
 
-    } else if (function is FSRegisterNamedFunction) {
-      FSRegisterNamedFunction f = function;
+    } else if (function is _RegisterNamedFunction) {
+      _RegisterNamedFunction f = function;
       var symbol = MirrorSystem.getSymbol(f.name);
       if (!mirror.instanceMembers.containsKey(symbol)) {
-        return _isGetterSetter(function);;
+        return _isGetterSetter(function);
       }
 
       MethodMirror mMirror = mirror.instanceMembers[symbol];
@@ -1128,14 +1128,15 @@ class TypeFSRegisterHandler extends FSRegisterHandler {
     return false;
   }
 
-  dynamic runFunction(String type, FSRegisterFunction function, [instance=null]) {
+  dynamic runFunction(String type, _RegisterFunction function, [instance=null]) {
+
     instance = instance == null ? this.instance : instance;
 
-    if (function is FSRegisterArrayAccessFunction) {
-      FSRegisterArrayAccessFunction f = function;
-      return reflect(instance).invoke(MirrorSystem.getSymbol("[]"), f.key).reflectee;
+    if (function is _RegisterArrayAccessFunction) {
+      _RegisterArrayAccessFunction f = function;
+      return reflect(instance).invoke(MirrorSystem.getSymbol("[]"), [f.key]).reflectee;
     } else {
-      FSRegisterNamedFunction f = function;
+      _RegisterNamedFunction f = function;
       var s = _getterSetterSymbol(f);
       if(s != null){
         if(f.name.startsWith('get')){
@@ -1151,40 +1152,40 @@ class TypeFSRegisterHandler extends FSRegisterHandler {
 
 }
 
-class SimpleFSRegisterHandler extends FSRegisterHandler {
+class SimpleRegisterHandler extends RegisterHandler {
   final String type;
   final Map<String, Function> functions = new Map<String, Function>();
   Function arrayAccessFunction;
 
-  SimpleFSRegisterHandler(FSRegister register, this.type, [instance = null]) : super(register, instance);
+  SimpleRegisterHandler(Register register, this.type, [instance = null]) : super(register, instance);
 
-  bool canRunFunction(String type, FSRegisterFunction function, [instance]) {
+  bool canRunFunction(String type, _RegisterFunction function, [instance]) {
     if (type != this.type) {
       return false;
     }
 
-    if (function is FSRegisterNamedFunction) {
-      FSRegisterNamedFunction f = function;
+    if (function is _RegisterNamedFunction) {
+      _RegisterNamedFunction f = function;
       return functions.containsKey(f.name);
     }
 
-    if (function is FSRegisterArrayAccessFunction) {
+    if (function is _RegisterArrayAccessFunction) {
       return arrayAccessFunction != null;
     }
     return false;
   }
 
-  dynamic runFunction(String type, FSRegisterFunction function, [instance]) {
+  dynamic runFunction(String type, _RegisterFunction function, [instance]) {
 
     instance = instance == null ? this.instance : instance;
 
-    if (function is FSRegisterNamedFunction) {
-      FSRegisterNamedFunction f = function;
+    if (function is _RegisterNamedFunction) {
+      _RegisterNamedFunction f = function;
       var posArgs = f.positionalArguments;
       posArgs.insert(0, instance);
       return Function.apply(functions[f.name], posArgs, f.namedArguments);
     } else {
-      FSRegisterArrayAccessFunction f = function;
+      _RegisterArrayAccessFunction f = function;
       return arrayAccessFunction(instance, f.key);
     }
   }
@@ -1192,26 +1193,33 @@ class SimpleFSRegisterHandler extends FSRegisterHandler {
 
 }
 
-class FSRegister {
+class Register {
 
-  final List<FSRegisterHandler> handlers = new List<FSRegisterHandler>();
+  static Register _cache;
 
-  TypeFSRegisterHandler addType(Type t, [Object instance= null]) {
+  final List<RegisterHandler> handlers = new List<RegisterHandler>();
 
-    var h = new TypeFSRegisterHandler(this, t, instance);
+  factory Register() => _cache == null? _cache = new Register._internal():_cache;
+
+
+  Register._internal();
+
+  TypeRegisterHandler addType(Type t, [Object instance= null]) {
+
+    var h = new TypeRegisterHandler(this, t, instance);
     handlers.add(h);
     return h;
   }
 
-  SimpleFSRegisterHandler add(String type, [Object instance= null]) {
-    var h = new SimpleFSRegisterHandler(this, type, instance);
+  SimpleRegisterHandler add(String type, [Object instance= null]) {
+    var h = new SimpleRegisterHandler(this, type, instance);
     handlers.add(h);
     return h;
   }
 
 
-  dynamic _runRegisterFunction(List<String> types, FSRegisterFunction function, [instance = null]) {
-    var f = handlers.fold(null, (prev, FSRegisterHandler handler) {
+  dynamic _runRegisterFunction(List<String> types, _RegisterFunction function, [instance = null]) {
+    var f = handlers.fold(null, (prev, RegisterHandler handler) {
       if (prev != null) {
         return prev;
       }
@@ -1228,21 +1236,21 @@ class FSRegister {
     return f == null ? null : f();
   }
 
-  dynamic _runFunction(List<String> types, FSFunction function, [instance = null]) {
-    if (function is FSNamedFunction) {
-      return _runRegisterFunction(types, new FSRegisterNamedFunction.from(function, runProgram), instance);
+  dynamic _runFunction(List<String> types, _FSFunction function, [instance = null]) {
+    if (function is _FSNamedFunction) {
+      return _runRegisterFunction(types, new _RegisterNamedFunction.from(function, _runProgram), instance);
     } else {
-      return _runRegisterFunction(types, new FSRegisterArrayAccessFunction.from(function), instance);
+      return _runRegisterFunction(types, new _RegisterArrayAccessFunction.from(function), instance);
     }
   }
 
-  dynamic _runFunctionCall(FSFunctionCall f, [Object instance = null]) {
-    if (f.target is FSType) {
-      FSType t = f.target;
+  dynamic _runFunctionCall(_FSFunctionCall f, [Object instance = null]) {
+    if (f.target is _FSType) {
+      _FSType t = f.target;
       return _runFunction([t.value], f.function, instance);
     }
 
-    if (f.target is FSFunctionCall) {
+    if (f.target is _FSFunctionCall) {
       var i = _runFunctionCall(f.target);
       return _runFunction(_typesFromInstance(i), f.function, i);
     }
@@ -1275,71 +1283,20 @@ class FSRegister {
   }
 
 
-  dynamic runFunctionString(String s) => runProgram(parseFS(s));
+  dynamic runFunctionString(String s) => _runProgram(_parseFS(s));
 
-  dynamic runProgram(FSProgram program) {
+  dynamic _runProgram(_FSProgram program) {
     if (program == null) {
       return null;
     }
     var calls = program.toFunctionCalls();
     var lastReturn = null;
-    calls.forEach((FSFunctionCall c) {
+    calls.forEach((_FSFunctionCall c) {
       lastReturn = _runFunctionCall(c);
     });
 
     return lastReturn;
   }
-
-
-}
-
-class AAA {
-
-}
-
-class AA implements AAA {
-
-}
-
-class A extends AA {
-
-  int i = 0;
-
-  void inc() {
-    i++;
-  }
-
-  int get ii => i;
-  set ii(int i){
-    this.i = i;
-  }
-
-  String method(String s) => "TIME: $s";
-
-  operator [] (String s) => null;
-
-  String get l => "";
-
-  set l(String s) {
-
-
-  }
-
-  String s = "";
-
-}
-
-
-void main() {
-
-  var register = new FSRegister();
-
-  var rh1 = register.addType(A, new A());
-  var rh2 = register.add("CONSTANTS");
-
-  rh2.arrayAccessFunction = (_, String s) => "$s: ${new DateTime.now().toString()}";
-  print(parseFS("A..inc()..inc()..getIi()"));
-  print(register.runFunctionString("A..inc()..inc()..inc()..getIi(5)"));
 
 
 }
