@@ -672,20 +672,6 @@ class UserSettingsMailInitializer extends core.Initializer {
       });
     });
 
-    formH.submitFunction = (Map<String, String> map) {
-      var domain = mailDomainLibrary[selectFrom.value];
-      var domainTarget = mailDomainLibrary[selectTo.value];
-      if (domain == null || domainTarget == null) {
-        return true;
-      }
-      formH.blur();
-      domain.changeAliasTarget(domainTarget).thenResponse(onSuccess:(_) {
-        formH.unBlur();
-      }, onError:(core.Response response) {
-        formH.unBlur();
-      });
-      return true;
-    };
 
   }
 
@@ -721,19 +707,6 @@ class UserSettingsMailInitializer extends core.Initializer {
     new Validator<InputElement>(domainNameInput)
       ..addValueValidator((String value) => !mailDomainLibrary.domains.containsKey(value));
 
-    var h = validatingForm.formHandler;
-    /* = (Map<String, String > data) {
-      validatingForm.formHandler.blur();
-      mailDomainLibrary.createDomain(data['domain_name'], data['super_password']).thenResponse(onSuccess:(core.Response<MailDomain> response) {
-        validatingForm.formHandler.clearForm();
-        validatingForm.formHandler.unBlur();
-      }, onError:(core.Response<MailDomain> response) {
-        validatingForm.formHandler.unBlur();
-      });
-
-
-      return true;
-    };*/
 
   }
 

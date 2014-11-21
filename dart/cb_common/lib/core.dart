@@ -146,6 +146,8 @@ class Position {
 class Debugger {
   static Debugger _instance;
 
+  String _tabs = "";
+
   bool enabled = false;
 
   factory Debugger() => _instance == null ? _instance = new Debugger._internal() : _instance;
@@ -156,9 +158,23 @@ class Debugger {
     if (!enabled) {
       return;
     }
-    print(o);
-
+    print("$_tabs$o");
   }
+
+  void insertTab(){
+    _tabs += "\t";
+  }
+
+  void removeTab(){
+    if(numTabs == 0){
+      return;
+    }
+    _tabs = _tabs.substring(1);
+  }
+
+  int get numTabs => _tabs.length;
+
+  String get tabs => _tabs;
 
 }
 

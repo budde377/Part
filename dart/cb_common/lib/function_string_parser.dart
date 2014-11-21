@@ -11,7 +11,7 @@ import "core.dart";
  * <function_chain>             = <function_chain><function> | <function>
  *
  * <function_call>              = <target><function>
- * <function>                   = .<name>(<arg_list>) | .<name> () | \[<scalar>\]
+ * <function>                   = .<name>(<arg_list>) | .<name> () | \[<sap>\]
  * <target>                     = <function_call> | <type>
  * <type>                       = <name> | <type>\<name>
  * <arg_list>                   = <sap> | <sap>, <arg_list> | <named_arg_list>
@@ -173,11 +173,11 @@ _matchFirstNotNull(new RegExp(r"[\.\[]"), s, (Match m, String s) {
   if (t == null) {
     return null;
   }
-
   var f = _parseFSFunction(s.substring(m.start).trim());
   if (f == null) {
     return null;
   }
+
   return new _FSFunctionCall(t, f);
 
 });
@@ -317,7 +317,7 @@ _FSStringScalar _parseFSString(String s) {
 _FSFunction _parseFSFunction(String s) {
 
   var scalar;
-  if (s.startsWith("[") && s.endsWith("]") && (scalar = _parseFSScalar(s.substring(1, s.length - 1).trim())) != null) {
+  if (s.startsWith("[") && s.endsWith("]") && (scalar = _parseFSScalarArrayProgram(s.substring(1, s.length - 1).trim())) != null) {
     return new _FSArrayAccessFunction(scalar);
   }
 
@@ -731,7 +731,7 @@ class _FSArgumentFunction extends _FSNamedFunction {
 
 class _FSArrayAccessFunction extends _FSFunction {
 
-  final _FSScalar scalar;
+  final _FSScalarArrayProgram scalar;
 
 
   _FSArrayAccessFunction(this.scalar);
@@ -1014,7 +1014,7 @@ class _RegisterArrayAccessFunction implements _RegisterFunction {
 
   _RegisterArrayAccessFunction(this.key);
 
-  _RegisterArrayAccessFunction.from(_FSArrayAccessFunction f) : this(f.scalar.value);
+  _RegisterArrayAccessFunction.from(_FSArrayAccessFunction f,  dynamic convert(_FSProgram)) : this(f.scalar.compute(convert));
 
 }
 
@@ -1037,6 +1037,7 @@ abstract class RegisterHandler {
 
   RegisterHandler(this.register);
 
+  String toString() => "RegisterHandler: $type";
 
 }
 
@@ -1095,7 +1096,6 @@ class TypeRegisterHandler extends RegisterHandler {
       return null;
     }
 
-    print(mMirror);
 
     if (!((setter && mMirror.isSetter) || (!setter && mMirror.isGetter))) {
       return null;
@@ -1118,16 +1118,16 @@ class TypeRegisterHandler extends RegisterHandler {
 
 
     if (function is _RegisterArrayAccessFunction) {
-      return mirror.instanceMembers.containsKey(MirrorSystem.getSymbol("[]"));
+      return mirror.declarations.containsKey(MirrorSystem.getSymbol("[]"));
 
     } else if (function is _RegisterNamedFunction) {
       _RegisterNamedFunction f = function;
       var symbol = MirrorSystem.getSymbol(f.name);
-      if (!mirror.instanceMembers.containsKey(symbol)) {
+      if (!mirror.declarations.containsKey(symbol)) {
         return _isGetterSetter(function);
       }
 
-      MethodMirror mMirror = mirror.instanceMembers[symbol];
+      MethodMirror mMirror = mirror.declarations[symbol];
       if (!mMirror.isRegularMethod) {
         return false;
       }
@@ -1236,6 +1236,8 @@ class SimpleRegisterHandler extends RegisterHandler {
 
 class Register {
 
+  int _i = 0;
+
   static Register _cache;
 
   final List<RegisterHandler> handlers = new List<RegisterHandler>();
@@ -1288,7 +1290,7 @@ class Register {
     if (function is _FSNamedFunction) {
       return _runRegisterFunction(types, new _RegisterNamedFunction.from(function, _runProgram), instance);
     } else {
-      return _runRegisterFunction(types, new _RegisterArrayAccessFunction.from(function), instance);
+      return _runRegisterFunction(types, new _RegisterArrayAccessFunction.from(function, _runProgram), instance);
     }
   }
 
@@ -1334,16 +1336,21 @@ class Register {
   dynamic runFunctionString(String s) => _runProgram(_parseFS(s));
 
   dynamic _runProgram(_FSProgram program) {
-    debug("Running program: $program");
+
     if (program == null) {
+      debug("Program was null");
       return null;
     }
+
+    debug("Running program: $program");
+    debugger.insertTab();
     var calls = program.toFunctionCalls();
     var lastReturn = null;
     calls.forEach((_FSFunctionCall c) {
       lastReturn = _runFunctionCall(c);
     });
-
+    debugger.removeTab();
+    debug("Result: $lastReturn");
     return lastReturn;
   }
 

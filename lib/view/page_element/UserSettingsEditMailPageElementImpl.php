@@ -37,7 +37,9 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         <h3>Domæner</h3>
             {$this->getDomainList()}
         <div class='mail_form expandable'>
-        <form id='UserSettingsEditMailAddDomainForm'  data-function-string='MailDomainLibrary.createDomain(FormHandler[\"domain_name\"],FormHandler[\"super_password\"])' data-on-success-function-string='FormHandler.clearForm()' data-on-error-function-string=''>
+        <form id='UserSettingsEditMailAddDomainForm'  class='has_function_string'
+        data-function-string='MailDomainLibrary.createDomain(FormHandler[\"domain_name\"],FormHandler[\"super_password\"])'
+        data-on-success-function-string='FormHandler.clearForm()'>
             <div hidden>
                 <input type='text' />
                 <input type='password'/>
@@ -60,7 +62,9 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             {$this->getMailAliasList()}
                 <div class='mail_form expandable'>
 
-        <form id=\"UserSettingsEditMailAddDomainAliasForm\"  data-function-string='MailDomainLibrary.domains[from].addAliasTarget(to)'>
+        <form id=\"UserSettingsEditMailAddDomainAliasForm\" class='has_function_string'
+        data-function-string='MailDomainLibrary[FormHandler[\"from\"]].changeAliasTarget(MailDomainLibrary[FormHandler[\"to\"]])'
+        data-on-success-function-string='FormHandler.clearForm()'>
             <label>
                 Domæne
                 <select name='from' data-validator-method='non-empty'>

@@ -23,32 +23,29 @@ class FormHandler {
       submitFunction = (_){
         var h = FS.register.addType(FormHandler, this);
         var result = FS.register.runFunctionString(form.dataset['function-string']);
-        h.remove();
 
         if(result is! core.FutureResponse ){
+          h.remove();
           return true;
         }
+        blur();
         core.FutureResponse r = result;
 
         var f = (String s) => (core.Response r){
-          if(form.dataset[s] == null){
-            return;
+          if(form.dataset[s] != null){
+            var h2 = FS.register.addType(core.Response, r);
+            FS.register.runFunctionString(form.dataset[s]);
+            h2.remove();
+
           }
-          var h2 = FS.register.addType(core.Response, r);
-          FS.register.runFunctionString(form.dataset[s]);
-          h2.remove();
+          h.remove();
+          unBlur();
 
         };
 
         r.thenResponse(
             onSuccess: f('on-success-function-string'),
             onError:f('on-error-function-string'));
-
-
-
-
-
-
 
         return true;
       };

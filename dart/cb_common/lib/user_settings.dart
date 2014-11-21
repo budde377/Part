@@ -9,6 +9,7 @@ import 'site_classes.dart';
 import 'json.dart';
 import 'core.dart' as core;
 import 'elements.dart';
+import 'function_string_parser.dart' as FS;
 
 import 'pcre_syntax_checker.dart' as PCRE;
 
@@ -78,6 +79,21 @@ class UserSettingsInitializer extends core.Initializer {
   void setUp() {
     var client = new AJAXJSONClient();
     var order = pageOrder, userLib = userLibrary;
+
+    FS.register
+      ..addType(PageOrder,pageOrder)
+      ..addType(Page, pageOrder.currentPage)
+      ..addType(UserLibrary,userLibrary)
+      ..addType(User,userLibrary.userLoggedIn);
+    if(mailDomainLibraryAvailable){
+      FS.register
+        ..addType(MailDomainLibrary, mailDomainLibrary)
+        ..addType(MailDomain)
+        ..addType(MailAddressLibrary)
+        ..addType(MailAddress)
+        ..addType(MailMailbox);
+
+    }
 
     _initLib.registerInitializer(new TitleURLUpdateInitializer(order, client));
     _initLib.registerInitializer(new UserSettingsDecorationInitializer());
