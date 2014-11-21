@@ -24,7 +24,7 @@ class ParserImpl implements Parser
         $this->dNumPattern = "[0-9]*[\.][0-9]*";
     }
 
-
+    //TODO Update bnf wrt. function chain and array access
     /**
      * <program>                    = <composite_function_call> | <function_call>
      *
