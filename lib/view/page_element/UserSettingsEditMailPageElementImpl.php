@@ -37,7 +37,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         <h3>Domæner</h3>
             {$this->getDomainList()}
         <div class='mail_form expandable'>
-        <form id='UserSettingsEditMailAddDomainForm'  data-function-string='MailDomainLibrary.createDomain(domain_name,super_password)'>
+        <form id='UserSettingsEditMailAddDomainForm'  data-function-string='MailDomainLibrary.createDomain(FormHandler[\"domain_name\"],FormHandler[\"super_password\"])' data-on-success-function-string='FormHandler.clearForm()' data-on-error-function-string=''>
             <div hidden>
                 <input type='text' />
                 <input type='password'/>
@@ -83,7 +83,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         <h3>Adresser</h3>
             {$this->getAddressList()}
         <div class='mail_form expandable'>
-        <form id='UserSettingsEditMailAddAddressForm'  data-function-string='MailDomainLibrary.domains[domain].aliasLibrary.createAlias(local_part)'>
+        <form id='UserSettingsEditMailAddAddressForm'>
             <div hidden>
                 <input type='text' />
                 <input type='password'/>

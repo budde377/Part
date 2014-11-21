@@ -39,7 +39,7 @@ class UserSettingsMailInitializer extends core.Initializer {
 
     var gas = [];
 
-    var deleteListener = (MailAddress a, LIElement li){
+    var deleteListener = (MailAddress a, LIElement li) {
       var delete = li.querySelector('.delete');
 
       delete.onClick.listen((_) {
@@ -467,7 +467,7 @@ class UserSettingsMailInitializer extends core.Initializer {
         (LIElement li, _) => userLibrary.users[li.dataset['user-name']]);
 
     g.addUpdater((User u, LIElement li) {
-      if(u.hasSitePrivileges){
+      if (u.hasSitePrivileges) {
         li.remove();
         return;
       }
@@ -490,7 +490,7 @@ class UserSettingsMailInitializer extends core.Initializer {
       ..onNotEmpty.listen((_) => userListLabel.hidden = g.element.hidden = false);
 
 
-    g.dependsOn(userLibrary, whenAdd:(User u) => !u.hasSitePrivileges, whenUpdate: (User u)=>g.contains(u) || !u.hasSitePrivileges);
+    g.dependsOn(userLibrary, whenAdd:(User u) => !u.hasSitePrivileges, whenUpdate: (User u) => g.contains(u) || !u.hasSitePrivileges);
 
 
   }
@@ -721,7 +721,8 @@ class UserSettingsMailInitializer extends core.Initializer {
     new Validator<InputElement>(domainNameInput)
       ..addValueValidator((String value) => !mailDomainLibrary.domains.containsKey(value));
 
-    validatingForm.formHandler.submitFunction = (Map<String, String > data) {
+    var h = validatingForm.formHandler;
+    /* = (Map<String, String > data) {
       validatingForm.formHandler.blur();
       mailDomainLibrary.createDomain(data['domain_name'], data['super_password']).thenResponse(onSuccess:(core.Response<MailDomain> response) {
         validatingForm.formHandler.clearForm();
@@ -732,7 +733,7 @@ class UserSettingsMailInitializer extends core.Initializer {
 
 
       return true;
-    };
+    };*/
 
   }
 

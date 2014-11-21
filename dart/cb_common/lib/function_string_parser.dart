@@ -2,6 +2,7 @@ library function_string_parser;
 
 import "dart:mirrors";
 import "dart:math" as Math;
+import "core.dart";
 /**
  * <program>                    = <composite_function_call> | <function_call>
  *
@@ -1020,7 +1021,9 @@ class _RegisterArrayAccessFunction implements _RegisterFunction {
 
 abstract class RegisterHandler {
 
-  final Object instance;
+  Object get instance;
+
+  String get type;
 
   final Register register;
 
@@ -1032,18 +1035,26 @@ abstract class RegisterHandler {
     register.handlers.remove(this);
   }
 
-  RegisterHandler(this.register, this.instance);
+  RegisterHandler(this.register);
 
 
 }
 
 class TypeRegisterHandler extends RegisterHandler {
 
-  final Type type;
+  final Type typeT;
+
   final ClassMirror mirror;
 
+  final String type;
 
-  TypeRegisterHandler(Register register, Type type, [Object instance = null]) : super(register, instance), this.type = type, this.mirror = reflectType(type);
+  Object instance;
+
+
+  TypeRegisterHandler(Register register, Type type, [Object this.instance = null]) : super(register),
+  this.typeT = type,
+  this.type = MirrorSystem.getName(reflectType(type).simpleName),
+  this.mirror = reflectType(type);
 
 
   bool _isGetterSetter(_RegisterNamedFunction f) => _getterSetterSymbol(f) != null;
@@ -1090,7 +1101,7 @@ class TypeRegisterHandler extends RegisterHandler {
       return null;
     }
 
-    return setter?(MirrorSystem.getSymbol((s == s1?string[0].toUpperCase():string[0].toLowerCase()) + string.substring(1))):s;
+    return setter ? (MirrorSystem.getSymbol((s == s1 ? string[0].toUpperCase() : string[0].toLowerCase()) + string.substring(1))) : s;
   }
 
   bool canRunFunction(String type, _RegisterFunction function, [instance=null]) {
@@ -1101,9 +1112,7 @@ class TypeRegisterHandler extends RegisterHandler {
       return false;
     }
 
-    print("name: ${MirrorSystem.getName(mirror.simpleName)}");
-
-    if (type != MirrorSystem.getName(mirror.simpleName)) {
+    if (type != this.type) {
       return false;
     }
 
@@ -1138,26 +1147,58 @@ class TypeRegisterHandler extends RegisterHandler {
     } else {
       _RegisterNamedFunction f = function;
       var s = _getterSetterSymbol(f);
-      if(s != null){
-        if(f.name.startsWith('get')){
+      if (s != null) {
+        if (f.name.startsWith('get')) {
           return reflect(instance).getField(s).reflectee;
         }
         return reflect(instance).setField(s, f.positionalArguments[0]).reflectee;
 
       }
-      return reflect(instance).invoke( MirrorSystem.getSymbol(f.name), f.positionalArguments, f.namedArguments).reflectee;
+      return reflect(instance).invoke(MirrorSystem.getSymbol(f.name), f.positionalArguments, f.namedArguments).reflectee;
     }
   }
 
 
 }
 
-class SimpleRegisterHandler extends RegisterHandler {
+
+class AliasRegisterHandler extends RegisterHandler {
+
+
   final String type;
+
+  final RegisterHandler target;
+
+  AliasRegisterHandler(Register register, this.type, this.target) : super(register);
+
+  Object get instance => target.instance;
+
+  bool canRunFunction(String type, _RegisterFunction function, [Object instance]) =>
+  target.canRunFunction(type == this.type ? target.type : type, function, instance);
+
+  dynamic runFunction(String type, _RegisterFunction function, [Object instance]) =>
+  target.runFunction(type == this.type ? target.type : type, function, instance);
+
+
+  void removeWithTarget(){
+    super.remove();
+    target.remove();
+  }
+
+}
+
+class SimpleRegisterHandler extends RegisterHandler {
+
+
+  Object instance;
+
+  final String type;
+
   final Map<String, Function> functions = new Map<String, Function>();
+
   Function arrayAccessFunction;
 
-  SimpleRegisterHandler(Register register, this.type, [instance = null]) : super(register, instance);
+  SimpleRegisterHandler(Register register, this.type, [this.instance = null]) : super(register);
 
   bool canRunFunction(String type, _RegisterFunction function, [instance]) {
     if (type != this.type) {
@@ -1199,10 +1240,17 @@ class Register {
 
   final List<RegisterHandler> handlers = new List<RegisterHandler>();
 
-  factory Register() => _cache == null? _cache = new Register._internal():_cache;
+  factory Register() => _cache == null ? _cache = new Register._internal() : _cache;
 
 
   Register._internal();
+
+
+  AliasRegisterHandler addAlias(String type, RegisterHandler targetHandler) {
+    var h = new AliasRegisterHandler(this, type, targetHandler);
+    handlers.add(h);
+    return h;
+  }
 
   TypeRegisterHandler addType(Type t, [Object instance= null]) {
 
@@ -1286,6 +1334,7 @@ class Register {
   dynamic runFunctionString(String s) => _runProgram(_parseFS(s));
 
   dynamic _runProgram(_FSProgram program) {
+    debug("Running program: $program");
     if (program == null) {
       return null;
     }
@@ -1298,5 +1347,7 @@ class Register {
     return lastReturn;
   }
 
-
 }
+
+
+Register get register => new Register();

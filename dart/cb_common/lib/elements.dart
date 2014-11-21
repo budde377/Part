@@ -4,6 +4,7 @@ import "dart:async";
 import "dart:html";
 import "dart:math" as Math;
 
+import 'function_string_parser.dart' as FS;
 import 'core.dart' as core;
 import 'site_classes.dart';
 import 'json.dart';

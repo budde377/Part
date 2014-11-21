@@ -17,6 +17,46 @@ class FormHandler {
   Map<Element, Function > _clearFunctions = new Map<Element, Function>();
 
   FormHandler._internal(FormElement form):this.form = form{
+
+    if(form.dataset['function-string'] != null){
+
+      submitFunction = (_){
+        var h = FS.register.addType(FormHandler, this);
+        var result = FS.register.runFunctionString(form.dataset['function-string']);
+        h.remove();
+
+        if(result is! core.FutureResponse ){
+          return true;
+        }
+        core.FutureResponse r = result;
+
+        var f = (String s) => (core.Response r){
+          if(form.dataset[s] == null){
+            return;
+          }
+          var h2 = FS.register.addType(core.Response, r);
+          FS.register.runFunctionString(form.dataset[s]);
+          h2.remove();
+
+        };
+
+        r.thenResponse(
+            onSuccess: f('on-success-function-string'),
+            onError:f('on-error-function-string'));
+
+
+
+
+
+
+
+        return true;
+      };
+
+    }
+
+
+
     form.onSubmit.listen((Event e) {
       if(_submitFunction == null){
         return;
@@ -31,30 +71,8 @@ class FormHandler {
       }
 
 
-      var data = <String, String>{
-      };
-      form.querySelectorAll('input:not([type=submit]), textarea, select').forEach((e) {
-        if (e.name == "") {
-          return;
-        }
-        if (e is SelectElement) {
-          SelectElement ee = e;
-          data[ee.name] = ee.value;
-        } else if (e is InputElement) {
-          InputElement ee = e;
-          if (ee.type == "radio" || ee.type == "checkbox") {
-            if (e.checked) {
-              data[ee.name] = ee.value;
-            }
-          } else {
-            data[ee.name] = ee.value;
-          }
-        } else if (e is TextAreaElement) {
-          TextAreaElement ee = e;
-          data[ee.name] = ee.value;
-        }
-      });
-      if (!_submitFunction(data)) {
+
+      if (!_submitFunction(formDataMap)) {
         e.preventDefault();
         e.stopImmediatePropagation();
       }
@@ -65,6 +83,32 @@ class FormHandler {
     _submitFunction = f;
   }
 
+  Map<String, String> get formDataMap {
+    var data = <String, String>{
+    };
+    form.querySelectorAll('input:not([type=submit]), textarea, select').forEach((e) {
+      if (e.name == "") {
+        return;
+      }
+      if (e is SelectElement) {
+        SelectElement ee = e;
+        data[ee.name] = ee.value;
+      } else if (e is InputElement) {
+        InputElement ee = e;
+        if (ee.type == "radio" || ee.type == "checkbox") {
+          if (e.checked) {
+            data[ee.name] = ee.value;
+          }
+        } else {
+          data[ee.name] = ee.value;
+        }
+      } else if (e is TextAreaElement) {
+        TextAreaElement ee = e;
+        data[ee.name] = ee.value;
+      }
+    });
+    return data;
+  }
 
 
   void changeNotion(String message, String notion_type) {
@@ -138,6 +182,14 @@ class FormHandler {
   }
 
   ValidatingForm get validatingForm => new ValidatingForm(this.form);
+
+  String operator [](String s) {
+    var i = form.querySelector('input:not([type=submit])[name=$s], textarea[name=$s], select[name=$s]');
+    if(i == null){
+      return null;
+    }
+    return i.value;
+  }
 
 }
 
