@@ -1,5 +1,6 @@
 library function_string_parser;
 
+@MirrorsUsed(targets:const['user_settings', 'site_classes', 'core', 'elements'])
 import "dart:mirrors";
 import "dart:math" as Math;
 import "core.dart";
@@ -1115,15 +1116,15 @@ class TypeRegisterHandler extends RegisterHandler {
     if (type != this.type) {
       return false;
     }
-
+    var mirror = reflect(instance).type; //TODO: Fix when Issue 13440 is done
 
     if (function is _RegisterArrayAccessFunction) {
-      return mirror.declarations.containsKey(MirrorSystem.getSymbol("[]"));
+      return mirror.instanceMembers.containsKey(MirrorSystem.getSymbol("[]"));
 
     } else if (function is _RegisterNamedFunction) {
       _RegisterNamedFunction f = function;
       var symbol = MirrorSystem.getSymbol(f.name);
-      if (!mirror.declarations.containsKey(symbol)) {
+      if (!mirror.instanceMembers.containsKey(symbol)) {
         return _isGetterSetter(function);
       }
 
