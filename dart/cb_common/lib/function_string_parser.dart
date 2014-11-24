@@ -1246,7 +1246,14 @@ class Register {
   factory Register() => _cache == null ? _cache = new Register._internal() : _cache;
 
 
-  Register._internal();
+  Register._internal(){
+    addType(String);
+    addType(List);
+    addType(num);
+    addType(int);
+    addType(double);
+    addType(Map);
+  }
 
 
   AliasRegisterHandler addAlias(String type, RegisterHandler targetHandler) {

@@ -46,7 +46,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             </div>
             <label>
                 Domæne
-                <input type='text' name='domain_name' data-validator-method='pattern{^[a-z0-9-_\\.]+\\.[a-z]{2,}$}' data-error-message='Ugyldig domæne'/>
+                <input type='text' name='domain_name' data-validator-method='pattern{^[a-z0-9-_\\.]+\\.[a-z]\\{2,\\}$}' data-error-message='Ugyldig domæne'/>
             </label>
             <label>
                 Super-kodeord

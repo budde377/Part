@@ -229,9 +229,50 @@ class Validator<E extends Element> {
 
 
   Function _parseMethod(String method) {
-    if (method.startsWith('pattern{') && method.endsWith("}") && new RegExp(r"[{}]").allMatches(method.replaceAll(r"\\", "").replaceAll(r"\{", "").replaceAll(r"\}", "")).length == 2) {
-      var pattern = method.substring(0, method.length - 1).replaceAll(r"\{", r"{").replaceAll(r"\}", "}");
-      return (String value) => new RegExp(pattern).hasMatch(value);
+    if ((method.startsWith('pattern{') || method.startsWith("function-string{")) && method.endsWith("}") && new RegExp(r"[{}]").allMatches(method.replaceAll(r"\\", "").replaceAll(r"\{", "").replaceAll(r"\}", "")).length == 2) {
+
+      if(method.startsWith("p")){
+        var content = method.substring(8, method.length - 1).replaceAll(r"\{", r"{").replaceAll(r"\}", "}");
+        return (String value) => new RegExp(content).hasMatch(value);
+      }
+      var content = method.substring(16, method.length - 1).replaceAll(r"\{", r"{").replaceAll(r"\}", "}");
+
+      var f = (String value){
+        var h = FS.register.addType(Validator, this);
+        var h1 = FS.register.addType(String, value);
+        var h2 = FS.register.addAlias('_value', h1);
+
+        var r = FS.register.runFunctionString(content);
+        h2.removeWithTarget();
+        h.remove();
+
+        if(r == null){
+          return false;
+        }
+        if(r is List || r is Map || r is String){
+          return r.length > 0;
+        }
+        if(r is num){
+          return r > 0;
+        }
+
+        if(r is bool){
+          return r;
+        }
+
+        return true;
+
+      };
+
+
+      return !hasForm?f:(String v){
+        var h = FS.register.addType(ValidatingForm, validatingForm);
+        var r = f(v);
+        h.remove();
+        return r;
+      };
+
+
     } else if (method == "mail") {
       return core.validMail;
     } else if (method == "url") {
@@ -249,14 +290,15 @@ class Validator<E extends Element> {
         if (f1 == null) {
           return null;
         }
-
         var f2 = _parseMethod(method.substring(m.start + 2).trim());
         if (f2 == null) {
           return null;
         }
 
         if (m[0] == "&&") {
-          return (String value) => f1(value) && f2(value);
+          return (String value) {
+            return f1(value) && f2(value);
+          };
         } else {
           return (String value) => f1(value) || f2(value);
         }
@@ -510,5 +552,10 @@ class ValidatingForm {
   FormHandler get formHandler => new FormHandler(element);
 
   bool get valid => _validForm;
+
+  Validator operator[](String name) {
+    var elm = element.querySelector('input:not([type=submit])[name=$name], textarea[name=$name], select[name=$name]');
+    return elm == null? elm: new Validator(elm);
+  }
 
 }
