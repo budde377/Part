@@ -18,21 +18,21 @@ class FormHandler {
 
   FormHandler._internal(FormElement form):this.form = form{
 
-    if(form.dataset['function-string'] != null){
+    if (form.dataset['function-string'] != null) {
 
-      submitFunction = (_){
+      submitFunction = (_) {
         var h = FS.register.addType(FormHandler, this);
         var result = FS.register.runFunctionString(form.dataset['function-string']);
 
-        if(result is! core.FutureResponse ){
+        if (result is! core.FutureResponse) {
           h.remove();
           return true;
         }
         blur();
         core.FutureResponse r = result;
 
-        var f = (String s) => (core.Response r){
-          if(form.dataset[s] != null){
+        var f = (String s) => (core.Response r) {
+          if (form.dataset[s] != null) {
             var h2 = FS.register.addType(core.Response, r);
             FS.register.runFunctionString(form.dataset[s]);
             h2.remove();
@@ -53,9 +53,8 @@ class FormHandler {
     }
 
 
-
     form.onSubmit.listen((Event e) {
-      if(_submitFunction == null){
+      if (_submitFunction == null) {
         return;
       }
 
@@ -63,10 +62,9 @@ class FormHandler {
       e.preventDefault();
       e.stopImmediatePropagation();
 
-      if(ValidatingForm.hasValidator(form) && !validatingForm.valid){
+      if (ValidatingForm.hasValidator(form) && !validatingForm.valid) {
         return;
       }
-
 
 
       if (!_submitFunction(formDataMap)) {
@@ -182,7 +180,7 @@ class FormHandler {
 
   String operator [](String s) {
     var i = form.querySelector('input:not([type=submit])[name=$s], textarea[name=$s], select[name=$s]');
-    if(i == null){
+    if (i == null) {
       return null;
     }
     return i.value;
@@ -222,24 +220,52 @@ class Validator<E extends Element> {
       _initial = false;
       return;
     }
-    switch (element.dataset["validator-method"]) {
-      case "pattern":
-        if (!element.dataset.containsKey("pattern")) {
-          break;
-        }
-        addValidRegExpPatternValueValidator(new RegExp(element.dataset["pattern"]));
-        break;
-      case "mail":
-        addValidMailValueValidator();
-        break;
-      case "url":
-        addValidUrlValueValidator();
-        break;
-      case "non-empty":
-        addNonEmptyValueValidator();
-        break;
+    var v = _parseMethod(element.dataset['validator-method'].trim());
+    if (v != null) {
+      addValueValidator(v);
     }
     _initial = false;
+  }
+
+
+  Function _parseMethod(String method) {
+    if (method.startsWith('pattern{') && method.endsWith("}") && new RegExp(r"[{}]").allMatches(method.replaceAll(r"\\", "").replaceAll(r"\{", "").replaceAll(r"\}", "")).length == 2) {
+      var pattern = method.substring(0, method.length - 1).replaceAll(r"\{", r"{").replaceAll(r"\}", "}");
+      return (String value) => new RegExp(pattern).hasMatch(value);
+    } else if (method == "mail") {
+      return core.validMail;
+    } else if (method == "url") {
+      return core.validUrl;
+    } else if (method == "non-empty") {
+      return core.nonEmpty;
+    } else if (method.startsWith("(") && method.endsWith(")")) {
+      return _parseMethod(method.substring(1, method.length - 1).trim());
+    } else if (method.contains("&&") || method.contains("||")) {
+      return new RegExp(r"(&&|\|\|)").allMatches(method).fold(null, (Function p, Match m) {
+        if (p != null) {
+          return p;
+        }
+        var f1 = _parseMethod(method.substring(0, m.start).trim());
+        if (f1 == null) {
+          return null;
+        }
+
+        var f2 = _parseMethod(method.substring(m.start + 2).trim());
+        if (f2 == null) {
+          return null;
+        }
+
+        if (m[0] == "&&") {
+          return (String value) => f1(value) && f2(value);
+        } else {
+          return (String value) => f1(value) || f2(value);
+        }
+
+      });
+    }
+
+
+    return null;
   }
 
   ValidatingForm get validatingForm => _validatingForm;
@@ -426,7 +452,7 @@ class ValidatingForm {
     });
     if (initial) {
       hideInfoBoxes();
-     _infoBoxMap.clear();
+      _infoBoxMap.clear();
       element.classes.add('initial');
     }
     return valid;

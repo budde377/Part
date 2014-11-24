@@ -46,7 +46,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             </div>
             <label>
                 Domæne
-                <input type='text' name='domain_name' data-validator-method='pattern' data-pattern='^[a-z0-9-_\\.]+\\.[a-z]{2,}$' data-error-message='Ugyldig domæne'/>
+                <input type='text' name='domain_name' data-validator-method='pattern{^[a-z0-9-_\\.]+\\.[a-z]{2,}$}' data-error-message='Ugyldig domæne'/>
             </label>
             <label>
                 Super-kodeord
@@ -93,7 +93,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
                 <input type='password'/>
             </div>            <label>
                 Navn (tom for catchall addresse)
-                <input type='text' name='local_part' data-validator-method='pattern' data-pattern='^[a-z0-9\\._-]*$' data-error-message='Ugyldig addresse'>
+                <input type='text' name='local_part' data-validator-method='pattern{^[a-z0-9\\._-]*$}'  data-error-message='Ugyldig addresse'>
             </label>
             <span class='at'>@</span>
             <label>
