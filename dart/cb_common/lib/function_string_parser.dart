@@ -1,6 +1,6 @@
 library function_string_parser;
 
-@MirrorsUsed(targets:const['user_settings', 'site_classes', 'core', 'elements'])
+@MirrorsUsed(targets:const['user_settings', 'site_classes', 'core', 'elements', 'List', 'Map', 'String', 'num', 'int', 'double', 'bool'])
 import "dart:mirrors";
 import "dart:math" as Math;
 import "core.dart";
@@ -1253,6 +1253,7 @@ class Register {
     addType(int);
     addType(double);
     addType(Map);
+    addType(bool);
   }
 
 
