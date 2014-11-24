@@ -406,7 +406,13 @@ class LinkImageHandler {
 
   DivElement _boxElement = new DivElement();
 
-  ButtonElement _unlinkButton = new ButtonElement(), _openButton = new ButtonElement(), _editImageButton = new ButtonElement(), _youtubeButton = new ButtonElement(), _vimeoButton = new ButtonElement();
+  ButtonElement _unlinkButton = new ButtonElement(),
+                _openButton = new ButtonElement(),
+                _editImageButton = new ButtonElement(),
+                _floatImageLeftButton = new ButtonElement(),
+                _floatImageRightButton = new ButtonElement(),
+                _youtubeButton = new ButtonElement(),
+                _vimeoButton = new ButtonElement();
 
   AnchorElement _foundLink;
 
@@ -1491,7 +1497,7 @@ class ContentEditor {
                 if (!selection.containsNode(elm, false)) {
                   return;
                 }
-                elm.attributes.remove("style");
+                elm.attributes..remove("style")..remove("class");
               });
               executor.removeFormat();
             }
