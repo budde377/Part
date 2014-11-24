@@ -229,6 +229,30 @@ class Validator<E extends Element> {
 
 
   Function _parseMethod(String method) {
+
+    var folder = (Function p, Match m) {
+      if (p != null) {
+        return p;
+      }
+      var f1 = _parseMethod(method.substring(0, m.start).trim());
+      if (f1 == null) {
+        return null;
+      }
+      var f2 = _parseMethod(method.substring(m.start + 2).trim());
+      if (f2 == null) {
+        return null;
+      }
+
+      if (m[0] == "&&") {
+        return (String value) {
+          return f1(value) && f2(value);
+        };
+      } else {
+        return (String value) => f1(value) || f2(value);
+      }
+
+    };
+
     if ((method.startsWith('pattern{') || method.startsWith("function-string{")) && method.endsWith("}") && new RegExp(r"[{}]").allMatches(method.replaceAll(r"\\", "").replaceAll(r"\{", "").replaceAll(r"\}", "")).length == 2) {
 
       if(method.startsWith("p")){
@@ -272,7 +296,6 @@ class Validator<E extends Element> {
         return r;
       };
 
-
     } else if (method == "mail") {
       return core.validMail;
     } else if (method == "url") {
@@ -281,29 +304,10 @@ class Validator<E extends Element> {
       return core.nonEmpty;
     } else if (method.startsWith("(") && method.endsWith(")")) {
       return _parseMethod(method.substring(1, method.length - 1).trim());
-    } else if (method.contains("&&") || method.contains("||")) {
-      return new RegExp(r"(&&|\|\|)").allMatches(method).fold(null, (Function p, Match m) {
-        if (p != null) {
-          return p;
-        }
-        var f1 = _parseMethod(method.substring(0, m.start).trim());
-        if (f1 == null) {
-          return null;
-        }
-        var f2 = _parseMethod(method.substring(m.start + 2).trim());
-        if (f2 == null) {
-          return null;
-        }
-
-        if (m[0] == "&&") {
-          return (String value) {
-            return f1(value) && f2(value);
-          };
-        } else {
-          return (String value) => f1(value) || f2(value);
-        }
-
-      });
+    } else if (method.contains("&&")) {
+      return "&&".allMatches(method).fold(null, folder);
+    } else if(method.contains("||")){
+      return "||".allMatches(method).fold(null, folder);
     }
 
 
