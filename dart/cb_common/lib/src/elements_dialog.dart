@@ -69,9 +69,9 @@ class TextInputDialogBox extends DialogBox {
 
   Completer<String> _completer = new Completer<String>();
 
-  TextInputDialogBox(String message, {String value:""}) : super(new DivElement()) {
+  TextInputDialogBox(String message, {String value:"", bool password:false}) : super(new DivElement()) {
     element.classes..add('dialog')..add('text');
-    _textInput..type = "text"..value = value;
+    _textInput..type = (password?"password":"text")..value = value;
     _doneButton..onClick.listen((_) {
       _completer.complete(_textInput.value);
       close();
@@ -105,13 +105,21 @@ class LoadingDialog extends DialogBox{
   }
 
   void open(){
-    escQueue.enabled = false;
+    core.escQueue.enabled = false;
   }
 
   void close(){
-    escQueue.enabled = true;
+    core.escQueue.enabled = true;
     super.close();
 
+  }
+
+  void stopLoading(){
+    element.classes.remove("loading");
+  }
+
+  void startLoading(){
+    element.classes.add("loading");
   }
 
 
@@ -165,6 +173,12 @@ class DialogContainer {
     return dialog;
   }
 
+  TextInputDialogBox password(String message, {String value:""}) {
+    var dialog = new TextInputDialogBox(message, value:value, password:true);
+    addDialogBox(dialog);
+    return dialog;
+  }
+
   LoadingDialog loading(String text){
     var dialog = new LoadingDialog(text);
     addDialogBox(dialog);
@@ -178,7 +192,7 @@ class DialogContainer {
       return;
     }
     _appendDialog(dialog);
-    query('body').append(dialogBg);
+    querySelector('body').append(dialogBg);
     enableNoScrollBody();
 
   }
@@ -187,7 +201,7 @@ class DialogContainer {
     _cell.append(dialog.element);
     dialog.open();
     _currentDialog = dialog;
-    escQueue.add(() {
+    core.escQueue.add(() {
       if (dialog != _currentDialog) {
         return false;
       }
@@ -216,7 +230,7 @@ DialogContainer get dialogContainer => new DialogContainer();
 
 
 void enableNoScrollBody(){
-  var body = query('body');
+  var body = querySelector('body');
   if(window.innerHeight >= body.scrollHeight){
     return;
   }
@@ -226,9 +240,9 @@ void enableNoScrollBody(){
 
 
 void disableNoScrollBody(){
-  var body = query('body');
+  var body = querySelector('body');
   body.classes.remove('no_scroll');
-  var y = parsePx(body.style.top);
+  var y = core.parseNumber(body.style.top);
   body.style.removeProperty('top');
   window.scrollTo(window.scrollX,y);
 

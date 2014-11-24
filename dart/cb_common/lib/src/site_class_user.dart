@@ -14,45 +14,49 @@ abstract class User {
 
   String get parent;
 
+  DateTime get lastLogin;
+
   int get privileges;
 
   List<Page> get pages;
 
-  void changeInfo({String username:null, String mail:null, ChangeCallback callback:null});
+  FutureResponse<User> changeInfo({String username:null, String mail:null});
 
-  void changePassword(String currentPassword, String newPassword, [ChangeCallback callback]);
+  FutureResponse<User> changePassword(String currentPassword, String newPassword);
 
-  void addPagePrivilege(Page page, [ChangeCallback callback]);
+  FutureResponse<User> addPagePrivilege(Page page);
 
-  void revokePagePrivilege(Page page, [ChangeCallback callback]);
+  FutureResponse<User>revokePagePrivilege(Page page);
 
   bool get hasRootPrivileges;
   bool get hasSitePrivileges;
 
   bool canModifyPage(Page page);
 
+  bool get canModifySite;
 
   Stream<User> get onChange;
 
 }
 
 
-class JSONUser extends User {
+class AJAXUser extends User {
   String _username, _mail, _parent;
+
+  DateTime _lastLogin;
 
   StreamController<User> _changeController = new StreamController<User>();
   Stream<User> _changeStream;
-
-  final JSONClient _client;
 
   int _privileges;
 
   List<Page> _pages;
 
-  JSONUser(String username, String mail, String parent, int privileges, List<Page> pages, JSONClient client):_client = client {
+  AJAXUser(String username, String mail, String parent, int lastLogin, int privileges, List<Page> pages) {
     _username = username;
     _mail = mail;
     _parent = parent;
+    _lastLogin = lastLogin == null?null:new DateTime.fromMillisecondsSinceEpoch(lastLogin*1000);
     _pages = privileges == User.PRIVILEGE_PAGE ? new List<Page>.from(pages) : <Page>[];
     _privileges = privileges;
 
@@ -64,35 +68,49 @@ class JSONUser extends User {
 
   String get parent => _parent;
 
-  void changeInfo({String username:null, String mail:null, ChangeCallback callback:null}) {
+  DateTime get lastLogin => _lastLogin;
+
+  FutureResponse<User> changeInfo({String username:null, String mail:null}) {
+    var completer = new Completer<Response<User>>();
+
+    var functionString = "";
+
+    if(mail != null && mail != _mail){
+      functionString += "..setMail(${quoteString(mail)})";
+    }
+
+    if(username != null && username != _username){
+      functionString += "..setUsername(${quoteString(username)})";
+    }
+
     mail = mail != null ? mail : _mail;
     username = username != null ? username : _username;
-    callback = callback != null ? callback : (e1, [e2, e3]) {
-    };
-    var jsonFunction = new ChangeUserInfoJSONFunction(_username, username, mail);
-    _client.callFunction(jsonFunction).then( (JSONResponse response) {
-      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
-        _username = username;
-        _mail = mail;
-        callback(CALLBACK_STATUS_SUCCESS);
+
+    ajaxClient.callFunctionString("UserLibrary.getUser(${quoteString(_username)})$functionString..getInstance()").then( (JSONResponse response) {
+      if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
+
+        _username = response.payload.variables["username"];
+        _mail = response.payload.variables["mail"];
         _callListeners();
+        completer.complete(new Response<User>.success(this));
       } else {
-        callback(CALLBACK_STATUS_ERROR, response.error_code);
+        completer.complete(new Response<User>.error(response.error_code));
       }
     });
+    return new FutureResponse(completer.future);
   }
 
-  void changePassword(String currentPassword, String newPassword, [ChangeCallback callback]) {
-    var jsonFunction = new ChangeUserPasswordJSONFunction(_username, currentPassword, newPassword);
-    _client.callFunction(jsonFunction).then((JSONResponse response) {
-      switch (response.type) {
-        case JSONResponse.RESPONSE_TYPE_SUCCESS:
-          callback(response.type);
-          break;
-        default:
-          callback(JSONResponse.RESPONSE_TYPE_ERROR, response.error_code);
+  FutureResponse<User> changePassword(String currentPassword, String newPassword) {
+    var completer = new Completer<Response<User>>();
+    ajaxClient.callFunctionString("UserLibrary.getUser(${quoteString(_username)}).setPassword(${quoteString(currentPassword)}, ${quoteString(newPassword)})").then((JSONResponse response) {
+      if(response.type == Response.RESPONSE_TYPE_SUCCESS){
+        completer.complete(new Response<User>.success(this));
+      } else {
+        completer.complete(new Response<User>.error(response.error_code));
       }
+
     });
+    return new FutureResponse(completer.future);
   }
 
   Stream<User> get onChange => _changeStream == null? _changeStream = _changeController.stream.asBroadcastStream():_changeStream;
@@ -107,30 +125,35 @@ class JSONUser extends User {
   List<Page> get pages => new List<Page>.from(_pages);
 
 
-  void addPagePrivilege(Page page, [ChangeCallback callback]) {
-    var function = new AddUserPagePrivilegeJSONFunction(_username, page.id);
-    _client.callFunction(function).then( (JSONResponse response) {
-      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
+  FutureResponse<User> addPagePrivilege(Page page) {
+    var completer = new Completer<Response<User>>();
+    var pageIdString = quoteString(page.id);
+    ajaxClient.callFunctionString("UserLibrary.getUser(${quoteString(username)}).getUserPrivileges()..addPagePrivileges($pageIdString)..hasPagePrivileges($pageIdString)").then( (JSONResponse response) {
+      if (response.type == Response.RESPONSE_TYPE_SUCCESS && response.payload) {
         _pages.add(page);
-        callback(response.type);
+        completer.complete(new Response<User>.success(this));
         _callListeners();
       } else {
-        callback(JSONResponse.RESPONSE_TYPE_ERROR, response.error_code);
+        completer.complete(new Response<User>.error(response.error_code));
       }
     });
+    return new FutureResponse(completer.future);
   }
 
-  void revokePagePrivilege(Page page, [ChangeCallback callback]) {
-    var function = new RevokeUserPagePrivilegeJSONFunction(_username, page.id);
-    _client.callFunction(function).then((JSONResponse response) {
-      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
+  FutureResponse<User> revokePagePrivilege(Page page) {
+    var pageIdString = quoteString(page.id);
+
+    var completer = new Completer<Response<User>>();
+    ajaxClient.callFunctionString("UserLibrary.getUser(${quoteString(username)}).getUserPrivileges()..revokePagePrivileges($pageIdString)..hasPagePrivileges($pageIdString)").then((JSONResponse response) {
+      if (response.type == Response.RESPONSE_TYPE_SUCCESS && !response.payload) {
         _pages.remove(page);
-        callback(response.type);
         _callListeners();
+        completer.complete(new Response<User>.success(this));
       } else {
-        callback(JSONResponse.RESPONSE_TYPE_ERROR, response.error_code);
+        completer.complete(new Response<User>.error(response.error_code));
       }
     });
+    return new FutureResponse(completer.future);
   }
 
   bool get hasRootPrivileges => privileges == User.PRIVILEGE_ROOT;
@@ -139,5 +162,6 @@ class JSONUser extends User {
 
   bool canModifyPage(Page page) => _privileges == User.PRIVILEGE_ROOT || _privileges == User.PRIVILEGE_SITE ||  _pages.map((Page p) => p.id).contains(page.id);
 
+  bool get canModifySite => _privileges == User.PRIVILEGE_ROOT || _privileges == User.PRIVILEGE_SITE;
 
 }

@@ -7,12 +7,12 @@ class UserSettingsSlideDecoration extends SlideDecoration {
 
   int _currentPosition = 0;
 
-  Animation currentAnimation;
+  core.Animation currentAnimation;
   static UserSettingsSlideDecoration _cache;
 
   factory UserSettingsSlideDecoration(){
     if (_cache == null) {
-      var lis = queryAll('#UserSettingsMenu > ul > li');
+      var lis = querySelectorAll('#UserSettingsMenu > ul > li');
       var startIndex = 0, ii = 0;
       lis.forEach((LIElement li) {
         if (li.classes.contains('active')) {
@@ -20,7 +20,7 @@ class UserSettingsSlideDecoration extends SlideDecoration {
         }
         ii++;
       });
-      _cache = new UserSettingsSlideDecoration._internal(query("#UserSettingsContent > ul"), lis.length, startIndex);
+      _cache = new UserSettingsSlideDecoration._internal(querySelector("#UserSettingsContent > ul"), lis.length, startIndex);
     }
     return _cache;
   }
@@ -40,7 +40,7 @@ class UserSettingsSlideDecoration extends SlideDecoration {
       currentAnimation.stop();
     }
     var c = _currentPosition, ci = currentIndex;
-    currentAnimation = new Animation(new Duration(milliseconds:150 * (ci - index).abs()), (pct) {
+    currentAnimation = new core.Animation(new Duration(milliseconds:150 * (ci - index).abs()), (pct) {
       element.style.marginLeft = "${c + (newPos - c) * pct}px";
     }, (success) {
       if (!success) {
@@ -65,7 +65,7 @@ class UserSettingsExpandDecoration extends ExpandDecoration {
 
   factory UserSettingsExpandDecoration(){
     if (_cache == null) {
-      _cache = new UserSettingsExpandDecoration._internal(query('#UserSettingsContainer'));
+      _cache = new UserSettingsExpandDecoration._internal(querySelector('#UserSettingsContainer'));
     }
     return _cache;
   }
@@ -85,7 +85,7 @@ class UserSettingsExpandDecoration extends ExpandDecoration {
     _hasBeenInitialized = true;
     var lastBottom;
     var first_1 = true;
-    expandAnimation = new Animation(new Duration(milliseconds:200), (double pct) {
+    expandAnimation = new core.Animation(new Duration(milliseconds:200), (double pct) {
       if (first_1) {
         lastBottom = _lastBottom();
         first_1 = false;
@@ -97,7 +97,7 @@ class UserSettingsExpandDecoration extends ExpandDecoration {
       element.style.height = "auto";
     });
     var first_2 = true;
-    contractAnimation = new Animation(new Duration(milliseconds:150), (double pct) {
+    contractAnimation = new core.Animation(new Duration(milliseconds:150), (double pct) {
       if (_expanded) {
         _expanded = false;
       }
@@ -137,10 +137,10 @@ class UserSettingsExpandLinkExpandDecoration extends ExpandDecoration {
       return;
     }
     _hasBeenInitialized = true;
-    expandAnimation = new Animation(new Duration(milliseconds:100), (double pct) {
+    expandAnimation = new core.Animation(new Duration(milliseconds:100), (double pct) {
       element.style.height = "${(10 * pct + 60).toInt()}px";
     });
-    contractAnimation = new Animation(new Duration(milliseconds:200), (double pct) {
+    contractAnimation = new core.Animation(new Duration(milliseconds:200), (double pct) {
       element.style.height = "${(70 - 10 * pct).toInt()}px";
     });
   }

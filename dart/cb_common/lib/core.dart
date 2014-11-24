@@ -2,23 +2,23 @@ library core;
 
 import "dart:html";
 import "dart:math" as Math;
-import "dart:isolate";
 import "dart:async";
 
-import 'pcre_syntax_checker.dart';
-
 import 'json.dart';
-import 'site_classes.dart' as SiteClasses;
 
 part "src/core_animation.dart";
 part "src/core_keep_alive.dart";
 part 'src/core_initializer.dart';
 part 'src/core_file_uploader.dart';
+part 'src/core_function_string_compiler.dart';
+part 'src/core_connection.dart';
+part 'src/core_response.dart';
+part 'src/core_lazy_map.dart';
+part 'src/core_generator.dart';
 
+int parseNumber(String pxString) => int.parse(pxString.replaceAll(new RegExp("[^0-9]"), ""), onError:(_) => 0);
 
-int parsePx(String pxString) => int.parse(pxString.replaceAll(new RegExp("[^0-9]"), ""), onError:(_) => 0);
-
-num linearAnimationFunction(double pct, num from, num to) => from + (to - from) * pct;
+num linearAnimationFunction(num pct, num from, num to) => from + (to - from) * pct;
 
 
 String sizeToString(int bytes) {
@@ -30,7 +30,7 @@ String sizeToString(int bytes) {
 
 bool validMail(String string) => new RegExp(r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$', caseSensitive:false).hasMatch(string);
 
-bool validUrl(String string) => new RegExp(r"^http(s)?://[a-z\-0-9\.æøå]+\.[a-z]{2,3}(/[.]*)?", caseSensitive:false).hasMatch(string);
+bool validUrl(String string) => new RegExp(r"^http(s)?://.+\.[a-z]{2,3}(/[.]*)?$", caseSensitive:false).hasMatch(string);
 
 bool youtubeVideoIdFromUrl(String string) {
   var firstMatch = new RegExp(r"^http(s)?:\/\/www.youtube.com\/watch\?v=([^&#]+)", caseSensitive:false).firstMatch(string);
@@ -106,7 +106,7 @@ class BodySelectManager {
 BodySelectManager get bodySelectManager => new BodySelectManager();
 
 
-BodyElement get body => query('body');
+BodyElement get body => querySelector('body');
 
 class NullTreeSanitizer implements NodeTreeSanitizer {
   void sanitizeTree(Node node) {
@@ -146,6 +146,8 @@ class Position {
 class Debugger {
   static Debugger _instance;
 
+  String _tabs = "";
+
   bool enabled = false;
 
   factory Debugger() => _instance == null ? _instance = new Debugger._internal() : _instance;
@@ -156,9 +158,23 @@ class Debugger {
     if (!enabled) {
       return;
     }
-    print(o);
-
+    print("$_tabs$o");
   }
+
+  void insertTab(){
+    _tabs += "\t";
+  }
+
+  void removeTab(){
+    if(numTabs == 0){
+      return;
+    }
+    _tabs = _tabs.substring(1);
+  }
+
+  int get numTabs => _tabs.length;
+
+  String get tabs => _tabs;
 
 }
 
@@ -168,3 +184,112 @@ void debug(Object o) => debugger.debug(o);
 
 
 final double GOLDEN_RATIO = ((Math.sqrt(5)+1)/2);
+
+
+
+String dayNumberToName(int weekday) {
+  var ret;
+  switch (weekday) {
+    case 1:
+      ret = "mandag";
+      break;
+    case 2:
+      ret = "tirsdag";
+      break;
+    case 3:
+      ret = "onsdag";
+      break;
+    case 4:
+      ret = "torsdag";
+      break;
+    case 5:
+      ret = "fredag";
+      break;
+    case 6:
+      ret = "lørdag";
+      break;
+    case 7:
+      ret = "søndag";
+      break;
+  }
+  return ret;
+}
+
+String monthNumberToName(int monthNumber) {
+  var ret;
+  switch (monthNumber) {
+    case 1:
+      ret = "januar";
+      break;
+    case 2:
+      ret = "februar";
+      break;
+    case 3:
+      ret = "marts";
+      break;
+    case 4:
+      ret = "april";
+      break;
+    case 5:
+      ret = "maj";
+      break;
+    case 6:
+      ret = "juni";
+      break;
+    case 7:
+      ret = "juli";
+      break;
+    case 8:
+      ret = "august";
+      break;
+    case 9:
+      ret = "september";
+      break;
+    case 10:
+      ret = "oktober";
+      break;
+    case 11:
+      ret = "november";
+      break;
+    case 12:
+      ret = "december";
+      break;
+  }
+  return ret;
+}
+
+String addLeadingZero(int i) => i < 10 ? "0$i" : "$i";
+
+String dateString(DateTime dt) {
+  var now = new DateTime.now();
+
+  var returnString = "";
+  if (now.day != dt.day || now.month != dt.month || now.year != dt.year) {
+    returnString = "${dayNumberToName(dt.weekday)} ";
+  } else {
+    returnString = "i dag ";
+  }
+
+  if (now.difference(dt).inDays > 7) {
+    returnString += "d. ${dt.day}. ${monthNumberToName(dt.month)} ${dt.year} ";
+  }
+
+  returnString += "kl. ${addLeadingZero(dt.hour)}:${addLeadingZero(dt.minute)}";
+
+  return returnString.trim();
+}
+
+
+
+class Pair<K, V> {
+  final K k;
+  final V v;
+
+  Pair(this.k, this.v);
+
+}
+
+String quoteString(String string, [String quote = '"']) => quote+(string.replaceAll(quote, r"\"+quote))+quote;
+
+
+String upperCaseWords(String str) => str.replaceAllMapped(new RegExp("^([a-z\u00E0-\u00FC])|\\s([a-z\u00E0-\u00FC])"), (Match m) => m[0].toUpperCase());

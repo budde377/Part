@@ -5,7 +5,7 @@ class ElementDiasDecoration {
 
   Element _currentElement;
 
-  Animation _currentAnimation;
+  core.Animation _currentAnimation;
 
   int _currentPosition = 0;
 
@@ -53,8 +53,8 @@ class ElementDiasDecoration {
       _currentAnimation.stop();
     }
 
-    _currentAnimation = new Animation(duration, (num pct){
-      _currentPosition = Animation.easeInOutExpo(_currentPosition, newPosition - _currentPosition, pct);
+    _currentAnimation = new core.Animation(duration, (num pct){
+      _currentPosition = core.Animation.easeInOutExpo(_currentPosition, newPosition - _currentPosition, pct);
       _updatePosition();
     }, (bool success){
       if(!success){

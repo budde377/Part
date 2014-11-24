@@ -2,7 +2,7 @@ part of elements;
 
 abstract class ExpandDecoration {
   final Element element;
-  Animation expandAnimation, contractAnimation;
+  core.Animation expandAnimation, contractAnimation;
   StreamSubscription _mouseOver, _mouseOut;
 
   ExpandDecoration(Element element):element = element;

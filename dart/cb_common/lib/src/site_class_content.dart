@@ -17,48 +17,46 @@ abstract class Content {
 }
 
 
-abstract class JSONContentFunctionGenerator{
+abstract class AJAXContentFunctionGenerator{
 
-  JSONFunction generateListContentFunction({int from:0, int to: -1, bool includeContent:false});
-  JSONFunction generateContentAtTimeFunction(num time);
-  JSONFunction generateAddContentFunction(String content);
-  String get id;
+  final String contentLibrary, id;
+
+  AJAXContentFunctionGenerator(this.contentLibrary, this.id);
+
+  String generateListContentFunction({int from:null, int to: null, bool includeContent:false}) => contentLibrary+".listContentHistory($from, $to, ${!includeContent})";
+  String generateContentAtTimeFunction(num time) => contentLibrary+".getContentAt($time)";
+  Map generateAddContentFunction(String content){
+    var formData = new FormData();
+    formData.append("content", content);
+    return {"function":contentLibrary+".addContent(POST['content'])", "formdata":formData};
+  }
+
 }
 
 
-class JSONContentPageFunctionGenerator implements JSONContentFunctionGenerator{
+class JSONContentPageFunctionGenerator extends AJAXContentFunctionGenerator{
   final Page page;
-  final String _id;
-  JSONContentPageFunctionGenerator (this.page, this._id);
 
-  JSONFunction generateListContentFunction({int from:0, int to: -1, bool includeContent:false}) => new ListPageContentRevisionsJSONFunction(page.id, id , from:from, to:to, includeContent:includeContent);
-  JSONFunction generateContentAtTimeFunction(num time) => new PageContentAtTimeJSONFunction(page.id, id, time);
-  JSONFunction generateAddContentFunction(String content) => new AddPageContentJSONFunction(page.id, id, content);
-
-  String get id => _id;
-}
-
-class JSONContentSiteFunctionGenerator implements JSONContentFunctionGenerator{
-  final String _id;
-  JSONContentSiteFunctionGenerator(this._id);
-
-  JSONFunction generateListContentFunction({int from:0, int to: -1, bool includeContent:false}) => new ListSiteContentRevisionsJSONFunction(id , from:from, to:to, includeContent:includeContent);
-  JSONFunction generateContentAtTimeFunction(num time) => new SiteContentAtTimeJSONFunction(id, time);
-  JSONFunction generateAddContentFunction(String content) => new AddSiteContentJSONFunction(id, content);
-
-  String get id => _id;
+  JSONContentPageFunctionGenerator (Page page, String id) : super("PageOrder.getPage(${quoteString(page.id)}).getContent(${quoteString(id)})", id), this.page = page;
 
 }
 
-class JSONContent extends Content {
-  JSONClient _client;
-  final JSONContentFunctionGenerator contentStrategy;
+class JSONContentSiteFunctionGenerator extends AJAXContentFunctionGenerator{
 
-  JSONContent(JSONContentFunctionGenerator contentStrategy, this._client): super(contentStrategy.id), this.contentStrategy = contentStrategy;
+  JSONContentSiteFunctionGenerator(String id) : super("SiteContentLibrary.getContent(${quoteString(id)})",id);
 
-  JSONContent.page(Page page, String id, JSONClient client) : this(new JSONContentPageFunctionGenerator(page, id), client);
 
-  JSONContent.site(String id, JSONClient client) : this(new JSONContentSiteFunctionGenerator(id), client);
+}
+
+class AJAXContent extends Content {
+
+  final AJAXContentFunctionGenerator contentStrategy;
+
+  AJAXContent(AJAXContentFunctionGenerator contentStrategy): super(contentStrategy.id), this.contentStrategy = contentStrategy;
+
+  AJAXContent.page(Page page, String id) : this(new JSONContentPageFunctionGenerator(page, id));
+
+  AJAXContent.site(String id) : this(new JSONContentSiteFunctionGenerator(id));
 
   Map<DateTime, Revision> _revisions = new Map<DateTime, Revision>();
 
@@ -67,10 +65,10 @@ class JSONContent extends Content {
 
   Future<List<DateTime>> get changeTimes {
     var completer = new Completer<List<DateTime>>();
-    _client.callFunction(contentStrategy.generateListContentFunction()).then((JSONResponse response) {
-      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
-        List<int> payload = response.payload== null? []:response.payload;
-        completer.complete(payload.map((int) => new DateTime.fromMillisecondsSinceEpoch(int * 1000)).toList(growable:false));
+    ajaxClient.callFunctionString(contentStrategy.generateListContentFunction()).then((JSONResponse response) {
+      if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
+        List<String> payload = response.payload== null? []:response.payload;
+        completer.complete(payload.map((String timeString) => new DateTime.fromMillisecondsSinceEpoch(int.parse(timeString) * 1000)).toList(growable:false));
       } else {
         completer.completeError(new Exception("Could not list times"));
       }
@@ -81,8 +79,8 @@ class JSONContent extends Content {
   Future<Revision> operator [](DateTime time){
     var completer = new Completer<Revision>();
 
-    _client.callFunction(contentStrategy.generateContentAtTimeFunction(time.millisecond~/1000)).then((JSONResponse response) {
-      if (response.type != JSONResponse.RESPONSE_TYPE_SUCCESS) {
+    ajaxClient.callFunctionString(contentStrategy.generateContentAtTimeFunction(time.millisecond~/1000)).then((JSONResponse response) {
+      if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         completer.completeError(new Exception("Could not get content at time"));
         return;
       }
@@ -98,8 +96,9 @@ class JSONContent extends Content {
 
   Future<Revision> addContent(String content) {
     var completer = new Completer<Revision>();
-    _client.callFunction(contentStrategy.generateAddContentFunction(content)).then((JSONResponse response) {
-      if (response.type != JSONResponse.RESPONSE_TYPE_SUCCESS) {
+    var c = contentStrategy.generateAddContentFunction(content);
+    ajaxClient.callFunctionString(c["function"], form_data:c["formdata"]).then((JSONResponse response) {
+      if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         completer.completeError(new Exception("Could not add content"));
         return;
       }
@@ -116,10 +115,10 @@ class JSONContent extends Content {
     to = to == null ? new DateTime.now() : to;
 
     var fromm = from.millisecondsSinceEpoch ~/ 1000, too = to.millisecondsSinceEpoch ~/ 1000;
-    _client.callFunction(contentStrategy.generateListContentFunction(from:fromm, to:too, includeContent:true)).then((JSONResponse response) {
-      if (response.type == JSONResponse.RESPONSE_TYPE_SUCCESS) {
+    ajaxClient.callFunctionString(contentStrategy.generateListContentFunction(from:fromm, to:too, includeContent:true)).then((JSONResponse response) {
+      if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         List<Map<String, dynamic>> payload = response.payload == null? []:response.payload;
-        completer.complete(payload.map((Map<String, dynamic> m) => _generateRevision(new DateTime.fromMillisecondsSinceEpoch(m['time'] * 1000), m['content'])).toList(growable:false));
+        completer.complete(payload.map((Map<String, dynamic> m) => _generateRevision(new DateTime.fromMillisecondsSinceEpoch(int.parse(m['time']) * 1000), m['content'])).toList(growable:false));
 
       } else {
         completer.completeError(new Exception("Could not list revisions"));

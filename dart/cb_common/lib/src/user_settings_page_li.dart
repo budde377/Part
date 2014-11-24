@@ -2,7 +2,7 @@ part of user_settings;
 
 
 class UserSettingsActivePagesPath {
-  final DivElement _pagePath = query('#ActiveListPath');
+  final DivElement _pagePath = querySelector('#ActiveListPath');
 
   List<Page> _currentlyShowingPath = [];
 
@@ -18,16 +18,16 @@ class UserSettingsActivePagesPath {
   factory UserSettingsActivePagesPath() => _cache;
 
   UserSettingsActivePagesPath._internal(){
-    _up = _pagePath.query('.up');
-    _dot = _pagePath.query('.dot');
+    _up = _pagePath.querySelector('.up');
+    _dot = _pagePath.querySelector('.dot');
     _dot.onClick.listen((MouseEvent) => showSubMenu(""));
-    _up.onClick.listen((e) => _pagePath.queryAll('.dot,.file').reversed.toList()[1].click());
+    _up.onClick.listen((e) => _pagePath.querySelectorAll('.dot,.file').reversed.toList()[1].click());
   }
 
 
   void showSubMenu(String page_id) {
-    var activeList = query('#ActivePageList');
-    activeList.queryAll('.showSubList, .hasSubList').forEach((Element e) => e.classes..remove('showSubList')..remove('hasSubList'));
+    var activeList = querySelector('#ActivePageList');
+    activeList.querySelectorAll('.showSubList, .hasSubList').forEach((Element e) => e.classes..remove('showSubList')..remove('hasSubList'));
     if (page_id == null || page_id == "") {
       activeList.classes.remove('showSubList');
       _up.classes.add('hidden');
@@ -36,7 +36,6 @@ class UserSettingsActivePagesPath {
       return;
     }
 
-    var pageOrder = new UserSettingsJSONPageOrder();
     if (!pageOrder.isActive(page_id)) {
       return;
     }
@@ -56,7 +55,7 @@ class UserSettingsActivePagesPath {
   void reset() => showSubMenu("");
 
   void _updatePath() {
-    _pagePath.queryAll(':not(.dot):not(.up)').forEach((Element e) {
+    _pagePath.querySelectorAll(':not(.dot):not(.up)').forEach((Element e) {
       e.remove();
     });
     _currentlyShowingPath.forEach((Page p) {
@@ -81,7 +80,7 @@ class UserSettingsPageLi {
 
   final PageOrder _pageOrder;
 
-  final UListElement _inactiveList = query('#InactivePageList'), _activeList = query('#ActivePageList');
+  final UListElement _inactiveList = querySelector('#InactivePageList'), _activeList = querySelector('#ActivePageList');
 
   final Page page;
 
@@ -95,17 +94,14 @@ class UserSettingsPageLi {
 
   factory UserSettingsPageLi(LIElement li){
     var id = li.dataset["id"];
-    var pageOrder = new UserSettingsJSONPageOrder();
     return _resolveInstance(id, () => new UserSettingsPageLi._internal(li, pageOrder, pageOrder.pages[id]));
   }
 
   factory UserSettingsPageLi.fromPage(Page page){
-    var pageOrder = new UserSettingsJSONPageOrder();
     return _resolveInstance(page.id, () => new UserSettingsPageLi._internal(new LIElement(), pageOrder, page));
   }
 
   factory UserSettingsPageLi.fromPageId(String page_id){
-    var pageOrder = new UserSettingsJSONPageOrder();
     return _resolveInstance(page_id, () => new UserSettingsPageLi._internal(new LIElement(), pageOrder, pageOrder.pages[page_id]));
   }
 
@@ -122,8 +118,8 @@ class UserSettingsPageLi {
 
   UserSettingsPageLi._internal(this.li, this._pageOrder, this.page){
     _active = _pageOrder.isActive(page.id);
-    _returnNewDivIfNecessary(li.query('.padding'), ['padding'], true);
-    _anchor = li.query('a.val');
+    _returnNewDivIfNecessary(li.querySelector('.padding'), ['padding'], true);
+    _anchor = li.querySelector('a.val');
     if (_anchor == null) {
       _anchor = new AnchorElement();
       _anchor.text = page.title;
@@ -131,11 +127,11 @@ class UserSettingsPageLi {
       _anchor.classes.add('val');
       li.append(_anchor);
     }
-    //_handle = _returnNewDivIfNecessary(li.query('.handle'), ['handle'], _active);
-    _delete = _returnNewDivIfNecessary(li.query('.delete'), ['link', 'delete'], true, title:'Slet');
-    _activate = _returnNewDivIfNecessary(li.query('.activate'), ['link', 'activate'], true, title:_pageOrder.isActive(page.id) ? 'Deaktiver' : 'Aktiver');
-    _hide = _returnNewDivIfNecessary(li.query('.showhide'), ['link', 'showhide'], _active, title:page.hidden ? "Vis" : "Skjul");
-    _subPagesButton = _returnNewDivIfNecessary(li.query('.subpages.link'), ['link', 'subpages'], _active, title:'Undersider');
+    //_handle = _returnNewDivIfNecessary(li.querySelector('.handle'), ['handle'], _active);
+    _delete = _returnNewDivIfNecessary(li.querySelector('.delete'), ['link', 'delete'], true, title:'Slet');
+    _activate = _returnNewDivIfNecessary(li.querySelector('.activate'), ['link', 'activate'], true, title:_pageOrder.isActive(page.id) ? 'Deaktiver' : 'Aktiver');
+    _hide = _returnNewDivIfNecessary(li.querySelector('.showhide'), ['link', 'showhide'], _active, title:page.hidden ? "Vis" : "Skjul");
+    _subPagesButton = _returnNewDivIfNecessary(li.querySelector('.subpages.link'), ['link', 'subpages'], _active, title:'Undersider');
 
     updateInfo();
 
@@ -143,24 +139,19 @@ class UserSettingsPageLi {
   }
 
   void _setUpListeners() {
-    var bar = new SavingBar();
     page.onChange.listen((_) {
       updateInfo();
     });
     _hide.onClick.listen((MouseEvent event) {
-      var i = bar.startJob();
-      page.changeInfo(hidden:!page.hidden, callback:(String status, [int error_code, dynamic payload]) {
-        bar.endJob(i);
-      });
+      var i = savingBar.startJob();
+      page.changeInfo(hidden:!page.hidden).then((_)=>savingBar.endJob(i));
     });
     var dialog = new DialogContainer();
     _activate.onClick.listen((MouseEvent event) {
       if (_pageOrder.isActive(page.id)) {
         var deactivate = () {
-          var i = bar.startJob();
-          _pageOrder.deactivatePage(page.id, (String status, [int error_code, dynamic payload]) {
-            bar.endJob(i);
-          });
+          var i = savingBar.startJob();
+          _pageOrder.deactivatePage(page.id).then((_) => savingBar.endJob(i));
         };
         if(_pageOrder.listPageOrder(parent_id:page.id).length > 0){
           dialog.confirm("Denne side har undersider. <br /> Er du sikker på at du vil deaktivere siden og dens undersider?").result.then((bool b){
@@ -174,14 +165,12 @@ class UserSettingsPageLi {
         }
 
       } else {
-        var i = bar.startJob();
+        var i = savingBar.startJob();
         var parent_id = _pagesPath.currentlyShowingPath.length > 0 ? _pagesPath.currentlyShowingPath.last.id : null;
         var newOrder = _pageOrder.listPageOrder(parent_id:parent_id);
-        newOrder = newOrder.map((Page p) => p.id).toList();
-        newOrder.add(page.id);
-        _pageOrder.changePageOrder(newOrder, parent_id:parent_id, callback:(String status, [int error_code, dynamic payload]) {
-          bar.endJob(i);
-        });
+        var newOrderString = newOrder.map((Page p) => p.id).toList();
+        newOrderString .add(page.id);
+        _pageOrder.changePageOrder(newOrderString , parent_id:parent_id).then((_) => savingBar.endJob(i));
       }
     });
     _subPagesButton.onClick.listen((MouseEvent event) {
@@ -193,10 +182,10 @@ class UserSettingsPageLi {
           return;
         }
         li.classes.add('blur');
-        var i = bar.startJob();
-        _pageOrder.deletePage(page.id, (String status, [int error_code, dynamic payload]) {
+        var i = savingBar.startJob();
+        _pageOrder.deletePage(page.id).then((core.Response response) {
           li.classes.remove('blur');
-          bar.endJob(i);
+          savingBar.endJob(i);
         });
       });
     });
@@ -231,7 +220,7 @@ class UserSettingsPageLi {
       _subPagesButton.remove();
       //_handle.remove();
       var ul;
-      if ((ul = li.query('ul')) != null) {
+      if ((ul = li.querySelector('ul')) != null) {
         ul.remove();
       }
 

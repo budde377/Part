@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<mysqldump>
+    <database name="test_postfix">
+        <table_data name="test_postfix.DomainAssignment">
+            <row>
+                <field name="database">test_cms</field>
+                <field name="domain">test.dk</field>
+            </row>
+        </table_data>
+    </database>
+
+    <database name="test_cms">
+        <table_data name="MailDomain">
+            <row>
+                <field name="domain">test.dk</field>
+                <field name="description">Some desc.</field>
+                <field name="created">2000-01-01 12:00:00</field>
+                <field name="modified">2000-01-01 13:00:00</field>
+                <field name="active">1</field>
+            </row>
+        </table_data>
+    </database>
+</mysqldump>

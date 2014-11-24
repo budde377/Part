@@ -10,9 +10,10 @@ abstract class FloatingBox{
     element.classes.add('floating_box');
   }
 
-  bool get _inDom => element.parent != null;
+  bool get visible => element.parent != null;
+
   Function _changeListener (void f()) => (_) {
-    if(_inDom){
+    if(visible){
       f();
     }
   };
@@ -141,7 +142,7 @@ abstract class FloatingBox{
     }
     if(b){
       _mouseDownSubscription = window.onMouseDown.listen((MouseEvent e){
-        if(element.contains(e.toElement)){
+        if(element.contains(e.target)){
           return;
         }
         remove();
@@ -159,7 +160,7 @@ abstract class FloatingBox{
 
 
   void remove(){
-    if(!_inDom){
+    if(!visible){
       return;
     }
     _removeController.add(new Event("remove", canBubble:false, cancelable:false));
@@ -167,10 +168,10 @@ abstract class FloatingBox{
   }
   void showAt(int x, int y){
     if(element.parent == null){
-      query('body').append(element);
+      querySelector('body').append(element);
     }
     if(removeOnESC){
-      escQueue.add(_escRemover);
+      core.escQueue.add(_escRemover);
     }
     element.style.top = "${y}px";
     element.style.left = "${x}px";
@@ -241,8 +242,8 @@ class InfoBox extends FloatingBox{
     }
   }
   void showAt(int x, int y){
-    query('body').append(element);
-    x = x-(element.clientWidth/2).toInt();
+    querySelector('body').append(element);
+    x = x-(element.clientWidth~/2);
     y = y-(reversed ? 0: element.clientHeight-_arrowElement.clientHeight);
     super.showAt(x,y);
   }
@@ -286,7 +287,7 @@ class DropDown{
     closeOnESC = true;
     element.onClick.listen((_)=>toggle());
     document.onMouseDown.listen((MouseEvent e){
-      if(element.contains(e.toElement) || _dropBox.element.contains(e.toElement)){
+      if(element.contains(e.target) || _dropBox.element.contains(e.target)){
         return;
       }
       close();

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <mysqldump>
-    <database name="cms2012testdb">
+    <database name="test_cms">
         <table_data name="Page">
             <row>
                 <field name="page_id">testpage</field>

@@ -173,7 +173,9 @@ class EditorGalleryHandler implements EditorHandler {
     _children.add(h);
     element.classes.add('gallery');
     element.append(_imageCount);
-    _imageCount..classes.add('image_count')..text = "0";
+    _imageCount
+      ..classes.add('image_count')
+      ..text = "0";
 
   }
 
@@ -201,27 +203,33 @@ class EditorFileHandler implements EditorHandler {
 
   final ProgressBar progressBar = new ProgressBar();
 
-  FileProgress _fileProgress;
+  core.FileProgress _fileProgress;
 
 
-  EditorFileHandler(AnchorElement dataElement) : this.dataElement = dataElement{
+  EditorFileHandler(AnchorElement dataElement) : this.dataElement = dataElement {
     _setUp();
   }
 
-  EditorFileHandler.fileProgress(this.dataElement, FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
+  EditorFileHandler.fileProgress(this.dataElement, core.FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
     var size = new SpanElement();
-    size.text = sizeToString(fileProgress.file.size);
+    size.text = core.sizeToString(fileProgress.file.size);
 
-    _fileStandIn..text = fileProgress.file.name..append(size);
+    _fileStandIn
+      ..text = fileProgress.file.name
+      ..append(size);
 
     _fileProgress.onProgress.listen((_) => progressBar.percentage = _fileProgress.progress);
     _fileProgress.onPathAvailable.listen((_) {
-      dataElement..href = _fileProgress.path..text = fileProgress.file.name;
+      dataElement
+        ..href = "/_files/"+_fileProgress.path
+        ..text = fileProgress.file.name;
       progressBar.bar.remove();
       element.classes.remove('uploading');
       ready();
     });
-    element..classes.add('uploading')..append(progressBar.bar);
+    element
+      ..classes.add('uploading')
+      ..append(progressBar.bar);
     _setUp();
   }
 
@@ -240,25 +248,27 @@ class EditorImageHandler implements EditorHandler {
 
   final ProgressBar progressBar = new ProgressBar();
 
-  FileProgress _fileProgress;
+  core.FileProgress _fileProgress;
 
 
-  EditorImageHandler(ImageElement dataElement) : this.dataElement = dataElement{
+  EditorImageHandler(ImageElement dataElement) : this.dataElement = dataElement {
     _setUp();
   }
 
-  EditorImageHandler.fileProgress(this.dataElement, FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
+  EditorImageHandler.fileProgress(this.dataElement, core.FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
     _fileProgress.onProgress.listen((_) => progressBar.percentage = _fileProgress.progress);
     _fileProgress.onPathAvailable.listen((_) {
-      dataElement.src = _fileProgress.path;
+      dataElement.src = "/_files/"+_fileProgress.path;
       progressBar.bar.remove();
       element.classes.remove('uploading');
       ready();
     });
-    _fileProgress.onPreviewPathAvailable.listen((_){
+    _fileProgress.onPreviewPathAvailable.listen((_) {
       _imageStandIn.style.backgroundImage = "url(\'${_fileProgress.previewPath}\')";
     });
-    element..classes.add('uploading')..append(progressBar.bar);
+    element
+      ..classes.add('uploading')
+      ..append(progressBar.bar);
     _setUp();
   }
 
@@ -290,18 +300,22 @@ class EditorFileContainer {
     element.hidden = true;
     _change_stream = _change_controller.stream.asBroadcastStream();
 
-    trashcan..onDragOver.listen((MouseEvent ev) => ev.preventDefault())..onDrop.listen((MouseEvent ev) {
+    trashcan
+      ..onDragOver.listen((MouseEvent ev) => ev.preventDefault())
+      ..onDrop.listen((MouseEvent ev) {
       if (_dragging == null) {
         return;
       }
       _dragging.remove();
       trashcan.classes.remove('hover');
       _notifyContentChange();
-    })..onDragEnter.listen((_) => trashcan.classes.add('hover'))..onDragLeave.listen((_) => trashcan.classes.remove('hover'));
+    })
+      ..onDragEnter.listen((_) => trashcan.classes.add('hover'))
+      ..onDragLeave.listen((_) => trashcan.classes.remove('hover'));
 
   }
 
-  EditorImageHandler addImage(ImageElement image, [FileProgress progress = null]) {
+  EditorImageHandler addImage(ImageElement image, [core.FileProgress progress = null]) {
     element.hidden = false;
     var handler;
     if (progress == null) {
@@ -316,7 +330,7 @@ class EditorFileContainer {
     return handler;
   }
 
-  EditorFileHandler addFile(AnchorElement fileLink, [FileProgress progress = null]) {
+  EditorFileHandler addFile(AnchorElement fileLink, [core.FileProgress progress = null]) {
     element.hidden = false;
     var handler;
     if (progress == null) {
@@ -380,10 +394,6 @@ class EditorFileContainer {
 }
 
 
-class ImagePropertiesEditImageContentJSONFunction extends EditImageJSONFunction {
-  ImagePropertiesEditImageContentJSONFunction(ImageEditProperties properties) : super(properties.url, mirrorHorizontal:properties.mirrorHorizontal, mirrorVertical:properties.mirrorVertical, cropW:properties.cropW, cropH:properties.cropH, cropX:properties.cropX, cropY:properties.cropY, rotate:properties.rotate, width:properties.width, height:properties.height);
-}
-
 
 class LinkImageHandler {
   final Element element;
@@ -396,19 +406,14 @@ class LinkImageHandler {
 
   DivElement _boxElement = new DivElement();
 
-  ButtonElement _unlinkButton = new ButtonElement(),
-                _openButton = new ButtonElement(),
-                _editImageButton = new ButtonElement(),
-                _floatImageLeftButton = new ButtonElement(),
-                _floatImageRightButton = new ButtonElement(),
-                _youtubeButton = new ButtonElement(),
-                _vimeoButton = new ButtonElement();
+  ButtonElement _unlinkButton = new ButtonElement(), _openButton = new ButtonElement(), _editImageButton = new ButtonElement(), _youtubeButton = new ButtonElement(), _vimeoButton = new ButtonElement();
 
   AnchorElement _foundLink;
 
   ImageElement _foundImage;
 
   LinkImageHandler(this.element, this.editor) {
+//    _imageEditor.open(element.querySelector('img'));
     _enabled = editor.isOpen;
     editor.onOpenChange.listen((bool b) {
       _setUp();
@@ -426,7 +431,9 @@ class LinkImageHandler {
       return;
     }
 
-    _unlinkButton..classes.add('unlink')..onClick.listen((MouseEvent mev) {
+    _unlinkButton
+      ..classes.add('unlink')
+      ..onClick.listen((MouseEvent mev) {
       mev.preventDefault();
       _foundLink.insertAdjacentHtml("afterEnd", _foundLink.innerHtml);
       _foundLink.remove();
@@ -434,33 +441,41 @@ class LinkImageHandler {
       editor.executor.triggerCommandStateChangeListener();
     });
 
-    _youtubeButton..classes.add('youtube')..onClick.listen((MouseEvent mev) {
+    _youtubeButton
+      ..classes.add('youtube')
+      ..onClick.listen((MouseEvent mev) {
       mev.preventDefault();
-      var id = youtubeVideoIdFromUrl(_foundLink.href);
-      var width  = element.clientWidth;
-      var height = (width*9/16).ceil();
+      var id = core.youtubeVideoIdFromUrl(_foundLink.href);
+      var width = element.clientWidth;
+      var height = (width * 9 / 16).ceil();
       _foundLink.insertAdjacentHtml("afterEnd", '<iframe width="$width" height="$height" src="//www.youtube.com/embed/$id?badge=0&amp;modestbranding=1&amp;controls=1&amp;autohide=1&amp;showinfo=0&amp;rel=0&amp;fs=0" frameborder="0" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe>');
       _foundLink.remove();
       _infoBox.remove();
       editor.executor.triggerCommandStateChangeListener();
     });
 
-    _vimeoButton..classes.add('vimeo')..onClick.listen((MouseEvent mev) {
+    _vimeoButton
+      ..classes.add('vimeo')
+      ..onClick.listen((MouseEvent mev) {
       mev.preventDefault();
-      var id = vimeoVideoIdFromUrl(_foundLink.href);
-      var width  = element.clientWidth;
-      var height = (width*9/16).ceil();
+      var id = core.vimeoVideoIdFromUrl(_foundLink.href);
+      var width = element.clientWidth;
+      var height = (width * 9 / 16).ceil();
       _foundLink.insertAdjacentHtml("afterEnd", '<iframe width="$width" height="$height" src="//player.vimeo.com/video/$id?badge=0&amp;modestbranding=1&amp;controls=1&amp;autohide=1&amp;showinfo=0&amp;rel=0&amp;fs=0" frameborder="0" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe>');
       _foundLink.remove();
       _infoBox.remove();
       editor.executor.triggerCommandStateChangeListener();
     });
-    _openButton..classes.add('open')..onClick.listen((MouseEvent mev) {
+    _openButton
+      ..classes.add('open')
+      ..onClick.listen((MouseEvent mev) {
       mev.preventDefault();
       _infoBox.remove();
       window.open(_foundLink.href, "_blank");
     });
-    _editImageButton..classes.add('edit_image')..onClick.listen((MouseEvent mev) {
+    _editImageButton
+      ..classes.add('edit_image')
+      ..onClick.listen((MouseEvent mev) {
       mev.preventDefault();
       _infoBox.remove();
 
@@ -469,7 +484,7 @@ class LinkImageHandler {
       handler.editor.minWidth = 50;
       handler.open();
       handler.onEdit.listen((ImageEditProperties p) {
-        _triggerInput();
+        editor.element.dispatchEvent(new Event("input"));
       });
 
     });
@@ -490,7 +505,10 @@ class LinkImageHandler {
 
 
     _infoBox = new InfoBox.elementContent(_boxElement);
-    _infoBox..backgroundColor = InfoBox.COLOR_GREYSCALE..removeOnESC = true..element.classes.add('edit_link_image_popup');
+    _infoBox
+      ..backgroundColor = InfoBox.COLOR_GREYSCALE
+      ..removeOnESC = true
+      ..element.classes.add('edit_link_image_popup');
 
     document.onClick.listen(_clickHandler);
 
@@ -506,7 +524,7 @@ class LinkImageHandler {
     if (!_enabled) {
       return;
     }
-    var elm = event.toElement;
+    var elm = event.target;
     if (_infoBox.element.contains(elm)) {
       return;
     }
@@ -538,15 +556,15 @@ class LinkImageHandler {
 
     if (_foundLink != null) {
       _boxElement.append(_unlinkButton);
-      if(youtubeVideoIdFromUrl(_foundLink.href) != null){
+      if (core.youtubeVideoIdFromUrl(_foundLink.href) != null) {
         _boxElement.append(_youtubeButton);
       }
-      if(vimeoVideoIdFromUrl(_foundLink.href) != null){
+      if (core.vimeoVideoIdFromUrl(_foundLink.href) != null) {
         _boxElement.append(_vimeoButton);
       }
       _boxElement.append(_openButton);
     }
-    _updateInfoBox();
+    _infoBox.showAboveCenterOfElement(_foundLink == null ? _foundImage : _foundLink);
 
   }
 
@@ -571,15 +589,20 @@ class EditorAction {
 
 class ContentEditor {
 
+  static const int EDITOR_MODE_SIMPLE = 1;
+  static const int EDITOR_MODE_NORMAL = 2;
+
   static Map<Element, ContentEditor> _cache = new Map<Element, ContentEditor>();
 
-  factory ContentEditor(Element element, Content content) => _cache.putIfAbsent(element, () => new ContentEditor._internal(element, content));
+  factory ContentEditor(Element element, Content content, [int editor_mode = ContentEditor.EDITOR_MODE_NORMAL]) => _cache.putIfAbsent(element, () => new ContentEditor._internal(element, content, editor_mode));
 
   factory ContentEditor.getCached(Element elm) => _cache[elm];
 
   final Element element;
 
   final EditorCommandExecutor executor;
+
+  final int editorMode;
 
   DivElement _contentWrapper = new DivElement(), _topBar, _toolBarPlaceholder = new DivElement(), _wrapper = new DivElement(), _preview = new DivElement();
 
@@ -610,7 +633,7 @@ class ContentEditor {
 
   int _hash;
 
-  ContentEditor._internal(Element element, this._currentContent) : this.element = element, executor = new EditorCommandExecutor(element){
+  ContentEditor._internal(Element element, this._currentContent, this.editorMode) : this.element = element, executor = new EditorCommandExecutor(element){
 
     _setUpStream();
     _toolBarPlaceholder.classes.add('tool_bar_placeholder');
@@ -635,7 +658,7 @@ class ContentEditor {
 
   Stream<bool> get onOpenChange => _onOpenChangeStream == null ? _onOpenChangeStream = _onOpenChangeStreamController.stream.asBroadcastStream() : _onOpenChangeStream;
 
-  Stream<Element> get onSave => _onSaveStream == null? _onSaveStream = _onSaveStreamController.stream.asBroadcastStream() : _onSaveStream;
+  Stream<Element> get onSave => _onSaveStream == null ? _onSaveStream = _onSaveStreamController.stream.asBroadcastStream() : _onSaveStream;
 
   bool get isOpen => !_closed;
 
@@ -672,7 +695,7 @@ class ContentEditor {
 
 
   void _loadRevision(Revision rev) {
-    element.setInnerHtml(rev.content, treeSanitizer:nullNodeTreeSanitizer);
+    element.setInnerHtml(rev.content, treeSanitizer:core.nullNodeTreeSanitizer);
     _currentRevision = rev;
     _notifyChange();
 
@@ -697,12 +720,12 @@ class ContentEditor {
     _previewAnimation.stop();
     var hidePreview = true;
     if (content != null) {
-      _preview.setInnerHtml(content.content, treeSanitizer:nullNodeTreeSanitizer);
+      _preview.setInnerHtml(content.content, treeSanitizer:core.nullNodeTreeSanitizer);
       hidePreview = false;
     }
 
     element.hidden = !(_preview.hidden = hidePreview);
-    var images = hidePreview ? element.queryAll("img") : _preview.queryAll('img');
+    var images = hidePreview ? element.querySelectorAll("img") : _preview.querySelectorAll('img');
     if (images.length > 0) {
       var i = 0;
       images.forEach((ImageElement e) {
@@ -736,7 +759,7 @@ class ContentEditor {
 
 
   void open() {
-    escQueue.add(() {
+    core.escQueue.add(() {
       if (_closed) {
         return false;
       }
@@ -772,24 +795,24 @@ class ContentEditor {
       save();
     });
 
-    element.onKeyDown.listen((KeyboardEvent kev){
-      if(kev.keyCode != 32){
+    element.onKeyDown.listen((KeyboardEvent kev) {
+      if (kev.keyCode != 32) {
         return;
       }
       var selection = window.getSelection();
-      if(selection.rangeCount == 0){
+      if (selection.rangeCount == 0) {
         return;
       }
       var range = selection.getRangeAt(0);
       var endOffset = range.startOffset, startOffset = range.endOffset;
-      if(endOffset != startOffset){
+      if (endOffset != startOffset) {
         return;
       }
       var parentNode = range.commonAncestorContainer;
 
       var q = parentNode.parent;
-      while(q != null){
-        if(q is AnchorElement){
+      while (q != null) {
+        if (q is AnchorElement) {
           return;
         }
         q = q.parent;
@@ -797,40 +820,40 @@ class ContentEditor {
 
       var regex = new RegExp(r"\s([^\s]+)$");
       var value = parentNode.nodeValue;
-      if(value == null){
+      if (value == null) {
         return;
       }
 
-      var match = regex.firstMatch(" "+ value.substring(0,startOffset));
+      var match = regex.firstMatch(" " + value.substring(0, startOffset));
 
-      if(match == null){
+      if (match == null) {
         return;
       }
 
       var m = match.group(1);
 
-      if(m.trim() != m){
+      if (m.trim() != m) {
         return;
       }
       m = m.trim();
 
-      if(!validUrl(m) && !validMail(m)){
+      if (!core.validUrl(m) && !core.validMail(m)) {
         return;
       }
 
       var start = startOffset - m.length;
-      var t1 = new Text(value.substring(0,start)), t2 = new Text(" "+value.substring(startOffset));
+      var t1 = new Text(value.substring(0, start)), t2 = new Text(" " + value.substring(startOffset));
       var p = parentNode.parent;
       p.insertBefore(t1, parentNode);
       var anchor = new AnchorElement();
       anchor.text = m;
-      anchor.href = (validMail(m)?"mailto:":"") + m;
+      anchor.href = (core.validMail(m) ? "mailto:" : "") + m;
       anchor.target = "_blank";
       p.insertBefore(anchor, parentNode);
       p.insertBefore(t2, parentNode);
       kev.preventDefault();
       parentNode.remove();
-      selection.setPosition(t2,1);
+      selection.setPosition(t2, 1);
 
 
     });
@@ -866,7 +889,7 @@ class ContentEditor {
       return;
     }
 
-    var b = _topBar.query(".tool_bar button.active");
+    var b = _topBar.querySelector(".tool_bar button.active");
     if (b != null) {
       b.click();
     }
@@ -897,17 +920,21 @@ class ContentEditor {
     var savingBar = new SavingBar();
     var jobId = savingBar.startJob();
     _inputSinceSave = false;
-    var l = element.queryAll("h2, h1, h3");
+    var l = element.querySelectorAll("h2, h1, h3");
 
-    l.forEach((Element h){
-      h.id= "";
+    l.forEach((Element h) {
+      h.id = "";
     });
 
-    l.forEach((Element h){
-      var id = h.text.replaceAll(new RegExp(r"[^a-zA-Z0-9]+"),"_");
+    l.forEach((Element h) {
+      var id = h.text.replaceAll(new RegExp(r"[^a-zA-Z0-9]+"), "_");
+      if (id.length == 0) {
+        h.remove();
+        return;
+      }
       var base = id;
       var i = 1;
-      while(query("#$id") != null){
+      while (querySelector("#$id") != null) {
         id = "${base}_$i";
         i++;
       }
@@ -931,16 +958,23 @@ class ContentEditor {
     _wrapper.style.removeProperty("top");
     if (floatCandidate) {
       _wrapper.style.width = "${_wrapper.clientWidth}px";
-      _wrapper.classes..remove('floating')..add('fixed');
+      _wrapper.classes
+        ..remove('floating')
+        ..add('fixed');
       _wrapper.style.top = "${_contentWrapper.offsetHeight - _topBar.clientHeight}px";
     } else if (!_wrapper.classes.contains('floating') && window.scrollY > _elementOffsetTop(_topBar) && !floatCandidate) {
       _toolBarPlaceholder.style.height = "${_topBar.clientHeight}px";
       _wrapper.insertAdjacentElement("afterEnd", _toolBarPlaceholder);
       _wrapper.style.width = "${_wrapper.clientWidth}px";
-      _wrapper.classes..add('floating')..remove('fixed');
+      _wrapper.classes
+        ..add('floating')
+        ..remove('fixed');
     } else if (window.scrollY <= _elementOffsetTop(_toolBarPlaceholder)) {
       _toolBarPlaceholder.remove();
-      _wrapper..style.removeProperty("width")..classes.remove('floating')..classes.remove('fixed');
+      _wrapper
+        ..style.removeProperty("width")
+        ..classes.remove('floating')
+        ..classes.remove('fixed');
 
     }
     if (_wrapper.classes.contains('floating')) {
@@ -972,7 +1006,7 @@ class ContentEditor {
     _elementToSubMenu[element] = subMenu;
     subMenu.classes.add('menu');
     element.onClick.listen((_) {
-      var active = menu.query('.active');
+      var active = menu.querySelector('.active');
       if (active == null) {
         element.classes.add('active');
         subMenu.hidden = false;
@@ -988,7 +1022,7 @@ class ContentEditor {
       }
 
       if (element.classes.contains('active')) {
-        escQueue.add(() {
+        core.escQueue.add(() {
 
           if (!element.classes.contains('active')) {
             return false;
@@ -1019,7 +1053,7 @@ class ContentEditor {
     _addTitleToElement("Formater tekst", textEdit);
     bar.append(textEdit);
 
-    if (!element.classes.contains("simple_editor")) {
+    if (editorMode == ContentEditor.EDITOR_MODE_NORMAL) {
 
       addImage.classes.add('image');
       _setUpSubMenu(addImage, bar, imageMenu, (Element e) => _fillUploadMenu(e, true));
@@ -1045,12 +1079,17 @@ class ContentEditor {
 
     saveElement.classes.add('save');
     var saveBox = new InfoBox("Gem ændringer");
-    saveBox..backgroundColor = InfoBox.COLOR_BLACK..reversed = true;
-    saveElement..onMouseOver.listen((_) {
+    saveBox
+      ..backgroundColor = InfoBox.COLOR_BLACK
+      ..reversed = true;
+    saveElement
+      ..onMouseOver.listen((_) {
       if (changed) {
         saveBox.showBelowCenterOfElement(saveElement);
       }
-    })..onMouseOut.listen((_) => saveBox.remove())..onClick.listen((_) {
+    })
+      ..onMouseOut.listen((_) => saveBox.remove())
+      ..onClick.listen((_) {
       if (changed) {
         save();
       }
@@ -1083,12 +1122,17 @@ class ContentEditor {
 
   void _fillHistoryMenu(Element menu) {
     var calendar = new Calendar(), historyList = new UListElement();
-    menu..classes.add('history_menu')..classes.add('loading');
+    menu
+      ..classes.add('history_menu')
+      ..classes.add('loading');
 
     historyList.classes.add("history_list");
 
     _currentContent.changeTimes.then((List<DateTime> changeTimes) {
-      menu..classes.remove('loading')..append(calendar.element)..append(historyList);
+      menu
+        ..classes.remove('loading')
+        ..append(calendar.element)
+        ..append(historyList);
       _updatePlaceholder();
 
       var last = new DateTime.fromMillisecondsSinceEpoch(0);
@@ -1200,11 +1244,15 @@ class ContentEditor {
 
     var uploadIconWrapper = new DivElement(), uploadIcon = new DivElement(), fileUploadElementWrapper = new DivElement(), fileUploadElement = new FileUploadInputElement(), preview = new DivElement();
     uploadIcon.classes.add('upload_icon');
-    uploadIconWrapper..classes.add('upload_icon_wrapper')..append(uploadIcon);
+    uploadIconWrapper
+      ..classes.add('upload_icon_wrapper')
+      ..append(uploadIcon);
 
     var setUpFileUpload = () {
       var fileUploadElement = new FileUploadInputElement();
-      fileUploadElement..hidden = true..multiple = true;
+      fileUploadElement
+        ..hidden = true
+        ..multiple = true;
       fileUploadElementWrapper.append(fileUploadElement);
 
       return fileUploadElement;
@@ -1214,30 +1262,37 @@ class ContentEditor {
 //TODO Fix close fileupload with ESC
     preview.classes.add('preview');
 
-    var uploadStrategy = images ? new AJAXImageURIUploadStrategy(new ImageSizes.atMost(element.clientWidth, 500), new ImageSizes.atMost(70, 70, dataURI:true)) : new AJAXFileURIUploadStrategy();
+    var uploadStrategy = images ? new core.AJAXImageUploadStrategy(new core.ImageSize.scaleMethodLimitToOuterBox(element.clientWidth, 500), new core.ImageSize.scaleMethodLimitToOuterBox(70, 70, dataURI:true)) : new core.AJAXFileUploadStrategy();
     ;
-    var uploader = new FileUploader(uploadStrategy);
+    var uploader = new core.FileUploader(uploadStrategy);
     var container = new EditorFileContainer(new DivElement(), uploadIcon);
-    container.onChange.listen((_){
+    container.onChange.listen((_) {
       _updatePlaceholder();
     });
 
     if (images) {
       menu.classes.add('image_menu');
-      preview..classes.add('image_preview')..append(container.element);
-      uploader.onFileAddedToQueue.listen((FileProgress fp) => container.addImage(new ImageElement(), fp));
+      preview
+        ..classes.add('image_preview')
+        ..append(container.element);
+      uploader.onFileAddedToQueue.listen((core.FileProgress fp) => container.addImage(new ImageElement(), fp));
     } else {
       menu.classes.add('file_menu');
-      preview..classes.add('file_preview')..append(container.element);
-      uploader.onFileAddedToQueue.listen((FileProgress fp) => container.addFile(new AnchorElement(), fp));
+      preview
+        ..classes.add('file_preview')
+        ..append(container.element);
+      uploader.onFileAddedToQueue.listen((core.FileProgress fp) => container.addFile(new AnchorElement(), fp));
     }
 
 
-    menu..append(fileUploadElementWrapper)..append(preview)..append(uploadIconWrapper);
-    uploadIcon.onClick.listen((_) => fileUploadElementWrapper.query('input').click());
+    menu
+      ..append(fileUploadElementWrapper)
+      ..append(preview)
+      ..append(uploadIconWrapper);
+    uploadIcon.onClick.listen((_) => fileUploadElementWrapper.querySelector('input').click());
 
     fileUploadElementWrapper.onChange.listen((_) {
-      uploader.uploadFiles(fileUploadElementWrapper.query('input').files);
+      uploader.uploadFiles(fileUploadElementWrapper.querySelector('input').files);
       fileUploadElement.remove();
       fileUploadElement = setUpFileUpload();
     });
@@ -1248,7 +1303,9 @@ class ContentEditor {
     menu.classes.add('text_menu');
 
     var menuHandler = new MenuOverflowHandler(menu);
-    menuHandler.dropDown..preventDefaultOnClick = true..content.classes.add('submenu');
+    menuHandler.dropDown
+      ..preventDefaultOnClick = true
+      ..content.classes.add('submenu');
 
 
     var actionsSetup = (EditorCommandExecutor executor, List<EditorAction> actions, DropDown dropDown, dynamic state()) {
@@ -1268,9 +1325,7 @@ class ContentEditor {
 
     };
 
-    var simple = element.classes.contains("simple_editor");
-
-    if (!simple) {
+    if (editorMode == ContentEditor.EDITOR_MODE_NORMAL) {
 
 
       var actions = [new EditorAction.liElementWithInnerHtml("<h2>Overskift</h2>", () => executor.formatBlockH2(), (String s) => s == "h2"), new EditorAction.liElementWithInnerHtml("<h3>Underoverskrift</h3>", () => executor.formatBlockH3(), (String s) => s == "h3"), new EditorAction.liElementWithInnerHtml("<p>Normal tekst</p>", () => executor.formatBlockP(), (String s) => s == "p"), new EditorAction.liElementWithInnerHtml("<blockquote>Citat</blockquote>", () => executor.formatBlockBlockquote(), (String s) => s == "blockquote"), new EditorAction.liElementWithInnerHtml("<pre>Kode</pre>", () => executor.formatBlockPre(), (String s) => s == "pre")];
@@ -1286,7 +1341,7 @@ class ContentEditor {
 
       var sizeActions = [new EditorAction.liElementWithInnerHtml("<font size='1'>Lille</font>", () => executor.setFontSize(1), (int s) => s == 1), new EditorAction.liElementWithInnerHtml("Normal", () {
         executor.setFontSize(3);
-        var fonts = element.queryAll("font");
+        var fonts = element.querySelectorAll("font");
         fonts.forEach((Element e) => e.attributes['size'] == '3' ? (() {
           e.attributes.remove("size");
         })() : () {
@@ -1304,13 +1359,21 @@ class ContentEditor {
 
       var colorContent = new DivElement(), colorSelect = new DropDown(colorContent), textColorPalette = new ColorPalette(), backgroundColorPalette = new ColorPalette(), colorLabel1 = new DivElement(), colorLabel2 = new DivElement();
 
-      colorLabel1..classes.add('color_label')..text = "Tekstfarve";
-      colorLabel2..classes.add('color_label')..text = "Baggrundsfarve";
+      colorLabel1
+        ..classes.add('color_label')
+        ..text = "Tekstfarve";
+      colorLabel2
+        ..classes.add('color_label')
+        ..text = "Baggrundsfarve";
 
       colorSelect.element.classes.add('color');
       colorSelect.preventDefaultOnClick = true;
       colorSelect.text = " ";
-      colorContent..append(colorLabel1)..append(colorLabel2)..append(textColorPalette.element)..append(backgroundColorPalette.element);
+      colorContent
+        ..append(colorLabel1)
+        ..append(colorLabel2)
+        ..append(textColorPalette.element)
+        ..append(backgroundColorPalette.element);
       colorSelect.dropDownBox.element.classes.add('color_select');
 
       executor.listenQueryCommandStateChange(() {
@@ -1366,19 +1429,19 @@ class ContentEditor {
         var commonAncestorContainer = r.commonAncestorContainer;
         var parent = commonAncestorContainer;
 
-        while(parent != null && parent.nodeType != Node.ELEMENT_NODE){
+        while (parent != null && parent.nodeType != Node.ELEMENT_NODE) {
           parent = parent.parentNode;
         }
 
-        var linksBefore = parent.queryAll("a");
+        var linksBefore = parent.querySelectorAll("a");
 
         ranges.first.selectNode(element);
         executor.createLink(s);
 
-        var linksAfter = parent.queryAll("a");
+        var linksAfter = parent.querySelectorAll("a");
 
-        linksAfter.forEach((AnchorElement a){
-          if(!linksBefore.contains(a)){
+        linksAfter.forEach((AnchorElement a) {
+          if (!linksBefore.contains(a)) {
             a.target = "_blank";
           }
         });
@@ -1424,11 +1487,11 @@ class ContentEditor {
               if (!(commonAncestor is Element)) {
                 return;
               }
-              commonAncestor.queryAll("*").forEach((Element elm) {
+              commonAncestor.querySelectorAll("*").forEach((Element elm) {
                 if (!selection.containsNode(elm, false)) {
                   return;
                 }
-                elm.attributes..remove("style")..remove("class");
+                elm.attributes.remove("style");
               });
               executor.removeFormat();
             }
@@ -1438,7 +1501,8 @@ class ContentEditor {
     textIconMap.forEach((String k, Map<String, dynamic> v) {
       var b = new ButtonElement();
       var i;
-      b..classes.add(k);
+      b
+        ..classes.add(k);
       _addTitleToElement(v['title'], b);
       var f = () {
       };
@@ -1460,14 +1524,19 @@ class ContentEditor {
 
   InfoBox _addTitleToElement(String title, Element e) {
     var i = new InfoBox(title);
-    i..backgroundColor = InfoBox.COLOR_BLACK..reversed = true;
-    e..onMouseOver.listen((_) => i.showBelowCenterOfElement(e))..onMouseOut.listen((_) => i.remove())..onClick.listen((_) => i.remove());
+    i
+      ..backgroundColor = InfoBox.COLOR_BLACK
+      ..reversed = true;
+    e
+      ..onMouseOver.listen((_) => i.showBelowCenterOfElement(e))
+      ..onMouseOut.listen((_) => i.remove())
+      ..onClick.listen((_) => i.remove());
     onChange.listen((_) => i.remove());
     return i;
   }
 
 
-  String get id => element.id;
+//  String get id => element.id;
 
 }
 
@@ -1494,7 +1563,9 @@ class MenuOverflowHandler {
 
     if (dropDown.element.parent == null) {
       var divider = new Element.html("<div class='divider' />");
-      menu..append(element)..append(divider);
+      menu
+        ..append(element)
+        ..append(divider);
 
       if (_smallestOffsetToTop == null) {
         _smallestOffsetToTop = element.offsetTop;
@@ -1523,5 +1594,53 @@ class MenuOverflowHandler {
     }
 
 
+  }
+}
+
+
+/**
+ * Looking for elements with the 'editable' class.
+ * Getting:
+ *    id : from data-id (if not found use id attribute)
+ *    site-content : if data-site-content is true will use site content instead of page content (default: false)
+ *    page-id : From data-page-id, default is current page. If site-content, does nothing.
+ *              If page id not found fallback is current.
+ *    editor-mode: From data-editor-mode, if simple will initialize simple editor else normal editor.
+ *
+ */
+
+class EditorInitializer implements core.Initializer {
+
+  final PageOrder pageOrder;
+
+  final UserLibrary userLibrary;
+
+  final Site site;
+
+  EditorInitializer(this.site, this.pageOrder, this.userLibrary);
+
+
+  bool get canBeSetUp => site != null && pageOrder != null && userLibrary != null && userLibrary.userLoggedIn != null;
+
+  void setUp() {
+    var user = userLibrary.userLoggedIn;
+    var editableElements = querySelectorAll("div.editable");
+
+    editableElements.forEach((DivElement div) {
+      var id = (div.dataset.containsKey("id") ? div.dataset["id"] : div.id);
+      var editorMode = (div.dataset["editorMode"] == "simple" ? ContentEditor.EDITOR_MODE_SIMPLE : ContentEditor.EDITOR_MODE_NORMAL);
+
+      if (div.dataset["siteContent"] == "true") {
+        if (!user.canModifySite) {
+          return;
+        }
+        new ContentEditor(div, site[id], editorMode);
+      } else {
+        var p;
+        var page = div.dataset.containsKey("pageId") && (p = pageOrder[div.dataset["pageId"]]) is Page ? p : pageOrder.currentPage;
+        new ContentEditor(div, page[id], editorMode);
+
+      }
+    });
   }
 }

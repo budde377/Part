@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <database name="cms2012testdb">
+<mysqldump>
+    <database name="test_cms">
         <table_data name="Page">
             <row>
                 <field name="page_id">testpage</field>

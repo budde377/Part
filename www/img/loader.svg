@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+	 viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" xml:space="preserve">
+
+    <path fill="#FFFFFF" d="M500,0C223.9,0,0,223.9,0,500s223.9,500,500,500s500-223.9,500-500S776.1,0,500,0z M500,875
+	c-207.1,0-375-167.9-375-375s167.9-375,375-375s375,167.9,375,375S707.1,875,500,875z" fill-opacity="0.7"/>
+	<path fill="#2E4172" d="M370.7,68.9C411.6,56.6,455,50,500,50s88.4,6.6,129.3,18.9L643.7,21C598.2,7.3,550,0,500,0
+		s-98.2,7.3-143.7,21L370.7,68.9z">
+
+     <animateTransform attributeName="transform"
+                          attributeType="XML"
+                          type="rotate"
+                          from="0 500 500"
+                          to="360 500 500"
+                          dur="2s"
+                          repeatCount="indefinite"/>
+	</path>
+	<path fill="#AA3939" d="M411.7,58.7l14.7,73.6c23.8-4.7,48.4-7.2,73.6-7.2s49.8,2.5,73.6,7.2l14.7-73.6C559.7,53,530.2,50,500,50
+		S440.3,53,411.7,58.7z">
+     <animateTransform attributeName="transform"
+                          attributeType="XML"
+                          type="rotate"
+                          from="0 500 500"
+                          to="-360 500 500"
+                          dur="3s"
+                          repeatCount="indefinite"/>
+
+	</path>
+</svg>

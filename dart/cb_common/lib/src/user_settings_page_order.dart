@@ -5,14 +5,16 @@ String idFromAnchor(AnchorElement val) => val.href.substring(val.href.lastIndexO
 class UserSettingsJSONPageOrder implements PageOrder {
 
   final PageOrder _pageOrder;
+  static final UserSettingsJSONPageOrder _cache = new UserSettingsJSONPageOrder._internal(querySelector("#ActivePageList"), querySelector("#InactivePageList"));
 
-  UserSettingsJSONPageOrder.initializeFromMenu(UListElement activePageList, UListElement inactivePageList) : _pageOrder = new JSONPageOrder.initializeFromLists( _listToPageOrder(activePageList), _listToPages(inactivePageList), (() {
+  factory UserSettingsJSONPageOrder() => _cache;
+
+  UserSettingsJSONPageOrder._internal(UListElement activePageList, UListElement inactivePageList) : _pageOrder = new AJAXPageOrder(_listToPageOrder(activePageList), _listToPages(inactivePageList), (() {
     var v;
-    return (v = activePageList.query('li.current')) == null ?
-          ((v = inactivePageList.query('li.current')) == null ? null : v.dataset["id"]) : v.dataset["id"];
+    return (v = activePageList.querySelector('li.current')) == null ?
+    ((v = inactivePageList.querySelector('li.current')) == null ? null : v.dataset["id"]) : v.dataset["id"];
   })());
 
-  UserSettingsJSONPageOrder() : _pageOrder = new JSONPageOrder();
 
   static Map<String, List<Page>> _listToPageOrder(UListElement list) {
     var returnMap = {
@@ -26,7 +28,7 @@ class UserSettingsJSONPageOrder implements PageOrder {
       returnMap[parent] = l;
       list.children.forEach((LIElement e) {
         if (e.dataset.containsKey("id")) {
-          recursiveMapBuilder(e.query('ul'), e.dataset["id"]);
+          recursiveMapBuilder(e.querySelector('ul'), e.dataset["id"]);
         }
       });
     };
@@ -44,7 +46,7 @@ class UserSettingsJSONPageOrder implements PageOrder {
       var template = li.dataset["template"];
       var alias = li.dataset["alias"];
       var hidden = li.dataset["hidden"] == "true";
-      var page = new JSONPage(id, title, template, alias, hidden, new AJAXJSONClient());
+      var page = new AJAXPage(id, title, template, alias, hidden);
 
       returnList.add(page);
     });
@@ -70,15 +72,29 @@ class UserSettingsJSONPageOrder implements PageOrder {
 
   bool pageExists(String page_id) => _pageOrder.pageExists(page_id);
 
-  void deactivatePage(String page_id, [ChangeCallback callback = null]) => _pageOrder.deactivatePage(page_id, callback);
+  Future<core.Response<Page>> deactivatePage(String page_id) => _pageOrder.deactivatePage(page_id);
 
-  void changePageOrder(List<String> page_id_list, {ChangeCallback callback:null, String parent_id:null}) => _pageOrder.changePageOrder(page_id_list, callback:callback, parent_id:parent_id);
+  Future<core.Response<PageOrder>> changePageOrder(List<String> page_id_list, {String parent_id:null}) => _pageOrder.changePageOrder(page_id_list, parent_id:parent_id);
 
-  void createPage(String title, [ChangeCallback callback]) => _pageOrder.createPage(title, callback);
+  Future<core.Response<Page>> createPage(String title) => _pageOrder.createPage(title);
 
-  Stream<PageOrderChange> get onUpdate => _pageOrder.onUpdate;
+  Stream<PageOrderChange> get onChange => _pageOrder.onChange;
 
-  void deletePage(String id, [ChangeCallback callback]) => _pageOrder.deletePage(id, callback);
+  Stream<Page> get onUpdate => _pageOrder.onUpdate;
+
+  Stream<Page> get onAdd => _pageOrder.onAdd;
+
+  Stream<Page> get onRemove => _pageOrder.onRemove;
+
+  Stream<Page> get onDeactivate => _pageOrder.onDeactivate;
+
+  Stream<Page> get onActivate => _pageOrder.onActivate;
+
+  Iterable<Page> get elements => _pageOrder.elements;
+
+  void every(void f(User)) => _pageOrder.every(f);
+
+  Future<core.Response<Page>> deletePage(String id) => _pageOrder.deletePage(id);
 
   Page operator [](String id) => _pageOrder[id];
 

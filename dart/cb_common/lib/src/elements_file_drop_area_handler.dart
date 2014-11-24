@@ -8,17 +8,17 @@ class FileDropAreaHandler {
 
   final Element area = new DivElement();
 
-  FileUploader _uploader;
+  core.FileUploader _uploader;
 
   bool multiple = false;
 
-  factory FileDropAreaHandler.ajaxImages(Element element, [ImageSizes size = null, ImageSizes preview = null]) => _cache.putIfAbsent(element, () => new FileDropAreaHandler._internal(element, new FileUploader.ajaxImages(size, preview)));
+  factory FileDropAreaHandler.ajaxImages(Element element, [core.ImageSize size = null, core.ImageSize preview = null]) => _cache.putIfAbsent(element, () => new FileDropAreaHandler._internal(element, new core.FileUploader.ajaxImages(size, preview)));
 
-  factory FileDropAreaHandler.ajaxFiles(Element element) => _cache.putIfAbsent(element, () => new FileDropAreaHandler._internal(element, new FileUploader.ajaxFiles()));
+  factory FileDropAreaHandler.ajaxFiles(Element element) => _cache.putIfAbsent(element, () => new FileDropAreaHandler._internal(element, new core.FileUploader.ajaxFiles()));
 
-  factory FileDropAreaHandler(Element element, FileUploader uploader) => _cache.putIfAbsent(element, () => new FileDropAreaHandler._internal(element, uploader));
+  factory FileDropAreaHandler(Element element, core.FileUploader uploader) => _cache.putIfAbsent(element, () => new FileDropAreaHandler._internal(element, uploader));
 
-  FileDropAreaHandler._internal(this.element, FileUploader uploader){
+  FileDropAreaHandler._internal(this.element, core.FileUploader uploader){
     element.classes.add('drop_area');
     area.classes.add('drop_goal');
     element.append(area);
@@ -49,11 +49,11 @@ class FileDropAreaHandler {
     });
   }
 
-  FileUploader get uploader => _uploader;
+  core.FileUploader get uploader => _uploader;
 
-  set uploader(FileUploader uploader) {
+  set uploader(core.FileUploader uploader) {
     _uploader = uploader;
-    _uploader.onFileAddedToQueue.listen((FileProgress progress) {
+    _uploader.onFileAddedToQueue.listen((core.FileProgress progress) {
       progress.onPathAvailable.listen((_) {
         area.classes.remove('active');
       });

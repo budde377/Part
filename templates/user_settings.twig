@@ -1,0 +1,81 @@
+{% if current_user != null %}
+    {% set inactive = not (current_page.editable and has_page_privileges) %}
+    <div id='UserSettingsContainer'>
+        <div id='UserSettingsMenu'>
+            <ul>
+                <li class='page active' title='Rediger side'>&nbsp;</li>
+                <li class='pages' title='Administrer sider'>&nbsp;</li>
+                <li class='user ' title='Rediger oplysninger'>&nbsp;</li>
+                <li class='users' title='Administrer brugere'>&nbsp;</li>
+                {% if config.mailMySQLConnection != null %}
+                    <li class='mail ' title='Administrer mailkonti'>&nbsp;</li>
+                {% endif %}
+                {% if config.updaterEnabled and  has_site_privileges %}
+                    <li class='update_site' title='Opdater website'>&nbsp;</li>
+                {% endif %}
+                {% if has_root_privileges %}
+                    <li class='log ' title='Administrer log'>&nbsp;</li>
+                {% endif %}
+                {% block user_settings_menu %}
+                {% endblock %}
+            </ul>
+        </div>
+        <div id='UserSettingsContractLink'>&nbsp;</div>
+        <div id='UserSettingsContent' class="disable_on_offline">
+            <ul>
+                <li class="{{ inactive?"inactive":"" }}">
+                    {% if inactive %}
+                        <div class='inactiveFilter' title='Du kan ikke redigere denne side'>&nbsp;</div>
+                    {% endif %}
+                    <h2>Rediger Side</h2>
+                    {% page_element ChristianBudde.cbweb.view.page_element.UserSettingsEditPagePageElementImpl %}
+                </li>
+                <li>
+                    <h2>Administrer Sider</h2>
+                    {% page_element ChristianBudde.cbweb.view.page_element.UserSettingsEditPagesPageElementImpl %}
+                </li>
+                <li>
+                    <h2>Rediger Oplysninger</h2>
+                    {% page_element ChristianBudde.cbweb.view.page_element.UserSettingsEditUserPageElementImpl %}
+                </li>
+                <li>
+                    <h2>Administrer Brugere</h2>
+                    {% page_element ChristianBudde.cbweb.view.page_element.UserSettingsEditUsersPageElementImpl %}
+                </li>
+                {% if config.mailMySQLConnection != null %}
+                    <li>
+                        <h2>Administrer Mailkonti</h2>
+                        {% page_element ChristianBudde.cbweb.view.page_element.UserSettingsEditMailPageElementImpl %}
+
+                    </li>
+                {% endif %}
+                {% if config.updaterEnabled and  has_site_privileges %}
+                    <li>
+                        <h2>Opdater Website</h2>
+                        {% page_element ChristianBudde.cbweb.view.page_element.UserSettingsUpdateWebsitePageElementImpl %}
+                    </li>
+                {% endif %}
+                {% if has_root_privileges %}
+                    <li>
+                        <h2>Log</h2>
+                        {% page_element ChristianBudde.cbweb.view.page_element.UserSettingsEditLogPageElementImpl %}
+                    </li>
+                {% endif %}
+                {% block user_settings %}
+                {% endblock %}
+            </ul>
+        </div>
+    </div>
+    <div id='UserSettingsExpandLink'>
+        &nbsp;
+    </div>
+    <div id='UpdateInformationMessage' {{ (config.updaterEnabled and updater.checkForUpdates(true))?"":"hidden" }}>
+        Siden kan opdateres. Klik <a href='#'>her</a> for at starte opdateringen.
+    </div>
+    <div id='LoginUserMessage'>
+        Du er logget ind som <i>{{ current_user.username }}</i>, <a href='/logout'>log ud</a>.
+    </div>
+    <div id="OnlineOfflineIndicator" class="no_select">
+
+    </div>
+{% endif %}

@@ -2,40 +2,83 @@ part of elements;
 
 class BetterSelect {
   static final Map<SelectElement, BetterSelect> _cached = new Map<SelectElement, BetterSelect>();
-  final SelectElement _element;
+  final SelectElement element;
 
-  DivElement _container, _arrow, _currentSelection;
+  final DivElement
+  container = new DivElement(),
+  arrow = new DivElement(),
+  currentSelection = new DivElement();
 
   factory BetterSelect(SelectElement element) {
 
-    if(!_cached.containsKey(element)){
+    if (!_cached.containsKey(element)) {
       _cached[element] = new BetterSelect._internal(element);
     }
     return _cached[element];
   }
 
 
+  static bool isHandling(SelectElement select) => _cached.containsKey(select);
 
-  String get selectedString => _element.query("option") != null ? _element.selectedOptions.map((Node n) => n.text).join(", ") : "";
+  BetterSelect._internal(this.element) {
 
-  BetterSelect._internal(this._element) {
-    _container = new DivElement();
-    _container.classes.add("better_select");
-    _currentSelection = new DivElement();
-    _currentSelection.classes.add("current_selection");
-    _currentSelection.text = selectedString;
-    _arrow = new DivElement();
-    _arrow.classes.add("arrow_down");
-    _currentSelection.children.add(_arrow);
-    _element.classes.add("better_select_select");
-    _element.insertAdjacentElement("afterEnd", _container);
-    _element.remove();
-    _container.children.add(_element);
-    _container.children.add(_currentSelection);
-    _container.style.width = "${_element.offsetWidth}px";
-    _element.onChange.listen((event) {
-      _currentSelection.text = selectedString;
-      _currentSelection.children.add(_arrow);
-    });
+    arrow.classes.add("arrow_down");
+
+    currentSelection
+      ..classes.add("current_selection")
+      ..text = selectedString
+      ..children.add(arrow);
+
+    element
+      ..classes.add("better_select_select")
+      ..insertAdjacentElement("afterEnd", container)
+      ..remove();
+
+    container
+      ..children.add(element)
+      ..children.add(currentSelection)
+      ..style.width = "${element.offsetWidth}px"
+      ..classes.add("better_select");
+
+    disabled = element.disabled;
+
+    element.onChange.listen((_) => update());
+
+
   }
+
+  String get selectedString => element.querySelector("option") != null ? element.selectedOptions.map((Node n) => n.text).join(", ") : "";
+
+  String get value => element.value;
+
+  void set value(String v) {
+    element.value = v;
+    element.dispatchEvent(new Event("update", canBubble:false));
+    update();
+  }
+
+  void update() {
+    currentSelection.text = selectedString;
+    currentSelection.children.add(arrow);
+    if(element.disabled){
+      container.classes.add('disabled');
+    } else {
+      container.classes.remove('disabled');
+    }
+
+  }
+
+
+  bool get disabled => element.disabled;
+
+  void set disabled(bool b) {
+    if (b == container.classes.contains('disabled')) {
+      return;
+    }
+
+    element.disabled = b;
+    update();
+
+  }
+
 }

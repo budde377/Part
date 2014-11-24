@@ -5,19 +5,23 @@ part of user_settings;
 class UserSettingsJSONUserLibrary implements UserLibrary {
 
   final UserLibrary _userLibrary;
+  static final UserSettingsJSONUserLibrary _cache = new UserSettingsJSONUserLibrary._internal(querySelector('#UserList'));
 
-  UserSettingsJSONUserLibrary.initializeFromMenu(UListElement userList) : _userLibrary = _generateUserLibFromMenu(userList);
+  factory UserSettingsJSONUserLibrary() => _cache;
+
+  UserSettingsJSONUserLibrary._internal(UListElement userList) : _userLibrary = _generateUserLibFromMenu(userList);
 
   static UserLibrary _generateUserLibFromMenu(UListElement userList){
-    var lis = userList.queryAll('li:not(.emptyListInfo)');
+    var lis = userList.querySelectorAll('li:not(.emptyListInfo)');
     var users = <User>[], currentUser = "";
 
     lis.forEach((LIElement li) {
-      var aElement = li.query('.val'), privileges = li.query('.privileges');
-      var username, mail, parent, t;
+      var aElement = li.querySelector('.val'), privileges = li.querySelector('.privileges');
+      var username, mail, parent, lastLogin, t;
       parent = li.dataset["parent"];
       username = li.dataset["username"];
       mail = li.dataset["mail"];
+      lastLogin = li.dataset["lastLogin"]== ""?null:int.parse(li.dataset["lastLogin"]);
       var client = new AJAXJSONClient();
       var p = li.dataset["privileges"], privilege;
       switch(p){
@@ -35,7 +39,8 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
       var pagesString = li.dataset["pages"];
       var pageStringList = privilege == User.PRIVILEGE_PAGE && pagesString != null? pagesString.trim().split(" ") : [];
       var pageList = pageStringList.map((String id) => pageOrder.pages[id]).toList();
-      var user = new JSONUser(username, mail, parent, privilege, pageList, client);
+      pageList.removeWhere((e)=>!(e is Page));
+      var user = new AJAXUser(username, mail, parent, lastLogin, privilege, pageList);
       users.add(user);
       if (li.classes.contains('current')) {
         currentUser = username;
@@ -43,18 +48,23 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
 
     });
 
-    return new JSONUserLibrary.initializeFromLists(users, currentUser, pageOrder);
+    return new AJAXUserLibrary(users, currentUser, pageOrder);
   }
 
-  UserSettingsJSONUserLibrary() : _userLibrary = new JSONUserLibrary(pageOrder);
+  Future<core.Response<User>> createUser(String mail, String privileges) => _userLibrary.createUser(mail, privileges);
 
-  void createUser(String mail, String privileges, [ChangeCallback callback = null]) => _userLibrary.createUser(mail, privileges, callback);
-
-  void deleteUser(String username, [ChangeCallback callback = null]) => _userLibrary.deleteUser(username, callback);
+  Future<core.Response<User>> deleteUser(String username) => _userLibrary.deleteUser(username);
 
   Stream<UserLibraryChangeEvent> get onChange => _userLibrary.onChange;
+  Stream<User> get onUpdate => _userLibrary.onUpdate;
+  Stream<User> get onAdd => _userLibrary.onAdd;
+  Stream<User> get onRemove => _userLibrary.onRemove;
 
   Map<String, User> get users => _userLibrary.users;
+
+  Iterable<User> get elements => _userLibrary.elements;
+
+  void every(void f(User)) => _userLibrary.every(f);
 
   Map<String, User> get rootUsers => _userLibrary.rootUsers;
 
@@ -63,4 +73,9 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
   Map<String, User> get pageUsers => _userLibrary.pageUsers;
 
   User get userLoggedIn => _userLibrary.userLoggedIn;
+
+  Future<core.Response<String>> userLogin(String username, String password) => _userLibrary.userLogin(username, password);
+
+  Future<core.Response> forgotPassword(String password) => _userLibrary.forgotPassword(password);
+
 }

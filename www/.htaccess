@@ -1,0 +1,23 @@
+RewriteEngine on
+RewriteRule ^([^/][^.]+)$	index.php?page=$1 [L,QSA]
+RewriteRule .* - [E=HTTP_IF_MODIFIED_SINCE:%{HTTP:If-Modified-Since}]
+RewriteRule .* - [E=HTTP_IF_NONE_MATCH:%{HTTP:If-None-Match}]
+
+ErrorDocument 500 /internal_server_error_500
+ErrorDocument 404 /_404
+
+AddType application/dart .dart
+
+ExpiresActive On
+ExpiresByType image/jpg "access plus 1 year"
+ExpiresByType image/jpeg "access plus 1 year"
+ExpiresByType image/gif "access plus 1 year"
+ExpiresByType image/png "access plus 1 year"
+ExpiresByType text/css "access plus 1 month"
+ExpiresByType application/pdf "access plus 1 month"
+ExpiresByType application/x-font-woff "access plus 1 month"
+ExpiresByType font/woff2 "access plus 1 month"
+ExpiresByType image/svg+xml "access plus 1 month"
+ExpiresByType text/javascript "access plus 1 month"
+ExpiresByType application/javascript "access plus 1 month"
+ExpiresByType image/x-icon "access plus 1 year"

@@ -3,7 +3,8 @@ part of json;
 abstract class JSONClient {
   String urlPrefix = "";
 
-  Future<JSONResponse> callFunction(JSONFunction function, [void progress(double pct)]);
+
+  FutureResponse callFunctionString(String function, {void progress(double pct), FormData form_data:null});
 }
 
 
@@ -15,38 +16,61 @@ class AJAXJSONClient extends JSONClient {
 
   AJAXJSONClient._internal();
 
-  Future<JSONResponse> _setUpRequest(HttpRequest request) {
+  FutureResponse _setUpRequest(HttpRequest request) {
     var completer = new Completer();
     request.onReadyStateChange.listen((Event e) {
       if (request.readyState != 4) {
         return;
       }
       debug(request.responseText);
-      Map responseObject = JSON.decode(request.responseText);
+      var responseObject;
+      try {
+        responseObject = JSON.decode(request.responseText);
+      } catch(e){
+        completer.complete(new Response.error(connection.hasConnection?Response.ERROR_CODE_COULD_NOT_PARSE_RESPONSE:Response.ERROR_CODE_NO_CONNECTION));
+        return;
+      }
       var response;
       if ((response = parseResponse(responseObject)) == null) {
-        completer.completeError(new Exception("Couldn't parse response"));
+        completer.complete(new Response.error(connection.hasConnection?Response.ERROR_CODE_COULD_NOT_PARSE_RESPONSE:Response.ERROR_CODE_NO_CONNECTION));
       } else {
         completer.complete(response);
       }
 
     });
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
-  Future<JSONResponse> callFunction(JSONFunction function, [void progress(double pct)]) {
-    debug(function.jsonString);
-    var request = new HttpRequest();
-    var future = _setUpRequest(request);
-    if (progress != null) {
-      request.onLoad.listen((ProgressEvent evt) => progress(evt.loaded / evt.total));
+  FutureResponse callFunctionString(String function, {void progress(num pct), FormData form_data:null}) {
+    if(!connection.hasConnection){
+      return new FutureResponse.error(Response.ERROR_CODE_NO_CONNECTION);
     }
 
-    request.open("POST", urlPrefix + "?ajax=${function.name}");
-    debug(urlPrefix + "?ajax=${function.name}");
-    request.send(function.jsonString);
+    var request = connection.buildRequest();
+    var future = _setUpRequest(request);
+    _registerProgressHandler(request, progress);
+    var token = window.localStorage['user-login-token'];
+    token = token != null?"&token="+token:"";
+    if(form_data != null){
+      request.open("POST", urlPrefix + "?ajax=$function$token");
+      request.send(form_data);
+      debug("POST: "+urlPrefix + "?ajax=$function$token");
+    } else {
+      request.open("GET", urlPrefix + "?ajax=$function$token");
+      debug("GET: "+urlPrefix + "?ajax=$function$token");
+      request.send();
+    }
     return future;
   }
+
+  _registerProgressHandler(HttpRequest request, progress) {
+    if (progress != null) {
+      var f = (ProgressEvent evt) => evt.total == 0?0:progress(evt.loaded / evt.total);
+      request.upload.onProgress.listen(f);
+      request.upload.onLoadEnd.listen(f);
+    }
+  }
+
 
 }
 

@@ -16,13 +16,23 @@ class ImageEditProperties {
   }
 
   ImageEditProperties.fromUrlString(String src) {
-    var regexp = new RegExp(r"(_files/[^\-]+)(-[^\.]+)(\.[A-Za-z]+)$");
+    setUpFromUrlString(src);
+  }
+
+  void setUpFromUrlString(String src) {
+    var regexp = new RegExp(r"((_files/)(.+)(\.[A-Za-z]+))$");
     var match = regexp.firstMatch(src);
     if (match == null) {
       return;
     }
-    _url = match[1] + match[3];
-    var options = match[2];
+    _url = match[1];
+    var regexp2 = new RegExp(r"^([^\-]+)(-[^\.]+)$");
+    var match2 = regexp2.firstMatch(match[3]);
+    if (match2 == null) {
+      return;
+    }
+    _url = match[2] + match2[1] + match[4];
+    var options = match2[2];
     var optRegexp = new RegExp(r"-([CSRM])([^-]+)");
     optRegexp.allMatches(options).forEach((Match m) {
       var vars = m[2].split("_");
@@ -39,7 +49,7 @@ class ImageEditProperties {
           _cropH = int.parse(vars[3]);
           break;
         case 'R':
-          _rotate = int.parse(vars[0]);
+          _rotate = int.parse(vars[0]) ~/ 90;
           break;
         case 'M':
           _mirrorVertical = int.parse(vars[0]) > 0;
@@ -50,7 +60,16 @@ class ImageEditProperties {
     });
   }
 
-  ImageEditProperties.fromImageElement(ImageElement element): this.fromUrlString(element.src);
+
+  ImageEditProperties.fromImageElement(ImageElement element){
+    this.setUpFromUrlString(element.src);
+    if (_width == null) {
+      _width = element.width;
+    }
+    if (_height == null) {
+      _height = element.height;
+    }
+  }
 
   bool _mirrorVertical = false, _mirrorHorizontal = false;
 
@@ -84,20 +103,47 @@ class ImageEditProperties {
       "url":url, "cropW": cropW, "cropH":cropH, "cropX":cropX, "cropY":cropY, "rotate":rotate, "width":width, "height":height, "mirrorVertical":mirrorVertical, "mirrorHorizontal": mirrorHorizontal
   }.toString();
 
-  bool operator==(ImageEditProperties p) => (p.url.length < url.length? url.endsWith(p.url): p.url.endsWith(url)) &&
-                                            p.cropW == cropW &&
-                                            p.cropH == cropH &&
-                                            p.cropX == cropX &&
-                                            p.cropY == cropY &&
-                                            p.rotate == rotate &&
-                                            p.width == width &&
-                                            p.height == height &&
-                                            p.mirrorHorizontal == mirrorHorizontal &&
-                                            p.mirrorVertical == mirrorVertical;
+  bool operator ==(ImageEditProperties p) => (p.url.length < url.length ? url.endsWith(p.url) : p.url.endsWith(url)) &&
+  p.cropW == cropW &&
+  p.cropH == cropH &&
+  p.cropX == cropX &&
+  p.cropY == cropY &&
+  p.rotate == rotate &&
+  p.width == width &&
+  p.height == height &&
+  p.mirrorHorizontal == mirrorHorizontal &&
+  p.mirrorVertical == mirrorVertical;
 
   int get hashCode => "${cropW}${cropH}${cropX}${cropY}${rotate}${width}${height}${mirrorHorizontal}${mirrorVertical}".hashCode;
 
-  //TODO write better get hashcode
+
+  String toFunctionString() {
+    var src = url.split("_files").toList()[1];
+    var functionString = "ImageFile.getFile(${core.quoteString(src)})";
+
+    if (width != null && height != null) {
+      functionString += ".forceSize(${width}, ${height})";
+    }
+
+    if (cropX != null && cropY != null && cropH != null && cropW != null) {
+      functionString += ".crop(${cropX}, ${cropY}, ${cropW}, ${cropH})";
+    }
+
+    if (rotate != 0) {
+      functionString += ".rotate(${rotate * 90})";
+    }
+
+    if (mirrorHorizontal) {
+      functionString += ".mirrorHorizontal()";
+    }
+
+    if (mirrorVertical) {
+      functionString += ".mirrorVertical()";
+    }
+    return functionString;
+  }
+
+//TODO write better get hashcode
 }
 
 
@@ -144,13 +190,12 @@ class ImageEditor {
     _originalWidth = properties.width;
     _originalHeight = properties.height;
 
-    _handler.width = rotated?_originalHeight:_originalWidth;
-    _handler.height = rotated?_originalWidth:_originalHeight;
-
+    _handler.width = rotated ? _originalHeight : _originalWidth;
+    _handler.height = rotated ? _originalWidth : _originalHeight;
 
 
     _handler.addLayer(_imageLayer);
-    _fullImage = new ImageElement(src:"/"+properties.url);
+    _fullImage = new ImageElement(src:"/" + properties.url);
     _fullImage.onLoad.listen((_) {
       _image = new ImageCanvasShape(_fullImage, width:_originalWidth, height:_originalHeight);
       _imageLayer.addShape(_image);
@@ -179,13 +224,13 @@ class ImageEditor {
         rotate = properties.rotate;
       }
       if (properties.cropX != null) {
-        setCrop(properties.cropX, properties.cropY , properties.cropW , properties.cropH );
+        setCrop(properties.cropX, properties.cropY, properties.cropW, properties.cropH);
       } else {
         removeCrop();
       }
 
       if (properties.width != null) {
-        if(isRotated){
+        if (isRotated) {
           _updateSize(properties.height, properties.width);
         } else {
           _updateSize(properties.width, properties.height);
@@ -198,15 +243,16 @@ class ImageEditor {
   }
 
   ImageEditProperties get properties => new ImageEditProperties(_fullImage.src,
-                                                                mirrorHorizontal:this.mirrorHorizontal,
-                                                                mirrorVertical:this.mirrorVertical,
-                                                                cropW:hasCrop ? _cropShape.cropW.floor() : null,
-                                                                cropH:hasCrop ? _cropShape.cropH.floor() : null,
-                                                                cropX:hasCrop ? _cropShape.cropX.floor() : null,
-                                                                cropY:hasCrop ? _cropShape.cropY.floor() : null,
-                                                                rotate:this.rotate,
-                                                                width:_image.width.toInt(),
-                                                                height:_image.height.toInt());
+  mirrorHorizontal:this.mirrorHorizontal,
+  mirrorVertical:this.mirrorVertical,
+  cropW:hasCrop ? _cropShape.cropW.floor() : null,
+  cropH:hasCrop ? _cropShape.cropH.floor() : null,
+  cropX:hasCrop ? _cropShape.cropX.floor() : null,
+  cropY:hasCrop ? _cropShape.cropY.floor() : null,
+  rotate:this.rotate,
+  width:_image.width.toInt(),
+  height:_image.height.toInt());
+
   int get rotate => _rotate;
 
   bool get isRotated => _rotate % 2 == 1;
@@ -294,12 +340,12 @@ class ImageEditor {
 
 
   void setCrop(int x, int y, int width, int height) {
-    var mw = isRotated?maxHeight:maxWidth;
-    var mh = !isRotated?maxHeight:maxWidth;
-    if(mw != null && width > mw){
+    var mw = isRotated ? maxHeight : maxWidth;
+    var mh = !isRotated ? maxHeight : maxWidth;
+    if (mw != null && width > mw) {
       width = mw;
     }
-    if(mh != null && height > mh){
+    if (mh != null && height > mh) {
       height = mh;
     }
     _cropShape.setCrop(x, y, width, height);
@@ -318,24 +364,24 @@ class ImageEditor {
 
 
     var sizeCheck = (int h, int w) => (maxHeight != null && h > maxHeight) || (minHeight != null && h < minHeight) || (maxWidth != null && maxWidth < w) || (minWidth != null && minWidth > w);
-    var ratioW = w/_handler.width, ratioH = h/_handler.height;
+    var ratioW = w / _handler.width, ratioH = h / _handler.height;
     var cw = 0, ch = 0;
-    if(hasCrop){
-      cw = _cropShape.cropW*ratioW;
-      ch = _cropShape.cropH*ratioH;
+    if (hasCrop) {
+      cw = _cropShape.cropW * ratioW;
+      ch = _cropShape.cropH * ratioH;
     }
-    if (!force && ((!hasCrop && sizeCheck(h,w)) || (hasCrop && ((!isRotated && sizeCheck(ch, cw)) || (isRotated && sizeCheck(cw, ch)))))) {
+    if (!force && ((!hasCrop && sizeCheck(h, w)) || (hasCrop && ((!isRotated && sizeCheck(ch, cw)) || (isRotated && sizeCheck(cw, ch)))))) {
       return;
     }
 
     _handler.doWithoutUpdate(() {
-      if(hasCrop){
-        if(cw < 10 || ch < 10){
+      if (hasCrop) {
+        if (cw < 10 || ch < 10) {
           return;
         }
-        _cropShape.setCrop(_cropShape.cropX*ratioW, _cropShape.cropY*ratioH, cw, ch);
+        _cropShape.setCrop(_cropShape.cropX * ratioW, _cropShape.cropY * ratioH, cw, ch);
       }
-      if(image != null){
+      if (image != null) {
 
       }
       _image.width = isRotated ? h : w;
@@ -354,15 +400,15 @@ class ImageEditor {
     }
 
     var w = _handler.width,
-        h = _handler.height;
+    h = _handler.height;
 
 
-    var rh = maxHeight == null? 0: h/ maxHeight,
-        rw = maxWidth == null ? 0:w / maxWidth;
+    var rh = maxHeight == null ? 0 : h / maxHeight,
+    rw = maxWidth == null ? 0 : w / maxWidth;
 
-    if(Math.max(rh, rw) > 1 && rh > rw){
+    if (Math.max(rh, rw) > 1 && rh > rw) {
       height = maxHeight;
-    } else if(rw > 1){
+    } else if (rw > 1) {
       width = maxWidth;
     }
 
@@ -372,33 +418,32 @@ class ImageEditor {
   }
 
 
-  int get cropX => _cropShape == null?null:_cropShape.cropX;
+  int get cropX => _cropShape == null ? null : _cropShape.cropX;
 
-  int get cropY => _cropShape == null?null:_cropShape.cropY;
+  int get cropY => _cropShape == null ? null : _cropShape.cropY;
 
-  int get cropW => _cropShape == null?null:_cropShape.cropW;
+  int get cropW => _cropShape == null ? null : _cropShape.cropW;
 
-  int get cropH => _cropShape == null?null:_cropShape.cropH;
+  int get cropH => _cropShape == null ? null : _cropShape.cropH;
 
   num _interval(num n, num min, num max) => Math.max(min, Math.min(max, n));
 
-  CanvasShape get dotNE => _cropShape == null?null:_cropShape.dotNE;
+  CanvasShape get dotNE => _cropShape == null ? null : _cropShape.dotNE;
 
-  CanvasShape get dotNW => _cropShape == null?null:_cropShape.dotNW;
+  CanvasShape get dotNW => _cropShape == null ? null : _cropShape.dotNW;
 
-  CanvasShape get dotSE => _cropShape == null?null:_cropShape.dotSE;
+  CanvasShape get dotSE => _cropShape == null ? null : _cropShape.dotSE;
 
-  CanvasShape get dotSW => _cropShape == null?null:_cropShape.dotSW;
+  CanvasShape get dotSW => _cropShape == null ? null : _cropShape.dotSW;
 
 }
-
 
 
 class ImageEditorHandler {
   static final Map<ImageEditor, ImageEditorHandler> _cache = new Map<ImageEditor, ImageEditorHandler>();
 
   ButtonElement _rcw = new ButtonElement(),
-                _rccw = new ButtonElement(),
+  _rccw = new ButtonElement(),
   _mirror_v = new ButtonElement(),
   _mirror_h = new ButtonElement(),
   _zoom_in = new ButtonElement(),
@@ -442,15 +487,23 @@ class ImageEditorHandler {
     _save.classes.add('save');
     _close.classes.add('close');
 
-    wrapper..append(_rcw)..append(_rccw)..append(_mirror_v)..append(_mirror_h)..append(_zoom_in)..append(_zoom_out)..append(_crop)
-      ..append(_save)..append(_close);
+    wrapper
+      ..append(_rcw)
+      ..append(_rccw)
+      ..append(_mirror_v)
+      ..append(_mirror_h)
+      ..append(_zoom_in)
+      ..append(_zoom_out)
+      ..append(_crop)
+      ..append(_save)
+      ..append(_close);
     _setUpListeners();
   }
 
 
-  Stream<ImageEditProperties> get onEdit => _stream == null?_stream = _editStreamController.stream.asBroadcastStream():_stream;
+  Stream<ImageEditProperties> get onEdit => _stream == null ? _stream = _editStreamController.stream.asBroadcastStream() : _stream;
 
-  int _inDot (num x, num y) {
+  int _inDot(num x, num y) {
     var p = transformMirror(x, y);
     x = p.x;
     y = p.y;
@@ -460,8 +513,12 @@ class ImageEditorHandler {
 
   InfoBox _addTitleToElement(String title, Element e) {
     var i = new InfoBox(title);
-    i..backgroundColor = InfoBox.COLOR_BLACK;
-    e..onMouseOver.listen((_) => i.showAboveCenterOfElement(e))..onMouseOut.listen((_) => i.remove())..onClick.listen((_) => i.remove());
+    i
+      ..backgroundColor = InfoBox.COLOR_BLACK;
+    e
+      ..onMouseOver.listen((_) => i.showAboveCenterOfElement(e))
+      ..onMouseOut.listen((_) => i.remove())
+      ..onClick.listen((_) => i.remove());
     i.element.classes.add("image_editor_title");
     return i;
   }
@@ -498,7 +555,7 @@ class ImageEditorHandler {
     _save.onClick.listen((_) {
       var p = editor.properties;
 
-      if(_properties == null || p == _properties || _saving){
+      if (_properties == null || p == _properties || _saving) {
         return;
       }
       var pb = new ProgressBar();
@@ -506,16 +563,18 @@ class ImageEditorHandler {
       _savingBar.append(pb.bar);
       _savingBar.classes.add("saving");
       _saving = true;
-      ajaxClient.callFunction(new ImagePropertiesEditImageContentJSONFunction(p)).then((JSONResponse response){
-        if(response.type != JSONResponse.RESPONSE_TYPE_SUCCESS){
+
+
+      ajaxClient.callFunctionString(p.toFunctionString() + ".getPath()").then((JSONResponse response) {
+        if (response.type != core.Response.RESPONSE_TYPE_SUCCESS) {
           return;
         }
         pb.percentage = 1;
-        var t = new Timer(new Duration(milliseconds:500), (){
+        var t = new Timer(new Duration(milliseconds:500), () {
           _savingBar.classes.remove("saving");
           pb.bar.remove();
         });
-        editor.image.src = response.payload;
+        editor.image.src = "/_files/" + response.payload;
         _properties = p;
         _saving = false;
         _editStreamController.add(p);
@@ -523,19 +582,19 @@ class ImageEditorHandler {
 
     });
 
-    _close.onClick.listen((_) =>_dialogBox.close());
+    _close.onClick.listen((_) => _dialogBox.close());
 
     _rcw.onClick.listen((_) => editor.rotate++);
     _rccw.onClick.listen((_) => editor.rotate--);
     _mirror_v.onClick.listen((_) => editor.mirrorVertical = !editor.mirrorVertical);
     _mirror_h.onClick.listen((_) => editor.mirrorHorizontal = !editor.mirrorHorizontal);
-    _crop.onClick.listen((_){
-      if(editor.hasCrop){
+    _crop.onClick.listen((_) {
+      if (editor.hasCrop) {
         editor.removeCrop();
       } else {
-        var w = editor.isRotated?editor.height:editor.width,
-            h = editor.isRotated?editor.width:editor.height;
-        editor.setCrop((0.25*w).floor(), (0.25*h).floor(), (0.5*w).floor(), (0.5*h).floor());
+        var w = editor.isRotated ? editor.height : editor.width,
+        h = editor.isRotated ? editor.width : editor.height;
+        editor.setCrop((0.25 * w).floor(), (0.25 * h).floor(), (0.5 * w).floor(), (0.5 * h).floor());
       }
     });
 
@@ -551,7 +610,7 @@ class ImageEditorHandler {
 
 
     editor.canvas.onMouseMove.listen((MouseEvent ev) {
-      if(editor == null || !editor.hasCrop){
+      if (editor == null || !editor.hasCrop) {
         return;
       }
       if (_inDot(ev.offset.x, ev.offset.y) > 0) {
@@ -568,15 +627,15 @@ class ImageEditorHandler {
       var sub1, sub2;
       sub1 = document.onMouseMove.listen((MouseEvent ev) {
         var mx = ev.movement.x, my = ev.movement.y;
-        if(editor.mirrorHorizontal){
+        if (editor.mirrorHorizontal) {
           my = -my;
         }
 
-        if(editor.mirrorVertical){
+        if (editor.mirrorVertical) {
           mx = -mx;
         }
 
-        var p = rotatePoint(mx,my,0, 0, editor.rotate*Math.PI/2);
+        var p = rotatePoint(mx, my, 0, 0, editor.rotate * Math.PI / 2);
         mx = p.x;
         my = p.y;
 
@@ -589,10 +648,10 @@ class ImageEditorHandler {
             editor.setCrop(editor.cropX, editor.cropY + my, mx + editor.cropW, -my + editor.cropH);
             break;
           case 3:
-            editor.setCrop(editor.cropX , editor.cropY , mx + editor.cropW, my + editor.cropH);
+            editor.setCrop(editor.cropX, editor.cropY, mx + editor.cropW, my + editor.cropH);
             break;
           case 4:
-            editor.setCrop(editor.cropX + mx, editor.cropY , -mx + editor.cropW, my + editor.cropH);
+            editor.setCrop(editor.cropX + mx, editor.cropY, -mx + editor.cropW, my + editor.cropH);
             break;
 
         }
@@ -607,29 +666,29 @@ class ImageEditorHandler {
     });
   }
 
-  Position transformMirror(int x, int y) {
+  core.Position transformMirror(int x, int y) {
 
 
-    if(editor.mirrorHorizontal){
-      y = editor.height-y;
+    if (editor.mirrorHorizontal) {
+      y = editor.height - y;
     }
 
-    if(editor.mirrorVertical){
-      x = editor.width-x;
+    if (editor.mirrorVertical) {
+      x = editor.width - x;
     }
 
-    return new Position(x:x, y:y);
+    return new core.Position(x:x, y:y);
   }
 
   void open() {
     _dialogBox = dialogContainer.dialog(_dialogElement);
     _dialogBox.onClose.listen((_) => close());
-    body.append(_toolBar);
+    core.body.append(_toolBar);
 
-    if(editor.isReady){
+    if (editor.isReady) {
       _properties = editor.properties = new ImageEditProperties.fromImageElement(editor.image);
     } else {
-      editor.onLoad.listen((_){
+      editor.onLoad.listen((_) {
         _properties = editor.properties = new ImageEditProperties.fromImageElement(editor.image);
       });
     }
