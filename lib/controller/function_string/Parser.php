@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\controller\function_string;
+namespace ChristianBudde\cbweb\controller\function_string\ast;
 /**
  * Created by PhpStorm.
  * User: budde

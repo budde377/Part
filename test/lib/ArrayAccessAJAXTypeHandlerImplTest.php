@@ -9,7 +9,7 @@ namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\controller\ajax\ArrayAccessTypeHandlerImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
-use ChristianBudde\cbweb\controller\function_string\ParserImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\ParserImpl;
 use PHPUnit_Framework_TestCase;
 
 class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase
@@ -17,7 +17,7 @@ class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase
 
     /** @var  \ChristianBudde\cbweb\controller\ajax\ArrayAccessTypeHandlerImpl */
     private $handler;
-    /** @var  \ChristianBudde\cbweb\controller\function_string\Parser */
+    /** @var  \ChristianBudde\cbweb\controller\function_string\ast\Parser */
     private $parser;
     /** @var  JSONFunction */
     private $function;

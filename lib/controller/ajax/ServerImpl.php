@@ -4,7 +4,7 @@ use ChristianBudde\cbweb\BackendSingletonContainer;
 use ChristianBudde\cbweb\exception\ClassNotDefinedException;
 use ChristianBudde\cbweb\exception\ClassNotInstanceOfException;
 use ChristianBudde\cbweb\exception\FileNotFoundException;
-use ChristianBudde\cbweb\controller\function_string\ParserImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\ParserImpl;
 use ChristianBudde\cbweb\controller\json\CompositeFunction;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
 use ChristianBudde\cbweb\controller\json\ParserImpl as JSONParser;

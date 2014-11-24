@@ -10,7 +10,7 @@ namespace ChristianBudde\cbweb\test;
 use ChristianBudde\cbweb\controller\ajax\TypeHandler;
 use ChristianBudde\cbweb\controller\json\Element;
 use ChristianBudde\cbweb\controller\ajax\GenericObjectTypeHandlerImpl;
-use ChristianBudde\cbweb\controller\function_string\ParserImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\ParserImpl;
 use ChristianBudde\cbweb\controller\json\Object;
 use ChristianBudde\cbweb\controller\json\ObjectImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;

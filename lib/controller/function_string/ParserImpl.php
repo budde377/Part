@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\controller\function_string;
+namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 use ChristianBudde\cbweb\controller\json\CompositeFunctionImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;

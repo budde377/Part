@@ -8,7 +8,7 @@ use ChristianBudde\cbweb\model\updater\Updater;
 use ChristianBudde\cbweb\model\user\UserPrivileges;
 use ChristianBudde\cbweb\util\file\File;
 use ChristianBudde\cbweb\util\file\FileImpl;
-use ChristianBudde\cbweb\controller\function_string\ParserImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\ParserImpl;
 use ChristianBudde\cbweb\util\file\ImageFileImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
 use ChristianBudde\cbweb\controller\json\Response;

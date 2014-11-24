@@ -15,13 +15,15 @@ import "core.dart";
  * <function>                   = .<name>(<arg_list>) | .<name> () | \[<sap>\]
  * <target>                     = <function_call> | <type>
  * <type>                       = <name> | <type>\<name>
- * <arg_list>                   = <sap> | <sap>, <arg_list> | <named_arg_list>
+ * <arg_list>                   = <arg> | <arg>, <arg_list> | <named_arg_list>
+ * <arg>                        = <sap>
  * <named_arg_list>             = <named_arg> | <named_arg>, <named_arg_list>
  * <named_arg>                  = <name_nswu> : <sap>
  * <sap>                        = <scalar> | <array> | <program>
  * <array>                      = \[ <all_array_entries>\]
  * <all_array_entries>          = <array_entries> | <named_array_entries>
- * <array_entries>              = <sap> | <sap>, <all_array_entries>
+ * <array_entries>              = <array_entry> | <array_entry>, <all_array_entries>
+ * <array_entry>                = <sap>
  * <named_array_entries>        = <array_named_entry> | <array_named_entry>, <all_array_entries>
  * <array_named_entry>          = <scalar> => <sap>
  * <scalar>                     = true | false | null | <num> | <string>

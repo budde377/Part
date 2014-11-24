@@ -3,7 +3,7 @@
 namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\controller\ajax\ServerImpl;
-use ChristianBudde\cbweb\controller\function_string\ParserImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\ParserImpl;
 use ChristianBudde\cbweb\controller\json\ObjectImpl;
 use ChristianBudde\cbweb\controller\json\Response;
 use ChristianBudde\cbweb\controller\json\ResponseImpl;
