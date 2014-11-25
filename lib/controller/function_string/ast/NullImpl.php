@@ -9,7 +9,7 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class Null implements Scalar{
+class NullImpl implements Scalar{
 
     public function getValue()
     {

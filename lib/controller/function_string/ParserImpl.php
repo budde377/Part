@@ -1,11 +1,48 @@
 <?php
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\cbweb\controller\function_string;
 
-use ChristianBudde\cbweb\controller\json\CompositeFunctionImpl;
-use ChristianBudde\cbweb\controller\json\JSONFunction;
-use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
-use ChristianBudde\cbweb\controller\json\NullTargetImpl;
-use ChristianBudde\cbweb\controller\json\TypeImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\AllArrayEntries;
+use ChristianBudde\cbweb\controller\function_string\ast\ArgumentList;
+use ChristianBudde\cbweb\controller\function_string\ast\ArgumentNamedFunction;
+use ChristianBudde\cbweb\controller\function_string\ast\ArgumentNamedFunctionImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\ArgumentsImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\ArrayAccessFunctionImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntriesImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntry;
+use ChristianBudde\cbweb\controller\function_string\ast\ArrayImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\BinaryImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\BoolImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\ChainCompositeFunctionImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\CompositeChainCompositeFunctionImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\CompositeFunctionCallImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\DecimalImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\DoubleNumberImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\ExpDoubleNumberImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\FFunction;
+use ChristianBudde\cbweb\controller\function_string\ast\FunctionCallImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\FunctionChain;
+use ChristianBudde\cbweb\controller\function_string\ast\FunctionChainsImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\HexadecimalImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\KeyArrowValueImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\NamedArgumentImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\NamedArgumentList;
+use ChristianBudde\cbweb\controller\function_string\ast\NamedArgumentsImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\NamedArrayEntriesImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\NamedArrayEntry;
+use ChristianBudde\cbweb\controller\function_string\ast\NameImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\NameNotStartingWithUnderscoreImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\NoArgumentNamedFunctionImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\NullImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\NumImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\OctalImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\Program;
+use ChristianBudde\cbweb\controller\function_string\ast\Scalar;
+use ChristianBudde\cbweb\controller\function_string\ast\ScalarArrayProgram;
+use ChristianBudde\cbweb\controller\function_string\ast\StringImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\Target;
+use ChristianBudde\cbweb\controller\function_string\ast\Type;
+use ChristianBudde\cbweb\controller\function_string\ast\TypeNameImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\UnsignedNum;
 
 
 /**
@@ -17,651 +54,562 @@ use ChristianBudde\cbweb\controller\json\TypeImpl;
 class ParserImpl implements Parser
 {
 
-    private $dNumPattern;
-
-    function __construct()
-    {
-        $this->dNumPattern = "[0-9]*[\.][0-9]*";
-    }
-
-    //TODO Update bnf wrt. function chain and array access
-    /**
-     * <program>                    = <composite_function_call> | <function_call>
-     *
-     * <composite_function_call>    = <target><composite_function>
-     * <composite_function>         = [..<function_chain>]+
-     * <function_chain>             = <function_chain>.<function> | <function>
-     *
-     * <function_call>              = <target>.<function> | <target>\[<scalar>\]
-     * <function>                   = <name>([<arg>, ...])
-     * <target>                     = <function_call> | <type>
-     * <type>                       = <name> | [a-zA-Z_][A-Za-z0-9_\]+[a-zA-Z_]
-     * <arg>                        = <scalar> | <array> | <program>
-     * <array>                      = \[ <array_index>, ... \]
-     * <array_index>                = <scalar> => <arg> | <arg>
-     * <scalar>                     = true | false | null | <num> | <string>
-     * <name>                       = [a-zA-Z_][A-Za-z0-9_]*
-     * <num>                        = [+-]? <integer> | <float>
-     * <integer>                    = <octal> | <decimal> | <hexadecimal> | <binary>
-     * <float>                      = <double_number> | <exp_double_number>
-     * <string>                     = *single-quoted-string* | *double-quoted-string*
-     * <decimal>                    = [0-9]+
-     * <hexadecimal>                = 0x[0-9A-Fa-f]
-     * <octal>                      = 0[0-7]+
-     * <binary>                     = 0b[0-1]+
-     * <double_number>              = [0-9]*[\.][0-9]*
-     * <exp_double_number>          = ([0-9]+|[0-9]*[\.][0-9]*)[eE][+-]?[0-9]+
-     * @param string $input
-     * @return \ChristianBudde\cbweb\controller\json\Program
-     */
-
-    public function parseFunctionString($input)
-    {
-        return $this->parseProgram($input, $result) ? $result : null;
-    }
-
 
     /**
-     * @param $input
-     * @param  $result
-     * @return bool
+     * @param array $tokens An assoc. array containing *match* and *token*
+     * @return Program
      */
-    public function parseProgram($input, &$result){
-        return $this->parseFunctionCall($input, $result) || $this->parseCompositeFunctionCall($input, $result);
+    public static function parse(array $tokens)
+    {
+        return self::parseProgram($tokens);
     }
 
     /**
-     * @param $input
-     * @param  $result
-     * @return bool
+     * @param array
+     * @return Program
      */
-    public function parseCompositeFunctionCall($input, &$result)
+    private static function parseProgram(array $tokens)
+    {
+        return self::orCallable($tokens, 'parseCompositeFunctionCall', 'parseFunctionCall');
+    }
+
+    /**
+     * @param array $tokens
+     * @return CompositeFunctionCallImpl
+     */
+    private static function parseCompositeFunctionCall(array $tokens)
+    {
+        return self::concatCallable(function (Target $t, CompositeFunction $f) {
+            return new CompositeFunctionCallImpl($t, $f);
+        }, $tokens, 'parseTarget', 'parseCompositeFunction');
+    }
+
+    /**
+     * @param array $tokens
+     * @return CompositeFunction
+     */
+    private static function parseCompositeFunction(array $tokens)
+    {
+        return self::orCallable($tokens, 'parseChainCompositeFunction', 'parseCompositeChainCompositeFunction');
+    }
+
+    /**
+     * @param array $tokens
+     * @return ChainCompositeFunctionImpl
+     */
+    private static function parseChainCompositeFunction(array $tokens)
+    {
+        if (!self::expect($tokens, Lexer::T_DOT)) {
+            return null;
+        }
+        return self::parseFunctionChain(array_splice($tokens, 1));
+    }
+
+    /**
+     * @param array $tokens
+     * @return CompositeChainCompositeFunctionImpl
+     */
+    private static function parseCompositeChainCompositeFunction(array $tokens)
+    {
+        return self::concatCallable(function (CompositeFunction $f, FunctionChain $fc) {
+            return new CompositeChainCompositeFunctionImpl($f, $fc);
+        }, $tokens, 'parseCompositeFunction', self::generateTokenTester(Lexer::T_DOT), 'parseFunctionChain');
+    }
+
+    private static function generateTokenTester($token)
+    {
+        return function (array $tokens) use ($token) {
+
+            if (count($tokens) != 1) {
+                return null;
+            }
+            if (!self::expect($tokens, $token)) {
+                return null;
+            }
+            return true;
+        };
+
+    }
+
+
+    /**
+     * @param array $tokens
+     * @return FunctionChain
+     */
+    private static function parseFunctionChain(array $tokens)
     {
 
-        preg_match_all('/\.\./', $input, $matches, PREG_OFFSET_CAPTURE);
+        return self::orCallable($tokens, 'parseFunctionChains', 'parseFunction');
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return FunctionChainsImpl
+     */
+    private static function parseFunctionChains(array $tokens)
+    {
+        return self::concatCallable(function (FunctionChain $fc, FFunction $f) {
+            return new FunctionChainsImpl($fc, $f);
+        }, $tokens, 'parseFunctionChain', 'parseFunction');
+    }
 
 
-        foreach ($matches as $match) {
-            if (!isset($match[0][1])) {
+    /**
+     * @param array $tokens
+     * @return FunctionCallImpl
+     */
+    private static function parseFunctionCall(array $tokens)
+    {
+        return self::concatCallable(function (Target $t, FFunction $f) {
+            return new FunctionCallImpl($t, $f);
+        }, $tokens, 'parseTarget', 'parseFunction');
+
+    }
+
+
+    /**
+     * @param array $tokens
+     * @return FFunction
+     */
+    private static function parseFunction(array $tokens)
+    {
+
+        return self::orCallable($tokens, 'parseNamedArgumentFunction', 'parseArrayAccessFunction');
+    }
+
+    /**
+     * @param array $tokens
+     * @return ArgumentNamedFunction
+     */
+    private static function parseNamedArgumentFunction(array $tokens)
+    {
+        return self::orCallable($tokens, 'parseNoArgumentNamedFunction', 'parseArgumentNamedFunction');
+    }
+
+    /**
+     * @param array $tokens
+     * @return NoArgumentNamedFunctionImpl
+     */
+    private static function parseNoArgumentNamedFunction(array $tokens)
+    {
+        return self::concatCallable(function (NameImpl $n) {
+            return new NoArgumentNamedFunctionImpl($n);
+        }, $tokens, self::generateTokenTester(Lexer::T_DOT), 'parseName', self::generateTokenTester(Lexer::T_L_PAREN), self::generateTokenTester(Lexer::T_R_PAREN));
+    }
+
+    /**
+     * @param array $tokens
+     * @return ArgumentNamedFunctionImpl
+     */
+    private static function parseArgumentNamedFunction(array $tokens)
+    {
+        return self::concatCallable(function (NameImpl $n, ArgumentList $argList) {
+            return new ArgumentNamedFunctionImpl($n, $argList);
+        }, $tokens, self::generateTokenTester(Lexer::T_DOT), 'parseName', self::generateTokenTester(Lexer::T_L_PAREN), 'parseArgumentList', self::generateTokenTester(Lexer::T_R_PAREN));
+    }
+
+    /**
+     * @param array $tokens
+     * @return ArrayAccessFunctionImpl
+     */
+    private static function parseArrayAccessFunction(array $tokens)
+    {
+        return self::concatCallable(function (ScalarArrayProgram $sap) {
+            return new ArrayAccessFunctionImpl($sap);
+        }, $tokens, self::generateTokenTester(Lexer::T_L_BRACKET), 'parseScalarArrayProgram', self::generateTokenTester(Lexer::T_L_PAREN), 'parseArgumentList', self::generateTokenTester(Lexer::T_R_BRACKET));
+
+    }
+
+
+    /**
+     * @param array $tokens
+     * @return Target
+     */
+    private static function parseTarget(array $tokens)
+    {
+
+    }
+
+
+    /**
+     * @param array $tokens
+     * @return Type
+     */
+    private static function parseType(array $tokens)
+    {
+
+    }
+
+
+    /**
+     * @param array $tokens
+     * @return TypeNameImpl
+     */
+    private static function parseTypeNameImpl(array $tokens)
+    {
+
+    }
+
+
+    /**
+     * @param array $tokens
+     * @return ArgumentList
+     */
+    private static function parseArgumentList(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return ArgumentsImpl
+     */
+    private static function parseArguments(array $tokens)
+    {
+
+    }
+
+
+    /**
+     * @param array $tokens
+     * @return NamedArgumentList
+     */
+    private static function parseNamedArgumentList(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return NamedArgumentsImpl
+     */
+    private static function parseNamedArguments(array $tokens)
+    {
+
+    }
+
+
+    /**
+     * @param array $tokens
+     * @return NamedArgumentImpl
+     */
+    private static function parseNamedArgument(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return ScalarArrayProgram
+     */
+    private static function parseScalarArrayProgram(array $tokens)
+    {
+
+    }
+
+
+    /**
+     * @param array $tokens
+     * @return ArrayImpl
+     */
+    private static function parseArray(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return AllArrayEntries
+     */
+    private static function parseAllArrayEntries(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return ArrayEntry
+     */
+    private static function parseArrayEntry(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return ArrayEntriesImpl
+     */
+    private static function parseArrayEntries(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return NamedArrayEntry
+     */
+    private static function parseNamedArrayEntry(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return NamedArrayEntriesImpl
+     */
+    private static function parseNamedArrayEntries(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return KeyArrowValueImpl
+     */
+    private static function parseKeyArrowValue(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return Scalar
+     */
+    private static function parseScalar(array $tokens)
+    {
+
+    }
+
+
+    /**
+     * @param array $tokens
+     * @return BoolImpl
+     */
+    private static function parseBool(array $tokens)
+    {
+
+    }
+
+
+    /**
+     * @param array $tokens
+     * @return NullImpl
+     */
+    private static function parseNull(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return NameNotStartingWithUnderscoreImpl
+     */
+    private static function parseNameNotStartingWithUnderscore(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return NameImpl
+     */
+    private static function parseName(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return NumImpl
+     */
+    private static function parseNum(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return UnsignedNum
+     */
+    private static function parseUnsignedNum(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return Integer
+     */
+    private static function parseInteger(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return Float
+     */
+    private static function parseFloat(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return StringImpl
+     */
+    private static function parseString(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return DecimalImpl
+     */
+    private static function parseDecimal(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return HexadecimalImpl
+     */
+    private static function parseHexaDecimal(array $tokens)
+    {
+
+    }
+
+
+    /**
+     * @param array $tokens
+     * @return OctalImpl
+     */
+    private static function parseOctal(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return BinaryImpl
+     */
+    private static function parseBinary(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return DoubleNumberImpl
+     */
+    private static function parseDoubleNumber(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return ExpDoubleNumberImpl
+     */
+    private static function parseExpDoubleNumber(array $tokens)
+    {
+
+    }
+
+    /**
+     * @param array $tokens
+     * @param callable $c1,...
+     * @return mixed
+     */
+    private static function orCallable(array $tokens, callable $c1)
+    {
+        if (func_num_args() <= 1) {
+            return null;
+        }
+
+        $p = call_user_func($c1, $tokens);
+        if ($p != null) {
+            return $p;
+        }
+
+        $a = func_get_args();
+        $t = array_shift($a);
+        array_shift($a);
+        array_unshift($a, $t);
+        return call_user_func_array('orCallable', $a);
+
+    }
+
+    /**
+     * @param callable $constructor
+     * @param array $tokens
+     * @param callable $c1,...
+     * @return mixed
+     */
+    private static function concatCallable(callable $constructor, array $tokens, $c1)
+    {
+
+        $a = func_get_args();
+        array_shift($a);
+        $t = array_shift($a);
+        array_unshift($a, 0);
+        array_unshift($a, $t);
+        $args = call_user_func_array('concatCallableHelper', $a);
+        $newArgs = [];
+        foreach($args as $arg){
+            if(!is_object($arg)){
                 continue;
             }
-            if ($this->parseTarget(substr($input, 0, $match[0][1]), $resultTarget) &&
-                $this->parseCompositeFunction(substr($input, $match[0][1]), $resultFunction)
+            $newArgs[] = $arg;
+        }
 
-            ) {
-                /** @var $resultTarget \ChristianBudde\cbweb\controller\json\Target */
-                /** @var $resultFunction \ChristianBudde\cbweb\controller\json\JSONFunction */
-                $resultFunction->setTarget($resultTarget);
-                $result = $resultFunction;
-                return true;
+        return call_user_func_array($constructor, $newArgs);
+
+    }
+
+    /**
+     * @param array $tokens
+     * @param callable $c1 ...
+     * @return mixed
+     */
+
+    private static function concatCallableHelper(array $tokens, callable $c1)
+    {
+        $n = func_num_args();
+
+        if (count($tokens) < $n - 1) {
+            return null;
+        }
+
+        if ($n == 2) {
+            return [$c1($tokens)];
+        }
+
+        for ($i = 1; $i < count($tokens); $i++) {
+
+            $r = call_user_func($c1, array_splice($tokens, 0, $i));
+            if ($r == null) {
+                continue;
             }
-        }
-        return false;
-
-    }
-
-
-
-    /**
-     * @param $input
-     * @param  $result
-     * @return bool
-     */
-    public function parseCompositeFunction($input, &$result)
-    {
-
-        $input = trim($input);
-        if(substr($input, 0,2) != ".."){
-            return false;
-        }
-
-        if($this->parseFunctionChain(substr($input, 2), $resultFunctionChainBaseCase)){
-            $result = new CompositeFunctionImpl( new NullTargetImpl());
-            $result->prependFunction($resultFunctionChainBaseCase);
-            return true;
-        }
-
-
-        $pos = strpos($input, "..",2);
-
-        while ($pos !== false) {
-            if ($this->parseCompositeFunction(substr($input, 0 ,$pos), $resultCompositeFunction) && $this->parseFunctionChain(substr($input, $pos+2), $resultFunctionChain)) {
-                /** @var $resultCompositeFunction \ChristianBudde\cbweb\controller\json\CompositeFunction */
-                $resultCompositeFunction->appendFunction($resultFunctionChain);
-                $result = $resultCompositeFunction;
-                return true;
+            $a = array_merge([array_slice($tokens, $i)], array_splice(func_get_args(), 2));
+            $rest = call_user_func_array('concatCallableHelper', $a);
+            if (in_array(null, $rest)) {
+                continue;
             }
-            $pos = strpos($input, "..", $pos + 2);
+            return array_merge([$r], $rest);
         }
 
-        return false;
-
+        return null;
     }
 
-    /**
-     * @param $input
-     * @param  $result
-     * @return bool
-     */
-    public function parseFunctionChain($input, &$result)
+    private static function expect(array $tokens, $token)
     {
 
-
-        if($this->parseFunction($input, $result)){
-            return true;
-        }
-
-        preg_match_all('/\./', $input, $matches, PREG_OFFSET_CAPTURE);
-        array_reverse($matches);
-
-        foreach ($matches[0] as $match) {
-
-            if ($this->parseFunction(substr($input, $match[1] + 1), $resultFunction) &&
-                $this->parseFunctionChain(substr($input, 0, $match[1]), $resultFunctionChain)
-            ) {
-                /** @var $resultTarget \ChristianBudde\cbweb\controller\json\Target */
-                /** @var $resultFunction JSONFunction */
-                $resultFunction->setTarget($resultFunctionChain);
-                $result = $resultFunction;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @param $input
-     * @param  $result
-     * @return bool
-     */
-    public function parseFunctionCall($input, &$result)
-    {
-        $input = trim($input);
-        if(substr($input, -1,1) == "]"){
-            preg_match_all('/\[/', $input, $matches, PREG_OFFSET_CAPTURE);
-            foreach ($matches[0] as $match) {
-
-                if ($this->parseScalar(substr($input, $match[1] + 1, -1), $resultScalar) &&
-                    $this->parseTarget(substr($input, 0, $match[1]), $resultTarget)
-                ) {
-                    /** @var $resultTarget \ChristianBudde\cbweb\controller\json\Target */
-                    /** @var $resultFunction \ChristianBudde\cbweb\controller\json\JSONFunction */
-                    $result = new JSONFunctionImpl("arrayAccess", $resultTarget);
-                    $result->setArg(0, $resultScalar);
-                    return true;
-                }
-            }
-        }
-
-
-
-        preg_match_all('/\./', $input, $matches, PREG_OFFSET_CAPTURE);
-        $matches = array_reverse($matches);
-
-        foreach ($matches[0] as $match) {
-
-            if ($this->parseFunction(substr($input, $match[1] + 1), $resultFunction) &&
-                $this->parseTarget(substr($input, 0, $match[1]), $resultTarget)
-            ) {
-                /** @var $resultTarget \ChristianBudde\cbweb\controller\json\Target */
-                /** @var $resultFunction \ChristianBudde\cbweb\controller\json\JSONFunction */
-                $resultFunction->setTarget($resultTarget);
-                $result = $resultFunction;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @param $input
-     * @param  $result
-     * @return bool
-     */
-    public function parseFunction($input, &$result)
-    {
-        $input = trim($input);
-        if (preg_match('/^([^(]+)\((.*)\)$/', $input, $match) &&
-            $this->parseName($match[1], $resultName)
-
-        ) {
-            if ($match[2] == "") {
-                $result = new JSONFunctionImpl($resultName, new NullTargetImpl());
-                return true;
-            }
-
-            if ($this->parseArgumentList($match[2], $resultArgumentList)) {
-
-                $result = new JSONFunctionImpl($resultName, new NullTargetImpl());
-                foreach ($resultArgumentList as $key => $arg) {
-                    $result->setArg($key, $arg);
-                }
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param $input
-     * @param  $result
-     * @return bool
-     */
-    public function parseTarget($input, &$result)
-    {
-        return $this->parseType($input, $result) || $this->parseFunctionCall($input, $result);
-    }
-
-    /**
-     * @param $input
-     * @param  $result
-     * @return bool
-     */
-    public function parseType($input, &$result)
-    {
-        if ($this->parseNamespaceName($input, $resultName)) {
-            $result = new TypeImpl($resultName);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseName($input, &$result)
-    {
-        $input = trim($input);
-        if ($r = preg_match('/^[a-z_][a-z0-9_]*$/i', $input)) {
-            $result = $input;
-        }
-
-        return $r == 1;
-    }
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public  function parseNamespaceName($input, &$result)
-    {
-        if($this->parseName($input, $result)){
-            return true;
-        }
-
-        $input = trim($input);
-        if ($r = preg_match('/^[a-z_][a-z0-9_\\\\]+[a-z_]$/i', $input)) {
-            $result = $input;
-        }
-
-        return $r == 1;
-    }
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseArgumentList($input, &$result)
-    {
-
-        if ($this->parseArgument($input, $resultArgumentBaseCase)) {
-            $result = [$resultArgumentBaseCase];
-            return true;
-        }
-
-        $pos = strpos($input, ",");
-        while ($pos !== false) {
-            if ($this->parseArgument(substr($input, 0, $pos), $resultArgument) && $this->parseArgumentList(substr($input, $pos + 1), $resultArgumentList)) {
-                $result = array_merge([$resultArgument], $resultArgumentList);
-                return true;
-            }
-            $pos = strpos($input, ",", $pos + 1);
-        }
-
-        return false;
-
-    }
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseArgument($input, &$result)
-    {
-        return $this->parseScalar($input, $result) || $this->parseArray($input, $result) || $this->parseProgram($input, $result);
+        return count($tokens) > 0 && $tokens[0]['token'] == $token;
     }
 
 
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseScalar($input, &$result)
-    {
-        return $this->parseBoolNull($input, $result) || $this->parseString($input, $result) || $this->parseNumeric($input, $result);
-    }
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseString($input, &$result)
-    {
-        $input = trim($input);
-        $startCharacter = substr($input, 0, 1);
-        $endCharacter = substr($input, -1, 1);
-        if ($startCharacter != $endCharacter || ($startCharacter != "'" && $startCharacter != '"')) {
-            return false;
-        }
-
-        $i = str_replace("\\\\", "x", $input);
-        $i = str_replace("\\$startCharacter", "x", $i);
-
-        if (substr($i, 0, 1) != $startCharacter || substr($i, -1, 1) != $startCharacter) {
-            return false;
-        }
-
-        $i = substr($i, 1, strlen($i) - 2);
-
-        if (strpos($i, $startCharacter) !== false) {
-            return false;
-        }
-
-        $result = $input;
-        if ($startCharacter == '"') {
-            $result = preg_replace("|([^\\\\])\\\\n|", "$1\n", $result);
-            $result = preg_replace("/([^\\\\])\\\\r/", "$1\r", $result);
-            $result = preg_replace("/([^\\\\])\\\\t/", "$1\t", $result);
-            $result = preg_replace("/([^\\\\])\\\\v/", "$1\v", $result);
-            $result = preg_replace("/([^\\\\])\\\\e/", "$1\e", $result);
-            $result = preg_replace("/([^\\\\])\\\\f/", "$1\f", $result);
-            $result = preg_replace_callback("/([^\\\\])\\\\([0-7]{1,3})/",
-                function ($m) {
-                    return $m[1] . chr(octdec($m[2]));
-                }, $result);
-            $result = preg_replace_callback("/([^\\\\])\\\\x([0-9A-Fa-f]{1,2})/",
-                function ($m) {
-                    return $m[1] . chr(hexdec($m[2]));
-                }, $result);
-
-        }
-        $result = preg_replace("/([^\\\\])\\\\$startCharacter/", "$1$startCharacter", $result);
-        $result = str_replace("\\\\", "\\", $result);
-        $result = substr($result, 1, strlen($result) - 2);
-
-        return true;
-    }
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseNumeric($input, &$result)
-    {
-        $input = trim($input);
-
-        $signString = substr($input, 0, 1);
-        $sign = 1;
-
-        if ($isMinus = ($signString == "-")) {
-            $sign = -1;
-        }
-
-        if ($isMinus || $signString == "+") {
-            $input = substr($input, 1);
-        }
-
-        if (!$this->parseInteger($input, $result) && !$this->parseFloat($input, $result)) {
-            return false;
-        }
-        $result = $sign * $result;
-
-        return true;
-    }
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseFloat($input, &$result)
-    {
-        return $this->parseDoubleNumber($input, $result) || $this->parseExponentDoubleNum($input, $result);
-    }
-
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseDoubleNumber($input, &$result)
-    {
-        $input = trim($input);
-        if (preg_match("/^({$this->dNumPattern})$/", $input)) {
-            $result = floatval($input);
-            return true;
-        }
-
-        return false;
-    }
-
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseExponentDoubleNum($input, &$result)
-    {
-        $input = trim($input);
-
-        if (preg_match("/^(([0-9]+|{$this->dNumPattern})[eE][+-]?[0-9]+)$/", $input)) {
-            $result = floatval($input);
-            return true;
-        }
-
-
-        return false;
-    }
-
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseInteger($input, &$result)
-    {
-
-        return $this->parseOctal($input, $result) ||
-        $this->parseDecimal($input, $result) ||
-        $this->parseHexadecimal($input, $result) ||
-        $this->parseBinary($input, $result);
-    }
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseDecimal($input, &$result)
-    {
-        $input = trim($input);
-        if (preg_match('/^[0-9]+$/', $input)) {
-            $result = intval($input);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseHexadecimal($input, &$result)
-    {
-        $input = trim($input);
-        if (preg_match('/^0[xX]([0-9a-fA-F]+)$/', $input, $match)) {
-            $result = intval($match[1], 16);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseOctal($input, &$result)
-    {
-        $input = trim($input);
-        if (preg_match('/^0([0-7]+)$/', $input, $match)) {
-            $result = intval($match[1], 8);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseBinary($input, &$result)
-    {
-        $input = trim($input);
-        if (preg_match('/^0b([01]+)$/', $input, $match)) {
-            $result = intval($match[1], 2);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseArray($input, &$result)
-    {
-        $input = trim($input);
-        if (substr($input, 0, 1) != "[" || substr($input, -1, 1) != "]") {
-            return false;
-        }
-
-        $input = substr($input, 1, strlen($input) - 2);
-
-        if (trim($input) == "") {
-            $result = [];
-            return true;
-        }
-
-        return $this->parseArrayList($input, $result);
-    }
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseArrayList($input, &$result)
-    {
-        if (trim($input) == "") {
-
-            return false;
-        }
-
-        if ($this->parseArrayListEntry($input, $result)) {
-            return true;
-        }
-
-        $pos = strpos($input, ",");
-        while ($pos !== false) {
-            if ($this->parseArrayListEntry($s1 = substr($input, 0, $pos), $result) && $this->parseArrayList($s2 = substr($input, $pos + 1), $result)) {
-
-                return true;
-            }
-            $pos = strpos($input, ",", $pos + 1);
-        }
-
-        return false;
-    }
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseArrayListEntry($input, &$result)
-    {
-        if ($this->parseArgument($input, $resultArgument)) {
-            if (is_array($result)) {
-                $result[] = $resultArgument;
-            } else {
-                $result = [$resultArgument];
-            }
-            return true;
-
-        }
-
-
-        $pos = strpos($input, "=>");
-        while ($pos !== false) {
-            if ($this->parseScalar(substr($input, 0, $pos), $resultScalar) && $this->parseArgument(substr($input, $pos + 2), $resultArgument)) {
-                if (is_array($result)) {
-                    $result[$resultScalar] = $resultArgument;
-                } else {
-                    $result = [$resultScalar => $resultArgument];
-                }
-                return true;
-            }
-            $pos = strpos($input, "=>", $pos + 2);
-        }
-
-
-        return false;
-    }
-
-
-    /**
-     * @param $input
-     * @param $result
-     * @return bool
-     */
-    public function parseBoolNull($input, &$result)
-    {
-        if (($its = strtolower(trim($input))) == "true") {
-            $result = true;
-            return true;
-        }
-
-        if ($its == "false") {
-            $result = false;
-            return true;
-        }
-
-        if ($its == "null") {
-            $result = null;
-            return true;
-        }
-
-        return false;
-    }
-
-
-} 
+}

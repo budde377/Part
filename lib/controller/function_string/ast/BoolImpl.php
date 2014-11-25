@@ -9,7 +9,7 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class Bool implements Scalar{
+class BoolImpl implements Scalar{
 
     /** @var  bool */
     private $value;
