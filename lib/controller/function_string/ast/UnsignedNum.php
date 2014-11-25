@@ -3,12 +3,12 @@
  * Created by PhpStorm.
  * User: budde
  * Date: 11/24/14
- * Time: 4:05 PM
+ * Time: 10:30 PM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface ExpDouble extends Float{
+interface UnsignedNum extends Scalar{
 
 } 

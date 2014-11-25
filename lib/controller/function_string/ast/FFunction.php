@@ -3,12 +3,12 @@
  * Created by PhpStorm.
  * User: budde
  * Date: 11/24/14
- * Time: 3:59 PM
+ * Time: 10:19 PM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface FSArray extends ScalarArrayProgram{
+interface FFunction extends FunctionChain{
 
 } 

@@ -3,12 +3,12 @@
  * Created by PhpStorm.
  * User: budde
  * Date: 11/24/14
- * Time: 3:48 PM
+ * Time: 10:26 PM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface ScalarArrayProgram {
+interface ScalarArrayProgram extends ArgumentList, ArrayEntry{
 
 } 

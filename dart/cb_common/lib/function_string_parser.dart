@@ -5,40 +5,50 @@ import "dart:mirrors";
 import "dart:math" as Math;
 import "core.dart";
 /**
- * <program>                    = <composite_function_call> | <function_call>
+ * <program>                            = <composite_function_call> | <function_call>
  *
- * <composite_function_call>    = <target><composite_function>
- * <composite_function>         = .<function_chain> | <composite_function>.<function_chain>
- * <function_chain>             = <function_chain><function> | <function>
+ * <composite_function_call>            = <target><composite_function>
+ * <composite_function>                 = <chain_composite_function> | <composite_chain_composite_function>
+ * <chain_composite_function>           = .<function_chain>
+ * <composite_chain_composite_function> = <composite_function>.<function_chain>
+ * <function_chain>                     = <function_chains> | <function>
+ * <function_chains>                    = <function_chain><function>
  *
- * <function_call>              = <target><function>
- * <function>                   = .<name>(<arg_list>) | .<name> () | \[<sap>\]
- * <target>                     = <function_call> | <type>
- * <type>                       = <name> | <type>\<name>
- * <arg_list>                   = <arg> | <arg>, <arg_list> | <named_arg_list>
- * <arg>                        = <sap>
- * <named_arg_list>             = <named_arg> | <named_arg>, <named_arg_list>
- * <named_arg>                  = <name_nswu> : <sap>
- * <sap>                        = <scalar> | <array> | <program>
- * <array>                      = \[ <all_array_entries>\]
- * <all_array_entries>          = <array_entries> | <named_array_entries>
- * <array_entries>              = <array_entry> | <array_entry>, <all_array_entries>
- * <array_entry>                = <sap>
- * <named_array_entries>        = <array_named_entry> | <array_named_entry>, <all_array_entries>
- * <array_named_entry>          = <scalar> => <sap>
- * <scalar>                     = true | false | null | <num> | <string>
- * <name_nswu>                  = [a-zA-Z0-9] | [a-zA-Z0-9]<name>
- * <name>                       = [a-zA-Z_][A-Za-z0-9_]*
- * <num>                        = [+-]? <integer> | <float>
- * <integer>                    = <octal> | <decimal> | <hexadecimal> | <binary>
- * <float>                      = <double_number> | <exp_double_number>
- * <string>                     = *single-quoted-php-string* | *double-quoted-php-string*
- * <decimal>                    = [0-9]+
- * <hexadecimal>                = 0x[0-9A-Fa-f]
- * <octal>                      = 0[0-7]+
- * <binary>                     = 0b[0-1]+
- * <double_number>              = [0-9]*[\.][0-9]*
- * <exp_double_number>          = ([0-9]+|[0-9]*[\.][0-9]*)[eE][+-]?[0-9]+
+ * <function_call>                      = <target><function>
+ * <function>                           = <arg_function> | <no_arg_function> | <array_access_function>
+ * <no_arg_function>                    = .<name> ()
+ * <arg_function>                       = .<name>(<arg_list>)
+ * <array_access_function>              = \[<sap>\]
+ * <target>                             = <function_call> | <type>
+ * <type>                               = <name> | <type_name>
+ * <type_name>                          = <type>\<name>
+ * <arg_list>                           = <sap> | <args> | <named_arg_list>
+ * <args>                               = <sap>, <arg_list>
+ * <named_arg_list>                     = <named_arg> | <named_args>
+ * <named_args>                         = <named_arg>, <named_arg_list>
+ * <named_arg>                          = <name_nswu> : <sap>
+ * <sap>                                = <scalar> | <array> | <program>
+ * <array>                              = \[ <all_array_entries>\]
+ * <all_array_entry>                    = <array_entry> | <named_array_entry>
+ * <array_entry>                        = <sap> | <array_entries>
+ * <array_entries>                      = <sap>, <all_array_entry>
+ * <named_array_entry>                  = <key_arrow_value> | <named_array_entries>
+ * <named_array_entries>                = <key_arrow_value>, <all_array_entries>
+ * <key_arrow_value>                    = <scalar> => <sap>
+ * <scalar>                             = true | false | null | <num> | <string>
+ * <name_nswu>                          = [a-zA-Z0-9] | [a-zA-Z0-9]<name>
+ * <name>                               = [a-zA-Z_][A-Za-z0-9_]*
+ * <num>                                = [+-]? <unsigned_num>
+ * <unsigned_num>                       = <integer> | <float>
+ * <integer>                            = <octal> | <decimal> | <hexadecimal> | <binary>
+ * <float>                              = <double_number> | <exp_double_number>
+ * <string>                             = *single-quoted-php-string* | *double-quoted-php-string*
+ * <decimal>                            = [0-9]+
+ * <hexadecimal>                        = 0x[0-9A-Fa-f]
+ * <octal>                              = 0[0-7]+
+ * <binary>                             = 0b[0-1]+
+ * <double_number>                      = [0-9]*[\.][0-9]*
+ * <exp_double_number>                  = ([0-9]+|[0-9]*[\.][0-9]*)[eE][+-]?[0-9]+
  */
 
 

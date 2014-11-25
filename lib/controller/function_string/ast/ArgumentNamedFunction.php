@@ -3,12 +3,16 @@
  * Created by PhpStorm.
  * User: budde
  * Date: 11/24/14
- * Time: 3:53 PM
+ * Time: 10:40 PM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface TypeBackslashName extends  Type{
+interface ArgumentNamedFunction extends FFunction{
 
+    /**
+     * @return NameImpl
+     */
+    public function getName();
 } 

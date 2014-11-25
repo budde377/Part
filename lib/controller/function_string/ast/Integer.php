@@ -3,12 +3,13 @@
  * Created by PhpStorm.
  * User: budde
  * Date: 11/24/14
- * Time: 4:04 PM
+ * Time: 10:30 PM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface Integer extends Num{
+interface Integer extends UnsignedNum{
+
 
 } 
