@@ -61,8 +61,25 @@ class ParserImpl implements Parser
      */
     public static function parse(array $tokens)
     {
-        //TODO clear whitespace
-        return self::parseProgram($tokens);
+        return self::parseProgram(self::clearWhitespace($tokens));
+    }
+
+
+    /**
+     * @param array $tokens
+     * @return array
+     */
+    private static function clearWhitespace(array $tokens){
+        $result = [];
+        foreach ($tokens as $token) {
+            if($token['token'] == Lexer::T_WHITESPACE){
+                continue;
+            }
+            $result[] = $token;
+        }
+
+        return $result;
+
     }
 
     /**
@@ -71,7 +88,7 @@ class ParserImpl implements Parser
      */
     private static function parseProgram(array $tokens)
     {
-        return self::orCallable($tokens, 'parseCompositeFunctionCall', 'parseFunctionCall');
+        return self::orCallable($tokens, 'self::parseCompositeFunctionCall', 'self::parseFunctionCall');
     }
 
     /**
@@ -82,7 +99,7 @@ class ParserImpl implements Parser
     {
         return self::concatCallable(function (Target $t, CompositeFunction $f) {
             return new CompositeFunctionCallImpl($t, $f);
-        }, $tokens, 'parseTarget', 'parseCompositeFunction');
+        }, $tokens, 'self::parseTarget', 'self::parseCompositeFunction');
     }
 
     /**
@@ -91,7 +108,7 @@ class ParserImpl implements Parser
      */
     private static function parseCompositeFunction(array $tokens)
     {
-        return self::orCallable($tokens, 'parseChainCompositeFunction', 'parseCompositeChainCompositeFunction');
+        return self::orCallable($tokens, 'self::parseChainCompositeFunction', 'self::parseCompositeChainCompositeFunction');
     }
 
     /**
@@ -102,7 +119,7 @@ class ParserImpl implements Parser
     {
         return self::concatCallable(function (FunctionChain $c) {
             return new ChainCompositeFunctionImpl($c);
-        }, $tokens, self::generateTokenTester(Lexer::T_DOT), 'parseFunctionString');
+        }, $tokens, self::generateTokenTester(Lexer::T_DOT), 'self::parseFunctionChain');
     }
 
     /**
@@ -113,7 +130,7 @@ class ParserImpl implements Parser
     {
         return self::concatCallable(function (CompositeFunction $f, FunctionChain $fc) {
             return new CompositeChainCompositeFunctionImpl($f, $fc);
-        }, $tokens, 'parseCompositeFunction', self::generateTokenTester(Lexer::T_DOT), 'parseFunctionChain');
+        }, $tokens, 'self::parseCompositeFunction', self::generateTokenTester(Lexer::T_DOT), 'self::parseFunctionChain');
     }
 
     private static function generateTokenTester($token)
@@ -131,24 +148,6 @@ class ParserImpl implements Parser
 
     }
 
-    private static function generateTokensTester(array $tokens)
-    {
-        return function (array $t) use ($tokens) {
-
-            if (count($t) != 1) {
-                return null;
-            }
-            foreach ($tokens as $token) {
-                if (self::expect($t, $token)) {
-                    return true;
-                }
-            }
-
-            return null;
-        };
-
-    }
-
 
     /**
      * @param array $tokens
@@ -157,7 +156,7 @@ class ParserImpl implements Parser
     private static function parseFunctionChain(array $tokens)
     {
 
-        return self::orCallable($tokens, 'parseFunctionChains', 'parseFunction');
+        return self::orCallable($tokens, 'self::parseFunctionChains', 'self::parseFunction');
 
     }
 
@@ -169,7 +168,7 @@ class ParserImpl implements Parser
     {
         return self::concatCallable(function (FunctionChain $fc, FFunction $f) {
             return new FunctionChainsImpl($fc, $f);
-        }, $tokens, 'parseFunctionChain', 'parseFunction');
+        }, $tokens, 'self::parseFunctionChain', 'self::parseFunction');
     }
 
 
@@ -181,7 +180,7 @@ class ParserImpl implements Parser
     {
         return self::concatCallable(function (Target $t, FFunction $f) {
             return new FunctionCallImpl($t, $f);
-        }, $tokens, 'parseTarget', 'parseFunction');
+        }, $tokens, 'self::parseTarget', 'self::parseFunction');
 
     }
 
@@ -193,7 +192,7 @@ class ParserImpl implements Parser
     private static function parseFunction(array $tokens)
     {
 
-        return self::orCallable($tokens, 'parseNamedArgumentFunction', 'parseArrayAccessFunction');
+        return self::orCallable($tokens, 'self::parseNamedArgumentFunction', 'self::parseArrayAccessFunction');
     }
 
     /**
@@ -202,7 +201,7 @@ class ParserImpl implements Parser
      */
     private static function parseNamedArgumentFunction(array $tokens)
     {
-        return self::orCallable($tokens, 'parseNoArgumentNamedFunction', 'parseArgumentNamedFunction');
+        return self::orCallable($tokens, 'self::parseNoArgumentNamedFunction', 'self::parseArgumentNamedFunction');
     }
 
     /**
@@ -213,7 +212,7 @@ class ParserImpl implements Parser
     {
         return self::concatCallable(function (NameImpl $n) {
             return new NoArgumentNamedFunctionImpl($n);
-        }, $tokens, self::generateTokenTester(Lexer::T_DOT), 'parseName', self::generateTokenTester(Lexer::T_L_PAREN), self::generateTokenTester(Lexer::T_R_PAREN));
+        }, $tokens, self::generateTokenTester(Lexer::T_DOT), 'self::parseName', self::generateTokenTester(Lexer::T_L_PAREN), self::generateTokenTester(Lexer::T_R_PAREN));
     }
 
     /**
@@ -224,7 +223,7 @@ class ParserImpl implements Parser
     {
         return self::concatCallable(function (NameImpl $n, ArgumentList $argList) {
             return new ArgumentNamedFunctionImpl($n, $argList);
-        }, $tokens, self::generateTokenTester(Lexer::T_DOT), 'parseName', self::generateTokenTester(Lexer::T_L_PAREN), 'parseArgumentList', self::generateTokenTester(Lexer::T_R_PAREN));
+        }, $tokens, self::generateTokenTester(Lexer::T_DOT), 'self::parseName', self::generateTokenTester(Lexer::T_L_PAREN), 'self::parseArgumentList', self::generateTokenTester(Lexer::T_R_PAREN));
     }
 
     /**
@@ -235,7 +234,7 @@ class ParserImpl implements Parser
     {
         return self::concatCallable(function (ScalarArrayProgram $sap) {
             return new ArrayAccessFunctionImpl($sap);
-        }, $tokens, self::generateTokenTester(Lexer::T_L_BRACKET), 'parseScalarArrayProgram', self::generateTokenTester(Lexer::T_L_PAREN), 'parseArgumentList', self::generateTokenTester(Lexer::T_R_BRACKET));
+        }, $tokens, self::generateTokenTester(Lexer::T_L_BRACKET), 'self::parseScalarArrayProgram', self::generateTokenTester(Lexer::T_L_PAREN), 'self::parseArgumentList', self::generateTokenTester(Lexer::T_R_BRACKET));
 
     }
 
@@ -246,7 +245,7 @@ class ParserImpl implements Parser
      */
     private static function parseTarget(array $tokens)
     {
-        return self::orCallable($tokens, 'parseFunctionCall', 'parseType');
+        return self::orCallable($tokens, 'self::parseFunctionCall', 'self::parseType');
     }
 
 
@@ -256,7 +255,7 @@ class ParserImpl implements Parser
      */
     private static function parseType(array $tokens)
     {
-        return self::orCallable($tokens, 'parseName', 'parseTypeName');
+        return self::orCallable($tokens, 'self::parseName', 'self::parseTypeName');
     }
 
 
@@ -268,7 +267,7 @@ class ParserImpl implements Parser
     {
         return self::concatCallable(function (Type $type, NameImpl $name) {
             return new TypeNameImpl($type, $name);
-        }, $tokens, 'parseType', self::generateTokenTester(Lexer::T_BACKSLASH), 'parseName');
+        }, $tokens, 'self::parseType', self::generateTokenTester(Lexer::T_BACKSLASH), 'self::parseName');
     }
 
 
@@ -279,9 +278,9 @@ class ParserImpl implements Parser
     private static function parseArgumentList(array $tokens)
     {
         return self::orCallable($tokens,
-            'parseScalarArrayProgram',
-            'parseArguments',
-            'parseNamedArgumentList');
+            'self::parseScalarArrayProgram',
+            'self::parseArguments',
+            'self::parseNamedArgumentList');
     }
 
     /**
@@ -292,7 +291,7 @@ class ParserImpl implements Parser
     {
         return self::concatCallable(function (ScalarArrayProgram $sap, ArgumentList $l) {
             return new ArgumentsImpl($sap, $l);
-        }, $tokens, 'parseScalarArrayProgram', self::generateTokenTester(Lexer::T_COMMA), 'parseArgumentList');
+        }, $tokens, 'self::parseScalarArrayProgram', self::generateTokenTester(Lexer::T_COMMA), 'self::parseArgumentList');
     }
 
 
@@ -302,7 +301,7 @@ class ParserImpl implements Parser
      */
     private static function parseNamedArgumentList(array $tokens)
     {
-        return self::orCallable($tokens, 'parseNamedArgument', 'parseNamedArguments');
+        return self::orCallable($tokens, 'self::parseNamedArgument', 'self::parseNamedArguments');
     }
 
     /**
@@ -313,7 +312,7 @@ class ParserImpl implements Parser
     {
         return self::concatCallable(function (NamedArgumentImpl $a, NamedArgumentList $l) {
             return new NamedArgumentsImpl($a, $l);
-        }, $tokens, 'parseNamedArgument', self::generateTokenTester(Lexer::T_COMMA), 'parseNamedArgumentList');
+        }, $tokens, 'self::parseNamedArgument', self::generateTokenTester(Lexer::T_COMMA), 'self::parseNamedArgumentList');
 
     }
 
@@ -326,7 +325,7 @@ class ParserImpl implements Parser
     {
         return self::concatCallable(function (NameNotStartingWithUnderscoreImpl $n, ScalarArrayProgram $sap) {
             return new NamedArgumentImpl($n, $sap);
-        }, $tokens, 'parseNameNotStartingWithUnderscore', self::generateTokenTester(Lexer::T_COMMA), 'parseScalarArrayProgram');
+        }, $tokens, 'self::parseNameNotStartingWithUnderscore', self::generateTokenTester(Lexer::T_COMMA), 'self::parseScalarArrayProgram');
     }
 
     /**
@@ -335,7 +334,7 @@ class ParserImpl implements Parser
      */
     private static function parseScalarArrayProgram(array $tokens)
     {
-        return self::orCallable($tokens, 'parseScalar', 'parseArray', 'parseProgram');
+        return self::orCallable($tokens, 'self::parseScalar', 'self::parseArray', 'self::parseProgram');
     }
 
 
@@ -349,7 +348,7 @@ class ParserImpl implements Parser
                 return new ArrayImpl($e);
             }, $tokens,
             self::generateTokenTester(Lexer::T_L_BRACKET),
-            'parseAllArrayEntries',
+            'self::parseAllArrayEntries',
             self::generateTokenTester(Lexer::T_R_BRACKET)
         );
     }
@@ -360,7 +359,7 @@ class ParserImpl implements Parser
      */
     private static function parseAllArrayEntries(array $tokens)
     {
-        return self::orCallable($tokens, 'parseArrayEntry', 'parseNamedArrayEntry');
+        return self::orCallable($tokens, 'self::parseArrayEntry', 'self::parseNamedArrayEntry');
     }
 
     /**
@@ -369,7 +368,7 @@ class ParserImpl implements Parser
      */
     private static function parseArrayEntry(array $tokens)
     {
-        return self::orCallable($tokens, 'parseScalarArrayProgram', 'parseArrayEntries');
+        return self::orCallable($tokens, 'self::parseScalarArrayProgram', 'self::parseArrayEntries');
     }
 
     /**
@@ -381,9 +380,9 @@ class ParserImpl implements Parser
         return self::concatCallable(function (ScalarArrayProgram $sap, AllArrayEntries $e) {
                 return new ArrayEntriesImpl($sap, $e);
             }, $tokens,
-            'parseScalarArrayProgram',
+            'self::parseScalarArrayProgram',
             self::generateTokenTester(Lexer::T_COMMA),
-            'parseAllArrayEntries');
+            'self::parseAllArrayEntries');
     }
 
     /**
@@ -392,7 +391,7 @@ class ParserImpl implements Parser
      */
     private static function parseNamedArrayEntry(array $tokens)
     {
-        return self::orCallable($tokens, 'parseKeyArrowValue', 'parseNamedArrayEntries');
+        return self::orCallable($tokens, 'self::parseKeyArrowValue', 'self::parseNamedArrayEntries');
     }
 
     /**
@@ -404,9 +403,9 @@ class ParserImpl implements Parser
         return self::concatCallable(function (KeyArrowValueImpl $sap, AllArrayEntries $e) {
                 return new NamedArrayEntriesImpl($sap, $e);
             }, $tokens,
-            'parseKeyArrowValue',
+            'self::parseKeyArrowValue',
             self::generateTokenTester(Lexer::T_COMMA),
-            'parseAllArrayEntries');
+            'self::parseAllArrayEntries');
     }
 
     /**
@@ -418,9 +417,9 @@ class ParserImpl implements Parser
         return self::concatCallable(function (Scalar $s, ScalarArrayProgram $sap) {
                 return new KeyArrowValueImpl($s, $sap);
             }, $tokens,
-            'parseScalar',
+            'self::parseScalar',
             self::generateTokenTester(Lexer::T_DOUBLE_ARROW),
-            'parseScalarArrayProgram');
+            'self::parseScalarArrayProgram');
     }
 
     /**
@@ -429,7 +428,7 @@ class ParserImpl implements Parser
      */
     private static function parseScalar(array $tokens)
     {
-        return self::orCallable($tokens, 'parseBool', 'parseNull', 'parseNum', 'parseString', 'parseUnsignedNum');
+        return self::orCallable($tokens, 'self::parseBool', 'self::parseNull', 'self::parseNum', 'self::parseString', 'self::parseUnsignedNum');
     }
 
 
@@ -474,6 +473,17 @@ class ParserImpl implements Parser
      */
     private static function parseName(array $tokens)
     {
+
+        return self::orCallable($tokens, 'self::parseNameNotStartingWithUnderscore', 'self::parseNameStaringWithUnderscore');
+
+    }
+
+    /**
+     * @param array $tokens
+     * @return NameImpl
+     */
+    private static function parseNameStaringWithUnderscore(array $tokens)
+    {
         return self::expectGenerator(function ($t) {
             return new NameImpl($t);
         }, $tokens, Lexer::T_NAME);
@@ -488,7 +498,7 @@ class ParserImpl implements Parser
     {
         return self::concatCallable(function (UnsignedNum $num) use ($tokens) {
             return new NumImpl($tokens[0]['match'] == "-" ? NumImpl::SIGN_MINUS : NumImpl::SIGN_PLUS, $num);
-        }, $tokens, self::generateTokenTester(Lexer::T_SIGN), 'parseUnsignedNum');
+        }, $tokens, self::generateTokenTester(Lexer::T_SIGN), 'self::parseUnsignedNum');
     }
 
     /**
@@ -497,7 +507,7 @@ class ParserImpl implements Parser
      */
     private static function parseUnsignedNum(array $tokens)
     {
-        return self::orCallable($tokens, 'parseInteger', 'parseFloat');
+        return self::orCallable($tokens, 'self::parseInteger', 'self::parseFloat');
     }
 
     /**
@@ -506,7 +516,7 @@ class ParserImpl implements Parser
      */
     private static function parseInteger(array $tokens)
     {
-        return self::orCallable($tokens, 'parseOctal', 'parseDecimal', 'parseHexadecimal', 'parseBinary');
+        return self::orCallable($tokens, 'self::parseOctal', 'self::parseDecimal', 'self::parseHexadecimal', 'self::parseBinary');
     }
 
     /**
@@ -515,7 +525,7 @@ class ParserImpl implements Parser
      */
     private static function parseFloat(array $tokens)
     {
-        return self::orCallable($tokens, 'parseDoubleNumber', 'parseExpDoubleNumber');
+        return self::orCallable($tokens, 'self::parseDoubleNumber', 'self::parseExpDoubleNumber');
     }
 
     /**
@@ -524,7 +534,7 @@ class ParserImpl implements Parser
      */
     private static function parseString(array $tokens)
     {
-        return self::orCallable($tokens, 'parseSingleQuotedString', 'parseDoubleQuotedString');
+        return self::orCallable($tokens, 'self::parseSingleQuotedString', 'self::parseDoubleQuotedString');
     }
 
     /**
@@ -621,22 +631,23 @@ class ParserImpl implements Parser
      * @param callable $c1,...
      * @return mixed
      */
-    private static function orCallable(array $tokens, callable $c1)
+    private static function orCallable(array $tokens, $c1)
     {
-        if (func_num_args() <= 1) {
-            return null;
-        }
 
         $p = call_user_func($c1, $tokens);
         if ($p != null) {
             return $p;
         }
 
+        if(func_num_args() <= 2){
+            return null;
+        }
+
         $a = func_get_args();
         $t = array_shift($a);
         array_shift($a);
         array_unshift($a, $t);
-        return call_user_func_array('orCallable', $a);
+        return call_user_func_array('self::orCallable', $a);
 
     }
 
@@ -651,10 +662,10 @@ class ParserImpl implements Parser
 
         $a = func_get_args();
         array_shift($a);
-        $t = array_shift($a);
-        array_unshift($a, 0);
-        array_unshift($a, $t);
-        $args = call_user_func_array('concatCallableHelper', $a);
+        $args = call_user_func_array('self::concatCallableHelper', $a);
+        if($args == null){
+            return null;
+        }
         $newArgs = [];
         foreach ($args as $arg) {
             if (!is_object($arg)) {
@@ -673,7 +684,7 @@ class ParserImpl implements Parser
      * @return mixed
      */
 
-    private static function concatCallableHelper(array $tokens, callable $c1)
+    private static function concatCallableHelper(array $tokens, $c1)
     {
         $n = func_num_args();
 
@@ -682,18 +693,18 @@ class ParserImpl implements Parser
         }
 
         if ($n == 2) {
-            return [$c1($tokens)];
+            return [call_user_func($c1, $tokens)];
         }
 
         for ($i = 1; $i < count($tokens); $i++) {
 
-            $r = call_user_func($c1, array_splice($tokens, 0, $i));
+            $r = call_user_func($c1, array_slice($tokens, 0, $i));
             if ($r == null) {
                 continue;
             }
-            $a = array_merge([array_slice($tokens, $i)], array_splice(func_get_args(), 2));
-            $rest = call_user_func_array('concatCallableHelper', $a);
-            if (in_array(null, $rest)) {
+            $a = array_merge([array_slice($tokens, $i)], array_slice(func_get_args(), 2));
+            $rest = call_user_func_array('self::concatCallableHelper', $a);
+            if ($rest == null || in_array(null, $rest)) {
                 continue;
             }
             return array_merge([$r], $rest);
@@ -713,7 +724,7 @@ class ParserImpl implements Parser
             return null;
         }
 
-        return self::expect($tokens, $token) ? $constructor($token[0]['match']) : null;
+        return self::expect($tokens, $token) ? $constructor($tokens[0]['match']) : null;
     }
 
 
