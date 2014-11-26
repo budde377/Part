@@ -61,6 +61,7 @@ class ParserImpl implements Parser
      */
     public static function parse(array $tokens)
     {
+        //TODO clear whitespace
         return self::parseProgram($tokens);
     }
 
