@@ -24,6 +24,7 @@ class LexerImpl implements Lexer
         self::T_DOUBLE_QUOTED_STRING => '"(?:[^\\"]|\\.)*"',
         self::T_SINGLE_QUOTED_STRING => "'(?:[^\\']|\\.)*'",
         self::T_BOOL => "true|false",
+        self::T_SIGN => "[+-]",
         self::T_NULL => "null",
         self::T_L_PAREN => "\\(",
         self::T_R_PAREN => "\\)",

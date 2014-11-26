@@ -33,6 +33,7 @@ interface Lexer {
     const T_DOUBLE_ARROW = "T_DOUBLE_ARROW";
     const T_BACKSLASH = "T_BACKSLASH";
     const T_BOOL = "T_BOOL";
+    const T_SIGN = "T_SIGN";
 
 
     /**
