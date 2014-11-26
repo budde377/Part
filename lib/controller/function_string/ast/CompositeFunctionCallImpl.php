@@ -9,8 +9,6 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-use ChristianBudde\cbweb\controller\function_string\CompositeFunction;
-
 class CompositeFunctionCallImpl implements Program{
 
     private $target;

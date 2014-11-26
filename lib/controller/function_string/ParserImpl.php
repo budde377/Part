@@ -14,6 +14,7 @@ use ChristianBudde\cbweb\controller\function_string\ast\BinaryImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\BoolImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ChainCompositeFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\CompositeChainCompositeFunctionImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\CompositeFunction;
 use ChristianBudde\cbweb\controller\function_string\ast\CompositeFunctionCallImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\DecimalImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\DoubleNumberImpl;
@@ -156,7 +157,7 @@ class ParserImpl implements Parser
     private static function parseFunctionChain(array $tokens)
     {
 
-        return self::orCallable($tokens, 'self::parseFunctionChains', 'self::parseFunction');
+        return self::orCallable($tokens, 'self::parseFunction', 'self::parseFunctionChains' );
 
     }
 

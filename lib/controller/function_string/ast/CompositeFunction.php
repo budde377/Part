@@ -6,8 +6,7 @@
  * Time: 10:12 PM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string;
-
+namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 interface CompositeFunction {
 
