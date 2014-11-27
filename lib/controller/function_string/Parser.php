@@ -23,4 +23,10 @@ interface Parser
      */
     public static function parse(array $tokens);
 
+    /**
+     * @param string $input
+     * @return Program
+     */
+    public static function parseString($input);
+
 }

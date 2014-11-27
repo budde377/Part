@@ -9,6 +9,6 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface NamedArrayEntry {
+interface NamedArrayEntry extends AllArrayEntries{
 
 } 

@@ -9,6 +9,8 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
+use ChristianBudde\cbweb\controller\json\Type as JType;
+
 class TypeNameImpl implements Type{
 
     /** @var  NameImpl */
@@ -39,6 +41,11 @@ class TypeNameImpl implements Type{
     }
 
 
-
-
-} 
+    /**
+     * @return JType
+     */
+    public function toJSONTarget()
+    {
+        return "{$this->type->toJSONTarget()->getTypeString()}\\{$this->getName()}";
+    }
+}

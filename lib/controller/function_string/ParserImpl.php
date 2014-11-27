@@ -44,7 +44,6 @@ use ChristianBudde\cbweb\controller\function_string\ast\Target;
 use ChristianBudde\cbweb\controller\function_string\ast\Type;
 use ChristianBudde\cbweb\controller\function_string\ast\TypeNameImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\UnsignedNum;
-use ChristianBudde\cbweb\controller\json\TypeImpl;
 
 
 /**
@@ -55,6 +54,8 @@ use ChristianBudde\cbweb\controller\json\TypeImpl;
  */
 class ParserImpl implements Parser
 {
+
+
 
 
     /**
@@ -198,7 +199,7 @@ class ParserImpl implements Parser
         return self::runThrough([Lexer::T_DOT, Lexer::T_L_BRACKET], $tokens, function(FunctionChain $fc, FFunction $f){
             return new FunctionChainsImpl($fc, $f);
         }, function($i, array $tokens){
-            return self::parseFunctionChains(array_slice($tokens,0,$i));
+            return self::parseFunctionChain(array_slice($tokens,0,$i));
         }, function($i, array $tokens){
             return self::parseFunction(array_slice($tokens, $i));
         });
@@ -543,7 +544,7 @@ class ParserImpl implements Parser
      */
     private static function parseScalar(array $tokens)
     {
-        return self::orCallable($tokens, 'self::parseBool', 'self::parseNull', 'self::parseNum', 'self::parseString', 'self::parseUnsignedNum');
+        return self::orCallable($tokens, 'self::parseBool', 'self::parseNull', 'self::parseNum', 'self::parseStringScalar', 'self::parseUnsignedNum');
     }
 
 
@@ -649,7 +650,7 @@ class ParserImpl implements Parser
      * @param array $tokens
      * @return StringImpl
      */
-    private static function parseString(array $tokens)
+    private static function parseStringScalar(array $tokens)
     {
         return self::orCallable($tokens, 'self::parseSingleQuotedString', 'self::parseDoubleQuotedString');
     }
@@ -883,5 +884,14 @@ class ParserImpl implements Parser
 
         return $r;
 
+    }
+
+    /**
+     * @param string $input
+     * @return Program
+     */
+    public static function parseString($input)
+    {
+        return self::parse(LexerImpl::lex($input));
     }
 }

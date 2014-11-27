@@ -9,6 +9,8 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
+use ChristianBudde\cbweb\controller\json\CompositeFunction as JCompositeFunction;
+
 class CompositeFunctionCallImpl implements Program{
 
     private $target;
@@ -37,4 +39,11 @@ class CompositeFunctionCallImpl implements Program{
     }
 
 
-} 
+    /**
+     * @return JCompositeFunction
+     */
+    public function toJSONProgram()
+    {
+        // TODO: Implement toJSONProgram() method.
+    }
+}

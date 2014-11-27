@@ -9,6 +9,10 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
+use ChristianBudde\cbweb\controller\json\JSONFunction;
+use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
+use ChristianBudde\cbweb\controller\json\Type as JType;
+
 class FunctionCallImpl implements Program, Target{
 
     /** @var  Target */
@@ -39,6 +43,28 @@ class FunctionCallImpl implements Program, Target{
     }
 
 
+    /**
+     * @return JSONFunction
+     */
+    public function toJSONProgram()
+    {
+        if($this->function instanceof ArrayAccessFunctionImpl){
+            $name = "arrayAccess";
+        } else if($this->function instanceof ArgumentNamedFunction){
+            $name = $this->function->getName()->getValue();
+        } else {
+            return null;
+        }
+        $f = new JSONFunctionImpl($name, $this->target->toJSONTarget());
+        //TODO add arguments
+        return $f;
+    }
 
-
+    /**
+     * @return JType
+     */
+    public function toJSONTarget()
+    {
+        return $this->toJSONProgram();
+    }
 }
