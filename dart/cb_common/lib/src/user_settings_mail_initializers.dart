@@ -155,6 +155,7 @@ class UserSettingsMailInitializer extends core.Initializer {
       gas.add(ga);
 
       ga.onEmpty.listen((_) {
+        ul.hidden = true;
         if (gas.any((core.Generator g) => g.size > 0)) {
           return;
         }
@@ -162,6 +163,9 @@ class UserSettingsMailInitializer extends core.Initializer {
       });
 
       ga.onNotEmpty.listen((_) => g.element.classes.remove('empty'));
+      ga.onNotEmpty.listen((_){
+        ul.hidden = false;
+      });
       ga.onAdd.listen(sort);
 
       ga.onRemove.listen((core.Pair p) {
