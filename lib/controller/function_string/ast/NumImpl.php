@@ -9,7 +9,7 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class NumImpl implements Scalar
+class NumImpl extends Scalar
 {
 
     const SIGN_MINUS = 1;

@@ -9,7 +9,7 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class StringImpl implements Scalar{
+class StringImpl extends Scalar{
 
     private $value;
 

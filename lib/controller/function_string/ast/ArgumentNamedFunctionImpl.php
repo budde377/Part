@@ -9,7 +9,7 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class ArgumentNamedFunctionImpl implements ArgumentNamedFunction{
+class ArgumentNamedFunctionImpl extends ArgumentNamedFunction{
 
     /** @var  NameImpl */
     private $name;
@@ -40,5 +40,42 @@ class ArgumentNamedFunctionImpl implements ArgumentNamedFunction{
     }
 
 
+    /**
+     * @return ArgumentList[]
+     */
+    public function generateArgumentList()
+    {
+        return $this->argumentList->toArgumentList();
+    }
 
+    /**
+     * @return ArgumentImpl[]
+     */
+    public function generatePositionalArgumentList()
+    {
+        $r = [];
+        foreach($this->generateArgumentList() as $arg){
+            if($arg instanceof NamedArgumentImpl){
+                return $r;
+            }
+            $r[] = $arg;
+        }
+        return $r;
+
+    }
+
+    /**
+     * @return NamedArgumentImpl[]
+     */
+    public function generateNamedArgumentList()
+    {
+        $r = [];
+        foreach($this->generateArgumentList() as $arg){
+            if($arg instanceof ScalarArrayProgram){
+                continue;
+            }
+            $r[] = $arg;
+        }
+        return $r;
+    }
 }

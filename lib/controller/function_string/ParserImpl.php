@@ -2,13 +2,14 @@
 namespace ChristianBudde\cbweb\controller\function_string;
 
 use ChristianBudde\cbweb\controller\function_string\ast\AllArrayEntries;
+use ChristianBudde\cbweb\controller\function_string\ast\ArgumentImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArgumentList;
 use ChristianBudde\cbweb\controller\function_string\ast\ArgumentNamedFunction;
 use ChristianBudde\cbweb\controller\function_string\ast\ArgumentNamedFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArgumentsImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayAccessFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntriesImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntry;
+use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntryImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\BinaryImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\BoolImpl;
@@ -36,6 +37,7 @@ use ChristianBudde\cbweb\controller\function_string\ast\NoArgumentNamedFunctionI
 use ChristianBudde\cbweb\controller\function_string\ast\NullImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\NumImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\OctalImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\PositionalArrayEntry;
 use ChristianBudde\cbweb\controller\function_string\ast\Program;
 use ChristianBudde\cbweb\controller\function_string\ast\Scalar;
 use ChristianBudde\cbweb\controller\function_string\ast\ScalarArrayProgram;
@@ -353,9 +355,14 @@ class ParserImpl implements Parser
     private static function parseArgumentList(array $tokens)
     {
         return self::orCallable($tokens,
-            'self::parseScalarArrayProgram',
+            'self::parseArgument',
             'self::parseArguments',
             'self::parseNamedArgumentList');
+    }
+
+    private static function parseArgument(array $tokens){
+        $sap = self::parseScalarArrayProgram($tokens);
+        return $sap == null?null:new ArgumentImpl($sap);
     }
 
     /**
@@ -368,10 +375,10 @@ class ParserImpl implements Parser
             return null;
         }
 
-        return self::runThrough(Lexer::T_COMMA, $tokens, function (ScalarArrayProgram $sap, ArgumentList $argList){
-            return new ArgumentsImpl($sap, $argList);
+        return self::runThrough(Lexer::T_COMMA, $tokens, function (ArgumentImpl $arg, ArgumentList $argList){
+            return new ArgumentsImpl($arg, $argList);
         }, function ($i, array $tokens){
-            return self::parseScalarArrayProgram(array_slice($tokens, 0, $i));
+            return self::parseArgument(array_slice($tokens, 0, $i));
         }, function ($i, array $tokens){
             return self::parseArgumentList(array_slice($tokens, $i+1));
         });
@@ -431,7 +438,7 @@ class ParserImpl implements Parser
      */
     private static function parseScalarArrayProgram(array $tokens)
     {
-        return self::orCallable($tokens, 'self::parseScalar', 'self::parseArray', 'self::parseProgram');
+        return self::orCallable($tokens, 'self::parseScalar', 'self::parseArrayI', 'self::parseProgram');
     }
 
 
@@ -439,7 +446,7 @@ class ParserImpl implements Parser
      * @param array $tokens
      * @return ArrayImpl
      */
-    private static function parseArray(array $tokens)
+    private static function parseArrayI(array $tokens)
     {
         if(!self::expect($tokens, Lexer::T_L_BRACKET) || !self::expect($tokens, Lexer::T_R_BRACKET, -1)){
             return null;
@@ -455,16 +462,22 @@ class ParserImpl implements Parser
      */
     private static function parseAllArrayEntries(array $tokens)
     {
-        return self::orCallable($tokens, 'self::parseArrayEntry', 'self::parseNamedArrayEntry');
+        return self::orCallable($tokens, 'self::parsePositionalArrayEntry', 'self::parseNamedArrayEntry');
     }
 
     /**
      * @param array $tokens
-     * @return ArrayEntry
+     * @return PositionalArrayEntry
      */
-    private static function parseArrayEntry(array $tokens)
+    private static function parsePositionalArrayEntry(array $tokens)
     {
-        return self::orCallable($tokens, 'self::parseScalarArrayProgram', 'self::parseArrayEntries');
+        return self::orCallable($tokens, 'self::parseArrayEntry', 'self::parseArrayEntries');
+    }
+
+
+    private static function parseArrayEntry(array $tokens){
+        $sap = self::parseScalarArrayProgram($tokens);
+        return $sap == null?null:new ArrayEntryImpl($sap);
     }
 
     /**
@@ -477,10 +490,10 @@ class ParserImpl implements Parser
             return null;
         }
 
-        return self::runThrough(Lexer::T_COMMA, $tokens, function (ScalarArrayProgram $sap, AllArrayEntries $argList){
-            return new ArrayEntriesImpl($sap, $argList);
+        return self::runThrough(Lexer::T_COMMA, $tokens, function (ArrayEntryImpl $entry, AllArrayEntries $argList){
+            return new ArrayEntriesImpl($entry, $argList);
         }, function ($i, array $tokens){
-            return self::parseScalarArrayProgram(array_slice($tokens, 0, $i));
+            return self::parseArrayEntry(array_slice($tokens, 0, $i));
         }, function ($i, array $tokens){
             return self::parseAllArrayEntries(array_slice($tokens, $i+1));
         });
@@ -893,5 +906,23 @@ class ParserImpl implements Parser
     public static function parseString($input)
     {
         return self::parse(LexerImpl::lex($input));
+    }
+
+    /**
+     * @param array $tokens An assoc. array containing *match* and *token*
+     * @return Program
+     */
+    public static function parseArray(array $tokens)
+    {
+        return self::parseArray(self::clearWhitespace($tokens));
+    }
+
+    /**
+     * @param string $input
+     * @return Program
+     */
+    public static function parseArrayString($input)
+    {
+        return self::parseArray(LexerImpl::lex($input));
     }
 }

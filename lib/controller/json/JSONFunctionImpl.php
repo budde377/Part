@@ -13,18 +13,18 @@ class JSONFunctionImpl extends ProgramImpl implements JSONFunction
 
     private $name;
 
-    private $args = array();
-
-    private $size = 0;
+    private $args;
 
     /**
      * @param string $name
      * @param Target $target
+     * @param array $args
      */
-    function __construct($name, Target $target)
+    function __construct($name, Target $target, array $args = [])
     {
         parent::__construct($target);
         $this->name = $name;
+        $this->args = $args;
     }
 
 
@@ -69,62 +69,5 @@ class JSONFunctionImpl extends ProgramImpl implements JSONFunction
         return $this->name;
     }
 
-    /**
-     * Will set an argument with value
-     * @param int $num
-     * @param mixed $value
-     * @return void
-     */
-    public function setArg($num, $value)
-    {
 
-        if (!is_numeric($num)) {
-            return;
-        }
-        if (!$this->validValue($value)) {
-            return;
-        }
-
-        if ($this->size < $num) {
-            for ($i = $this->size; $i < $num; $i++) {
-                $this->args[$i] = null;
-            }
-        }
-        $this->size = $num + 1;
-        $this->args[$num] = $value;
-    }
-
-    /**
-     * Clears arguments
-     * @return void
-     */
-    public function clearArguments()
-    {
-        $this->size = 0;
-        $this->args = array();
-    }
-
-
-    /**
-     * @param string $name
-     * @return void
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * Sets the root target, i.e. calls recursively on target until target is not a function.
-     * @param Target $target
-     * @return void
-     */
-    public function setRootTarget(Target $target)
-    {
-        if($this->target instanceof JSONFunction){
-            $this->target->setTarget($target);
-        } else {
-            $this->setTarget($target);
-        }
-    }
 }

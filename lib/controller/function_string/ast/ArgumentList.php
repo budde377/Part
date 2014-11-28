@@ -11,4 +11,9 @@ namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 interface ArgumentList {
 
-} 
+    /**
+     * @return ArgumentList[]
+     */
+    public function toArgumentList();
+
+}

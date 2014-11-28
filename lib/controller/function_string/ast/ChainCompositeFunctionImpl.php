@@ -28,6 +28,12 @@ class ChainCompositeFunctionImpl implements CompositeFunction{
     }
 
 
-
-
-} 
+    /**
+     * @param Target $target
+     * @return FunctionCallImpl[]
+     */
+    public function toFunctionCalls(Target $target)
+    {
+        return [$this->functionChain->toFunctionCall($target)];
+    }
+}

@@ -9,7 +9,7 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class DoubleNumberImpl implements Float{
+class DoubleNumberImpl extends Float{
 
     private $value;
 

@@ -9,10 +9,10 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface ArgumentNamedFunction extends FFunction{
+abstract class ArgumentNamedFunction extends FFunction{
 
     /**
      * @return NameImpl
      */
-    public function getName();
+    abstract  public function getName();
 } 

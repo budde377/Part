@@ -9,6 +9,6 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface Float extends UnsignedNum{
+abstract class Float extends UnsignedNum{
 
 } 

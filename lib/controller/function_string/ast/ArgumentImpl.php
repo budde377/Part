@@ -2,31 +2,21 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/24/14
- * Time: 10:26 PM
+ * Date: 11/28/14
+ * Time: 12:55 PM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class NamedArgumentImpl implements NamedArgumentList{
-    /** @var  NameNotStartingWithUnderscoreImpl */
-    private $name;
+class ArgumentImpl implements ArgumentList{
+
     /** @var  ScalarArrayProgram */
     private $value;
 
-    function __construct(NameNotStartingWithUnderscoreImpl $name, ScalarArrayProgram $value)
+    function __construct(ScalarArrayProgram $value)
     {
-        $this->name = $name;
         $this->value = $value;
-    }
-
-    /**
-     * @return NameNotStartingWithUnderscoreImpl
-     */
-    public function getName()
-    {
-        return $this->name;
     }
 
     /**

@@ -11,4 +11,8 @@ namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 interface AllArrayEntries {
 
+    /**
+     * @return ScalarArrayProgram[]
+     */
+    public function toArray();
 } 

@@ -22,5 +22,29 @@ class NamedArgumentsImpl implements NamedArgumentList{
         $this->argumentList = $argumentList;
     }
 
+    /**
+     * @return NamedArgumentImpl
+     */
+    public function getArgument()
+    {
+        return $this->argument;
+    }
 
-} 
+    /**
+     * @return NamedArgumentList
+     */
+    public function getArgumentList()
+    {
+        return $this->argumentList;
+    }
+
+
+
+    /**
+     * @return ArgumentList[]
+     */
+    public function toArgumentList()
+    {
+        return array_merge($this->getArgument()->toArgumentList(), $this->getArgumentList()->toArgumentList());
+    }
+}

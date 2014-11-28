@@ -9,6 +9,12 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface ScalarArrayProgram extends ArgumentList, ArrayEntry{
+interface ScalarArrayProgram{
+
+    /**
+     * @param callable $programComputer
+     * @return mixed
+     */
+    public function compute(callable $programComputer);
 
 } 

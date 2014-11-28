@@ -13,7 +13,7 @@ use ChristianBudde\cbweb\controller\json\JSONFunction;
 use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
 use ChristianBudde\cbweb\controller\json\Type as JType;
 
-class FunctionCallImpl implements Program, Target{
+class FunctionCallImpl extends Program implements  Target{
 
     /** @var  Target */
     private $target;
@@ -55,8 +55,23 @@ class FunctionCallImpl implements Program, Target{
         } else {
             return null;
         }
-        $f = new JSONFunctionImpl($name, $this->target->toJSONTarget());
-        //TODO add arguments
+
+        $f = new JSONFunctionImpl($name, $this->target->toJSONTarget(), array_map(function(ArgumentList $argumentList){
+            if($argumentList instanceof NamedArgumentImpl || $argumentList instanceof ArgumentImpl){
+                $argumentList = $argumentList->getValue();
+            }
+
+            if($argumentList instanceof ScalarArrayProgram){
+                return $argumentList->compute(function (Program $program){
+                    return $program->toJSONProgram();
+                });
+            }
+            return null;
+
+        }, $this->function->generateArgumentList()));
+
+
+
         return $f;
     }
 
@@ -67,4 +82,6 @@ class FunctionCallImpl implements Program, Target{
     {
         return $this->toJSONProgram();
     }
+
+
 }

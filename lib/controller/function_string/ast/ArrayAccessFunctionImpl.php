@@ -9,7 +9,7 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class ArrayAccessFunctionImpl implements FFunction{
+class ArrayAccessFunctionImpl extends  FFunction{
 
     /** @var  ScalarArrayProgram */
     private $key;
@@ -28,6 +28,27 @@ class ArrayAccessFunctionImpl implements FFunction{
     }
 
 
+    /**
+     * @return ArgumentList[]
+     */
+    public function generateArgumentList()
+    {
+        return $this->generatePositionalArgumentList();
+    }
 
+    /**
+     * @return ScalarArrayProgram[]
+     */
+    public function generatePositionalArgumentList()
+    {
+        return [new ArgumentImpl($this->getKey())];
+    }
 
-} 
+    /**
+     * @return NamedArgumentImpl[]
+     */
+    public function generateNamedArgumentList()
+    {
+        return [];
+    }
+}

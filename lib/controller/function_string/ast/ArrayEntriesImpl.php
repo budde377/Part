@@ -9,17 +9,17 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class ArrayEntriesImpl implements ArrayEntry{
+class ArrayEntriesImpl implements PositionalArrayEntry{
 
-    /** @var  ScalarArrayProgram */
-    private $value;
+    /** @var  ArrayEntryImpl */
+    private $entry;
 
     /** @var  AllArrayEntries */
     private $arrayEntries;
 
-    function __construct(ScalarArrayProgram $value, AllArrayEntries$arrayEntries)
+    function __construct(ArrayEntryImpl $entry, AllArrayEntries $arrayEntries)
     {
-        $this->value = $value;
+        $this->entry = $entry;
         $this->arrayEntries = $arrayEntries;
     }
 
@@ -32,14 +32,19 @@ class ArrayEntriesImpl implements ArrayEntry{
     }
 
     /**
-     * @return ScalarArrayProgram
+     * @return ArrayEntryImpl
      */
-    public function getValue()
+    public function getEntry()
     {
-        return $this->value;
+        return $this->entry;
     }
 
 
-
-
-} 
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return array_merge($this->getEntry()->toArray(), $this->getArrayEntries()->toArray());
+    }
+}

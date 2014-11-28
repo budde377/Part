@@ -9,7 +9,31 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface FFunction extends FunctionChain{
+abstract class FFunction implements FunctionChain{
+
+    /**
+     * @return ArgumentList[]
+     */
+    abstract  public function generateArgumentList();
+
+    /**
+     * @return ArgumentImpl[]
+     */
+    abstract  public function generatePositionalArgumentList();
+
+    /**
+     * @return NamedArgumentImpl[]
+     */
+    abstract public function generateNamedArgumentList();
+
+    /**
+     * @param Target $target
+     * @return FunctionCallImpl
+     */
+    public function toFunctionCall(Target $target)
+    {
+        return new FunctionCallImpl($target, $this);
+    }
 
 
 } 

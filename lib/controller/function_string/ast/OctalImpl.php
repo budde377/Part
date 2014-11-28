@@ -9,7 +9,7 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class OctalImpl implements Integer{
+class OctalImpl extends Integer{
 
     private $value;
 

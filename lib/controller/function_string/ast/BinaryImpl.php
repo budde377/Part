@@ -9,7 +9,7 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class BinaryImpl implements Integer{
+class BinaryImpl extends Integer{
 
     private $value;
 

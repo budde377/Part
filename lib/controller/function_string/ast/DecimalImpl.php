@@ -9,7 +9,7 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class DecimalImpl implements Integer{
+class DecimalImpl extends Integer{
 
     private $value;
 

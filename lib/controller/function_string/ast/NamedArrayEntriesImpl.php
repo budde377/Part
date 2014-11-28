@@ -39,5 +39,11 @@ class NamedArrayEntriesImpl implements NamedArrayEntry{
     }
 
 
-
-} 
+    /**
+     * @return ScalarArrayProgram[]
+     */
+    public function toArray()
+    {
+        return array_merge($this->value->toArray(), $this->arrayEntries->toArray());
+    }
+}

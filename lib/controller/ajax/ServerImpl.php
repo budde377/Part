@@ -4,6 +4,7 @@ use ChristianBudde\cbweb\BackendSingletonContainer;
 use ChristianBudde\cbweb\controller\function_string\ParserImpl;
 use ChristianBudde\cbweb\controller\json\CompositeFunction;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
+use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
 use ChristianBudde\cbweb\controller\json\ParserImpl as JSONParser;
 use ChristianBudde\cbweb\controller\json\Program;
 use ChristianBudde\cbweb\controller\json\Response;
@@ -202,8 +203,10 @@ class ServerImpl implements Server
         $types = [];
         $instance = null;
 
-        foreach($function->getArgs() as $num => $arg){
+        $args = [];
+        foreach($function->getArgs() as $arg){
             if(!($arg instanceof Program)){
+                $args[] = $arg;
                 continue;
             }
 
@@ -212,9 +215,13 @@ class ServerImpl implements Server
                 return $argumentResponse;
             }
 
-            $function->setArg($num, $argumentResponse);
+            $args[] = $argumentResponse;
 
         }
+
+
+        $function = new JSONFunctionImpl($function->getName(), $target, $args);
+
 
         if ($target instanceof Type) {
 
@@ -224,7 +231,7 @@ class ServerImpl implements Server
             $types[] = $target->getTypeString();
 
         } else if ($target instanceof JSONFunction) {
-            $instance = $target === $targetOverride?$overrideInstance:$this->internalHandleFunction($target, $targetOverride, $overrideInstance);
+            $instance = $target == $targetOverride?$overrideInstance:$this->internalHandleFunction($target, $targetOverride, $overrideInstance);
             if(is_array($instance)){
                 $types = ['array'];
 

@@ -9,8 +9,19 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface Scalar extends ScalarArrayProgram{
+abstract class Scalar implements ScalarArrayProgram{
 
-    public function getValue();
+    abstract public function getValue();
+
+
+    /**
+     * @param callable $programComputer
+     * @return mixed
+     */
+    public function compute(callable $programComputer)
+    {
+        return $this->getValue();
+    }
+
 
 } 

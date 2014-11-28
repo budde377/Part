@@ -1,25 +1,24 @@
 <?php
 namespace ChristianBudde\cbweb\controller\ajax;
 use ChristianBudde\cbweb\BackendSingletonContainer;
-
-use ChristianBudde\cbweb\model\mail\Address;
-use ChristianBudde\cbweb\model\mail\Mailbox;
-use ChristianBudde\cbweb\model\updater\Updater;
-use ChristianBudde\cbweb\model\user\UserPrivileges;
-use ChristianBudde\cbweb\util\file\File;
-use ChristianBudde\cbweb\util\file\FileImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\ParserImpl;
-use ChristianBudde\cbweb\util\file\ImageFileImpl;
+use ChristianBudde\cbweb\controller\function_string\ParserImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
 use ChristianBudde\cbweb\controller\json\Response;
 use ChristianBudde\cbweb\controller\json\ResponseImpl;
-use ChristianBudde\cbweb\util\mail\Mail;
-use ChristianBudde\cbweb\util\mail\MailImpl;
+use ChristianBudde\cbweb\model\mail\Address;
+use ChristianBudde\cbweb\model\mail\Mailbox;
 use ChristianBudde\cbweb\model\page\Page;
 use ChristianBudde\cbweb\model\page\PageContent;
 use ChristianBudde\cbweb\model\page\PageOrder;
+use ChristianBudde\cbweb\model\updater\Updater;
 use ChristianBudde\cbweb\model\user\User;
 use ChristianBudde\cbweb\model\user\UserLibrary;
+use ChristianBudde\cbweb\model\user\UserPrivileges;
+use ChristianBudde\cbweb\util\file\File;
+use ChristianBudde\cbweb\util\file\FileImpl;
+use ChristianBudde\cbweb\util\file\ImageFileImpl;
+use ChristianBudde\cbweb\util\mail\Mail;
+use ChristianBudde\cbweb\util\mail\MailImpl;
 use ChristianBudde\cbweb\util\traits\ValidationTrait;
 
 /**
@@ -762,9 +761,7 @@ class BackendTypeHandlerImpl implements TypeHandler
             if(!is_string($string)){
                 return $string;
             }
-            $p = new ParserImpl();
-            $p->parseArray($string, $result);
-            return $result;
+            return ParserImpl::parseArrayString($string);
         });
     }
 

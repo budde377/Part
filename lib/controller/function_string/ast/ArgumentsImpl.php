@@ -11,14 +11,14 @@ namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 class ArgumentsImpl implements  ArgumentList{
 
-    /** @var  ScalarArrayProgram */
-    private $value;
+    /** @var  ArgumentImpl  */
+    private $argument;
     /** @var  ArgumentList */
     private $argumentList;
 
-    function __construct(ScalarArrayProgram $value, ArgumentList $argumentList)
+    function __construct(ArgumentImpl $argument, ArgumentList $argumentList)
     {
-        $this->value = $value;
+        $this->argument = $argument;
         $this->argumentList = $argumentList;
     }
 
@@ -31,14 +31,19 @@ class ArgumentsImpl implements  ArgumentList{
     }
 
     /**
-     * @return ScalarArrayProgram
+     * @return ArgumentImpl
      */
-    public function getValue()
+    public function getArgument()
     {
-        return $this->value;
+        return $this->argument;
     }
 
 
-
-
-} 
+    /**
+     * @return ArgumentList[]
+     */
+    public function toArgumentList()
+    {
+        return array_merge($this->getArgument()->toArgumentList(), $this->getArgumentList()->toArgumentList());
+    }
+}

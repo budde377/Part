@@ -9,7 +9,7 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class NoArgumentNamedFunctionImpl implements ArgumentNamedFunction{
+class NoArgumentNamedFunctionImpl extends ArgumentNamedFunction{
 
     /** @var  NameImpl */
     private $name;
@@ -28,5 +28,27 @@ class NoArgumentNamedFunctionImpl implements ArgumentNamedFunction{
     }
 
 
+    /**
+     * @return ArgumentList[]
+     */
+    public function generateArgumentList()
+    {
+        return [];
+    }
 
+    /**
+     * @return ScalarArrayProgram[]
+     */
+    public function generatePositionalArgumentList()
+    {
+        return [];
+    }
+
+    /**
+     * @return NamedArgumentImpl[]
+     */
+    public function generateNamedArgumentList()
+    {
+        return [];
+    }
 }

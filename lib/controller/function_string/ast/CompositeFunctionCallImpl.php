@@ -10,8 +10,10 @@ namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
 use ChristianBudde\cbweb\controller\json\CompositeFunction as JCompositeFunction;
+use ChristianBudde\cbweb\controller\json\CompositeFunctionImpl;
 
-class CompositeFunctionCallImpl implements Program{
+class CompositeFunctionCallImpl extends Program
+{
 
     private $target;
     private $compositeFunction;
@@ -44,6 +46,12 @@ class CompositeFunctionCallImpl implements Program{
      */
     public function toJSONProgram()
     {
-        // TODO: Implement toJSONProgram() method.
+        $f = new CompositeFunctionImpl($this->target->toJSONTarget(),
+            array_map(function (FunctionCallImpl $callImpl) {
+                return $callImpl->toJSONProgram();
+            }, $this->compositeFunction->toFunctionCalls($this->target)));
+        return $f;
     }
+
+
 }

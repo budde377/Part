@@ -28,6 +28,33 @@ class ArrayImpl implements ScalarArrayProgram{
     }
 
 
+    /**
+     * @return ArgumentList[]
+     */
+    public function toArgumentList()
+    {
+        return [$this];
+    }
 
+    /**
+     * @return ScalarArrayProgram[]
+     */
+    public function toArray()
+    {
+        return $this->arrayEntries->toArray();
+    }
 
-} 
+    /**
+     * @param callable $programComputer
+     * @return mixed
+     */
+    public function compute(callable $programComputer)
+    {
+        $r = [];
+        foreach($this->toArray() as $k=>$v){
+            $r[$k] = $v->compute($programComputer);
+        }
+
+        return $r;
+    }
+}

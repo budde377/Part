@@ -9,7 +9,7 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface Integer extends UnsignedNum{
+abstract class Integer extends UnsignedNum{
 
 
 } 

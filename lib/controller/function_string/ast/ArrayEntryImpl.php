@@ -2,33 +2,20 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/24/14
- * Time: 10:28 PM
+ * Date: 11/28/14
+ * Time: 12:15 PM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class KeyArrowValueImpl implements NamedArrayEntry{
-
-    /** @var  Scalar */
-    private $key;
-
+class ArrayEntryImpl implements PositionalArrayEntry {
     /** @var  ScalarArrayProgram */
     private $value;
 
-    function __construct(Scalar $key, ScalarArrayProgram $value)
+    function __construct(ScalarArrayProgram $value)
     {
-        $this->key = $key;
         $this->value = $value;
-    }
-
-    /**
-     * @return Scalar
-     */
-    public function getKey()
-    {
-        return $this->key;
     }
 
     /**
@@ -39,12 +26,13 @@ class KeyArrowValueImpl implements NamedArrayEntry{
         return $this->value;
     }
 
+
+
     /**
      * @return ScalarArrayProgram[]
      */
     public function toArray()
     {
-
-        return [$this->getKey()->getValue() => $this->getValue()];
+        return [$this->value];
     }
 }

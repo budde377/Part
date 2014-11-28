@@ -9,6 +9,6 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface UnsignedNum extends Scalar{
+abstract class UnsignedNum extends Scalar{
 
 } 

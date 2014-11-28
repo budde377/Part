@@ -7,13 +7,13 @@
  */
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\ajax\TypeHandler;
-use ChristianBudde\cbweb\controller\json\Element;
 use ChristianBudde\cbweb\controller\ajax\GenericObjectTypeHandlerImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\ParserImpl;
+use ChristianBudde\cbweb\controller\ajax\TypeHandler;
+use ChristianBudde\cbweb\controller\function_string\ParserImpl;
+use ChristianBudde\cbweb\controller\json\Element;
+use ChristianBudde\cbweb\controller\json\JSONFunction;
 use ChristianBudde\cbweb\controller\json\Object;
 use ChristianBudde\cbweb\controller\json\ObjectImpl;
-use ChristianBudde\cbweb\controller\json\JSONFunction;
 use ChristianBudde\cbweb\controller\json\Response;
 use ChristianBudde\cbweb\controller\json\ResponseImpl;
 use ChristianBudde\cbweb\model\page\Page;
@@ -29,8 +29,6 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
     private $handler;
 
     private $nullAJAXServer;
-    /** @var  ParserImpl */
-    private $parser;
     private $falseFunction;
     private $trueFunction;
 
@@ -40,7 +38,6 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->object = new ObjectImpl('someObject');
         $this->handler = new GenericObjectTypeHandlerImpl($this->object);
         $this->nullAJAXServer = new stub\NullAJAXServerImpl();
-        $this->parser = new ParserImpl();
         $this->falseFunction = function () {
             return false;
         };
@@ -243,7 +240,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
     {
         $this->handler->setUp($this->nullAJAXServer, 'Element');
         /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.getAsJSONString('test',123)");
+        $f = ParserImpl::parseString("Element.getAsJSONString('test',123)")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
 
     }
@@ -253,7 +250,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->setUp($this->nullAJAXServer, 'Element');
         $this->handler->whitelistFunction('Element', 'getAsArray');
         /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.getAsJSONString('test',123)");
+        $f = ParserImpl::parseString("Element.getAsJSONString('test',123)")->toJSONProgram();
         $this->assertFalse($this->handler->canHandle('Element', $f));
 
     }
@@ -265,7 +262,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->whitelistFunction('Element', 'getAsArray');
         $this->handler->addFunction('Element', 'custom', function(){return "success";});
         /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.custom()");
+        $f = ParserImpl::parseString("Element.custom()")->toJSONProgram();
         $this->assertFalse($this->handler->canHandle('Element', $f));
 
     }
@@ -275,7 +272,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
     {
         $this->handler->setUp($this->nullAJAXServer, 'Element');
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.nonExistingFunction('test',123)");
+        $f = ParserImpl::parseString("Element.nonExistingFunction('test',123)")->toJSONProgram();
         $this->assertFalse($this->handler->canHandle('Element', $f));
 
     }
@@ -285,7 +282,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->setUp($this->nullAJAXServer, 'Element');
 
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.getAsJSONString()");
+        $f = ParserImpl::parseString("Element.getAsJSONString()")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
         /** @var Response $r */
         $r = $this->handler->handle('Element', $f);
@@ -298,7 +295,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->setUp($this->nullAJAXServer, 'Element');
         $o = new ObjectImpl('someNewObject');
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.getAsJSONString()");
+        $f = ParserImpl::parseString("Element.getAsJSONString()")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f, $o));
         /** @var Response $r */
         $r = $this->handler->handle('Element', $f, $o);
@@ -314,7 +311,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
             $args = func_get_args();
         });
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.getAsJSONString('test',123)");
+        $f = ParserImpl::parseString("Element.getAsJSONString('test',123)")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
         /** @var Response $r */
         $this->handler->handle('Element', $f);
@@ -334,7 +331,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
             $args = func_get_args();
         });
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.getAsJSONString('test',123)");
+        $f = ParserImpl::parseString("Element.getAsJSONString('test',123)")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
         /** @var Response $r */
         $this->handler->handle('Element', $f);
@@ -354,7 +351,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
             $args = func_get_args();
         });
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.getAsJSONString('test',123)");
+        $f = ParserImpl::parseString("Element.getAsJSONString('test',123)")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
         /** @var Response $r */
         $this->handler->handle('Element', $f);
@@ -370,7 +367,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $handler = new GenericObjectTypeHandlerImpl($h = new StubAJAXTypeHandlerImpl());
         $handler->setUp(new NullAJAXServerImpl(), 'AJAXTypeHandler');
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString('AJAXTypeHandler.hasType("asd",123)');
+        $f = ParserImpl::parseString('AJAXTypeHandler.hasType("asd",123)')->toJSONProgram();
         $handler->handle('AJAXTypeHandler', $f);
 
         $this->assertEquals(['method' => 'hasType', 'arguments' => ['asd', 123]], $h->calledMethods[1]);
@@ -383,7 +380,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->setUp($this->nullAJAXServer, 'Element');
         $this->handler->addAuthFunction($this->falseFunction);
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.getAsJSONString('test',123)");
+        $f = ParserImpl::parseString("Element.getAsJSONString('test',123)")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
         /** @var Response $r */
         $r = $this->handler->handle('Element', $f);
@@ -397,7 +394,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->setUp($this->nullAJAXServer, 'Element');
         $this->handler->addFunctionAuthFunction('Element', 'getAsJSONString', $this->falseFunction);
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.getAsJSONString('test',123)");
+        $f = ParserImpl::parseString("Element.getAsJSONString('test',123)")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
         /** @var Response $r */
         $r = $this->handler->handle('Element', $f);
@@ -411,7 +408,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->setUp($this->nullAJAXServer, 'Element');
         $this->handler->addTypeAuthFunction('Element', $this->falseFunction);
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.getAsJSONString('test',123)");
+        $f = ParserImpl::parseString("Element.getAsJSONString('test',123)")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
         /** @var Response $r */
         $r = $this->handler->handle('Element', $f);
@@ -425,7 +422,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->setUp($this->nullAJAXServer, 'Element');
         $this->handler->addFunctionAuthFunction('Object', 'getAsJSONString', $this->falseFunction);
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.getAsJSONString('test',123)");
+        $f = ParserImpl::parseString("Element.getAsJSONString('test',123)")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
         /** @var \ChristianBudde\cbweb\controller\json\Response $r */
         $r = $this->handler->handle('Element', $f);
@@ -438,7 +435,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->setUp($this->nullAJAXServer, 'Element');
         $this->handler->addTypeAuthFunction('Object', $this->falseFunction);
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.getAsJSONString('test',123)");
+        $f = ParserImpl::parseString("Element.getAsJSONString('test',123)")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
         /** @var \ChristianBudde\cbweb\controller\json\Response $r */
         $r = $this->handler->handle('Element', $f);
@@ -455,7 +452,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
             $args = func_get_args();
         });
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.getAsJSONString(1,2,3)");
+        $f = ParserImpl::parseString("Element.getAsJSONString(1,2,3)")->toJSONProgram();
 
         $this->handler->handle('Element', $f);
         $this->assertEquals([$this->object, 1, 2, 3], $args);
@@ -486,7 +483,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
             $args = func_get_args();
         });
         /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.custom()");
+        $f = ParserImpl::parseString("Element.custom()")->toJSONProgram();
 
         $this->handler->handle('Element', $f);
         $this->assertEquals([
@@ -522,7 +519,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
             return [1];
         });
         /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.custom()");
+        $f = ParserImpl::parseString("Element.custom()")->toJSONProgram();
 
         $r = $this->handler->handle('Element', $f);
         $this->assertEquals([
@@ -565,7 +562,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $handler->setUp(new NullAJAXServerImpl(), 'User');
         /** @var JSONFunction $f */
 
-        $f = $this->parser->parseFunctionString('User.getName()');
+        $f = ParserImpl::parseString('User.getName()')->toJSONProgram();
 
         $r = $handler->handle('User', $f);
 
@@ -583,7 +580,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $handler->addFunction('User', 'custom', function () use (&$args) {
             $args = func_get_args();
         });
-        $f = $this->parser->parseFunctionString('User.custom(1,2,3)');
+        $f = ParserImpl::parseString('User.custom(1,2,3)')->toJSONProgram();
         $r = $handler->handle('User', $f);
         $this->assertNull($r);
         $this->assertEquals([null, 1, 2, 3], $args);
@@ -598,7 +595,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $list = $this->handler->listFunctions("Element");
         $this->assertContains("getInstance", $list);
         /** @var JSONFunction $function */
-        $function = $this->parser->parseFunctionString("Element.getInstance()");
+        $function = ParserImpl::parseString("Element.getInstance()")->toJSONProgram();
         $r = $this->handler->handle("Element", $function, $this);
         $this->assertTrue($this === $r);
     }
@@ -611,7 +608,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $list = $this->handler->listFunctions("Element");
         $this->assertContains("getInstance", $list);
         /** @var JSONFunction $function */
-        $function = $this->parser->parseFunctionString("Element.getInstance()");
+        $function = ParserImpl::parseString("Element.getInstance()")->toJSONProgram();
         $r = $this->handler->handle("Element", $function, $this);
         $this->assertTrue($this === $r);
     }
@@ -658,7 +655,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
             return false;
         });
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element.custom2()");
+        $f = ParserImpl::parseString("Element.custom2()")->toJSONProgram();
         $this->assertTrue($this->handler->handle('Element', $f));
 
 
@@ -671,7 +668,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->addFunction('Element', 'custom', function ($element, array $a) {
         });
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element . custom()");
+        $f = ParserImpl::parseString("Element . custom()")->toJSONProgram();
         $this->assertFalse($this->handler->canHandle('Element', $f));
     }
 
@@ -682,7 +679,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->addFunction('Element', 'custom', function ($element, array $a = []) {
         });
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element . custom()");
+        $f = ParserImpl::parseString("Element . custom()")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
     }
 
@@ -693,7 +690,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->addFunction('Element', 'custom', function ($element, Object $a = null) {
         });
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element . custom()");
+        $f = ParserImpl::parseString("Element . custom()")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
     }
 
@@ -703,7 +700,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->addFunction('Element', 'custom', function ($element, Object $a = null) {
         });
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element . custom(null)");
+        $f = ParserImpl::parseString("Element . custom(null)")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
     }
 
@@ -713,7 +710,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->addFunction('Element', 'custom', function ($element, Object $a = null, $s) {
         });
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element . custom(null,'some string')");
+        $f = ParserImpl::parseString("Element . custom(null,'some string')")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
     }
 
@@ -723,7 +720,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->addFunction('Element', 'custom', function ($element, array $a = [], $v) {
         });
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element . custom([])");
+        $f = ParserImpl::parseString("Element . custom([])")->toJSONProgram();
         $this->assertFalse($this->handler->canHandle('Element', $f));
     }
 
@@ -734,7 +731,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->addFunction('Element', 'custom', function ($element, array $a) {
         });
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element . custom('string')");
+        $f = ParserImpl::parseString("Element . custom('string')")->toJSONProgram();
         $this->assertFalse($this->handler->canHandle('Element', $f));
     }
 
@@ -744,7 +741,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->addFunction('Element', 'custom', function ($element, Page $a) {
         });
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element . custom('string')");
+        $f = ParserImpl::parseString("Element . custom('string')")->toJSONProgram();
         $this->assertFalse($this->handler->canHandle('Element', $f));
     }
 
@@ -757,7 +754,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
             $arguments[0] = new ObjectImpl('someName');
         });
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element . custom('string')");
+        $f = ParserImpl::parseString("Element . custom('string')")->toJSONProgram();
 
 
         $this->assertTrue($this->handler->canHandle('Element', $f));
@@ -769,7 +766,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->addFunction('Element', 'custom', function ($element, Page $a) {
         });
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString("Element . custom(null)");
+        $f = ParserImpl::parseString("Element . custom(null)")->toJSONProgram();
         $this->assertFalse($this->handler->canHandle('Element', $f));
     }
 
@@ -781,7 +778,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $handler->addFunction('JSONProgram', 'custom', function (array $a) {
         });
         /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
-        $f = $this->parser->parseFunctionString("JSONProgram . custom([])");
+        $f = ParserImpl::parseString("JSONProgram . custom([])")->toJSONProgram();
         $this->assertTrue($handler->canHandle('JSONProgram', $f));
     }
 
@@ -796,7 +793,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         });
 
         /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
-        $f = $this->parser->parseFunctionString("ProgramAlias . custom()");
+        $f = ParserImpl::parseString("ProgramAlias . custom()")->toJSONProgram();
         $this->assertTrue($handler->canHandle('ProgramAlias', $f));
         $this->assertEquals(1, $handler->handle('ProgramAlias', $f));
     }
@@ -812,7 +809,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         });
 
         /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
-        $f = $this->parser->parseFunctionString("ProgramAlias . custom()");
+        $f = ParserImpl::parseString("ProgramAlias . custom()")->toJSONProgram();
         $this->assertTrue($handler->canHandle('ProgramAlias', $f));
         $this->assertEquals(1, $handler->handle('ProgramAlias', $f));
     }

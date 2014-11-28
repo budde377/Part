@@ -13,6 +13,8 @@ class LexerImpl implements Lexer
 {
 
     private static $patterns = [
+        self::T_NULL => "null",
+        self::T_BOOL => "true|false",
         self::T_NAME_NOT_STARTING_WITH_UNDERSCORE => "[a-zA-Z][A-Za-z0-9_]*",
         self::T_NAME => "[a-zA-Z_][A-Za-z0-9_]*",
         self::T_OCTAL => "0[0-7]+",
@@ -23,9 +25,7 @@ class LexerImpl implements Lexer
         self::T_DECIMAL => "[0-9]+",
         self::T_DOUBLE_QUOTED_STRING => '"(?:[^\\"]|\\.)*"',
         self::T_SINGLE_QUOTED_STRING => "'(?:[^\\']|\\.)*'",
-        self::T_BOOL => "true|false",
         self::T_SIGN => "[+-]",
-        self::T_NULL => "null",
         self::T_L_PAREN => "\\(",
         self::T_R_PAREN => "\\)",
         self::T_L_BRACKET => "\\[",
@@ -62,14 +62,28 @@ class LexerImpl implements Lexer
 
     private static function match($input)
     {
+        $candidates = [];
         foreach (self::$patterns as $symbol => $pattern) {
             if (preg_match("/^($pattern)/",$input , $matches)) {
-                return [
+                $candidates[] = [
                     "match" => $matches[1],
                     "token" => $symbol
                 ];
             }
         }
-        return false;
+        if(count($candidates) == 0){
+            return false;
+        }
+        $largestLength = 0;
+        $largest = null;
+        foreach ($candidates as $candidate) {
+            $l = strlen($candidate['match']);
+            if($l > $largestLength){
+                $largestLength = $l;
+                $largest = $candidate;
+            }
+        }
+        return $largest;
+
     }
 }

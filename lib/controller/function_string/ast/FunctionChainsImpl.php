@@ -37,6 +37,12 @@ class FunctionChainsImpl implements FunctionChain{
     }
 
 
-
-
-} 
+    /**
+     * @param Target $target
+     * @return FunctionCallImpl
+     */
+    public function toFunctionCall(Target $target)
+    {
+        return new FunctionCallImpl($this->functionChain->toFunctionCall($target), $this->function);
+    }
+}

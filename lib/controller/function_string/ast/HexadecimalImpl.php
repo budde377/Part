@@ -9,7 +9,7 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class HexadecimalImpl implements Integer{
+class HexadecimalImpl extends Integer{
 
     private $value;
 

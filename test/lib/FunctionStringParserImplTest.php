@@ -1,10 +1,12 @@
 <?php
 namespace ChristianBudde\cbweb\test;
 
+use ChristianBudde\cbweb\controller\function_string\ast\ArgumentImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArgumentNamedFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArgumentsImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayAccessFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntriesImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntryImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ChainCompositeFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\CompositeChainCompositeFunctionImpl;
@@ -144,25 +146,27 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new FunctionCallImpl(
             new NameNotStartingWithUnderscoreImpl('A'),
             new ArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl('f'),
-                new ArgumentsImpl(new StringImpl('asd'),
-                    new ArgumentsImpl(new DecimalImpl(1),
+                new ArgumentsImpl(new ArgumentImpl(new StringImpl('asd')),
+                    new ArgumentsImpl(new ArgumentImpl(new DecimalImpl(1)),
                         new NamedArgumentImpl(new NameNotStartingWithUnderscoreImpl('a'), new DecimalImpl(5)))))
         ), $p);
     }
 
 
-    public function testArrays(){
+    public function testArrays()
+    {
         $l = LexerImpl::lex("A.f([1,2,3, 4=>5])");
         $p = ParserImpl::parse($l);
         $this->assertEquals(new FunctionCallImpl(
             new NameNotStartingWithUnderscoreImpl('A'),
             new ArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl('f'),
-                new ArrayImpl(
-                    new ArrayEntriesImpl(new DecimalImpl(1),
-                        new ArrayEntriesImpl(new DecimalImpl(2),
-                            new ArrayEntriesImpl(new DecimalImpl(3),
-                                new KeyArrowValueImpl(new DecimalImpl(4), new DecimalImpl(5))))))
-        )), $p);
+                new ArgumentImpl(
+                    new ArrayImpl(
+                        new ArrayEntriesImpl(new ArrayEntryImpl(new DecimalImpl(1)),
+                            new ArrayEntriesImpl(new ArrayEntryImpl(new DecimalImpl(2)),
+                                new ArrayEntriesImpl(new ArrayEntryImpl(new DecimalImpl(3)),
+                                    new KeyArrowValueImpl(new DecimalImpl(4), new DecimalImpl(5))))))
+                ))), $p);
 
     }
 }

@@ -38,6 +38,12 @@ class CompositeChainCompositeFunctionImpl implements CompositeFunction
     }
 
 
-
-
+    /**
+     * @param Target $target
+     * @return FunctionCallImpl[]
+     */
+    public function toFunctionCalls(Target $target)
+    {
+        return array_merge($this->compositeFunction->toFunctionCalls($target), [$this->functionChain->toFunctionCall($target)]);
+    }
 }
