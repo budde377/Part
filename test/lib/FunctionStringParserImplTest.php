@@ -7,7 +7,7 @@ use ChristianBudde\cbweb\controller\function_string\ast\ArgumentsImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayAccessFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntriesImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntryImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\ArrayImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\NonEmptyArrayImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ChainCompositeFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\CompositeChainCompositeFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\CompositeFunctionCallImpl;
@@ -161,7 +161,7 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
             new NameNotStartingWithUnderscoreImpl('A'),
             new ArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl('f'),
                 new ArgumentImpl(
-                    new ArrayImpl(
+                    new NonEmptyArrayImpl(
                         new ArrayEntriesImpl(new ArrayEntryImpl(new DecimalImpl(1)),
                             new ArrayEntriesImpl(new ArrayEntryImpl(new DecimalImpl(2)),
                                 new ArrayEntriesImpl(new ArrayEntryImpl(new DecimalImpl(3)),

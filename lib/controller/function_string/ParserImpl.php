@@ -1,6 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\controller\function_string;
 
+use ChristianBudde\cbweb\controller\function_string\ast\AArray;
 use ChristianBudde\cbweb\controller\function_string\ast\AllArrayEntries;
 use ChristianBudde\cbweb\controller\function_string\ast\ArgumentImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArgumentList;
@@ -10,7 +11,7 @@ use ChristianBudde\cbweb\controller\function_string\ast\ArgumentsImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayAccessFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntriesImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntryImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\ArrayImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\NonEmptyArrayImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\BinaryImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\BoolImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ChainCompositeFunctionImpl;
@@ -19,6 +20,7 @@ use ChristianBudde\cbweb\controller\function_string\ast\CompositeFunction;
 use ChristianBudde\cbweb\controller\function_string\ast\CompositeFunctionCallImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\DecimalImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\DoubleNumberImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\EmptyArrayImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ExpDoubleNumberImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\FFunction;
 use ChristianBudde\cbweb\controller\function_string\ast\FunctionCallImpl;
@@ -438,21 +440,31 @@ class ParserImpl implements Parser
      */
     private static function parseScalarArrayProgram(array $tokens)
     {
-        return self::orCallable($tokens, 'self::parseScalar', 'self::parseArrayI', 'self::parseProgram');
+        return self::orCallable($tokens, 'self::parseScalar', 'self::parseAArray', 'self::parseProgram');
     }
 
 
     /**
      * @param array $tokens
-     * @return ArrayImpl
+     * @return AArray
      */
-    private static function parseArrayI(array $tokens)
+    private static function parseAArray(array $tokens)
     {
         if(!self::expect($tokens, Lexer::T_L_BRACKET) || !self::expect($tokens, Lexer::T_R_BRACKET, -1)){
             return null;
         }
 
-        return ($a = self::parseAllArrayEntries(array_slice($tokens, 1, count($tokens)-2))) == null?null:new ArrayImpl($a);
+        return self::orCallable($tokens, 'self::parseEmptyArray', 'self::parseNonEmptyArray');
+
+    }
+
+    private static function parseEmptyArray(array $tokens){
+        return count($tokens) == 2?new EmptyArrayImpl():null;
+    }
+
+
+    private static function parseNonEmptyArray(array $tokens){
+        return ($a = self::parseAllArrayEntries(array_slice($tokens, 1, count($tokens)-2))) == null?null:new NonEmptyArrayImpl($a);
 
     }
 

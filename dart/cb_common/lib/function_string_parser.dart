@@ -4,52 +4,6 @@ library function_string_parser;
 import "dart:mirrors";
 import "dart:math" as Math;
 import "core.dart";
-/**
- * <program>                            = <composite_function_call> | <function_call>
- *
- * <composite_function_call>            = <target><composite_function>
- * <composite_function>                 = <chain_composite_function> | <composite_chain_composite_function>
- * <chain_composite_function>           = .<function_chain>
- * <composite_chain_composite_function> = <composite_function>.<function_chain>
- * <function_chain>                     = <function_chains> | <function>
- * <function_chains>                    = <function_chain><function>
- *
- * <function_call>                      = <target><function>
- * <function>                           = <arg_function> | <no_arg_function> | <array_access_function>
- * <no_arg_function>                    = .<name> ()
- * <arg_function>                       = .<name>(<arg_list>)
- * <array_access_function>              = \[<sap>\]
- * <target>                             = <function_call> | <type>
- * <type>                               = <name> | <type_name>
- * <type_name>                          = <type>\<name>
- * <arg_list>                           = <sap> | <args> | <named_arg_list>
- * <args>                               = <sap>, <arg_list>
- * <named_arg_list>                     = <named_arg> | <named_args>
- * <named_args>                         = <named_arg>, <named_arg_list>
- * <named_arg>                          = <name_nswu> : <sap>
- * <sap>                                = <scalar> | <array> | <program>
- * <array>                              = \[ <all_array_entries>\]
- * <all_array_entry>                    = <array_entry> | <named_array_entry>
- * <array_entry>                        = <sap> | <array_entries>
- * <array_entries>                      = <sap>, <all_array_entry>
- * <named_array_entry>                  = <key_arrow_value> | <named_array_entries>
- * <named_array_entries>                = <key_arrow_value>, <all_array_entries>
- * <key_arrow_value>                    = <scalar> => <sap>
- * <scalar>                             = true | false | null | <num> | <string>
- * <name_nswu>                          = [a-zA-Z0-9] | [a-zA-Z0-9]<name>
- * <name>                               = [a-zA-Z_][A-Za-z0-9_]*
- * <num>                                = [+-]? <unsigned_num>
- * <unsigned_num>                       = <integer> | <float>
- * <integer>                            = <octal> | <decimal> | <hexadecimal> | <binary>
- * <float>                              = <double_number> | <exp_double_number>
- * <string>                             = *single-quoted-php-string* | *double-quoted-php-string*
- * <decimal>                            = [0-9]+
- * <hexadecimal>                        = 0x[0-9A-Fa-f]
- * <octal>                              = 0[0-7]+
- * <binary>                             = 0b[0-1]+
- * <double_number>                      = [0-9]*[\.][0-9]*
- * <exp_double_number>                  = ([0-9]+|[0-9]*[\.][0-9]*)[eE][+-]?[0-9]+
- */
 
 
 Function _firstNotNull(Iterable<Function> l) => (String s) => l.fold(null, (prev, Function f) => prev != null ? prev : f(s));
@@ -457,7 +411,21 @@ _FSScalarArrayProgram _parseFSScalarArrayProgram(String s) => _firstNotNull([_pa
 /*
  * <array>                      = \[ <array_entries>\]
  */
-_FSArray _parseFSArray(String s) {
+
+_FSArray _parseFSArray(String s) => _firstNotNull([_parseFSEmptyArray, _parseFSNonEmptyArray])(s);
+
+_FSEmptyArray _parseFSEmptyArray(String s) {
+  if (!s.startsWith("[") || !s.endsWith("]")) {
+    return null;
+  }
+  if (s.substring(1, s.length - 1).trim() != "") {
+    return null;
+  }
+
+  return new _FSEmptyArray();
+}
+
+_FSNonEmptyArray _parseFSNonEmptyArray(String s) {
   if (!s.startsWith("[") || !s.endsWith("]")) {
     return null;
   }
@@ -468,7 +436,7 @@ _FSArray _parseFSArray(String s) {
     return null;
   }
 
-  return new _FSArray(entries);
+  return new _FSNonEmptyArray(entries);
 
 }
 /*
@@ -831,7 +799,18 @@ abstract class _FSScalarArrayProgram {
 
 }
 
-class _FSArray extends _FSScalarArrayProgram {
+
+abstract class _FSArray extends _FSScalarArrayProgram {
+
+  List<_FSArrayEntry> get entries;
+
+  bool get isList;
+
+  bool get isMap;
+
+}
+
+class _FSNonEmptyArray extends _FSArray {
   final _FSArrayEntry entry;
 
   List<_FSArrayEntry> get entries => entry.toEntryList();
@@ -869,9 +848,24 @@ class _FSArray extends _FSScalarArrayProgram {
 
   dynamic compute(dynamic computer(_FSProgram)) => isList ? computeList(computer) : computeMap(computer);
 
-  _FSArray(this.entry);
+  _FSNonEmptyArray(this.entry);
 
   String toString() => "[" + entry.toString() + "]";
+
+}
+
+class _FSEmptyArray extends _FSArray {
+
+  dynamic compute(dynamic computer(_FSProgram)) => [];
+
+  String toString() => "[]";
+
+  List<_FSArrayEntry> get entries => [];
+
+  bool get isList => true;
+
+  bool get isMap => false;
+
 
 }
 
@@ -1027,7 +1021,7 @@ class _RegisterArrayAccessFunction implements _RegisterFunction {
 
   _RegisterArrayAccessFunction(this.key);
 
-  _RegisterArrayAccessFunction.from(_FSArrayAccessFunction f,  dynamic convert(_FSProgram)) : this(f.scalar.compute(convert));
+  _RegisterArrayAccessFunction.from(_FSArrayAccessFunction f, dynamic convert(_FSProgram)) : this(f.scalar.compute(convert));
 
 }
 
@@ -1193,7 +1187,7 @@ class AliasRegisterHandler extends RegisterHandler {
   target.runFunction(type == this.type ? target.type : type, function, instance);
 
 
-  void removeWithTarget(){
+  void removeWithTarget() {
     super.remove();
     target.remove();
   }

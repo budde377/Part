@@ -9,7 +9,7 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class ArrayImpl implements ScalarArrayProgram{
+class NonEmptyArrayImpl implements AArray{
 
     /** @var  AllArrayEntries */
     private $arrayEntries;
@@ -27,14 +27,6 @@ class ArrayImpl implements ScalarArrayProgram{
         return $this->arrayEntries;
     }
 
-
-    /**
-     * @return ArgumentList[]
-     */
-    public function toArgumentList()
-    {
-        return [$this];
-    }
 
     /**
      * @return ScalarArrayProgram[]

@@ -48,40 +48,12 @@ class JSONCompositeFunctionImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->function1Target, $this->compositeFunction->getTarget());
     }
 
-    public function testSetTargetSets()
-    {
-        $this->compositeFunction->setTarget($this->function2);
-        $this->assertEquals($this->function2, $this->compositeFunction->getTarget());
-
-    }
 
     public function testListFunctionsReturnArray()
     {
         $array = $this->compositeFunction->listFunctions();
         $this->assertTrue(is_array($array));
         $this->assertEquals(0, count($array));
-    }
-
-    public function testAddFunctionAdds()
-    {
-        $this->compositeFunction->appendFunction($this->function1);
-        $this->assertEquals($this->function1, $this->compositeFunction->listFunctions()[0]);
-    }
-
-    public function testPrependFunctionPrepends()
-    {
-        $this->compositeFunction->prependFunction($this->function1);
-        $this->compositeFunction->prependFunction($this->function2);
-        $l = $this->compositeFunction->listFunctions();
-        $this->assertEquals($this->function2, $l[0]);
-        $this->assertEquals($this->function1, $l[1]);
-    }
-
-    public function testRemoveFunctionRemoves()
-    {
-        $this->compositeFunction->appendFunction($this->function1);
-        $this->compositeFunction->removeFunction($this->function1);
-        $this->assertEquals(0, count($this->compositeFunction->listFunctions()));
     }
 
 
@@ -102,12 +74,11 @@ class JSONCompositeFunctionImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetAsArrayReturnsRight()
     {
+        $f = new CompositeFunctionImpl($this->compositeFunction->getTarget(), array_merge($this->compositeFunction->listFunctions(), [$this->function1, $this->function2]));
+        $f->setId($id = 123);
 
-        $this->compositeFunction->setId($id = 123);
-        $this->compositeFunction->appendFunction($this->function1);
-        $this->compositeFunction->appendFunction($this->function2);
 
-        $array = $this->compositeFunction->getAsArray();
+        $array = $f->getAsArray();
 
         $this->assertTrue(is_array($array));
         $this->assertArrayHasKey('type', $array);
@@ -124,33 +95,5 @@ class JSONCompositeFunctionImplTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testGetAsJSONIsSimilarToArray()
-    {
-        $this->function2->setArg(0, "v0");
-        $this->function2->setArg(2, "v2");
-        $this->assertEquals(json_encode($this->compositeFunction->getAsArray()), $this->compositeFunction->getAsJSONString());
-    }
-
-
-    public function testCompositeFunctionSetsRootTarget()
-    {
-        $this->compositeFunction->setTarget($t1 = new TypeImpl("newType"));
-        $this->compositeFunction->appendFunction($this->function2);
-        $this->assertEquals($t1, $this->function1->getTarget());
-    }
-
-    public function testCompositeFunctionSetsRootTargetOnPrepend()
-    {
-        $this->compositeFunction->setTarget($t1 = new TypeImpl("newType"));
-        $this->compositeFunction->prependFunction($this->function2);
-        $this->assertEquals($t1, $this->function1->getTarget());
-    }
-
-    public function testCompositeFunctionUpdatesRootTarget()
-    {
-        $this->compositeFunction->appendFunction($this->function2);
-        $this->compositeFunction->setTarget($t1 = new TypeImpl("newType"));
-        $this->assertEquals($t1, $this->function1->getTarget());
-    }
 
 }
