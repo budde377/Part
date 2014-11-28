@@ -39,9 +39,14 @@ class UserSettingsMailInitializer extends core.Initializer {
 
     var gas = [];
 
+    var deletes = [];
+
     var deleteListener = (MailAddress a, LIElement li) {
       var delete = li.querySelector('.delete');
-
+      if(deletes.contains(delete)){
+        return;
+      }
+      deletes.add(delete);
       delete.onClick.listen((_) {
         dialogContainer.confirm("Er du sikker på at du vil slette? <br /> Hvis der er tilknyttet en mailbox vil den også blive slettet ugenopretteligt").result.then((bool b) {
           if (!b) {
