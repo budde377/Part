@@ -65,11 +65,12 @@ class LexerImpl implements Lexer
         $largestLength = 0;
         $largest = false; 
         foreach (self::$patterns as $symbol => $pattern) {
-            if (preg_match("/^($pattern)/",$input , $matches) && strlen($matches[1]) > $largestLength) {
+            if (preg_match("/^($pattern)/",$input , $matches) && ($l = strlen($matches[1])) > $largestLength) {
                 $largest = [
                     "match" => $matches[1],
                     "token" => $symbol
                 ];
+                $largestLength = $l;
             }
         }
         return $largest;
