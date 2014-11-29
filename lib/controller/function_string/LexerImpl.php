@@ -62,25 +62,14 @@ class LexerImpl implements Lexer
 
     private static function match($input)
     {
-        $candidates = [];
+        $largestLength = 0;
+        $largest = false; 
         foreach (self::$patterns as $symbol => $pattern) {
-            if (preg_match("/^($pattern)/",$input , $matches)) {
-                $candidates[] = [
+            if (preg_match("/^($pattern)/",$input , $matches) && strlen($matches[1]) > $largestLength) {
+                $largest = [
                     "match" => $matches[1],
                     "token" => $symbol
                 ];
-            }
-        }
-        if(count($candidates) == 0){
-            return false;
-        }
-        $largestLength = 0;
-        $largest = null;
-        foreach ($candidates as $candidate) {
-            $l = strlen($candidate['match']);
-            if($l > $largestLength){
-                $largestLength = $l;
-                $largest = $candidate;
             }
         }
         return $largest;
