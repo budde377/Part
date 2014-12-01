@@ -7,7 +7,7 @@ use ChristianBudde\cbweb\controller\function_string\ast\ArgumentsImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayAccessFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntriesImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntryImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\NonEmptyArrayImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\BoolImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ChainCompositeFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\CompositeChainCompositeFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\CompositeFunctionCallImpl;
@@ -19,6 +19,7 @@ use ChristianBudde\cbweb\controller\function_string\ast\NamedArgumentImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\NameImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\NameNotStartingWithUnderscoreImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\NoArgumentNamedFunctionImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\NonEmptyArrayImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\StringImpl;
 use ChristianBudde\cbweb\controller\function_string\LexerImpl;
 use ChristianBudde\cbweb\controller\function_string\ParserImpl;
@@ -38,6 +39,13 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
         $l = LexerImpl::lex("A.f()");
         $p = ParserImpl::parse($l);
         $this->assertEquals(new FunctionCallImpl(new NameNotStartingWithUnderscoreImpl("A"), new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("f"))), $p);
+    }
+
+    public function testParseProgramWithBoolArgument()
+    {
+        $l = LexerImpl::lex("A.f(true)");
+        $p = ParserImpl::parse($l);
+        $this->assertEquals(new FunctionCallImpl(new NameNotStartingWithUnderscoreImpl("A"), new ArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("f"), new ArgumentImpl(new BoolImpl(true)))), $p);
     }
 
     public function testParseFunctionChain()

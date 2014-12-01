@@ -11,7 +11,6 @@ use ChristianBudde\cbweb\controller\function_string\ast\ArgumentsImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayAccessFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntriesImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntryImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\NonEmptyArrayImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\BinaryImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\BoolImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ChainCompositeFunctionImpl;
@@ -36,6 +35,7 @@ use ChristianBudde\cbweb\controller\function_string\ast\NamedArrayEntry;
 use ChristianBudde\cbweb\controller\function_string\ast\NameImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\NameNotStartingWithUnderscoreImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\NoArgumentNamedFunctionImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\NonEmptyArrayImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\NullImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\NumImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\OctalImpl;
@@ -580,7 +580,7 @@ class ParserImpl implements Parser
     private static function parseBool(array $tokens)
     {
         return self::expectGenerator(function ($t) {
-            return new BoolImpl($t);
+            return new BoolImpl($t == "true");
         }, $tokens, Lexer::T_BOOL);
     }
 
