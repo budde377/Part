@@ -246,7 +246,7 @@ class UserSettingsMailInitializer extends core.Initializer {
     targets.value = a.targets.join(" ");
 
     a.owners.forEach((User u) {
-      CheckboxInputElement c = addAddressForm.querySelector('input[name=user_${u.username}');
+      CheckboxInputElement c = addAddressForm.querySelector('input[name=user_${u.username}]');
       c.checked = true;
     });
 
