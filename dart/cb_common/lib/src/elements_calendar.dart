@@ -3,15 +3,15 @@ part of elements;
 class Calendar {
   DateTime _showDate, _now = new DateTime.now();
 
-  final DivElement element = new DivElement(), nav = new DivElement(), leftNav = new DivElement(), rightNav = new DivElement();
+  final DivElement element, nav , leftNav , rightNav;
 
-  final SpanElement navText = new SpanElement();
+  final SpanElement navText;
 
-  TableElement _table = new TableElement();
+  final TableElement table;
 
   Map<int, TableCellElement> _cellMap = new Map<int, TableCellElement>();
 
-  Calendar() {
+  Calendar() : element = new DivElement(), nav = new DivElement(), leftNav = new DivElement(), rightNav = new DivElement(), table = new TableElement(), navText = new SpanElement(){
     date = _now;
     leftNav.classes..add('nav')..add('left_nav');
     leftNav.append(new DivElement());
@@ -23,7 +23,18 @@ class Calendar {
 
     nav..append(leftNav)..append(rightNav)..append(navText)..classes.add('calendar_nav');
 
-    element..append(nav)..append(_table)..classes.add('calendar');
+    element..append(nav)..append(table)..classes.add('calendar');
+  }
+
+  Calendar.fromElements(DivElement element, DivElement navDiv, TableElement calendarTable) :
+  leftNav = navDiv.querySelector('div.left_nav.nav'),
+  rightNav = navDiv.querySelector('div.right_nav.nav'),
+  table = calendarTable,
+  navText = navDiv.querySelector('span'),
+  this.element = element,
+  nav = navDiv
+  {
+    date = _now;
   }
 
   bool get showNav => nav.hidden;
@@ -54,14 +65,15 @@ class Calendar {
   set date(DateTime dt) {
     _showDate = dt;
     navText.text = _dateToString(_showDate);
-    _table.children.clear();
+    table.children.clear();
     var d = dt.subtract(new Duration(days:dt.day + ((dt.weekday - dt.day) % 7) - 1));
-    while (_table.children.length < 6) {
-      var row = _table.addRow();
+    while (table.children.length < 6) {
+      var row = table.addRow();
       for (var i = 0;i < 7;i++) {
         row.append(_createCell(d));
-        d = d.add(new Duration(days:1));
+        d = new DateTime(d.year, d.month, d.day+1);
       }
+      table.append(row);
     }
 
   }
