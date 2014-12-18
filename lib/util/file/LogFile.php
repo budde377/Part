@@ -14,10 +14,10 @@ interface LogFile extends File{
      * Will log a message and write to file.
      * @param string $message
      * @param int $level
-     * @param bool $createDumpFile
-     * @return null | DumpFile
+     * @param bool | DumpFile $createDumpFile
+     * @return int
      */
-    public function log($message, $level, $createDumpFile = false);
+    public function log($message, $level, &$createDumpFile = false);
 
     /**
      * @param int $level Use bitwise or to show multiple levels.

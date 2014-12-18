@@ -6,6 +6,7 @@ namespace ChristianBudde\cbweb\model\mail;
  * Date: 7/8/14
  * Time: 6:02 PM
  */
+use ChristianBudde\cbweb\controller\json\MailMailboxObjectImpl;
 use ChristianBudde\cbweb\util\db\DB;
 
 use ChristianBudde\cbweb\util\Observer;
@@ -261,5 +262,26 @@ class MailboxImpl implements Mailbox{
 
         $this->saveChangesStatement->execute(array(':name'=>$this->name, ':password'=>$this->password, ':id'=>$this->address->getId()));
         $this->setUp(true);
+    }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return Object
+     */
+    public function jsonObjectSerialize()
+    {
+        return new MailMailboxObjectImpl($this);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.4.0)<br/>
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     */
+    function jsonSerialize()
+    {
+        return $this->jsonObjectSerialize()->jsonSerialize();
     }
 }

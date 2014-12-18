@@ -4,7 +4,7 @@ abstract class JSONClient {
   String urlPrefix = "";
 
 
-  Future<JSONResponse> callFunctionString(String function, {void progress(double pct), FormData form_data:null});
+  FutureResponse callFunctionString(String function, {void progress(double pct), FormData form_data:null});
 }
 
 
@@ -16,27 +16,37 @@ class AJAXJSONClient extends JSONClient {
 
   AJAXJSONClient._internal();
 
-  Future<JSONResponse> _setUpRequest(HttpRequest request) {
+  FutureResponse _setUpRequest(HttpRequest request) {
     var completer = new Completer();
     request.onReadyStateChange.listen((Event e) {
       if (request.readyState != 4) {
         return;
       }
       debug(request.responseText);
-      Map responseObject = JSON.decode(request.responseText);
+      var responseObject;
+      try {
+        responseObject = JSON.decode(request.responseText);
+      } catch(e){
+        completer.complete(new Response.error(connection.hasConnection?Response.ERROR_CODE_COULD_NOT_PARSE_RESPONSE:Response.ERROR_CODE_NO_CONNECTION));
+        return;
+      }
       var response;
       if ((response = parseResponse(responseObject)) == null) {
-        completer.completeError(new Exception("Couldn't parse response"));
+        completer.complete(new Response.error(connection.hasConnection?Response.ERROR_CODE_COULD_NOT_PARSE_RESPONSE:Response.ERROR_CODE_NO_CONNECTION));
       } else {
         completer.complete(response);
       }
 
     });
-    return completer.future;
+    return new FutureResponse(completer.future);
   }
 
-  Future<JSONResponse> callFunctionString(String function, {void progress(num pct), FormData form_data:null}) {
-    var request = new HttpRequest();
+  FutureResponse callFunctionString(String function, {void progress(num pct), FormData form_data:null}) {
+    if(!connection.hasConnection){
+      return new FutureResponse.error(Response.ERROR_CODE_NO_CONNECTION);
+    }
+
+    var request = connection.buildRequest();
     var future = _setUpRequest(request);
     _registerProgressHandler(request, progress);
     var token = window.localStorage['user-login-token'];

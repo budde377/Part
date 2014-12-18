@@ -65,7 +65,7 @@ interface UserLibrary extends Iterator, JSONObjectSerializable
      * @abstract
      * Input must be instance of User and an instance provided by the library.
      * @param User $user
-     * @return User[] Array containing children User instances. Empty array on no children or input not valid.
+     * @return User[] Array containing all children (and children's children) as User instances. Empty array on no children or input not valid.
      */
     public function getChildren(User $user);
 

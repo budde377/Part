@@ -45,13 +45,14 @@ class ParserImpl implements Parser{
                 }
                 /** @var Target $target */
                 $target = $this->parseDecoded($obj['target']);
-                $function = new JSONFunctionImpl($obj['name'],$target );
+                $args = [];
+                foreach($obj['arguments'] as $key => $val){
+                    $args[$key] = $this->parseDecoded($val);
+                }
+
+                $function = new JSONFunctionImpl($obj['name'],$target, $args);
                 if($obj['id'] != null){
                     $function->setId($obj['id']);
-                }
-                foreach($obj['arguments'] as $key => $val){
-                    $decodedVal = $this->parseDecoded($val);
-                    $function->setArg($key, $decodedVal);
                 }
 
                 return $function;
@@ -81,12 +82,10 @@ class ParserImpl implements Parser{
                 }
                 /** @var Target  $target */
                 $target = $this->parseDecoded($obj['target']);
-                $compositeFunction = new CompositeFunctionImpl($target);
-                foreach($obj['functions'] as $f){
+                $compositeFunction = new CompositeFunctionImpl($target, array_map(function($f){
                     /** @var JSONFunction $func */
-                    $func = $this->parseDecoded($f);
-                    $compositeFunction->appendFunction($func);
-                }
+                    return $this->parseDecoded($f);
+                }, $obj['functions']));
                 if($obj['id'] != null){
                     $compositeFunction->setId($obj['id']);
                 }

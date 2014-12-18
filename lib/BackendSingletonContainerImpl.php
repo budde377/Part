@@ -267,7 +267,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getMailDomainLibraryInstance()
     {
         if ($this->mailDomainLibrary == null) {
-            $this->mailDomainLibrary = new DomainLibraryImpl($this->getConfigInstance(), $this->getDBInstance());
+            $this->mailDomainLibrary = new DomainLibraryImpl($this->getConfigInstance(), $this->getDBInstance(), $this->getUserLibraryInstance());
         }
 
         return $this->mailDomainLibrary;

@@ -17,24 +17,4 @@ interface CompositeFunction extends Program{
      */
     public function listFunctions();
 
-
-    /**
-     * @param JSONFunction $function
-     * @return void
-     */
-    public function appendFunction(JSONFunction $function);
-
-    /**
-     * @param JSONFunction $function
-     * @return void
-     */
-
-    public function prependFunction(JSONFunction $function);
-
-    /**
-     * @param JSONFunction $function
-     * @return void
-     */
-    public function removeFunction(JSONFunction $function);
-
 } 

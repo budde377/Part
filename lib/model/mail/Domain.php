@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\model\mail;
+use ChristianBudde\cbweb\controller\json\JSONObjectSerializable;
 use ChristianBudde\cbweb\util\Observable;
 
 /**
@@ -9,7 +10,7 @@ use ChristianBudde\cbweb\util\Observable;
  * Time: 9:32 AM
  */
 
-interface Domain extends Observable{
+interface Domain extends Observable, JSONObjectSerializable{
     const EVENT_DELETE = 2;
 
 

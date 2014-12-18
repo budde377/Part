@@ -2,6 +2,8 @@
 namespace ChristianBudde\cbweb\model\mail;
 
 use ChristianBudde\cbweb\Config;
+use ChristianBudde\cbweb\controller\json\MailDomainLibraryObjectImpl;
+use ChristianBudde\cbweb\model\user\UserLibrary;
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\util\Observable;
 use ChristianBudde\cbweb\util\Observer;
@@ -26,9 +28,11 @@ class DomainLibraryImpl implements DomainLibrary, Observer
     private $listDomainStatement;
     /** @var  PDO */
     private $connection;
+    private $userLibrary;
 
-    function __construct(Config $config, DB $db)
+    function __construct(Config $config, DB $db, UserLibrary $userLibrary)
     {
+        $this->userLibrary = $userLibrary;
         $this->databaseName = $config->getMySQLConnection()['database'];
         $this->db = $db;
         $this->connection = $db->getConnection();
@@ -67,13 +71,22 @@ class DomainLibraryImpl implements DomainLibrary, Observer
     {
         $d = $this->getDomain($domain);
         if ($d == null) {
-            $d = ($this->domainList[$domain] = new DomainImpl($domain, $this->databaseName, $this->db, $this));
-            $d->attachObserver($this);
+            $d = new DomainImpl($domain, $this->databaseName, $this->db, $this->userLibrary, $this);
+
+            if($d->create($password)){
+                $this->domainList[$domain] =$d;
+                $d->attachObserver($this);
+                return $d;
+            }
+
+        } else {
+            if($d->create($password)){
+                return $d;
+            }
         }
 
-        $d->create($password);
 
-        return $d;
+        return null;
     }
 
     /**
@@ -122,7 +135,7 @@ class DomainLibraryImpl implements DomainLibrary, Observer
         $this->domainList = array();
         foreach ($this->listDomainStatement->fetchAll(PDO::FETCH_ASSOC) as $d) {
             $domain = $d['domain'];
-            $d = ($this->domainList[$domain] = new DomainImpl($domain, $this->databaseName, $this->db, $this));
+            $d = ($this->domainList[$domain] = new DomainImpl($domain, $this->databaseName, $this->db, $this->userLibrary, $this));
             $d->attachObserver($this);
         }
 
@@ -138,5 +151,26 @@ class DomainLibraryImpl implements DomainLibrary, Observer
     {
         $this->setUpList();
         return isset($this->domainList[$domain->getDomainName()]) && $this->domainList[$domain->getDomainName()] === $domain;
+    }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return Object
+     */
+    public function jsonObjectSerialize()
+    {
+        return new MailDomainLibraryObjectImpl($this);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.4.0)<br/>
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     */
+    function jsonSerialize()
+    {
+        return $this->jsonObjectSerialize()->jsonSerialize();
     }
 }

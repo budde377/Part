@@ -8,8 +8,8 @@
 namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\controller\ajax\ArrayAccessTypeHandlerImpl;
-use ChristianBudde\cbweb\controller\json\JSONFunction;
 use ChristianBudde\cbweb\controller\function_string\ParserImpl;
+use ChristianBudde\cbweb\controller\json\JSONFunction;
 use PHPUnit_Framework_TestCase;
 
 class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase
@@ -17,7 +17,6 @@ class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase
 
     /** @var  \ChristianBudde\cbweb\controller\ajax\ArrayAccessTypeHandlerImpl */
     private $handler;
-    /** @var  \ChristianBudde\cbweb\controller\function_string\Parser */
     private $parser;
     /** @var  JSONFunction */
     private $function;
@@ -26,8 +25,10 @@ class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase
     {
         parent::setUp();
         $this->handler = new ArrayAccessTypeHandlerImpl();
-        $this->parser = new ParserImpl();
-        $this->function = $this->parser->parseFunctionString("POST.arrayAccess('id')");
+        $p = $this->parser = function ($string){
+            return ParserImpl::parseString($string)->toJSONProgram();
+        };
+        $this->function = $p("POST.arrayAccess('id')");
     }
 
 
@@ -37,7 +38,7 @@ class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->handler->canHandle('POST', $this->function));
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString('POST.otherFunction()');
+        $f = call_user_func($this->parser, ('POST.otherFunction()'));
         $this->assertFalse($this->handler->canHandle('POST', $f));
         $this->assertFalse($this->handler->canHandle('SomeOtherType', $this->function));
     }
@@ -55,11 +56,11 @@ class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase
     {
         $this->handler->addArray("POST", [1, 2, 3]);
         /** @var JSONFunction $f */
-        $f = $this->parser->parseFunctionString('POST.getVar(0)');
+        $f = call_user_func($this->parser, 'POST.getVar(0)');
         $this->assertEquals(1, $this->handler->handle('POST', $f));
-        $f = $this->parser->parseFunctionString('POST.getVar(1)');
+        $f = call_user_func($this->parser, 'POST.getVar(1)');
         $this->assertEquals(2, $this->handler->handle('POST', $f));
-        $f = $this->parser->parseFunctionString('POST.getVar(2)');
+        $f = call_user_func($this->parser, 'POST.getVar(2)');
         $this->assertEquals(3, $this->handler->handle('POST', $f));
     }
 

@@ -4,8 +4,6 @@ const USER_LIBRARY_CHANGE_DELETE = 1;
 const USER_LIBRARY_CHANGE_CREATE = 2;
 
 
-typedef void UserLibraryChangeListener(int changeType, User user);
-
 class UserLibraryChangeEvent {
   static const CHANGE_DELETE = 1;
   static const CHANGE_CREATE = 2;
@@ -17,11 +15,11 @@ class UserLibraryChangeEvent {
 
 }
 
-abstract class UserLibrary {
+abstract class UserLibrary extends GeneratorDependable<User>{
 
-  Future<ChangeResponse<User>> createUser(String mail, String privileges);
+  FutureResponse<User> createUser(String mail, String privileges);
 
-  Future<ChangeResponse<User>> deleteUser(String username);
+  FutureResponse<User> deleteUser(String username);
 
 
   Stream<UserLibraryChangeEvent> get onChange;
@@ -36,27 +34,26 @@ abstract class UserLibrary {
   Map<String, User> get pageUsers;
 
   User get userLoggedIn;
+
+  FutureResponse<String> userLogin(String username, String password);
+
+  FutureResponse forgotPassword(String password);
+
 }
 
-class JSONUserLibrary extends UserLibrary {
+class AJAXUserLibrary extends UserLibrary {
   final PageOrder pageOrder;
   String _userLoggedInId;
   Map<String, User> _users = <String, User>{
   };
   bool _hasBeenSetUp = false;
-  Stream<UserLibraryChangeEvent> _changeStream;
-  StreamController<UserLibraryChangeEvent> _changeController = new StreamController<UserLibraryChangeEvent>();
+  StreamController<UserLibraryChangeEvent> _changeController = new StreamController<UserLibraryChangeEvent>.broadcast();
+
+  StreamController<User>
+  _onUpdateController = new StreamController<User>.broadcast();
 
 
-/*
-  factory JSONUserLibrary(PageOrder pageOrder){
-    var library = _retrieveInstance(pageOrder);
-    library._setUp();
-
-  }
-*/
-
-  JSONUserLibrary(List<User> users, String currentUserName, PageOrder pageOrder) : this.pageOrder = pageOrder {
+  AJAXUserLibrary(List<User> users, String currentUserName, PageOrder pageOrder) : this.pageOrder = pageOrder {
     _setUpFromLists(users, currentUserName);
 
   }
@@ -77,32 +74,12 @@ class JSONUserLibrary extends UserLibrary {
 
   }
 
-/*
-  void _setUp() {
-    if (_hasBeenSetUp) {
-      return;
-    }
-    _hasBeenSetUp = true;
 
-    var function = new ListUsersJSONFunction();
-    var functionCallback = (JSONResponse response) {
-      if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
-        return;
-      }
-      _userLoggedInId = response.payload['user_logged_in'];
-
-      response.payload['users'].forEach((JSONObject o) => _addUserFromObjectToUsers(o,response.payload['page_privileges'].containsKey(o.variables['username'])?response.payload['page_privileges'][o.variables['username']]:[]));
-
-    };
-    ajaxClient.callFunction(function).then(functionCallback);
-  }
-*/
-
-  String _addUserFromObjectToUsers(JSONObject o, List<String> page_ids) {
-    var privilegesString = o.variables['privileges'];
-    var pages = page_ids.map((String id) => pageOrder.pages[id]);
-    var privileges = privilegesString == 'root' ? User.PRIVILEGE_ROOT : (privilegesString == 'site' ? User.PRIVILEGE_SITE : User.PRIVILEGE_PAGE);
-    var user = new JSONUser(o.variables['username'], o.variables['mail'], o.variables['parent'], o.variables['last-login'], privileges, pages);
+  String _addUserFromObjectToUsers(JSONObject o) {
+    JSONObject privilegesObject = o.variables['privileges'];
+    var pages = privilegesObject.variables['page_privileges'].map((String id) => pageOrder.pages[id]);
+    var privileges = privilegesObject.variables['root_privileges'] ? User.PRIVILEGE_ROOT : (privilegesObject.variables['site_privileges'] ? User.PRIVILEGE_SITE : User.PRIVILEGE_PAGE);
+    var user = new AJAXUser(o.variables['username'], o.variables['mail'], o.variables['parent'], o.variables['last-login'], privileges, pages);
     _addUserListener(user);
     _users[user.username] = user;
     return user.username;
@@ -126,20 +103,21 @@ class JSONUserLibrary extends UserLibrary {
       _users.remove(removeKey);
       _users[u.username] = u;
     });
+    user.onChange.listen((_) => _onUpdateController.add(user));
   }
 
-  Future<ChangeResponse<User>>createUser(String mail, String privileges) {
-    var completer = new Completer<ChangeResponse<User>>();
+  FutureResponse<User> createUser(String mail, String privileges) {
+    var completer = new Completer<Response<User>>();
     var functionCallback = (JSONResponse response) {
 
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         var o = response.payload;
-        var username = _addUserFromObjectToUsers(o, []);
+        var username = _addUserFromObjectToUsers(o);
         var user = _users[username];
         _callListeners(UserLibraryChangeEvent.CHANGE_CREATE, user);
-        completer.complete(new ChangeResponse<User>.success(user));
+        completer.complete(new Response<User>.success(user));
       } else {
-        completer.complete(new ChangeResponse<User>.error(response.error_code));
+        completer.complete(new Response<User>.error(response.error_code));
       }
 
     };
@@ -147,17 +125,17 @@ class JSONUserLibrary extends UserLibrary {
     return completer.future;
   }
 
-  Future<ChangeResponse<User>> deleteUser(String username) {
-    var completer = new Completer<ChangeResponse<User>>();
+  FutureResponse<User> deleteUser(String username) {
+    var completer = new Completer<Response<User>>();
     var functionCallback = (JSONResponse response) {
 
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         var user = _users[username];
         _users.remove(username);
         _callListeners(USER_LIBRARY_CHANGE_DELETE, user);
-        completer.complete(new ChangeResponse<User>.success(user));
+        completer.complete(new Response<User>.success(user));
       } else {
-        completer.complete(new ChangeResponse<User>.error(response.error_code));
+        completer.complete(new Response<User>.error(response.error_code));
       }
 
     };
@@ -165,7 +143,7 @@ class JSONUserLibrary extends UserLibrary {
     return completer.future;
   }
 
-  Stream<UserLibraryChangeEvent> get onChange => _changeStream == null ? _changeStream = _changeController.stream.asBroadcastStream() : _changeStream;
+  Stream<UserLibraryChangeEvent> get onChange => _changeController.stream;
 
   void _callListeners(int changeType, User user) {
     _changeController.add(new UserLibraryChangeEvent(user, changeType));
@@ -173,6 +151,8 @@ class JSONUserLibrary extends UserLibrary {
   }
 
   Map<String, User> get users => new Map.from(_users);
+
+  Iterable<User> get elements => _users.values;
 
   Map<String, User> get rootUsers => _generateUserList(User.PRIVILEGE_ROOT);
 
@@ -191,5 +171,23 @@ class JSONUserLibrary extends UserLibrary {
     });
     return retMap;
   }
+
+
+  FutureResponse<String> userLogin(String username, String password) {
+    var future = ajaxClient.callFunctionString('UserLibrary.userLogin(${quoteString(username)}, ${quoteString(password)})');
+    future.thenResponse(onSuccess:(Response response) {
+      _userLoggedInId = username;
+    });
+    return future;
+  }
+
+  FutureResponse forgotPassword(String password) => ajaxClient.callFunctionString('UserLibrary.forgotPassword(${quoteString(password)})');
+
+
+  Stream<User> get onAdd => onChange.where((UserLibraryChangeEvent evt)=>evt.type == UserLibraryChangeEvent.CHANGE_CREATE).map((UserLibraryChangeEvent evt) => evt.user);
+
+  Stream<User> get onRemove => onChange.where((UserLibraryChangeEvent evt)=>evt.type == UserLibraryChangeEvent.CHANGE_DELETE).map((UserLibraryChangeEvent evt) => evt.user);
+
+  Stream<User> get onUpdate => _onUpdateController.stream;
 
 }

@@ -5,10 +5,13 @@
  * Date: 7/8/14
  * Time: 6:08 PM
  */
-use ChristianBudde\cbweb\model\mail\AddressLibrary;
-use ChristianBudde\cbweb\model\mail\AddressImpl;
-use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
 use ChristianBudde\cbweb\model\mail\Address;
+use ChristianBudde\cbweb\model\mail\AddressImpl;
+use ChristianBudde\cbweb\model\mail\AddressLibrary;
+use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
+use ChristianBudde\cbweb\model\user\User;
+use ChristianBudde\cbweb\model\user\UserLibrary;
+use ChristianBudde\cbweb\model\user\UserLibraryImpl;
 use ChristianBudde\cbweb\test\stub\StubConfigImpl;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
 use ChristianBudde\cbweb\test\stub\StubObserverImpl;
@@ -28,9 +31,14 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
     private $domainLibrary;
     private $domain;
     private $mailPass;
-    /** @var  \ChristianBudde\cbweb\model\mail\AddressImpl */
+    /** @var  AddressImpl */
     private $address2;
-
+    /** @var  User */
+    private $owner1;
+    /** @var  User */
+    private $owner2;
+    /** @var  UserLibrary */
+    private $userLibrary;
 
     function __construct()
     {
@@ -57,12 +65,16 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
 
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db);
+        $this->userLibrary = new UserLibraryImpl($this->db);
+        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db, $this->userLibrary);
         $this->domain = $this->domainLibrary->getDomain('test.dk');
         $this->addressLibrary = $this->domain->getAddressLibrary();
         $this->address = $this->addressLibrary->getAddress('test');
         $this->address2 = $this->addressLibrary->getAddress('test2');
         $this->nonExistingAddress = $this->createAddress('test3');
+        $this->owner1 = $this->userLibrary->getUser('owner1');
+        $this->owner2 = $this->userLibrary->getUser('owner2');
+
     }
 
 
@@ -277,12 +289,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
 
     public function testGetTargetsReturnArrayOfTargets(){
         $ar = $this->address2->getTargets();
-        $this->assertTrue(is_array($ar));
-        $this->assertEquals(2, count($ar));
-        $this->assertArrayHasKey('test2@example.org', $ar);
-        $this->assertArrayHasKey('test@example.org', $ar);
-        $this->assertEquals('test@example.org', $ar['test@example.org']);
-        $this->assertEquals('test2@example.org', $ar['test2@example.org']);
+        $this->assertEquals(['test2@example.org', 'test@example.org'], $ar);
 
     }
 
@@ -329,8 +336,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
 
     public function testAddTargetAddsATarget(){
         $this->address->addTarget($t = 'test@test.dk');
-        $this->assertArrayHasKey($t, $ta = $this->address->getTargets());
-        $this->assertEquals($t, $ta[$t]);
+        $this->assertContains($t, $this->address->getTargets());
     }
 
     public function testAddTargetWillDoNothingIfTargetExists(){
@@ -347,14 +353,23 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
 
     public function testAddTargetWillTrim(){
         $this->address->addTarget(($t = 'test@test.dk').' ');
-        $this->assertArrayHasKey($t, $ta = $this->address->getTargets());
-        $this->assertEquals($t, $ta[$t]);
+        $this->assertContains($t, $this->address->getTargets());
     }
+
 
     public function testAddTargetWillBePersistent(){
         $this->address->addTarget('test@example.org');
         $adr = $this->createAddress('test');
         $this->assertTrue($adr->hasTarget('test@example.org'));
+    }
+
+
+    public function testTargetRemovedOnDelete(){
+        $this->address->addTarget('test@example.org');
+        $this->address->delete();
+        $this->assertFalse($this->address->hasTarget('test@example.org'));
+        $adr = $this->createAddress('test');
+        $this->assertFalse($adr->hasTarget('test@example.org'));
     }
 
 
@@ -421,15 +436,126 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
         $this->assertEquals('addressId2',$this->address->getId());
     }
 
+    public function testAddOwnerAddsOwner(){
+        $this->address->addOwner($this->owner1);
+        $this->address->addOwner($this->owner2);
+        $list = $this->address->listOwners();
+        $this->assertEquals([$this->owner1->getUsername(), $this->owner2->getUsername()], $list);
+    }
+
+    public function testIsOwnerIsTrueIfOwner(){
+        $this->assertFalse($this->address->isOwner($this->owner1));
+        $this->address->addOwner($this->owner1);
+        $this->assertTrue($this->address->isOwner($this->owner1));
+    }
+
+    public function testRemoveOwnerRemovesOwner(){
+        $this->address->addOwner($this->owner1);
+        $this->assertTrue($this->address->isOwner($this->owner1));
+        $this->address->removeOwner($this->owner1);
+        $this->assertFalse($this->address->isOwner($this->owner1));
+        $this->assertEquals(0, count($this->address->listOwners()));
+    }
+
+    public function testListOwnersWillUseUserLibraryIfProvided(){
+        $this->address->addOwner($this->owner1);
+        $list = $this->address->listOwners(true);
+        $this->assertTrue($this->owner1 === $list[0]);
+    }
+
+    public function testListOwnersReturnsArray(){
+        $list = $this->address->listOwners();
+        $this->assertTrue(is_array($list));
+        $this->assertEquals(0, count($list));
+    }
+
+    public function testIsOwnerIsUpToDateWithChangeOfUsername(){
+        $this->address->addOwner($this->owner1);
+        $this->owner1->setUsername("bob");
+        $this->assertTrue($this->address->isOwner($this->owner1));
+    }
+
+    public function testAddRemoveUserAndUpdateUsernameIsOk(){
+        $this->address->addOwner($this->owner1);
+        $this->address->removeOwner($this->owner1);
+        $this->owner1->setUsername("bob");
+        $this->assertFalse($this->address->isOwner($this->owner1));
+        $this->assertEquals(0, count($this->address->listOwners()));
+    }
+
+    public function testListOwnersIsUpToDateWithChangeOfUsername(){
+        $this->address->addOwner($this->owner1);
+        $this->owner1->setUsername("bob");
+        $list = $this->address->listOwners(true);
+        $this->assertTrue($this->owner1 === $list[0]);
+    }
+
+    public function testAddUserIsPersistent(){
+        $this->address->addOwner($this->owner1);
+        $address = $this->cloneAddress($this->address);
+        $this->assertTrue($address->isOwner($this->owner1));
+
+    }
+
+    public function testAddUserIsPersistentAndInList(){
+        $this->address->addOwner($this->owner1);
+        $address = $this->cloneAddress($this->address);
+        $this->assertContains($this->owner1, $address->listOwners(true));
+        $this->assertContains($this->owner1->getUsername(), $address->listOwners());
+
+    }
+
+    public function testAddUserIsPersistentAndUsernameUpdateOk(){
+        $this->address->addOwner($this->owner1);
+        $address = $this->cloneAddress($this->address);
+        $this->owner1->setUsername("bob");
+        $this->assertTrue($address->isOwner($this->owner1));
+    }
+
+    public function testRemoveUserIsPersistent(){
+        $this->address->addOwner($this->owner1);
+        $this->address->removeOwner($this->owner1);
+        $address = $this->cloneAddress($this->address);
+        $this->assertFalse($address->isOwner($this->owner1));
+
+    }
 
 
+    public function testRemoveOwnerIsOKWhenNotOwner(){
+        $this->address->removeOwner($this->owner1);
+    }
+
+    public function testAddOwnerWhenOwnerIsOk(){
+        $this->address->addOwner($this->owner1);
+        $this->address->addOwner($this->owner1);
+    }
+
+    public function testDeleteAddressRemovesOwners(){
+        $this->address->addOwner($this->owner1);
+        $this->address->delete();
+        $this->assertEquals([], $this->address->listOwners());
+    }
+
+    public function testCantAddOwnersToNonExisting(){
+        $this->address->delete();
+        $this->address->addOwner($this->owner1);
+        $this->assertEquals(0, count($this->address->listOwners()));
+    }
+
+    private function cloneAddress(Address $address){
+        return $this->createAddress($address->getLocalPart());
+    }
+    public function testReturnsRightJSONObject(){
+        $this->assertEquals($o = new \ChristianBudde\cbweb\controller\json\MailAddressObjectImpl($this->address), $this->address->jsonObjectSerialize());
+        $this->assertEquals($o->jsonSerialize(), $this->address->jsonSerialize());
+    }
     /**
      * @param string $string
      * @return AddressImpl
      */
     private function createAddress($string)
     {
-        return new AddressImpl($string, $this->db, $this->addressLibrary);
+        return new AddressImpl($string, $this->db, $this->userLibrary, $this->addressLibrary);
     }
 
 

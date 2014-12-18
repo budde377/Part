@@ -7,11 +7,13 @@
  */
 namespace ChristianBudde\cbweb\test;
 
+use ChristianBudde\cbweb\controller\json\MailDomainObjectImpl;
 use ChristianBudde\cbweb\model\mail\DomainImpl;
 use ChristianBudde\cbweb\Config;
 use ChristianBudde\cbweb\test\stub\StubConfigImpl;
 use ChristianBudde\cbweb\test\stub\StubMailDomainLibraryImpl;
 use ChristianBudde\cbweb\test\stub\StubObserverImpl;
+use ChristianBudde\cbweb\test\stub\StubUserLibraryImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\util\db\MySQLDBImpl;
@@ -38,7 +40,10 @@ class MailDomainImplTest extends CustomDatabaseTestCase
     private $domainLib;
 
     private $mailPass;
+
     private $databaseName;
+    /** @var  StubUserLibraryImpl */
+    private $userLibrary;
 
     function __construct()
     {
@@ -65,11 +70,13 @@ class MailDomainImplTest extends CustomDatabaseTestCase
         $this->db = new MySQLDBImpl($this->config);
         $this->databaseName = self::$mysqlOptions->getDatabase();
         $this->domainLib = new StubMailDomainLibraryImpl();
-        $this->domain = new DomainImpl('test.dk', $this->databaseName, $this->db, $this->domainLib);
-        $this->domain2 = new DomainImpl('test2.dk', $this->databaseName, $this->db, $this->domainLib);
+        $this->userLibrary = $userLibrary = new StubUserLibraryImpl();
+        $this->domain = new DomainImpl('test.dk', $this->databaseName, $this->db, $userLibrary, $this->domainLib);
+        $this->domain2 = new DomainImpl('test2.dk', $this->databaseName, $this->db, $userLibrary, $this->domainLib);
+        $this->domainLib->setDomainList(['test.dk'=>$this->domain, 'test2.dk'=>$this->domain2]);
         $this->modTime = strtotime("2000-01-01 13:00:00");
         $this->creaTime = strtotime("2000-01-01 12:00:00");
-        $this->nonCreatedDomain = new DomainImpl('non-existing.dk', $this->databaseName, $this->db, $this->domainLib);
+        $this->nonCreatedDomain = new DomainImpl('non-existing.dk', $this->databaseName, $this->db, $userLibrary, $this->domainLib);
 
     }
 
@@ -251,6 +258,18 @@ class MailDomainImplTest extends CustomDatabaseTestCase
         $this->assertFalse($this->domain->isAliasDomain());
     }
 
+    public function testCantSetUpCircularAliasTarget(){
+        $this->domain->setAliasTarget($this->domain2);
+        $this->assertFalse($this->domain->isAliasDomain());
+        $this->assertNull($this->domain->getAliasTarget());
+    }
+
+    public function testCantSetUpTargetToSelf(){
+        $this->domain->setAliasTarget($this->domain);
+        $this->assertFalse($this->domain->isAliasDomain());
+        $this->assertNull($this->domain->getAliasTarget());
+    }
+
     public function testDeleteCallsObservers()
     {
         $ob = new StubObserverImpl();
@@ -398,6 +417,10 @@ class MailDomainImplTest extends CustomDatabaseTestCase
         $this->assertTrue($this->domain->getAddressLibrary()->getDomainLibrary() === $this->domainLib);
     }
 
+    public function testReturnsRightJSONObject(){
+        $this->assertEquals($o = new MailDomainObjectImpl($this->domain), $this->domain->jsonObjectSerialize());
+        $this->assertEquals($o->jsonSerialize(), $this->domain->jsonSerialize());
+    }
 
     /**
      * @param DomainImpl $domain
@@ -405,7 +428,7 @@ class MailDomainImplTest extends CustomDatabaseTestCase
      */
     private function cloneDomain($domain)
     {
-        return new DomainImpl($domain->getDomainName(), $this->databaseName, $this->db, $this->domainLib);
+        return new DomainImpl($domain->getDomainName(), $this->databaseName, $this->db, $this->userLibrary,  $this->domainLib);
     }
 
 

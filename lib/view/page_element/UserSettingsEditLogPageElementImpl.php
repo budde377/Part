@@ -27,7 +27,6 @@ class UserSettingsEditLogPageElementImpl extends PageElementImpl{
         parent::generateContent();
 
         $log = $this->container->getLoggerInstance();
-       // $log->log(uniqid("MSG"),pow(2,rand(0,3)), rand(0,1));
         $rows = "";
         foreach($l = $log->listLog() as $entry){
             /** @var $entry array */

@@ -7,6 +7,9 @@
                 <li class='pages' title='Administrer sider'>&nbsp;</li>
                 <li class='user ' title='Rediger oplysninger'>&nbsp;</li>
                 <li class='users' title='Administrer brugere'>&nbsp;</li>
+                {% if config.mailMySQLConnection != null %}
+                    <li class='mail ' title='Administrer mailkonti'>&nbsp;</li>
+                {% endif %}
                 {% if config.updaterEnabled and  has_site_privileges %}
                     <li class='update_site' title='Opdater website'>&nbsp;</li>
                 {% endif %}
@@ -15,11 +18,10 @@
                 {% endif %}
                 {% block user_settings_menu %}
                 {% endblock %}
-                <!-- <li class='mail ' title='Administrer mailkonti'>&nbsp;</li>-->
             </ul>
         </div>
         <div id='UserSettingsContractLink'>&nbsp;</div>
-        <div id='UserSettingsContent'>
+        <div id='UserSettingsContent' class="disable_on_offline">
             <ul>
                 <li class="{{ inactive?"inactive":"" }}">
                     {% if inactive %}
@@ -40,6 +42,13 @@
                     <h2>Administrer Brugere</h2>
                     {% page_element ChristianBudde.cbweb.view.page_element.UserSettingsEditUsersPageElementImpl %}
                 </li>
+                {% if config.mailMySQLConnection != null %}
+                    <li>
+                        <h2>Administrer Mailkonti</h2>
+                        {% page_element ChristianBudde.cbweb.view.page_element.UserSettingsEditMailPageElementImpl %}
+
+                    </li>
+                {% endif %}
                 {% if config.updaterEnabled and  has_site_privileges %}
                     <li>
                         <h2>Opdater Website</h2>
@@ -65,5 +74,8 @@
     </div>
     <div id='LoginUserMessage'>
         Du er logget ind som <i>{{ current_user.username }}</i>, <a href='/logout'>log ud</a>.
+    </div>
+    <div id="OnlineOfflineIndicator" class="no_select">
+
     </div>
 {% endif %}

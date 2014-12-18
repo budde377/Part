@@ -1,5 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\model\mail;
+use ChristianBudde\cbweb\controller\json\MailDomainObjectImpl;
+use ChristianBudde\cbweb\model\user\UserLibrary;
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\util\Observable;
 use ChristianBudde\cbweb\util\Observer;
@@ -44,10 +46,12 @@ class DomainImpl implements Domain, Observer
 
     private $hasBeenSetup = false;
     private $aliasHasBeenSetup = false;
+    private $userLibrary;
 
 
-    function __construct($domain, $database, DB $db, DomainLibrary $library )
+    function __construct($domain, $database, DB $db,  UserLibrary $userLibrary, DomainLibrary $library)
     {
+        $this->userLibrary = $userLibrary;
         $this->observerLibrary = new ObserverLibraryImpl($this);
         $this->db = $db;
         $this->domain = $domain;
@@ -256,7 +260,7 @@ class DomainImpl implements Domain, Observer
      */
     public function getAddressLibrary()
     {
-        return $this->addressLibrary == null? $this->addressLibrary = new AddressLibraryImpl($this, $this->db):$this->addressLibrary;
+        return $this->addressLibrary == null? $this->addressLibrary = new AddressLibraryImpl($this,$this->userLibrary, $this->db):$this->addressLibrary;
     }
 
     /**
@@ -275,6 +279,11 @@ class DomainImpl implements Domain, Observer
     public function setAliasTarget(Domain $domain)
     {
         $this->setupAlias();
+
+        if($this === $domain){
+            return;
+        }
+
         if(!$domain->exists()){
             return;
         }
@@ -282,6 +291,15 @@ class DomainImpl implements Domain, Observer
         if(!$this->library->containsDomain($domain)){
             return;
         }
+
+        $t = $domain->getAliasTarget();
+        while($t != null){
+            if($t === $this){
+                return;
+            }
+            $t = $t->getAliasTarget();
+        }
+
 
         $this->aliasTarget = $domain;
         $domain->attachObserver($this);
@@ -439,5 +457,26 @@ class DomainImpl implements Domain, Observer
 
             $this->saveAliasChangesStatement2->execute(array($this->domain, $this->aliasTarget->getDomainName(), $this->aliasTarget->getDomainName()));
         }
+    }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return Object
+     */
+    public function jsonObjectSerialize()
+    {
+        return new MailDomainObjectImpl($this);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.4.0)<br/>
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     */
+    public function jsonSerialize()
+    {
+        return $this->jsonObjectSerialize()->jsonSerialize();
     }
 }

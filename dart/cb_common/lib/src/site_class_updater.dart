@@ -1,21 +1,21 @@
 part of site_classes;
 
 abstract class Updater {
-  Future<Response<bool>> checkForUpdates([bool quick = false]);
+  FutureResponse<bool> checkForUpdates([bool quick = false]);
 
-  Future<Response<Updater>> update();
+  FutureResponse<Updater> update();
 
-  Future<Response<DateTime>> lastChecked();
+  FutureResponse<DateTime> lastChecked();
 
-  Future<Response<DateTime>> lastUpdated();
+  FutureResponse<DateTime> lastUpdated();
 
-  Future<Response<String>> getVersion();
+  FutureResponse<String> getVersion();
 
-  Future<Response<Updater>> disallowCheckOnLogin();
+  FutureResponse<Updater> disallowCheckOnLogin();
 
-  Future<Response<Updater>> allowCheckOnLogin();
+  FutureResponse<Updater> allowCheckOnLogin();
 
-  Future<Response<bool>> isCheckOnLoginAllowed();
+  FutureResponse<bool> isCheckOnLoginAllowed();
 
 }
 
@@ -29,71 +29,71 @@ class AJAXUpdater extends Updater {
   AJAXUpdater._internal();
 
 
-  Future<Response<bool>> checkForUpdates([bool quick = false]) => ajaxClient.callFunctionString("Updater.checkForUpdates(${FunctionStringCompiler.compile(quick)})");
+  FutureResponse<bool> checkForUpdates([bool quick = false]) => ajaxClient.callFunctionString("Updater.checkForUpdates(${FunctionStringCompiler.compile(quick)})");
 
-  Future<Response<Updater>> update() {
+  FutureResponse<Updater> update() {
     var c = new Completer<Response<Updater>>();
     ajaxClient.callFunctionString("Updater.update()").then((Response r) {
       if (r.type == Response.RESPONSE_TYPE_SUCCESS) {
-        c.complete(new ChangeResponse.success(this));
+        c.complete(new Response.success(this));
       } else {
-        c.complete(new ChangeResponse.error(r.error_code));
+        c.complete(new Response.error(r.error_code));
       }
     });
-    return c.future;
+    return new FutureResponse(c.future);
   }
 
-  Future<Response<DateTime>> lastChecked() {
+  FutureResponse<DateTime> lastChecked() {
     var c = new Completer<Response<DateTime>>();
     ajaxClient.callFunctionString("Updater.lastChecked()").then((Response<int> r) {
       if (r.type == Response.RESPONSE_TYPE_SUCCESS) {
-        c.complete(new ChangeResponse.success(new DateTime.fromMillisecondsSinceEpoch(r.payload * 1000)));
+        c.complete(new Response.success(new DateTime.fromMillisecondsSinceEpoch(r.payload * 1000)));
       } else {
-        c.complete(new ChangeResponse.error(r.error_code));
+        c.complete(new Response.error(r.error_code));
       }
     });
-    return c.future;
+    return new FutureResponse(c.future);
   }
 
-  Future<Response<DateTime>> lastUpdated() {
+  FutureResponse<DateTime> lastUpdated() {
     var c = new Completer<Response<DateTime>>();
     ajaxClient.callFunctionString("Updater.lastChecked()").then((Response<int> r) {
       if (r.type == Response.RESPONSE_TYPE_SUCCESS) {
-        c.complete(new ChangeResponse.success(new DateTime.fromMillisecondsSinceEpoch(r.payload * 1000)));
+        c.complete(new Response.success(new DateTime.fromMillisecondsSinceEpoch(r.payload * 1000)));
       } else {
-        c.complete(new ChangeResponse.error(r.error_code));
+        c.complete(new Response.error(r.error_code));
       }
     });
-    return c.future;
+    return new FutureResponse(c.future);
   }
 
-  Future<Response<String>> getVersion() => ajaxClient.callFunctionString("Updater.getVersion()");
+  FutureResponse<String> getVersion() => ajaxClient.callFunctionString("Updater.getVersion()");
 
-  Future<Response<Updater>> disallowCheckOnLogin(){
+  FutureResponse<Updater> disallowCheckOnLogin(){
     var c = new Completer<Response<Updater>>();
     ajaxClient.callFunctionString("Updater.disallowCheckOnLogin()").then((Response r) {
       if (r.type == Response.RESPONSE_TYPE_SUCCESS) {
-        c.complete(new ChangeResponse.success(this));
+        c.complete(new Response.success(this));
       } else {
-        c.complete(new ChangeResponse.error(r.error_code));
+        c.complete(new Response.error(r.error_code));
       }
     });
-    return c.future;
+    return new FutureResponse(c.future);
   }
 
-  Future<Response<Updater>> allowCheckOnLogin(){
+  FutureResponse<Updater> allowCheckOnLogin(){
     var c = new Completer<Response<Updater>>();
     ajaxClient.callFunctionString("Updater.allowCheckOnLogin()").then((Response r) {
       if (r.type == Response.RESPONSE_TYPE_SUCCESS) {
-        c.complete(new ChangeResponse.success(this));
+        c.complete(new Response.success(this));
       } else {
-        c.complete(new ChangeResponse.error(r.error_code));
+        c.complete(new Response.error(r.error_code));
       }
     });
-    return c.future;
+    return new FutureResponse(c.future);
 
   }
 
-  Future<Response<bool>> isCheckOnLoginAllowed() => ajaxClient.callFunctionString("Updater.isCheckOnLoginAllowed()");
+  FutureResponse<bool> isCheckOnLoginAllowed() => ajaxClient.callFunctionString("Updater.isCheckOnLoginAllowed()");
 
 }

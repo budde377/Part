@@ -46,12 +46,6 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->function1, $this->function2->getTarget());
     }
 
-    public function testSetTargetSets()
-    {
-        $this->function1->setTarget($this->function2);
-        $this->assertEquals($this->function2, $this->function1->getTarget());
-
-    }
 
 
     public function testGetNameGets()
@@ -60,13 +54,6 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->function2Name, $this->function2->getName());
     }
 
-    public function testSetNameSets()
-    {
-        $name = "newName";
-        $this->function1->setName($name);
-        $this->assertEquals($name, $this->function1->getName());
-
-    }
 
     public function testGetArgumentIsNullPrDefault()
     {
@@ -94,83 +81,12 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(intval($id), $this->function1->getID());
     }
 
-    public function testSetArgumentSetsArgument()
-    {
-        $val = "LOL";
-        $this->function1->setArg(0, $val);
-        $this->assertEquals($val, $this->function1->getArg(0));
-    }
-
-    public function testSetArgumentsFillsArrayUpToInserted()
-    {
-        $val1 = "v1";
-        $val2 = "v2";
-        $this->function1->setArg(0, $val1);
-        $this->function1->setArg(4, $val2);
-        $this->assertEquals(5, count($array = $this->function1->getArgs()));
-        $this->assertTrue(isset($array[0]));
-        $this->assertTrue(isset($array[4]));
-        $this->assertEquals($val1, $array[0]);
-        $this->assertNull($array[1]);
-        $this->assertNull($array[2]);
-        $this->assertNull($array[3]);
-        $this->assertEquals($val2, $array[4]);
-    }
-
-    public function testWillNotSetArgumentWithNonNumericIndex()
-    {
-        $this->function1->setArg("test", "test");
-        $this->assertEquals(0, count($this->function1->getArgs()));
-    }
-
-
-    public function testWillNotSetNonScalarValue()
-    {
-        $this->function1->setArg(0, $this);
-        $this->assertEquals(0, count($this->function1->getArgs()));
-    }
-
-
-    public function testSetterWillNotSetArrayWithNonScalar()
-    {
-        $this->function1->setArg(0, array($this));
-        $this->assertEquals([null], $this->function1->getArg(0));
-    }
-
-    public function testSetterWillSetArrayContainingArraysOrScalars()
-    {
-        $variableValue = array("test", 'asd' => 'dsa', array(1, 2, 3), new NullJsonSerializableImpl());
-        $this->function1->setArg(0, $variableValue);
-        $this->assertEquals($variableValue, $this->function1->getArg(0));
-    }
-
-
-    public function testSetterWillSetArrayContainingJsonObjectSerializable()
-    {
-        $variableValue = new NullJSONObjectSerializableImpl();
-        $this->function1->setArg(0, $variableValue);
-        $this->assertEquals($variableValue, $this->function1->getArg(0));
-    }
-
-    public function testSetterWillSetArrayContainingJsonObjectSerializableInArray()
-    {
-        $variableValue = new NullJSONObjectSerializableImpl();
-        $this->function1->setArg(0, [[$variableValue]]);
-        $this->assertEquals([[$variableValue]], $this->function1->getArg(0));
-    }
-
-    public function testWillSetJSONElement()
-    {
-        $this->function1->setArg(0, $this->function2);
-        $this->assertEquals(1, count($this->function1->getArgs()));
-        $this->assertEquals($this->function2, $this->function1->getArg(0));
-    }
-
 
     public function testGetAsArrayReturnsRight()
     {
-        $this->function2->setArg(0, "v0");
-        $this->function2->setArg(2, "v2");
+
+
+        $this->function2 = new JSONFunctionImpl($this->function2->getName(), $this->function2->getTarget(), ["v0", null, "v2"]);
         $this->function2->setId($id = 123);
         $array = $this->function2->getAsArray();
 
@@ -191,72 +107,8 @@ class JSONFunctionImplTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testGetAsJSONIsSimilarToArray()
-    {
-        $this->function2->setArg(0, "v0");
-        $this->function2->setArg(2, "v2");
-        $this->assertEquals(json_encode($this->function2->getAsArray()), $this->function2->getAsJSONString());
-    }
 
 
-    public function testClearArgumentsClears()
-    {
-        $this->function1->setArg(0, "v0");
-        $this->function1->setArg(1, "v1");
-        $this->function1->clearArguments();
-        $this->assertEquals(array(), $this->function1->getArgs());
-    }
-
-    public function testSetArgumentAfterClearIsOk()
-    {
-        $this->function1->setArg(4, "v4");
-        $this->function1->clearArguments();
-        $this->function1->setArg(3, "v3");
-        $this->assertEquals(4, count($this->function1->getArgs()));
-    }
-
-
-    public function testSetArgumentToObjectIsOk()
-    {
-        $this->function1->setArg(0, $obj = new ObjectImpl("obj1"));
-        $this->assertTrue(strpos($this->function1->getAsJSONString(), $obj->getAsJSONString()) !== false);
-    }
-
-    public function testCorrectArgumentWithNullUnSets()
-    {
-        $this->function1->setArg(0, "test");
-        $this->function1->setArg(0, null);
-        $this->assertNull($this->function1->getArg(0));
-
-    }
-
-    public function testCorrectArgumentWithNullUnSetsFromArgumentList()
-    {
-        $this->function1->setArg(0, "test");
-        $this->function1->setArg(0, null);
-        $args = $this->function1->getArgs();
-        $this->assertEquals([null], $args);
-
-    }
-
-
-    public function testCorrectArgumentWithNullUnSetsFromArgumentListNotIfNotLast()
-    {
-        $this->function1->setArg(0, "test");
-        $this->function1->setArg(1, "test");
-        $this->function1->setArg(0, null);
-        $args = $this->function1->getArgs();
-        $this->assertEquals([null, "test"], $args);
-
-    }
-
-
-    public function testSetRootTargetSetsRootTarget()
-    {
-        $this->function2->setRootTarget($t = new TypeImpl("NewType"));
-        $this->assertEquals($this->function1, $this->function2->getTarget());
-        $this->assertEquals($t, $this->function1->getTarget());
-    }
 
 
 }

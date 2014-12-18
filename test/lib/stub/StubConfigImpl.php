@@ -275,4 +275,12 @@ class StubConfigImpl implements Config
         $this->AJAXTypeHandlers = $AJAXTypeHandlers;
     }
 
+    /**
+     * Returns true if mail support is enabled. Else false.
+     * @return bool
+     */
+    public function isMailManagementEnabled()
+    {
+        return $this->getMailMySQLConnection() != null;
+    }
 }

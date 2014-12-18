@@ -29,4 +29,20 @@ class UserPrivilegesJSONObjectImplTest extends PHPUnit_Framework_TestCase
 
 
     }
+    public function testConstructorWillSetVariables2()
+    {
+
+
+        $privileges = new StubUserPrivilegesImpl(true, false, true);
+        $privileges->pagePrivileges = ['page1', 'page2'];
+
+        $jsonObject = new UserPrivilegesObjectImpl($privileges);
+
+        $this->assertEquals('user_privileges', $jsonObject->getName());
+        $this->assertTrue($jsonObject->getVariable('root_privileges'));
+        $this->assertFalse($jsonObject->getVariable('site_privileges'));
+        $this->assertEquals($privileges->pagePrivileges, $jsonObject->getVariable('page_privileges'));
+
+
+    }
 }

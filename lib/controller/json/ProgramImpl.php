@@ -29,15 +29,6 @@ abstract class ProgramImpl extends ElementImpl implements Program{
         $this->id = intval($id);
     }
 
-    /**
-     * @param Target $target
-     * @return void
-     */
-    public function setTarget(Target $target)
-    {
-        $this->target = $target;
-    }
-
 
     /**
      * @return string | JSONFunction

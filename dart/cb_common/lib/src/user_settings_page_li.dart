@@ -183,7 +183,7 @@ class UserSettingsPageLi {
         }
         li.classes.add('blur');
         var i = savingBar.startJob();
-        _pageOrder.deletePage(page.id).then((ChangeResponse response) {
+        _pageOrder.deletePage(page.id).then((core.Response response) {
           li.classes.remove('blur');
           savingBar.endJob(i);
         });

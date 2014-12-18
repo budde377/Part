@@ -1,13 +1,22 @@
-update: install-composer
+update: install-composer update-pub update-dart
+
+update-pub:
 	@echo "### Upgrading PUB###"
 	export HOME=/home/www-data/; cd dart/*/; pub upgrade
+
+update-dart:
 	@echo "### Building JavaScript files ###"
 	find dart/ -type f -name 'main*.dart' -exec dart2js {} --minify -o  {}.js \;
 
 
-update-dev: update-composer-dev
+update-dev: update-composer-dev update-pub-dev update-dart-dev
+
+update-pub-dev:
 	@echo "### Upgrading PUB###"
 	cd dart/*/; pub upgrade
+
+
+update-dart-dev:
 	@echo "### Building JavaScript files ###"
 	find dart/ -type f -name 'main*.dart' -exec dart2js {} -o {}.js \;
 

@@ -13,9 +13,9 @@ use ChristianBudde\cbweb\model\page\PageContent;
 class PageContentObjectImpl extends ContentObjectImpl
 {
 
-    function __construct(PageContent $pageContent)
+    function __construct(PageContent $domainLibraryContent)
     {
-        parent::__construct($pageContent);
+        parent::__construct($domainLibraryContent);
         $this->name = "page_content";
     }
 }

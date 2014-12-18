@@ -6,6 +6,9 @@ namespace ChristianBudde\cbweb\model\mail;
  * Date: 7/7/14
  * Time: 11:17 PM
  */
+
+use ChristianBudde\cbweb\controller\json\MailAddressLibraryObjectImpl;
+use ChristianBudde\cbweb\model\user\UserLibrary;
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\util\Observable;
 use ChristianBudde\cbweb\util\Observer;
@@ -19,12 +22,14 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
     private $domainName;
 
     private $setupStatement;
+    private $userLibrary;
 
-    function __construct(Domain $domain, DB $db)
+    function __construct(Domain $domain, UserLibrary $userLibrary, DB $db)
     {
         $this->db = $db;
         $this->domain = $domain;
         $this->domainName = $domain->getDomainName();
+        $this->userLibrary = $userLibrary;
 
     }
 
@@ -49,10 +54,19 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      * @param string $localPart
      * @return bool
      */
-    public function hasAddress($localPart)
+    public function hasAddressWithLocalPart($localPart)
     {
         $this->setUpLibrary();
         return isset($this->addressList[trim($localPart)]);
+    }
+
+    /**
+     * @param Address $address
+     * @return bool
+     */
+    public function hasAddress(Address $address)
+    {
+        return array_search($address, $this->addressList, true ) !== false;
     }
 
     /**
@@ -80,6 +94,11 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      */
     public function deleteAddress(Address $address)
     {
+        if($address === $this->getCatchallAddress()){
+            $this->deleteCatchallAddress();
+            return;
+        }
+
         if(!$this->contains($address)){
             return;
         }
@@ -93,10 +112,10 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      */
     public function createAddress($localPart)
     {
-        if($this->hasAddress($localPart)){
+        if($this->hasAddressWithLocalPart($localPart)){
             return $this->getAddress($localPart);
         }
-        $a = new AddressImpl($localPart, $this->db, $this);
+        $a = new AddressImpl($localPart, $this->db, $this->userLibrary, $this);
         $a->create();
         $this->addInstance($a);
         return $a;
@@ -125,11 +144,12 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
     public function createCatchallAddress()
     {
         if($this->hasCatchallAddress()){
-            return;
+            return $this->getCatchallAddress();
         }
-        $address = new AddressImpl('', $this->db, $this);
+        $address = new AddressImpl('', $this->db, $this->userLibrary, $this);
         $address->create();
         $this->addInstance($address);
+        return $address;
     }
 
     /**
@@ -182,7 +202,7 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
         $this->setupStatement->execute();
 
         foreach($this->setupStatement->fetchAll(PDO::FETCH_ASSOC) as $row){
-            $a = new AddressImpl($row['name'], $this->db, $this);
+            $a = new AddressImpl($row['name'], $this->db,$this->userLibrary, $this);
             $this->addInstance($a);
         }
 
@@ -194,7 +214,7 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      */
     public function contains(Address $address)
     {
-        return $this->hasAddress($l = $address->getLocalPart()) && $this->getAddress($l) === $address;
+        return $this->hasAddress($address);
     }
 
     private function addInstance(AddressImpl $instance)
@@ -206,6 +226,8 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
     public function onChange(Observable $subject, $changeType)
     {
         if(!($subject instanceof Address) || !$this->contains($subject)){
+         //todo fix
+         return;
         }
 
         if($changeType == Address::EVENT_DELETE){
@@ -218,5 +240,26 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
             $this->addressList[$subject->getLocalPart()] = $this->addressList[$oldKey];
             unset($this->addressList[$oldKey]);
         }
+    }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return Object
+     */
+    public function jsonObjectSerialize()
+    {
+        return new MailAddressLibraryObjectImpl($this);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.4.0)<br/>
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     */
+    function jsonSerialize()
+    {
+        return $this->jsonObjectSerialize()->jsonSerialize();
     }
 }

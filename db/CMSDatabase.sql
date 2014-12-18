@@ -1,13 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 3.4.10.1deb1
+-- version 4.0.10deb1
 -- http://www.phpmyadmin.net
 --
 -- Vært: localhost
--- Genereringstid: 09. 07 2014 kl. 13:24:55
--- Serverversion: 5.5.35
--- PHP-version: 5.5.14-1+deb.sury.org~precise+1
+-- Genereringstid: 10. 11 2014 kl. 21:23:24
+-- Serverversion: 5.5.38-0ubuntu0.14.04.1
+-- PHP-version: 5.5.17-2+deb.sury.org~trusty+1
 
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 --
@@ -32,6 +32,20 @@ CREATE TABLE IF NOT EXISTS `MailAddress` (
   UNIQUE KEY `id` (`id`),
   KEY `address_ibfk_1` (`domain`),
   KEY `mailbox_id` (`mailbox_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur-dump for tabellen `MailAddressUserOwnership`
+--
+
+CREATE TABLE IF NOT EXISTS `MailAddressUserOwnership` (
+  `username` varchar(255) NOT NULL,
+  `address_id` varchar(255) NOT NULL,
+  UNIQUE KEY `username_2` (`username`,`address_id`),
+  KEY `username` (`username`),
+  KEY `address_id` (`address_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -96,7 +110,7 @@ CREATE TABLE IF NOT EXISTS `MailMailbox` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Postfix Admin - Virtual Mailboxes';
 
 --
--- Triggers `MailMailbox`
+-- Triggers/udløsere `MailMailbox`
 --
 DROP TRIGGER IF EXISTS `mailbox_insert`;
 DELIMITER //
@@ -287,6 +301,13 @@ CREATE TABLE IF NOT EXISTS `UserVariables` (
 ALTER TABLE `MailAddress`
 ADD CONSTRAINT `MailAddress_ibfk_2` FOREIGN KEY (`domain`) REFERENCES `MailDomain` (`domain`) ON DELETE CASCADE ON UPDATE CASCADE,
 ADD CONSTRAINT `MailAddress_ibfk_3` FOREIGN KEY (`mailbox_id`) REFERENCES `MailMailbox` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Begrænsninger for tabel `MailAddressUserOwnership`
+--
+ALTER TABLE `MailAddressUserOwnership`
+ADD CONSTRAINT `MailAddressUserOwnership_ibfk_1` FOREIGN KEY (`username`) REFERENCES `User` (`username`) ON DELETE CASCADE ON UPDATE CASCADE,
+ADD CONSTRAINT `MailAddressUserOwnership_ibfk_2` FOREIGN KEY (`address_id`) REFERENCES `MailAddress` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Begrænsninger for tabel `MailAlias`

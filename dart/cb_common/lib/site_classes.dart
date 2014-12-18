@@ -14,14 +14,11 @@ part "src/site_class_user.dart";
 part "src/site_class_user_library.dart";
 part 'src/site_class_logger.dart';
 part 'src/site_class_updater.dart';
-
-class ChangeResponse<V> extends Response<V>{
-
-
-  ChangeResponse.success([V payload = null]): super.success(payload);
-  ChangeResponse.error(int error_code): super.error(error_code);
-
-}
+part "src/site_class_mail_domain_library.dart";
+part "src/site_class_mail_domain.dart";
+part "src/site_class_mail_address_library.dart";
+part "src/site_class_mail_address.dart";
+part "src/site_class_mail_mailbox.dart";
 
 Logger get logger => new AJAXLogger();
 Updater get updater => new AJAXUpdater();

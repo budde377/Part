@@ -40,7 +40,7 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
       var pageStringList = privilege == User.PRIVILEGE_PAGE && pagesString != null? pagesString.trim().split(" ") : [];
       var pageList = pageStringList.map((String id) => pageOrder.pages[id]).toList();
       pageList.removeWhere((e)=>!(e is Page));
-      var user = new JSONUser(username, mail, parent, lastLogin, privilege, pageList);
+      var user = new AJAXUser(username, mail, parent, lastLogin, privilege, pageList);
       users.add(user);
       if (li.classes.contains('current')) {
         currentUser = username;
@@ -48,18 +48,23 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
 
     });
 
-    return new JSONUserLibrary(users, currentUser, pageOrder);
+    return new AJAXUserLibrary(users, currentUser, pageOrder);
   }
 
-//  UserSettingsJSONUserLibrary() : _userLibrary = new JSONUserLibrary(pageOrder);
+  Future<core.Response<User>> createUser(String mail, String privileges) => _userLibrary.createUser(mail, privileges);
 
-  Future<ChangeResponse<User>> createUser(String mail, String privileges) => _userLibrary.createUser(mail, privileges);
-
-  Future<ChangeResponse<User>> deleteUser(String username) => _userLibrary.deleteUser(username);
+  Future<core.Response<User>> deleteUser(String username) => _userLibrary.deleteUser(username);
 
   Stream<UserLibraryChangeEvent> get onChange => _userLibrary.onChange;
+  Stream<User> get onUpdate => _userLibrary.onUpdate;
+  Stream<User> get onAdd => _userLibrary.onAdd;
+  Stream<User> get onRemove => _userLibrary.onRemove;
 
   Map<String, User> get users => _userLibrary.users;
+
+  Iterable<User> get elements => _userLibrary.elements;
+
+  void every(void f(User)) => _userLibrary.every(f);
 
   Map<String, User> get rootUsers => _userLibrary.rootUsers;
 
@@ -68,4 +73,9 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
   Map<String, User> get pageUsers => _userLibrary.pageUsers;
 
   User get userLoggedIn => _userLibrary.userLoggedIn;
+
+  Future<core.Response<String>> userLogin(String username, String password) => _userLibrary.userLogin(username, password);
+
+  Future<core.Response> forgotPassword(String password) => _userLibrary.forgotPassword(password);
+
 }

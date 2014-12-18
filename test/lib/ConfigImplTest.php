@@ -379,54 +379,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(empty($registrable), 'getAJAXRegistrable did not return an empty array with empty config.');
     }
 
-    public function testGetAJAXRegistrableHasEntrySpecifiedInConfig()
-    {
-        $path1 = "path1";
-        $id1 = "id1";
-        $id2 = "id2";
-        $configXML = simplexml_load_string("
-        <config>{$this->defaultOwner}
-        <AJAXRegistrable>
-        <class link='$path1' ajax_id='$id1'>main</class>
-        <class ajax_id='$id2'>main2</class>
-        </AJAXRegistrable>
-        </config>");
-        $rootPath = dirname(__FILE__) . '/';
-        $config = new ConfigImpl($configXML, $rootPath);
-        $registrable = $config->getAJAXRegistrable();
-        $this->assertArrayHasKey(0, $registrable, 'getAJAXRegistrable did not return array with right entrance');
-        $this->assertArrayHasKey(1, $registrable, 'getAJAXRegistrable did not return array with right entrance');
-        $this->assertTrue(is_array($registrable[0]));
-        $this->assertTrue(is_array($registrable[1]));
-        $this->assertArrayHasKey('link', $registrable[0]);
-        $this->assertArrayHasKey('ajax_id', $registrable[0]);
-        $this->assertArrayHasKey('class_name', $registrable[0]);
-        $this->assertEquals($registrable[0]['link'], $rootPath . $path1);
-        $this->assertEquals($registrable[0]['ajax_id'], $id1);
-        $this->assertEquals($registrable[0]['class_name'], 'main');
-        $this->assertArrayNotHasKey('link', $registrable[1]);
-        $this->assertArrayHasKey('ajax_id', $registrable[1]);
-        $this->assertArrayHasKey('class_name', $registrable[1]);
-        $this->assertEquals($registrable[1]['ajax_id'], $id2);
-        $this->assertEquals($registrable[1]['class_name'], 'main2');
-    }
 
-
-    public function testOrderOfAJAXRegistrableIsTheSameInFileAsOutput()
-    {
-        $configXML = simplexml_load_string("
-        <config>{$this->defaultOwner}
-        <AJAXRegistrable>
-        <class ajax_id='id2' link='some_link2'>main2</class>
-        <class ajax_id='id' link='some_link'>main</class>
-        </AJAXRegistrable>
-        </config>");
-
-        $rootPath = dirname(__FILE__) . '/';
-        $config = new ConfigImpl($configXML, $rootPath);
-        $registrable = $config->getAJAXRegistrable();
-        $this->assertEquals('main2', $registrable[0]['class_name']);
-    }
 
 
     public function testGetAJAXTypeHandlersReturnEmptyArrayWithEmptyConfig()
@@ -611,6 +564,28 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('someHost', $connArray['host'], 'Host was not right');
         $this->assertEquals('someDatabase', $connArray['database'], 'Host was not right');
         $this->assertEquals('someUser', $connArray['user'], 'Host was not right');
+
+    }
+
+    public function testIsMailManagementIsSupportedReflectsConnection()
+    {
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+            <MailMySQLConnection>
+                <host>someHost</host>
+                <database>someDatabase</database>
+                <username>someUser</username>
+            </MailMySQLConnection>
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertTrue($config->isMailManagementEnabled());
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertFalse($config->isMailManagementEnabled());
 
     }
 

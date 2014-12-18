@@ -1,15 +1,18 @@
 <?php
 namespace ChristianBudde\cbweb\model\mail;
 
+use ChristianBudde\cbweb\controller\json\MailAddressObjectImpl;
+use ChristianBudde\cbweb\model\user\User;
+use ChristianBudde\cbweb\model\user\UserLibrary;
 use ChristianBudde\cbweb\util\db\DB;
 use ChristianBudde\cbweb\util\Observable;
 use ChristianBudde\cbweb\util\Observer;
 use ChristianBudde\cbweb\util\ObserverLibrary;
 use ChristianBudde\cbweb\util\ObserverLibraryImpl;
 use ChristianBudde\cbweb\util\traits\ValidationTrait;
-use PDOStatement;
 use PDO;
 use PDOException;
+use PDOStatement;
 
 /**
  * Created by PhpStorm.
@@ -48,14 +51,20 @@ class AddressImpl implements Address, Observer
     private $updateLastModifiedStatement;
     private $addTargetStatement;
     private $clearTargetsStatement;
+    private $setUpOwnerStatement;
+    private $addOwnerStatement;
+    private $removeOwnerStatement;
+    private $owners = [];
+    private $userLibrary;
 
-    function __construct($localPart, DB $db, AddressLibrary $addressLibrary)
+    function __construct($localPart, DB $db, UserLibrary $userLibrary, AddressLibrary $addressLibrary)
     {
         $this->observerLibrary = new ObserverLibraryImpl($this);
         $this->addressLibrary = $addressLibrary;
         $this->db = $db;
         $this->localPart = $localPart;
         $this->domainName = $addressLibrary->getDomain()->getDomainName();
+        $this->userLibrary = $userLibrary;
     }
 
 
@@ -156,8 +165,9 @@ class AddressImpl implements Address, Observer
         $this->deleteStatement->execute();
         $this->callObservers(Address::EVENT_DELETE);
 
+        $this->owners = [];
+        $this->aliasList = [];
     }
-
     /**
      * Creates an address
      * @return void
@@ -218,7 +228,7 @@ class AddressImpl implements Address, Observer
     public function getTargets()
     {
         $this->setUpAlias();
-        return $this->aliasList;
+        return array_values($this->aliasList);
     }
 
     /**
@@ -478,11 +488,32 @@ class AddressImpl implements Address, Observer
 
     public function onChange(Observable $subject, $changeType)
     {
-        if($this->mailbox !== $subject || $changeType != Mailbox::EVENT_DELETE){
-            return;
+
+        if($subject instanceof Mailbox){
+            if($this->mailbox !== $subject || $changeType != Mailbox::EVENT_DELETE){
+                return;
+            }
+            $this->mailbox->detachObserver($this);
+            $this->mailbox = null;
+
+        } else if($subject instanceof User ){
+            if($changeType == User::EVENT_DELETE){
+                $subject->detachObserver($this);
+            } else if($changeType == User::EVENT_USERNAME_UPDATE){
+                $k = array_search($subject, $this->owners);
+                if($k === false){
+                    return;
+                }
+                if($k == $subject->getUsername()){
+                    return;
+                }
+                $this->owners[$subject->getUsername()] = $this->owners[$k];
+                unset($this->owners[$k]);
+
+
+            }
         }
-        $this->mailbox->detachObserver($this);
-        $this->mailbox = null;
+
 
     }
 
@@ -499,5 +530,120 @@ class AddressImpl implements Address, Observer
     {
         $this->setUp();
         return $this->id;
+    }
+
+    /**
+     * Adds a user as owner of the address.
+     * @param User $owner
+     * @return void
+     */
+    public function addOwner(User $owner)
+    {
+        if($this->isOwner($owner) || !$this->exists()){
+            return;
+        }
+
+        if($this->addOwnerStatement == null){
+            $this->addOwnerStatement = $this->db->getConnection()->prepare("INSERT INTO MailAddressUserOwnership (address_id, username) VALUES (?, ?)");
+        }
+        $this->addOwnerStatement->execute(array($this->getId(), $owner->getUsername()));
+        $this->owners[$owner->getUsername()] = $owner;
+        $owner->attachObserver($this);
+
+
+    }
+
+    /**
+     * Removes a user as owner of the address.
+     * @param User $owner
+     * @return void
+     */
+    public function removeOwner(User $owner)
+    {
+
+        if(!$this->isOwner($owner)){
+            return;
+        }
+
+        if($this->removeOwnerStatement == null){
+            $this->removeOwnerStatement= $this->db->getConnection()->prepare("DELETE FROM MailAddressUserOwnership WHERE address_id = ? AND username = ?");
+        }
+        $this->removeOwnerStatement->execute(array($this->getId(), $owner->getUsername()));
+
+        /** @var User $owner */
+        $owner = $this->owners[$owner->getUsername()];
+        $owner->detachObserver($this);
+        unset($this->owners[$owner->getUsername()]);
+    }
+
+    /**
+     * Checks if a user is a owner of the address.
+     * @param User $owner
+     * @return bool
+     */
+    public function isOwner(User $owner)
+    {
+        $this->setUpOwners();
+        return isset($this->owners[$owner->getUsername()]);
+    }
+
+    /**
+     * Lists the username of the owners as strings.
+     * @param bool $instances If true will returns instances rather than username strings
+     * @return array
+     */
+    public function listOwners($instances = false)
+    {
+
+        $this->setUpOwners();
+        $returnArray = array();
+        if($instances){
+            foreach($this->owners as $key=>$val){
+                $returnArray[] = $this->userLibrary->getUser($key);
+            }
+
+        } else {
+            foreach($this->owners as $key=>$val){
+                $returnArray[] = $key;
+            }
+
+        }
+
+        return $returnArray;
+    }
+
+    private function setUpOwners()
+    {
+        if($this->setUpOwnerStatement == null){
+            $this->setUpOwnerStatement = $this->db->getConnection()->prepare("SELECT username FROM MailAddressUserOwnership WHERE address_id = ?");
+            $this->setUpOwnerStatement->execute(array($this->getId()));
+            foreach($this->setUpOwnerStatement->fetchAll(PDO::FETCH_NUM) as $row ){
+                $username = $row[0];
+                $this->owners[$username] = $user = $this->userLibrary->getUser($username);
+                $user->attachObserver($this);
+            }
+        }
+
+    }
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return Object
+     */
+    public function jsonObjectSerialize()
+    {
+        return new MailAddressObjectImpl($this);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.4.0)<br/>
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     */
+    function jsonSerialize()
+    {
+        return $this->jsonObjectSerialize()->jsonSerialize();
     }
 }

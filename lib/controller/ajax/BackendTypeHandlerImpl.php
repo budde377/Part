@@ -1,22 +1,25 @@
 <?php
 namespace ChristianBudde\cbweb\controller\ajax;
 use ChristianBudde\cbweb\BackendSingletonContainer;
-
-use ChristianBudde\cbweb\model\updater\Updater;
-use ChristianBudde\cbweb\util\file\File;
-use ChristianBudde\cbweb\util\file\FileImpl;
 use ChristianBudde\cbweb\controller\function_string\ParserImpl;
-use ChristianBudde\cbweb\util\file\ImageFileImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
 use ChristianBudde\cbweb\controller\json\Response;
 use ChristianBudde\cbweb\controller\json\ResponseImpl;
-use ChristianBudde\cbweb\util\mail\Mail;
-use ChristianBudde\cbweb\util\mail\MailImpl;
+use ChristianBudde\cbweb\model\mail\Address;
+use ChristianBudde\cbweb\model\mail\Mailbox;
 use ChristianBudde\cbweb\model\page\Page;
 use ChristianBudde\cbweb\model\page\PageContent;
 use ChristianBudde\cbweb\model\page\PageOrder;
+use ChristianBudde\cbweb\model\updater\Updater;
 use ChristianBudde\cbweb\model\user\User;
 use ChristianBudde\cbweb\model\user\UserLibrary;
+use ChristianBudde\cbweb\model\user\UserPrivileges;
+use ChristianBudde\cbweb\util\file\File;
+use ChristianBudde\cbweb\util\file\FileImpl;
+use ChristianBudde\cbweb\util\file\ImageFileImpl;
+use ChristianBudde\cbweb\util\mail\Mail;
+use ChristianBudde\cbweb\util\mail\MailImpl;
+use ChristianBudde\cbweb\util\traits\ValidationTrait;
 
 /**
  * Created by PhpStorm.
@@ -27,10 +30,12 @@ use ChristianBudde\cbweb\model\user\UserLibrary;
 class BackendTypeHandlerImpl implements TypeHandler
 {
 
+    use ValidationTrait;
+
     private $backend;
     private $userLibrary;
 
-
+    /** @var callable  */
     private $sitePrivilegesFunction;
 
     private $userLoggedInAuthFunction;
@@ -69,6 +74,7 @@ class BackendTypeHandlerImpl implements TypeHandler
 
         $this->setUpUserLibraryHandler($server);
         $this->setUpUserHandler($server);
+        $this->setUpUserPrivilegesHandler($server);
         $this->setUpPageOrderHandler($server);
         $this->setUpPageHandler($server);
         $this->setUpLoggerHandler($server);
@@ -79,11 +85,21 @@ class BackendTypeHandlerImpl implements TypeHandler
         $this->setUpSiteContentHandler($server);
         $this->setUpSiteContentLibraryHandler($server);
 
+        // Setup mail
+        if($this->backend->getConfigInstance()->isMailManagementEnabled()){
+            $this->setupMailDomainLibraryHandler($server);
+            $this->setupMailDomainHandler($server);
+            $this->setupMailAddressLibraryHandler($server);
+            $this->setupMailAddressHandler($server);
+            $this->setupMailMailboxHandler($server);
+        }
+
         $this->setUpParserHandler($server);
 
         $this->setUpFileHandler($server);
 
         $this->setUpArraysHandler($server);
+
 
     }
 
@@ -136,7 +152,10 @@ class BackendTypeHandlerImpl implements TypeHandler
 
 
         $userLibraryHandler->addAuthFunction(function ($type, $instance, $functionName) {
-            if ($this->userLibrary->getUserLoggedIn() == null && $functionName != "userLogin") {
+            if ($this->userLibrary->getUserLoggedIn() == null &&
+                $functionName != "userLogin" &&
+                $functionName != "forgotPassword"
+            ) {
                 return false;
             }
             return true;
@@ -146,6 +165,7 @@ class BackendTypeHandlerImpl implements TypeHandler
             'listUsers',
             'deleteUser',
             'userLogin',
+            'forgotPassword',
             'getUserLoggedIn',
             'getInstance',
             'getUser',
@@ -156,7 +176,26 @@ class BackendTypeHandlerImpl implements TypeHandler
         $userLibraryHandler->addGetInstanceFunction('UserLibrary');
 
         $userLibraryHandler->addFunction("UserLibrary", "userLogin", function (UserLibrary $instance, $username, $password) {
-            if (($user = $instance->getUser($username)) == null) {
+
+            if (($user = $instance->getUser($username)) == null && $this->validMail($username)) {
+                foreach($instance->listUsers() as $u){
+                    if($user != null){
+                        continue;
+                    }
+                    if($u->getMail() !== trim($username)){
+                        continue;
+                    }
+                    if(!$u->verifyLogin($password)){
+                        continue;
+                    }
+                    $user = $u;
+
+                }
+
+
+            }
+
+            if($user == null){
                 return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_LOGIN);
             }
 
@@ -233,6 +272,40 @@ class BackendTypeHandlerImpl implements TypeHandler
 
         });
 
+        $userLibraryHandler->addFunction('UserLibrary', 'forgotPassword', function(UserLibrary $instance, $mail){
+
+            $mail = trim($mail);
+            if(!$this->validMail($mail)){
+                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_MAIL);
+            }
+            $domain = $this->backend->getConfigInstance()->getDomain();
+
+            foreach($instance->listUsers() as $user){
+                if($user->getMail() == $mail){
+                    $password = uniqid();
+                    $user->setPassword($password);
+                    $m = new MailImpl();
+                    $m->addReceiver($user);
+                    $m->setSender("no-reply@$domain");
+                    $m->setMailType(Mail::MAIL_TYPE_PLAIN);
+                    $m->setSubject("Kodeord nulstillet");
+                    $m->setMessage("Hej,\n" .
+                        "Dit kodeord på $domain er blevet nulstillet.\n" .
+                        "Du kan nu logge ind med følgende oplysninger:\n\n" .
+
+                        "    Brugernavn: {$user->getUsername()}\n" .
+                        "    Kodeord:    $password\n\n" .
+
+                        "Vh\n" .
+                        "Admin Jensen");
+                    $m->sendMail();
+
+                }
+            }
+
+            return new ResponseImpl();
+        });
+
     }
 
     private function setUpUserHandler(Server $server)
@@ -280,6 +353,58 @@ class BackendTypeHandlerImpl implements TypeHandler
         });
 
     }
+
+    private function setUpUserPrivilegesHandler(Server $server)
+    {
+        $server->registerHandler($userHandler =
+                new GenericObjectTypeHandlerImpl(($u = $this->userLibrary->getUserLoggedIn()) == null ? "ChristianBudde\\cbweb\\model\\user\\UserPrivileges" : $u->getUserPrivileges()),
+            ' UserPrivileges');
+
+        $userHandler->addGetInstanceFunction("UserPrivileges");
+
+        $userHandler->addTypePreCallFunction('UserPrivileges', function($type, $instance, $functionName, &$arguments){
+
+            if($functionName != 'addPagePrivileges' && $functionName != 'hasPagePrivileges' && $functionName != 'revokePagePrivileges'){
+                return;
+            }
+
+            if(!isset($arguments[0])){
+                return;
+            }
+
+            if($arguments[0] instanceof Page){
+                return;
+            }
+
+            $arguments[0] = $this->backend->getPageOrderInstance()->getPage($arguments[0]);
+        });
+
+        $userHandler->addTypeAuthFunction('UserPrivileges', function($type, UserPrivileges $instance, $functionName, array $args){
+
+            if(in_array($functionName, [
+                'hasRootPrivileges',
+                'hasSitePrivileges',
+                'hasPagePrivileges',
+                'listPagePrivileges',
+                'getUser'])){
+                return true;
+            }
+
+            $currentUser = $this->userLibrary->getUserLoggedIn();
+            if($currentUser == null){
+                return false;
+            }
+
+            $user = $instance->getUser();
+            if(!$this->isChildOfUser($user)){
+                return false;
+            }
+
+            return true;
+        });
+
+    }
+
 
     /**
      * @param User $user
@@ -636,10 +761,170 @@ class BackendTypeHandlerImpl implements TypeHandler
             if(!is_string($string)){
                 return $string;
             }
-            $p = new ParserImpl();
-            $p->parseArray($string, $result);
-            return $result;
+            return ParserImpl::parseArrayString($string);
         });
+    }
+
+    private function setupMailDomainLibraryHandler(Server $server)
+    {
+        $handler = new GenericObjectTypeHandlerImpl($this->backend->getMailDomainLibraryInstance());
+        $handler->addAlias('MailDomainLibrary', ['ChristianBudde\cbweb\model\mail\DomainLibrary']);
+        $handler->whitelistType('MailDomainLibrary');
+        $handler->addGetInstanceFunction('MailDomainLibrary');
+        $server->registerHandler($handler);
+        $handler->addFunctionAuthFunction('MailDomainLibrary', 'deleteDomain', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomainLibrary', 'createDomain', $this->sitePrivilegesFunction);
+        $handler->addTypeAuthFunction('MailDomainLibrary', $this->userLoggedInAuthFunction);
+    }
+
+    private function setupMailDomainHandler(Server $server)
+    {
+        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\Domain');
+        $handler->addAlias('MailDomain', ['ChristianBudde\cbweb\model\mail\Domain']);
+        $handler->whitelistType('MailDomain');
+        $handler->whitelistFunction('MailDomain',
+            'getDomainName',
+            'isActive',
+            'activate',
+            'deactivate',
+            'getDescription',
+            'setDescription',
+            'lastModified',
+            'getAddressLibrary',
+            'isAliasDomain',
+            'setAliasTarget',
+            'getInstance',
+            'getAliasTarget',
+            'clearAliasTarget',
+            'getDomainLibrary');
+
+        $handler->addGetInstanceFunction('MailDomain');
+
+        $server->registerHandler($handler);
+        $handler->addFunctionAuthFunction('MailDomain', 'clearAliasTarget', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomain', 'setAliasTarget', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomain', 'setDescription', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomain', 'activate', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomain', 'deactivate', $this->sitePrivilegesFunction);
+
+        $handler->addTypeAuthFunction('MailDomainLibrary', $this->userLoggedInAuthFunction);
+
+    }
+
+    private function setupMailAddressLibraryHandler(Server $server)
+    {
+        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\AddressLibrary');
+        $handler->addAlias('MailAddressLibrary', ['ChristianBudde\cbweb\model\mail\AddressLibrary']);
+        $handler->whitelistType('MailAddressLibrary');
+        $handler->addGetInstanceFunction('MailAddressLibrary');
+
+        $server->registerHandler($handler);
+
+        $handler->addFunctionAuthFunction('MailAddressLibrary', 'createAddress', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddressLibrary', 'deleteAddress', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddressLibrary', 'createCatchallAddress', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddressLibrary', 'deleteCatchallAddress', $this->sitePrivilegesFunction);
+
+        $handler->addTypeAuthFunction('MailAddressLibrary', $this->userLoggedInAuthFunction);
+
+    }
+
+    private function setupMailAddressHandler(Server $server)
+    {
+        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\Address');
+        $handler->addAlias('MailAddress', ['ChristianBudde\cbweb\model\mail\Address']);
+        $handler->whitelistType('MailAddress');
+        $handler->whitelistFunction('MailAddress',
+            'getLocalPart',
+            'setLocalPart',
+            'isActive',
+            'lastModified',
+            'getDomain',
+            'getAddressLibrary',
+            'activate',
+            'deactivate',
+            'getTargets',
+            'addTarget',
+            'removeTarget',
+            'hasTarget',
+            'getMailbox',
+            'hasMailbox',
+            'createMailbox',
+            'getInstance',
+            'deleteMailbox',
+            'getDomainLibrary',
+            'getId',
+            'addOwner',
+            'removeOwner',
+            'isOwner',
+            'listOwners');
+        $handler->addGetInstanceFunction('MailAddress');
+        $server->registerHandler($handler);
+
+        $handler->addFunctionAuthFunction('MailAddress', 'setLocalPart', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'addOwner', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'removeOwner', $this->sitePrivilegesFunction);
+
+        $isOwnerAuthFunction = function($type, Address $instance){
+            $f = $this->sitePrivilegesFunction;
+            if($f()){
+                return true;
+            }
+            $user = $this->userLibrary->getUserLoggedIn();
+            if($user == null) {
+                return false;
+            }
+
+
+            return $instance->isOwner($user);
+        };
+
+        $handler->addFunctionAuthFunction('MailAddress', 'activate', $isOwnerAuthFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'deactivate', $isOwnerAuthFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'addTarget', $isOwnerAuthFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'removeTarget', $isOwnerAuthFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'createMailbox', $isOwnerAuthFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'deleteMailbox', $isOwnerAuthFunction);
+
+        $handler->addTypeAuthFunction('MailAddress', $this->userLoggedInAuthFunction);
+
+    }
+
+    private function setupMailMailboxHandler(Server $server)
+    {
+        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\Mailbox', 'Mailbox');
+        $handler->whitelistFunction('Mailbox',
+            'setName',
+            'getName',
+            'setPassword',
+            'checkPassword',
+            'getAddress',
+            'getAddressLibrary',
+            'getDomain',
+            'getInstance',
+            'getDomainLibrary',
+            'lastModified'
+            );
+        $handler->addGetInstanceFunction('Mailbox');
+        $server->registerHandler($handler);
+        $handler->addTypeAuthFunction('Mailbox', $this->userLoggedInAuthFunction);
+        $isOwnerAuthFunction = function($type, Mailbox $instance){
+            $f = $this->sitePrivilegesFunction;
+            if($f()){
+                return true;
+            }
+            $user = $this->userLibrary->getUserLoggedIn();
+            if($user == null) {
+                return false;
+            }
+
+
+            return $instance->getAddress()->isOwner($user);
+        };
+
+        $handler->addFunctionAuthFunction('Mailbox', 'setName', $isOwnerAuthFunction);
+        $handler->addFunctionAuthFunction('Mailbox', 'setPassword', $isOwnerAuthFunction);
+
     }
 
 

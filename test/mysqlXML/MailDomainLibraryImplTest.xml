@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
-<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <database name="postfix_test">
-        <table_data name="postfix_test.DomainAssignment">
+<mysqldump>
+    <database name="test_postfix">
+        <table_data name="test_postfix.DomainAssignment">
             <row>
-                <field name="database">cms2012testdb</field>
+                <field name="database">test_cms</field>
                 <field name="domain">test.dk</field>
             </row>
         </table_data>
     </database>
 
-    <database name="cms2012testdb">
+    <database name="test_cms">
         <table_data name="MailDomain">
             <row>
                 <field name="domain">test.dk</field>

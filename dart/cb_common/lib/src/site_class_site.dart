@@ -8,18 +8,18 @@ abstract class Site{
 }
 
 
-class JSONSite implements Site{
+class AJAXSite implements Site{
 
-  static final JSONSite _cache = new JSONSite._internal();
+  static final AJAXSite _cache = new AJAXSite._internal();
 
   Map<String,Content> _contentMap = new Map<String,Content>();
 
-  factory JSONSite() => _cache;
+  factory AJAXSite() => _cache;
 
-  JSONSite._internal();
+  AJAXSite._internal();
 
-  Content operator[](String id) => _contentMap.putIfAbsent(id,()=>new JSONContent.site(id));
+  Content operator[](String id) => _contentMap.putIfAbsent(id,()=>new AJAXContent.site(id));
 }
 
 
-get site => new JSONSite();
+get site => new AJAXSite();

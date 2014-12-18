@@ -8,9 +8,11 @@
 namespace ChristianBudde\cbweb\test;
 
 
+use ChristianBudde\cbweb\controller\json\MailMailboxObjectImpl;
 use ChristianBudde\cbweb\model\mail\MailboxImpl;
 use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
 use ChristianBudde\cbweb\model\mail\Mailbox;
+use ChristianBudde\cbweb\test\stub\StubUserLibraryImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubConfigImpl;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
@@ -57,7 +59,7 @@ class MailMailboxImplTest extends CustomDatabaseTestCase
 
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db);
+        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db, new StubUserLibraryImpl());
         $this->domain = $this->domainLibrary->getDomain('test.dk');
         $this->addressLibrary = $this->domain->getAddressLibrary();
         $this->address = $this->addressLibrary->getAddress('test');
@@ -215,5 +217,8 @@ class MailMailboxImplTest extends CustomDatabaseTestCase
         $this->assertFalse($ob->hasBeenCalled());
 
     }
-
+    public function testReturnsRightJSONObject(){
+        $this->assertEquals($o = new MailMailboxObjectImpl($this->mailbox), $this->mailbox->jsonObjectSerialize());
+        $this->assertEquals($o->jsonSerialize(), $this->mailbox->jsonSerialize());
+    }
 }

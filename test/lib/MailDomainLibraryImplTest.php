@@ -8,6 +8,8 @@
 namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\Config;
+use ChristianBudde\cbweb\controller\json\MailDomainLibraryObjectImpl;
+use ChristianBudde\cbweb\test\stub\StubUserLibraryImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 
 use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
@@ -27,6 +29,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
     private $mailPass;
     private $databaseName;
 
+    private $userLibrary;
 
     function __construct()
     {
@@ -53,7 +56,8 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
             'password' => self::$mysqlOptions->getPassword()
         ));
         $this->db = new MySQLDBImpl($this->config);
-        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db);
+        $this->userLibrary = new StubUserLibraryImpl();
+        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db, $this->userLibrary);
     }
 
 
@@ -100,7 +104,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
 
     public function testContainsDomainFailsOnDifferentDomain()
     {
-        $this->assertFalse($this->domainLibrary->containsDomain(new DomainImpl('test.dk', $this->databaseName, $this->db, $this->domainLibrary)));
+        $this->assertFalse($this->domainLibrary->containsDomain(new DomainImpl('test.dk', $this->databaseName, $this->db, $this->userLibrary, $this->domainLibrary)));
     }
 
     public function testContainsReturnsTrueIfContains()
@@ -128,6 +132,10 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
 
     }
 
+    public function testCreateDomainReturnsNullOnError(){
+        $this->assertNull($this->domainLibrary->createDomain('test2.dk', "notRealPass"));
+    }
+
 
     public function testDeleteDomainDoesThat()
     {
@@ -147,9 +155,15 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
 
     public function testWillNotDeleteInstancesNotInLibrary()
     {
-        $d = new DomainImpl('test.dk', $this->databaseName, $this->db, $this->domainLibrary);
+        $d = new DomainImpl('test.dk', $this->databaseName, $this->db, $this->userLibrary, $this->domainLibrary);
         $this->domainLibrary->deleteDomain($d, $this->mailPass);
         $this->assertTrue($d->exists());
     }
+
+    public function testReturnsRightJSONObject(){
+        $this->assertEquals($o = new MailDomainLibraryObjectImpl($this->domainLibrary), $this->domainLibrary->jsonObjectSerialize());
+        $this->assertEquals($o->jsonSerialize(), $this->domainLibrary->jsonSerialize());
+    }
+
 
 }

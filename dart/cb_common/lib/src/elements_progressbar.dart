@@ -114,7 +114,7 @@ class SavingBar{
   }
 
   void _updatePercentage(double pct){
-    _text.text = "Gemmer ændringer (${(pct*100).toInt()}%)";
+    _text.text = "Gemmer ændringer (${(pct*100).toInt()}%)"; //TODO Remove danish
     _progressBar.percentage = pct;
   }
 }

@@ -13,13 +13,16 @@ class CompositeFunctionImpl extends ProgramImpl implements CompositeFunction
 {
 
 
+    private $functions = [];
 
-
-    private $functions = array();
-
-    function __construct(Target $target)
+    /**
+     * @param Target $target
+     * @param JSONFunction[] $functions
+     */
+    function __construct(Target $target, array $functions = [])
     {
         parent::__construct($target);
+        $this->functions = $functions;
     }
 
 
@@ -31,29 +34,6 @@ class CompositeFunctionImpl extends ProgramImpl implements CompositeFunction
         return $this->functions;
     }
 
-    public function appendFunction(JSONFunction $function)
-    {
-        $function->setRootTarget($this->target);
-        $this->functions[] = $function;
-    }
-
-    public function removeFunction(JSONFunction $function)
-    {
-        $newArray = array();
-        foreach ($this->functions as $func) {
-            if ($function === $func) {
-                continue;
-            }
-            $newArray[] = $func;
-        }
-        $this->functions = $newArray;
-    }
-
-    public function prependFunction(JSONFunction $function)
-    {
-        $function->setRootTarget($this->target);
-        $this->functions = array_merge([$function], $this->functions);
-    }
     /**
      * @return array
      */
@@ -62,11 +42,5 @@ class CompositeFunctionImpl extends ProgramImpl implements CompositeFunction
         return ['type'=>'composite_function', 'id' => $this->id, 'functions' => $this->functions, 'target'=>$this->target];
     }
 
-    public function setTarget(Target $target){
-        foreach($this->functions as $func){
-            /** @var JSONFunction  $func */
-            $func->setRootTarget($target);
-        }
-        parent::setTarget($target);
-    }
+
 }

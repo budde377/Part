@@ -83,4 +83,9 @@ interface UserPrivileges extends JSONObjectSerializable
      * @return void
      */
     public function revokeAllPrivileges();
+
+    /**
+     * @return User
+     */
+    public function getUser();
 }

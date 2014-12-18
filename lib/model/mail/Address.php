@@ -1,5 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\model\mail;
+use ChristianBudde\cbweb\controller\json\JSONObjectSerializable;
+use ChristianBudde\cbweb\model\user\User;
 use ChristianBudde\cbweb\util\Observable;
 
 
@@ -10,7 +12,7 @@ use ChristianBudde\cbweb\util\Observable;
  * Time: 2:19 PM
  */
 
-interface Address extends Observable {
+interface Address extends Observable, JSONObjectSerializable {
 
     const EVENT_DELETE = 1;
     const EVENT_CHANGE_LOCAL_PART = 2;
@@ -155,4 +157,31 @@ interface Address extends Observable {
      */
     public function getId();
 
+    /**
+     * Adds a user as owner of the address.
+     * @param User $owner
+     * @return void
+     */
+    public function addOwner(User $owner);
+
+    /**
+     * Removes a user as owner of the address.
+     * @param User $owner
+     * @return void
+     */
+    public function removeOwner(User $owner);
+
+    /**
+     * Checks if a user is a owner of the address.
+     * @param User $owner
+     * @return bool
+     */
+    public function isOwner(User $owner);
+
+    /**
+     * Lists the username of the owners as strings.
+     * @param bool $instances If true will returns instances rather than username strings
+     * @return array
+     */
+    public function listOwners($instances = false);
 }

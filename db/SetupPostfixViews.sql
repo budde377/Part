@@ -1,3 +1,32 @@
+-- phpMyAdmin SQL Dump
+-- version 4.0.10deb1
+-- http://www.phpmyadmin.net
+--
+-- Host: localhost
+-- Generation Time: Nov 18, 2014 at 04:56 PM
+-- Server version: 5.5.40-0ubuntu0.14.04.1
+-- PHP Version: 5.5.18-1+deb.sury.org~trusty+1
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+--
+-- Database: `postfix_test`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `DomainAssignment`
+--
+
+CREATE TABLE IF NOT EXISTS `DomainAssignment` (
+  `database` varchar(255) NOT NULL,
+  `domain` varchar(255) NOT NULL,
+  UNIQUE KEY `domain` (`domain`),
+  UNIQUE KEY `database` (`database`,`domain`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 
 DROP PROCEDURE IF EXISTS procPrepareAndCreateView;
 DELIMITER &&

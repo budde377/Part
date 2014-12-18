@@ -10,12 +10,12 @@
 
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\model\page\PageContentImpl;
-use ChristianBudde\cbweb\model\page\Page;
-use ChristianBudde\cbweb\model\page\PageImpl;
 use ChristianBudde\cbweb\controller\json\PageContentObjectImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
+use ChristianBudde\cbweb\model\page\Page;
+use ChristianBudde\cbweb\model\page\PageContentImpl;
+use ChristianBudde\cbweb\model\page\PageImpl;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
+use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\util\db\DB;
 
 class PageContentImplTest extends CustomDatabaseTestCase
@@ -90,16 +90,19 @@ class PageContentImplTest extends CustomDatabaseTestCase
 
     public function testFromToWillBeAccurate()
     {
+        $this->assertEquals(2, count($this->existingContent2->listContentHistory()));
         $this->existingContent2->addContent("3");
-        $this->assertEquals(3, count($this->existingContent2->listContentHistory()));
-        $this->assertEquals(1, count($this->existingContent2->listContentHistory(1356994000, 1356995000)));
+        $history = $this->existingContent2->listContentHistory(null, null, true);
+        $this->assertEquals(3, count($history));
+        $this->assertEquals([$history[0]], $this->existingContent2->listContentHistory($history[0], $history[0], true));
     }
 
     public function testOnlyTimestampWillListTimestamps()
     {
 
-        $list = $this->existingContent2->listContentHistory(null, null, true);
-        $this->assertEquals([946681201, 1356994801], $list);
+        $list1 = $this->existingContent2->listContentHistory(null, null);
+        $list2 = $this->existingContent2->listContentHistory(null, null, true);
+        $this->assertEquals([$list1[0]['time'], $list1[1]['time']], $list2);
     }
 
 
@@ -197,14 +200,15 @@ class PageContentImplTest extends CustomDatabaseTestCase
         $this->assertFalse($this->existingContent2->containsSubString("Some Content"));
     }
 
-
     public function testContainsSubStringWillReturnTrueIfContainsString()
     {
+        $this->existingContent->addContent($s = "New String");
+
         $this->assertTrue($this->existingContent->containsSubString("Some"));
         $this->assertTrue($this->existingContent->containsSubString("Content"));
         $this->assertTrue($this->existingContent->containsSubString("Some Content"));
+        $this->assertTrue($this->existingContent->containsSubString($s));
     }
-
 
     public function testContainsWillRespectTime()
     {

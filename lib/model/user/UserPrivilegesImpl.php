@@ -144,7 +144,7 @@ class UserPrivilegesImpl implements UserPrivileges
             $this->revokeSiteStatement->bindParam(1,$this->user->getUsername());
         }
         $this->revokeSiteStatement->execute();
-        $this->sitePrivilege = false;
+        $this->sitePrivilege = 0;
     }
 
     /**
@@ -241,5 +241,13 @@ class UserPrivilegesImpl implements UserPrivileges
     public function jsonSerialize()
     {
         return $this->jsonObjectSerialize()->jsonSerialize();
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 }

@@ -1,4 +1,44 @@
 
+#OnlineOfflineIndicator {
+    display: block;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    background-color: #656565;
+    border-radius: 0 3px 0 0;
+    padding: 0 20px 0 0;
+    font-weight: bold;
+    color: #fff;
+    line-height: 26px;
+    font-size: 12px;
+    width: 70px;
+    text-align: right;
+    z-index: 500;
+}
+
+#OnlineOfflineIndicator::after {
+    content: "Online";
+}
+
+#OnlineOfflineIndicator::before {
+    background-color: #00A301;
+    box-shadow: 0 0 3px rgb(36, 76, 12);
+    float: left;
+    width: 10px;
+    height: 10px;
+    margin: 8px 10px 8px 5px;
+    content: "";
+    border-radius: 5px;
+}
+
+body.offline #OnlineOfflineIndicator::after {
+    content: "Offline";
+}
+
+body.offline #OnlineOfflineIndicator::before {
+    background-color: #CF2D2D;
+    box-shadow: 0 0 5px #B90000;
+}
 
 #UserSettingsContainer {
     position: relative;
@@ -52,14 +92,15 @@
     margin-left: 10px;
 }
 
-#UserSettingsContent > ul > li.inactive{
+#UserSettingsContent > ul > li.inactive {
     position: relative;
 }
 
-#UserSettingsContent > ul > li.inactive > *:not(.inactiveFilter){
+#UserSettingsContent > ul > li.inactive > *:not(.inactiveFilter) {
     opacity: 0.2;
 }
-#UserSettingsContent > ul > li.inactive > .inactiveFilter{
+
+#UserSettingsContent > ul > li.inactive > .inactiveFilter {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -69,8 +110,7 @@
     cursor: default;
 }
 
-
-#UserSettingsContent >  ul {
+#UserSettingsContent > ul {
     list-style-type: none;
     overflow: hidden;
     display: table;
@@ -89,17 +129,15 @@
 #UserSettingsContent > ul > li {
     width: 880px;
     padding-bottom: 20px;
-    overflow:  hidden;
+    overflow: hidden;
     display: table-cell;
     vertical-align: top;
 
 }
 
-
 #UserSettingsContent > ul > li span.hidden {
     display: none;
 }
-
 
 #UserSettingsContent ul.colorList {
     width: 550px;
@@ -112,19 +150,16 @@
     color: #2f5377;
 }
 
-#UserSettingsContent p.text{
+#UserSettingsContent p.text {
     float: left;
     margin-top: 20px;
     width: 600px;
 }
 
-#UserSettingsContent .container_box{
+#UserSettingsContent .container_box {
     float: left;
     width: 870px;
 }
-
-
-
 
 #ActiveListPath {
     float: left;
@@ -217,8 +252,8 @@
     background: #656565 url(/_common/img/login_user_menu_icons_vertical.png) no-repeat scroll center -315px;
     border-right: 1px solid #a9a9a9;
     cursor: pointer;
-    -webkit-transition:background-color 0.1s;
-    transition:background-color 0.1s;
+    -webkit-transition: background-color 0.1s;
+    transition: background-color 0.1s;
 }
 
 #UserSettingsMenu li.active, #UserSettingsMenu li:hover {
@@ -237,15 +272,15 @@
     background-position: center -395px;
 }
 
-#UserSettingsMenu li.update_site{
+#UserSettingsMenu li.update_site {
     background-position: center -435px;
 }
 
-#UserSettingsMenu li.mail{
+#UserSettingsMenu li.mail {
     background-position: center -474px;
 }
 
-#UserSettingsMenu li.log{
+#UserSettingsMenu li.log {
     position: relative;
     background-position: center -514px;
 }
@@ -266,19 +301,17 @@
     background-position: center -115px;
 }
 
-#UserSettingsMenu li.update_site.active{
+#UserSettingsMenu li.update_site.active {
     background-position: center -155px;
 }
 
-#UserSettingsMenu li.mail.active{
+#UserSettingsMenu li.mail.active {
     background-position: center -194px;
 }
 
-#UserSettingsMenu li.log.active{
+#UserSettingsMenu li.log.active {
     background-position: center -234px;
 }
-
-
 
 #UserSettingsMenu li > .num {
     position: absolute;
@@ -342,7 +375,7 @@ form.oneLineForm > div {
     float: left;
 }
 
-form.oneLineForm > div.submit > input {
+form.oneLineForm > div.submit > input[type=submit]:not([type=radio]):not([type=checkbox]) {
     margin: 25px 0 0 4px;
 }
 
@@ -350,7 +383,11 @@ form > span.notion {
     width: 100%;
 }
 
-#UserSettingsContent .blur:after{
+#UserSettingsContent .blur:after {
+    background: rgba(206, 206, 206, 0.7);
+}
+
+#UserSettingsContent .blur:after, body.offline .disable_on_offline::after {
     background: rgba(206, 206, 206, 0.7);
 }
 
@@ -379,102 +416,105 @@ form.initial input.invalid {
     background: rgb(223, 223, 223);
 }
 
-#ActivePageList ul{
+#ActivePageList ul {
     display: none;
 }
+
 #UserSettingsContent .showSubList {
     padding: 0 !important;
-    margin:0 !important;
+    margin: 0 !important;
     width: auto !important;
 }
+
 #UserSettingsContent .showSubList > li:not(.hasSubList) {
     display: none;
 }
+
 #UserSettingsContent .showSubList > .hasSubList {
     background: transparent !important;
     padding: 0;
 }
+
 #UserSettingsContent .showSubList > .hasSubList > *:not(ul) {
     display: none !important;
 }
+
 #UserSettingsContent .showSubList > .hasSubList > ul {
     display: block !important;
     margin-left: 10px;
 }
 
-#ActivePageList .link, #InactivePageList .link, #PageUserList .link, #UserList .link{
-    margin:0;
+#ActivePageList .link, #InactivePageList .link, #PageUserList .link, #UserList .link {
+    margin: 0;
     width: 20px;
     background: transparent none scroll no-repeat center center;
 }
 
-#ActivePageList .subpages{
-    background-image: url(/_common/img/subpages.png) ;
+#ActivePageList .subpages {
+    background-image: url(/_common/img/subpages.png);
 }
 
-#ActivePageList .delete, #InactivePageList .delete, #PageUserList .delete, #UserList .delete{
-    background-image: url(/_common/img/redx.png) ;
+#ActivePageList .delete, #InactivePageList .delete, #PageUserList .delete, #UserList .delete {
+    background-image: url(/_common/img/redx.png);
 }
 
-#UserList .time{
-    background-image: url(/_common/img/time_icon_16.png) ;
+#UserList .time {
+    background-image: url(/_common/img/time_icon_16.png);
 }
 
-#ActivePageList .activate{
-    background-image: url(/_common/img/archive.png) ;
+#ActivePageList .activate {
+    background-image: url(/_common/img/archive.png);
 }
 
-#InactivePageList .activate{
-    background-image: url(/_common/img/arrowup.png) ;
+#InactivePageList .activate {
+    background-image: url(/_common/img/arrowup.png);
 }
 
-#ActivePageList .showhide{
+#ActivePageList .showhide {
     background-image: url(/_common/img/eyeslash.png);
 }
 
-#ActivePageList li{
+#ActivePageList li {
 
 }
 
-#ActivePageList li.dragging{
+#ActivePageList li.dragging {
     cursor: move;
 }
-
 
 #ActivePageList li.dragging > .link {
     display: none;
 }
 
-#ActivePageList li.divider{
+#ActivePageList li.divider {
     height: 0;
     background: transparent;
     transition: height 0.2s;
 }
 
-#ActivePageList li.divider.expanded{
+#ActivePageList li.divider.expanded {
     height: 30px;
 }
 
-#ActivePageList li.ishidden:not(.hasSubList){
+#ActivePageList li.ishidden:not(.hasSubList) {
     opacity: 0.4;
     text-decoration: line-through;
 }
 
-
-#ActivePageList li.ishidden .showhide{
+#ActivePageList li.ishidden .showhide {
     background-image: url(/_common/img/eye.png);
 }
 
-#InactivePageList li:not(.emptyListInfo){
+#InactivePageList li:not(.emptyListInfo) {
     padding-right: 30px;
     padding-left: 0;
 }
 
-#ActivePageList li:not(.emptyListInfo){
+#ActivePageList li:not(.emptyListInfo) {
     padding-left: 0;
 }
 
-#InactivePageList .padding, #ActivePageList .padding{
+#InactivePageList .padding, #ActivePageList .padding {
     border: 4px solid transparent;
     width: 0;
     height: 0;
@@ -484,14 +524,13 @@ form.initial input.invalid {
 }
 
 #ActivePageList li.current > .link.delete, #InactivePageList li.current > .link.delete,
-#ActivePageList.levelPage .link:not(.subpages), #InactivePageList.levelPage  .link:not(.subpages),
-#ActivePageList.levelPage .handle, #InactivePageList.levelPage  .handle{
+#ActivePageList.levelPage .link:not(.subpages), #InactivePageList.levelPage .link:not(.subpages),
+#ActivePageList.levelPage .handle, #InactivePageList.levelPage .handle {
     display: none;
 }
 
-
 #ActivePageList.levelPage li.current,
-#InactivePageList.levelPage li.current{
+#InactivePageList.levelPage li.current {
     padding-right: 0;
 }
 
@@ -499,12 +538,11 @@ form.initial input.invalid {
     padding-right: 30px;
 }
 
-#ActivePageList li.current > .padding, #InactivePageList li.current > .padding{
+#ActivePageList li.current > .padding, #InactivePageList li.current > .padding {
     border-color: transparent transparent transparent #253977;
 }
 
-
-#ActivePageList li.loading > .padding, #InactivePageList li.loading > .padding{
+#ActivePageList li.loading > .padding, #InactivePageList li.loading > .padding {
     background: transparent url(/_common/img/smallloader.gif) scroll no-repeat center center;
     margin: 0;
     padding: 0;
@@ -526,7 +564,7 @@ form.initial input.invalid {
     text-decoration: underline;
 }
 
-#UserSettingsContent span.version{
+#UserSettingsContent span.version {
     background: #FFF;
     padding: 0 5px;
     margin: 0 5px;
@@ -534,9 +572,10 @@ form.initial input.invalid {
     font-size: 14px;
     line-height: 20px;
     color: #3C3C3C;
+
 }
 
-#UserSettingsLogTable{
+#UserSettingsLogTable {
     width: 550px;
     margin-right: 330px;
     margin-top: 5px;
@@ -544,46 +583,45 @@ form.initial input.invalid {
     float: left;
 }
 
-#UserSettingsLogTable tr > td.date{
+#UserSettingsLogTable tr > td.date {
     width: 140px;
     text-align: right;
     padding-right: 10px;
 }
 
-#UserSettingsLogTable td{
+#UserSettingsLogTable td {
     line-height: 30px;
     height: 30px;
     background: #fff;
 }
 
-#UserSettingsLogTable tr:nth-of-type(even) > td{
+#UserSettingsLogTable tr:nth-of-type(even) > td {
     background: #dedede;
 }
 
-#UserSettingsLogTable tr > td.level{
+#UserSettingsLogTable tr > td.level {
     width: 30px;
     background-image: url("/_common/img/log_icons.png");
     background-repeat: no-repeat;
 }
 
-#UserSettingsLogTable tr.error > td.level{
-    background-position:  7px center;
+#UserSettingsLogTable tr.error > td.level {
+    background-position: 7px center;
 }
 
-#UserSettingsLogTable tr.warning > td.level{
-    background-position:  -33px center;
+#UserSettingsLogTable tr.warning > td.level {
+    background-position: -33px center;
 }
 
-#UserSettingsLogTable tr.notice > td.level{
-    background-position:  -73px center;
+#UserSettingsLogTable tr.notice > td.level {
+    background-position: -73px center;
 }
 
-
-#UserSettingsLogTable tr.debug > td.level{
-    background-position:  -113px center;
+#UserSettingsLogTable tr.debug > td.level {
+    background-position: -113px center;
 }
 
-#UserSettingsLogTable tr td:nth-of-type(3){
+#UserSettingsLogTable tr td:nth-of-type(3) {
     width: 14px;
 }
 
@@ -595,17 +633,20 @@ form.initial input.invalid {
     text-decoration: none;
 }
 
-#UserSettingsLogTable tr.empty_row td{
+#UserSettingsLogTable tr.empty_row td {
     text-align: center;
     font-style: italic;
 }
 
-#UserSettingsLogTable:not(.empty) tr.empty_row{
+#UserSettingsLogTable:not(.empty) tr.empty_row {
     display: none;
 }
 
+#LogInfoParagraph{
+    float: left;
+}
 
-#UpdateInformationMessage{
+#UpdateInformationMessage {
     text-align: center;
     background: #FF7100;
     color: #fff;
@@ -618,4 +659,330 @@ form.initial input.invalid {
 #UpdateInformationMessage a {
     color: #fff;
     text-decoration: underline;
+}
+
+#UserSettingsContent .floating_list {
+    list-style-type: none;
+    width: 550px;
+    float: left;
+    padding-bottom: 10px;
+}
+
+#UserSettingsContent .floating_list > li {
+    float: left;
+    border-radius: 3px;
+}
+
+#UserSettingsContent .floating_list > li {
+    padding: 3px 15px;
+    border: 1px solid #aaa;
+    margin: 0 10px 10px 0;
+    background: rgb(253, 253, 253);
+    color: #000;
+
+}
+
+#UserSettingsContent .floating_list.points_to > li:not(.empty_list){
+    padding: 0;
+}
+
+#UserSettingsContent .floating_list.points_to > li > div {
+    float: left;
+    padding: 3px 15px;
+}
+
+#UserSettingsContent .floating_list.points_to > li > div:first-child {
+    padding-right: 10px;
+    background: #e0e0e0;
+    border-radius: 3px 0 0 3px;
+}
+
+#UserSettingsContent .floating_list.points_to > li > div:not(.delete):last-of-type{
+    padding-left: 10px;
+}
+
+#UserSettingsContent .floating_list.points_to > li > div.arrow {
+    width: 0;
+    height: 0;
+    border-top: 13px solid transparent;
+    border-bottom: 13px solid transparent;
+
+    border-left: 6px solid #e0e0e0;
+    padding: 0;
+}
+#UserSettingsContent .has_deletable.floating_list > li{
+    position:relative;
+}
+
+
+#UserSettingsContent .has_deletable.floating_list > li > .delete::after{
+    background: url(/_common/img/redx.png) no-repeat center center;
+    width: 100%;
+    height: 100%;
+    content: "";
+    position: absolute;
+
+}
+#UserSettingsContent .has_deletable.floating_list > li > .delete {
+    cursor: pointer;
+    opacity: 0;
+    padding:0;
+    position:absolute;
+    right:0;
+    top: 0;
+    height:26px;
+    width:30px;
+    transition: 0.2s opacity;
+    z-index: 150;
+    background-color: rgb(255,255,255);
+}
+
+#UserSettingsContent .has_deletable.floating_list > li:hover > .delete{
+    opacity: 0.7;
+    display: block;
+}
+
+#UserSettingsContent .has_deletable.floating_list > li:hover > .delete:hover{
+    opacity: 1;
+}
+
+
+
+
+#UserSettingsContent ul > li.empty_list{
+    display: none;
+    width: 530px;
+    padding: 10px;
+    text-align: center;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    margin: 0;
+}
+
+#UserSettingsContent ul.empty > li.empty_list{
+    display: block;
+}
+
+#UserSettingsContent .floating_list:hover > li.add {
+    opacity: 0.5;
+}
+
+#UserSettingsContent .floating_list:hover > li.add:hover {
+    opacity: 1;
+}
+
+#UserSettingsEditMailAddAddressForm {
+    width: 550px;
+}
+
+#UserSettingsEditMailAddAddressForm span.at {
+    float: left;
+    display: block;
+    margin: 25px 0 0;
+    line-height: 30px;
+    font-size: 14px;
+    font-weight: bold;
+    width: 26px;
+    text-align: center;
+}
+
+#UserSettingsContent .mail_form {
+    width: 550px;
+    overflow: hidden;
+    max-height: 28px;
+    transition: 0.5s max-height;
+}
+
+#UserSettingsContent .mail_form > form  {
+    transition: 0.3s opacity;
+    opacity: 1;
+}
+
+#UserSettingsContent .mail_form:not(.expanded)  > form  {
+    opacity: 0;
+}
+
+#UserSettingsContent .mail_form.expanded {
+    max-height: 800px;
+}
+
+#UserSettingsContent .mail_form > .expander_link {
+    position: relative;
+    cursor: pointer;
+}
+
+#UserSettingsContent .mail_form > .expander_link::after {
+    position: absolute;
+    left: 0;
+    top: 0;
+    content: "";
+    height: 26px;
+    width: 26px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    background: #fff url("/_common/img/add_icon_16.png") scroll no-repeat center center;
+    opacity: 0.5;
+    transition: 0.3s opacity;
+    z-index: 150;
+
+}
+
+#UserSettingsContent .mail_form.expanded > .expander_link::after {
+    right: 0;
+    left: auto;
+    border: 0;
+    background-color: transparent;
+    background-image: url("/_common/img/x-mark-icon.svg");
+    background-size: 16px 16px;
+
+}
+
+#UserSettingsContent .mail_form > .expander_link:hover::after {
+    opacity: 1;
+}
+
+#UserSettingsContent .mail_form > form   {
+    float: left;
+    padding: 20px 10px;
+    width: 530px;
+    background: #FFF;
+    border-radius: 3px;
+}
+
+#UserSettingsContent .mail_form label {
+    float: left;
+    width: 252px;
+}
+
+#UserSettingsContent .mail_form label.long_input {
+    width: 530px;
+}
+
+#UserSettingsContent .mail_form label.long_input input:not([type=submit]):not([type=radio]):not([type=checkbox]) {
+    width: 518px;
+}
+
+#UserSettingsContent .mail_form div.submit {
+    float: left;
+    width: 100%;
+}
+
+#UserSettingsContent input:not([type=submit]):not([type=radio]):not([type=checkbox]) {
+    width: 240px;
+}
+
+#UserSettingsContent .better_select {
+    width: 252px !important;
+}
+
+#UserSettingsContent .better_select_select {
+    width: 252px !important;
+}
+
+#UserSettingsContent .owner_check_list {
+    width: 518px;
+    float: left;
+    list-style-type: none;
+    border: 1px solid rgb(170, 170, 170);
+    padding: 5px;
+}
+
+#UserSettingsContent .owner_check_list li {
+    float: left;
+}
+
+#UserSettingsContent .owner_check_list input {
+    display: none;
+}
+
+#UserSettingsContent .mail_form .owner_check_list label {
+    width: auto;
+    cursor: pointer;
+    padding: 0 10px;
+    border-radius: 3px;
+    margin: 5px;
+    /* margin-bottom: 10px; */
+    font-weight: bold;
+    color: #9D9D9D;
+    background-color: #eee;
+}
+
+#UserSettingsContent .mail_form .owner_check_list input[type=checkbox]:checked + label {
+    background: rgb(33, 117, 213);
+    color: #fff;
+
+}
+
+#UserSettingsEditMailAddDomainForm label:first-of-type,
+#UserSettingsEditMailAddDomainAliasForm label:first-of-type {
+    padding-right: 26px;
+}
+
+
+#UserSettingsEditMailAddAddressAddMailboxCheckbox + label + div {
+
+    transition: 0.3s height;
+    float: left;
+    position: relative;
+    width: 530px;
+    overflow: hidden;
+    height: 0;
+}
+#UserSettingsEditMailAddAddressAddMailboxCheckbox + label + div > label:nth-of-type(3){
+    float: right;
+}
+
+#UserSettingsEditMailAddAddressAddMailboxCheckbox + label + div > label:first-of-type {
+    padding-right: 26px;
+}
+
+#UserSettingsEditMailAddAddressAddMailboxCheckbox + label + div::after {
+    display: block;
+    position: absolute;
+    content: "";
+    z-index: 200;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+#UserSettingsEditMailAddAddressAddMailboxCheckbox:checked + label + div {
+    height: 114px;
+}
+
+#UserSettingsEditMailAddAddressAddMailboxCheckbox:checked + label + div::after {
+    display: none;
+}
+
+
+#UserSettingsEditMailAddressLists{
+    float: left;
+    list-style-type: none;
+}
+
+
+#UserSettingsEditMailAddressLists li.can_edit{
+    cursor: pointer;
+}
+
+
+#UserSettingsEditMailAddressLists li.active{
+    background-color: #4F8FA8 ;
+    color: #fff ;
+    border-color: #025C6D ;
+
+}
+#UserSettingsContent #UserSettingsEditMailAddressLists  .has_deletable.floating_list > li.active > .delete{
+    background-color: #4F8FA8 ;
+
+}
+
+#UserSettingsEditMailAddAddressForm.editing .submit.create{
+    display: none;
+}
+
+#UserSettingsEditMailAddAddressForm:not(.editing) .submit.edit{
+    display: none;
 }

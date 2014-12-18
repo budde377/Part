@@ -328,7 +328,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         }
 
         foreach ($this->functionWhitelist[$type] as $k => $fn) {
-            if (in_array($fn, $this->functions[$type])) {
+            if (in_array($fn, $this->functions[$type]) || (isset($this->customFunctions[$type], $this->customFunctions[$type][$fn]))) {
                 continue;
             }
             unset($this->functionWhitelist[$type][$k]);
@@ -420,6 +420,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         $args = $function->getArgs();
         /** @var \ReflectionParameter[] $parameters */
         $parameters = null;
+        $this->callPreCallFunctions($type, $instance, $name, $args);
 
         if (isset($this->customFunctions[$type][$name])) {
             $f = new \ReflectionFunction($this->customFunctions[$type][$name]);
@@ -432,6 +433,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         if ($parameters === null) {
             return false;
         }
+
         return $this->parametersCheck($args, $parameters);
     }
 
@@ -627,13 +629,14 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
             }
             if ($c = $param->getClass()) {
                 if (isset($functionArgs[$k])) {
+
                     if (!is_a($functionArgs[$k], $c->getName())) {
                         return false;
                     } else {
                         continue;
                     }
                 }
-                if (!$param->isOptional()) {
+                if (!$param->isDefaultValueAvailable()) {
                     return false;
                 }
 
@@ -643,6 +646,22 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         }
 
         return true;
+
+    }
+
+    /**
+     * Adds an alias.
+     * If the alias already exists the types are merged.
+     * @param string $alias
+     * @param array $target
+     */
+    public function addAlias($alias, array $target){
+        $this->alias[$alias] = isset($this->alias[$alias])?array_merge($this->alias[$alias], $target):$target;
+
+        if(in_array($alias, $this->types)){
+            return;
+        }
+        $this->types[] = $alias;
 
     }
 }

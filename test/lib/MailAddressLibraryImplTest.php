@@ -7,9 +7,12 @@
  */
 namespace ChristianBudde\cbweb\test;
 
+use ChristianBudde\cbweb\controller\json\MailAddressLibraryObjectImpl;
 use ChristianBudde\cbweb\model\mail\AddressLibrary;
+use ChristianBudde\cbweb\model\mail\AddressLibraryImpl;
 use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
 use ChristianBudde\cbweb\model\mail\AddressImpl;
+use ChristianBudde\cbweb\test\stub\StubUserLibraryImpl;
 use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubConfigImpl;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
@@ -19,12 +22,13 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
 
     private $config;
-    /** @var  AddressLibrary */
+    /** @var  AddressLibraryImpl */
     private $addressLibrary;
     private $db;
     private $domainLibrary;
     private $domain;
     private $mailPass;
+    private $userLibrary;
 
     function __construct()
     {
@@ -51,7 +55,8 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db);
+        $this->userLibrary = new StubUserLibraryImpl();
+        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db, $this->userLibrary);
         $this->domain = $this->domainLibrary->getDomain('test.dk');
         $this->addressLibrary = $this->domain->getAddressLibrary();
     }
@@ -118,14 +123,14 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
     public function testHasAddressWillReturnRightBool()
     {
-        $this->assertTrue($this->addressLibrary->hasAddress('test'));
-        $this->assertFalse($this->addressLibrary->hasAddress('non-existing'));
+        $this->assertTrue($this->addressLibrary->hasAddressWithLocalPart('test'));
+        $this->assertFalse($this->addressLibrary->hasAddressWithLocalPart('non-existing'));
 
     }
 
     public function testContainsReturnRightBool()
     {
-        $a = new AddressImpl('test', $this->db, $this->addressLibrary);
+        $a = new AddressImpl('test', $this->db, new StubUserLibraryImpl(), $this->addressLibrary);
         $this->assertTrue($this->addressLibrary->contains($this->addressLibrary->getAddress('test')));
         $this->assertFalse($this->addressLibrary->contains($a));
 
@@ -166,7 +171,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
     public function testDeleteFromInstanceNotInLibDoesNothing()
     {
-        $a = new AddressImpl('test', $this->db, $this->addressLibrary);
+        $a = new AddressImpl('test', $this->db, $this->userLibrary, $this->addressLibrary);
         $this->addressLibrary->deleteAddress($a);
         $this->assertTrue($a->exists());
     }
@@ -175,8 +180,8 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
     {
         $a = $this->addressLibrary->getAddress('test');
         $a->setLocalPart('test3');
-        $this->assertTrue($this->addressLibrary->hasAddress('test3'));
-        $this->assertFalse($this->addressLibrary->hasAddress('test'));
+        $this->assertTrue($this->addressLibrary->hasAddressWithLocalPart('test3'));
+        $this->assertFalse($this->addressLibrary->hasAddressWithLocalPart('test'));
     }
 
     public function testRenameIsOkWRTList()
@@ -198,24 +203,43 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
         $this->assertFalse($catchAll->exists());
     }
 
+    public function testDeleteCatchallAddressDeletesTheAddressWithDeleteAddressFunction()
+    {
+        $catchAll = $this->addressLibrary->getCatchallAddress();
+        $this->addressLibrary->deleteAddress($catchAll);
+        $this->assertFalse($this->addressLibrary->hasCatchallAddress());
+        $this->assertFalse($catchAll->exists());
+    }
+
     public function testCreateCatchallAddressCreates()
     {
         $c1 = $this->addressLibrary->getCatchallAddress();
         $this->addressLibrary->deleteCatchallAddress();
         $this->assertNull($this->addressLibrary->getCatchallAddress());
-        $this->addressLibrary->createCatchallAddress();
+        $c3 = $this->addressLibrary->createCatchallAddress();
         $this->assertTrue($this->addressLibrary->hasCatchallAddress());
         $c2 = $this->addressLibrary->getCatchallAddress();
         $this->assertEquals('', $c2->getLocalPart());
         $this->assertFalse($c1 === $c2);
+        $this->assertTrue($c3 === $c2);
         $this->assertTrue($c2->exists());
+    }
+
+    public function testCreateCatchallAddressWhileExistingReturnsOldInstance()
+    {
+        $c1 = $this->addressLibrary->createCatchallAddress();
+        $c2 = $this->addressLibrary->createCatchallAddress();
+        $this->assertTrue($c1 === $c2);
     }
 
 
     public function testHasAddressLocalPartWillBeTrimmed()
     {
 
-        $this->assertTrue($this->addressLibrary->hasAddress('test '));
+        $this->assertTrue($this->addressLibrary->hasAddressWithLocalPart('test '));
     }
-
+    public function testReturnsRightJSONObject(){
+        $this->assertEquals($o = new MailAddressLibraryObjectImpl($this->addressLibrary), $this->addressLibrary->jsonObjectSerialize());
+        $this->assertEquals($o->jsonSerialize(), $this->addressLibrary->jsonSerialize());
+    }
 }

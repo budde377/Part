@@ -50,12 +50,13 @@ class StubLogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testLogReturnsNull()
     {
-        $this->assertNull($this->logFile->log("", 1));
+        $this->assertLessThanOrEqual(time(), $this->logFile->log("", 1));
     }
 
     public function testLogDoesReturnFile()
     {
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\util\\file\\StubDumpFileImpl", $this->logFile->log("MSG", Logger::LOG_LEVEL_ERROR, true));
+        $this->logFile->log("MSG", Logger::LOG_LEVEL_ERROR, $d);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\util\\file\\StubDumpFileImpl", $d);
     }
 
 }

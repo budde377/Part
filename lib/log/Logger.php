@@ -27,7 +27,7 @@ interface Logger
      *
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function emergency($message, array $context = array());
 
@@ -39,7 +39,7 @@ interface Logger
      *
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function alert($message, array $context = array());
 
@@ -50,7 +50,7 @@ interface Logger
      *
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function critical($message, array $context = array());
 
@@ -60,7 +60,7 @@ interface Logger
      *
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function error($message, array $context = array());
 
@@ -72,7 +72,7 @@ interface Logger
      *
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function warning($message, array $context = array());
 
@@ -81,7 +81,7 @@ interface Logger
      *
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function notice($message, array $context = array());
 
@@ -92,7 +92,7 @@ interface Logger
      *
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function info($message, array $context = array());
 
@@ -101,7 +101,7 @@ interface Logger
      *
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function debug($message, array $context = array());
 
@@ -111,7 +111,7 @@ interface Logger
      * @param mixed $level
      * @param string $message
      * @param array $context
-     * @return null
+     * @return int
      */
     public function log($level, $message, array $context = array());
 

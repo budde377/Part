@@ -1,12 +1,12 @@
 <?php
 namespace ChristianBudde\cbweb\test;
 
+use ChristianBudde\cbweb\controller\json\SiteContentObjectImpl;
 use ChristianBudde\cbweb\model\site\SiteContentImpl;
 use ChristianBudde\cbweb\model\site\SiteImpl;
-use ChristianBudde\cbweb\controller\json\SiteContentObjectImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\test\stub\StubDBImpl;
 use ChristianBudde\cbweb\test\stub\StubSiteImpl;
+use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
 use ChristianBudde\cbweb\util\db\DB;
 
 /**
@@ -57,38 +57,45 @@ class SiteContentImplTest extends CustomDatabaseTestCase
 
     public function testListContentWillReturnArrayOfRightSize()
     {
+        $list = $this->existingContent->listContentHistory();
+        $this->assertGreaterThan(0, $list[0]['time']);
+        $this->assertLessThan(time(), $list[0]['time']);
+        unset($list[0]['time']);
+        $this->assertEquals([['content'=>'Some Content']], $list);
 
-        $this->assertEquals(1, count($ar = $this->existingContent->listContentHistory()));
-        $this->assertEquals(2, count($ar[0]));
-        $this->assertEquals("Some Content", trim($ar[0]['content']));
-        $this->assertGreaterThan(0, trim($ar[0]['time']));
     }
 
     public function testFromWillLimitList()
     {
-        $this->assertEquals(0, count($this->existingContent->listContentHistory(time())));
+
+        $this->assertEquals([], $this->existingContent->listContentHistory(time()));
     }
 
     public function testToWillLimitList()
     {
-        $this->existingContent->addContent("TEST!");
-        $this->assertEquals(1, count($this->existingContent->listContentHistory(null, time() - 100)));
+        $newT = $this->existingContent->addContent($c = "TEST!")-1;
+        $l = $this->existingContent->listContentHistory(null, $newT);
+        unset($l[0]['time']);
+        $this->assertEquals([['content'=>'Some Content']], $l);
 
     }
 
     public function testFromToWillBeAccurate()
     {
+        $this->assertEquals(2, count($this->existingContent2->listContentHistory()));
         $this->existingContent2->addContent("3");
-        $this->assertEquals(3, count($this->existingContent2->listContentHistory()));
-        $this->assertEquals(1, count($this->existingContent2->listContentHistory(1356994000, 1356995000)));
+        $history = $this->existingContent2->listContentHistory(null, null, true);
+        $this->assertEquals(3, count($history));
+        $this->assertEquals([$history[0]], $this->existingContent2->listContentHistory($history[0], $history[0], true));
     }
 
 
     public function testOnlyTimestampWillListTimestamps()
     {
 
-        $list = $this->existingContent2->listContentHistory(null, null, true);
-        $this->assertEquals([946681201, 1356994801], $list);
+        $list1 = $this->existingContent2->listContentHistory(null, null);
+        $list2 = $this->existingContent2->listContentHistory(null, null, true);
+        $this->assertEquals([$list1[0]['time'], $list1[1]['time']], $list2);
     }
 
     public function testAddContentWillAddContent()
@@ -174,9 +181,12 @@ class SiteContentImplTest extends CustomDatabaseTestCase
 
     public function testContainsSubStringWillReturnTrueIfContainsString()
     {
+        $this->existingContent->addContent($s = "New String");
+
         $this->assertTrue($this->existingContent->containsSubString("Some"));
         $this->assertTrue($this->existingContent->containsSubString("Content"));
         $this->assertTrue($this->existingContent->containsSubString("Some Content"));
+        $this->assertTrue($this->existingContent->containsSubString($s));
     }
 
 

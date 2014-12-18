@@ -1,6 +1,7 @@
 <?php
 namespace ChristianBudde\cbweb\test;
 
+use ChristianBudde\cbweb\util\file\DumpFile;
 use ChristianBudde\cbweb\util\file\LogFileImpl;
 
 use ChristianBudde\cbweb\util\file\FolderImpl;
@@ -111,19 +112,19 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testLogWillReturnNull()
     {
-        $this->assertNull($this->logFile->log("SOME MSG", 2));
+        $this->assertLessThanOrEqual(time(), $this->logFile->log("SOME MSG", 2));
     }
 
     public function testLogWillReturnDumpFile()
     {
-        $this->dumpFile = $this->logFile->log("MSG", 2, true);
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\util\\file\\DumpFileImpl", $this->dumpFile);
-
+        $this->logFile->log("MSG", 2, $dumpFile);
+        $this->assertInstanceOf("ChristianBudde\\cbweb\\util\\file\\DumpFileImpl", $dumpFile);
+        $this->dumpFile = $dumpFile;
     }
 
     public function testListLogWillContainDumpFile()
     {
-        $d = $this->logFile->log("Some msg", 2, true);
+        $this->logFile->log("Some msg", 2, $d);
         $ar = $this->logFile->listLog();
         $ar1 = $ar[0];
         $this->assertArrayHasKey("dumpfile", $ar1);
@@ -135,7 +136,7 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testListLogDumpFileAndReuseInstance()
     {
-        $d = $this->logFile->log("Some msg", 2, true);
+        $this->logFile->log("Some msg", 2, $d);
         $ar = $this->logFile->listLog();
         $ar1 = $ar[0];
         $this->assertTrue($d === $ar1["dumpfile"]);
@@ -185,31 +186,36 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testClearWillDeleteDumpFiles()
     {
-        $this->dumpFile = $f = $this->logFile->log("SOME MSG", 1, true);
-        $f->writeSerialized([1, 2, 3]);
-        $this->assertTrue($f->exists());
+        /** @var $d DumpFile */
+        $this->logFile->log("SOME MSG", 1, $d);
+        $this->dumpFile = $d;
+        $d->writeSerialized([1, 2, 3]);
+        $this->assertTrue($d->exists());
         $this->logFile->clearLog();
-        $this->assertFalse($f->exists());
+        $this->assertFalse($d->exists());
     }
 
 
     public function testAbsolutePathIsTheSameWithNewInstanceOfLogFile()
     {
-        $d = $this->logFile->log("LOL", 4, true);
+        $this->logFile->log("LOL", 4, $d);
         $this->dumpFile = $d;
         $logfile = new LogFileImpl($this->logFile->getAbsoluteFilePath());
         $dl = $logfile->listLog();
-        /** @var \ChristianBudde\cbweb\util\file\DumpFile $d2 */
+        /** @var DumpFile $d2 */
+        /** @var DumpFile $d */
         $d2 = $dl[0]["dumpfile"];
         $this->assertEquals($d->getAbsoluteFilePath(), $d2->getAbsoluteFilePath());
     }
 
     public function testClearLogWithNewInstanceOfLogFile()
     {
-        $d = $this->logFile->log("LOL", 4, true);
+        /** @var DumpFile $d */
+        $this->logFile->log("LOL", 4, $d);
         $logfile = new LogFileImpl($this->logFile->getAbsoluteFilePath());
         $logfile->clearLog();
         $this->assertFalse($d->exists());
+        $this->dumpFile = $d;
 
     }
 

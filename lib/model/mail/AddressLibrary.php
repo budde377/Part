@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\cbweb\model\mail;
+use ChristianBudde\cbweb\controller\json\JSONObjectSerializable;
 
 
 /**
@@ -9,10 +10,10 @@ namespace ChristianBudde\cbweb\model\mail;
  * Time: 2:13 PM
  */
 
-interface AddressLibrary {
+interface AddressLibrary extends JSONObjectSerializable {
 
     /**
-     * @return array An array containing selected entries.
+     * @return Address[] An array containing selected entries.
      */
     public function listAddresses();
 
@@ -20,7 +21,7 @@ interface AddressLibrary {
      * @param string $localPart
      * @return bool
      */
-    public function hasAddress($localPart);
+    public function hasAddressWithLocalPart($localPart);
 
     /**
      * Gets a address from the given address. Null if not found.

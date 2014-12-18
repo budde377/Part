@@ -31,32 +31,5 @@ interface JSONFunction extends Target, Program
      */
     public function getName();
 
-    /**
-     * @param string $name
-     * @return void
-     */
-    public function setName($name);
-
-    /**
-     * Will set an argument with value
-     * @param int $num
-     * @param mixed $value
-     * @return void
-     */
-    public function setArg($num, $value);
-
-    /**
-     * Clears arguments
-     * @return void
-     */
-    public function clearArguments();
-
-
-    /**
-     * Sets the root target, i.e. calls recursively on target until target is not a function.
-     * @param Target $target
-     * @return void
-     */
-    public function setRootTarget(Target $target );
 
 }

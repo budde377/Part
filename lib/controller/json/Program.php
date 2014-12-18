@@ -11,13 +11,6 @@ namespace ChristianBudde\cbweb\controller\json;
 
 interface Program extends Element{
 
-
-    /**
-     * @param Target $target
-     * @return void
-     */
-    public function setTarget(Target $target);
-
     /**
      * @return Target
      */
