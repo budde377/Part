@@ -57,13 +57,11 @@ class Calendar {
     _table.children.clear();
     var d = dt.subtract(new Duration(days:dt.day + ((dt.weekday - dt.day) % 7) - 1));
     while (_table.children.length < 6) {
-      var row = new TableRowElement();
+      var row = _table.addRow();
       for (var i = 0;i < 7;i++) {
         row.append(_createCell(d));
         d = d.add(new Duration(days:1));
       }
-
-      _table.append(row);
     }
 
   }
