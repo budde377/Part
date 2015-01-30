@@ -789,7 +789,7 @@ class ParserImpl implements Parser
         $a = func_get_args();
         $t = array_shift($a);
         array_shift($a);
-        array_unshift($a, $t);
+        $a = array_merge([$t], $a);
         return call_user_func_array('self::orCallable', $a);
 
     }
