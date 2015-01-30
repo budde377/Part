@@ -31,7 +31,7 @@ class FormHandler {
         blur();
         core.FutureResponse r = result;
 
-        var f = (String s) => (core.Response r) {
+        var f = (String s, String notion_selector, String notion_type) => (core.Response r) {
           if (form.dataset[s] != null) {
             var h2 = FS.register.addType(core.Response, r);
             FS.register.runFunctionString(form.dataset[s]);
@@ -41,11 +41,16 @@ class FormHandler {
           h.remove();
           unBlur();
 
+          var notion = form.dataset[notion_selector];
+          if(notion != null){
+            changeNotion(notion, notion_type);
+          }
+
         };
 
         r.thenResponse(
-            onSuccess: f('on-success-function-string'),
-            onError:f('on-error-function-string'));
+            onSuccess: f('on-success-function-string', 'on-success-notion', NOTION_TYPE_SUCCESS),
+            onError:f('on-error-function-string', 'on-error-notion', NOTION_TYPE_ERROR));
 
         return true;
       };
@@ -154,6 +159,10 @@ class FormHandler {
 
       }
     });
+
+    if(ValidatingForm.hasValidator(form)){
+      validatingForm.validate(true);
+    }
   }
 
 

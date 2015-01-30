@@ -9,6 +9,9 @@ import 'core.dart' as core;
 import 'site_classes.dart';
 import 'json.dart';
 
+@MirrorsUsed(targets: const[FormHandler, core.Response, Validator, String, ValidatingForm])
+import "dart:mirrors";
+
 part "src/elements_animation.dart";
 part "src/elements_better_select.dart";
 part "src/elements_calendar.dart";

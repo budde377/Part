@@ -283,7 +283,7 @@ class AJAXPageOrder extends PageOrder {
 
   FutureResponse<Page> deletePage(String id) {
     var completer = new Completer<Response<Page>>();
-    var functionCallback = (JSONResponse response) {
+    var functionCallback = (Response response) {
       if (response.type == Response.RESPONSE_TYPE_SUCCESS) {
         var page = _pages[id];
         _pages.remove(id);
