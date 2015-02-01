@@ -444,6 +444,7 @@ select.better_select_select {
     height: 32px;
     padding-right: 25px;
     cursor: pointer;
+    left: 0;
 }
 
 .colorList {
