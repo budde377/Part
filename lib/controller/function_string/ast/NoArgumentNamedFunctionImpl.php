@@ -2,53 +2,52 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/24/14
- * Time: 10:20 PM
+ * Date: 2/1/15
+ * Time: 8:45 AM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class NoArgumentNamedFunctionImpl extends ArgumentNamedFunction{
+use ChristianBudde\cbweb\controller\json\CompositeFunction as JCompositeFunction;
+use ChristianBudde\cbweb\controller\json\CompositeFunctionImpl as JCompositeFunctionImpl;
+use ChristianBudde\cbweb\controller\json\JSONFunction;
+use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
+use ChristianBudde\cbweb\controller\json\Target;
 
-    /** @var  NameImpl */
-    private $name;
+class NoArgumentNamedFunctionImpl implements  NoArgumentNamedFunction{
 
-    function __construct(NameImpl $name)
+    private  $name;
+
+    function __construct(Name $name)
     {
         $this->name = $name;
     }
 
+
     /**
-     * @return NameImpl
+     * @return Name
      */
     public function getName()
     {
         return $this->name;
     }
 
-
     /**
-     * @return ArgumentList[]
+     * @param Target $target
+     * @return JCompositeFunction
      */
-    public function generateArgumentList()
+    public function toJSONCompositeFunction(Target $target)
     {
-        return [];
+        return new JCompositeFunctionImpl($target, [$this->toJSONFunction($target)]);
     }
 
     /**
-     * @return ScalarArrayProgram[]
+     * @param Target $target
+     * @return JSONFunction
      */
-    public function generatePositionalArgumentList()
+    public function toJSONFunction(Target $target)
     {
-        return [];
-    }
-
-    /**
-     * @return NamedArgumentImpl[]
-     */
-    public function generateNamedArgumentList()
-    {
-        return [];
+        return new JSONFunctionImpl($this->getName()->getValue(), $target);
     }
 }

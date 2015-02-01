@@ -3,6 +3,7 @@
 namespace ChristianBudde\cbweb\test;
 
 use ChristianBudde\cbweb\controller\ajax\ServerImpl;
+use ChristianBudde\cbweb\controller\function_string\Parser;
 use ChristianBudde\cbweb\controller\function_string\ParserImpl;
 use ChristianBudde\cbweb\controller\json\JSONFunction;
 use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
@@ -36,6 +37,8 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
     private $handler2;
     /** @var  StubUserLibraryImpl */
     private $userLibrary;
+    /** @var  Parser */
+    private $parser;
 
     protected function setUp()
     {
@@ -45,7 +48,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->server = new ServerImpl($this->backendContainer);
         $this->handler1 = new StubAJAXTypeHandlerImpl();
         $this->handler2 = new StubAJAXTypeHandlerImpl();
-
+        $this->parser = new ParserImpl();
     }
 
 
@@ -321,8 +324,8 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
 
         $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('handle', $this->handler1));
         $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled('handle', $this->handler2));
-        $this->assertEquals([$type1, ParserImpl::parseString("SomeElement.func('success')")->toJSONProgram(), null], $r1['arguments']);
-        $this->assertEquals([$type2, ParserImpl::parseString("PageElement.f()")->toJSONProgram(), null], $r2['arguments']);
+        $this->assertEquals([$type1, $this->parser->parseString("SomeElement.func('success')")->toJSONProgram(), null], $r1['arguments']);
+        $this->assertEquals([$type2, $this->parser->parseString("PageElement.f()")->toJSONProgram(), null], $r2['arguments']);
 
         $this->assertEquals("success too", $r->getPayload());
     }
@@ -482,7 +485,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $expectedResponse = ($this->handler2->handle[$type] = new ResponseImpl());
         $expectedResponse->setPayload("success");
         $this->server->registerHandler($this->handler2);
-        $func = ParserImpl::parseString('someType.func()')->toJSONProgram();
+        $func = $this->parser->parseString('someType.func()')->toJSONProgram();
 
         /** @var JSONFunction $func */
         /** @var Response $r */
@@ -529,8 +532,8 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled('handle', $this->handler1));
         $this->assertNull($this->checkIfFunctionIsCalled('handle', $this->handler1));
 
-        $this->assertEquals([$type1, ParserImpl::parseString("SomeElement.func()")->toJSONProgram(), null], $r1['arguments']);
-        $this->assertEquals([$type1, ParserImpl::parseString("SomeElement.func2()")->toJSONProgram(), null], $r2['arguments']);
+        $this->assertEquals([$type1, $this->parser->parseString("SomeElement.func()")->toJSONProgram(), null], $r1['arguments']);
+        $this->assertEquals([$type1, $this->parser->parseString("SomeElement.func2()")->toJSONProgram(), null], $r2['arguments']);
 
         $this->assertEquals("success", $r->getPayload());
 
@@ -570,9 +573,9 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->assertNull($this->checkIfFunctionIsCalled('handle', $this->handler1));
         $this->assertNull($this->checkIfFunctionIsCalled('handle', $this->handler2));
 
-        $this->assertEquals([$type1, ParserImpl::parseString("SomeElement.f()")->toJSONProgram(), null], $r1['arguments']);
-        $this->assertEquals([$type2, ParserImpl::parseString("SomeElement.f().f1()")->toJSONProgram(), $instance1], $r2['arguments']);
-        $this->assertEquals([$type2, ParserImpl::parseString("SomeElement.f().f2()")->toJSONProgram(), $instance1], $r3['arguments']);
+        $this->assertEquals([$type1, $this->parser->parseString("SomeElement.f()")->toJSONProgram(), null], $r1['arguments']);
+        $this->assertEquals([$type2, $this->parser->parseString("SomeElement.f().f1()")->toJSONProgram(), $instance1], $r2['arguments']);
+        $this->assertEquals([$type2, $this->parser->parseString("SomeElement.f().f2()")->toJSONProgram(), $instance1], $r3['arguments']);
 
         $this->assertEquals("success", $r->getPayload());
 
@@ -624,9 +627,9 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('handle', $this->handler1));
         $this->assertNotNull($r2 = $this->checkIfFunctionIsCalled('handle', $this->handler1));
         /** @var JSONFunction $f */
-        $f = ParserImpl::parseString("Content.c1()")->toJSONProgram();
+        $f = $this->parser->parseString("Content.c1()")->toJSONProgram();
         $f = new JSONFunctionImpl($f->getName(), $f->getTarget(), [null]);
-        $this->assertEquals([$type1, ParserImpl::parseString("Content.c2()")->toJSONProgram(), $instance1], $r1['arguments']);
+        $this->assertEquals([$type1, $this->parser->parseString("Content.c2()")->toJSONProgram(), $instance1], $r1['arguments']);
         $this->assertEquals([$type1, $f, $instance1], $r2['arguments']);
 
     }

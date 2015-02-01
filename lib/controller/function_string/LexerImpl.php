@@ -55,7 +55,7 @@ class LexerImpl implements Lexer
             $input = substr($input, strlen($m['match']));
 
         }
-
+        $tokens[] = ['match'=> '', 'token'=>self::T_EOF];
         return $tokens;
     }
 

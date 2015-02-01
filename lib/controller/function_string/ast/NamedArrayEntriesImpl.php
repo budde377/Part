@@ -2,48 +2,60 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/24/14
- * Time: 10:28 PM
+ * Date: 2/1/15
+ * Time: 9:54 AM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class NamedArrayEntriesImpl implements NamedArrayEntry{
+use ChristianBudde\cbweb\util\traits\ParserTrait;
 
-    /** @var  KeyArrowValueImpl */
+class NamedArrayEntriesImpl implements NamedArrayEntries{
+
+    use ParserTrait;
+
+    private $name;
     private $value;
-    /** @var  AllArrayEntries */
-    private $arrayEntries;
+    private $arrayEntry;
 
-    function __construct(KeyArrowValueImpl $value, AllArrayEntries $arrayEntries)
+    function __construct(Scalar $name, ScalarArrayProgram $value, ArrayEntry $arrayEntry)
     {
+        $this->name = $name;
         $this->value = $value;
-        $this->arrayEntries = $arrayEntries;
+        $this->arrayEntry = $arrayEntry;
     }
 
+
     /**
-     * @return AllArrayEntries
+     * @return Scalar
      */
-    public function getArrayEntries()
+    public function getName()
     {
-        return $this->arrayEntries;
+        return $this->name;
     }
 
     /**
-     * @return KeyArrowValueImpl
+     * @return ScalarArrayProgram
      */
     public function getValue()
     {
         return $this->value;
     }
 
+    /**
+     * @return ArrayEntry
+     */
+    public function getArrayEntry()
+    {
+        return $this->arrayEntry;
+    }
 
     /**
-     * @return ScalarArrayProgram[]
+     * @return array
      */
     public function toArray()
     {
-        return array_merge($this->value->toArray(), $this->arrayEntries->toArray());
+        return $this->merge_arrays([$this->name->getValue() => $this->getValue()->toJSON()] , $this->getArrayEntry()->toArray());
     }
 }

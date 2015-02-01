@@ -26,7 +26,8 @@ class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase
         parent::setUp();
         $this->handler = new ArrayAccessTypeHandlerImpl();
         $p = $this->parser = function ($string){
-            return ParserImpl::parseString($string)->toJSONProgram();
+            $p = new ParserImpl();
+            return $p->parseString($string)->toJSONProgram();
         };
         $this->function = $p("POST.arrayAccess('id')");
     }

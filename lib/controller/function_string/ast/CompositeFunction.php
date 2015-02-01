@@ -8,12 +8,15 @@
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
+use ChristianBudde\cbweb\controller\json\Target;
+use ChristianBudde\cbweb\controller\json\CompositeFunction as JCompositeFunction;
+
 interface CompositeFunction {
 
     /**
      * @param Target $target
-     * @return FunctionCallImpl[]
+     * @return JCompositeFunction
      */
-    public function toFunctionCalls(Target $target);
+    public function toJSONCompositeFunction(Target $target);
 
 } 

@@ -2,49 +2,50 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/24/14
- * Time: 10:27 PM
+ * Date: 2/1/15
+ * Time: 9:27 AM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class ArrayEntriesImpl implements PositionalArrayEntry{
+use ChristianBudde\cbweb\util\traits\ParserTrait;
 
-    /** @var  ArrayEntryImpl */
-    private $entry;
+class ArrayEntriesImpl implements ArrayEntries{
 
-    /** @var  AllArrayEntries */
-    private $arrayEntries;
+    use ParserTrait;
 
-    function __construct(ArrayEntryImpl $entry, AllArrayEntries $arrayEntries)
+    private $scalarArrayProgram;
+    private $arrayEntry;
+
+    function __construct(ScalarArrayProgram $scalarArrayProgram, ArrayEntry $arrayEntry)
     {
-        $this->entry = $entry;
-        $this->arrayEntries = $arrayEntries;
+        $this->scalarArrayProgram = $scalarArrayProgram;
+        $this->arrayEntry = $arrayEntry;
+    }
+
+
+    /**
+     * @return ScalarArrayProgram
+     */
+    public function getValue()
+    {
+        return $this->scalarArrayProgram;
     }
 
     /**
-     * @return AllArrayEntries
+     * @return ArrayEntry
      */
-    public function getArrayEntries()
+    public function getArrayEntry()
     {
-        return $this->arrayEntries;
+        return $this->arrayEntry;
     }
-
-    /**
-     * @return ArrayEntryImpl
-     */
-    public function getEntry()
-    {
-        return $this->entry;
-    }
-
 
     /**
      * @return array
      */
     public function toArray()
     {
-        return array_merge($this->getEntry()->toArray(), $this->getArrayEntries()->toArray());
+        return $this->merge_arrays($this->getValue()->toArray(), $this->getArrayEntry()->toArray());
     }
 }

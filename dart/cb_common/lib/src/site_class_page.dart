@@ -63,7 +63,7 @@ class AJAXPage extends Page {
 
   FutureResponse<Page> changeInfo({String id:null, String title:null, String template:null, String alias:null, bool hidden:null}) {
     var functionString = "";
-    functionString += id == null || id == _id? "" : "..setId(${quoteString(id)})";
+    functionString += id == null || id == _id? "" : "..setID(${quoteString(id)})";
     functionString += title == null || title == _title? "" : "..setTitle(${quoteString(title)})";
     functionString += template == null || template == _template? "" : "..setTemplate(${quoteString(template)})";
     functionString += alias == null || alias == _alias? "" : "..setAlias(${quoteString(alias)})";
@@ -91,7 +91,7 @@ class AJAXPage extends Page {
         completer.complete(new Response<Page>.error(response.error_code));
       }
     };
-    ajaxClient.callFunctionString("PageOrder.getPage(${quoteString(id)})$functionString..getInstance()").then(functionCallback);
+    ajaxClient.callFunctionString("PageOrder.getPage(${quoteString(_id)})$functionString..getInstance()").then(functionCallback);
     return new FutureResponse(completer.future);
   }
 

@@ -9,11 +9,16 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface FunctionChain {
+use ChristianBudde\cbweb\controller\json\JSONFunction;
+use ChristianBudde\cbweb\controller\json\Target;
+
+interface FunctionChain extends CompositeFunction{
+
 
     /**
      * @param Target $target
-     * @return FunctionCallImpl
+     * @return JSONFunction
      */
-    public function toFunctionCall(Target $target);
+    public function toJSONFunction(Target $target);
+
 } 

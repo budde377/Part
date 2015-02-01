@@ -1,27 +1,28 @@
 <?php
 namespace ChristianBudde\cbweb\test;
 
-use ChristianBudde\cbweb\controller\function_string\ast\ArgumentImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\ArgumentNamedFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArgumentsImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayAccessFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntriesImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntryImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\BoolImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\ChainCompositeFunctionImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\CompositeChainCompositeFunctionImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\CompositeFunctionCallImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\DecimalImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\FunctionCallImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\BoolScalarImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\CompositeFunctionProgramImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\CompositeFunctionsImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\DecimalUnsignedNumScalarImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\DoubleQuotedStringScalarImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\FunctionChainCompositeFunctionProgramImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\FunctionChainProgramImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\FunctionChainsImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\KeyArrowValueImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\NamedArgumentImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\NamedArrayEntriesImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\NamedArrayEntryImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\NamedFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\NameImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\NameNotStartingWithUnderscoreImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\NoArgumentNamedFunctionImpl;
 use ChristianBudde\cbweb\controller\function_string\ast\NonEmptyArrayImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\StringImpl;
+use ChristianBudde\cbweb\controller\function_string\ast\SingleQuotedStringScalarImpl;
 use ChristianBudde\cbweb\controller\function_string\LexerImpl;
+use ChristianBudde\cbweb\controller\function_string\Parser;
 use ChristianBudde\cbweb\controller\function_string\ParserImpl;
 use PHPUnit_Framework_TestCase;
 
@@ -33,33 +34,74 @@ use PHPUnit_Framework_TestCase;
  */
 class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
 {
+    /** @var  Parser */
+    private $parser;
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->parser = new ParserImpl();
+    }
+
 
     public function testParseProgram()
     {
         $l = LexerImpl::lex("A.f()");
-        $p = ParserImpl::parse($l);
-        $this->assertEquals(new FunctionCallImpl(new NameNotStartingWithUnderscoreImpl("A"), new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("f"))), $p);
+        $p = $this->parser->parse($l);
+        $this->assertEquals(new FunctionChainProgramImpl(
+            new NameNotStartingWithUnderscoreImpl('A'),
+            new NoArgumentNamedFunctionImpl(
+                new NameNotStartingWithUnderscoreImpl('f'))), $p);
+    }
+
+    public function testParseCompositeFunctionOnFunctionChain()
+    {
+        $l = LexerImpl::lex("A.f()..g()..h()");
+        $p = $this->parser->parse($l);
+        $this->assertEquals(
+            new FunctionChainCompositeFunctionProgramImpl(
+                new NameNotStartingWithUnderscoreImpl('A'),
+                new NoArgumentNamedFunctionImpl(
+                    new NameNotStartingWithUnderscoreImpl('f')),
+                new CompositeFunctionsImpl(
+                    new NoArgumentNamedFunctionImpl(
+                        new NameNotStartingWithUnderscoreImpl('g')),
+                    new NoArgumentNamedFunctionImpl(
+                        new NameNotStartingWithUnderscoreImpl('h')))), $p);
+
     }
 
     public function testParseProgramWithBoolArgument()
     {
         $l = LexerImpl::lex("A.f(true)");
-        $p = ParserImpl::parse($l);
-        $this->assertEquals(new FunctionCallImpl(new NameNotStartingWithUnderscoreImpl("A"), new ArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("f"), new ArgumentImpl(new BoolImpl(true)))), $p);
+        $p = $this->parser->parse($l);
+        $this->assertEquals(new FunctionChainProgramImpl(
+            new NameNotStartingWithUnderscoreImpl('A'),
+            new NamedFunctionImpl(
+                new NameNotStartingWithUnderscoreImpl('f'),
+                new BoolScalarImpl('true'))), $p);
     }
 
     public function testParseFunctionChain()
     {
         $l = LexerImpl::lex("A.f().g()");
-        $p = ParserImpl::parse($l);
-        $this->assertEquals(new FunctionCallImpl(new FunctionCallImpl(new NameNotStartingWithUnderscoreImpl("A"), new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("f"))), new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl('g'))), $p);
+        $p = $this->parser->parse($l);
+        $this->assertEquals(new FunctionChainProgramImpl(
+            new NameNotStartingWithUnderscoreImpl('A'),
+            new FunctionChainsImpl(new NoArgumentNamedFunctionImpl(
+                new NameNotStartingWithUnderscoreImpl('f')),
+                new NoArgumentNamedFunctionImpl(
+                    new NameNotStartingWithUnderscoreImpl('g')))), $p);
     }
 
     public function testParseArrayAccessFunction()
     {
         $l = LexerImpl::lex("A[1]");
-        $p = ParserImpl::parse($l);
-        $this->assertEquals(new FunctionCallImpl(new NameNotStartingWithUnderscoreImpl("A"), new ArrayAccessFunctionImpl(new DecimalImpl(1))), $p);
+        $p = $this->parser->parse($l);
+        $this->assertEquals(new FunctionChainProgramImpl(
+            new NameNotStartingWithUnderscoreImpl('A'),
+            new ArrayAccessFunctionImpl(new DecimalUnsignedNumScalarImpl('1'))
+        ), $p);
     }
 
     public function testParseProgramWithWhitespace()
@@ -68,113 +110,239 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
 
         .   f (
          )");
-        $p = ParserImpl::parse($l);
-        $this->assertEquals(new FunctionCallImpl(new NameNotStartingWithUnderscoreImpl("A"), new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("f"))), $p);
+        $p = $this->parser->parse($l);
+        $this->assertEquals(new FunctionChainProgramImpl(
+            new NameNotStartingWithUnderscoreImpl('A'),
+            new NoArgumentNamedFunctionImpl(
+                new NameNotStartingWithUnderscoreImpl('f'))), $p);
     }
 
     public function testParseProgramWithUnderscore()
     {
         $l = LexerImpl::lex("_A._f()");
-        $p = ParserImpl::parse($l);
-        $this->assertEquals(new FunctionCallImpl(new NameImpl("_A"), new NoArgumentNamedFunctionImpl(new NameImpl("_f"))), $p);
+        $p = $this->parser->parse($l);
+        $this->assertEquals(new FunctionChainProgramImpl(
+            new NameImpl('_A'),
+            new NoArgumentNamedFunctionImpl(
+                new NameImpl('_f'))), $p);
     }
 
     public function testParseCompositeFunctionCall()
     {
         $l = LexerImpl::lex("A..f()..g()");
-        $p = ParserImpl::parse($l);
+        $p = $this->parser->parse($l);
         $this->assertEquals(
-            new CompositeFunctionCallImpl(
-                new NameNotStartingWithUnderscoreImpl("A"),
-                new CompositeChainCompositeFunctionImpl(
-                    new ChainCompositeFunctionImpl(
-                        new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("f"))),
-                    new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("g")))), $p);
+            new CompositeFunctionProgramImpl(
+                new NameNotStartingWithUnderscoreImpl('A'),
+                new CompositeFunctionsImpl(
+                    new NoArgumentNamedFunctionImpl(
+                        new NameNotStartingWithUnderscoreImpl('f')),
+                    new NoArgumentNamedFunctionImpl(
+                        new NameNotStartingWithUnderscoreImpl('g')))), $p);
 
+    }
+
+    public function testParseLongFS()
+    {
+        $l = LexerImpl::lex('PageOrder..setPageOrder(PageOrder.getPage("hjem"), 0 )..setPageOrder(PageOrder.getPage("arrangementer"), 1 )..setPageOrder(PageOrder.getPage("nyheder"), 2 )..setPageOrder(PageOrder.getPage("nyheder"), 3 )..setPageOrder(PageOrder.getPage("nyheder"), 4 )..setPageOrder(PageOrder.getPage("nyheder"), 5 )..getPageOrder()');
+        $p = $this->parser->parse($l);
+
+        $this->assertEquals(
+            new CompositeFunctionProgramImpl(
+                new NameNotStartingWithUnderscoreImpl('PageOrder'),
+                new CompositeFunctionsImpl(
+                    new NamedFunctionImpl(
+                        new NameNotStartingWithUnderscoreImpl('setPageOrder'),
+                        new ArgumentsImpl(
+                            new FunctionChainProgramImpl(
+                                new NameNotStartingWithUnderscoreImpl('PageOrder'),
+                                new NamedFunctionImpl(
+                                    new NameNotStartingWithUnderscoreImpl('getPage'),
+                                    new DoubleQuotedStringScalarImpl('"hjem"'))),
+                            new DecimalUnsignedNumScalarImpl('0'))
+                    ),
+
+                    new CompositeFunctionsImpl(
+                        new NamedFunctionImpl(
+                            new NameNotStartingWithUnderscoreImpl('setPageOrder'),
+                            new ArgumentsImpl(
+                                new FunctionChainProgramImpl(
+                                    new NameNotStartingWithUnderscoreImpl('PageOrder'),
+                                    new NamedFunctionImpl(
+                                        new NameNotStartingWithUnderscoreImpl('getPage'),
+                                        new DoubleQuotedStringScalarImpl('"arrangementer"'))),
+                                new DecimalUnsignedNumScalarImpl('1'))),
+                        new CompositeFunctionsImpl(
+                            new NamedFunctionImpl(
+                                new NameNotStartingWithUnderscoreImpl('setPageOrder'),
+                                new ArgumentsImpl(
+                                    new FunctionChainProgramImpl(
+                                        new NameNotStartingWithUnderscoreImpl('PageOrder'),
+                                        new NamedFunctionImpl(
+                                            new NameNotStartingWithUnderscoreImpl('getPage'),
+                                            new DoubleQuotedStringScalarImpl('"nyheder"'))),
+                                    new DecimalUnsignedNumScalarImpl('2'))),
+                            new CompositeFunctionsImpl(
+                                new NamedFunctionImpl(
+                                    new NameNotStartingWithUnderscoreImpl('setPageOrder'),
+                                    new ArgumentsImpl(
+                                        new FunctionChainProgramImpl(
+                                            new NameNotStartingWithUnderscoreImpl('PageOrder'),
+                                            new NamedFunctionImpl(
+                                                new NameNotStartingWithUnderscoreImpl('getPage'),
+                                                new DoubleQuotedStringScalarImpl('"nyheder"'))),
+                                        new DecimalUnsignedNumScalarImpl('3'))),
+                                new CompositeFunctionsImpl(
+                                    new NamedFunctionImpl(
+                                        new NameNotStartingWithUnderscoreImpl('setPageOrder'),
+                                        new ArgumentsImpl(
+                                            new FunctionChainProgramImpl(
+                                                new NameNotStartingWithUnderscoreImpl('PageOrder'),
+                                                new NamedFunctionImpl(
+                                                    new NameNotStartingWithUnderscoreImpl('getPage'),
+                                                    new DoubleQuotedStringScalarImpl('"nyheder"'))),
+                                            new DecimalUnsignedNumScalarImpl('4'))),
+                                    new CompositeFunctionsImpl(
+                                        new NamedFunctionImpl(
+                                            new NameNotStartingWithUnderscoreImpl('setPageOrder'),
+                                            new ArgumentsImpl(
+                                                new FunctionChainProgramImpl(
+                                                    new NameNotStartingWithUnderscoreImpl('PageOrder'),
+                                                    new NamedFunctionImpl(
+                                                        new NameNotStartingWithUnderscoreImpl('getPage'),
+                                                        new DoubleQuotedStringScalarImpl('"nyheder"'))),
+                                                new DecimalUnsignedNumScalarImpl('5'))),
+                                        new NoArgumentNamedFunctionImpl(
+                                            new NameNotStartingWithUnderscoreImpl('getPageOrder'))))))
+                    ))), $p);
     }
 
     public function testParseMoreCompositeFunctionCall()
     {
         $l = LexerImpl::lex("A..f()..g()..h()");
-        $p = ParserImpl::parse($l);
+        $p = $this->parser->parse($l);
         $this->assertEquals(
-            new CompositeFunctionCallImpl(
-                new NameNotStartingWithUnderscoreImpl("A"),
-                new CompositeChainCompositeFunctionImpl(
-                    new CompositeChainCompositeFunctionImpl(
-                        new ChainCompositeFunctionImpl(
-                            new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("f"))),
-                        new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("g"))),
-                    new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("h"))
-                )), $p);
-
+            new CompositeFunctionProgramImpl(
+                new NameNotStartingWithUnderscoreImpl('A'),
+                new CompositeFunctionsImpl(
+                    new NoArgumentNamedFunctionImpl(
+                        new NameNotStartingWithUnderscoreImpl('f')),
+                    new CompositeFunctionsImpl(
+                        new NoArgumentNamedFunctionImpl(
+                            new NameNotStartingWithUnderscoreImpl('g')),
+                        new NoArgumentNamedFunctionImpl(
+                            new NameNotStartingWithUnderscoreImpl('h'))))), $p);
     }
 
 
     public function testParseMoreCompositeFunctionCallWithArrayAccess()
     {
         $l = LexerImpl::lex("A..f()..g()[0]..h()");
-        $p = ParserImpl::parse($l);
+        $p = $this->parser->parse($l);
         $this->assertEquals(
-            new CompositeFunctionCallImpl(
-                new NameNotStartingWithUnderscoreImpl("A"),
-                new CompositeChainCompositeFunctionImpl(
-                    new CompositeChainCompositeFunctionImpl(
-                        new ChainCompositeFunctionImpl(
-                            new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("f"))),
-                        new FunctionChainsImpl(new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("g")), new ArrayAccessFunctionImpl(new DecimalImpl(0)))),
-                    new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("h"))
-                )), $p);
-
+            new CompositeFunctionProgramImpl(
+                new NameNotStartingWithUnderscoreImpl('A'),
+                new CompositeFunctionsImpl(
+                    new NoArgumentNamedFunctionImpl(
+                        new NameNotStartingWithUnderscoreImpl('f')),
+                    new CompositeFunctionsImpl(
+                        new FunctionChainsImpl(
+                            new NoArgumentNamedFunctionImpl(
+                                new NameNotStartingWithUnderscoreImpl('g')),
+                            new ArrayAccessFunctionImpl(new DecimalUnsignedNumScalarImpl('0'))),
+                        new NoArgumentNamedFunctionImpl(
+                            new NameNotStartingWithUnderscoreImpl('h'))))), $p);
     }
 
     public function testParseMoreComplexFunctionCall()
     {
         $l = LexerImpl::lex("A..f()..g()..a().b().c()");
-        $p = ParserImpl::parse($l);
+        $p = $this->parser->parse($l);
         $this->assertEquals(
-            new CompositeFunctionCallImpl(new NameNotStartingWithUnderscoreImpl('A'),
-                new CompositeChainCompositeFunctionImpl(
-                    new CompositeChainCompositeFunctionImpl(
-                        new ChainCompositeFunctionImpl(new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("f"))),
-                        new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("g"))),
-                    new FunctionChainsImpl(
+            new CompositeFunctionProgramImpl(
+                new NameNotStartingWithUnderscoreImpl('A'),
+                new CompositeFunctionsImpl(
+                    new NoArgumentNamedFunctionImpl(
+                        new NameNotStartingWithUnderscoreImpl('f')),
+                    new CompositeFunctionsImpl(
+                        new NoArgumentNamedFunctionImpl(
+                            new NameNotStartingWithUnderscoreImpl('g')),
                         new FunctionChainsImpl(
-                            new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("a")),
-                            new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("b"))),
-                        new NoArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl("c"))))), $p);
-
+                            new NoArgumentNamedFunctionImpl(
+                                new NameNotStartingWithUnderscoreImpl('a')),
+                            new FunctionChainsImpl(
+                                new NoArgumentNamedFunctionImpl(
+                                    new NameNotStartingWithUnderscoreImpl('b')),
+                                new NoArgumentNamedFunctionImpl(
+                                    new NameNotStartingWithUnderscoreImpl('c'))))))), $p);
     }
 
 
     public function testFunctionWithArguments()
     {
         $l = LexerImpl::lex("A.f('asd', 1, a:5)");
-        $p = ParserImpl::parse($l);
-        $this->assertEquals(new FunctionCallImpl(
+        $p = $this->parser->parse($l);
+        $this->assertEquals(new FunctionChainProgramImpl(
             new NameNotStartingWithUnderscoreImpl('A'),
-            new ArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl('f'),
-                new ArgumentsImpl(new ArgumentImpl(new StringImpl('asd')),
-                    new ArgumentsImpl(new ArgumentImpl(new DecimalImpl(1)),
-                        new NamedArgumentImpl(new NameNotStartingWithUnderscoreImpl('a'), new DecimalImpl(5)))))
-        ), $p);
+            new NamedFunctionImpl(
+                new NameNotStartingWithUnderscoreImpl('f'),
+                new ArgumentsImpl(
+                    new SingleQuotedStringScalarImpl("'asd'"),
+                    new ArgumentsImpl(
+                        new DecimalUnsignedNumScalarImpl('1'),
+                        new NamedArgumentImpl(
+                            new NameNotStartingWithUnderscoreImpl('a'),
+                            new DecimalUnsignedNumScalarImpl('5')))))), $p);
+
     }
 
 
     public function testArrays()
     {
         $l = LexerImpl::lex("A.f([1,2,3, 4=>5])");
-        $p = ParserImpl::parse($l);
-        $this->assertEquals(new FunctionCallImpl(
+        $p = $this->parser->parse($l);
+        $this->assertEquals(new FunctionChainProgramImpl(
             new NameNotStartingWithUnderscoreImpl('A'),
-            new ArgumentNamedFunctionImpl(new NameNotStartingWithUnderscoreImpl('f'),
-                new ArgumentImpl(
-                    new NonEmptyArrayImpl(
-                        new ArrayEntriesImpl(new ArrayEntryImpl(new DecimalImpl(1)),
-                            new ArrayEntriesImpl(new ArrayEntryImpl(new DecimalImpl(2)),
-                                new ArrayEntriesImpl(new ArrayEntryImpl(new DecimalImpl(3)),
-                                    new KeyArrowValueImpl(new DecimalImpl(4), new DecimalImpl(5))))))
-                ))), $p);
+            new NamedFunctionImpl(
+                new NameNotStartingWithUnderscoreImpl('f'),
+                new NonEmptyArrayImpl(
+                    new ArrayEntriesImpl(
+                        new DecimalUnsignedNumScalarImpl('1'),
+                        new ArrayEntriesImpl(
+                            new DecimalUnsignedNumScalarImpl('2'),
+                            new ArrayEntriesImpl(
+                                new DecimalUnsignedNumScalarImpl('3'),
+                                new NamedArrayEntryImpl(
+                                    new DecimalUnsignedNumScalarImpl('4'),
+                                    new DecimalUnsignedNumScalarImpl('5')))))))), $p);
+    }
+
+    public function testArrays2()
+    {
+        $l = LexerImpl::lex("A.f([4=>5,1])");
+        $p = $this->parser->parse($l);
+        $this->assertEquals(new FunctionChainProgramImpl(
+            new NameNotStartingWithUnderscoreImpl('A'),
+            new NamedFunctionImpl(
+                new NameNotStartingWithUnderscoreImpl('f'),
+                new NonEmptyArrayImpl(
+                    new NamedArrayEntriesImpl(
+                        new DecimalUnsignedNumScalarImpl('4'),
+                        new DecimalUnsignedNumScalarImpl('5'),
+                        new DecimalUnsignedNumScalarImpl('1'))))), $p);
+
+    }
+
+    public function testReturnsNullOnInvalidProgram()
+    {
+        $p = $this->parser->parseString('A.f(_a:123)');
+        $this->assertNull($p);
+    }
+
+    public function testReturnsNullOnInvalidProgram2()
+    {
+        $p = $this->parser->parseString('A.f(a:123, 1)');
+        $this->assertNull($p);
 
     }
 }

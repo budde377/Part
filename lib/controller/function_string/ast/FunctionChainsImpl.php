@@ -2,23 +2,28 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/24/14
- * Time: 10:18 PM
+ * Date: 2/1/15
+ * Time: 8:35 AM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class FunctionChainsImpl implements FunctionChain{
+use ChristianBudde\cbweb\controller\json\CompositeFunction as JCompositeFunction;
+use ChristianBudde\cbweb\controller\json\JSONFunction;
+use ChristianBudde\cbweb\controller\json\Target;
+use ChristianBudde\cbweb\test\JSONCompositeFunctionImplTest;
 
-    private $functionChain;
+class FunctionChainsImpl implements FunctionChains{
     private $function;
+    private $functionChain;
 
-    function __construct(FunctionChain $functionChain, FFunction $function)
+    function __construct(FFunction $function, FunctionChain $functionChain)
     {
-        $this->functionChain = $functionChain;
         $this->function = $function;
+        $this->functionChain = $functionChain;
     }
+
 
     /**
      * @return FFunction
@@ -36,13 +41,21 @@ class FunctionChainsImpl implements FunctionChain{
         return $this->functionChain;
     }
 
+    /**
+     * @param Target $target
+     * @return JCompositeFunction
+     */
+    public function toJSONCompositeFunction(Target $target)
+    {
+        return new JSONCompositeFunctionImplTest($target, [$this->toJSONFunction($target)]);
+    }
 
     /**
      * @param Target $target
-     * @return FunctionCallImpl
+     * @return JSONFunction
      */
-    public function toFunctionCall(Target $target)
+    public function toJSONFunction(Target $target)
     {
-        return new FunctionCallImpl($this->functionChain->toFunctionCall($target), $this->function);
+        return $this->getFunctionChain()->toJSONFunction($this->getFunction()->toJSONFunction($target));
     }
 }

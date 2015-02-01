@@ -10,21 +10,18 @@ namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 use ChristianBudde\cbweb\controller\json\Program as JProgram;
 
-abstract class Program implements ScalarArrayProgram{
+interface Program extends ScalarArrayProgram{
+
+
+
+    /**
+     * @return Type
+     */
+    public function getType();
 
     /**
      * @return JProgram
      */
-    abstract public function toJSONProgram();
-
-    /**
-     * @param callable $programComputer
-     * @return mixed
-     */
-    public function compute(callable $programComputer)
-    {
-        return $programComputer($this);
-    }
-
+    public function toJSONProgram();
 
 }

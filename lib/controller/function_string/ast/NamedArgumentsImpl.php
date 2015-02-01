@@ -2,49 +2,56 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/24/14
- * Time: 10:25 PM
+ * Date: 2/1/15
+ * Time: 9:13 AM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class NamedArgumentsImpl implements NamedArgumentList{
+class NamedArgumentsImpl implements NamedArguments{
+    private $name;
+    private $value;
+    private $namedArgument;
 
-    /** @var  NamedArgumentImpl */
-    private $argument;
-    /** @var  NamedArgumentList */
-    private $argumentList;
-
-    function __construct(NamedArgumentImpl $argument, NamedArgumentList $argumentList)
+    function __construct(NameNotStartingWithUnderscore $name, ScalarArrayProgram $value, NamedArgument $namedArgument)
     {
-        $this->argument = $argument;
-        $this->argumentList = $argumentList;
-    }
-
-    /**
-     * @return NamedArgumentImpl
-     */
-    public function getArgument()
-    {
-        return $this->argument;
-    }
-
-    /**
-     * @return NamedArgumentList
-     */
-    public function getArgumentList()
-    {
-        return $this->argumentList;
+        $this->name = $name;
+        $this->value = $value;
+        $this->namedArgument = $namedArgument;
     }
 
 
+    /**
+     * @return NameNotStartingWithUnderscore
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
     /**
-     * @return ArgumentList[]
+     * @return ScalarArrayProgram
      */
-    public function toArgumentList()
+    public function getValue()
     {
-        return array_merge($this->getArgument()->toArgumentList(), $this->getArgumentList()->toArgumentList());
+        return $this->value;
+    }
+
+    /**
+     * @return NamedArgument
+     */
+    public function getNamedArgument()
+    {
+        return $this->namedArgument;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function toArgumentArray()
+    {
+        return array_merge([$this->getName()->getValue()=>$this->getValue()->toJSON()], $this->getNamedArgument()->toArgumentArray());
     }
 }

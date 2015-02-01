@@ -9,6 +9,13 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface Type extends Target{
+use ChristianBudde\cbweb\controller\json\Type as JType;
+
+interface Type {
+
+    /**
+     * @return JType
+     */
+    public function toJSONTarget();
 
 } 

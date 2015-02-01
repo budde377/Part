@@ -34,6 +34,7 @@ interface Lexer {
     const T_BACKSLASH = "T_BACKSLASH";
     const T_BOOL = "T_BOOL";
     const T_SIGN = "T_SIGN";
+    const T_EOF = "T_EOF";
 
 
     /**

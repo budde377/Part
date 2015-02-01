@@ -9,12 +9,8 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface ScalarArrayProgram{
+interface ScalarArrayProgram extends Argument, ArrayEntry{
 
-    /**
-     * @param callable $programComputer
-     * @return mixed
-     */
-    public function compute(callable $programComputer);
+    public function toJSON();
 
 } 

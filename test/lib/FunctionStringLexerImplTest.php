@@ -19,7 +19,7 @@ class FunctionStringLexerImplTest extends \PHPUnit_Framework_TestCase
     public function testLexerLexesWhitespace()
     {
         $r = LexerImpl::lex(" ");
-        $this->assertEquals([Lexer::T_WHITESPACE], $this->simplify($r));
+        $this->assertEquals([Lexer::T_WHITESPACE, Lexer::T_EOF], $this->simplify($r));
     }
 
     public function testLexerGetsNumbersRight()
@@ -32,7 +32,7 @@ class FunctionStringLexerImplTest extends \PHPUnit_Framework_TestCase
             Lexer::T_HEXADECIMAL, Lexer::T_WHITESPACE,
             Lexer::T_BINARY, Lexer::T_WHITESPACE,
             Lexer::T_OCTAL, Lexer::T_WHITESPACE,
-            Lexer::T_DECIMAL
+            Lexer::T_DECIMAL, Lexer::T_EOF
 
         ], $this->simplify($r));
     }
@@ -41,7 +41,7 @@ class FunctionStringLexerImplTest extends \PHPUnit_Framework_TestCase
         $r = LexerImpl::lex("_hej hej");
         $this->assertEquals([
             Lexer::T_NAME, Lexer::T_WHITESPACE,
-            Lexer::T_NAME_NOT_STARTING_WITH_UNDERSCORE
+            Lexer::T_NAME_NOT_STARTING_WITH_UNDERSCORE, Lexer::T_EOF
 
         ], $this->simplify($r));
 
@@ -58,7 +58,7 @@ class FunctionStringLexerImplTest extends \PHPUnit_Framework_TestCase
             Lexer::T_L_BRACKET,
             Lexer::T_COLON,
             Lexer::T_DOUBLE_ARROW,
-            Lexer::T_BACKSLASH
+            Lexer::T_BACKSLASH, Lexer::T_EOF
         ], $this->simplify($r));
 
     }

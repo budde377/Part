@@ -2,53 +2,51 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/24/14
- * Time: 10:21 PM
+ * Date: 2/1/15
+ * Time: 8:30 AM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class ArrayAccessFunctionImpl extends  FFunction{
+use ChristianBudde\cbweb\controller\json\CompositeFunction as JCompositeFunction;
+use ChristianBudde\cbweb\controller\json\CompositeFunctionImpl as JCompositeFunctionImpl;
+use ChristianBudde\cbweb\controller\json\JSONFunction;
+use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
+use ChristianBudde\cbweb\controller\json\Target;
 
-    /** @var  ScalarArrayProgram */
-    private $key;
+class ArrayAccessFunctionImpl implements ArrayAccessFunction{
+    private $argument;
 
-    function __construct(ScalarArrayProgram $key)
+    function __construct(ScalarArrayProgram $argument)
     {
-        $this->key = $key;
+        $this->argument = $argument;
     }
+
 
     /**
      * @return ScalarArrayProgram
      */
-    public function getKey()
+    public function getArgument()
     {
-        return $this->key;
-    }
-
-
-    /**
-     * @return ArgumentList[]
-     */
-    public function generateArgumentList()
-    {
-        return $this->generatePositionalArgumentList();
+        return $this->argument;
     }
 
     /**
-     * @return ScalarArrayProgram[]
+     * @param Target $target
+     * @return JCompositeFunction
      */
-    public function generatePositionalArgumentList()
+    public function toJSONCompositeFunction(Target $target)
     {
-        return [new ArgumentImpl($this->getKey())];
+        return new JCompositeFunctionImpl($target, [$this->toJSONFunction($target)]);
     }
 
     /**
-     * @return NamedArgumentImpl[]
+     * @param Target $target
+     * @return JSONFunction
      */
-    public function generateNamedArgumentList()
+    public function toJSONFunction(Target $target)
     {
-        return [];
+        return new JSONFunctionImpl('arrayAccess', $target, [$this->getArgument()->toJSON()]);
     }
 }
