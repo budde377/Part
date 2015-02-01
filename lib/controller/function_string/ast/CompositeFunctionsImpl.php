@@ -9,7 +9,12 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
+use ChristianBudde\cbweb\controller\json\CompositeFunction as JCompositeFunction;
+use ChristianBudde\cbweb\controller\json\CompositeFunctionImpl as JCompositeFunctionImpl;
+use ChristianBudde\cbweb\controller\json\Target;
+
 class CompositeFunctionsImpl implements CompositeFunctions{
+
     private $functionChain;
     private $compositeFunction;
 
@@ -33,5 +38,16 @@ class CompositeFunctionsImpl implements CompositeFunctions{
     public function getCompositeFunction()
     {
         return $this->compositeFunction;
+    }
+
+    /**
+     * @param Target $target
+     * @return JCompositeFunction
+     */
+    public function toJSONCompositeFunction(Target $target)
+    {
+        $f = $this->functionChain->toJSONFunction($target);
+        $cf = $this->compositeFunction->toJSONCompositeFunction($target);
+        return new JCompositeFunctionImpl($target, array_merge([$f],$cf->listFunctions()));
     }
 }

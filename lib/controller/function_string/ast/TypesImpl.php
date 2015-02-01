@@ -10,6 +10,9 @@ namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
 
+use ChristianBudde\cbweb\controller\json\Type as JType;
+use ChristianBudde\cbweb\controller\json\TypeImpl;
+
 class TypesImpl implements Types{
 
     /** @var  Type */
@@ -40,4 +43,11 @@ class TypesImpl implements Types{
     }
 
 
+    /**
+     * @return JType
+     */
+    public function toJSONTarget()
+    {
+        return new TypeImpl($this->name->getValue()."\\".$this->getType()->toJSONTarget()->getTypeString());
+    }
 }

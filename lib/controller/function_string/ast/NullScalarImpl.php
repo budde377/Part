@@ -18,4 +18,25 @@ class NullScalarImpl implements Scalar{
     {
         return null;
     }
+
+    public function toJSON()
+    {
+        return $this->getValue();
+    }
+
+    /**
+     * @return array
+     */
+    public function toArgumentArray()
+    {
+        return [null];
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return [null];
+    }
 }

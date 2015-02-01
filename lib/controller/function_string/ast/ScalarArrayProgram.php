@@ -11,6 +11,6 @@ namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 interface ScalarArrayProgram extends Argument, ArrayEntry{
 
-
+    public function toJSON();
 
 } 

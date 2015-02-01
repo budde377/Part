@@ -215,7 +215,6 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
                                         new NoArgumentNamedFunctionImpl(
                                             new NameNotStartingWithUnderscoreImpl('getPageOrder'))))))
                     ))), $p);
-
     }
 
     public function testParseMoreCompositeFunctionCall()
@@ -253,7 +252,6 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
                             new ArrayAccessFunctionImpl(new DecimalUnsignedNumScalarImpl('0'))),
                         new NoArgumentNamedFunctionImpl(
                             new NameNotStartingWithUnderscoreImpl('h'))))), $p);
-
     }
 
     public function testParseMoreComplexFunctionCall()
@@ -295,6 +293,7 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
                         new NamedArgumentImpl(
                             new NameNotStartingWithUnderscoreImpl('a'),
                             new DecimalUnsignedNumScalarImpl('5')))))), $p);
+
     }
 
 
@@ -331,15 +330,19 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
                         new DecimalUnsignedNumScalarImpl('4'),
                         new DecimalUnsignedNumScalarImpl('5'),
                         new DecimalUnsignedNumScalarImpl('1'))))), $p);
+
     }
 
-    public function testReturnsNullOnInvalidProgram(){
+    public function testReturnsNullOnInvalidProgram()
+    {
         $p = $this->parser->parseString('A.f(_a:123)');
         $this->assertNull($p);
     }
 
-    public function testReturnsNullOnInvalidProgram2(){
+    public function testReturnsNullOnInvalidProgram2()
+    {
         $p = $this->parser->parseString('A.f(a:123, 1)');
         $this->assertNull($p);
+
     }
 }

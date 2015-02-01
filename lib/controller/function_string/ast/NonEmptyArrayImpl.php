@@ -25,4 +25,25 @@ class NonEmptyArrayImpl implements NonEmptyArray{
     {
         return $this->arrayEntry;
     }
+
+    /**
+     * @return array
+     */
+    public function toArgumentArray()
+    {
+        return [$this->toJSON()];
+    }
+
+    public function toJSON()
+    {
+        return $this->getArrayEntry()->toArray();
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->toArgumentArray();
+    }
 }

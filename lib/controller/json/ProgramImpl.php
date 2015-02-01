@@ -31,7 +31,7 @@ abstract class ProgramImpl extends ElementImpl implements Program{
 
 
     /**
-     * @return string | JSONFunction
+     * @return Target
      */
     public function getTarget()
     {

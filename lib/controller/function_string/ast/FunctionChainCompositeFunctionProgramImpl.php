@@ -10,6 +10,8 @@ namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
 
+use ChristianBudde\cbweb\controller\json\Program as JProgram;
+
 class FunctionChainCompositeFunctionProgramImpl implements Program{
 
     private $functionChain;
@@ -32,5 +34,34 @@ class FunctionChainCompositeFunctionProgramImpl implements Program{
     {
 
         return $this->type;
+    }
+
+    /**
+     * @return JProgram
+     */
+    public function toJSONProgram()
+    {
+        return $this->compositeFunction->toJSONCompositeFunction($this->functionChain->toJSONFunction($this->type->toJSONTarget()));
+    }
+
+    public function toJSON()
+    {
+        return $this->toJSONProgram();
+    }
+
+    /**
+     * @return array
+     */
+    public function toArgumentArray()
+    {
+        return [$this->toJSON()];
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return [$this->toJSON()];
     }
 }

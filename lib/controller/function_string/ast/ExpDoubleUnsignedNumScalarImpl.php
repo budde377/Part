@@ -25,4 +25,25 @@ class ExpDoubleUnsignedNumScalarImpl implements UnsignedNumScalar{
     {
         return $this->value;
     }
+
+    public function toJSON()
+    {
+        return $this->getValue();
+    }
+
+    /**
+     * @return array
+     */
+    public function toArgumentArray()
+    {
+        return [$this->getValue()];
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->toArgumentArray();
+    }
 }

@@ -19,6 +19,6 @@ interface NamedFunction extends FFunction{
     /**
      * @return Argument
      */
-    public function getArgumentList();
+    public function getArgument();
 
 }

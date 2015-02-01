@@ -9,7 +9,7 @@
 namespace ChristianBudde\cbweb\util\traits;
 
 
-trait ParseTrait {
+trait ParserTrait {
     protected function doubleQuotedStringToString($input)
     {
         $startCharacter = '"';
@@ -43,5 +43,19 @@ trait ParseTrait {
         $result = str_replace("\\\\", "\\", $result);
         return substr($result, 1, strlen($result) - 2);
 
+    }
+
+    /**
+     * @param $a1
+     * @param $a2
+     * @return array
+     */
+    protected function merge_arrays($a1, $a2){
+
+        foreach ($a2 as $key => $val) {
+            $a1[$key] = $val;
+        }
+
+        return $a1;
     }
 }

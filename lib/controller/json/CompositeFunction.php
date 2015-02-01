@@ -13,7 +13,7 @@ namespace ChristianBudde\cbweb\controller\json;
 interface CompositeFunction extends Program{
 
     /**
-     * @return array
+     * @return JSONFunction[]
      */
     public function listFunctions();
 

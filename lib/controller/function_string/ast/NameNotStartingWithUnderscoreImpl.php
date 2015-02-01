@@ -9,6 +9,9 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
+use ChristianBudde\cbweb\controller\json\Target;
+use ChristianBudde\cbweb\controller\json\TypeImpl;
+
 class NameNotStartingWithUnderscoreImpl implements NameNotStartingWithUnderscore{
     private $value;
 
@@ -25,4 +28,11 @@ class NameNotStartingWithUnderscoreImpl implements NameNotStartingWithUnderscore
         return $this->value;
     }
 
+    /**
+     * @return Target
+     */
+    public function toJSONTarget()
+    {
+        return new TypeImpl($this->getValue());
+    }
 }

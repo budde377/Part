@@ -9,11 +9,11 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-use ChristianBudde\cbweb\util\traits\ParseTrait;
+use ChristianBudde\cbweb\util\traits\ParserTrait;
 
 class DoubleQuotedStringScalarImpl implements Scalar{
 
-    use ParseTrait;
+    use ParserTrait;
 
     private $value;
 
@@ -29,5 +29,26 @@ class DoubleQuotedStringScalarImpl implements Scalar{
     public function getValue()
     {
         return $this->value;
+    }
+
+    public function toJSON()
+    {
+        return $this->getValue();
+    }
+
+    /**
+     * @return array
+     */
+    public function toArgumentArray()
+    {
+        return [$this->getValue()];
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->toArgumentArray();
     }
 }

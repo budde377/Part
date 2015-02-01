@@ -35,4 +35,12 @@ class NamedArgumentImpl implements NamedArgument{
     {
         return $this->value;
     }
+
+    /**
+     * @return array
+     */
+    public function toArgumentArray()
+    {
+        return [$this->getName()->getValue()=>$this->getValue()->toJSON()];
+    }
 }

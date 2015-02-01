@@ -9,8 +9,11 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
+use ChristianBudde\cbweb\util\traits\ParserTrait;
+
 class NamedArrayEntriesImpl implements NamedArrayEntries{
 
+    use ParserTrait;
 
     private $name;
     private $value;
@@ -46,5 +49,13 @@ class NamedArrayEntriesImpl implements NamedArrayEntries{
     public function getArrayEntry()
     {
         return $this->arrayEntry;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->merge_arrays([$this->name->getValue() => $this->getValue()->toJSON()] , $this->getArrayEntry()->toArray());
     }
 }

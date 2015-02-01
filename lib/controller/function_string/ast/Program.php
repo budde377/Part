@@ -8,6 +8,7 @@
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
+use ChristianBudde\cbweb\controller\json\Program as JProgram;
 
 interface Program extends ScalarArrayProgram{
 
@@ -17,5 +18,10 @@ interface Program extends ScalarArrayProgram{
      * @return Type
      */
     public function getType();
+
+    /**
+     * @return JProgram
+     */
+    public function toJSONProgram();
 
 }

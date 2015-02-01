@@ -11,5 +11,9 @@ namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 interface ArrayEntry {
 
+    /**
+     * @return array
+     */
+    public function toArray();
 
 } 

@@ -44,4 +44,25 @@ class SignedNumScalarImpl implements SignedNumScalar{
     {
         return $this->number;
     }
+
+    public function toJSON()
+    {
+        return $this->getValue();
+    }
+
+    /**
+     * @return array
+     */
+    public function toArgumentArray()
+    {
+        return [$this->getValue()];
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->toArgumentArray();
+    }
 }

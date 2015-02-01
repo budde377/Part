@@ -36,4 +36,12 @@ class NamedArrayEntryImpl implements NamedArrayEntry {
     {
         return $this->value;
     }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return [$this->getName()->getValue()=>$this->getValue()->toJSON()];
+    }
 }

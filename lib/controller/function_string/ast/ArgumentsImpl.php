@@ -9,6 +9,7 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
+
 class ArgumentsImpl implements Arguments{
 
     private $sap;
@@ -36,4 +37,14 @@ class ArgumentsImpl implements Arguments{
     {
         return $this->argument;
     }
+
+    /**
+     * @return array
+     */
+    public function toArgumentArray()
+    {
+        return array_merge($this->getValue()->toArgumentArray(), $this->getArgument()->toArgumentArray());
+    }
+
+
 }
