@@ -2,49 +2,39 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/24/14
- * Time: 10:27 PM
+ * Date: 2/1/15
+ * Time: 9:27 AM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class ArrayEntriesImpl implements PositionalArrayEntry{
+class ArrayEntriesImpl implements ArrayEntries{
 
-    /** @var  ArrayEntryImpl */
-    private $entry;
+    private $scalarArrayProgram;
+    private $arrayEntry;
 
-    /** @var  AllArrayEntries */
-    private $arrayEntries;
-
-    function __construct(ArrayEntryImpl $entry, AllArrayEntries $arrayEntries)
+    function __construct(ScalarArrayProgram $scalarArrayProgram, ArrayEntry $arrayEntry)
     {
-        $this->entry = $entry;
-        $this->arrayEntries = $arrayEntries;
-    }
-
-    /**
-     * @return AllArrayEntries
-     */
-    public function getArrayEntries()
-    {
-        return $this->arrayEntries;
-    }
-
-    /**
-     * @return ArrayEntryImpl
-     */
-    public function getEntry()
-    {
-        return $this->entry;
+        $this->scalarArrayProgram = $scalarArrayProgram;
+        $this->arrayEntry = $arrayEntry;
     }
 
 
     /**
-     * @return array
+     * @return ScalarArrayProgram
      */
-    public function toArray()
+    public function getValue()
     {
-        return array_merge($this->getEntry()->toArray(), $this->getArrayEntries()->toArray());
+        return $this->scalarArrayProgram;
     }
+
+    /**
+     * @return ArrayEntry
+     */
+    public function getArrayEntry()
+    {
+        return $this->arrayEntry;
+    }
+
 }

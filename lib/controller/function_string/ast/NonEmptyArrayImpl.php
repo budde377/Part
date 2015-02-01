@@ -2,51 +2,27 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/24/14
- * Time: 10:26 PM
+ * Date: 2/1/15
+ * Time: 9:18 AM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class NonEmptyArrayImpl implements AArray{
+class NonEmptyArrayImpl implements NonEmptyArray{
+    private $arrayEntry;
 
-    /** @var  AllArrayEntries */
-    private $arrayEntries;
-
-    function __construct(AllArrayEntries $arrayEntries)
+    function __construct(ArrayEntry $arrayEntry)
     {
-        $this->arrayEntries = $arrayEntries;
-    }
-
-    /**
-     * @return AllArrayEntries
-     */
-    public function getArrayEntries()
-    {
-        return $this->arrayEntries;
+        $this->arrayEntry = $arrayEntry;
     }
 
 
     /**
-     * @return ScalarArrayProgram[]
+     * @return ArrayEntry
      */
-    public function toArray()
+    public function getArrayEntry()
     {
-        return $this->arrayEntries->toArray();
-    }
-
-    /**
-     * @param callable $programComputer
-     * @return mixed
-     */
-    public function compute(callable $programComputer)
-    {
-        $r = [];
-        foreach($this->toArray() as $k=>$v){
-            $r[$k] = $v->compute($programComputer);
-        }
-
-        return $r;
+        return $this->arrayEntry;
     }
 }

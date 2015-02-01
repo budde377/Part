@@ -2,38 +2,13 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/24/14
- * Time: 10:19 PM
+ * Date: 2/1/15
+ * Time: 8:36 AM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-abstract class FFunction implements FunctionChain{
+interface FFunction extends FunctionChain{
 
-    /**
-     * @return ArgumentList[]
-     */
-    abstract  public function generateArgumentList();
-
-    /**
-     * @return ArgumentImpl[]
-     */
-    abstract  public function generatePositionalArgumentList();
-
-    /**
-     * @return NamedArgumentImpl[]
-     */
-    abstract public function generateNamedArgumentList();
-
-    /**
-     * @param Target $target
-     * @return FunctionCallImpl
-     */
-    public function toFunctionCall(Target $target)
-    {
-        return new FunctionCallImpl($target, $this);
-    }
-
-
-} 
+}

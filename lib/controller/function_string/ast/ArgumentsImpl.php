@@ -2,48 +2,38 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/24/14
- * Time: 10:24 PM
+ * Date: 2/1/15
+ * Time: 9:05 AM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class ArgumentsImpl implements  ArgumentList{
+class ArgumentsImpl implements Arguments{
 
-    /** @var  ArgumentImpl  */
+    private $sap;
     private $argument;
-    /** @var  ArgumentList */
-    private $argumentList;
 
-    function __construct(ArgumentImpl $argument, ArgumentList $argumentList)
+    function __construct(ScalarArrayProgram $sap, Argument $argument)
     {
+        $this->sap = $sap;
         $this->argument = $argument;
-        $this->argumentList = $argumentList;
     }
 
+
     /**
-     * @return ArgumentList
+     * @return ScalarArrayProgram
      */
-    public function getArgumentList()
+    public function getValue()
     {
-        return $this->argumentList;
+        return $this->sap;
     }
 
     /**
-     * @return ArgumentImpl
+     * @return Argument
      */
     public function getArgument()
     {
         return $this->argument;
-    }
-
-
-    /**
-     * @return ArgumentList[]
-     */
-    public function toArgumentList()
-    {
-        return array_merge($this->getArgument()->toArgumentList(), $this->getArgumentList()->toArgumentList());
     }
 }

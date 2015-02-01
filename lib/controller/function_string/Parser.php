@@ -21,23 +21,23 @@ interface Parser
      * @param array $tokens An assoc. array containing *match* and *token*
      * @return Program
      */
-    public static function parse(array $tokens);
+    public function parse(array $tokens);
 
     /**
      * @param string $input
      * @return Program
      */
-    public static function parseString($input);
+    public function parseString($input);
     /**
      * @param array $tokens An assoc. array containing *match* and *token*
      * @return Program
      */
-    public static function parseArray(array $tokens);
+    public function parseArray(array $tokens);
 
     /**
      * @param string $input
      * @return Program
      */
-    public static function parseArrayString($input);
+    public function parseArrayString($input);
 
 }

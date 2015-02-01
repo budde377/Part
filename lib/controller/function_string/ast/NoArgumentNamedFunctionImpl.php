@@ -2,53 +2,28 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/24/14
- * Time: 10:20 PM
+ * Date: 2/1/15
+ * Time: 8:45 AM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class NoArgumentNamedFunctionImpl extends ArgumentNamedFunction{
+class NoArgumentNamedFunctionImpl implements  NoArgumentNamedFunction{
 
-    /** @var  NameImpl */
-    private $name;
+    private  $name;
 
-    function __construct(NameImpl $name)
+    function __construct(Name $name)
     {
         $this->name = $name;
     }
 
+
     /**
-     * @return NameImpl
+     * @return Name
      */
     public function getName()
     {
         return $this->name;
-    }
-
-
-    /**
-     * @return ArgumentList[]
-     */
-    public function generateArgumentList()
-    {
-        return [];
-    }
-
-    /**
-     * @return ScalarArrayProgram[]
-     */
-    public function generatePositionalArgumentList()
-    {
-        return [];
-    }
-
-    /**
-     * @return NamedArgumentImpl[]
-     */
-    public function generateNamedArgumentList()
-    {
-        return [];
     }
 }

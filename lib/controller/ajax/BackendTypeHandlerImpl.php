@@ -761,7 +761,8 @@ class BackendTypeHandlerImpl implements TypeHandler
             if(!is_string($string)){
                 return $string;
             }
-            return ParserImpl::parseArrayString($string);
+            $p = new ParserImpl();
+            return $p->parseArrayString($string);
         });
     }
 

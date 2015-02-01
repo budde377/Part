@@ -2,53 +2,27 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/24/14
- * Time: 10:21 PM
+ * Date: 2/1/15
+ * Time: 8:30 AM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class ArrayAccessFunctionImpl extends  FFunction{
+class ArrayAccessFunctionImpl implements ArrayAccessFunction{
+    private $argument;
 
-    /** @var  ScalarArrayProgram */
-    private $key;
-
-    function __construct(ScalarArrayProgram $key)
+    function __construct(ScalarArrayProgram $argument)
     {
-        $this->key = $key;
+        $this->argument = $argument;
     }
+
 
     /**
      * @return ScalarArrayProgram
      */
-    public function getKey()
+    public function getArgument()
     {
-        return $this->key;
-    }
-
-
-    /**
-     * @return ArgumentList[]
-     */
-    public function generateArgumentList()
-    {
-        return $this->generatePositionalArgumentList();
-    }
-
-    /**
-     * @return ScalarArrayProgram[]
-     */
-    public function generatePositionalArgumentList()
-    {
-        return [new ArgumentImpl($this->getKey())];
-    }
-
-    /**
-     * @return NamedArgumentImpl[]
-     */
-    public function generateNamedArgumentList()
-    {
-        return [];
+        return $this->argument;
     }
 }

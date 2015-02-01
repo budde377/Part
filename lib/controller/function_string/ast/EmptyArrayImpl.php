@@ -2,26 +2,14 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/28/14
- * Time: 5:00 PM
+ * Date: 2/1/15
+ * Time: 9:17 AM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class EmptyArrayImpl implements AArray{
+class EmptyArrayImpl implements EmptyArray{
 
-    /**
-     * @param callable $programComputer
-     * @return mixed
-     */
-    public function compute(callable $programComputer)
-    {
-        return [];
-    }
 
-    public function toArray()
-    {
-        return [];
-    }
 }

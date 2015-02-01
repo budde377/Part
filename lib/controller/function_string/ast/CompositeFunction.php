@@ -10,10 +10,5 @@ namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 interface CompositeFunction {
 
-    /**
-     * @param Target $target
-     * @return FunctionCallImpl[]
-     */
-    public function toFunctionCalls(Target $target);
 
 } 

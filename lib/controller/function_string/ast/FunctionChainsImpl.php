@@ -2,23 +2,23 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/24/14
- * Time: 10:18 PM
+ * Date: 2/1/15
+ * Time: 8:35 AM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class FunctionChainsImpl implements FunctionChain{
-
-    private $functionChain;
+class FunctionChainsImpl implements FunctionChains{
     private $function;
+    private $functionChain;
 
-    function __construct(FunctionChain $functionChain, FFunction $function)
+    function __construct(FFunction $function, FunctionChain $functionChain)
     {
-        $this->functionChain = $functionChain;
         $this->function = $function;
+        $this->functionChain = $functionChain;
     }
+
 
     /**
      * @return FFunction
@@ -34,15 +34,5 @@ class FunctionChainsImpl implements FunctionChain{
     public function getFunctionChain()
     {
         return $this->functionChain;
-    }
-
-
-    /**
-     * @param Target $target
-     * @return FunctionCallImpl
-     */
-    public function toFunctionCall(Target $target)
-    {
-        return new FunctionCallImpl($this->functionChain->toFunctionCall($target), $this->function);
     }
 }

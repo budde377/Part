@@ -2,48 +2,49 @@
 /**
  * Created by PhpStorm.
  * User: budde
- * Date: 11/24/14
- * Time: 10:28 PM
+ * Date: 2/1/15
+ * Time: 9:54 AM
  */
 
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-class NamedArrayEntriesImpl implements NamedArrayEntry{
+class NamedArrayEntriesImpl implements NamedArrayEntries{
 
-    /** @var  KeyArrowValueImpl */
+
+    private $name;
     private $value;
-    /** @var  AllArrayEntries */
-    private $arrayEntries;
+    private $arrayEntry;
 
-    function __construct(KeyArrowValueImpl $value, AllArrayEntries $arrayEntries)
+    function __construct(Scalar $name, ScalarArrayProgram $value, ArrayEntry $arrayEntry)
     {
+        $this->name = $name;
         $this->value = $value;
-        $this->arrayEntries = $arrayEntries;
+        $this->arrayEntry = $arrayEntry;
     }
 
+
     /**
-     * @return AllArrayEntries
+     * @return Scalar
      */
-    public function getArrayEntries()
+    public function getName()
     {
-        return $this->arrayEntries;
+        return $this->name;
     }
 
     /**
-     * @return KeyArrowValueImpl
+     * @return ScalarArrayProgram
      */
     public function getValue()
     {
         return $this->value;
     }
 
-
     /**
-     * @return ScalarArrayProgram[]
+     * @return ArrayEntry
      */
-    public function toArray()
+    public function getArrayEntry()
     {
-        return array_merge($this->value->toArray(), $this->arrayEntries->toArray());
+        return $this->arrayEntry;
     }
 }

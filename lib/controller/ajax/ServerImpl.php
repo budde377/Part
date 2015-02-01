@@ -40,6 +40,8 @@ class ServerImpl implements Server
 
         $this->backendSingletonContainer = $backendSingletonContainer;
         $this->jsonParser = new JSONParser();
+        $this->functionStringParser = new ParserImpl();
+
     }
 
 
@@ -275,8 +277,8 @@ class ServerImpl implements Server
      */
     public function handleFromFunctionString($input, $token = null)
     {
-        $p = ParserImpl::parseString($input);
-        return $this->wrapperHandler($p instanceof \ChristianBudde\cbweb\controller\function_string\ast\Program?$p->toJSONProgram():null, $token);
+
+        return $this->wrapperHandler(($pr = $this->functionStringParser->parseString($input)) instanceof \ChristianBudde\cbweb\controller\function_string\ast\Program?$pr->toJSONProgram():null, $token);
     }
 
     private function buildType(ReflectionClass $reflection)

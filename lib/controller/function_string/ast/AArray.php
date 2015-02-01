@@ -11,7 +11,6 @@ namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 interface AArray extends ScalarArrayProgram
 {
-    public function toArray();
 
 
 } 

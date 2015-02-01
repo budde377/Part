@@ -9,11 +9,7 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-interface FunctionChain {
+interface FunctionChain extends CompositeFunction{
 
-    /**
-     * @param Target $target
-     * @return FunctionCallImpl
-     */
-    public function toFunctionCall(Target $target);
+
 } 
