@@ -330,7 +330,6 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
                         new DecimalUnsignedNumScalarImpl('4'),
                         new DecimalUnsignedNumScalarImpl('5'),
                         new DecimalUnsignedNumScalarImpl('1'))))), $p);
-
     }
 
     public function testReturnsNullOnInvalidProgram()
@@ -338,6 +337,7 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
         $p = $this->parser->parseString('A.f(_a:123)');
         $this->assertNull($p);
     }
+
 
     public function testReturnsNullOnInvalidProgram2()
     {

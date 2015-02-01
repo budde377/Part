@@ -36,7 +36,19 @@ class NonEmptyArrayImpl implements NonEmptyArray{
 
     public function toJSON()
     {
-        return $this->getArrayEntry()->toArray();
+        $array = $this->getArrayEntry()->toArray();
+        $retArray = [];
+
+        foreach($array as $entry){
+            if($entry instanceof NamedArrayEntry){
+                $retArray[$entry->getName()->getValue()] = $entry->getValue()->toJSON();
+            } else {
+                $retArray[] = $entry;
+            }
+
+        }
+
+        return $retArray;
     }
 
     /**

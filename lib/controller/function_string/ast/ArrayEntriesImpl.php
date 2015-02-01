@@ -9,11 +9,9 @@
 namespace ChristianBudde\cbweb\controller\function_string\ast;
 
 
-use ChristianBudde\cbweb\util\traits\ParserTrait;
 
 class ArrayEntriesImpl implements ArrayEntries{
 
-    use ParserTrait;
 
     private $scalarArrayProgram;
     private $arrayEntry;
@@ -46,6 +44,6 @@ class ArrayEntriesImpl implements ArrayEntries{
      */
     public function toArray()
     {
-        return $this->merge_arrays($this->getValue()->toArray(), $this->getArrayEntry()->toArray());
+        return array_merge($this->getValue()->toArray(), $this->getArrayEntry()->toArray());
     }
 }
