@@ -21,6 +21,7 @@ class BetterSelect {
   static bool isHandling(SelectElement select) => _cached.containsKey(select);
 
   BetterSelect._internal(this.element) {
+    var width = element.offsetWidth;
 
     arrow.classes.add("arrow_down");
 
@@ -28,7 +29,6 @@ class BetterSelect {
       ..classes.add("current_selection")
       ..text = selectedString
       ..children.add(arrow);
-
     element
       ..classes.add("better_select_select")
       ..insertAdjacentElement("afterEnd", container)
@@ -37,8 +37,8 @@ class BetterSelect {
     container
       ..children.add(element)
       ..children.add(currentSelection)
-      ..style.width = "${element.offsetWidth}px"
-      ..classes.add("better_select");
+      ..classes.add("better_select")
+      ..style.width = "${width}px";
 
     disabled = element.disabled;
 
