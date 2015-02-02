@@ -886,6 +886,8 @@ class ContentEditor {
   int get _currentHash => element.innerHtml.hashCode;
 
 
+  ElementList<HeadingElement> get headers => element.querySelectorAll("h2, h1, h3").toList();
+
   void save() {
     if (!changed) {
       return;
@@ -894,7 +896,7 @@ class ContentEditor {
     var savingBar = new SavingBar();
     var jobId = savingBar.startJob();
     _inputSinceSave = false;
-    var l = element.querySelectorAll("h2, h1, h3");
+    var l = headers;
 
     l.forEach((Element h) {
       h.id = "";
