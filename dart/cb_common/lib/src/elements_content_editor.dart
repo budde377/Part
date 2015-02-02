@@ -620,7 +620,7 @@ class ContentEditor {
       if (!_closed) {
         return;
       }
-      window.getSelection().empty();
+      window.getSelection().removeAllRanges();
       open();
     });
     new LinkImageHandler(element, this);
