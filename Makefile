@@ -6,7 +6,7 @@ update-pub:
 
 update-dart:
 	@echo "### Building JavaScript files ###"
-	find dart/ -type f -name 'main*.dart' -exec dart2js {} --minify -o  {}.js \;
+	find dart/ -type f -name 'main*.dart' -exec dart2js {} --enable-experimental-mirrors --minify -o  {}.js \;
 
 
 update-dev: update-composer-dev update-pub-dev update-dart-dev
@@ -18,7 +18,7 @@ update-pub-dev:
 
 update-dart-dev:
 	@echo "### Building JavaScript files ###"
-	find dart/ -type f -name 'main*.dart' -exec dart2js {} -o {}.js \;
+	find dart/ -type f -name 'main*.dart' -exec dart2js {} --enable-experimental-mirrors -o {}.js \;
 
 update-composer: get-composer
 	@echo "### Updating composer ###"
