@@ -293,3 +293,16 @@ String quoteString(String string, [String quote = '"']) => quote+(string.replace
 
 
 String upperCaseWords(String str) => str.replaceAllMapped(new RegExp("^([a-z\u00E0-\u00FC])|\\s([a-z\u00E0-\u00FC])"), (Match m) => m[0].toUpperCase());
+
+Stream functionStreamGenerator( fun(), Iterable<Stream> streams) {
+  StreamController c = new StreamController<bool>();
+  var last = fun();
+  var f = (_) {
+    if (last != fun()) {
+      last = !last;
+      c.add(last);
+    }
+  };
+  streams.forEach((Stream s) => s.listen(f));
+  return c.stream;
+}
