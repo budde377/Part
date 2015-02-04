@@ -87,6 +87,12 @@ class EditorCommandExecutor {
 
   void formatBlockH3() => _formatBlock('h3');
 
+  void formatBlockH4() => _formatBlock('h4');
+
+  void formatBlockH5() => _formatBlock('h5');
+
+  void formatBlockH6() => _formatBlock('h6');
+
   void formatBlockBlockquote() => _formatBlock('blockquote');
 
   void formatBlockPre() => _formatBlock('pre');
@@ -221,7 +227,7 @@ class EditorFileHandler implements EditorHandler {
     _fileProgress.onProgress.listen((_) => progressBar.percentage = _fileProgress.progress);
     _fileProgress.onPathAvailable.listen((_) {
       dataElement
-        ..href = "/_files/"+_fileProgress.path
+        ..href = "/_files/" + _fileProgress.path
         ..text = fileProgress.file.name;
       progressBar.bar.remove();
       element.classes.remove('uploading');
@@ -258,7 +264,7 @@ class EditorImageHandler implements EditorHandler {
   EditorImageHandler.fileProgress(this.dataElement, core.FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
     _fileProgress.onProgress.listen((_) => progressBar.percentage = _fileProgress.progress);
     _fileProgress.onPathAvailable.listen((_) {
-      dataElement.src = "/_files/"+_fileProgress.path;
+      dataElement.src = "/_files/" + _fileProgress.path;
       progressBar.bar.remove();
       element.classes.remove('uploading');
       ready();
@@ -392,7 +398,6 @@ class EditorFileContainer {
   void _notifyContentChange() => _change_controller.add(this);
 
 }
-
 
 
 class LinkImageHandler {
@@ -551,8 +556,11 @@ class EditorAction {
 
   EditorAction.elementFromHtmlString(String html, this.onClickAction, this.selectionStateChanger) : element = new Element.html(html);
 
-  EditorAction.liElementWithInnerHtml(String innerHtml, this.onClickAction, this.selectionStateChanger) : element = new LIElement(){
+  EditorAction.liElementWithInnerHtml(String innerHtml, this.onClickAction, this.selectionStateChanger, [List<String> element_class]) : element = new LIElement(){
     element.innerHtml = innerHtml;
+    if(element_class != null){
+      element.classes.addAll(element_class);
+    }
   }
 
   final Element element;
@@ -955,6 +963,9 @@ class ContentEditor {
     }
     if (_wrapper.classes.contains('floating')) {
       _wrapper.style.left = "${_elementOffsetLeft(_contentWrapper) - window.scrollX}px";
+    } else {
+      _wrapper.style.left = "";
+
     }
 
     _updatePlaceholder();
@@ -1304,10 +1315,20 @@ class ContentEditor {
     if (editorMode == ContentEditor.EDITOR_MODE_NORMAL) {
 
 
-      var actions = [new EditorAction.liElementWithInnerHtml("<h2>Overskift</h2>", () => executor.formatBlockH2(), (String s) => s == "h2"), new EditorAction.liElementWithInnerHtml("<h3>Underoverskrift</h3>", () => executor.formatBlockH3(), (String s) => s == "h3"), new EditorAction.liElementWithInnerHtml("<p>Normal tekst</p>", () => executor.formatBlockP(), (String s) => s == "p"), new EditorAction.liElementWithInnerHtml("<blockquote>Citat</blockquote>", () => executor.formatBlockBlockquote(), (String s) => s == "blockquote"), new EditorAction.liElementWithInnerHtml("<pre>Kode</pre>", () => executor.formatBlockPre(), (String s) => s == "pre")];
+      var actions = [
+          new EditorAction.liElementWithInnerHtml("<h1>Overskift 1</h1>", () => executor.formatBlockH1(), (String s) => s == "h1", ['t_h1']),
+          new EditorAction.liElementWithInnerHtml("<h2>Overskift 2</h2>", () => executor.formatBlockH2(), (String s) => s == "h2", ['t_h2']),
+          new EditorAction.liElementWithInnerHtml("<h3>Overskrift 3</h3>", () => executor.formatBlockH3(), (String s) => s == "h3", ['t_h3']),
+          new EditorAction.liElementWithInnerHtml("<h4>Overskrift 4</h4>", () => executor.formatBlockH4(), (String s) => s == "h4", ['t_h4']),
+          new EditorAction.liElementWithInnerHtml("<h4>Overskrift 5</h4>", () => executor.formatBlockH5(), (String s) => s == "h5", ['t_h5']),
+          new EditorAction.liElementWithInnerHtml("<h4>Overskrift 6</h4>", () => executor.formatBlockH6(), (String s) => s == "h6", ['t_h6']),
+          new EditorAction.liElementWithInnerHtml("<p>Normal tekst</p>", () => executor.formatBlockP(), (String s) => s == "p", ['t_p']),
+          new EditorAction.liElementWithInnerHtml("<blockquote>Citat</blockquote>", () => executor.formatBlockBlockquote(), (String s) => s == "blockquote", ['t_blockquote']),
+          new EditorAction.liElementWithInnerHtml("<pre>Kode</pre>", () => executor.formatBlockPre(), (String s) => s == "pre", ['t_pre'])];
+
+
 
       var textType = new DropDown.fromLIList(actions.map((EditorAction a) => a.element).toList());
-
 
       actionsSetup(executor, actions, textType, () => executor.blockState);
 
