@@ -180,7 +180,10 @@ class Debugger {
 
 Debugger get debugger => new Debugger();
 
-void debug(Object o) => debugger.debug(o);
+Object debug(Object o){
+  debugger.debug(o);
+  return o;
+}
 
 
 final double GOLDEN_RATIO = ((Math.sqrt(5)+1)/2);

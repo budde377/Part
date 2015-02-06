@@ -12,6 +12,9 @@ class EditorCommandExecutor {
 
   Function _listenerFunction;
 
+
+  StreamController _onFormatBlockController = new StreamController.broadcast();
+
   factory EditorCommandExecutor(Element element) => _cache.putIfAbsent(element, () => new EditorCommandExecutor._internal(element));
 
   EditorCommandExecutor._internal(this.element){
@@ -73,7 +76,10 @@ class EditorCommandExecutor {
 
   void setBackColor(Color color) => _execCommand('backColor', value:"#" + color.hex);
 
-  void _formatBlock(String tagName) => _execCommand('formatBlock', value:tagName);
+  void _formatBlock(String tagName) {
+    _execCommand('formatBlock', value:tagName);
+    _onFormatBlockController.add(null);
+  }
 
   void insertParagraph() => _execCommand('insertparagraph');
 
@@ -148,6 +154,9 @@ class EditorCommandExecutor {
       listener();
     };
   }
+
+
+  Stream get onFormatBlock => _onFormatBlockController.stream;
 
 }
 
@@ -558,7 +567,7 @@ class EditorAction {
 
   EditorAction.liElementWithInnerHtml(String innerHtml, this.onClickAction, this.selectionStateChanger, [List<String> element_class]) : element = new LIElement(){
     element.innerHtml = innerHtml;
-    if(element_class != null){
+    if (element_class != null) {
       element.classes.addAll(element_class);
     }
   }
@@ -639,6 +648,8 @@ class ContentEditor {
   Stream<bool> get onChange => _onContentChangeStream == null ? _onContentChangeStream = _onContentChangeStreamController.stream.asBroadcastStream() : _onContentChangeStream;
 
   Stream<bool> get onOpenChange => _onOpenChangeStream == null ? _onOpenChangeStream = _onOpenChangeStreamController.stream.asBroadcastStream() : _onOpenChangeStream;
+
+  Stream get onFormatBlock => executor.onFormatBlock;
 
   Stream<Element> get onSave => _onSaveStream == null ? _onSaveStream = _onSaveStreamController.stream.asBroadcastStream() : _onSaveStream;
 
@@ -888,7 +899,6 @@ class ContentEditor {
 
   void _saveCurrentHash() {
     _hash = _currentHash;
-
   }
 
   int get _currentHash => element.innerHtml.hashCode;
@@ -1327,7 +1337,6 @@ class ContentEditor {
           new EditorAction.liElementWithInnerHtml("<pre>Kode</pre>", () => executor.formatBlockPre(), (String s) => s == "pre", ['t_pre'])];
 
 
-
       var textType = new DropDown.fromLIList(actions.map((EditorAction a) => a.element).toList());
 
       actionsSetup(executor, actions, textType, () => executor.blockState);
@@ -1640,4 +1649,65 @@ class EditorInitializer implements core.Initializer {
       }
     });
   }
+}
+
+
+class EditableContentNavigator<T extends Element> {
+  final ContentEditor editor;
+  final T element;
+  final Function builder;
+
+  EditableContentNavigator(ContentEditor this.editor, Content navContent, this.element, void builder(T element, ElementList<HeadingElement> l)) : this.builder = builder {
+    editor.onChange.where((b) => b).listen((_) => builder(element, editor.headers));
+    editor.onSave.listen((_) {
+      builder(element, editor.headers);
+      var jobId = savingBar.startJob();
+      navContent.addContent(element.innerHtml).then((_) {
+        savingBar.endJob(jobId);
+      });
+    });
+
+  }
+
+}
+
+
+class UListEditableContentNavigator extends EditableContentNavigator<UListElement> {
+
+  UListEditableContentNavigator(ContentEditor editor, Content navContent, UListElement element) : super(editor, navContent, element, defaultBuilder);
+
+
+  static void defaultBuilder(UListElement element, ElementList<HeadingElement> l, [bool first = true]) {
+    if (first) {
+      element.children.clear();
+    }
+    var e, tagNameNumber = -1;
+    while (l.length > 0) {
+      e = l.first;
+      var t = _tagNameNumber(e);
+      if (tagNameNumber > t && !first) {
+        return;
+      }
+      tagNameNumber = _tagNameNumber(e);
+      var li = new LIElement();
+      var a = new AnchorElement();
+      li.classes.add(e.tagName);
+      a
+        ..text = e.text
+        ..href = "#${e.id}";
+      li.append(a);
+      element.append(li);
+      l.removeAt(0);
+      if (l.length > 0 && _tagNameNumber(l.first) > tagNameNumber) {
+        var ul = new UListElement();
+        defaultBuilder(ul, l, false);
+        li.append(ul);
+      }
+
+    }
+
+  }
+
+
+  static int _tagNameNumber(HeadingElement h) => h == null ? -1 : int.parse(h.tagName.substring(1));
 }
