@@ -948,7 +948,7 @@ class ContentEditor {
     if (_closed) {
       return;
     }
-    var floatCandidate = window.scrollY > _elementOffsetTop(_contentWrapper) + _contentWrapper.offsetHeight - _topBar.clientHeight;
+    var floatCandidate = window.scrollY > elementOffsetTop(_contentWrapper) + _contentWrapper.offsetHeight - _topBar.clientHeight;
     _wrapper.style.removeProperty("top");
     if (floatCandidate) {
       _wrapper.style.width = "${_wrapper.clientWidth}px";
@@ -956,14 +956,14 @@ class ContentEditor {
         ..remove('floating')
         ..add('fixed');
       _wrapper.style.top = "${_contentWrapper.offsetHeight - _topBar.clientHeight}px";
-    } else if (!_wrapper.classes.contains('floating') && window.scrollY > _elementOffsetTop(_topBar) && !floatCandidate) {
+    } else if (!_wrapper.classes.contains('floating') && window.scrollY > elementOffsetTop(_topBar) && !floatCandidate) {
       _toolBarPlaceholder.style.height = "${_topBar.clientHeight}px";
       _wrapper.insertAdjacentElement("afterEnd", _toolBarPlaceholder);
       _wrapper.style.width = "${_wrapper.clientWidth}px";
       _wrapper.classes
         ..add('floating')
         ..remove('fixed');
-    } else if (window.scrollY <= _elementOffsetTop(_toolBarPlaceholder)) {
+    } else if (window.scrollY <= elementOffsetTop(_toolBarPlaceholder)) {
       _toolBarPlaceholder.remove();
       _wrapper
         ..style.removeProperty("width")
@@ -972,7 +972,7 @@ class ContentEditor {
 
     }
     if (_wrapper.classes.contains('floating')) {
-      _wrapper.style.left = "${_elementOffsetLeft(_contentWrapper) - window.scrollX}px";
+      _wrapper.style.left = "${elementOffsetLeft(_contentWrapper) - window.scrollX}px";
     } else {
       _wrapper.style.left = "";
 
@@ -993,11 +993,6 @@ class ContentEditor {
     }
     _toolBarPlaceholder.style.height = "${_topBar.clientHeight}px";
   }
-
-  int _elementOffsetTop(Element e) => e == null ? 0 : e.offsetTop + _elementOffsetTop(e.offsetParent);
-
-  int _elementOffsetLeft(Element e) => e == null ? 0 : e.offsetLeft + _elementOffsetLeft(e.offsetParent);
-
 
   void _setUpSubMenu(Element element, Element menu, Element subMenu, void menuFiller(Element)) {
     _elementToSubMenu[element] = subMenu;

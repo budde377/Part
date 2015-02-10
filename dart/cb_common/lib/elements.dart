@@ -151,7 +151,14 @@ Stream<bool> childBottomInContainer(Element child, Element container) => core.fu
 
 Stream<bool> childTopInContainer(Element child, Element container) => core.functionStreamGenerator(()=>isChildBottomInContainer(child, container), [window.onResize, window.onScroll]);
 
-bool isChildBottomInContainer(Element child, Element container) => child.documentOffset.y + child.offsetHeight > container.documentOffset.y;
+bool isChildBottomInContainer(Element child, Element container) => child.documentOffset.y + child.offsetHeight > container.documentOffset.y+container.offsetHeight;
 
 bool isChildTopInContainer(Element child, Element container) => child.documentOffset.y > container.documentOffset.y;
+
+
+Point elementOffset(Element e) => e == null ? new Point(0,0) : new Point(e.offsetLeft,e.offsetTop) + elementOffset(e.offsetParent);
+
+int elementOffsetTop(Element e) => e == null ? 0 : e.offsetTop + elementOffsetTop(e.offsetParent);
+
+int elementOffsetLeft(Element e) => e == null ? 0 : e.offsetLeft + elementOffsetLeft(e.offsetParent);
 
