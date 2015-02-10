@@ -851,6 +851,33 @@ class ContentEditor {
 
     });
 
+    element.onPaste.listen((Event event) {
+      var selection = window.getSelection();
+      if (_closed || selection.rangeCount == 0) {
+        return;
+      }
+
+      var types = event.clipboardData.types;
+      core.debug(types);
+      var newHtml;
+      if (types.contains('text/html')) {
+        newHtml = event.clipboardData.getData('text/html');
+      } else if (types.contains('text/plain')) {
+        newHtml = event.clipboardData.getData('text/plain');
+      } else {
+        return;
+      }
+
+      core.debug(newHtml);
+      selection
+        .getRangeAt(0)..deleteContents()..insertNode(new DocumentFragment.html(newHtml));
+
+
+      event.preventDefault();
+
+
+    });
+
     _contentWrapper.append(_wrapper);
     _wrapper.style.height = "0";
     _wrapper.append(_topBar == null ? _topBar = _generateToolBar() : _topBar);
@@ -1484,12 +1511,13 @@ class ContentEditor {
             "title":"Fjern formatering", "selChange":null, "func":() {
               var selection = window.getSelection();
               var range = selection.getRangeAt(0);
-              var commonAncestor = range.commonAncestorContainer;
+              Element commonAncestor = range.commonAncestorContainer;
               if (!(commonAncestor is Element)) {
+                executor.removeFormat();
                 return;
               }
               commonAncestor.querySelectorAll("*").forEach((Element elm) {
-                if (!selection.containsNode(elm, false)) {
+                if (!element.contains(elm) || !selection.containsNode(elm, true)) {
                   return;
                 }
                 elm.attributes.remove("style");
