@@ -146,7 +146,7 @@ class GitUpdaterImpl implements Updater
 
     private function exec($command)
     {
-        $ret = trim(shell_exec("cd $this->path && $command"));
+        $ret = trim(shell_exec("(cd $this->path && $command) 2>/dev/null"));
         return $ret;
     }
 
