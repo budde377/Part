@@ -4,5 +4,7 @@ php:
   - 5.6
 before_script:
   - sudo apt-get install php5-imagick
-  - sudo apt-get install php5-imagick
+  - sudo apt-get install php5-json
+  - sudo php5enmod imagick
+  - sudo php5enmod json
   - composer install
