@@ -26,6 +26,7 @@ class StubConfigImpl implements Config
 
     private $defaultPages = array();
     private $logPath;
+    private $facebookAppCredentials;
 
     /**
      * @param array $defaultPages
@@ -283,4 +284,23 @@ class StubConfigImpl implements Config
     {
         return $this->getMailMySQLConnection() != null;
     }
+
+    /**
+     * @return array|null An assoc array with keys: `id` and `secret` which contains the facebook app id and secret respectively. Returns null if not set.
+     */
+    public function getFacebookAppCredentials()
+    {
+        return $this->facebookAppCredentials;
+    }
+
+    /**
+     * @param mixed $facebookAppCredentials
+     */
+    public function setFacebookAppCredentials($facebookAppCredentials)
+    {
+        $this->facebookAppCredentials = $facebookAppCredentials;
+    }
+
+
+
 }

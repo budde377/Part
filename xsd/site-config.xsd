@@ -70,6 +70,12 @@
                 </xs:element>
                 <xs:element name="tmpFolder" type="requiredPathAttribute" minOccurs="0"/>
                 <xs:element name="log" type="requiredPathAttribute" minOccurs="0" />
+                <xs:element name="facebookApp" minOccurs="0">
+                    <xs:complexType>
+                        <xs:attribute name="id" type="xs:string" use="required"/>
+                        <xs:attribute name="secret" type="xs:string" use="required"/>
+                    </xs:complexType>
+                </xs:element>
             </xs:all>
         </xs:complexType>
     </xs:element>

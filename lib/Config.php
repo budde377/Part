@@ -102,6 +102,7 @@ interface Config
      * @return bool
      */
     public function isMailManagementEnabled();
+
     /**
      * @return bool
      */
@@ -136,5 +137,11 @@ interface Config
      * @return string Path to the error log.
      */
     public function getLogPath();
+
+
+    /**
+     * @return array An assoc array with keys: `id` and `secret` which contains the facebook app id and secret respectively. Values are empty if element is not defined.
+     */
+    public function getFacebookAppCredentials();
 
 }

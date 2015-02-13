@@ -31,6 +31,7 @@ class ConfigImpl implements Config
     private $tmpFolderPath;
     private $log;
     private $ajaxTypeHandlers;
+    private $facebookAppCredentials;
 
     /**
      * @param SimpleXMLElement $configFile
@@ -432,5 +433,19 @@ class ConfigImpl implements Config
     public function isMailManagementEnabled()
     {
         return $this->getMailMySQLConnection() != null;
+    }
+
+    /**
+     * @return array An assoc array with keys: `id` and `secret` which contains the facebook app id and secret respectively. Values are empty if element is not defined.
+     */
+    public function getFacebookAppCredentials()
+    {
+        if ($this->facebookAppCredentials !== null) {
+            return $this->facebookAppCredentials;
+        }
+
+        $id = $this->facebookAppCredentials = (string)$this->configFile->facebookApp['id'];
+        $secret = $this->facebookAppCredentials = (string)$this->configFile->facebookApp['secret'];
+        return $this->facebookAppCredentials = ['id'=>$id, 'secret'=>$secret];
     }
 }

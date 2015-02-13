@@ -708,6 +708,14 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $configXML = simplexml_load_string("<config>{$this->defaultOwner}
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertEquals("", $config->getTmpFolderPath());
+    }
+    public function testGetLogPathReturnsReturnsEmptyWhenNotDefined()
+    {
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $this->assertEquals("", $config->getLogPath());
     }
 
@@ -720,6 +728,26 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $this->assertEquals("/some/path", $config->getLogPath());
     }
+
+    public function testGetFacebookCredentialsIsNullWhenNotDefined()
+    {
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertEquals(['id'=>'', 'secret'=>''],$config->getFacebookAppCredentials());
+    }
+
+    public function testGetFacebookCredentialsIsRightArrayWhenDefined()
+    {
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}
+            <facebookApp id='ID' secret='SECRET'/>
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertEquals(['id'=>'ID', 'secret'=>'SECRET'], $config->getFacebookAppCredentials());
+    }
+
 
     public function testGetErrorLogReturnsReturnsEmptyWhenNotDefined()
     {
