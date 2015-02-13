@@ -8,5 +8,5 @@ before_script:
   - mysql -e "CREATE DATABASE IF NOT EXISTS test_cms;" -uroot
   - mysql "test_cms" < db/CMSDatabase.sql
   - mysql -e "CREATE DATABASE IF NOT EXISTS test_postfix;" -uroot
-  - mysql "test_cms" < db/SetupPostfixViews.sql
+  - mysql "test_postfix" < db/SetupPostfixViews.sql
 
