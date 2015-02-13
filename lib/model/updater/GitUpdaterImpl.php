@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\model\updater;
-use ChristianBudde\cbweb\model;
-use ChristianBudde\cbweb\model\site\Site;
-use ChristianBudde\cbweb\model\user\User;
+namespace ChristianBudde\Part\model\updater;
+use ChristianBudde\Part\model;
+use ChristianBudde\Part\model\site\Site;
+use ChristianBudde\Part\model\user\User;
 
 /**
  * Created by JetBrains PhpStorm.

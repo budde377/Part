@@ -1,6 +1,6 @@
 <?php
-namespace ChristianBudde\cbweb\util\mail;
-use ChristianBudde\cbweb\model\user\User;
+namespace ChristianBudde\Part\util\mail;
+use ChristianBudde\Part\model\user\User;
 
 /**
  * Created by JetBrains PhpStorm.

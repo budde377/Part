@@ -6,14 +6,14 @@
  * Time: 8:31 AM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\Part\controller\function_string\ast;
 
 
-use ChristianBudde\cbweb\controller\json\CompositeFunction as JCompositeFunction;
-use ChristianBudde\cbweb\controller\json\CompositeFunctionImpl as JCompositeFunctionImpl;
-use ChristianBudde\cbweb\controller\json\JSONFunction;
-use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
-use ChristianBudde\cbweb\controller\json\Target;
+use ChristianBudde\Part\controller\json\CompositeFunction as JCompositeFunction;
+use ChristianBudde\Part\controller\json\CompositeFunctionImpl as JCompositeFunctionImpl;
+use ChristianBudde\Part\controller\json\JSONFunction;
+use ChristianBudde\Part\controller\json\JSONFunctionImpl;
+use ChristianBudde\Part\controller\json\Target;
 
 class NamedFunctionImpl implements NamedFunction{
     private $argumentList;

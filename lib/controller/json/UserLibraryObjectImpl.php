@@ -1,7 +1,7 @@
 <?php
-namespace ChristianBudde\cbweb\controller\json;
+namespace ChristianBudde\Part\controller\json;
 
-use ChristianBudde\cbweb\model\user\UserLibrary;
+use ChristianBudde\Part\model\user\UserLibrary;
 
 /**
  * Created by PhpStorm.

@@ -1,11 +1,11 @@
 <?php
-namespace ChristianBudde\cbweb;
-use ChristianBudde\cbweb\exception\ClassNotDefinedException;
-use ChristianBudde\cbweb\exception\ClassNotInstanceOfException;
-use ChristianBudde\cbweb\exception\FileNotFoundException;
-use ChristianBudde\cbweb\util\script\Script;
-use ChristianBudde\cbweb\util\script\ScriptChain;
-use ChristianBudde\cbweb\util\script\ScriptChainImpl;
+namespace ChristianBudde\Part;
+use ChristianBudde\Part\exception\ClassNotDefinedException;
+use ChristianBudde\Part\exception\ClassNotInstanceOfException;
+use ChristianBudde\Part\exception\FileNotFoundException;
+use ChristianBudde\Part\util\script\Script;
+use ChristianBudde\Part\util\script\ScriptChain;
+use ChristianBudde\Part\util\script\ScriptChainImpl;
 
 /**
  * Created by JetBrains PhpStorm.

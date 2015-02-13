@@ -1,14 +1,14 @@
 <?php
-namespace ChristianBudde\cbweb\model\user;
-use ChristianBudde\cbweb\controller\json\UserObjectImpl;
-use ChristianBudde\cbweb\util\db\DB;
-use ChristianBudde\cbweb\model\Variables;
-use ChristianBudde\cbweb\util\Observer;
-use ChristianBudde\cbweb\util\traits\RequestTrait;
-use ChristianBudde\cbweb\util\traits\ValidationTrait;
-use PDOStatement;
-use PDOException;
+namespace ChristianBudde\Part\model\user;
+use ChristianBudde\Part\controller\json\UserObjectImpl;
+use ChristianBudde\Part\model\Variables;
+use ChristianBudde\Part\util\db\DB;
+use ChristianBudde\Part\util\Observer;
+use ChristianBudde\Part\util\traits\RequestTrait;
+use ChristianBudde\Part\util\traits\ValidationTrait;
 use PDO;
+use PDOException;
+use PDOStatement;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -347,7 +347,7 @@ class UserImpl implements User
     private function notifyObservers($event)
     {
         foreach ($this->observers as $observer) {
-            /** @var $observer \ChristianBudde\cbweb\util\Observer */
+            /** @var $observer \ChristianBudde\Part\util\Observer */
             $observer->onChange($this, $event);
         }
 
@@ -469,7 +469,7 @@ class UserImpl implements User
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return \ChristianBudde\cbweb\controller\json\Object
+     * @return \ChristianBudde\Part\controller\json\Object
      */
     public function jsonObjectSerialize()
     {

@@ -1,7 +1,7 @@
 <?php
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\util\traits\RequestTrait;
+use ChristianBudde\Part\util\traits\RequestTrait;
 use PHPUnit_Framework_TestCase;
 
 /**

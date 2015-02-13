@@ -1,25 +1,25 @@
 <?php
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\exception\EntryNotFoundException;
-use ChristianBudde\cbweb\view\page_element\PageElementFactoryImpl;
-use ChristianBudde\cbweb\view\template\TemplateImpl;
-use ChristianBudde\cbweb\model\site\Site;
-use ChristianBudde\cbweb\exception\FileNotFoundException;
-use ChristianBudde\cbweb\util\file\FolderImpl;
-use ChristianBudde\cbweb\util\file\FileImpl;
-use ChristianBudde\cbweb\ConfigImpl;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\ConfigImpl;
+use ChristianBudde\Part\exception\EntryNotFoundException;
+use ChristianBudde\Part\exception\FileNotFoundException;
+use ChristianBudde\Part\model\site\Site;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
+use ChristianBudde\Part\test\stub\StubCurrentPageStrategyImpl;
+use ChristianBudde\Part\test\stub\StubPageImpl;
+use ChristianBudde\Part\test\stub\StubPageOrderImpl;
+use ChristianBudde\Part\test\stub\StubSiteImpl;
+use ChristianBudde\Part\test\stub\StubUserLibraryImpl;
+use ChristianBudde\Part\test\stub\StubVariablesImpl;
+use ChristianBudde\Part\util\file\FileImpl;
+use ChristianBudde\Part\util\file\FolderImpl;
+use ChristianBudde\Part\view\page_element\PageElementFactoryImpl;
+use ChristianBudde\Part\view\template\TemplateImpl;
 use Exception;
 use PHPUnit_Framework_TestCase;
 use SimpleXMLElement;
-use ChristianBudde\cbweb\test\stub\StubBackendSingletonContainerImpl;
-use ChristianBudde\cbweb\test\stub\StubCurrentPageStrategyImpl;
-use ChristianBudde\cbweb\test\stub\StubPageImpl;
-use ChristianBudde\cbweb\test\stub\StubPageOrderImpl;
-use ChristianBudde\cbweb\test\stub\StubSiteImpl;
-use ChristianBudde\cbweb\test\stub\StubUserLibraryImpl;
-use ChristianBudde\cbweb\test\stub\StubVariablesImpl;
 use Twig_Error;
 
 /**
@@ -34,9 +34,9 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     /** @var $backFactory BackendSingletonContainer */
     private $backFactory;
-    /** @var  \ChristianBudde\cbweb\model\page\Page */
+    /** @var  \ChristianBudde\Part\model\page\Page */
     private $inactivePage;
-    /** @var $template \ChristianBudde\cbweb\view\template\TemplateImpl */
+    /** @var $template \ChristianBudde\Part\view\template\TemplateImpl */
     private $template;
     private $rootPath;
     /** @var  StubPageImpl */
@@ -65,8 +65,8 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
             $config = "
             <config>{$this->defaultOwner}
             <pageElements>
-                <class name='someElement' link='lib/stub/HelloPageElementImpl.php'>ChristianBudde\\cbweb\\test\\stub\\HelloPageElementImpl</class>
-                <class name='initElement' link='lib/stub/CheckInitializedPageElementImpl.php'>ChristianBudde\\cbweb\\test\\stub\\CheckInitializedPageElementImpl</class>
+                <class name='someElement' link='lib/stub/HelloPageElementImpl.php'>ChristianBudde\\Part\\test\\stub\\HelloPageElementImpl</class>
+                <class name='initElement' link='lib/stub/CheckInitializedPageElementImpl.php'>ChristianBudde\\Part\\test\\stub\\CheckInitializedPageElementImpl</class>
             </pageElements>
 
             </config>";
@@ -122,7 +122,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         try {
             $this->template->setTemplate($file);
         } catch (Exception $exception) {
-            $this->assertInstanceOf('ChristianBudde\cbweb\exception\FileNotFoundException', $exception, 'Got the wrong exception');
+            $this->assertInstanceOf('ChristianBudde\Part\exception\FileNotFoundException', $exception, 'Got the wrong exception');
             /** @var $exception FileNotFoundException */
             $exceptionWasThrown = true;
             $this->assertEquals($file->getAbsoluteFilePath(), $exception->getFileName(), 'Did not expect the right file');
@@ -163,7 +163,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         try {
             $this->template->setTemplateFromConfig('main');
         } catch (Exception $exception) {
-            $this->assertInstanceOf('ChristianBudde\cbweb\exception\FileNotFoundException', $exception, 'Got the wrong exception');
+            $this->assertInstanceOf('ChristianBudde\Part\exception\FileNotFoundException', $exception, 'Got the wrong exception');
             /** @var $exception FileNotFoundException */
             $exceptionWasThrown = true;
             $this->assertEquals($this->rootPath . 'folder/NonExistingFile', $exception->getFileName(), 'Did not expect the right file');
@@ -195,7 +195,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         try {
             $this->template->setTemplateFromConfig('main');
         } catch (Exception $exception) {
-            $this->assertInstanceOf('ChristianBudde\cbweb\exception\EntryNotFoundException', $exception, 'Got the wrong exception');
+            $this->assertInstanceOf('ChristianBudde\Part\exception\EntryNotFoundException', $exception, 'Got the wrong exception');
             /** @var $exception EntryNotFoundException */
             $exceptionWasThrown = true;
             $this->assertEquals('main', $exception->getEntry(), 'Could not find the right wrong entry');
@@ -402,7 +402,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
-        $this->template->setTemplateFromString("{%page_element ChristianBudde.cbweb.test.stub.HelloPageElementImpl%}");
+        $this->template->setTemplateFromString("{%page_element ChristianBudde.Part.test.stub.HelloPageElementImpl%}");
         $v = $this->template->render();
         $this->assertEquals("Hello World", $v);
     }
@@ -411,7 +411,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
-        $this->template->setTemplateFromString("{%page_element ChristianBudde.cbweb.test.stub.HelloNamespacePageElementImpl  %}");
+        $this->template->setTemplateFromString("{%page_element ChristianBudde.Part.test.stub.HelloNamespacePageElementImpl  %}");
         $v = $this->template->render();
         $this->assertEquals("Hello World", $v);
     }
@@ -440,14 +440,14 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     public function testTemplateInitializePageElementIsSupportedFromClassName()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%init_page_element ChristianBudde.cbweb.test.stub.HelloPageElementImpl%}");
+        $this->template->setTemplateFromString("{%init_page_element ChristianBudde.Part.test.stub.HelloPageElementImpl%}");
         $this->assertEquals("", $this->template->render());
     }
 
     public function testTemplateInitializePageElementIsSupportedFromClassNameWithNamespace()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%init_page_element ChristianBudde.cbweb.view.page_element.TitlePageElementImpl%}");
+        $this->template->setTemplateFromString("{%init_page_element ChristianBudde.Part.view.page_element.TitlePageElementImpl%}");
         $this->assertEquals("", $this->template->render());
     }
 

@@ -1,7 +1,7 @@
 <?php
 
-namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde\cbweb\util\db\DB;
+namespace ChristianBudde\Part\test\stub;
+use ChristianBudde\Part\util\db\DB;
 use PDO;
 
 /**

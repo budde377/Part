@@ -6,7 +6,7 @@
  * Time: 1:15 PM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string;
+namespace ChristianBudde\Part\controller\function_string;
 
 
 class LexerImpl implements Lexer

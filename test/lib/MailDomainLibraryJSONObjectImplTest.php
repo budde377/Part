@@ -5,11 +5,11 @@
  * Date: 9/4/14
  * Time: 5:59 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\controller\json\MailDomainLibraryObjectImpl;
-use ChristianBudde\cbweb\test\stub\StubMailDomainImpl;
-use ChristianBudde\cbweb\test\stub\StubMailDomainLibraryImpl;
+use ChristianBudde\Part\controller\json\MailDomainLibraryObjectImpl;
+use ChristianBudde\Part\test\stub\StubMailDomainImpl;
+use ChristianBudde\Part\test\stub\StubMailDomainLibraryImpl;
 use PHPUnit_Framework_TestCase;
 
 

@@ -1,11 +1,10 @@
 <?php
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\util\file\JSFileImpl;
-
-use ChristianBudde\cbweb\util\traits\FilePathTrait;
+use ChristianBudde\Part\test\stub\StubOptimizerImpl;
+use ChristianBudde\Part\util\file\JSFileImpl;
+use ChristianBudde\Part\util\traits\FilePathTrait;
 use PHPUnit_Framework_TestCase;
-use ChristianBudde\cbweb\test\stub\StubOptimizerImpl;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -26,7 +25,7 @@ class JSFileImplTest extends PHPUnit_Framework_TestCase
         $jsFile = new JSFileImpl($file);
         $this->assertTrue($jsFile->exists(), 'File did not exists to begin with');
         $jsCopy = $jsFile->copy($file . '2');
-        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\JSFile', $jsCopy);
+        $this->assertInstanceOf('ChristianBudde\Part\util\file\JSFile', $jsCopy);
         $jsCopy->delete();
     }
 
@@ -88,9 +87,9 @@ class JSFileImplTest extends PHPUnit_Framework_TestCase
         $optimizer = new StubOptimizerImpl(true);
         $jsFile->setMinimizer($optimizer);
         $originalContent = $jsFile->getContents();
-        /** @var $ret \ChristianBudde\cbweb\util\file\CSSFile */
+        /** @var $ret \ChristianBudde\Part\util\file\CSSFile */
         $ret = $jsFile->minimize();
-        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\JSFile', $ret, 'Did not return JSFile');
+        $this->assertInstanceOf('ChristianBudde\Part\util\file\JSFile', $ret, 'Did not return JSFile');
         $this->assertEquals($this->relativeToAbsolute($fileCopy . '-original'), $ret->getAbsoluteFilePath(), 'Did not return JSFile with right path');
         $this->assertTrue($jsFile->isMinimized(), 'File was not minimized');
         $this->assertEquals($originalContent, $ret->getContents(), 'Content did not match');

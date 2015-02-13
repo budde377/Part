@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\view\page_element;
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\log\Logger;
-use ChristianBudde\cbweb\util\traits\DateTimeTrait;
+namespace ChristianBudde\Part\view\page_element;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\log\Logger;
+use ChristianBudde\Part\util\traits\DateTimeTrait;
 
 /**
  * Created by PhpStorm.

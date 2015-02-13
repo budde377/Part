@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\model\user;
+namespace ChristianBudde\Part\model\user;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -7,12 +7,11 @@ namespace ChristianBudde\cbweb\model\user;
  * Time: 3:46 PM
  * To change this template use File | Settings | File Templates.
  */
-use ChristianBudde\cbweb\util\db\DB;
-
-use ChristianBudde\cbweb\model\Variables;
-use Traversable;
 use ArrayObject;
+use ChristianBudde\Part\model\Variables;
+use ChristianBudde\Part\util\db\DB;
 use PDO;
+use Traversable;
 
 class UserVariablesImpl implements Variables
 {

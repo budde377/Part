@@ -6,7 +6,7 @@
  * Time: 8:44 AM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\Part\controller\function_string\ast;
 
 
 interface NoArgumentNamedFunction extends FFunction{

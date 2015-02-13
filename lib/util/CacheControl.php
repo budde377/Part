@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\util;
+namespace ChristianBudde\Part\util;
 
 /**
  * Created by JetBrains PhpStorm.

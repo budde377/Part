@@ -17,12 +17,12 @@ session_start();
 date_default_timezone_set("Europe/Copenhagen");
 /** @var $siteConfig SimpleXMLElement */
 $siteConfig = simplexml_load_file('../site-config.xml');
-$config = new ChristianBudde\cbweb\ConfigImpl($siteConfig, '../');
+$config = new ChristianBudde\Part\ConfigImpl($siteConfig, '../');
 
-$factory = isset($factory) ? $factory : new ChristianBudde\cbweb\SiteFactoryImpl($config);
+$factory = isset($factory) ? $factory : new ChristianBudde\Part\SiteFactoryImpl($config);
 
 $setUp = function () use ($factory) {
-    $website = new ChristianBudde\cbweb\WebsiteImpl($factory);
+    $website = new ChristianBudde\Part\WebsiteImpl($factory);
     $website->generateSite();
     return $website;
 };
@@ -36,11 +36,11 @@ if ($config->isDebugMode()) {
         $setUp();
     } catch (Exception $exception) {
         ob_clean();
-        $mail = new \ChristianBudde\cbweb\util\mail\MailImpl();
+        $mail = new \ChristianBudde\Part\util\mail\MailImpl();
         $backendContainer = $factory->buildBackendSingletonContainer($config);
 
         foreach ($backendContainer->getUserLibraryInstance() as $user) {
-            /** @var $user \ChristianBudde\cbweb\model\user\User */
+            /** @var $user \ChristianBudde\Part\model\user\User */
             if ($user->getUserPrivileges()->hasRootPrivileges()) {
                 $mail->addReceiver($user);
             }
@@ -59,7 +59,7 @@ if ($config->isDebugMode()) {
 
         $mail->setSubject("Fejl på $host");
         $mail->setSender("no-reply@$host");
-        $mail->setMailType(\ChristianBudde\cbweb\util\mail\Mail::MAIL_TYPE_HTML);
+        $mail->setMailType(\ChristianBudde\Part\util\mail\Mail::MAIL_TYPE_HTML);
         $mail->sendMail();
 
         if ($log = $backendContainer->getLoggerInstance()) {
@@ -74,11 +74,11 @@ if ($config->isDebugMode()) {
 
         }
 
-        $log = new \ChristianBudde\cbweb\log\LoggerImpl($config->getLogPath());
+        $log = new \ChristianBudde\Part\log\LoggerImpl($config->getLogPath());
         $log->error("Exception: ".$exception->getMessage(), $exception->getTrace());
 
         if (!isset($_SERVER['REQUEST_URI']) || strpos($_SERVER['REQUEST_URI'], '_500') === false) {
-            \ChristianBudde\cbweb\util\helper\HTTPHeaderHelper::redirectToLocation("/_500");
+            \ChristianBudde\Part\util\helper\HTTPHeaderHelper::redirectToLocation("/_500");
         }
 
 

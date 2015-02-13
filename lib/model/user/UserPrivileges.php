@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\model\user;
-use ChristianBudde\cbweb\controller\json\JSONObjectSerializable;
-use ChristianBudde\cbweb\model\page\Page;
-use ChristianBudde\cbweb\model\page\PageOrder;
+namespace ChristianBudde\Part\model\user;
+use ChristianBudde\Part\controller\json\JSONObjectSerializable;
+use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\model\page\PageOrder;
 
 /**
  * Created by JetBrains PhpStorm.

@@ -1,11 +1,11 @@
 <?php
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\controller\json\Response;
-use ChristianBudde\cbweb\controller\json\ResponseImpl;
-use ChristianBudde\cbweb\controller\json\ObjectImpl;
-use ChristianBudde\cbweb\test\stub\NullJSONObjectSerializableImpl;
-use ChristianBudde\cbweb\test\stub\NullJsonSerializableImpl;
+use ChristianBudde\Part\controller\json\ObjectImpl;
+use ChristianBudde\Part\controller\json\Response;
+use ChristianBudde\Part\controller\json\ResponseImpl;
+use ChristianBudde\Part\test\stub\NullJSONObjectSerializableImpl;
+use ChristianBudde\Part\test\stub\NullJsonSerializableImpl;
 use PHPUnit_Framework_TestCase;
 
 /**

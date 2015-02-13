@@ -1,7 +1,7 @@
 <?php
-namespace ChristianBudde\cbweb\model\page;
+namespace ChristianBudde\Part\model\page;
 use ArrayIterator;
-use ChristianBudde\cbweb\Config;
+use ChristianBudde\Part\Config;
 
 
 /**

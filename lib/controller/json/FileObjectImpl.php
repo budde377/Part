@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\controller\json;
+namespace ChristianBudde\Part\controller\json;
 
 
-use ChristianBudde\cbweb\util\file\File;
+use ChristianBudde\Part\util\file\File;
 
 /**
  * Created by PhpStorm.

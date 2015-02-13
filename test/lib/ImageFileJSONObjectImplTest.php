@@ -5,10 +5,10 @@
  * Date: 9/7/14
  * Time: 6:03 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\controller\json\ImageFileObjectImpl;
-use ChristianBudde\cbweb\util\file\ImageFileImpl;
+use ChristianBudde\Part\controller\json\ImageFileObjectImpl;
+use ChristianBudde\Part\util\file\ImageFileImpl;
 use PHPUnit_Framework_TestCase;
 
 class ImageFileJSONObjectImplTest extends PHPUnit_Framework_TestCase

@@ -1,11 +1,10 @@
 <?php
-namespace ChristianBudde\cbweb\view\page_element;
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\Config;
-use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\model\user\UserPrivileges;
-use ChristianBudde\cbweb\view;
-
+namespace ChristianBudde\Part\view\page_element;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\Config;
+use ChristianBudde\Part\model\user\User;
+use ChristianBudde\Part\model\user\UserPrivileges;
+use ChristianBudde\Part\view;
 
 
 /**

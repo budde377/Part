@@ -1,6 +1,6 @@
 <?php
-namespace ChristianBudde\cbweb;
-use ChristianBudde\cbweb\util\script\ScriptChain;
+namespace ChristianBudde\Part;
+use ChristianBudde\Part\util\script\ScriptChain;
 
 /**
  * Created by JetBrains PhpStorm.

@@ -6,9 +6,9 @@
  * Time: 10:08 PM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\Part\controller\function_string\ast;
 
-use ChristianBudde\cbweb\controller\json\Program as JProgram;
+use ChristianBudde\Part\controller\json\Program as JProgram;
 
 interface Program extends ScalarArrayProgram{
 

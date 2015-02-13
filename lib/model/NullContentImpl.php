@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\model;
+namespace ChristianBudde\Part\model;
 
 
 /**

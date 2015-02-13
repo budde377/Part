@@ -7,9 +7,9 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\model\page\DefaultPageImpl;
+use ChristianBudde\Part\model\page\DefaultPageImpl;
 use PHPUnit_Framework_TestCase;
 
 class DefaultPageImplTest extends PHPUnit_Framework_TestCase
@@ -73,13 +73,13 @@ class DefaultPageImplTest extends PHPUnit_Framework_TestCase
 
     public function testContentIsNullPageContent()
     {
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\NullContentImpl', $this->defaultPage->getContent());
+        $this->assertInstanceOf('ChristianBudde\Part\model\NullContentImpl', $this->defaultPage->getContent());
     }
 
     public function testPageIsJSONObjectSerializable()
     {
         $o = $this->defaultPage->jsonObjectSerialize();
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\PageObjectImpl', $o);
+        $this->assertInstanceOf('ChristianBudde\Part\controller\json\PageObjectImpl', $o);
         $this->assertEquals($o->getVariable('title'), $this->defaultPage->getTitle());
 
     }

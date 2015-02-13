@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 use JsonSerializable;
 
 /**

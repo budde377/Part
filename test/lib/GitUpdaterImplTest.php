@@ -6,16 +6,16 @@
  * Time: 6:13 PM
  */
 
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
 
-use ChristianBudde\cbweb\model\updater\GitUpdaterImpl;
-use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\model\user\UserImpl;
-use ChristianBudde\cbweb\test\stub\StubDBImpl;
-use ChristianBudde\cbweb\test\stub\StubSiteImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
-use ChristianBudde\cbweb\util\db\DB;
+use ChristianBudde\Part\model\updater\GitUpdaterImpl;
+use ChristianBudde\Part\model\user\User;
+use ChristianBudde\Part\model\user\UserImpl;
+use ChristianBudde\Part\test\stub\StubDBImpl;
+use ChristianBudde\Part\test\stub\StubSiteImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\util\db\DB;
 
 class GitUpdaterImplTest extends CustomDatabaseTestCase{
 

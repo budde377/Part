@@ -1,6 +1,6 @@
 <?php
-namespace ChristianBudde\cbweb\view\template;
-use ChristianBudde\cbweb\util\file\File;
+namespace ChristianBudde\Part\view\template;
+use ChristianBudde\Part\util\file\File;
 
 
 /**

@@ -5,10 +5,10 @@
  * Date: 7/7/14
  * Time: 2:14 PM
  */
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 
-use ChristianBudde\cbweb\model\mail\Domain;
-use ChristianBudde\cbweb\model\mail\DomainLibrary;
+use ChristianBudde\Part\model\mail\Domain;
+use ChristianBudde\Part\model\mail\DomainLibrary;
 
 
 class StubMailDomainLibraryImpl implements DomainLibrary
@@ -36,7 +36,7 @@ class StubMailDomainLibraryImpl implements DomainLibrary
     /**
      * Will get and reuse an instance of the domain.
      * @param string $domain The domain name as a string
-     * @return \ChristianBudde\cbweb\model\mail\Domain
+     * @return \ChristianBudde\Part\model\mail\Domain
      */
     public function getDomain($domain)
     {
@@ -46,7 +46,7 @@ class StubMailDomainLibraryImpl implements DomainLibrary
     /**
      * @param string $domain
      * @param string $password
-     * @return \ChristianBudde\cbweb\model\mail\Domain
+     * @return \ChristianBudde\Part\model\mail\Domain
      */
     public function createDomain($domain, $password)
     {
@@ -54,7 +54,7 @@ class StubMailDomainLibraryImpl implements DomainLibrary
 
     /**
      * Will delete the domain, if it domain is an instance in the library.
-     * @param \ChristianBudde\cbweb\model\mail\Domain $domain
+     * @param \ChristianBudde\Part\model\mail\Domain $domain
      * @param string $password
      * @return void
      */
@@ -64,7 +64,7 @@ class StubMailDomainLibraryImpl implements DomainLibrary
 
     /**
      * Check if the instance is in the library.
-     * @param \ChristianBudde\cbweb\model\mail\Domain $domain
+     * @param \ChristianBudde\Part\model\mail\Domain $domain
      * @return bool
      */
     public function containsDomain(Domain $domain)

@@ -1,9 +1,9 @@
 <?php
-namespace ChristianBudde\cbweb\view\template;
+namespace ChristianBudde\Part\view\template;
 
-use \Twig_TokenParser;
-use \Twig_Token;
-use \Twig_Node;
+use Twig_Node;
+use Twig_Token;
+use Twig_TokenParser;
 
 /**
  * Created by PhpStorm.

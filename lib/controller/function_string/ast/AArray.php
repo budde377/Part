@@ -6,7 +6,7 @@
  * Time: 5:00 PM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\Part\controller\function_string\ast;
 
 
 interface AArray extends ScalarArrayProgram

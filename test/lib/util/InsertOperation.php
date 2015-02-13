@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\test\util;
-use PHPUnit_Extensions_Database_Operation_Insert;
+namespace ChristianBudde\Part\test\util;
 use PHPUnit_Extensions_Database_DataSet_IDataSet;
 use PHPUnit_Extensions_Database_DB_IDatabaseConnection;
+use PHPUnit_Extensions_Database_Operation_Insert;
 
 /**
  * Created by PhpStorm.

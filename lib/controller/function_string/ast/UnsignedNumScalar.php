@@ -6,7 +6,7 @@
  * Time: 10:23 AM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\Part\controller\function_string\ast;
 
 
 interface UnsignedNumScalar extends NumScalar{

@@ -5,11 +5,11 @@
  * Date: 18/01/13
  * Time: 10:24
  */
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 
 use ArrayIterator;
-use ChristianBudde\cbweb\model\page\DefaultPageLibrary;
-use ChristianBudde\cbweb\model\page\Page;
+use ChristianBudde\Part\model\page\DefaultPageLibrary;
+use ChristianBudde\Part\model\page\Page;
 
 class StubDefaultPageLibraryImpl implements DefaultPageLibrary
 {

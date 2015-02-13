@@ -1,9 +1,9 @@
 <?php
-namespace ChristianBudde\cbweb\view\page_element;
+namespace ChristianBudde\Part\view\page_element;
 
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\model\mail\Address;
-use ChristianBudde\cbweb\model\mail\Domain;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\model\mail\Address;
+use ChristianBudde\Part\model\mail\Domain;
 
 
 /**

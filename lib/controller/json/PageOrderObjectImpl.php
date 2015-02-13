@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\controller\json;
+namespace ChristianBudde\Part\controller\json;
 
-use ChristianBudde\cbweb\model\page\Page;
-use ChristianBudde\cbweb\model\page\PageOrder;
+use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\model\page\PageOrder;
 
 /**
  * Created by PhpStorm.

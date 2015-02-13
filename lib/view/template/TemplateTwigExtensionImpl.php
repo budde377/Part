@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\view\template;
+namespace ChristianBudde\Part\view\template;
 /**
  * Created by PhpStorm.
  * User: budde

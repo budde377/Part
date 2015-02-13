@@ -7,16 +7,16 @@
  * Time: 4:27 PM
  * To change this template use File | Settings | File Templates.
  */
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 
-use ChristianBudde\cbweb\util\Observable;
-use ChristianBudde\cbweb\util\Observer;
+use ChristianBudde\Part\util\Observable;
+use ChristianBudde\Part\util\Observer;
 
 class StubObserverImpl implements Observer
 {
 
     private $hasBeenCalled = false;
-    /** @var $lastCallSubject null | \ChristianBudde\cbweb\util\Observable */
+    /** @var $lastCallSubject null | \ChristianBudde\Part\util\Observable */
     private $lastCallSubject = null;
     private $lastCallType = null;
 

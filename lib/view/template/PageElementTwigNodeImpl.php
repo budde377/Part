@@ -1,7 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\view\template;
-use \Twig_Node;
-use \Twig_Compiler;
+namespace ChristianBudde\Part\view\template;
+use Twig_Compiler;
+use Twig_Node;
+
 /**
  * Created by PhpStorm.
  * User: budde

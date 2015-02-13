@@ -1,7 +1,7 @@
 <?php
 
-namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde\cbweb\view\page_element\PageElementImpl;
+namespace ChristianBudde\Part\test\stub;
+use ChristianBudde\Part\view\page_element\PageElementImpl;
 
 /**
  * Created by JetBrains PhpStorm.

@@ -6,7 +6,7 @@
  * Time: 9:28 AM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\Part\controller\function_string\ast;
 
 
 interface NamedArrayEntries extends NamedArrayEntry,ArrayEntries{

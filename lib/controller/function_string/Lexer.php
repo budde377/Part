@@ -6,7 +6,7 @@
  * Time: 11:47 AM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string;
+namespace ChristianBudde\Part\controller\function_string;
 
 
 interface Lexer {

@@ -6,12 +6,12 @@
  * Date: 6/1/12
  * Time: 9:38 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\util\file\FileImpl;
-use ChristianBudde\cbweb\util\file\File;
-use ChristianBudde\cbweb\controller\json\FileObjectImpl;
-use ChristianBudde\cbweb\util\traits\FilePathTrait;
+use ChristianBudde\Part\controller\json\FileObjectImpl;
+use ChristianBudde\Part\util\file\File;
+use ChristianBudde\Part\util\file\FileImpl;
+use ChristianBudde\Part\util\traits\FilePathTrait;
 use PHPUnit_Framework_TestCase;
 
 class FileImplTest extends PHPUnit_Framework_TestCase
@@ -159,7 +159,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
         $file = new FileImpl($filePath);
         $this->assertTrue($file->exists(), 'File did not exist to begin with.');
         $newFile = $file->copy($filePath . '2');
-        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\File', $newFile, 'Did not return an instance of File');
+        $this->assertInstanceOf('ChristianBudde\Part\util\file\File', $newFile, 'Did not return an instance of File');
         $this->assertEquals($filePath . '2', $newFile->getAbsoluteFilePath(), 'New file did not have right path');
         $this->assertTrue($newFile->exists(), 'The new file did note exists');
         unlink($newFile->getAbsoluteFilePath());
@@ -370,7 +370,7 @@ class FileImplTest extends PHPUnit_Framework_TestCase
         $folderNo = $this->relativeToAbsolute(dirname(__FILE__) . '/../stubs');
         $file = new FileImpl($fn);
         $folder = $file->getParentFolder();
-        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\Folder', $folder);
+        $this->assertInstanceOf('ChristianBudde\Part\util\file\Folder', $folder);
         $this->assertEquals($folderNo, $folder->getAbsolutePath(), 'Parent did not match');
     }
 

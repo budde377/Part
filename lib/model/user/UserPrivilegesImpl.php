@@ -1,14 +1,14 @@
 <?php
-namespace ChristianBudde\cbweb\model\user;
+namespace ChristianBudde\Part\model\user;
 
-use ChristianBudde\cbweb\controller\json\UserPrivilegesObjectImpl;
-use ChristianBudde\cbweb\util\db\DB;
-use ChristianBudde\cbweb\model\page\Page;
-use ChristianBudde\cbweb\model\page\PageOrder;
-
-
-use PDOException;
+use ChristianBudde\Part\controller\json\UserPrivilegesObjectImpl;
+use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\model\page\PageOrder;
+use ChristianBudde\Part\util\db\DB;
 use PDO;
+use PDOException;
+
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -223,7 +223,7 @@ class UserPrivilegesImpl implements UserPrivileges
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return \ChristianBudde\cbweb\controller\json\Object
+     * @return \ChristianBudde\Part\controller\json\Object
      */
     public function jsonObjectSerialize()
     {

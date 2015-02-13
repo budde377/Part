@@ -1,9 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\model\user;
-use ChristianBudde\cbweb\controller\json\JSONObjectSerializable;
-
-use ChristianBudde\cbweb\model\Variables;
-use ChristianBudde\cbweb\util\Observable;
+namespace ChristianBudde\Part\model\user;
+use ChristianBudde\Part\controller\json\JSONObjectSerializable;
+use ChristianBudde\Part\model\Variables;
+use ChristianBudde\Part\util\Observable;
 
 /**
  * Created by JetBrains PhpStorm.

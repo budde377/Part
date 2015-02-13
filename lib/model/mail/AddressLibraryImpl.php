@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\model\mail;
+namespace ChristianBudde\Part\model\mail;
 /**
  * Created by PhpStorm.
  * User: budde
@@ -7,11 +7,11 @@ namespace ChristianBudde\cbweb\model\mail;
  * Time: 11:17 PM
  */
 
-use ChristianBudde\cbweb\controller\json\MailAddressLibraryObjectImpl;
-use ChristianBudde\cbweb\model\user\UserLibrary;
-use ChristianBudde\cbweb\util\db\DB;
-use ChristianBudde\cbweb\util\Observable;
-use ChristianBudde\cbweb\util\Observer;
+use ChristianBudde\Part\controller\json\MailAddressLibraryObjectImpl;
+use ChristianBudde\Part\model\user\UserLibrary;
+use ChristianBudde\Part\util\db\DB;
+use ChristianBudde\Part\util\Observable;
+use ChristianBudde\Part\util\Observer;
 use PDO;
 
 class AddressLibraryImpl implements AddressLibrary, Observer{

@@ -1,6 +1,6 @@
 <?php
-namespace ChristianBudde\cbweb\model\site;
-use ChristianBudde\cbweb\model\Content;
+namespace ChristianBudde\Part\model\site;
+use ChristianBudde\Part\model\Content;
 
 /**
  * Created by PhpStorm.

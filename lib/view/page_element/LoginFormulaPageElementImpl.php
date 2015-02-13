@@ -1,11 +1,10 @@
 <?php
-namespace ChristianBudde\cbweb\view\page_element;
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\util\helper\HTTPHeaderHelper;
-use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\model\user\UserImpl;
-
-use ChristianBudde\cbweb\view\html\FormElement;
+namespace ChristianBudde\Part\view\page_element;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\model\user\User;
+use ChristianBudde\Part\model\user\UserImpl;
+use ChristianBudde\Part\util\helper\HTTPHeaderHelper;
+use ChristianBudde\Part\view\html\FormElement;
 
 
 /**

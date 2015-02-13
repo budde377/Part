@@ -6,7 +6,7 @@
  * Time: 10:24 AM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\Part\controller\function_string\ast;
 
 
 class SignedNumScalarImpl implements SignedNumScalar{

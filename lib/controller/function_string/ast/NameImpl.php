@@ -6,13 +6,13 @@
  * Time: 10:29 PM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\Part\controller\function_string\ast;
 
 
 
 
-use ChristianBudde\cbweb\controller\json\Type as JType;
-use ChristianBudde\cbweb\controller\json\TypeImpl;
+use ChristianBudde\Part\controller\json\Type as JType;
+use ChristianBudde\Part\controller\json\TypeImpl;
 
 class NameImpl implements Name{
 

@@ -5,9 +5,9 @@
  * Date: 8/28/14
  * Time: 1:01 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\controller\json\TypeImpl;
+use ChristianBudde\Part\controller\json\TypeImpl;
 use PHPUnit_Framework_TestCase;
 
 class JSONTypeImplTest extends PHPUnit_Framework_TestCase

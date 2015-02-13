@@ -1,19 +1,18 @@
 <?php
-namespace ChristianBudde\cbweb\model\mail;
+namespace ChristianBudde\Part\model\mail;
 /**
  * Created by PhpStorm.
  * User: budde
  * Date: 7/8/14
  * Time: 6:02 PM
  */
-use ChristianBudde\cbweb\controller\json\MailMailboxObjectImpl;
-use ChristianBudde\cbweb\util\db\DB;
-
-use ChristianBudde\cbweb\util\Observer;
-use ChristianBudde\cbweb\util\ObserverLibraryImpl;
-use ChristianBudde\cbweb\util\traits\EncryptionTrait;
-use PDOStatement;
+use ChristianBudde\Part\controller\json\MailMailboxObjectImpl;
+use ChristianBudde\Part\util\db\DB;
+use ChristianBudde\Part\util\Observer;
+use ChristianBudde\Part\util\ObserverLibraryImpl;
+use ChristianBudde\Part\util\traits\EncryptionTrait;
 use PDO;
+use PDOStatement;
 
 class MailboxImpl implements Mailbox{
 

@@ -1,5 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\exception;use Exception;
+namespace ChristianBudde\Part\exception;
+
+use Exception;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

@@ -6,13 +6,13 @@
  * Time: 3:53 PM
  * To change this template use File | Settings | File Templates.
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\model\user\UserVariablesImpl;
-use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\model\user\UserImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
-use ChristianBudde\cbweb\test\stub\StubDBImpl;
+use ChristianBudde\Part\model\user\User;
+use ChristianBudde\Part\model\user\UserImpl;
+use ChristianBudde\Part\model\user\UserVariablesImpl;
+use ChristianBudde\Part\test\stub\StubDBImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 
 class UserVariablesImplTest extends CustomDatabaseTestCase
 {
@@ -28,7 +28,7 @@ class UserVariablesImplTest extends CustomDatabaseTestCase
     private $existingUser;
     /** @var  User */
     private $existingUser2;
-    /** @var  \ChristianBudde\cbweb\model\user\User */
+    /** @var  \ChristianBudde\Part\model\user\User */
     private $nonExistingUser;
 
     function __construct($dataset = null)

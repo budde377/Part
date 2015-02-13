@@ -1,15 +1,15 @@
 <?php
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\model\user\UserPrivilegesImpl;
-use ChristianBudde\cbweb\model\user\UserImpl;
-use ChristianBudde\cbweb\model\page\PageImpl;
-use ChristianBudde\cbweb\controller\json\UserPrivilegesObjectImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
-use ChristianBudde\cbweb\test\stub\StubDBImpl;
-use ChristianBudde\cbweb\test\stub\StubPageImpl;
-use ChristianBudde\cbweb\test\stub\StubPageOrderImpl;
-use ChristianBudde\cbweb\util\db\DB;
+use ChristianBudde\Part\controller\json\UserPrivilegesObjectImpl;
+use ChristianBudde\Part\model\page\PageImpl;
+use ChristianBudde\Part\model\user\UserImpl;
+use ChristianBudde\Part\model\user\UserPrivilegesImpl;
+use ChristianBudde\Part\test\stub\StubDBImpl;
+use ChristianBudde\Part\test\stub\StubPageImpl;
+use ChristianBudde\Part\test\stub\StubPageOrderImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\util\db\DB;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -20,13 +20,13 @@ use ChristianBudde\cbweb\util\db\DB;
 class UserPrivilegesImplTest extends CustomDatabaseTestCase
 {
 
-    /** @var \ChristianBudde\cbweb\model\user\User */
+    /** @var \ChristianBudde\Part\model\user\User */
     private $user;
     /** @var UserPrivilegesImpl */
     private $userPrivileges;
     /** @var DB */
     private $db;
-    /** @var \ChristianBudde\cbweb\model\page\Page */
+    /** @var \ChristianBudde\Part\model\page\Page */
     private $page1;
     /** @var $page2 */
     private $page2;
@@ -229,7 +229,7 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
     public function testPrivilegesIsJSONObjectSerializable()
     {
         $o = $this->userPrivileges->jsonObjectSerialize();
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\UserPrivilegesObjectImpl', $o);
+        $this->assertInstanceOf('ChristianBudde\Part\controller\json\UserPrivilegesObjectImpl', $o);
         $this->assertEquals(new UserPrivilegesObjectImpl($this->userPrivileges), $o);
     }
 

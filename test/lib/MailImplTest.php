@@ -5,13 +5,13 @@
  * Date: 02/08/12
  * Time: 14:54
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\test\stub\StubSendMailStrategyImpl;
-use ChristianBudde\cbweb\test\stub\StubUserImpl;
-use ChristianBudde\cbweb\util\mail\MailImpl;
-use ChristianBudde\cbweb\util\mail\Mail;
-use ChristianBudde\cbweb\util\traits\ValidationTrait;
+use ChristianBudde\Part\test\stub\StubSendMailStrategyImpl;
+use ChristianBudde\Part\test\stub\StubUserImpl;
+use ChristianBudde\Part\util\mail\Mail;
+use ChristianBudde\Part\util\mail\MailImpl;
+use ChristianBudde\Part\util\traits\ValidationTrait;
 use PHPUnit_Framework_TestCase;
 
 class MailImplTest extends PHPUnit_Framework_TestCase
@@ -19,7 +19,7 @@ class MailImplTest extends PHPUnit_Framework_TestCase
     use ValidationTrait;
     /** @var $strategy StubSendMailStrategyImpl */
     private $strategy;
-    /** @var $mail \ChristianBudde\cbweb\util\mail\MailImpl */
+    /** @var $mail \ChristianBudde\Part\util\mail\MailImpl */
     private $mail;
 
     private $validMail = "test@test.dk";

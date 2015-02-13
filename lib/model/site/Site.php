@@ -1,12 +1,12 @@
 <?php
-namespace ChristianBudde\cbweb\model\site;
+namespace ChristianBudde\Part\model\site;
 /**
  * Created by PhpStorm.
  * User: budde
  * Date: 10/23/13
  * Time: 1:16 PM
  */
-use ChristianBudde\cbweb\model\Content;
+use ChristianBudde\Part\model\Content;
 
 /**
  * Created by PhpStorm.
@@ -25,7 +25,7 @@ interface Site
 
     /**
      * Returns and reuses instance of site scoped variables
-     * @return \ChristianBudde\cbweb\model\Variables
+     * @return \ChristianBudde\Part\model\Variables
      */
     public function getVariables();
 
@@ -44,7 +44,7 @@ interface Site
 
     /**
      * Will get and reuse instance of content library.
-     * @return \ChristianBudde\cbweb\model\ContentLibrary
+     * @return \ChristianBudde\Part\model\ContentLibrary
      */
     public function getContentLibrary();
 }

@@ -1,6 +1,6 @@
 <?php
-namespace ChristianBudde\cbweb\model\page;
-use ChristianBudde\cbweb\controller\json\JSONObjectSerializable;
+namespace ChristianBudde\Part\model\page;
+use ChristianBudde\Part\controller\json\JSONObjectSerializable;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -173,7 +173,7 @@ interface Page extends JSONObjectSerializable
     public function lastModified();
 
     /**
-     * @return \ChristianBudde\cbweb\model\Variables Will return and reuse instance of variables
+     * @return \ChristianBudde\Part\model\Variables Will return and reuse instance of variables
      */
     public function getVariables();
 

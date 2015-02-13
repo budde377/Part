@@ -6,11 +6,11 @@
  * Time: 1:15 PM
  */
 
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
 
-use ChristianBudde\cbweb\controller\function_string\Lexer;
-use ChristianBudde\cbweb\controller\function_string\LexerImpl;
+use ChristianBudde\Part\controller\function_string\Lexer;
+use ChristianBudde\Part\controller\function_string\LexerImpl;
 
 class FunctionStringLexerImplTest extends \PHPUnit_Framework_TestCase
 {

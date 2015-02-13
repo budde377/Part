@@ -1,12 +1,12 @@
 <?php
-namespace ChristianBudde\cbweb\view\page_element;
+namespace ChristianBudde\Part\view\page_element;
 
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\model;
-use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\view\html\FormElement;
-use ChristianBudde\cbweb\view\html\FormElementImpl;
-use ChristianBudde\cbweb\view\html\SelectElement;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\model;
+use ChristianBudde\Part\model\user\User;
+use ChristianBudde\Part\view\html\FormElement;
+use ChristianBudde\Part\view\html\FormElementImpl;
+use ChristianBudde\Part\view\html\SelectElement;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -80,7 +80,7 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
         $this->generateUserList($nonDeletableUsers, $deletableUsers, $possibleUsers);
 
         foreach ($nonDeletableUsers as $user) {
-            /** @var $user \ChristianBudde\cbweb\model\user\User */
+            /** @var $user \ChristianBudde\Part\model\user\User */
             $userList .= "<li>{$user->getUsername()}</li>";
         }
         foreach ($deletableUsers as $user) {
@@ -114,7 +114,7 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
     {
         $users = $this->userLibrary->getChildren($this->currentUser);
         foreach ($users as $user) {
-            /** @var $user \ChristianBudde\cbweb\model\user\User */
+            /** @var $user \ChristianBudde\Part\model\user\User */
             $privilege = $user->getUserPrivileges();
             if ($privilege->hasPagePrivileges($this->currentPage)) {
                 if (!$privilege->hasRootPrivileges() && !$privilege->hasSitePrivileges()) {

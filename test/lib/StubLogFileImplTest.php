@@ -5,11 +5,10 @@
  * Date: 5/17/14
  * Time: 4:52 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\log\Logger;
-
-use ChristianBudde\cbweb\util\file\StubLogFileImpl;
+use ChristianBudde\Part\log\Logger;
+use ChristianBudde\Part\util\file\StubLogFileImpl;
 use PHPUnit_Framework_TestCase;
 
 class StubLogFileImplTest extends PHPUnit_Framework_TestCase
@@ -56,7 +55,7 @@ class StubLogFileImplTest extends PHPUnit_Framework_TestCase
     public function testLogDoesReturnFile()
     {
         $this->logFile->log("MSG", Logger::LOG_LEVEL_ERROR, $d);
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\util\\file\\StubDumpFileImpl", $d);
+        $this->assertInstanceOf("ChristianBudde\\Part\\util\\file\\StubDumpFileImpl", $d);
     }
 
 }

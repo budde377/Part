@@ -1,6 +1,6 @@
 <?php
-namespace ChristianBudde\cbweb\controller\ajax;
-use ChristianBudde\cbweb\controller\json\Response;
+namespace ChristianBudde\Part\controller\ajax;
+use ChristianBudde\Part\controller\json\Response;
 
 /**
  * Created by PhpStorm.

@@ -1,6 +1,6 @@
 <?php
-namespace ChristianBudde\cbweb\model;
-use ChristianBudde\cbweb\controller\json\JSONObjectSerializable;
+namespace ChristianBudde\Part\model;
+use ChristianBudde\Part\controller\json\JSONObjectSerializable;
 
 /**
  * Created by JetBrains PhpStorm.

@@ -6,7 +6,7 @@
  * Time: 10:15 AM
  */
 
-namespace ChristianBudde\cbweb\util\traits;
+namespace ChristianBudde\Part\util\traits;
 
 
 trait ParserTrait {

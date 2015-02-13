@@ -1,25 +1,25 @@
 <?php
-namespace ChristianBudde\cbweb\controller\ajax;
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\controller\function_string\ParserImpl;
-use ChristianBudde\cbweb\controller\json\JSONFunction;
-use ChristianBudde\cbweb\controller\json\Response;
-use ChristianBudde\cbweb\controller\json\ResponseImpl;
-use ChristianBudde\cbweb\model\mail\Address;
-use ChristianBudde\cbweb\model\mail\Mailbox;
-use ChristianBudde\cbweb\model\page\Page;
-use ChristianBudde\cbweb\model\page\PageContent;
-use ChristianBudde\cbweb\model\page\PageOrder;
-use ChristianBudde\cbweb\model\updater\Updater;
-use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\model\user\UserLibrary;
-use ChristianBudde\cbweb\model\user\UserPrivileges;
-use ChristianBudde\cbweb\util\file\File;
-use ChristianBudde\cbweb\util\file\FileImpl;
-use ChristianBudde\cbweb\util\file\ImageFileImpl;
-use ChristianBudde\cbweb\util\mail\Mail;
-use ChristianBudde\cbweb\util\mail\MailImpl;
-use ChristianBudde\cbweb\util\traits\ValidationTrait;
+namespace ChristianBudde\Part\controller\ajax;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\controller\function_string\ParserImpl;
+use ChristianBudde\Part\controller\json\JSONFunction;
+use ChristianBudde\Part\controller\json\Response;
+use ChristianBudde\Part\controller\json\ResponseImpl;
+use ChristianBudde\Part\model\mail\Address;
+use ChristianBudde\Part\model\mail\Mailbox;
+use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\model\page\PageContent;
+use ChristianBudde\Part\model\page\PageOrder;
+use ChristianBudde\Part\model\updater\Updater;
+use ChristianBudde\Part\model\user\User;
+use ChristianBudde\Part\model\user\UserLibrary;
+use ChristianBudde\Part\model\user\UserPrivileges;
+use ChristianBudde\Part\util\file\File;
+use ChristianBudde\Part\util\file\FileImpl;
+use ChristianBudde\Part\util\file\ImageFileImpl;
+use ChristianBudde\Part\util\mail\Mail;
+use ChristianBudde\Part\util\mail\MailImpl;
+use ChristianBudde\Part\util\traits\ValidationTrait;
 
 /**
  * Created by PhpStorm.
@@ -115,7 +115,7 @@ class BackendTypeHandlerImpl implements TypeHandler
     /**
      * Checks if handler can handle. If so handle will be called with same arguments, else next suitable handler will be called.
      * @param string $type
-     * @param \ChristianBudde\cbweb\controller\json\JSONFunction $function
+     * @param \ChristianBudde\Part\controller\json\JSONFunction $function
      * @param mixed $instance
      * @return bool
      */
@@ -126,7 +126,7 @@ class BackendTypeHandlerImpl implements TypeHandler
 
     /**
      * @param string $type
-     * @param \ChristianBudde\cbweb\controller\json\JSONFunction $function
+     * @param \ChristianBudde\Part\controller\json\JSONFunction $function
      * @param mixed $instance
      * @return mixed
      */
@@ -312,7 +312,7 @@ class BackendTypeHandlerImpl implements TypeHandler
     {
 
         $server->registerHandler($userHandler =
-                new GenericObjectTypeHandlerImpl(($u = $this->userLibrary->getUserLoggedIn()) == null ? "ChristianBudde\\cbweb\\model\\user\\User" : $u),
+                new GenericObjectTypeHandlerImpl(($u = $this->userLibrary->getUserLoggedIn()) == null ? "ChristianBudde\\Part\\model\\user\\User" : $u),
             ' User');
         $userHandler->whitelistFunction("User",
             "getUsername",
@@ -357,7 +357,7 @@ class BackendTypeHandlerImpl implements TypeHandler
     private function setUpUserPrivilegesHandler(Server $server)
     {
         $server->registerHandler($userHandler =
-                new GenericObjectTypeHandlerImpl(($u = $this->userLibrary->getUserLoggedIn()) == null ? "ChristianBudde\\cbweb\\model\\user\\UserPrivileges" : $u->getUserPrivileges()),
+                new GenericObjectTypeHandlerImpl(($u = $this->userLibrary->getUserLoggedIn()) == null ? "ChristianBudde\\Part\\model\\user\\UserPrivileges" : $u->getUserPrivileges()),
             ' UserPrivileges');
 
         $userHandler->addGetInstanceFunction("UserPrivileges");
@@ -508,7 +508,7 @@ class BackendTypeHandlerImpl implements TypeHandler
 
     private function setUpPageContentHandler(Server $server)
     {
-        $server->registerHandler($contentHandler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\page\PageContent'));
+        $server->registerHandler($contentHandler = new GenericObjectTypeHandlerImpl('ChristianBudde\Part\model\page\PageContent'));
         $contentHandler->addFunctionAuthFunction("PageContent", "addContent", function ($type, PageContent $instance) {
             return ($current = $this->backend->getUserLibraryInstance()->getUserLoggedIn()) != null && $current->getUserPrivileges()->hasPagePrivileges($instance->getPage());
         });
@@ -517,7 +517,7 @@ class BackendTypeHandlerImpl implements TypeHandler
 
     private function setUpSiteContentHandler(Server $server)
     {
-        $server->registerHandler($siteContentHandler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\site\SiteContent'));
+        $server->registerHandler($siteContentHandler = new GenericObjectTypeHandlerImpl('ChristianBudde\Part\model\site\SiteContent'));
         $siteContentHandler->addFunctionAuthFunction("SiteContent", "addContent", $this->sitePrivilegesFunction);
         $siteContentHandler->addGetInstanceFunction('SiteContent');
     }
@@ -525,7 +525,7 @@ class BackendTypeHandlerImpl implements TypeHandler
     private function setUpPageContentLibraryHandler(Server $server)
     {
         $contentLibrary = $this->backend->getPageOrderInstance()->getCurrentPage()->getContentLibrary();
-        $siteContentHandler = new GenericObjectTypeHandlerImpl($contentLibrary == null?"ChristianBudde\\cbweb\\model\\page\\PageContentLibrary":$contentLibrary);
+        $siteContentHandler = new GenericObjectTypeHandlerImpl($contentLibrary == null?"ChristianBudde\\Part\\model\\page\\PageContentLibrary":$contentLibrary);
         $server->registerHandler($siteContentHandler, "PageContentLibrary");
     }
 
@@ -570,7 +570,7 @@ class BackendTypeHandlerImpl implements TypeHandler
 
     private function setUpFileHandler(Server $server)
     {
-        $server->registerHandler($fileHandler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\util\file\ImageFile', 'File', 'ImageFile'));
+        $server->registerHandler($fileHandler = new GenericObjectTypeHandlerImpl('ChristianBudde\Part\util\file\ImageFile', 'File', 'ImageFile'));
         $fileHandler->whitelistFunction("File",
             'getContents',
             'getFilename',
@@ -769,7 +769,7 @@ class BackendTypeHandlerImpl implements TypeHandler
     private function setupMailDomainLibraryHandler(Server $server)
     {
         $handler = new GenericObjectTypeHandlerImpl($this->backend->getMailDomainLibraryInstance());
-        $handler->addAlias('MailDomainLibrary', ['ChristianBudde\cbweb\model\mail\DomainLibrary']);
+        $handler->addAlias('MailDomainLibrary', ['ChristianBudde\Part\model\mail\DomainLibrary']);
         $handler->whitelistType('MailDomainLibrary');
         $handler->addGetInstanceFunction('MailDomainLibrary');
         $server->registerHandler($handler);
@@ -780,8 +780,8 @@ class BackendTypeHandlerImpl implements TypeHandler
 
     private function setupMailDomainHandler(Server $server)
     {
-        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\Domain');
-        $handler->addAlias('MailDomain', ['ChristianBudde\cbweb\model\mail\Domain']);
+        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\Part\model\mail\Domain');
+        $handler->addAlias('MailDomain', ['ChristianBudde\Part\model\mail\Domain']);
         $handler->whitelistType('MailDomain');
         $handler->whitelistFunction('MailDomain',
             'getDomainName',
@@ -814,8 +814,8 @@ class BackendTypeHandlerImpl implements TypeHandler
 
     private function setupMailAddressLibraryHandler(Server $server)
     {
-        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\AddressLibrary');
-        $handler->addAlias('MailAddressLibrary', ['ChristianBudde\cbweb\model\mail\AddressLibrary']);
+        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\Part\model\mail\AddressLibrary');
+        $handler->addAlias('MailAddressLibrary', ['ChristianBudde\Part\model\mail\AddressLibrary']);
         $handler->whitelistType('MailAddressLibrary');
         $handler->addGetInstanceFunction('MailAddressLibrary');
 
@@ -832,8 +832,8 @@ class BackendTypeHandlerImpl implements TypeHandler
 
     private function setupMailAddressHandler(Server $server)
     {
-        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\Address');
-        $handler->addAlias('MailAddress', ['ChristianBudde\cbweb\model\mail\Address']);
+        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\Part\model\mail\Address');
+        $handler->addAlias('MailAddress', ['ChristianBudde\Part\model\mail\Address']);
         $handler->whitelistType('MailAddress');
         $handler->whitelistFunction('MailAddress',
             'getLocalPart',
@@ -893,7 +893,7 @@ class BackendTypeHandlerImpl implements TypeHandler
 
     private function setupMailMailboxHandler(Server $server)
     {
-        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\cbweb\model\mail\Mailbox', 'Mailbox');
+        $handler = new GenericObjectTypeHandlerImpl('ChristianBudde\Part\model\mail\Mailbox', 'Mailbox');
         $handler->whitelistFunction('Mailbox',
             'setName',
             'getName',

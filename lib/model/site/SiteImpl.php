@@ -1,12 +1,11 @@
 <?php
-namespace ChristianBudde\cbweb\model\site;
-use ChristianBudde\cbweb\model\ContentLibrary;
-use ChristianBudde\cbweb\util\db\DB;
-use ChristianBudde\cbweb\model\Content;
+namespace ChristianBudde\Part\model\site;
+use ChristianBudde\Part\model\Content;
+use ChristianBudde\Part\model\ContentLibrary;
+use ChristianBudde\Part\model\SiteVariablesImpl;
+use ChristianBudde\Part\model\Variables;
+use ChristianBudde\Part\util\db\DB;
 
-
-use ChristianBudde\cbweb\model\SiteVariablesImpl;
-use ChristianBudde\cbweb\model\Variables;
 
 /**
  * Created by PhpStorm.

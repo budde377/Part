@@ -1,6 +1,6 @@
 <?php
-namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde\cbweb\model\page\CurrentPageStrategy;
+namespace ChristianBudde\Part\test\stub;
+use ChristianBudde\Part\model\page\CurrentPageStrategy;
 
 /**
  * Created by JetBrains PhpStorm.

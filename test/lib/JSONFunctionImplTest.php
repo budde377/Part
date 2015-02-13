@@ -5,13 +5,10 @@
  * Date: 8/28/14
  * Time: 12:53 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\controller\json\TypeImpl;
-use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
-use ChristianBudde\cbweb\controller\json\ObjectImpl;
-use ChristianBudde\cbweb\test\stub\NullJSONObjectSerializableImpl;
-use ChristianBudde\cbweb\test\stub\NullJsonSerializableImpl;
+use ChristianBudde\Part\controller\json\JSONFunctionImpl;
+use ChristianBudde\Part\controller\json\TypeImpl;
 use PHPUnit_Framework_TestCase;
 
 class JSONFunctionImplTest extends PHPUnit_Framework_TestCase

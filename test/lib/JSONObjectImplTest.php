@@ -1,9 +1,9 @@
 <?php
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\controller\json\ObjectImpl;
-use ChristianBudde\cbweb\test\stub\NullJSONObjectSerializableImpl;
-use ChristianBudde\cbweb\test\stub\NullJsonSerializableImpl;
+use ChristianBudde\Part\controller\json\ObjectImpl;
+use ChristianBudde\Part\test\stub\NullJSONObjectSerializableImpl;
+use ChristianBudde\Part\test\stub\NullJsonSerializableImpl;
 use PHPUnit_Framework_TestCase;
 
 /**
@@ -114,7 +114,7 @@ class JSONObjectImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('object', $array['type']);
         $this->assertEquals($this->objectName, $array['name']);
         $this->assertEquals('test', $array['variables']['string']);
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\Object', $array['variables']['object']);
+        $this->assertInstanceOf('ChristianBudde\Part\controller\json\Object', $array['variables']['object']);
         $this->assertEquals($newObject, $array['variables']['object']);
     }
 

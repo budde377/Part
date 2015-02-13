@@ -1,15 +1,15 @@
 <?php
 
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\WebsiteImpl;
-use ChristianBudde\cbweb\util\script\ScriptChainImpl;
-use ChristianBudde\cbweb\BackendSingletonContainerImpl;
-use ChristianBudde\cbweb\Website;
+use ChristianBudde\Part\BackendSingletonContainerImpl;
+use ChristianBudde\Part\test\stub\StubConfigImpl;
+use ChristianBudde\Part\test\stub\StubScriptImpl;
+use ChristianBudde\Part\test\stub\StubSiteFactoryImpl;
+use ChristianBudde\Part\util\script\ScriptChainImpl;
+use ChristianBudde\Part\Website;
+use ChristianBudde\Part\WebsiteImpl;
 use PHPUnit_Framework_TestCase;
-use ChristianBudde\cbweb\test\stub\StubConfigImpl;
-use ChristianBudde\cbweb\test\stub\StubScriptImpl;
-use ChristianBudde\cbweb\test\stub\StubSiteFactoryImpl;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -21,7 +21,7 @@ use ChristianBudde\cbweb\test\stub\StubSiteFactoryImpl;
 class WebsiteImplTest extends PHPUnit_Framework_TestCase
 {
 
-    /** @var $factory \ChristianBudde\cbweb\test\stub\StubSiteFactoryImpl */
+    /** @var $factory \ChristianBudde\Part\test\stub\StubSiteFactoryImpl */
     public $factory;
 
     protected function setUp()

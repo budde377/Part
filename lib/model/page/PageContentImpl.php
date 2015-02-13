@@ -1,11 +1,11 @@
 <?php
-namespace ChristianBudde\cbweb\model\page;
-use ChristianBudde\cbweb\util\db\DB;
-
-
-use ChristianBudde\cbweb\controller\json\PageContentObjectImpl;
-use PDOStatement;
+namespace ChristianBudde\Part\model\page;
+use ChristianBudde\Part\controller\json\PageContentObjectImpl;
+use ChristianBudde\Part\util\db\DB;
 use PDO;
+use PDOStatement;
+
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

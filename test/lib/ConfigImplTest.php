@@ -6,10 +6,10 @@
  * Time: 7:07 PM
  * To change this template use File | Settings | File Templates.
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\ConfigImpl;
-use ChristianBudde\cbweb\exception\InvalidXMLException;
+use ChristianBudde\Part\ConfigImpl;
+use ChristianBudde\Part\exception\InvalidXMLException;
 use PHPUnit_Framework_TestCase;
 use SimpleXMLElement;
 

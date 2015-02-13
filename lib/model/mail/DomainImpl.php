@@ -1,13 +1,14 @@
 <?php
-namespace ChristianBudde\cbweb\model\mail;
-use ChristianBudde\cbweb\controller\json\MailDomainObjectImpl;
-use ChristianBudde\cbweb\model\user\UserLibrary;
-use ChristianBudde\cbweb\util\db\DB;
-use ChristianBudde\cbweb\util\Observable;
-use ChristianBudde\cbweb\util\Observer;
-use ChristianBudde\cbweb\util\ObserverLibraryImpl;
-use PDOException;
+namespace ChristianBudde\Part\model\mail;
+use ChristianBudde\Part\controller\json\MailDomainObjectImpl;
+use ChristianBudde\Part\model\user\UserLibrary;
+use ChristianBudde\Part\util\db\DB;
+use ChristianBudde\Part\util\Observable;
+use ChristianBudde\Part\util\Observer;
+use ChristianBudde\Part\util\ObserverLibraryImpl;
 use PDO;
+use PDOException;
+
 /**
  * Created by PhpStorm.
  * User: budde

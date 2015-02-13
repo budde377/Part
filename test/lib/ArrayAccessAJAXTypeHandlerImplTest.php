@@ -5,17 +5,17 @@
  * Date: 9/6/14
  * Time: 6:08 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\controller\ajax\ArrayAccessTypeHandlerImpl;
-use ChristianBudde\cbweb\controller\function_string\ParserImpl;
-use ChristianBudde\cbweb\controller\json\JSONFunction;
+use ChristianBudde\Part\controller\ajax\ArrayAccessTypeHandlerImpl;
+use ChristianBudde\Part\controller\function_string\ParserImpl;
+use ChristianBudde\Part\controller\json\JSONFunction;
 use PHPUnit_Framework_TestCase;
 
 class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase
 {
 
-    /** @var  \ChristianBudde\cbweb\controller\ajax\ArrayAccessTypeHandlerImpl */
+    /** @var  \ChristianBudde\Part\controller\ajax\ArrayAccessTypeHandlerImpl */
     private $handler;
     private $parser;
     /** @var  JSONFunction */

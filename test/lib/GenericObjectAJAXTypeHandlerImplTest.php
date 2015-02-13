@@ -5,21 +5,21 @@
  * Date: 8/31/14
  * Time: 7:33 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\controller\ajax\GenericObjectTypeHandlerImpl;
-use ChristianBudde\cbweb\controller\ajax\TypeHandler;
-use ChristianBudde\cbweb\controller\function_string\Parser;
-use ChristianBudde\cbweb\controller\function_string\ParserImpl;
-use ChristianBudde\cbweb\controller\json\Element;
-use ChristianBudde\cbweb\controller\json\JSONFunction;
-use ChristianBudde\cbweb\controller\json\Object;
-use ChristianBudde\cbweb\controller\json\ObjectImpl;
-use ChristianBudde\cbweb\controller\json\Response;
-use ChristianBudde\cbweb\controller\json\ResponseImpl;
-use ChristianBudde\cbweb\model\page\Page;
-use ChristianBudde\cbweb\test\stub\NullAJAXServerImpl;
-use ChristianBudde\cbweb\test\stub\StubAJAXTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\GenericObjectTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\function_string\Parser;
+use ChristianBudde\Part\controller\function_string\ParserImpl;
+use ChristianBudde\Part\controller\json\Element;
+use ChristianBudde\Part\controller\json\JSONFunction;
+use ChristianBudde\Part\controller\json\Object;
+use ChristianBudde\Part\controller\json\ObjectImpl;
+use ChristianBudde\Part\controller\json\Response;
+use ChristianBudde\Part\controller\json\ResponseImpl;
+use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\test\stub\NullAJAXServerImpl;
+use ChristianBudde\Part\test\stub\StubAJAXTypeHandlerImpl;
 
 class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
 {
@@ -62,8 +62,8 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(is_array($list));
         $this->assertEquals(5, count($list));
         $this->assertEquals('JsonSerializable', $list[0]);
-        $this->assertEquals('ChristianBudde\cbweb\controller\json\Element', $list[1]);
-        $this->assertEquals('ChristianBudde\cbweb\controller\json\Object', $list[2]);
+        $this->assertEquals('ChristianBudde\Part\controller\json\Element', $list[1]);
+        $this->assertEquals('ChristianBudde\Part\controller\json\Object', $list[2]);
         $this->assertEquals('Element', $list[3]);
         $this->assertEquals('Object', $list[4]);
     }
@@ -84,7 +84,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $list = $this->handler->listTypes();
         $this->assertEquals(2, count($list));
         $this->assertEquals('Element', $list[1]);
-        $this->assertEquals('ChristianBudde\cbweb\controller\json\Element', $list[0]);
+        $this->assertEquals('ChristianBudde\Part\controller\json\Element', $list[0]);
     }
 
 
@@ -93,9 +93,9 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->whitelistType('Element', 'Object');
         $list = $this->handler->listTypes();
         $this->assertEquals(4, count($list));
-        $this->assertEquals('ChristianBudde\cbweb\controller\json\Element', $list[0]);
+        $this->assertEquals('ChristianBudde\Part\controller\json\Element', $list[0]);
         $this->assertEquals('Element', $list[1]);
-        $this->assertEquals('ChristianBudde\cbweb\controller\json\Object', $list[2]);
+        $this->assertEquals('ChristianBudde\Part\controller\json\Object', $list[2]);
         $this->assertEquals('Object', $list[3]);
     }
 
@@ -106,7 +106,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
 
         $list = $handler->listTypes();
         $this->assertEquals(4, count($list));
-        $this->assertEquals(['ChristianBudde\cbweb\controller\json\Element', 'Element', 'ChristianBudde\cbweb\controller\json\Object', 'Object'], $list);
+        $this->assertEquals(['ChristianBudde\Part\controller\json\Element', 'Element', 'ChristianBudde\Part\controller\json\Object', 'Object'], $list);
     }
 
 
@@ -243,7 +243,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
     public function testCanHandleIsTrueWithRightFunction()
     {
         $this->handler->setUp($this->nullAJAXServer, 'Element');
-        /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
+        /** @var \ChristianBudde\Part\controller\json\JSONFunction $f */
         $f = $this->parser->parseString("Element.getAsJSONString('test',123)")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
 
@@ -253,7 +253,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
     {
         $this->handler->setUp($this->nullAJAXServer, 'Element');
         $this->handler->whitelistFunction('Element', 'getAsArray');
-        /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
+        /** @var \ChristianBudde\Part\controller\json\JSONFunction $f */
         $f = $this->parser->parseString("Element.getAsJSONString('test',123)")->toJSONProgram();
         $this->assertFalse($this->handler->canHandle('Element', $f));
 
@@ -265,7 +265,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->setUp($this->nullAJAXServer, 'Element');
         $this->handler->whitelistFunction('Element', 'getAsArray');
         $this->handler->addFunction('Element', 'custom', function(){return "success";});
-        /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
+        /** @var \ChristianBudde\Part\controller\json\JSONFunction $f */
         $f = $this->parser->parseString("Element.custom()")->toJSONProgram();
         $this->assertFalse($this->handler->canHandle('Element', $f));
 
@@ -319,11 +319,11 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->handler->canHandle('Element', $f));
         /** @var Response $r */
         $this->handler->handle('Element', $f);
-        $this->assertEquals(['ChristianBudde\cbweb\controller\json\Element', $this->object, 'getAsJSONString', ['test', 123]], $args);
+        $this->assertEquals(['ChristianBudde\Part\controller\json\Element', $this->object, 'getAsJSONString', ['test', 123]], $args);
 
         $o = new ObjectImpl('someNewObject');
         $this->handler->handle('Element', $f, $o);
-        $this->assertEquals(['ChristianBudde\cbweb\controller\json\Element', $o, 'getAsJSONString', ['test', 123]], $args);
+        $this->assertEquals(['ChristianBudde\Part\controller\json\Element', $o, 'getAsJSONString', ['test', 123]], $args);
     }
 
     public function testFunctionAuthFunctionIsPassedRightArguments()
@@ -339,11 +339,11 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->handler->canHandle('Element', $f));
         /** @var Response $r */
         $this->handler->handle('Element', $f);
-        $this->assertEquals(['ChristianBudde\cbweb\controller\json\Element', $this->object, 'getAsJSONString', ['test', 123]], $args);
+        $this->assertEquals(['ChristianBudde\Part\controller\json\Element', $this->object, 'getAsJSONString', ['test', 123]], $args);
 
         $o = new ObjectImpl('someNewObject');
         $this->handler->handle('Element', $f, $o);
-        $this->assertEquals(['ChristianBudde\cbweb\controller\json\Element', $o, 'getAsJSONString', ['test', 123]], $args);
+        $this->assertEquals(['ChristianBudde\Part\controller\json\Element', $o, 'getAsJSONString', ['test', 123]], $args);
     }
 
     public function testTypeAuthFunctionIsPassedRightArguments()
@@ -359,11 +359,11 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->handler->canHandle('Element', $f));
         /** @var Response $r */
         $this->handler->handle('Element', $f);
-        $this->assertEquals(['ChristianBudde\cbweb\controller\json\Element', $this->object, 'getAsJSONString', ['test', 123]], $args);
+        $this->assertEquals(['ChristianBudde\Part\controller\json\Element', $this->object, 'getAsJSONString', ['test', 123]], $args);
 
         $o = new ObjectImpl('someNewObject');
         $this->handler->handle('Element', $f, $o);
-        $this->assertEquals(['ChristianBudde\cbweb\controller\json\Element', $o, 'getAsJSONString', ['test', 123]], $args);
+        $this->assertEquals(['ChristianBudde\Part\controller\json\Element', $o, 'getAsJSONString', ['test', 123]], $args);
     }
 
     public function testHandleCallsWithRightArguments()
@@ -388,7 +388,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->handler->canHandle('Element', $f));
         /** @var Response $r */
         $r = $this->handler->handle('Element', $f);
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\Response', $r);
+        $this->assertInstanceOf('ChristianBudde\Part\controller\json\Response', $r);
         $this->assertEquals(Response::RESPONSE_TYPE_ERROR, $r->getResponseType());
         $this->assertEquals(Response::ERROR_CODE_UNAUTHORIZED, $r->getErrorCode());
     }
@@ -402,7 +402,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->handler->canHandle('Element', $f));
         /** @var Response $r */
         $r = $this->handler->handle('Element', $f);
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\Response', $r);
+        $this->assertInstanceOf('ChristianBudde\Part\controller\json\Response', $r);
         $this->assertEquals(Response::RESPONSE_TYPE_ERROR, $r->getResponseType());
         $this->assertEquals(Response::ERROR_CODE_UNAUTHORIZED, $r->getErrorCode());
     }
@@ -416,7 +416,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->handler->canHandle('Element', $f));
         /** @var Response $r */
         $r = $this->handler->handle('Element', $f);
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\Response', $r);
+        $this->assertInstanceOf('ChristianBudde\Part\controller\json\Response', $r);
         $this->assertEquals(Response::RESPONSE_TYPE_ERROR, $r->getResponseType());
         $this->assertEquals(Response::ERROR_CODE_UNAUTHORIZED, $r->getErrorCode());
     }
@@ -428,7 +428,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         /** @var JSONFunction $f */
         $f = $this->parser->parseString("Element.getAsJSONString('test',123)")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
-        /** @var \ChristianBudde\cbweb\controller\json\Response $r */
+        /** @var \ChristianBudde\Part\controller\json\Response $r */
         $r = $this->handler->handle('Element', $f);
         $this->assertEquals($this->object->getAsJSONString(), $r);
     }
@@ -441,7 +441,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         /** @var JSONFunction $f */
         $f = $this->parser->parseString("Element.getAsJSONString('test',123)")->toJSONProgram();
         $this->assertTrue($this->handler->canHandle('Element', $f));
-        /** @var \ChristianBudde\cbweb\controller\json\Response $r */
+        /** @var \ChristianBudde\Part\controller\json\Response $r */
         $r = $this->handler->handle('Element', $f);
         $this->assertEquals($this->object->getAsJSONString(), $r);
     }
@@ -486,17 +486,17 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->addFunction('Element', 'custom', function () use (&$args) {
             $args = func_get_args();
         });
-        /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
+        /** @var \ChristianBudde\Part\controller\json\JSONFunction $f */
         $f = $this->parser->parseString("Element.custom()")->toJSONProgram();
 
         $this->handler->handle('Element', $f);
         $this->assertEquals([
-            ['ChristianBudde\cbweb\controller\json\Element', $this->object, 'custom', [1]],
-            ['ChristianBudde\cbweb\controller\json\Element', $this->object, 'custom', [1, 2]],
-            ['ChristianBudde\cbweb\controller\json\Element', $this->object, 'custom', [1, 2, 3]],
-            ['ChristianBudde\cbweb\controller\json\Element', $this->object, 'custom', [4]],
-            ['ChristianBudde\cbweb\controller\json\Element', $this->object, 'custom', [4, 5]],
-            ['ChristianBudde\cbweb\controller\json\Element', $this->object, 'custom', [4, 5, 6]],
+            ['ChristianBudde\Part\controller\json\Element', $this->object, 'custom', [1]],
+            ['ChristianBudde\Part\controller\json\Element', $this->object, 'custom', [1, 2]],
+            ['ChristianBudde\Part\controller\json\Element', $this->object, 'custom', [1, 2, 3]],
+            ['ChristianBudde\Part\controller\json\Element', $this->object, 'custom', [4]],
+            ['ChristianBudde\Part\controller\json\Element', $this->object, 'custom', [4, 5]],
+            ['ChristianBudde\Part\controller\json\Element', $this->object, 'custom', [4, 5, 6]],
 
         ], $a);
         $this->assertEquals([$this->object, 4, 5, 6], $args);
@@ -522,14 +522,14 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->handler->addFunction('Element', 'custom', function () use (&$args) {
             return [1];
         });
-        /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
+        /** @var \ChristianBudde\Part\controller\json\JSONFunction $f */
         $f = $this->parser->parseString("Element.custom()")->toJSONProgram();
 
         $r = $this->handler->handle('Element', $f);
         $this->assertEquals([
-            ['ChristianBudde\cbweb\controller\json\Element', $this->object, 'custom', [1, 2]],
-            ['ChristianBudde\cbweb\controller\json\Element', $this->object, 'custom', [1, 2, 3]],
-            ['ChristianBudde\cbweb\controller\json\Element', $this->object, 'custom', [1, 2, 3, 4]]
+            ['ChristianBudde\Part\controller\json\Element', $this->object, 'custom', [1, 2]],
+            ['ChristianBudde\Part\controller\json\Element', $this->object, 'custom', [1, 2, 3]],
+            ['ChristianBudde\Part\controller\json\Element', $this->object, 'custom', [1, 2, 3, 4]]
 
         ], $a);
         $this->assertEquals([1, 2, 3, 4], $r);
@@ -560,8 +560,8 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
 
     public function testStringToConstructorDoesNotAddDefaultInstance()
     {
-        $handler = new GenericObjectTypeHandlerImpl("ChristianBudde\\cbweb\\model\\user\\User");
-        $this->assertTrue($handler->hasType("ChristianBudde\\cbweb\\model\\user\\User"));
+        $handler = new GenericObjectTypeHandlerImpl("ChristianBudde\\Part\\model\\user\\User");
+        $this->assertTrue($handler->hasType("ChristianBudde\\Part\\model\\user\\User"));
         $this->assertTrue($handler->hasType("User"));
         $handler->setUp(new NullAJAXServerImpl(), 'User');
         /** @var JSONFunction $f */
@@ -576,7 +576,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
 
     public function testStringToConstructorCanCallCustomFunctions()
     {
-        $handler = new GenericObjectTypeHandlerImpl("ChristianBudde\\cbweb\\model\\user\\User");
+        $handler = new GenericObjectTypeHandlerImpl("ChristianBudde\\Part\\model\\user\\User");
         $this->assertTrue($handler->hasType("User"));
         $handler->setUp(new NullAJAXServerImpl(), 'User');
         $args = [];
@@ -630,10 +630,10 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
 
     public function testStringOfActualTypeDoesAddTypesAndFunctions()
     {
-        $handler = new GenericObjectTypeHandlerImpl("ChristianBudde\\cbweb\\controller\\json\\Object");
+        $handler = new GenericObjectTypeHandlerImpl("ChristianBudde\\Part\\controller\\json\\Object");
         $this->assertTrue($handler->hasType("Element"));
 
-        $handler = new GenericObjectTypeHandlerImpl("ChristianBudde\\cbweb\\controller\\json\\Object");
+        $handler = new GenericObjectTypeHandlerImpl("ChristianBudde\\Part\\controller\\json\\Object");
         $this->assertTrue($handler->hasType("Element"));
 
 
@@ -781,7 +781,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
         $this->setUpHandler($handler);
         $handler->addFunction('JSONProgram', 'custom', function (array $a) {
         });
-        /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
+        /** @var \ChristianBudde\Part\controller\json\JSONFunction $f */
         $f = $this->parser->parseString("JSONProgram . custom([])")->toJSONProgram();
         $this->assertTrue($handler->canHandle('JSONProgram', $f));
     }
@@ -796,7 +796,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
             return 1;
         });
 
-        /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
+        /** @var \ChristianBudde\Part\controller\json\JSONFunction $f */
         $f = $this->parser->parseString("ProgramAlias . custom()")->toJSONProgram();
         $this->assertTrue($handler->canHandle('ProgramAlias', $f));
         $this->assertEquals(1, $handler->handle('ProgramAlias', $f));
@@ -812,7 +812,7 @@ class GenericObjectAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase
             return 1;
         });
 
-        /** @var \ChristianBudde\cbweb\controller\json\JSONFunction $f */
+        /** @var \ChristianBudde\Part\controller\json\JSONFunction $f */
         $f = $this->parser->parseString("ProgramAlias . custom()")->toJSONProgram();
         $this->assertTrue($handler->canHandle('ProgramAlias', $f));
         $this->assertEquals(1, $handler->handle('ProgramAlias', $f));

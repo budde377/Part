@@ -1,15 +1,15 @@
 <?php
-namespace ChristianBudde\cbweb\model\mail;
+namespace ChristianBudde\Part\model\mail;
 
-use ChristianBudde\cbweb\controller\json\MailAddressObjectImpl;
-use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\model\user\UserLibrary;
-use ChristianBudde\cbweb\util\db\DB;
-use ChristianBudde\cbweb\util\Observable;
-use ChristianBudde\cbweb\util\Observer;
-use ChristianBudde\cbweb\util\ObserverLibrary;
-use ChristianBudde\cbweb\util\ObserverLibraryImpl;
-use ChristianBudde\cbweb\util\traits\ValidationTrait;
+use ChristianBudde\Part\controller\json\MailAddressObjectImpl;
+use ChristianBudde\Part\model\user\User;
+use ChristianBudde\Part\model\user\UserLibrary;
+use ChristianBudde\Part\util\db\DB;
+use ChristianBudde\Part\util\Observable;
+use ChristianBudde\Part\util\Observer;
+use ChristianBudde\Part\util\ObserverLibrary;
+use ChristianBudde\Part\util\ObserverLibraryImpl;
+use ChristianBudde\Part\util\traits\ValidationTrait;
 use PDO;
 use PDOException;
 use PDOStatement;

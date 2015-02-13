@@ -6,17 +6,17 @@
  * Date: 2/22/14
  * Time: 3:15 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\util\file\File;
-use ChristianBudde\cbweb\util\file\FileImpl;
-use ChristianBudde\cbweb\util\file\FileLibraryImpl;
-use ChristianBudde\cbweb\util\file\Folder;
-use ChristianBudde\cbweb\util\file\FolderImpl;
+use ChristianBudde\Part\model\user\User;
+use ChristianBudde\Part\test\stub\StubConfigImpl;
+use ChristianBudde\Part\test\stub\StubUserImpl;
+use ChristianBudde\Part\util\file\File;
+use ChristianBudde\Part\util\file\FileImpl;
+use ChristianBudde\Part\util\file\FileLibraryImpl;
+use ChristianBudde\Part\util\file\Folder;
+use ChristianBudde\Part\util\file\FolderImpl;
 use PHPUnit_Framework_TestCase;
-use ChristianBudde\cbweb\test\stub\StubConfigImpl;
-use ChristianBudde\cbweb\test\stub\StubUserImpl;
 
 class FileLibraryImplTest extends PHPUnit_Framework_TestCase
 {
@@ -373,7 +373,7 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase
     public function testIfGetFilesFolderReturnsRightFolder()
     {
         $f = $this->lib->getFilesFolder();
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\util\\file\\Folder", $f);
+        $this->assertInstanceOf("ChristianBudde\\Part\\util\\file\\Folder", $f);
         $this->assertEquals($f->getAbsolutePath(), $this->testDir->getAbsolutePath());
         $this->assertFalse($this->testDir === $f);
     }

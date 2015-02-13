@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\log;
-use ChristianBudde\cbweb\util\file\DumpFile;
-use ChristianBudde\cbweb\util\file\LogFileImpl;
-use ChristianBudde\cbweb\util\file\StubLogFileImpl;
+namespace ChristianBudde\Part\log;
+use ChristianBudde\Part\util\file\DumpFile;
+use ChristianBudde\Part\util\file\LogFileImpl;
+use ChristianBudde\Part\util\file\StubLogFileImpl;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -140,6 +140,9 @@ class LoggerImpl implements Logger
     public function log($level, $message, array $context = array())
     {
         if($context != []){
+            /** @var DumpFile $dumpFile */
+            $dumpFile = true;
+
             $t = $this->logFile->log($message, $level, $dumpFile);
             $dumpFile->writeSerialized($context);
         } else {

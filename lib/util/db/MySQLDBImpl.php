@@ -1,7 +1,7 @@
 <?php
-namespace ChristianBudde\cbweb\util\db;
+namespace ChristianBudde\Part\util\db;
 
-use ChristianBudde\cbweb\Config;
+use ChristianBudde\Part\Config;
 use PDO;
 
 /**

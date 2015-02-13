@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\util;
-use ChristianBudde\cbweb\model\page\CurrentPageStrategy;
-use ChristianBudde\cbweb\model\page\Page;
-use ChristianBudde\cbweb\model\site\Site;
+namespace ChristianBudde\Part\util;
+use ChristianBudde\Part\model\page\CurrentPageStrategy;
+use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\model\site\Site;
 
 /**
  * Created by JetBrains PhpStorm.

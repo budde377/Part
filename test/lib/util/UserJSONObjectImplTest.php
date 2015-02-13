@@ -1,10 +1,10 @@
 <?php
-namespace ChristianBudde\cbweb\test\util;
+namespace ChristianBudde\Part\test\util;
 
-use ChristianBudde\cbweb\controller\json\UserObjectImpl;
+use ChristianBudde\Part\controller\json\UserObjectImpl;
+use ChristianBudde\Part\test\stub\StubUserImpl;
+use ChristianBudde\Part\test\stub\StubUserPrivilegesImpl;
 use PHPUnit_Framework_TestCase;
-use ChristianBudde\cbweb\test\stub\StubUserImpl;
-use ChristianBudde\cbweb\test\stub\StubUserPrivilegesImpl;
 
 /**
  * Created by JetBrains PhpStorm.

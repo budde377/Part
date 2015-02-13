@@ -6,15 +6,15 @@
  * Time: 9:18 PM
  * To change this template use File | Settings | File Templates.
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\model\page\PageImpl;
-use ChristianBudde\cbweb\exception\MalformedParameterException;
-use ChristianBudde\cbweb\model\page\Page;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\exception\MalformedParameterException;
+use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\model\page\PageImpl;
+use ChristianBudde\Part\test\stub\StubDBImpl;
+use ChristianBudde\Part\test\stub\StubObserverImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 use Exception;
-use ChristianBudde\cbweb\test\stub\StubDBImpl;
-use ChristianBudde\cbweb\test\stub\StubObserverImpl;
 
 class PageImplTest extends CustomDatabaseTestCase
 {
@@ -188,7 +188,7 @@ class PageImplTest extends CustomDatabaseTestCase
 
         } catch (Exception $e) {
             $exceptionWasThrown = true;
-            $this->assertInstanceOf('ChristianBudde\cbweb\exception\MalformedParameterException', $e, 'Exception was of wrong instance');
+            $this->assertInstanceOf('ChristianBudde\Part\exception\MalformedParameterException', $e, 'Exception was of wrong instance');
             /** @var $e MalformedParameterException */
             $this->assertEquals(1, $e->getParameterNumber(), 'Wrong parameter no');
             $this->assertEquals('RegEx[a-zA-Z0-9-_]+', $e->getExpectedType(), 'Wrong type');
@@ -347,7 +347,7 @@ class PageImplTest extends CustomDatabaseTestCase
 
     public function testGetContentReturnsInstanceOfContent()
     {
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Content", $this->testPage->getContent());
+        $this->assertInstanceOf("ChristianBudde\\Part\\model\\Content", $this->testPage->getContent());
     }
 
     public function testGetContentReturnSameInstanceOnSameId()
@@ -379,7 +379,7 @@ class PageImplTest extends CustomDatabaseTestCase
     public function testGetVariablesWillReturnInstanceOfVariables()
     {
         $var = $this->testPage->getVariables();
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\page\\PageVariablesImpl", $var);
+        $this->assertInstanceOf("ChristianBudde\\Part\\model\\page\\PageVariablesImpl", $var);
     }
 
     public function testGetVariablesWillReturnSameInstance()
@@ -393,13 +393,13 @@ class PageImplTest extends CustomDatabaseTestCase
         $lib1 = $this->testPage->getContentLibrary();
         $lib2 = $this->testPage->getContentLibrary();
         $this->assertTrue($lib1 === $lib2);
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\ContentLibrary", $lib1);
+        $this->assertInstanceOf("ChristianBudde\\Part\\model\\ContentLibrary", $lib1);
     }
 
     public function testPageIsJSONObjectSerializable()
     {
         $o = $this->testPage->jsonObjectSerialize();
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\PageObjectImpl', $o);
+        $this->assertInstanceOf('ChristianBudde\Part\controller\json\PageObjectImpl', $o);
         $this->assertEquals($o->getVariable('title'), $this->testPage->getTitle());
 
     }

@@ -5,8 +5,8 @@
  * Date: 9/6/14
  * Time: 6:07 PM
  */
-namespace ChristianBudde\cbweb\controller\ajax;
-use ChristianBudde\cbweb\controller\json\JSONFunction;
+namespace ChristianBudde\Part\controller\ajax;
+use ChristianBudde\Part\controller\json\JSONFunction;
 
 class ArrayAccessTypeHandlerImpl implements TypeHandler{
     public $arrays;
@@ -35,7 +35,7 @@ class ArrayAccessTypeHandlerImpl implements TypeHandler{
     /**
      * Checks if handler can handle. If so handle will be called with same arguments, else next suitable handler will be called.
      * @param string $type
-     * @param \ChristianBudde\cbweb\controller\json\JSONFunction $function
+     * @param \ChristianBudde\Part\controller\json\JSONFunction $function
      * @param mixed $instance
      * @return bool
      */

@@ -6,14 +6,14 @@
  * Date: 3/3/14
  * Time: 10:12 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\model\page\Page;
-use ChristianBudde\cbweb\model\page\PageContentLibraryImpl;
-use ChristianBudde\cbweb\model\page\PageImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
-use ChristianBudde\cbweb\test\stub\StubDBImpl;
-use ChristianBudde\cbweb\util\db\DB;
+use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\model\page\PageContentLibraryImpl;
+use ChristianBudde\Part\model\page\PageImpl;
+use ChristianBudde\Part\test\stub\StubDBImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\util\db\DB;
 
 class PageContentLibraryImplTest extends CustomDatabaseTestCase
 {
@@ -21,13 +21,13 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
 
     /** @var  DB */
     private $db;
-    /** @var  \ChristianBudde\cbweb\model\page\Page */
+    /** @var  \ChristianBudde\Part\model\page\Page */
     private $existingPage;
     /** @var  Page */
     private $nonExistingPage;
-    /** @var  \ChristianBudde\cbweb\model\page\PageContentLibraryImpl */
+    /** @var  \ChristianBudde\Part\model\page\PageContentLibraryImpl */
     private $existingContentLibrary;
-    /** @var  \ChristianBudde\cbweb\model\page\PageContentLibraryImpl */
+    /** @var  \ChristianBudde\Part\model\page\PageContentLibraryImpl */
     private $nonExistingContentLibrary;
 
     function __construct()
@@ -52,9 +52,9 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue(is_array($list = $this->existingContentLibrary->listContents()));
         $this->assertEquals(2, count($list));
         $this->assertArrayHasKey("", $list);
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Content", $list[""]);
+        $this->assertInstanceOf("ChristianBudde\\Part\\model\\Content", $list[""]);
         $this->assertArrayHasKey("Test", $list);
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Content", $list["Test"]);
+        $this->assertInstanceOf("ChristianBudde\\Part\\model\\Content", $list["Test"]);
     }
 
 
@@ -78,7 +78,7 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
     public function testGetInstanceWillCreateNewInstance()
     {
         $c = $this->existingContentLibrary->getContent($id = "id" . time());
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Content", $c);
+        $this->assertInstanceOf("ChristianBudde\\Part\\model\\Content", $c);
         $c2 = $this->existingContentLibrary->getContent($id);
         $this->assertTrue($c === $c2);
     }
@@ -124,8 +124,8 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
         $this->assertEquals(2, count($ar));
         $this->assertArrayHasKey("", $ar);
         $this->assertArrayHasKey("Test", $ar);
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Content", $ar[""]);
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Content", $ar["Test"]);
+        $this->assertInstanceOf("ChristianBudde\\Part\\model\\Content", $ar[""]);
+        $this->assertInstanceOf("ChristianBudde\\Part\\model\\Content", $ar["Test"]);
     }
 
     public function testSearchLibraryWillReuseInstances()

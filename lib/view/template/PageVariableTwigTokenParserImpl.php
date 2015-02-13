@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\view\template;
+namespace ChristianBudde\Part\view\template;
 /**
  * Created by PhpStorm.
  * User: budde
@@ -7,10 +7,10 @@ namespace ChristianBudde\cbweb\view\template;
  * Time: 11:08 PM
  */
 
-use \Twig_TokenParser;
-use \Twig_Token;
-use \Twig_Node;
-use \Twig_Error_Syntax;
+use Twig_Error_Syntax;
+use Twig_Node;
+use Twig_Token;
+use Twig_TokenParser;
 
 class PageVariableTwigTokenParserImpl extends Twig_TokenParser{
 

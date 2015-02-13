@@ -1,7 +1,7 @@
 <?php
-namespace ChristianBudde\cbweb\view\page_element;
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\model\page\PageContentImpl;
+namespace ChristianBudde\Part\view\page_element;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\model\page\PageContentImpl;
 
 
 /**

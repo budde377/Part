@@ -5,10 +5,10 @@
  * Date: 7/8/14
  * Time: 6:12 PM
  */
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 
-use ChristianBudde\cbweb\model\mail\Domain;
-use ChristianBudde\cbweb\util\Observer;
+use ChristianBudde\Part\model\mail\Domain;
+use ChristianBudde\Part\util\Observer;
 
 
 class StubMailDomainImpl implements Domain
@@ -126,7 +126,7 @@ class StubMailDomainImpl implements Domain
     }
 
     /**
-     * @return \ChristianBudde\cbweb\model\mail\AddressLibrary
+     * @return \ChristianBudde\Part\model\mail\AddressLibrary
      */
     public function getAddressLibrary()
     {
@@ -142,7 +142,7 @@ class StubMailDomainImpl implements Domain
     }
 
     /**
-     * @param \ChristianBudde\cbweb\model\mail\Domain $domain
+     * @param \ChristianBudde\Part\model\mail\Domain $domain
      * @return void
      */
     public function setAliasTarget(Domain $domain)
@@ -151,7 +151,7 @@ class StubMailDomainImpl implements Domain
     }
 
     /**
-     * @return \ChristianBudde\cbweb\model\mail\Domain
+     * @return \ChristianBudde\Part\model\mail\Domain
      */
     public function getAliasTarget()
     {
@@ -167,7 +167,7 @@ class StubMailDomainImpl implements Domain
     }
 
     /**
-     * @return \ChristianBudde\cbweb\model\mail\DomainLibrary
+     * @return \ChristianBudde\Part\model\mail\DomainLibrary
      */
     public function getDomainLibrary()
     {

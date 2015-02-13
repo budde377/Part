@@ -1,9 +1,9 @@
 <?php
-namespace ChristianBudde\cbweb\controller\ajax;
+namespace ChristianBudde\Part\controller\ajax;
 
-use ChristianBudde\cbweb\controller\json\JSONFunction;
-use ChristianBudde\cbweb\controller\json\Response;
-use ChristianBudde\cbweb\controller\json\ResponseImpl;
+use ChristianBudde\Part\controller\json\JSONFunction;
+use ChristianBudde\Part\controller\json\Response;
+use ChristianBudde\Part\controller\json\ResponseImpl;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -393,7 +393,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
     /**
      * Checks if handler can handle. If so handle will be called with same arguments, else next suitable handler will be called.
      * @param string $type
-     * @param \ChristianBudde\cbweb\controller\json\JSONFunction $function
+     * @param \ChristianBudde\Part\controller\json\JSONFunction $function
      * @param mixed $instance
      * @return bool
      */
@@ -439,7 +439,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
 
     /**
      * @param string $type
-     * @param \ChristianBudde\cbweb\controller\json\JSONFunction $function
+     * @param \ChristianBudde\Part\controller\json\JSONFunction $function
      * @param mixed $instance
      * @throws \Exception
      * @return mixed

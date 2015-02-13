@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\test\util;
+namespace ChristianBudde\Part\test\util;
 
 /**
  * Created by PhpStorm.

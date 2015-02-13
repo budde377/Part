@@ -6,11 +6,11 @@
  * Time: 09:26
  * To change this template use File | Settings | File Templates.
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\controller\json\PageObjectImpl;
+use ChristianBudde\Part\controller\json\PageObjectImpl;
+use ChristianBudde\Part\test\stub\StubPageImpl;
 use PHPUnit_Framework_TestCase;
-use ChristianBudde\cbweb\test\stub\StubPageImpl;
 
 
 class PageJSONObjectImplTest extends PHPUnit_Framework_TestCase

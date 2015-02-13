@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\view\page_element;
+namespace ChristianBudde\Part\view\page_element;
 
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\util\traits\DateTimeTrait;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\util\traits\DateTimeTrait;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -18,7 +18,7 @@ class UserSettingsUpdateWebsitePageElementImpl extends PageElementImpl
 
     /** @var  BackendSingletonContainer */
     private $container;
-    /** @var  \ChristianBudde\cbweb\model\updater\Updater */
+    /** @var  \ChristianBudde\Part\model\updater\Updater */
     private $updater;
 
     public function __construct(BackendSingletonContainer $container)

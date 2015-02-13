@@ -1,7 +1,7 @@
 <?php
-namespace ChristianBudde\cbweb\model\page;
+namespace ChristianBudde\Part\model\page;
 
-use ChristianBudde\cbweb\util\traits\RequestTrait;
+use ChristianBudde\Part\util\traits\RequestTrait;
 
 /**
  * Created by JetBrains PhpStorm.

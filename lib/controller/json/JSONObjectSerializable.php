@@ -1,8 +1,9 @@
 <?php
-namespace ChristianBudde\cbweb\controller\json;
+namespace ChristianBudde\Part\controller\json;
 
 
 use JsonSerializable;
+
 /**
  * Created by PhpStorm.
  * User: budde

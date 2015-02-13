@@ -1,7 +1,7 @@
 <?php
 
-namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde\cbweb\Config;
+namespace ChristianBudde\Part\test\stub;
+use ChristianBudde\Part\Config;
 
 /**
  * Created by JetBrains PhpStorm.

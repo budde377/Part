@@ -6,7 +6,7 @@
  * Time: 10:25 PM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\Part\controller\function_string\ast;
 
 
 interface NamedArgument extends Argument{

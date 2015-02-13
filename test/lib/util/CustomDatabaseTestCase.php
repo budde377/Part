@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\test\util;
+namespace ChristianBudde\Part\test\util;
 
 use PDO;
 use PHPUnit_Extensions_Database_DataSet_IDataSet;

@@ -1,7 +1,7 @@
 <?php
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 use ArrayIterator;
-use ChristianBudde\cbweb\model\Variables;
+use ChristianBudde\Part\model\Variables;
 use Traversable;
 
 /**

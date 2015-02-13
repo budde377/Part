@@ -6,7 +6,7 @@
  * Time: 10:26 PM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\Part\controller\function_string\ast;
 
 
 interface ScalarArrayProgram extends Argument, ArrayEntry{

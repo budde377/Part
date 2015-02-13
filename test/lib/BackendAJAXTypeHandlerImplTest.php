@@ -1,17 +1,17 @@
 <?php
 
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\BackendSingletonContainerImpl;
-use ChristianBudde\cbweb\ConfigImpl;
-use ChristianBudde\cbweb\controller\ajax\ServerImpl;
-use ChristianBudde\cbweb\controller\ajax\BackendTypeHandlerImpl;
-use ChristianBudde\cbweb\controller\json\Response;
-use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\model\user\UserLibrary;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
-use ChristianBudde\cbweb\util\file\FolderImpl;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\BackendSingletonContainerImpl;
+use ChristianBudde\Part\ConfigImpl;
+use ChristianBudde\Part\controller\ajax\BackendTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\ServerImpl;
+use ChristianBudde\Part\controller\json\Response;
+use ChristianBudde\Part\model\user\User;
+use ChristianBudde\Part\model\user\UserLibrary;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\util\file\FolderImpl;
 
 /**
  * Created by PhpStorm.
@@ -82,9 +82,9 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
     <debugMode>false</debugMode>
     <tmpFolder path='$tmpFolder'/>
     <preScripts>
-        <class >ChristianBudde\\cbweb\\util\\script\\UserLoginCheckPreScript</class>
-        <class >ChristianBudde\\cbweb\\util\\script\\UserLoginUpdateCheckPreScript</class>
-        <class >ChristianBudde\\cbweb\\util\\script\\RequireHTTPSPreScript</class>
+        <class >ChristianBudde\\Part\\util\\script\\UserLoginCheckPreScript</class>
+        <class >ChristianBudde\\Part\\util\\script\\UserLoginUpdateCheckPreScript</class>
+        <class >ChristianBudde\\Part\\util\\script\\RequireHTTPSPreScript</class>
     </preScripts>
     <log path='$logFile' />
 </config>"), $tmpFolder);
@@ -403,7 +403,7 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
     public function assertResponsePayloadEquals($functionString, $equals)
     {
         $response = $this->server->handleFromFunctionString($functionString, $this->userLibrary->getUserSessionToken());
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\Response', $response);
+        $this->assertInstanceOf('ChristianBudde\Part\controller\json\Response', $response);
         $this->assertEquals($response->getResponseType(), Response::RESPONSE_TYPE_SUCCESS);
         $this->assertEquals($equals, $response->getPayload());
         return $response;
@@ -418,7 +418,7 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
     public function assertErrorResponse($functionString, $errorCode = null)
     {
         $response = $this->server->handleFromFunctionString($functionString, $this->userLibrary->getUserSessionToken());
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\Response', $response);
+        $this->assertInstanceOf('ChristianBudde\Part\controller\json\Response', $response);
         $this->assertEquals($response->getResponseType(), Response::RESPONSE_TYPE_ERROR);
         if ($errorCode != null) {
             $this->assertEquals($errorCode, $response->getErrorCode());
@@ -434,7 +434,7 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
     {
 
         $response = $this->server->handleFromFunctionString($functionString, $this->userLibrary->getUserSessionToken());
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\Response', $response);
+        $this->assertInstanceOf('ChristianBudde\Part\controller\json\Response', $response);
         $this->assertEquals($response->getResponseType(), Response::RESPONSE_TYPE_SUCCESS);
         return $response;
     }

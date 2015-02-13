@@ -1,8 +1,9 @@
 <?php
-namespace ChristianBudde\cbweb;
-use ChristianBudde\cbweb\exception\InvalidXMLException;
-use SimpleXMLElement;
+namespace ChristianBudde\Part;
+use ChristianBudde\Part\exception\InvalidXMLException;
 use DOMDocument;
+use SimpleXMLElement;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

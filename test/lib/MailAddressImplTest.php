@@ -5,17 +5,17 @@
  * Date: 7/8/14
  * Time: 6:08 PM
  */
-use ChristianBudde\cbweb\model\mail\Address;
-use ChristianBudde\cbweb\model\mail\AddressImpl;
-use ChristianBudde\cbweb\model\mail\AddressLibrary;
-use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
-use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\model\user\UserLibrary;
-use ChristianBudde\cbweb\model\user\UserLibraryImpl;
-use ChristianBudde\cbweb\test\stub\StubConfigImpl;
-use ChristianBudde\cbweb\test\stub\StubDBImpl;
-use ChristianBudde\cbweb\test\stub\StubObserverImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\model\mail\Address;
+use ChristianBudde\Part\model\mail\AddressImpl;
+use ChristianBudde\Part\model\mail\AddressLibrary;
+use ChristianBudde\Part\model\mail\DomainLibraryImpl;
+use ChristianBudde\Part\model\user\User;
+use ChristianBudde\Part\model\user\UserLibrary;
+use ChristianBudde\Part\model\user\UserLibraryImpl;
+use ChristianBudde\Part\test\stub\StubConfigImpl;
+use ChristianBudde\Part\test\stub\StubDBImpl;
+use ChristianBudde\Part\test\stub\StubObserverImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 
 class MailAddressImplTest extends CustomDatabaseTestCase{
 
@@ -156,7 +156,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
     public function testGetMailBoxReturnsRightInstance(){
         $mb1 = $this->address->getMailbox();
         $mb2 = $this->address2->getMailbox();
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailboxImpl', $mb1);
+        $this->assertInstanceOf('ChristianBudde\Part\model\mail\MailboxImpl', $mb1);
         $this->assertNull($mb2);
 
     }
@@ -266,7 +266,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
 
     public function testCreateMailboxWillCreate(){
         $mb = $this->address2->createMailbox($n = "Bent", $p = "BentsPass");
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\MailboxImpl', $mb);
+        $this->assertInstanceOf('ChristianBudde\Part\model\mail\MailboxImpl', $mb);
         $this->assertEquals($n, $mb->getName());
         $this->assertTrue($mb->checkPassword($p));
         $this->assertTrue($mb->exists());
@@ -546,7 +546,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
         return $this->createAddress($address->getLocalPart());
     }
     public function testReturnsRightJSONObject(){
-        $this->assertEquals($o = new \ChristianBudde\cbweb\controller\json\MailAddressObjectImpl($this->address), $this->address->jsonObjectSerialize());
+        $this->assertEquals($o = new \ChristianBudde\Part\controller\json\MailAddressObjectImpl($this->address), $this->address->jsonObjectSerialize());
         $this->assertEquals($o->jsonSerialize(), $this->address->jsonSerialize());
     }
     /**

@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\exception;
+namespace ChristianBudde\Part\exception;
 
 use Exception;
 

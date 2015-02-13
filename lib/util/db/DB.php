@@ -1,6 +1,7 @@
 <?php
-namespace ChristianBudde\cbweb\util\db;
+namespace ChristianBudde\Part\util\db;
 use PDO;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

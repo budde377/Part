@@ -5,26 +5,25 @@
  * Date: 7/4/14
  * Time: 11:23 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\Config;
-use ChristianBudde\cbweb\controller\json\MailDomainLibraryObjectImpl;
-use ChristianBudde\cbweb\test\stub\StubUserLibraryImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
-
-use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
-use ChristianBudde\cbweb\util\db\MySQLDBImpl;
-use ChristianBudde\cbweb\model\mail\DomainImpl;
-use ChristianBudde\cbweb\test\stub\StubConfigImpl;
+use ChristianBudde\Part\Config;
+use ChristianBudde\Part\controller\json\MailDomainLibraryObjectImpl;
+use ChristianBudde\Part\model\mail\DomainImpl;
+use ChristianBudde\Part\model\mail\DomainLibraryImpl;
+use ChristianBudde\Part\test\stub\StubConfigImpl;
+use ChristianBudde\Part\test\stub\StubUserLibraryImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\util\db\MySQLDBImpl;
 
 class MailDomainLibraryImplTest extends CustomDatabaseTestCase
 {
 
     /** @var  Config */
     private $config;
-    /** @var  \ChristianBudde\cbweb\util\db\DB */
+    /** @var  \ChristianBudde\Part\util\db\DB */
     private $db;
-    /** @var  \ChristianBudde\cbweb\model\mail\DomainLibraryImpl */
+    /** @var  \ChristianBudde\Part\model\mail\DomainLibraryImpl */
     private $domainLibrary;
     private $mailPass;
     private $databaseName;
@@ -67,7 +66,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue(is_array($domainArray));
         $this->assertEquals(1, count($domainArray));
         $this->assertArrayHasKey('test.dk', $domainArray);
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\Domain', $domainArray['test.dk']);
+        $this->assertInstanceOf('ChristianBudde\Part\model\mail\Domain', $domainArray['test.dk']);
     }
 
     public function testListDomainsWillReuseInstances()
@@ -81,7 +80,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
     public function testGetDomainWillGetDomain()
     {
         $d = $this->domainLibrary->getDomain('test.dk');
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\DomainImpl', $d);
+        $this->assertInstanceOf('ChristianBudde\Part\model\mail\DomainImpl', $d);
 
     }
 

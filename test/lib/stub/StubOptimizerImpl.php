@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 
-use ChristianBudde\cbweb\util\file\File;
-use ChristianBudde\cbweb\util\file\Optimizer;
+use ChristianBudde\Part\util\file\File;
+use ChristianBudde\Part\util\file\Optimizer;
 
 /**
  * Created by JetBrains PhpStorm.

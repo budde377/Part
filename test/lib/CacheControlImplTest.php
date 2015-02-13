@@ -8,13 +8,13 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\util\CacheControlImpl;
+use ChristianBudde\Part\test\stub\StubCurrentPageStrategyImpl;
+use ChristianBudde\Part\test\stub\StubPageImpl;
+use ChristianBudde\Part\test\stub\StubSiteImpl;
+use ChristianBudde\Part\util\CacheControlImpl;
 use PHPUnit_Framework_TestCase;
-use ChristianBudde\cbweb\test\stub\StubCurrentPageStrategyImpl;
-use ChristianBudde\cbweb\test\stub\StubPageImpl;
-use ChristianBudde\cbweb\test\stub\StubSiteImpl;
 
 class CacheControlImplTest extends PHPUnit_Framework_TestCase
 {

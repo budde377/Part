@@ -6,13 +6,13 @@
  * Time: 22:47
  * To change this template use File | Settings | File Templates.
  */
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 
-use ChristianBudde\cbweb\model\page\Page;
-use ChristianBudde\cbweb\model\page\PageOrder;
-use ChristianBudde\cbweb\controller\json\UserPrivilegesObjectImpl;
-use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\model\user\UserPrivileges;
+use ChristianBudde\Part\controller\json\UserPrivilegesObjectImpl;
+use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\model\page\PageOrder;
+use ChristianBudde\Part\model\user\User;
+use ChristianBudde\Part\model\user\UserPrivileges;
 
 
 class StubUserPrivilegesImpl implements UserPrivileges
@@ -100,7 +100,7 @@ class StubUserPrivilegesImpl implements UserPrivileges
 
     /**
      * Will revoke privileges from given Page
-     * @param \ChristianBudde\cbweb\model\page\Page $page
+     * @param \ChristianBudde\Part\model\page\Page $page
      * @return void
      */
     public function revokePagePrivileges(Page $page)
@@ -122,7 +122,7 @@ class StubUserPrivilegesImpl implements UserPrivileges
      * If the user has site or root privileges an empty array is returned.
      * If the user has no privileges an empty array is returned.
      *
-     * @param \ChristianBudde\cbweb\model\page\PageOrder $pageOrder If order is given it will return array containing instances from the PageOrder
+     * @param \ChristianBudde\Part\model\page\PageOrder $pageOrder If order is given it will return array containing instances from the PageOrder
      * @return array
      */
     public function listPagePrivileges(PageOrder $pageOrder = null)

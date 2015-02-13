@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\model\user;
-use ChristianBudde\cbweb\controller\json\JSONObjectSerializable;
-
+namespace ChristianBudde\Part\model\user;
+use ChristianBudde\Part\controller\json\JSONObjectSerializable;
 use Iterator;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

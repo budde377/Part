@@ -1,7 +1,7 @@
 <?php
-namespace ChristianBudde\cbweb\controller\json;
+namespace ChristianBudde\Part\controller\json;
 
-use ChristianBudde\cbweb\model\page\PageContent;
+use ChristianBudde\Part\model\page\PageContent;
 
 /**
  * Created by PhpStorm.

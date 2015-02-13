@@ -6,13 +6,13 @@
  * Time: 8:35 AM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\Part\controller\function_string\ast;
 
 
-use ChristianBudde\cbweb\controller\json\CompositeFunction as JCompositeFunction;
-use ChristianBudde\cbweb\controller\json\JSONFunction;
-use ChristianBudde\cbweb\controller\json\Target;
-use ChristianBudde\cbweb\test\JSONCompositeFunctionImplTest;
+use ChristianBudde\Part\controller\json\CompositeFunction as JCompositeFunction;
+use ChristianBudde\Part\controller\json\JSONFunction;
+use ChristianBudde\Part\controller\json\Target;
+use ChristianBudde\Part\test\JSONCompositeFunctionImplTest;
 
 class FunctionChainsImpl implements FunctionChains{
     private $function;

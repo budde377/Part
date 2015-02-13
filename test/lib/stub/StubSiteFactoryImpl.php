@@ -1,11 +1,11 @@
 <?php
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\SiteFactory;
-use ChristianBudde\cbweb\util\script\ScriptChain;
-use ChristianBudde\cbweb\Config;
-use ChristianBudde\cbweb\util\script\ScriptChainImpl;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\Config;
+use ChristianBudde\Part\SiteFactory;
+use ChristianBudde\Part\util\script\ScriptChain;
+use ChristianBudde\Part\util\script\ScriptChainImpl;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -34,7 +34,7 @@ class StubSiteFactoryImpl implements SiteFactory
      * Builds a new PreScriptChain and returns it. This must contain prescripts specified
      * in some config (it must be ready to run).
      * @param BackendSingletonContainer $backendContainer
-     * @return \ChristianBudde\cbweb\util\script\ScriptChain
+     * @return \ChristianBudde\Part\util\script\ScriptChain
      */
     public function buildPreScriptChain(BackendSingletonContainer $backendContainer)
     {
@@ -45,7 +45,7 @@ class StubSiteFactoryImpl implements SiteFactory
      * Builds a new PostScriptChain and returns it. This must contain prescripts specified
      * in some config (it must be ready to run).
      * @param BackendSingletonContainer $backendContainer
-     * @return \ChristianBudde\cbweb\util\script\ScriptChain
+     * @return \ChristianBudde\Part\util\script\ScriptChain
      */
     public function buildPostScriptChain(BackendSingletonContainer $backendContainer)
     {

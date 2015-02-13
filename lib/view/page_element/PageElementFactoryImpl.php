@@ -1,11 +1,11 @@
 <?php
-namespace ChristianBudde\cbweb\view\page_element;
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\Config;
-use ChristianBudde\cbweb\exception\ClassNotDefinedException;
-use ChristianBudde\cbweb\exception\ClassNotInstanceOfException;
-use ChristianBudde\cbweb\exception\FileNotFoundException;
-use ChristianBudde\cbweb\view;
+namespace ChristianBudde\Part\view\page_element;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\Config;
+use ChristianBudde\Part\exception\ClassNotDefinedException;
+use ChristianBudde\Part\exception\ClassNotInstanceOfException;
+use ChristianBudde\Part\exception\FileNotFoundException;
+use ChristianBudde\Part\view;
 
 
 /**

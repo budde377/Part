@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\util\helper;
+namespace ChristianBudde\Part\util\helper;
 
 /**
  * Created by JetBrains PhpStorm.

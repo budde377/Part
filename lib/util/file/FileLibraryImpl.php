@@ -1,6 +1,6 @@
 <?php
-namespace ChristianBudde\cbweb\util\file;
-use ChristianBudde\cbweb\model\user\User;
+namespace ChristianBudde\Part\util\file;
+use ChristianBudde\Part\model\user\User;
 
 /**
  * Created by PhpStorm.
@@ -123,7 +123,7 @@ class FileLibraryImpl implements FileLibrary{
 
     /**
      * This will copy the file given to a implementation specific location.
-     * @param \ChristianBudde\cbweb\model\user\User $user The uploading user
+     * @param \ChristianBudde\Part\model\user\User $user The uploading user
      * @param File $file The file to be uploaded.
      * @return File The location of the new file
      */
@@ -150,7 +150,7 @@ class FileLibraryImpl implements FileLibrary{
      * If the user argument is not null, only files uploaded by this user will be subject
      * to cleaning, else the whole library is checked.
      *
-     * @param \ChristianBudde\cbweb\model\user\User $user
+     * @param \ChristianBudde\Part\model\user\User $user
      * @return bool TRUE on success else FALSE
      */
     public function cleanLibrary(User $user = null)
@@ -343,7 +343,7 @@ class FileLibraryImpl implements FileLibrary{
     /**
      * Will move a file to the library. It will use move_upload_file
      * function.
-     * @param \ChristianBudde\cbweb\model\user\User $user The uploading user
+     * @param \ChristianBudde\Part\model\user\User $user The uploading user
      * @param array $fileArray The file array to be added
      * @return File Will return newly added file
      */

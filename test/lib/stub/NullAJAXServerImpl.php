@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde\cbweb\controller\ajax\Server;
-use ChristianBudde\cbweb\controller\ajax\TypeHandler;
-use ChristianBudde\cbweb\controller\json\Response;
+namespace ChristianBudde\Part\test\stub;
+use ChristianBudde\Part\controller\ajax\Server;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\json\Response;
 
 /**
  * Created by PhpStorm.

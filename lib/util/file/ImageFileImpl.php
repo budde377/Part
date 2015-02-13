@@ -1,7 +1,7 @@
 <?php
-namespace ChristianBudde\cbweb\util\file;
+namespace ChristianBudde\Part\util\file;
 
-use ChristianBudde\cbweb\controller\json\ImageFileObjectImpl;
+use ChristianBudde\Part\controller\json\ImageFileObjectImpl;
 use Imagick;
 use ImagickException;
 

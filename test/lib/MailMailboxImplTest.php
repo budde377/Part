@@ -5,18 +5,18 @@
  * Date: 7/8/14
  * Time: 6:08 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
 
-use ChristianBudde\cbweb\controller\json\MailMailboxObjectImpl;
-use ChristianBudde\cbweb\model\mail\MailboxImpl;
-use ChristianBudde\cbweb\model\mail\DomainLibraryImpl;
-use ChristianBudde\cbweb\model\mail\Mailbox;
-use ChristianBudde\cbweb\test\stub\StubUserLibraryImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
-use ChristianBudde\cbweb\test\stub\StubConfigImpl;
-use ChristianBudde\cbweb\test\stub\StubDBImpl;
-use ChristianBudde\cbweb\test\stub\StubObserverImpl;
+use ChristianBudde\Part\controller\json\MailMailboxObjectImpl;
+use ChristianBudde\Part\model\mail\DomainLibraryImpl;
+use ChristianBudde\Part\model\mail\Mailbox;
+use ChristianBudde\Part\model\mail\MailboxImpl;
+use ChristianBudde\Part\test\stub\StubConfigImpl;
+use ChristianBudde\Part\test\stub\StubDBImpl;
+use ChristianBudde\Part\test\stub\StubObserverImpl;
+use ChristianBudde\Part\test\stub\StubUserLibraryImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 
 class MailMailboxImplTest extends CustomDatabaseTestCase
 {
@@ -26,12 +26,12 @@ class MailMailboxImplTest extends CustomDatabaseTestCase
     private $db;
     private $domainLibrary;
     private $domain;
-    /** @var  \ChristianBudde\cbweb\model\mail\AddressLibraryImpl */
+    /** @var  \ChristianBudde\Part\model\mail\AddressLibraryImpl */
     private $addressLibrary;
     private $address;
-    /** @var  \ChristianBudde\cbweb\model\mail\MailboxImpl */
+    /** @var  \ChristianBudde\Part\model\mail\MailboxImpl */
     private $mailbox;
-    /** @var  \ChristianBudde\cbweb\model\mail\MailboxImpl */
+    /** @var  \ChristianBudde\Part\model\mail\MailboxImpl */
     private $nonExistingMailbox;
     /** @var  MailboxImpl */
     private $mailbox2;

@@ -5,19 +5,19 @@
  * Date: 7/7/14
  * Time: 1:50 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\controller\json\MailDomainObjectImpl;
-use ChristianBudde\cbweb\model\mail\DomainImpl;
-use ChristianBudde\cbweb\Config;
-use ChristianBudde\cbweb\test\stub\StubConfigImpl;
-use ChristianBudde\cbweb\test\stub\StubMailDomainLibraryImpl;
-use ChristianBudde\cbweb\test\stub\StubObserverImpl;
-use ChristianBudde\cbweb\test\stub\StubUserLibraryImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
-use ChristianBudde\cbweb\util\db\DB;
-use ChristianBudde\cbweb\util\db\MySQLDBImpl;
-use ChristianBudde\cbweb\model\mail\Domain;
+use ChristianBudde\Part\Config;
+use ChristianBudde\Part\controller\json\MailDomainObjectImpl;
+use ChristianBudde\Part\model\mail\Domain;
+use ChristianBudde\Part\model\mail\DomainImpl;
+use ChristianBudde\Part\test\stub\StubConfigImpl;
+use ChristianBudde\Part\test\stub\StubMailDomainLibraryImpl;
+use ChristianBudde\Part\test\stub\StubObserverImpl;
+use ChristianBudde\Part\test\stub\StubUserLibraryImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\util\db\DB;
+use ChristianBudde\Part\util\db\MySQLDBImpl;
 
 class MailDomainImplTest extends CustomDatabaseTestCase
 {
@@ -397,8 +397,8 @@ class MailDomainImplTest extends CustomDatabaseTestCase
 
     public function testGetAddressLibraryReturnsRightInstance()
     {
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\AddressLibraryImpl', $a = $this->domain->getAddressLibrary());
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\mail\AddressLibrary', $a);
+        $this->assertInstanceOf('ChristianBudde\Part\model\mail\AddressLibraryImpl', $a = $this->domain->getAddressLibrary());
+        $this->assertInstanceOf('ChristianBudde\Part\model\mail\AddressLibrary', $a);
         $this->assertTrue($this->domain === $a->getDomain());
     }
 
@@ -424,7 +424,7 @@ class MailDomainImplTest extends CustomDatabaseTestCase
 
     /**
      * @param DomainImpl $domain
-     * @return \ChristianBudde\cbweb\model\mail\DomainImpl
+     * @return \ChristianBudde\Part\model\mail\DomainImpl
      */
     private function cloneDomain($domain)
     {

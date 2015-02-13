@@ -6,9 +6,9 @@
  * Time: 10:26 AM
  */
 
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\view\page_element\PageElementImpl;
+use ChristianBudde\Part\view\page_element\PageElementImpl;
 use PHPUnit_Framework_TestCase;
 
 class PageElementImplTest extends PHPUnit_Framework_TestCase

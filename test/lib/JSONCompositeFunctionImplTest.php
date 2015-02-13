@@ -5,11 +5,11 @@
  * Date: 8/30/14
  * Time: 9:09 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\controller\json\TypeImpl;
-use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
-use ChristianBudde\cbweb\controller\json\CompositeFunctionImpl;
+use ChristianBudde\Part\controller\json\CompositeFunctionImpl;
+use ChristianBudde\Part\controller\json\JSONFunctionImpl;
+use ChristianBudde\Part\controller\json\TypeImpl;
 use PHPUnit_Framework_TestCase;
 
 class JSONCompositeFunctionImplTest extends PHPUnit_Framework_TestCase

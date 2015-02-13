@@ -6,14 +6,14 @@
  * Time: 11:13 AM
  * To change this template use File | Settings | File Templates.
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\ConfigImpl;
-use ChristianBudde\cbweb\view\page_element\PageElementFactoryImpl;
-use ChristianBudde\cbweb\exception\ClassNotInstanceOfException;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\ConfigImpl;
+use ChristianBudde\Part\exception\ClassNotInstanceOfException;
+use ChristianBudde\Part\test\stub\NullBackendSingletonContainerImpl;
+use ChristianBudde\Part\view\page_element\PageElementFactoryImpl;
 use Exception;
-use ChristianBudde\cbweb\test\stub\NullBackendSingletonContainerImpl;
 use PHPUnit_Framework_TestCase;
 use SimpleXMLElement;
 
@@ -43,8 +43,8 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         $configXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
-        $element = $pageElementFactory->getPageElement('ChristianBudde\cbweb\test\stub\NullPageElementImpl');
-        $this->assertInstanceOf('ChristianBudde\cbweb\test\stub\NullPageElementImpl', $element);
+        $element = $pageElementFactory->getPageElement('ChristianBudde\Part\test\stub\NullPageElementImpl');
+        $this->assertInstanceOf('ChristianBudde\Part\test\stub\NullPageElementImpl', $element);
     }
 
     public function testWillReturnPageElementIfElementInList()
@@ -53,14 +53,14 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         <config>
         {$this->defaultOwner}
         <pageElements>
-            <class name='someElement' link='stub/NullPageElementImpl.php'>ChristianBudde\\cbweb\\test\\stub\\NullPageElementImpl</class>
+            <class name='someElement' link='stub/NullPageElementImpl.php'>ChristianBudde\\Part\\test\\stub\\NullPageElementImpl</class>
         </pageElements>
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
         $element = $pageElementFactory->getPageElement('someElement');
         $this->assertTrue(is_object($element), 'Did not return an object');
-        $this->assertInstanceOf('ChristianBudde\cbweb\test\stub\NullPageElementImpl', $element, 'Did not return element of right instance.');
+        $this->assertInstanceOf('ChristianBudde\Part\test\stub\NullPageElementImpl', $element, 'Did not return element of right instance.');
 
     }
 
@@ -70,14 +70,14 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         <config>
         {$this->defaultOwner}
         <pageElements>
-            <class name='someElement' >ChristianBudde\\cbweb\\test\\stub\\NullPageElementImpl</class>
+            <class name='someElement' >ChristianBudde\\Part\\test\\stub\\NullPageElementImpl</class>
         </pageElements>
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
         $element = $pageElementFactory->getPageElement('someElement');
         $this->assertTrue(is_object($element), 'Did not return an object');
-        $this->assertInstanceOf('ChristianBudde\cbweb\test\stub\NullPageElementImpl', $element, 'Did not return element of right instance.');
+        $this->assertInstanceOf('ChristianBudde\Part\test\stub\NullPageElementImpl', $element, 'Did not return element of right instance.');
 
     }
 
@@ -87,7 +87,7 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         <config>
         {$this->defaultOwner}
         <pageElements>
-            <class name='someElement' link='stub/NullPageElementImpl.php'>ChristianBudde\\cbweb\\test\\stub\\NullPageElementImpl</class>
+            <class name='someElement' link='stub/NullPageElementImpl.php'>ChristianBudde\\Part\\test\\stub\\NullPageElementImpl</class>
         </pageElements>
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
@@ -118,7 +118,7 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         <config>
         {$this->defaultOwner}
         <pageElements>
-            <class name='someElement' link='stub/NullPageElementImpl.php'>ChristianBudde\\cbweb\\test\\stub\\NullPageElementImpl</class>
+            <class name='someElement' link='stub/NullPageElementImpl.php'>ChristianBudde\\Part\\test\\stub\\NullPageElementImpl</class>
         </pageElements>
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
@@ -136,7 +136,7 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         <config>
         {$this->defaultOwner}
         <pageElements>
-            <class name='someElement' link='stub/NullPageElementImpl.php'>ChristianBudde\\cbweb\\test\\stub\\NullPageElementImpl</class>
+            <class name='someElement' link='stub/NullPageElementImpl.php'>ChristianBudde\\Part\\test\\stub\\NullPageElementImpl</class>
         </pageElements>
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
@@ -154,8 +154,8 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
-        $element = $pageElementFactory->getPageElement('ChristianBudde\\cbweb\\test\\stub\\NullPageElementImpl');
-        $element2 = $pageElementFactory->getPageElement('ChristianBudde\\cbweb\\test\\stub\\NullPageElementImpl', false);
+        $element = $pageElementFactory->getPageElement('ChristianBudde\\Part\\test\\stub\\NullPageElementImpl');
+        $element2 = $pageElementFactory->getPageElement('ChristianBudde\\Part\\test\\stub\\NullPageElementImpl', false);
         $this->assertFalse($element === $element2);
     }
 
@@ -165,7 +165,7 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         <config>
         {$this->defaultOwner}
         <pageElements>
-            <class name='someElement' link='stub/NullPageElementImpl.php'>ChristianBudde\\cbweb\\test\\stub\\NullPageElementImpl</class>
+            <class name='someElement' link='stub/NullPageElementImpl.php'>ChristianBudde\\Part\\test\\stub\\NullPageElementImpl</class>
         </pageElements>
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
@@ -184,7 +184,7 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         <config>
         {$this->defaultOwner}
         <pageElements>
-            <class name='someElement' link='stub/StubScriptImpl.php'>ChristianBudde\\cbweb\\test\\stub\\StubScriptImpl</class>
+            <class name='someElement' link='stub/StubScriptImpl.php'>ChristianBudde\\Part\\test\\stub\\StubScriptImpl</class>
         </pageElements>
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
@@ -193,10 +193,10 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         try {
             $pageElementFactory->getPageElement('someElement');
         } catch (Exception $exception) {
-            /** @var $exception \ChristianBudde\cbweb\exception\ClassNotInstanceOfException */
-            $this->assertInstanceOf('ChristianBudde\cbweb\exception\ClassNotInstanceOfException', $exception);
+            /** @var $exception \ChristianBudde\Part\exception\ClassNotInstanceOfException */
+            $this->assertInstanceOf('ChristianBudde\Part\exception\ClassNotInstanceOfException', $exception);
             $exceptionWasThrown = true;
-            $this->assertEquals('ChristianBudde\\cbweb\\test\\stub\\StubScriptImpl', $exception->getClass(), 'Was not expected class');
+            $this->assertEquals('ChristianBudde\\Part\\test\\stub\\StubScriptImpl', $exception->getClass(), 'Was not expected class');
             $this->assertEquals('PageElement', $exception->getExpectedInstance(), 'Was not expected instance');
 
         }
@@ -217,12 +217,12 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
         $exceptionWasThrown = false;
         try {
-            $pageElementFactory->getPageElement('ChristianBudde\cbweb\test\stub\StubScriptImpl');
+            $pageElementFactory->getPageElement('ChristianBudde\Part\test\stub\StubScriptImpl');
         } catch (ClassNotInstanceOfException $exception) {
             /** @var $exception ClassNotInstanceOfException */
-            $this->assertInstanceOf('ChristianBudde\cbweb\exception\ClassNotInstanceOfException', $exception);
+            $this->assertInstanceOf('ChristianBudde\Part\exception\ClassNotInstanceOfException', $exception);
             $exceptionWasThrown = true;
-            $this->assertEquals('ChristianBudde\cbweb\test\stub\StubScriptImpl', $exception->getClass(), 'Was not expected class');
+            $this->assertEquals('ChristianBudde\Part\test\stub\StubScriptImpl', $exception->getClass(), 'Was not expected class');
             $this->assertEquals('PageElement', $exception->getExpectedInstance(), 'Was not expected instance');
 
         }
@@ -239,12 +239,12 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         <config>
         {$this->defaultOwner}
         <pageElements>
-            <class name='someElement' link='notAValidLink'>ChristianBudde\\cbweb\\test\\stub\\NullPageElementImpl</class>
+            <class name='someElement' link='notAValidLink'>ChristianBudde\\Part\\test\\stub\\NullPageElementImpl</class>
         </pageElements>
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
-        $this->setExpectedException('ChristianBudde\cbweb\exception\FileNotFoundException');
+        $this->setExpectedException('ChristianBudde\Part\exception\FileNotFoundException');
         $pageElementFactory->getPageElement('someElement');
 
     }
@@ -260,7 +260,7 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $pageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
-        $this->setExpectedException('ChristianBudde\cbweb\exception\ClassNotDefinedException');
+        $this->setExpectedException('ChristianBudde\Part\exception\ClassNotDefinedException');
         $pageElementFactory->getPageElement('someElement');
 
     }

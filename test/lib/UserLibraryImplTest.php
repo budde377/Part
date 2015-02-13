@@ -1,12 +1,12 @@
 <?php
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\model\user\UserLibraryImpl;
-use ChristianBudde\cbweb\model\user\UserImpl;
-use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\controller\json\UserLibraryObjectImpl;
-use ChristianBudde\cbweb\test\stub\StubDBImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\controller\json\UserLibraryObjectImpl;
+use ChristianBudde\Part\model\user\User;
+use ChristianBudde\Part\model\user\UserImpl;
+use ChristianBudde\Part\model\user\UserLibraryImpl;
+use ChristianBudde\Part\test\stub\StubDBImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -105,7 +105,7 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
     public function testCreateUserWillCreateUser()
     {
         $ret = $this->library->createUser('user4', 'password', 'user3@test.dk', $this->library->getUser('user1'));
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\user\User', $ret, 'Did not return user');
+        $this->assertInstanceOf('ChristianBudde\Part\model\user\User', $ret, 'Did not return user');
         $this->assertTrue($ret->exists(), 'User does not exist');
     }
 
@@ -141,7 +141,7 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
     public function testDeleteUserWillDeleteUser()
     {
         $list = $this->library->listUsers();
-        /** @var $user \ChristianBudde\cbweb\model\user\User */
+        /** @var $user \ChristianBudde\Part\model\user\User */
         $user = $list[1];
         $ret = $this->library->deleteUser($user);
         $this->assertTrue($ret, 'Delete did not return true');
@@ -184,7 +184,7 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
     {
         $password = 'somePassword';
         $list = $this->library->listUsers();
-        /** @var $user \ChristianBudde\cbweb\model\user\User */
+        /** @var $user \ChristianBudde\Part\model\user\User */
         $user = $list[1];
         $ret = $user->setPassword($password);
         $this->assertTrue($ret, 'Could not set password');
@@ -213,7 +213,7 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
     {
         $password = 'somePassword';
         $list = $this->library->listUsers();
-        /** @var $user \ChristianBudde\cbweb\model\user\User */
+        /** @var $user \ChristianBudde\Part\model\user\User */
         $user = $list[1];
         $user->setPassword($password);
         $user->login($password);
@@ -241,7 +241,7 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
     public function testGetUSerWillReturnUserIfNotNIL()
     {
         $user = $this->library->getUser('user2');
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\user\User', $user, 'Did not return instance of User');
+        $this->assertInstanceOf('ChristianBudde\Part\model\user\User', $user, 'Did not return instance of User');
         $this->assertEquals('user2', $user->getUsername(), 'Usernames did not match');
     }
 
@@ -250,7 +250,7 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
     {
         $user = $this->library->getUser('user2');
         $user = $this->library->getParent($user);
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\user\User', $user);
+        $this->assertInstanceOf('ChristianBudde\Part\model\user\User', $user);
         $this->assertEquals('user1', $user->getUsername());
         $this->assertFalse($this->library->deleteUser($user), 'Could not delete user');
     }
@@ -266,7 +266,7 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
         $user = $this->library->getUser('user1');
         $user->setUsername('user11');
         $user = $this->library->getUser('user11');
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\user\User', $user);
+        $this->assertInstanceOf('ChristianBudde\Part\model\user\User', $user);
         $this->assertEquals('user11', $user->getUsername(), 'User names did not match');
     }
 
@@ -276,10 +276,10 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
         $ret = $this->library->getChildren($parent);
         $this->assertTrue(is_array($ret), 'Did not return array');
         $this->assertEquals(2, count($ret), 'Did not return array of right size');
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\user\User', $u1 = $ret[0]);
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\user\User', $u2 = $ret[1]);
+        $this->assertInstanceOf('ChristianBudde\Part\model\user\User', $u1 = $ret[0]);
+        $this->assertInstanceOf('ChristianBudde\Part\model\user\User', $u2 = $ret[1]);
         /** @var User $u1 */
-        /** @var \ChristianBudde\cbweb\model\user\User $u2 */
+        /** @var \ChristianBudde\Part\model\user\User $u2 */
         $this->assertTrue($u1->getUsername() == 'user2' || $u1->getUsername() == 'user3');
         $this->assertTrue($u2->getUsername() == 'user3' || $u2->getUsername() == 'user2');
 

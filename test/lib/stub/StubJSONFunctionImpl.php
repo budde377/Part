@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde\cbweb\controller\json\JSONFunction;
-use ChristianBudde\cbweb\controller\json\Response;
-use ChristianBudde\cbweb\controller\json\Target;
+namespace ChristianBudde\Part\test\stub;
+use ChristianBudde\Part\controller\json\JSONFunction;
+use ChristianBudde\Part\controller\json\Response;
+use ChristianBudde\Part\controller\json\Target;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -69,7 +69,7 @@ class StubJSONFunctionImpl implements JSONFunction
     }
 
     /**
-     * @return \ChristianBudde\cbweb\controller\json\Target
+     * @return \ChristianBudde\Part\controller\json\Target
      */
     public function getTarget()
     {

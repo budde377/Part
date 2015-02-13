@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde\cbweb\controller\ajax\Server;
-use ChristianBudde\cbweb\controller\ajax\TypeHandler;
-use ChristianBudde\cbweb\controller\json\JSONFunction;
+namespace ChristianBudde\Part\test\stub;
+use ChristianBudde\Part\controller\ajax\Server;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\json\JSONFunction;
 
 /**
  * Created by PhpStorm.
@@ -35,7 +35,7 @@ class StubAJAXTypeHandlerImpl implements TypeHandler
     /**
      * Sets up the type handler for provided type.
      * This should be called for each registered type.
-     * @param \ChristianBudde\cbweb\controller\ajax\Server $server The server which is setting-up the handler
+     * @param \ChristianBudde\Part\controller\ajax\Server $server The server which is setting-up the handler
      * @param string $type The type currently being set-up
      * @return void
      */
@@ -57,7 +57,7 @@ class StubAJAXTypeHandlerImpl implements TypeHandler
     /**
      * Checks if handler can handle. If so handle will be called with same arguments, else next suitable handler will be called.
      * @param string $type
-     * @param \ChristianBudde\cbweb\controller\json\JSONFunction $function
+     * @param \ChristianBudde\Part\controller\json\JSONFunction $function
      * @param mixed $instance
      * @return bool
      */
@@ -69,7 +69,7 @@ class StubAJAXTypeHandlerImpl implements TypeHandler
 
     /**
      * @param string $type
-     * @param \ChristianBudde\cbweb\controller\json\JSONFunction $function
+     * @param \ChristianBudde\Part\controller\json\JSONFunction $function
      * @param mixed $instance
      * @return mixed
      */

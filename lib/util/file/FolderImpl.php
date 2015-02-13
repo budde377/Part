@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\util\file;
+namespace ChristianBudde\Part\util\file;
 
-use ChristianBudde\cbweb\exception\MalformedParameterException;
-use ChristianBudde\cbweb\util\traits\FilePathTrait;
+use ChristianBudde\Part\exception\MalformedParameterException;
+use ChristianBudde\Part\util\traits\FilePathTrait;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -205,7 +205,7 @@ class FolderImpl implements Folder
 
     /**
      * @param int $mode Sets the mode, if recursive non empty folders can be deleted
-     * @throws \ChristianBudde\cbweb\exception\MalformedParameterException
+     * @throws \ChristianBudde\Part\exception\MalformedParameterException
      * @return bool Return TRUE if delete was successfully else FALSE
      */
     public function delete($mode = Folder::DELETE_FOLDER_NOT_RECURSIVE)

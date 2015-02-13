@@ -1,11 +1,11 @@
 <?php
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\util\file\LogFileImpl;
-use ChristianBudde\cbweb\util\file\Folder;
-use ChristianBudde\cbweb\log\LoggerImpl;
-use ChristianBudde\cbweb\util\file\FolderImpl;
-use ChristianBudde\cbweb\log\Logger;
+use ChristianBudde\Part\log\Logger;
+use ChristianBudde\Part\log\LoggerImpl;
+use ChristianBudde\Part\util\file\Folder;
+use ChristianBudde\Part\util\file\FolderImpl;
+use ChristianBudde\Part\util\file\LogFileImpl;
 use PHPUnit_Framework_TestCase;
 
 /**

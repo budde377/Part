@@ -1,19 +1,19 @@
 <?php
-namespace ChristianBudde\cbweb\controller\ajax;
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\controller\function_string\ParserImpl;
-use ChristianBudde\cbweb\controller\json\CompositeFunction;
-use ChristianBudde\cbweb\controller\json\JSONFunction;
-use ChristianBudde\cbweb\controller\json\JSONFunctionImpl;
-use ChristianBudde\cbweb\controller\json\ParserImpl as JSONParser;
-use ChristianBudde\cbweb\controller\json\Program;
-use ChristianBudde\cbweb\controller\json\Response;
-use ChristianBudde\cbweb\controller\json\ResponseImpl;
-use ChristianBudde\cbweb\controller\json\Target;
-use ChristianBudde\cbweb\controller\json\Type;
-use ChristianBudde\cbweb\exception\ClassNotDefinedException;
-use ChristianBudde\cbweb\exception\ClassNotInstanceOfException;
-use ChristianBudde\cbweb\exception\FileNotFoundException;
+namespace ChristianBudde\Part\controller\ajax;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\controller\function_string\ParserImpl;
+use ChristianBudde\Part\controller\json\CompositeFunction;
+use ChristianBudde\Part\controller\json\JSONFunction;
+use ChristianBudde\Part\controller\json\JSONFunctionImpl;
+use ChristianBudde\Part\controller\json\ParserImpl as JSONParser;
+use ChristianBudde\Part\controller\json\Program;
+use ChristianBudde\Part\controller\json\Response;
+use ChristianBudde\Part\controller\json\ResponseImpl;
+use ChristianBudde\Part\controller\json\Target;
+use ChristianBudde\Part\controller\json\Type;
+use ChristianBudde\Part\exception\ClassNotDefinedException;
+use ChristianBudde\Part\exception\ClassNotInstanceOfException;
+use ChristianBudde\Part\exception\FileNotFoundException;
 use ReflectionClass;
 
 /**
@@ -278,7 +278,7 @@ class ServerImpl implements Server
     public function handleFromFunctionString($input, $token = null)
     {
 
-        return $this->wrapperHandler(($pr = $this->functionStringParser->parseString($input)) instanceof \ChristianBudde\cbweb\controller\function_string\ast\Program?$pr->toJSONProgram():null, $token);
+        return $this->wrapperHandler(($pr = $this->functionStringParser->parseString($input)) instanceof \ChristianBudde\Part\controller\function_string\ast\Program?$pr->toJSONProgram():null, $token);
     }
 
     private function buildType(ReflectionClass $reflection)

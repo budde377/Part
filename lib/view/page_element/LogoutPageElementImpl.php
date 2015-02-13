@@ -1,10 +1,10 @@
 <?php
-namespace ChristianBudde\cbweb\view\page_element;
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\util\file\File;
-use ChristianBudde\cbweb\util\helper\HTTPHeaderHelper;
-use ChristianBudde\cbweb\model\ContentLibrary;
-use ChristianBudde\cbweb\model\page\Page;
+namespace ChristianBudde\Part\view\page_element;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\model\ContentLibrary;
+use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\util\file\File;
+use ChristianBudde\Part\util\helper\HTTPHeaderHelper;
 
 
 /**

@@ -1,15 +1,15 @@
 <?php
-namespace ChristianBudde\cbweb\model\page;
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\exception\MalformedParameterException;
-
-
-use ChristianBudde\cbweb\util\Observable;
-use ChristianBudde\cbweb\util\Observer;
-use ChristianBudde\cbweb\controller\json\PageOrderObjectImpl;
-use PDOStatement;
-use PDO;
+namespace ChristianBudde\Part\model\page;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\controller\json\PageOrderObjectImpl;
+use ChristianBudde\Part\exception\MalformedParameterException;
+use ChristianBudde\Part\util\Observable;
+use ChristianBudde\Part\util\Observer;
 use Exception;
+use PDO;
+use PDOStatement;
+
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -97,7 +97,7 @@ class PageOrderImpl implements PageOrder, Observer
      * @param Page $page
      * @param int $place
      * @param null | Page $parentPage
-     * @throws \ChristianBudde\cbweb\exception\MalformedParameterException
+     * @throws \ChristianBudde\Part\exception\MalformedParameterException
      * @return bool
      */
     public function setPageOrder(Page $page, $place = PageOrder::PAGE_ORDER_LAST, Page $parentPage = null)

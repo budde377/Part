@@ -1,19 +1,18 @@
 <?php
-namespace ChristianBudde\cbweb\model\page;
-use ChristianBudde\cbweb\model\ContentLibrary;
-use ChristianBudde\cbweb\util\db\DB;
-use ChristianBudde\cbweb\exception\MalformedParameterException;
-use ChristianBudde\cbweb\model\Content;
-
-
-use ChristianBudde\cbweb\util\Observable;
-use ChristianBudde\cbweb\util\Observer;
-use ChristianBudde\cbweb\controller\json\PageObjectImpl;
-
-use ChristianBudde\cbweb\model\Variables;
-use PDOStatement;
+namespace ChristianBudde\Part\model\page;
+use ChristianBudde\Part\controller\json\PageObjectImpl;
+use ChristianBudde\Part\exception\MalformedParameterException;
+use ChristianBudde\Part\model\Content;
+use ChristianBudde\Part\model\ContentLibrary;
+use ChristianBudde\Part\model\Variables;
+use ChristianBudde\Part\util\db\DB;
+use ChristianBudde\Part\util\Observable;
+use ChristianBudde\Part\util\Observer;
 use PDO;
 use PDOException;
+use PDOStatement;
+
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -65,7 +64,7 @@ class PageImpl implements Page, Observable
 
     /**
      * @param string $id
-     * @param \ChristianBudde\cbweb\util\db\DB $database
+     * @param \ChristianBudde\Part\util\db\DB $database
      * @throws MalformedParameterException
      */
     public function __construct($id, DB $database)
@@ -306,7 +305,7 @@ class PageImpl implements Page, Observable
     private function notifyObservers($type)
     {
         foreach ($this->observers as $observer) {
-            /** @var $observer \ChristianBudde\cbweb\util\Observer */
+            /** @var $observer \ChristianBudde\Part\util\Observer */
             $observer->onChange($this, $type);
         }
     }

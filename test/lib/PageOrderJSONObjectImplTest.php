@@ -5,12 +5,12 @@
  * Date: 9/4/14
  * Time: 12:47 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\controller\json\PageOrderObjectImpl;
+use ChristianBudde\Part\controller\json\PageOrderObjectImpl;
+use ChristianBudde\Part\test\stub\StubPageImpl;
+use ChristianBudde\Part\test\stub\StubPageOrderImpl;
 use PHPUnit_Framework_TestCase;
-use ChristianBudde\cbweb\test\stub\StubPageImpl;
-use ChristianBudde\cbweb\test\stub\StubPageOrderImpl;
 
 class PageOrderJSONObjectImplTest extends PHPUnit_Framework_TestCase
 {

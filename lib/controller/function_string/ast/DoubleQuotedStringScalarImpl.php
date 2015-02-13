@@ -6,10 +6,10 @@
  * Time: 10:12 AM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\Part\controller\function_string\ast;
 
 
-use ChristianBudde\cbweb\util\traits\ParserTrait;
+use ChristianBudde\Part\util\traits\ParserTrait;
 
 class DoubleQuotedStringScalarImpl implements Scalar{
 

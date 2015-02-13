@@ -1,10 +1,10 @@
 <?php
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 
-use ChristianBudde\cbweb\model\Content;
-use ChristianBudde\cbweb\model\ContentLibrary;
-use ChristianBudde\cbweb\model\site\Site;
-use ChristianBudde\cbweb\model\Variables;
+use ChristianBudde\Part\model\Content;
+use ChristianBudde\Part\model\ContentLibrary;
+use ChristianBudde\Part\model\site\Site;
+use ChristianBudde\Part\model\Variables;
 
 class StubSiteImpl implements Site
 {

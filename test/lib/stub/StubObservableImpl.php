@@ -5,10 +5,10 @@
  * Date: 7/9/14
  * Time: 3:10 PM
  */
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 
-use ChristianBudde\cbweb\util\Observer;
-use ChristianBudde\cbweb\util\Observable;
+use ChristianBudde\Part\util\Observable;
+use ChristianBudde\Part\util\Observer;
 
 class StubObservableImpl implements Observable
 {

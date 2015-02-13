@@ -6,10 +6,10 @@
  * Time: 10:58 PM
  */
 
-namespace ChristianBudde\cbweb\controller\json;
+namespace ChristianBudde\Part\controller\json;
 
 
-use ChristianBudde\cbweb\model\mail\Address;
+use ChristianBudde\Part\model\mail\Address;
 
 class MailAddressObjectImpl extends ObjectImpl{
     function __construct(Address $address)

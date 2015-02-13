@@ -1,6 +1,7 @@
 <?php
-namespace ChristianBudde\cbweb\model\page;
+namespace ChristianBudde\Part\model\page;
 use Iterator;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

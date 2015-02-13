@@ -1,12 +1,12 @@
 <?php
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\model\user\UserImpl;
-use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\test\stub\StubDBImpl;
-use ChristianBudde\cbweb\test\stub\StubObserverImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
-use ChristianBudde\cbweb\test\util\TruncateOperation;
+use ChristianBudde\Part\model\user\User;
+use ChristianBudde\Part\model\user\UserImpl;
+use ChristianBudde\Part\test\stub\StubDBImpl;
+use ChristianBudde\Part\test\stub\StubObserverImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\TruncateOperation;
 use PHPUnit_Extensions_Database_DataSet_IDataSet;
 use PHPUnit_Extensions_Database_DB_IDatabaseConnection;
 use PHPUnit_Extensions_Database_Operation_Composite;
@@ -22,9 +22,9 @@ class UserImplTest extends CustomDatabaseTestCase
 {
     /** @var $db StubDBImpl */
     private $db;
-    /** @var $user \ChristianBudde\cbweb\model\user\UserImpl */
+    /** @var $user \ChristianBudde\Part\model\user\UserImpl */
     private $user;
-    /** @var $user \ChristianBudde\cbweb\model\user\UserImpl */
+    /** @var $user \ChristianBudde\Part\model\user\UserImpl */
     private $user2;
 
 
@@ -630,7 +630,7 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testGetUserPrivilegesRightInstance()
     {
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\user\\UserPrivileges", $this->user->getUserPrivileges());
+        $this->assertInstanceOf("ChristianBudde\\Part\\model\\user\\UserPrivileges", $this->user->getUserPrivileges());
     }
 
     public function testGetUserPrivilegesReturnSameInstance()
@@ -641,7 +641,7 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testGetUserVariablesReturnsRightInstance()
     {
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Variables", $this->user->getUserVariables());
+        $this->assertInstanceOf("ChristianBudde\\Part\\model\\Variables", $this->user->getUserVariables());
     }
 
     public function testGetUserVariablesReturnsSameInstance()
@@ -651,7 +651,7 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testUserIsJSONObjectSerializable()
     {
-        $this->assertInstanceOf('ChristianBudde\cbweb\controller\json\Object', $o = $this->user->jsonObjectSerialize());
+        $this->assertInstanceOf('ChristianBudde\Part\controller\json\Object', $o = $this->user->jsonObjectSerialize());
         $this->assertEquals('user', $o->getName());
     }
 

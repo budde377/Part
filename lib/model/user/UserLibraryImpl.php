@@ -1,13 +1,12 @@
 <?php
-namespace ChristianBudde\cbweb\model\user;
-use ArrayObject;
+namespace ChristianBudde\Part\model\user;
 use ArrayIterator;
-use ChristianBudde\cbweb\controller\json\UserLibraryObjectImpl;
-use ChristianBudde\cbweb\util\db\DB;
+use ArrayObject;
+use ChristianBudde\Part\controller\json\UserLibraryObjectImpl;
+use ChristianBudde\Part\util\db\DB;
+use ChristianBudde\Part\util\Observable;
+use ChristianBudde\Part\util\Observer;
 
-
-use ChristianBudde\cbweb\util\Observable;
-use ChristianBudde\cbweb\util\Observer;
 
 /**
  * Created by JetBrains PhpStorm.

@@ -1,9 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb;
+namespace ChristianBudde\Part;
 
-use ChristianBudde\cbweb\util\traits\RequestTrait;
-
-use ChristianBudde\cbweb\view\template\TemplateImpl;
+use ChristianBudde\Part\util\traits\RequestTrait;
+use ChristianBudde\Part\view\template\TemplateImpl;
 
 /**
  * Created by JetBrains PhpStorm.

@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\util\traits;
+namespace ChristianBudde\Part\util\traits;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

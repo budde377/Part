@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\util\file;
+namespace ChristianBudde\Part\util\file;
 
-use ChristianBudde\cbweb\controller\json\FileObjectImpl;
-use ChristianBudde\cbweb\util\traits\FilePathTrait;
+use ChristianBudde\Part\controller\json\FileObjectImpl;
+use ChristianBudde\Part\util\traits\FilePathTrait;
 
 
 /**
@@ -266,7 +266,7 @@ class FileImpl implements File
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return \ChristianBudde\cbweb\controller\json\Object
+     * @return \ChristianBudde\Part\controller\json\Object
      */
     public function jsonObjectSerialize()
     {

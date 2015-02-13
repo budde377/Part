@@ -5,10 +5,10 @@
  * Date: 9/4/14
  * Time: 6:00 PM
  */
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 
-use ChristianBudde\cbweb\model\page\PageContent;
-use ChristianBudde\cbweb\model\page\Page;
+use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\model\page\PageContent;
 
 
 class StubPageContentImpl extends StubContentImpl implements PageContent

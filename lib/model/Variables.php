@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\model;
+namespace ChristianBudde\Part\model;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -8,8 +8,8 @@ namespace ChristianBudde\cbweb\model;
  * To change this template use File | Settings | File Templates.
  */
 
-use IteratorAggregate;
 use ArrayAccess;
+use IteratorAggregate;
 
 interface Variables extends IteratorAggregate, ArrayAccess{
 

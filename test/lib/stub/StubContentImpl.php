@@ -1,7 +1,7 @@
 <?php
-namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde\cbweb\controller\json\ContentObjectImpl;
-use ChristianBudde\cbweb\model\Content;
+namespace ChristianBudde\Part\test\stub;
+use ChristianBudde\Part\controller\json\ContentObjectImpl;
+use ChristianBudde\Part\model\Content;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -108,7 +108,7 @@ class StubContentImpl implements Content
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return \ChristianBudde\cbweb\controller\json\Object
+     * @return \ChristianBudde\Part\controller\json\Object
      */
     public function jsonObjectSerialize()
     {

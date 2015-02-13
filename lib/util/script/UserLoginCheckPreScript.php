@@ -1,8 +1,7 @@
 <?php
-namespace ChristianBudde\cbweb\util\script;
-use ChristianBudde\cbweb\BackendSingletonContainer;
-
-use ChristianBudde\cbweb\Website;
+namespace ChristianBudde\Part\util\script;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\Website;
 
 /**
  * Created by JetBrains PhpStorm.

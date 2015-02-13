@@ -1,6 +1,6 @@
 <?php
-namespace ChristianBudde\cbweb\util\file;
-use ChristianBudde\cbweb\model\user\User;
+namespace ChristianBudde\Part\util\file;
+use ChristianBudde\Part\model\user\User;
 
 
 /**
@@ -33,7 +33,7 @@ interface FileLibrary {
 
 
     /**
-     * @param \ChristianBudde\cbweb\model\user\User $user if null all files are returned else only files assoc with user are returned.
+     * @param \ChristianBudde\Part\model\user\User $user if null all files are returned else only files assoc with user are returned.
      * @return array Returns all files in library.
      */
     public function getFileList(User $user = null);
@@ -65,7 +65,7 @@ interface FileLibrary {
     /**
      * Will move a file to the library. It will use move_upload_file
      * function.
-     * @param \ChristianBudde\cbweb\model\user\User $user The uploading user
+     * @param \ChristianBudde\Part\model\user\User $user The uploading user
      * @param array $file The file array to be added
      * @return File Will return newly added file
      */
@@ -83,7 +83,7 @@ interface FileLibrary {
      * If the user argument is not null, only files uploaded by this user will be subject
      * to cleaning, else the whole library is checked.
      *
-     * @param \ChristianBudde\cbweb\model\user\User $user
+     * @param \ChristianBudde\Part\model\user\User $user
      * @return bool TRUE on success else FALSE
      */
     public function cleanLibrary(User $user = null);

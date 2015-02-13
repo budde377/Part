@@ -1,6 +1,6 @@
 <?php
-namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde\cbweb\model\site\SiteContent;
+namespace ChristianBudde\Part\test\stub;
+use ChristianBudde\Part\model\site\SiteContent;
 
 /**
  * Created by PhpStorm.

@@ -1,7 +1,7 @@
 <?php
-namespace ChristianBudde\cbweb\util\traits;
-use ChristianBudde\cbweb\util\file\File;
-use ChristianBudde\cbweb\util\file\FileImpl;
+namespace ChristianBudde\Part\util\traits;
+use ChristianBudde\Part\util\file\File;
+use ChristianBudde\Part\util\file\FileImpl;
 
 /**
  * Created by JetBrains PhpStorm.

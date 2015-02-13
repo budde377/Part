@@ -1,11 +1,10 @@
 <?php
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\util\file\DumpFile;
-use ChristianBudde\cbweb\util\file\LogFileImpl;
-
-use ChristianBudde\cbweb\util\file\FolderImpl;
-use ChristianBudde\cbweb\util\file\Folder;
+use ChristianBudde\Part\util\file\DumpFile;
+use ChristianBudde\Part\util\file\Folder;
+use ChristianBudde\Part\util\file\FolderImpl;
+use ChristianBudde\Part\util\file\LogFileImpl;
 use PHPUnit_Framework_TestCase;
 
 /**
@@ -16,11 +15,11 @@ use PHPUnit_Framework_TestCase;
  */
 class LogFileImplTest extends PHPUnit_Framework_TestCase
 {
-    /** @var  \ChristianBudde\cbweb\util\file\LogFileImpl */
+    /** @var  \ChristianBudde\Part\util\file\LogFileImpl */
     private $logFile;
-    /** @var  \ChristianBudde\cbweb\util\file\DumpFile */
+    /** @var  \ChristianBudde\Part\util\file\DumpFile */
     private $dumpFile;
-    /** @var \ChristianBudde\cbweb\util\file\Folder */
+    /** @var \ChristianBudde\Part\util\file\Folder */
     private $folder;
 
     public function setUp()
@@ -123,7 +122,7 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
     public function testLogWillReturnDumpFile()
     {
         $this->logFile->log("MSG", 2, $dumpFile);
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\util\\file\\DumpFileImpl", $dumpFile);
+        $this->assertInstanceOf("ChristianBudde\\Part\\util\\file\\DumpFileImpl", $dumpFile);
         $this->dumpFile = $dumpFile;
     }
 
@@ -133,7 +132,7 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
         $ar = $this->logFile->listLog();
         $ar1 = $ar[0];
         $this->assertArrayHasKey("dumpfile", $ar1);
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\util\\file\\DumpFile", $d2 = $ar1["dumpfile"]);
+        $this->assertInstanceOf("ChristianBudde\\Part\\util\\file\\DumpFile", $d2 = $ar1["dumpfile"]);
         $this->assertTrue($d === $d2);
         $this->dumpFile = $d;
     }

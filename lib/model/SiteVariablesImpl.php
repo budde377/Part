@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\model;
+namespace ChristianBudde\Part\model;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -7,11 +7,10 @@ namespace ChristianBudde\cbweb\model;
  * Time: 3:46 PM
  * To change this template use File | Settings | File Templates.
  */
-use ChristianBudde\cbweb\util\db\DB;
-
-use Traversable;
 use ArrayObject;
+use ChristianBudde\Part\util\db\DB;
 use PDO;
+use Traversable;
 
 class SiteVariablesImpl implements Variables
 {

@@ -6,7 +6,7 @@
  * Time: 8:19 AM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\Part\controller\function_string\ast;
 
 
 interface NamedFunction extends FFunction{

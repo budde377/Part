@@ -6,14 +6,14 @@
  * Date: 3/3/14
  * Time: 10:12 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\model\page\PageContentLibraryImpl;
-use ChristianBudde\cbweb\model\site\SiteContentLibraryImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
-use ChristianBudde\cbweb\test\stub\StubDBImpl;
-use ChristianBudde\cbweb\test\stub\StubSiteImpl;
-use ChristianBudde\cbweb\util\db\DB;
+use ChristianBudde\Part\model\page\PageContentLibraryImpl;
+use ChristianBudde\Part\model\site\SiteContentLibraryImpl;
+use ChristianBudde\Part\test\stub\StubDBImpl;
+use ChristianBudde\Part\test\stub\StubSiteImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\util\db\DB;
 
 class SiteContentLibraryImplTest extends CustomDatabaseTestCase
 {
@@ -44,9 +44,9 @@ class SiteContentLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue(is_array($list = $this->existingContentLibrary->listContents()));
         $this->assertEquals(2, count($list));
         $this->assertArrayHasKey("", $list);
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Content", $list[""]);
+        $this->assertInstanceOf("ChristianBudde\\Part\\model\\Content", $list[""]);
         $this->assertArrayHasKey("Test", $list);
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Content", $list["Test"]);
+        $this->assertInstanceOf("ChristianBudde\\Part\\model\\Content", $list["Test"]);
     }
 
 
@@ -70,7 +70,7 @@ class SiteContentLibraryImplTest extends CustomDatabaseTestCase
     public function testGetInstanceWillCreateNewInstance()
     {
         $c = $this->existingContentLibrary->getContent($id = "id" . time());
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Content", $c);
+        $this->assertInstanceOf("ChristianBudde\\Part\\model\\Content", $c);
         $c2 = $this->existingContentLibrary->getContent($id);
         $this->assertTrue($c === $c2);
     }
@@ -108,8 +108,8 @@ class SiteContentLibraryImplTest extends CustomDatabaseTestCase
         $this->assertEquals(2, count($ar));
         $this->assertArrayHasKey("", $ar);
         $this->assertArrayHasKey("Test", $ar);
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Content", $ar[""]);
-        $this->assertInstanceOf("ChristianBudde\\cbweb\\model\\Content", $ar["Test"]);
+        $this->assertInstanceOf("ChristianBudde\\Part\\model\\Content", $ar[""]);
+        $this->assertInstanceOf("ChristianBudde\\Part\\model\\Content", $ar["Test"]);
     }
 
     public function testSearchLibraryWillReuseInstances()

@@ -1,20 +1,20 @@
 <?php
-namespace ChristianBudde\cbweb;
-use ChristianBudde\cbweb\controller\ajax\Server;
-use ChristianBudde\cbweb\util\CacheControl;
-use ChristianBudde\cbweb\util\file\CSSRegister;
-use ChristianBudde\cbweb\util\file\DartRegister;
-use ChristianBudde\cbweb\util\file\FileLibrary;
-use ChristianBudde\cbweb\util\file\JSRegister;
-use ChristianBudde\cbweb\log\Logger;
-use ChristianBudde\cbweb\model\mail\DomainLibrary;
-use ChristianBudde\cbweb\model\page\CurrentPageStrategy;
-use ChristianBudde\cbweb\model\page\DefaultPageLibrary;
-use ChristianBudde\cbweb\model\page\PageOrder;
-use ChristianBudde\cbweb\model\site\Site;
-use ChristianBudde\cbweb\model\updater\Updater;
-use ChristianBudde\cbweb\model\user\UserLibrary;
-use ChristianBudde\cbweb\util\db\DB;
+namespace ChristianBudde\Part;
+use ChristianBudde\Part\controller\ajax\Server;
+use ChristianBudde\Part\log\Logger;
+use ChristianBudde\Part\model\mail\DomainLibrary;
+use ChristianBudde\Part\model\page\CurrentPageStrategy;
+use ChristianBudde\Part\model\page\DefaultPageLibrary;
+use ChristianBudde\Part\model\page\PageOrder;
+use ChristianBudde\Part\model\site\Site;
+use ChristianBudde\Part\model\updater\Updater;
+use ChristianBudde\Part\model\user\UserLibrary;
+use ChristianBudde\Part\util\CacheControl;
+use ChristianBudde\Part\util\db\DB;
+use ChristianBudde\Part\util\file\CSSRegister;
+use ChristianBudde\Part\util\file\DartRegister;
+use ChristianBudde\Part\util\file\FileLibrary;
+use ChristianBudde\Part\util\file\JSRegister;
 
 /**
  * Created by JetBrains PhpStorm.

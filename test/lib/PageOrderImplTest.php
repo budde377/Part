@@ -6,29 +6,28 @@
  * Time: 12:58 PM
  * To change this template use File | Settings | File Templates.
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\model\page\PageOrderImpl;
-use ChristianBudde\cbweb\model\page\PageOrder;
-
-use ChristianBudde\cbweb\model\page\PageImpl;
-use ChristianBudde\cbweb\controller\json\PageOrderObjectImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
-use ChristianBudde\cbweb\test\util\TruncateOperation;
+use ChristianBudde\Part\controller\json\PageOrderObjectImpl;
+use ChristianBudde\Part\model\page\PageImpl;
+use ChristianBudde\Part\model\page\PageOrder;
+use ChristianBudde\Part\model\page\PageOrderImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
+use ChristianBudde\Part\test\stub\StubCurrentPageStrategyImpl;
+use ChristianBudde\Part\test\stub\StubDBImpl;
+use ChristianBudde\Part\test\stub\StubPageImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\TruncateOperation;
 use PHPUnit_Extensions_Database_DataSet_IDataSet;
 use PHPUnit_Extensions_Database_DB_IDatabaseConnection;
 use PHPUnit_Extensions_Database_Operation_Composite;
 use PHPUnit_Extensions_Database_Operation_Factory;
-use ChristianBudde\cbweb\test\stub\StubBackendSingletonContainerImpl;
-use ChristianBudde\cbweb\test\stub\StubCurrentPageStrategyImpl;
-use ChristianBudde\cbweb\test\stub\StubDBImpl;
-use ChristianBudde\cbweb\test\stub\StubPageImpl;
 
 class PageOrderImplTest extends CustomDatabaseTestCase
 {
 
 
-    /** @var $db \ChristianBudde\cbweb\test\stub\StubDBImpl */
+    /** @var $db \ChristianBudde\Part\test\stub\StubDBImpl */
     private $db;
     /** @var  PageOrderImpl */
     private $pageOrder;
@@ -60,7 +59,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         $validID = 'someID';
         $page = $this->pageOrder->createPage($validID);
         $this->assertTrue(is_object($page), 'Did not return an object');
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\Page', $page, 'Did not return instance of Page');
+        $this->assertInstanceOf('ChristianBudde\Part\model\page\Page', $page, 'Did not return instance of Page');
         $this->assertEquals($validID, $page->getID(), 'IDs did not match');
         $this->assertTrue($page->exists(), 'New page did not exists');
     }
@@ -91,9 +90,9 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         $this->assertTrue(is_array($pages), 'Did not return array');
         $this->assertTrue(!$this->isAssoc($pages), 'Array was not numeric');
         $this->assertEquals(1, count($pages), 'Did not return array with right number of entrances');
-        /** @var $p1 \ChristianBudde\cbweb\model\page\Page */
+        /** @var $p1 \ChristianBudde\Part\model\page\Page */
         $p1 = array_pop($pages);
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\Page', $p1, 'Did not return instance of Page');
+        $this->assertInstanceOf('ChristianBudde\Part\model\page\Page', $p1, 'Did not return instance of Page');
 
         $id1 = $p1->getID();
         $this->assertEquals('page3', $id1);
@@ -106,13 +105,13 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         $this->assertTrue(is_array($pages), 'Did not return array');
         $this->assertTrue(!$this->isAssoc($pages), 'Array was not numeric');
         $this->assertEquals(2, count($pages), 'Did not return array with right number of entrances');
-        /** @var $p1 \ChristianBudde\cbweb\model\page\Page */
+        /** @var $p1 \ChristianBudde\Part\model\page\Page */
         $p1 = array_pop($pages);
-        /** @var $p2 \ChristianBudde\cbweb\model\page\Page */
+        /** @var $p2 \ChristianBudde\Part\model\page\Page */
         $p2 = array_pop($pages);
 
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\Page', $p1, 'Did not return instance of Page');
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\Page', $p2, 'Did not return instance of Page');
+        $this->assertInstanceOf('ChristianBudde\Part\model\page\Page', $p1, 'Did not return instance of Page');
+        $this->assertInstanceOf('ChristianBudde\Part\model\page\Page', $p2, 'Did not return instance of Page');
         $id1 = $p1->getID();
         $id2 = $p2->getID();
         $this->assertNotEquals($id1, $id2, 'IDs did match');
@@ -127,15 +126,15 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         $this->assertTrue(is_array($pages), 'Did not return array');
         $this->assertTrue(!$this->isAssoc($pages), 'Array was not numeric');
         $this->assertEquals(3, count($pages), 'Did not return array with right number of entrances');
-        /** @var $p1 \ChristianBudde\cbweb\model\page\Page */
+        /** @var $p1 \ChristianBudde\Part\model\page\Page */
         $p1 = array_pop($pages);
-        /** @var $p2 \ChristianBudde\cbweb\model\page\Page */
+        /** @var $p2 \ChristianBudde\Part\model\page\Page */
         $p2 = array_pop($pages);
-        /** @var $p3 \ChristianBudde\cbweb\model\page\Page */
+        /** @var $p3 \ChristianBudde\Part\model\page\Page */
         $p3 = array_pop($pages);
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\Page', $p1, 'Did not return instance of Page');
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\Page', $p2, 'Did not return instance of Page');
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\Page', $p3, 'Did not return instance of Page');
+        $this->assertInstanceOf('ChristianBudde\Part\model\page\Page', $p1, 'Did not return instance of Page');
+        $this->assertInstanceOf('ChristianBudde\Part\model\page\Page', $p2, 'Did not return instance of Page');
+        $this->assertInstanceOf('ChristianBudde\Part\model\page\Page', $p3, 'Did not return instance of Page');
         $id1 = $p1->getID();
         $id2 = $p2->getID();
         $id3 = $p3->getID();
@@ -188,7 +187,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     {
 
         $activePages = $this->pageOrder->listPages(PageOrder::LIST_ACTIVE);
-        /** @var $page \ChristianBudde\cbweb\model\page\Page */
+        /** @var $page \ChristianBudde\Part\model\page\Page */
         $page = array_pop($activePages);
         $this->assertTrue($this->pageOrder->isActive($page));
         $this->pageOrder->deactivatePage($page);
@@ -207,7 +206,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         $this->assertTrue(is_array($order));
         $this->assertEquals(1, count($order));
         $subPage = array_pop($order);
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\Page', $subPage);
+        $this->assertInstanceOf('ChristianBudde\Part\model\page\Page', $subPage);
         $this->pageOrder->deactivatePage($page);
         $this->assertFalse($this->pageOrder->isActive($subPage));
         $this->pageOrder->setPageOrder($page);
@@ -219,7 +218,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     {
 
         $pages = $this->pageOrder->listPages(PageOrder::LIST_ALL);
-        /** @var $page \ChristianBudde\cbweb\model\page\Page */
+        /** @var $page \ChristianBudde\Part\model\page\Page */
         $page = array_pop($pages);
 
         $deleteRet = $this->pageOrder->deletePage($page);
@@ -236,7 +235,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     {
 
         $pages = $this->pageOrder->listPages(PageOrder::LIST_ALL);
-        /** @var $page \ChristianBudde\cbweb\model\page\Page */
+        /** @var $page \ChristianBudde\Part\model\page\Page */
         $page = array_pop($pages);
         $altPage = new PageImpl($page->getID(), $this->db);
         $altPage->delete();
@@ -260,7 +259,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     {
 
         $pages = $this->pageOrder->listPages(PageOrder::LIST_ALL);
-        /** @var $page \ChristianBudde\cbweb\model\page\Page */
+        /** @var $page \ChristianBudde\Part\model\page\Page */
         $page = array_pop($pages);
 
         $deleteRet = $page->delete();
@@ -307,7 +306,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     {
 
         $pages = $this->pageOrder->listPages(PageOrder::LIST_ACTIVE);
-        /** @var $page \ChristianBudde\cbweb\model\page\Page */
+        /** @var $page \ChristianBudde\Part\model\page\Page */
         $page = array_pop($pages);
         $page->setID('someotherid');
 
@@ -329,9 +328,9 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         $this->assertTrue(is_array($topOrder));
         $this->assertTrue(!$this->isAssoc($topOrder));
         $this->assertEquals(1, count($topOrder));
-        /** @var $page \ChristianBudde\cbweb\model\page\Page */
+        /** @var $page \ChristianBudde\Part\model\page\Page */
         $page = array_pop($topOrder);
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\Page', $page);
+        $this->assertInstanceOf('ChristianBudde\Part\model\page\Page', $page);
         $this->assertEquals('page', $page->getID());
 
     }
@@ -340,7 +339,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     {
 
         $topOrder = $this->pageOrder->getPageOrder();
-        /** @var $parentPage \ChristianBudde\cbweb\model\page\Page */
+        /** @var $parentPage \ChristianBudde\Part\model\page\Page */
         $parentPage = array_pop($topOrder);
 
         $subOrder = $this->pageOrder->getPageOrder($parentPage);
@@ -348,9 +347,9 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         $this->assertTrue(is_array($subOrder));
         $this->assertTrue(!$this->isAssoc($subOrder));
         $this->assertEquals(1, count($subOrder));
-        /** @var $page \ChristianBudde\cbweb\model\page\Page */
+        /** @var $page \ChristianBudde\Part\model\page\Page */
         $page = array_pop($subOrder);
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\Page', $page);
+        $this->assertInstanceOf('ChristianBudde\Part\model\page\Page', $page);
         $this->assertEquals('page2', $page->getID());
 
     }
@@ -363,7 +362,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
                 $this->pageOrder->getPageOrder("Invalid Input");
             } catch (Exception $e) {
                 $exceptionWasThrown = true;
-                $this->assertInstanceOf('ChristianBudde\cbweb\MalformedParameterException', $e, 'Wrong type of exception');
+                $this->assertInstanceOf('ChristianBudde\Part\MalformedParameterException', $e, 'Wrong type of exception');
                 $this->assertEquals(1, $e->getParameterNumber(), 'Wrong param number');
                 $this->assertEquals('Page|null', $e->getExpectedType(), 'Wrong expected type');
 
@@ -377,7 +376,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     {
 
         $topOrder = $this->pageOrder->getPageOrder();
-        /** @var $parentPage \ChristianBudde\cbweb\model\page\Page */
+        /** @var $parentPage \ChristianBudde\Part\model\page\Page */
         $parentPage = array_pop($topOrder);
         $parentPage->setID('someID');
         $subOrder = $this->pageOrder->getPageOrder($parentPage);
@@ -433,10 +432,10 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
 
         $topPageOrder = $this->pageOrder->getPageOrder();
-        /** @var $topPage \ChristianBudde\cbweb\model\page\Page */
+        /** @var $topPage \ChristianBudde\Part\model\page\Page */
         $topPage = $topPageOrder[0];
         $subPageOrder = $this->pageOrder->getPageOrder($topPage);
-        /** @var $subPage \ChristianBudde\cbweb\model\page\Page */
+        /** @var $subPage \ChristianBudde\Part\model\page\Page */
         $subPage = $subPageOrder[0];
         $this->pageOrder->setPageOrder($subPage, 1);
 
@@ -453,7 +452,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
 
         $topPageOrder = $this->pageOrder->getPageOrder();
-        /** @var $topPage \ChristianBudde\cbweb\model\page\Page */
+        /** @var $topPage \ChristianBudde\Part\model\page\Page */
         $topPage = $topPageOrder[0];
 
         $newPage = $this->pageOrder->createPage('someID');
@@ -508,14 +507,14 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         $newPageOrder = new PageOrderImpl($this->backendContainer);
         $newTopOrder = $newPageOrder->getPageOrder();
 
-        /** @var \ChristianBudde\cbweb\model\page\Page $o1 */
+        /** @var \ChristianBudde\Part\model\page\Page $o1 */
         $o1 = $topOrder[0];
-        /** @var \ChristianBudde\cbweb\model\page\Page $o2 */
+        /** @var \ChristianBudde\Part\model\page\Page $o2 */
         $o2 = $topOrder[1];
 
-        /** @var \ChristianBudde\cbweb\model\page\Page $o3 */
+        /** @var \ChristianBudde\Part\model\page\Page $o3 */
         $o3 = $newTopOrder[0];
-        /** @var \ChristianBudde\cbweb\model\page\Page $o4 */
+        /** @var \ChristianBudde\Part\model\page\Page $o4 */
         $o4 = $newTopOrder[1];
 
         $this->assertEquals($o1->getID(), $o3->getID());
@@ -533,7 +532,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     {
 
         $page = $this->pageOrder->getPage('page');
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\Page', $page, 'Did not return right instance');
+        $this->assertInstanceOf('ChristianBudde\Part\model\page\Page', $page, 'Did not return right instance');
         $this->assertEquals('page', $page->getID(), 'IDs did not match');
 
     }
@@ -542,7 +541,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     {
 
         $page = $this->pageOrder->getPage('page3');
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\Page', $page, 'Did not return right instance');
+        $this->assertInstanceOf('ChristianBudde\Part\model\page\Page', $page, 'Did not return right instance');
         $this->assertEquals('page3', $page->getID(), 'IDs did not match');
 
     }
@@ -575,15 +574,15 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         $this->assertTrue(is_array($ret), 'Did not return an array');
         $this->assertEquals(2, count($ret), 'Did not return array of right size');
         $this->assertArrayHasKey(0, $ret, 'Array was not numeric');
-        /** @var $p \ChristianBudde\cbweb\model\page\Page */
+        /** @var $p \ChristianBudde\Part\model\page\Page */
         $p = $ret[0];
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\Page', $p);
+        $this->assertInstanceOf('ChristianBudde\Part\model\page\Page', $p);
         $this->assertEquals('page', $p->getID(), 'IDs did not match');
 
         $this->assertArrayHasKey(1, $ret, 'Array was not numeric');
-        /** @var $p \ChristianBudde\cbweb\model\page\Page */
+        /** @var $p \ChristianBudde\Part\model\page\Page */
         $p = $ret[1];
-        $this->assertInstanceOf('ChristianBudde\cbweb\model\page\Page', $p);
+        $this->assertInstanceOf('ChristianBudde\Part\model\page\Page', $p);
         $this->assertEquals('page2', $p->getID(), 'IDs did not match');
 
     }

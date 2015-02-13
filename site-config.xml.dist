@@ -8,7 +8,7 @@
         <owner name="JOHN DOE" mail="test@example.com" username="root"/>
     </siteInfo>
     <AJAXTypeHandlers>
-        <class>ChristianBudde\cbweb\controller\ajax\BackendTypeHandlerImpl</class>
+        <class>ChristianBudde\Part\controller\ajax\BackendTypeHandlerImpl</class>
     </AJAXTypeHandlers>
     <defaultPages>
         <page alias="" template="_login" id="login">Login</page>
@@ -23,10 +23,10 @@
         <template filename="error_400_template.twig">_500</template>
     </templates>
     <pageElements>
-        <class name="logout" >ChristianBudde\cbweb\view\page_element\LogoutPageElementImpl</class>
-        <class name="login_formula" >ChristianBudde\cbweb\view\page_element\LoginFormulaPageElementImpl</class>
-        <class name="title" >ChristianBudde\cbweb\view\page_element\TitlePageElementImpl</class>
-        <class name="style_script_head" >ChristianBudde\cbweb\view\page_element\HeadPageElementImpl</class>
+        <class name="logout" >ChristianBudde\Part\view\page_element\LogoutPageElementImpl</class>
+        <class name="login_formula" >ChristianBudde\Part\view\page_element\LoginFormulaPageElementImpl</class>
+        <class name="title" >ChristianBudde\Part\view\page_element\TitlePageElementImpl</class>
+        <class name="style_script_head" >ChristianBudde\Part\view\page_element\HeadPageElementImpl</class>
     </pageElements>
     <MySQLConnection>
         <host>DB HOST</host>
@@ -40,16 +40,16 @@
         <username>DB MAIL USERNAME</username>
     </MailMySQLConnection>
     <optimizers>
-        <class name="css" >ChristianBudde\cbweb\util\file\CSSYUICompressorOptimizerImpl</class>
-        <class name="js" >ChristianBudde\cbweb\util\file\JSYUICompressorOptimizerImpl</class>
+        <class name="css" >ChristianBudde\Part\util\file\CSSYUICompressorOptimizerImpl</class>
+        <class name="js" >ChristianBudde\Part\util\file\JSYUICompressorOptimizerImpl</class>
     </optimizers>
     <enableUpdater>true</enableUpdater>
     <debugMode>true</debugMode>
     <tmpFolder path="TMP FOLDER PATH"/>
     <preScripts>
-        <class >ChristianBudde\cbweb\util\script\UserLoginCheckPreScript</class>
-        <class >ChristianBudde\cbweb\util\script\UserLoginUpdateCheckPreScript</class>
-        <class >ChristianBudde\cbweb\util\script\RequireHTTPSPreScript</class>
+        <class >ChristianBudde\Part\util\script\UserLoginCheckPreScript</class>
+        <class >ChristianBudde\Part\util\script\UserLoginUpdateCheckPreScript</class>
+        <class >ChristianBudde\Part\util\script\RequireHTTPSPreScript</class>
     </preScripts>
     <log path="LOG FILE PATH " />
 </config>

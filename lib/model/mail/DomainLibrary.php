@@ -1,7 +1,6 @@
 <?php
-namespace ChristianBudde\cbweb\model\mail;
-use ChristianBudde\cbweb\controller\json\JSONObjectSerializable;
-use ChristianBudde\cbweb\util\Observable;
+namespace ChristianBudde\Part\model\mail;
+use ChristianBudde\Part\controller\json\JSONObjectSerializable;
 
 
 /**

@@ -1,11 +1,11 @@
 <?php
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 
-use ChristianBudde\cbweb\model\page\Page;
-use ChristianBudde\cbweb\model\Content;
-use ChristianBudde\cbweb\model\ContentLibrary;
-use ChristianBudde\cbweb\controller\json\PageObjectImpl;
-use ChristianBudde\cbweb\model\Variables;
+use ChristianBudde\Part\controller\json\PageObjectImpl;
+use ChristianBudde\Part\model\Content;
+use ChristianBudde\Part\model\ContentLibrary;
+use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\model\Variables;
 
 /**
  * Created by JetBrains PhpStorm.

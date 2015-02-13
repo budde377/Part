@@ -6,11 +6,11 @@
  * Time: 5:49 PM
  */
 
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 
 
-use ChristianBudde\cbweb\model\updater\Updater;
-use ChristianBudde\cbweb\model\user\User;
+use ChristianBudde\Part\model\updater\Updater;
+use ChristianBudde\Part\model\user\User;
 
 class StubUpdaterImpl implements Updater{
 

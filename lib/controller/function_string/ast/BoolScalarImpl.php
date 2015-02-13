@@ -6,7 +6,7 @@
  * Time: 10:21 AM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\Part\controller\function_string\ast;
 
 
 class BoolScalarImpl implements Scalar{

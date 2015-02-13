@@ -1,9 +1,9 @@
 <?php
-namespace ChristianBudde\cbweb\util\file;
+namespace ChristianBudde\Part\util\file;
 
-use ChristianBudde\cbweb\log\Logger;
-use ChristianBudde\cbweb\log\LoggerImpl;
-use ChristianBudde\cbweb\exception\MalformedParameterException;
+use ChristianBudde\Part\exception\MalformedParameterException;
+use ChristianBudde\Part\log\Logger;
+use ChristianBudde\Part\log\LoggerImpl;
 
 
 /**

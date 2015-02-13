@@ -1,7 +1,7 @@
 <?php
-namespace ChristianBudde\cbweb\controller\json;
+namespace ChristianBudde\Part\controller\json;
 
-use ChristianBudde\cbweb\model\user\UserPrivileges;
+use ChristianBudde\Part\model\user\UserPrivileges;
 
 /**
  * Created by PhpStorm.

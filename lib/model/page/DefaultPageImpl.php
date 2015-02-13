@@ -1,10 +1,9 @@
 <?php
-namespace ChristianBudde\cbweb\model\page;
-use ChristianBudde\cbweb\model\Content;
-
-use ChristianBudde\cbweb\model\NullContentImpl;
-use ChristianBudde\cbweb\controller\json\PageObjectImpl;
-use ChristianBudde\cbweb\model\Variables;
+namespace ChristianBudde\Part\model\page;
+use ChristianBudde\Part\controller\json\PageObjectImpl;
+use ChristianBudde\Part\model\Content;
+use ChristianBudde\Part\model\NullContentImpl;
+use ChristianBudde\Part\model\Variables;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -229,7 +228,7 @@ class DefaultPageImpl implements Page
 
     /**
      * Will return and reuse a ContentLibrary instance.
-     * @return \ChristianBudde\cbweb\model\ContentLibrary
+     * @return \ChristianBudde\Part\model\ContentLibrary
      */
     public function getContentLibrary()
     {

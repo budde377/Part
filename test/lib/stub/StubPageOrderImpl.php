@@ -1,9 +1,9 @@
 <?php
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 
-use ChristianBudde\cbweb\model\page\PageOrder;
-use ChristianBudde\cbweb\model\page\Page;
-use ChristianBudde\cbweb\controller\json\PageOrderObjectImpl;
+use ChristianBudde\Part\controller\json\PageOrderObjectImpl;
+use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\model\page\PageOrder;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -23,7 +23,7 @@ class StubPageOrderImpl implements PageOrder
      * order, else if valid page id is given, it will return the order of the
      * sub-list. The return array will, if non-empty, contain instances of Page
      * If invalid id is provided, it will return empty array
-     * @param null|\ChristianBudde\cbweb\model\page\Page $parentPage
+     * @param null|\ChristianBudde\Part\model\page\Page $parentPage
      * @return array
      */
     public function getPageOrder(Page $parentPage = null)
@@ -41,9 +41,9 @@ class StubPageOrderImpl implements PageOrder
      * There must not be created loops and parent/id must be valid page ID (and existing),
      * else the function will fail and return FALSE. If proper id('s) and no loops created,
      * function will return TRUE
-     * @param \ChristianBudde\cbweb\model\page\Page $page
+     * @param \ChristianBudde\Part\model\page\Page $page
      * @param int $place
-     * @param null | \ChristianBudde\cbweb\model\page\Page $parentPage
+     * @param null | \ChristianBudde\Part\model\page\Page $parentPage
      * @return bool
      */
     public function setPageOrder(Page $page, $place = PageOrder::PAGE_ORDER_LAST, Page $parentPage = null)
@@ -54,7 +54,7 @@ class StubPageOrderImpl implements PageOrder
     /**
      * Will return TRUE if the page is active (ie. in order), else FALSE
      * A page is only active if it is attached to root node (null)
-     * @param \ChristianBudde\cbweb\model\page\Page $page
+     * @param \ChristianBudde\Part\model\page\Page $page
      * @return bool
      */
     public function isActive(Page $page)
@@ -83,7 +83,7 @@ class StubPageOrderImpl implements PageOrder
 
     /**
      * @param string $id must satisfy syntax of Page id
-     * @return bool | \ChristianBudde\cbweb\model\page\Page Returns FALSE on invalid id or other error, else instance of Page
+     * @return bool | \ChristianBudde\Part\model\page\Page Returns FALSE on invalid id or other error, else instance of Page
      */
     public function createPage($id)
     {
@@ -92,7 +92,7 @@ class StubPageOrderImpl implements PageOrder
 
     /**
      * This will delete a page from page order and in general
-     * @param \ChristianBudde\cbweb\model\page\Page $page
+     * @param \ChristianBudde\Part\model\page\Page $page
      * @return bool
      */
     public function deletePage(Page $page)
@@ -103,7 +103,7 @@ class StubPageOrderImpl implements PageOrder
     /**
      * Will deactivate a page and all it's sub pages.
      * The page order remains the same
-     * @param \ChristianBudde\cbweb\model\page\Page $page
+     * @param \ChristianBudde\Part\model\page\Page $page
      * @return void
      */
     public function deactivatePage(Page $page)
@@ -141,7 +141,7 @@ class StubPageOrderImpl implements PageOrder
     public function getPage($id)
     {
         foreach ($this->listPages(PageOrder::LIST_ALL) as $page) {
-            /** @var $page \ChristianBudde\cbweb\model\page\Page */
+            /** @var $page \ChristianBudde\Part\model\page\Page */
             if ($page->getID() == $id) {
                 return $page;
             }
@@ -156,7 +156,7 @@ class StubPageOrderImpl implements PageOrder
      * will be returned.
      * If a page is inactive, an empty array will be returned.
      * If a page is not found, FALSE will be returned.
-     * @param \ChristianBudde\cbweb\model\page\Page $page
+     * @param \ChristianBudde\Part\model\page\Page $page
      * @return bool | array
      */
     public function getPagePath(Page $page)
@@ -173,7 +173,7 @@ class StubPageOrderImpl implements PageOrder
     /**
      * Will return the current page from the current page
      * strategy.
-     * @return \ChristianBudde\cbweb\model\page\Page
+     * @return \ChristianBudde\Part\model\page\Page
      */
     public function getCurrentPage()
     {

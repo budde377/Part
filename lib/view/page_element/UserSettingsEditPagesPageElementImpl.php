@@ -1,10 +1,10 @@
 <?php
-namespace ChristianBudde\cbweb\view\page_element;
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\model\page\Page;
-use ChristianBudde\cbweb\model\page\PageOrder;
-use ChristianBudde\cbweb\view\html\FormElement;
-use ChristianBudde\cbweb\view\html\FormElementImpl;
+namespace ChristianBudde\Part\view\page_element;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\model\page\PageOrder;
+use ChristianBudde\Part\view\html\FormElement;
+use ChristianBudde\Part\view\html\FormElementImpl;
 
 /**
  * Created by JetBrains PhpStorm.

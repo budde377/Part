@@ -1,6 +1,6 @@
 <?php
-namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde\cbweb\util\script\Script;
+namespace ChristianBudde\Part\test\stub;
+use ChristianBudde\Part\util\script\Script;
 
 /**
  * Created by JetBrains PhpStorm.

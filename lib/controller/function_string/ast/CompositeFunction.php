@@ -6,10 +6,10 @@
  * Time: 10:12 PM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\Part\controller\function_string\ast;
 
-use ChristianBudde\cbweb\controller\json\Target;
-use ChristianBudde\cbweb\controller\json\CompositeFunction as JCompositeFunction;
+use ChristianBudde\Part\controller\json\CompositeFunction as JCompositeFunction;
+use ChristianBudde\Part\controller\json\Target;
 
 interface CompositeFunction {
 

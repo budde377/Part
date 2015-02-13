@@ -6,8 +6,8 @@
  * Time: 11:21 AM
  */
 
-namespace ChristianBudde\cbweb\controller\ajax;
-use ChristianBudde\cbweb\controller\json\JSONFunction;
+namespace ChristianBudde\Part\controller\ajax;
+use ChristianBudde\Part\controller\json\JSONFunction;
 
 interface TypeHandler {
 
@@ -38,7 +38,7 @@ interface TypeHandler {
 
     /**
      * @param String $type
-     * @param \ChristianBudde\cbweb\controller\json\JSONFunction $function
+     * @param \ChristianBudde\Part\controller\json\JSONFunction $function
      * @param mixed $instance
      * @return mixed
      */

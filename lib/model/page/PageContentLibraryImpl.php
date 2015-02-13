@@ -1,9 +1,9 @@
 <?php
-namespace ChristianBudde\cbweb\model\page;
-use ChristianBudde\cbweb\util\db\DB;
-use ChristianBudde\cbweb\model\Content;
-
+namespace ChristianBudde\Part\model\page;
+use ChristianBudde\Part\model\Content;
+use ChristianBudde\Part\util\db\DB;
 use PDO;
+
 /**
  * Created by PhpStorm.
  * User: budde

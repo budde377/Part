@@ -1,9 +1,9 @@
 <?php
-namespace ChristianBudde\cbweb\view\page_element;
+namespace ChristianBudde\Part\view\page_element;
 
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\view\html\FormElement;
-use ChristianBudde\cbweb\view\html\FormElementImpl;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\view\html\FormElement;
+use ChristianBudde\Part\view\html\FormElementImpl;
 
 /**
  * Created by JetBrains PhpStorm.

@@ -6,13 +6,13 @@
  * Time: 3:53 PM
  * To change this template use File | Settings | File Templates.
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\model\page\Page;
-use ChristianBudde\cbweb\model\page\PageImpl;
-use ChristianBudde\cbweb\model\page\PageVariablesImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
-use ChristianBudde\cbweb\test\stub\StubDBImpl;
+use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\model\page\PageImpl;
+use ChristianBudde\Part\model\page\PageVariablesImpl;
+use ChristianBudde\Part\test\stub\StubDBImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 
 class PageVariablesImplTest extends CustomDatabaseTestCase
 {
@@ -26,7 +26,7 @@ class PageVariablesImplTest extends CustomDatabaseTestCase
     private $nonExistingVariablesNonExistingPage;
     /** @var  Page */
     private $existingUser;
-    /** @var  \ChristianBudde\cbweb\model\page\Page */
+    /** @var  \ChristianBudde\Part\model\page\Page */
     private $existingUser2;
     /** @var  Page */
     private $nonExistingUser;

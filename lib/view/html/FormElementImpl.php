@@ -1,6 +1,6 @@
 <?php
-namespace ChristianBudde\cbweb\view\html;
-use ChristianBudde\cbweb\exception\MalformedParameterException;
+namespace ChristianBudde\Part\view\html;
+use ChristianBudde\Part\exception\MalformedParameterException;
 
 
 /**
@@ -75,7 +75,7 @@ class FormElementImpl implements FormElement
      * Sets the form method, must either be post or get
      * if none of those exception will be thrown
      * @param string $method
-     * @throws \ChristianBudde\cbweb\exception\MalformedParameterException
+     * @throws \ChristianBudde\Part\exception\MalformedParameterException
      * @return void
      */
     public function setMethod($method = FormElementImpl::FORM_METHOD_GET)

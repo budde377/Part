@@ -5,9 +5,9 @@
  * Date: 5/17/14
  * Time: 5:00 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\util\file\StubDumpFileImpl;
+use ChristianBudde\Part\util\file\StubDumpFileImpl;
 use PHPUnit_Framework_TestCase;
 
 class StubDumpFileImplTest extends PHPUnit_Framework_TestCase

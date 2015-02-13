@@ -1,19 +1,18 @@
 <?php
-namespace ChristianBudde\cbweb\model\site;
+namespace ChristianBudde\Part\model\site;
 
-use ChristianBudde\cbweb\controller\json\SiteContentObjectImpl;
-use ChristianBudde\cbweb\util\db\DB;
-
-
+use ChristianBudde\Part\controller\json\SiteContentObjectImpl;
+use ChristianBudde\Part\util\db\DB;
 use PDO;
+use PDOStatement;
+
+
 /**
  * Created by PhpStorm.
  * User: budde
  * Date: 10/23/13
  * Time: 12:54 PM
  */
-use PDOStatement;
-
 class SiteContentImpl implements SiteContent
 {
 

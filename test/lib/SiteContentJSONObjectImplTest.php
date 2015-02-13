@@ -5,11 +5,11 @@
  * Date: 9/4/14
  * Time: 6:05 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\controller\json\SiteContentObjectImpl;
+use ChristianBudde\Part\controller\json\SiteContentObjectImpl;
+use ChristianBudde\Part\test\stub\StubSiteContentImpl;
 use PHPUnit_Framework_TestCase;
-use ChristianBudde\cbweb\test\stub\StubSiteContentImpl;
 
 class SiteContentJSONObjectImplTest extends PHPUnit_Framework_TestCase
 {

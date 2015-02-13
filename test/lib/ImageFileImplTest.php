@@ -1,11 +1,11 @@
 <?php
 
-namespace ChristianBudde\cbweb\test;
-use ChristianBudde\cbweb\controller\json\ImageFileObjectImpl;
-use ChristianBudde\cbweb\util\file\Folder;
-use ChristianBudde\cbweb\util\file\FolderImpl;
-use ChristianBudde\cbweb\util\file\ImageFile;
-use ChristianBudde\cbweb\util\file\ImageFileImpl;
+namespace ChristianBudde\Part\test;
+use ChristianBudde\Part\controller\json\ImageFileObjectImpl;
+use ChristianBudde\Part\util\file\Folder;
+use ChristianBudde\Part\util\file\FolderImpl;
+use ChristianBudde\Part\util\file\ImageFile;
+use ChristianBudde\Part\util\file\ImageFileImpl;
 use PHPUnit_Framework_TestCase;
 
 
@@ -48,7 +48,7 @@ class ImageFileImplTest extends PHPUnit_Framework_TestCase
     {
         $f = $this->imageFile->copy($this->imageFile->getParentFolder()->getAbsolutePath() . '/imgStub2.png');
         $f->delete();
-        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\ImageFileImpl', $f);
+        $this->assertInstanceOf('ChristianBudde\Part\util\file\ImageFileImpl', $f);
     }
 
     public function testGetWidthHeightRatioOfNonExistingFileReturnsNull()

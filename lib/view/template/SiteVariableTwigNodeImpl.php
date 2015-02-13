@@ -1,13 +1,13 @@
 <?php
-namespace ChristianBudde\cbweb\view\template;
+namespace ChristianBudde\Part\view\template;
 /**
  * Created by PhpStorm.
  * User: budde
  * Date: 1/31/14
  * Time: 11:17 PM
  */
-use \Twig_Node;
-use \Twig_Compiler;
+use Twig_Compiler;
+use Twig_Node;
 
 class SiteVariableTwigNodeImpl extends Twig_Node{
     /**

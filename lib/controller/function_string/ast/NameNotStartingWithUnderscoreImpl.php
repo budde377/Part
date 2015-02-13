@@ -6,11 +6,11 @@
  * Time: 9:00 AM
  */
 
-namespace ChristianBudde\cbweb\controller\function_string\ast;
+namespace ChristianBudde\Part\controller\function_string\ast;
 
 
-use ChristianBudde\cbweb\controller\json\Target;
-use ChristianBudde\cbweb\controller\json\TypeImpl;
+use ChristianBudde\Part\controller\json\Target;
+use ChristianBudde\Part\controller\json\TypeImpl;
 
 class NameNotStartingWithUnderscoreImpl implements NameNotStartingWithUnderscore{
     private $value;

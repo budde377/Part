@@ -5,12 +5,12 @@
  * Date: 7/9/14
  * Time: 3:09 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\util\ObserverLibraryImpl;
+use ChristianBudde\Part\test\stub\StubObservableImpl;
+use ChristianBudde\Part\test\stub\StubObserverImpl;
+use ChristianBudde\Part\util\ObserverLibraryImpl;
 use PHPUnit_Framework_TestCase;
-use ChristianBudde\cbweb\test\stub\StubObservableImpl;
-use ChristianBudde\cbweb\test\stub\StubObserverImpl;
 
 class ObserverLibraryImplTest extends PHPUnit_Framework_TestCase
 {
@@ -18,9 +18,9 @@ class ObserverLibraryImplTest extends PHPUnit_Framework_TestCase
     /** @var  ObserverLibraryImpl */
     private $observerLibrary;
     private $observable;
-    /** @var  \ChristianBudde\cbweb\test\stub\StubObserverImpl */
+    /** @var  \ChristianBudde\Part\test\stub\StubObserverImpl */
     private $observer;
-    /** @var  \ChristianBudde\cbweb\test\stub\StubObserverImpl */
+    /** @var  \ChristianBudde\Part\test\stub\StubObserverImpl */
     private $observer2;
 
     public function setUp()

@@ -1,7 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\util\file;
+namespace ChristianBudde\Part\util\file;
 
 use Iterator;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

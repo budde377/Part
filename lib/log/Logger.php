@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\cbweb\log;
+namespace ChristianBudde\Part\log;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde

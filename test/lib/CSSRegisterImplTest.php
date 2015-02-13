@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\util\file\CSSRegisterImpl;
-use ChristianBudde\cbweb\util\file\CSSFileImpl;
+use ChristianBudde\Part\util\file\CSSFileImpl;
+use ChristianBudde\Part\util\file\CSSRegisterImpl;
 use PHPUnit_Framework_TestCase;
 
 /**

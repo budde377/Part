@@ -1,9 +1,9 @@
 <?php
-namespace ChristianBudde\cbweb\view\page_element;
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\util\file\CSSFile;
-use ChristianBudde\cbweb\util\file\DartFile;
-use ChristianBudde\cbweb\util\file\JSFile;
+namespace ChristianBudde\Part\view\page_element;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\util\file\CSSFile;
+use ChristianBudde\Part\util\file\DartFile;
+use ChristianBudde\Part\util\file\JSFile;
 
 
 /**

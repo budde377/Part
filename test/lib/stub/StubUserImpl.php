@@ -5,13 +5,13 @@
  * Date: 02/08/12
  * Time: 15:24
  */
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 
-use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\model\user\UserPrivileges;
-use ChristianBudde\cbweb\model\Variables;
-use ChristianBudde\cbweb\controller\json\UserObjectImpl;
-use ChristianBudde\cbweb\util\Observer;
+use ChristianBudde\Part\controller\json\UserObjectImpl;
+use ChristianBudde\Part\model\user\User;
+use ChristianBudde\Part\model\user\UserPrivileges;
+use ChristianBudde\Part\model\Variables;
+use ChristianBudde\Part\util\Observer;
 
 class StubUserImpl implements User
 {
@@ -144,7 +144,7 @@ class StubUserImpl implements User
     }
 
     /**
-     * @param \ChristianBudde\cbweb\model\user\UserPrivileges $userPrivileges
+     * @param \ChristianBudde\Part\model\user\UserPrivileges $userPrivileges
      */
     public function setUserPrivileges($userPrivileges)
     {
@@ -234,7 +234,7 @@ class StubUserImpl implements User
 
     /**
      * Serializes the object to an instance of JSONObject.
-     * @return \ChristianBudde\cbweb\controller\json\Object
+     * @return \ChristianBudde\Part\controller\json\Object
      */
     public function jsonObjectSerialize()
     {

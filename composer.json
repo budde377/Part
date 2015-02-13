@@ -19,12 +19,12 @@
     "minimum-stability": "stable",
     "autoload" : {
         "psr-4" : {
-            "ChristianBudde\\cbweb\\" :"lib"
+            "ChristianBudde\\Part\\" :"lib"
         }
     },
     "autoload-dev" : {
         "psr-4" : {
-            "ChristianBudde\\cbweb\\test\\" :"test/lib"
+            "ChristianBudde\\Part\\test\\" :"test/lib"
         }
     }
 }

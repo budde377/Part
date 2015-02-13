@@ -1,11 +1,11 @@
 <?php
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\Config;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
-use ChristianBudde\cbweb\test\util\MailMySQLConstantsImpl;
-use ChristianBudde\cbweb\util\db\MySQLDBImpl;
-use ChristianBudde\cbweb\ConfigImpl;
+use ChristianBudde\Part\Config;
+use ChristianBudde\Part\ConfigImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\MailMySQLConstantsImpl;
+use ChristianBudde\Part\util\db\MySQLDBImpl;
 use Exception;
 use SimpleXMLElement;
 
@@ -27,7 +27,7 @@ class MySQLDBImplTest extends CustomDatabaseTestCase
     private $configXML;
     /** @var  Config */
     private $config;
-    /** @var  \ChristianBudde\cbweb\util\db\MySQLDBImpl */
+    /** @var  \ChristianBudde\Part\util\db\MySQLDBImpl */
     private $mysql;
 
     private $mailHost;

@@ -6,11 +6,11 @@
  * Time: 10:56 PM
  */
 
-namespace ChristianBudde\cbweb\controller\json;
+namespace ChristianBudde\Part\controller\json;
 
 
-use ChristianBudde\cbweb\model\mail\Address;
-use ChristianBudde\cbweb\model\mail\AddressLibrary;
+use ChristianBudde\Part\model\mail\Address;
+use ChristianBudde\Part\model\mail\AddressLibrary;
 
 class MailAddressLibraryObjectImpl extends ObjectImpl{
 

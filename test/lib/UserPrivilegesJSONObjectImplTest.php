@@ -5,11 +5,11 @@
  * Date: 9/3/14
  * Time: 10:06 PM
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\controller\json\UserPrivilegesObjectImpl;
+use ChristianBudde\Part\controller\json\UserPrivilegesObjectImpl;
+use ChristianBudde\Part\test\stub\StubUserPrivilegesImpl;
 use PHPUnit_Framework_TestCase;
-use ChristianBudde\cbweb\test\stub\StubUserPrivilegesImpl;
 
 class UserPrivilegesJSONObjectImplTest extends PHPUnit_Framework_TestCase
 {

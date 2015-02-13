@@ -1,10 +1,10 @@
 <?php
-namespace ChristianBudde\cbweb\model\site;
-use ChristianBudde\cbweb\util\db\DB;
-use ChristianBudde\cbweb\model\Content;
-
-
+namespace ChristianBudde\Part\model\site;
+use ChristianBudde\Part\model\Content;
+use ChristianBudde\Part\util\db\DB;
 use PDO;
+
+
 /**
  * Created by PhpStorm.
  * User: budde
@@ -17,7 +17,7 @@ class SiteContentLibraryImpl implements SiteContentLibrary
 
     /** @var  Site */
     private $site;
-    /** @var  \ChristianBudde\cbweb\util\db\DB */
+    /** @var  \ChristianBudde\Part\util\db\DB */
     private $db;
     private $listContentPreparedStatement;
     private $idArray;

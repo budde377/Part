@@ -7,11 +7,11 @@
  * Time: 3:53 PM
  * To change this template use File | Settings | File Templates.
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\model\SiteVariablesImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
-use ChristianBudde\cbweb\test\stub\StubDBImpl;
+use ChristianBudde\Part\model\SiteVariablesImpl;
+use ChristianBudde\Part\test\stub\StubDBImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 
 class SiteVariablesImplTest extends CustomDatabaseTestCase
 {

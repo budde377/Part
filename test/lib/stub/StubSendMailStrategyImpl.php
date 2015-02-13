@@ -1,6 +1,6 @@
 <?php
-namespace ChristianBudde\cbweb\test\stub;
-use ChristianBudde\cbweb\util\mail\SendMailStrategy;
+namespace ChristianBudde\Part\test\stub;
+use ChristianBudde\Part\util\mail\SendMailStrategy;
 
 /**
  * Created by JetBrains PhpStorm.

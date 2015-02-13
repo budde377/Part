@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\util\mail;
+namespace ChristianBudde\Part\util\mail;
 
-use ChristianBudde\cbweb\model\user\User;
-use ChristianBudde\cbweb\util\traits\ValidationTrait;
+use ChristianBudde\Part\model\user\User;
+use ChristianBudde\Part\util\traits\ValidationTrait;
 
 
 /**

@@ -1,9 +1,9 @@
 <?php
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\util\script\ScriptChainImpl;
+use ChristianBudde\Part\test\stub\StubScriptImpl;
+use ChristianBudde\Part\util\script\ScriptChainImpl;
 use PHPUnit_Framework_TestCase;
-use ChristianBudde\cbweb\test\stub\StubScriptImpl;
 
 /**
  * Created by JetBrains PhpStorm.

@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\test\stub;
+namespace ChristianBudde\Part\test\stub;
 
-use ChristianBudde\cbweb\util\file\File;
-use ChristianBudde\cbweb\util\file\Optimizer;
+use ChristianBudde\Part\util\file\File;
+use ChristianBudde\Part\util\file\Optimizer;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -16,7 +16,7 @@ class NullOptimizerImpl implements Optimizer
 
     /**
      * @param File $file
-     * @param \ChristianBudde\cbweb\util\file\File $outputFile
+     * @param \ChristianBudde\Part\util\file\File $outputFile
      * @return bool
      */
     public function optimize(File $file, File $outputFile)

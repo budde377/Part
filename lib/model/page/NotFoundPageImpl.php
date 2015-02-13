@@ -1,12 +1,11 @@
 <?php
-namespace ChristianBudde\cbweb\model\page;
-use ChristianBudde\cbweb\model\ContentLibrary;
-use ChristianBudde\cbweb\controller\json\PageObjectImpl;
-use ChristianBudde\cbweb\util\helper\HTTPHeaderHelper;
-use ChristianBudde\cbweb\model\Content;
-
-use ChristianBudde\cbweb\model\Variables;
-use ChristianBudde\cbweb\model\NullContentImpl;
+namespace ChristianBudde\Part\model\page;
+use ChristianBudde\Part\controller\json\PageObjectImpl;
+use ChristianBudde\Part\model\Content;
+use ChristianBudde\Part\model\ContentLibrary;
+use ChristianBudde\Part\model\NullContentImpl;
+use ChristianBudde\Part\model\Variables;
+use ChristianBudde\Part\util\helper\HTTPHeaderHelper;
 
 
 /**

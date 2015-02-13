@@ -8,15 +8,15 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\controller\json\PageContentObjectImpl;
-use ChristianBudde\cbweb\model\page\Page;
-use ChristianBudde\cbweb\model\page\PageContentImpl;
-use ChristianBudde\cbweb\model\page\PageImpl;
-use ChristianBudde\cbweb\test\stub\StubDBImpl;
-use ChristianBudde\cbweb\test\util\CustomDatabaseTestCase;
-use ChristianBudde\cbweb\util\db\DB;
+use ChristianBudde\Part\controller\json\PageContentObjectImpl;
+use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\model\page\PageContentImpl;
+use ChristianBudde\Part\model\page\PageImpl;
+use ChristianBudde\Part\test\stub\StubDBImpl;
+use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\util\db\DB;
 
 class PageContentImplTest extends CustomDatabaseTestCase
 {
@@ -29,9 +29,9 @@ class PageContentImplTest extends CustomDatabaseTestCase
     /** @var  PageContentImpl */
     private $existingContent2;
 
-    /** @var  \ChristianBudde\cbweb\model\page\PageContentImpl */
+    /** @var  \ChristianBudde\Part\model\page\PageContentImpl */
     private $nonExistingContent;
-    /** @var  \ChristianBudde\cbweb\model\page\Page */
+    /** @var  \ChristianBudde\Part\model\page\Page */
     private $existingPage;
     /** @var  Page */
     private $nonExistingPage;

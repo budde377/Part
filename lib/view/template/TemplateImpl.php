@@ -1,20 +1,20 @@
 <?php
-namespace ChristianBudde\cbweb\view\template;
+namespace ChristianBudde\Part\view\template;
 
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\exception\EntryNotFoundException;
-use ChristianBudde\cbweb\util\file\File;
-use ChristianBudde\cbweb\util\file\FileImpl;
-use ChristianBudde\cbweb\util\file\FolderImpl;
-use ChristianBudde\cbweb\exception\FileNotFoundException;
-use ChristianBudde\cbweb\exception\InvalidXMLException;
-use ChristianBudde\cbweb\view\page_element\PageElementFactory;
-use \Twig_Loader_Filesystem;
-use \Twig_Loader_String;
-use \Twig_LoaderInterface;
-use \Twig_Loader_Chain;
-use \Twig_Environment;
-use \Twig_Extension_Debug;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\exception\EntryNotFoundException;
+use ChristianBudde\Part\exception\FileNotFoundException;
+use ChristianBudde\Part\exception\InvalidXMLException;
+use ChristianBudde\Part\util\file\File;
+use ChristianBudde\Part\util\file\FileImpl;
+use ChristianBudde\Part\util\file\FolderImpl;
+use ChristianBudde\Part\view\page_element\PageElementFactory;
+use Twig_Environment;
+use Twig_Extension_Debug;
+use Twig_Loader_Chain;
+use Twig_Loader_Filesystem;
+use Twig_Loader_String;
+use Twig_LoaderInterface;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -51,7 +51,7 @@ class TemplateImpl implements Template
 
     /**
      * @param File $file
-     * @throws \ChristianBudde\cbweb\exception\FileNotFoundException
+     * @throws \ChristianBudde\Part\exception\FileNotFoundException
      * @return void
      */
     public function setTemplate(File $file)
@@ -78,7 +78,7 @@ class TemplateImpl implements Template
     /**
      * @param string $name The name of the template as defined in the config
      * @param string $defaultIfNotFound
-     * @throws \ChristianBudde\cbweb\exception\EntryNotFoundException
+     * @throws \ChristianBudde\Part\exception\EntryNotFoundException
      * @return void
      */
     public function setTemplateFromConfig($name, $defaultIfNotFound = null)

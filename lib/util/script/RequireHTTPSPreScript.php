@@ -1,8 +1,8 @@
 <?php
-namespace ChristianBudde\cbweb\util\script;
-use ChristianBudde\cbweb\BackendSingletonContainer;
-use ChristianBudde\cbweb\util\helper\HTTPHeaderHelper;
-use ChristianBudde\cbweb\Website;
+namespace ChristianBudde\Part\util\script;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\util\helper\HTTPHeaderHelper;
+use ChristianBudde\Part\Website;
 
 /**
  * Created by PhpStorm.

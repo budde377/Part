@@ -1,11 +1,11 @@
 <?php
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\util\file\FolderImpl;
-use ChristianBudde\cbweb\util\file\FileImpl;
-use ChristianBudde\cbweb\util\file\Folder;
-use ChristianBudde\cbweb\util\file\File;
-use ChristianBudde\cbweb\util\traits\FilePathTrait;
+use ChristianBudde\Part\util\file\File;
+use ChristianBudde\Part\util\file\FileImpl;
+use ChristianBudde\Part\util\file\Folder;
+use ChristianBudde\Part\util\file\FolderImpl;
+use ChristianBudde\Part\util\traits\FilePathTrait;
 use PHPUnit_Framework_TestCase;
 
 /**
@@ -204,29 +204,29 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
         $folder = dirname(__FILE__) . '/../stubs/testFolder';
         $fol = $this->setUpNonEmptyFolder($folder);
         $l = $fol->listFolder();
-        /** @var $e \ChristianBudde\cbweb\util\file\File */
+        /** @var $e \ChristianBudde\Part\util\file\File */
         $e = $l[0];
-        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\File', $e);
+        $this->assertInstanceOf('ChristianBudde\Part\util\file\File', $e);
         $this->assertEquals('1', $e->getFilename());
         /** @var $e File */
         $e = $l[1];
-        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\File', $e);
+        $this->assertInstanceOf('ChristianBudde\Part\util\file\File', $e);
         $this->assertEquals('2', $e->getFilename());
-        /** @var $e \ChristianBudde\cbweb\util\file\Folder */
+        /** @var $e \ChristianBudde\Part\util\file\Folder */
         $e = $l[2];
-        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\Folder', $e);
+        $this->assertInstanceOf('ChristianBudde\Part\util\file\Folder', $e);
         $this->assertEquals('3', $e->getName());
 
         $l = $fol->listFolder(Folder::LIST_FOLDER_FILES);
         $this->assertGreaterThan(0, count($l));
         foreach ($l as $f) {
-            $this->assertInstanceOf("ChristianBudde\\cbweb\\util\\file\\File", $f);
+            $this->assertInstanceOf("ChristianBudde\\Part\\util\\file\\File", $f);
         }
 
         $l = $fol->listFolder(Folder::LIST_FOLDER_FOLDERS);
         $this->assertGreaterThan(0, count($l));
         foreach ($l as $f) {
-            $this->assertInstanceOf("ChristianBudde\\cbweb\\util\\file\\Folder", $f);
+            $this->assertInstanceOf("ChristianBudde\\Part\\util\\file\\Folder", $f);
         }
 
 
@@ -289,7 +289,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
         @$this->rrmdir($folder . '2');
         $f = $this->setUpNonEmptyFolder($folder);
         $f2 = $f->copy($folder . '2');
-        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\Folder', $f2, 'Did not return instance of Folder');
+        $this->assertInstanceOf('ChristianBudde\Part\util\file\Folder', $f2, 'Did not return instance of Folder');
         /** @var $f2  Folder */
         $this->assertEquals($folder . '2', $f2->getAbsolutePath());
         $this->assertTrue($f->exists(), 'Folder was moved');
@@ -331,7 +331,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
         @$this->rrmdir($folder);
         $f = $this->setUpNonEmptyFolder($folder);
         $f2 = $f->copy($folder);
-        $this->assertInstanceOf('ChristianBudde\cbweb\util\file\Folder', $f2);
+        $this->assertInstanceOf('ChristianBudde\Part\util\file\Folder', $f2);
         $this->assertEquals($f->getAbsolutePath(), $f2->getAbsolutePath());
 
     }

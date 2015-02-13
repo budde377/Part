@@ -1,6 +1,6 @@
 <?php
-namespace ChristianBudde\cbweb\util\file;
-use ChristianBudde\cbweb\controller\json\JSONObjectSerializable;
+namespace ChristianBudde\Part\util\file;
+use ChristianBudde\Part\controller\json\JSONObjectSerializable;
 
 
 /**

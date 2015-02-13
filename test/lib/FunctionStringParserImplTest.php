@@ -1,29 +1,29 @@
 <?php
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\controller\function_string\ast\ArgumentsImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\ArrayAccessFunctionImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\ArrayEntriesImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\BoolScalarImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\CompositeFunctionProgramImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\CompositeFunctionsImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\DecimalUnsignedNumScalarImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\DoubleQuotedStringScalarImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\FunctionChainCompositeFunctionProgramImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\FunctionChainProgramImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\FunctionChainsImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\NamedArgumentImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\NamedArrayEntriesImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\NamedArrayEntryImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\NamedFunctionImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\NameImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\NameNotStartingWithUnderscoreImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\NoArgumentNamedFunctionImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\NonEmptyArrayImpl;
-use ChristianBudde\cbweb\controller\function_string\ast\SingleQuotedStringScalarImpl;
-use ChristianBudde\cbweb\controller\function_string\LexerImpl;
-use ChristianBudde\cbweb\controller\function_string\Parser;
-use ChristianBudde\cbweb\controller\function_string\ParserImpl;
+use ChristianBudde\Part\controller\function_string\ast\ArgumentsImpl;
+use ChristianBudde\Part\controller\function_string\ast\ArrayAccessFunctionImpl;
+use ChristianBudde\Part\controller\function_string\ast\ArrayEntriesImpl;
+use ChristianBudde\Part\controller\function_string\ast\BoolScalarImpl;
+use ChristianBudde\Part\controller\function_string\ast\CompositeFunctionProgramImpl;
+use ChristianBudde\Part\controller\function_string\ast\CompositeFunctionsImpl;
+use ChristianBudde\Part\controller\function_string\ast\DecimalUnsignedNumScalarImpl;
+use ChristianBudde\Part\controller\function_string\ast\DoubleQuotedStringScalarImpl;
+use ChristianBudde\Part\controller\function_string\ast\FunctionChainCompositeFunctionProgramImpl;
+use ChristianBudde\Part\controller\function_string\ast\FunctionChainProgramImpl;
+use ChristianBudde\Part\controller\function_string\ast\FunctionChainsImpl;
+use ChristianBudde\Part\controller\function_string\ast\NamedArgumentImpl;
+use ChristianBudde\Part\controller\function_string\ast\NamedArrayEntriesImpl;
+use ChristianBudde\Part\controller\function_string\ast\NamedArrayEntryImpl;
+use ChristianBudde\Part\controller\function_string\ast\NamedFunctionImpl;
+use ChristianBudde\Part\controller\function_string\ast\NameImpl;
+use ChristianBudde\Part\controller\function_string\ast\NameNotStartingWithUnderscoreImpl;
+use ChristianBudde\Part\controller\function_string\ast\NoArgumentNamedFunctionImpl;
+use ChristianBudde\Part\controller\function_string\ast\NonEmptyArrayImpl;
+use ChristianBudde\Part\controller\function_string\ast\SingleQuotedStringScalarImpl;
+use ChristianBudde\Part\controller\function_string\LexerImpl;
+use ChristianBudde\Part\controller\function_string\Parser;
+use ChristianBudde\Part\controller\function_string\ParserImpl;
 use PHPUnit_Framework_TestCase;
 
 /**

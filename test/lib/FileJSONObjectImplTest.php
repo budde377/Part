@@ -6,10 +6,10 @@
  * Time: 5:35 PM
  */
 
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\util\file\FileImpl;
-use ChristianBudde\cbweb\controller\json\FileObjectImpl;
+use ChristianBudde\Part\controller\json\FileObjectImpl;
+use ChristianBudde\Part\util\file\FileImpl;
 use PHPUnit_Framework_TestCase;
 
 class FileJSONObjectImplTest extends PHPUnit_Framework_TestCase

@@ -6,16 +6,16 @@
  * Date: 18/01/13
  * Time: 11:46
  */
-namespace ChristianBudde\cbweb\test;
+namespace ChristianBudde\Part\test;
 
-use ChristianBudde\cbweb\util\file\DartRegisterImpl;
-use ChristianBudde\cbweb\util\file\DartFileImpl;
+use ChristianBudde\Part\util\file\DartFileImpl;
+use ChristianBudde\Part\util\file\DartRegisterImpl;
 use PHPUnit_Framework_TestCase;
 
 class DartRegisterImplTest extends PHPUnit_Framework_TestCase
 {
 
-    /** @var \ChristianBudde\cbweb\util\file\DartRegisterImpl */
+    /** @var \ChristianBudde\Part\util\file\DartRegisterImpl */
     private $register;
 
     public function setUp()
