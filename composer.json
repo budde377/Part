@@ -1,5 +1,5 @@
 {
-    "name": "christianbud.de/cbweb",
+    "name": "christianbud.de/part",
     "description": "A way better CMS",
     "require": {
 	"php" : ">=5.5",

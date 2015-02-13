@@ -1,19 +1,18 @@
-# CB-Web common library
-This library has the structure of a website in the CBCMS but should be used as a git submodule, thus not extended by the user.
+# Part framework
+This framework has the recommended file structure of a website using it, but should be used with composer.
 
 ## Requirements
-The system installs some things on it own, but not all its requirements (yet).
+For now the system has only been tested on machines running Ubuntu, but other linux distros should work as well. 
 
 You'll need the following software:
 
- * A lamb server with PHP 5
+ * A LAMP server with PHP 5.5
  * `dart-pub`
  * `php5-json`
  * `php5-imagick`
 
 ## Install
-You can install the cms by download the install (python) script and running it. This will create a new project, which
-uses the common library as a submodule.
+There will be some sinister way of installing your own mock website... 
 
 ## Local initialization
 When the system is installed there is still plenty to be done. While the file structure is all op to you, we
@@ -24,6 +23,11 @@ The installation also provides a Makefile, this assumes that you follows the str
 dart package (and fetching dependencies) and look after a composer file at `./composer.json`, and fetch it.
 
 When on a development machine, run `update-dev`. This will fetch various development dependencies.
+
+### The `site-config.xml` file
+
+All your sensitive information should be declared in a site-config.xml file. Please ensure that you set-up your .htaccess 
+right, so none has access to it other than you.
 
 ### Providing your own `SiteFactory`
 Since the system is structured in a OOP manner, build on some default instance of `SiteFactory`. You can however provide
