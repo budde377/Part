@@ -45,7 +45,7 @@ class UserPrivilegesImpl implements UserPrivileges
      */
     public function addRootPrivileges()
     {
-        if($this->addRootPrivilegeStatement == null){
+        if ($this->addRootPrivilegeStatement == null) {
             $this->addRootPrivilegeStatement = $this->connection->prepare("
               INSERT INTO UserPrivileges (username, rootPrivileges, sitePrivileges, pageId) VALUES (?,1,0,NULL)");
         }
@@ -59,7 +59,7 @@ class UserPrivilegesImpl implements UserPrivileges
      */
     public function addSitePrivileges()
     {
-        if($this->addSitePrivilegeStatement == null){
+        if ($this->addSitePrivilegeStatement == null) {
             $this->addSitePrivilegeStatement = $this->connection->prepare("
               INSERT INTO UserPrivileges (username, rootPrivileges, sitePrivileges, pageId) VALUES (?,0,1,NULL)");
         }
@@ -74,17 +74,17 @@ class UserPrivilegesImpl implements UserPrivileges
      */
     public function addPagePrivileges(Page $page)
     {
-        if($this->addPagePrivilegeStatement == null){
+        if ($this->addPagePrivilegeStatement == null) {
             $this->addPagePrivilegeStatement = $this->connection->prepare("
               INSERT INTO UserPrivileges (username, rootPrivileges, sitePrivileges, pageId) VALUES (?,0,0,?)");
         }
         $success = true;
-        try{
-            $this->addPagePrivilegeStatement->execute(array($this->user->getUsername(),$page->getID()));
-        } catch(PDOException $e){
+        try {
+            $this->addPagePrivilegeStatement->execute(array($this->user->getUsername(), $page->getID()));
+        } catch (PDOException $e) {
             $success = false;
         }
-        if($success){
+        if ($success) {
             $this->pagePrivilege[$page->getID()] = 1;
         }
     }
@@ -123,10 +123,11 @@ class UserPrivilegesImpl implements UserPrivileges
      */
     public function revokeRootPrivileges()
     {
-        if($this->revokeRootStatement == null){
+        if ($this->revokeRootStatement == null) {
             $this->revokeRootStatement =
                 $this->connection->prepare("DELETE FROM UserPrivileges WHERE username = ? AND rootPrivileges = 1");
-            $this->revokeRootStatement->bindParam(1,$this->user->getUsername());
+            $u = $this->user->getUsername();
+            $this->revokeRootStatement->bindParam(1, $u);
         }
         $this->revokeRootStatement->execute();
         $this->rootPrivilege = false;
@@ -138,10 +139,11 @@ class UserPrivilegesImpl implements UserPrivileges
      */
     public function revokeSitePrivileges()
     {
-        if($this->revokeSiteStatement == null){
+        if ($this->revokeSiteStatement == null) {
             $this->revokeSiteStatement =
                 $this->connection->prepare("DELETE FROM UserPrivileges WHERE username = ? AND sitePrivileges = 1");
-            $this->revokeSiteStatement->bindParam(1,$this->user->getUsername());
+            $u = $this->user->getUsername();
+            $this->revokeSiteStatement->bindParam(1, $u);
         }
         $this->revokeSiteStatement->execute();
         $this->sitePrivilege = 0;
@@ -154,11 +156,11 @@ class UserPrivilegesImpl implements UserPrivileges
      */
     public function revokePagePrivileges(Page $page)
     {
-        if($this->revokePageStatement == null){
+        if ($this->revokePageStatement == null) {
             $this->revokePageStatement =
                 $this->connection->prepare("DELETE FROM UserPrivileges WHERE username = ? AND pageId = ?");
         }
-        $this->revokePageStatement->execute(array($this->user->getUsername(),$page->getID()));
+        $this->revokePageStatement->execute(array($this->user->getUsername(), $page->getID()));
         unset($this->pagePrivilege[$page->getID()]);
     }
 
@@ -168,10 +170,11 @@ class UserPrivilegesImpl implements UserPrivileges
      */
     public function revokeAllPrivileges()
     {
-        if($this->revokeAllStatement == null){
+        if ($this->revokeAllStatement == null) {
             $this->revokeAllStatement =
                 $this->connection->prepare("DELETE FROM UserPrivileges WHERE username = ?");
-            $this->revokeAllStatement->bindParam(1,$this->user->getUsername());
+            $u = $this->user->getUsername();
+            $this->revokeAllStatement->bindParam(1, $u);
         }
         $this->revokeAllStatement->execute();
         $this->rootPrivilege = $this->sitePrivilege = 0;
@@ -180,13 +183,13 @@ class UserPrivilegesImpl implements UserPrivileges
 
     private function initialize()
     {
-        if(!$this->valuesHasBeenSet){
+        if (!$this->valuesHasBeenSet) {
             $stm = $this->connection->prepare("SELECT * FROM UserPrivileges WHERE username = ?");
             $stm->execute(array($this->user->getUsername()));
-            foreach($stm->fetchAll(PDO::FETCH_ASSOC) as $row){
+            foreach ($stm->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 $this->rootPrivilege = $this->rootPrivilege || $row['rootPrivileges'] == 1;
                 $this->sitePrivilege = $this->sitePrivilege || $row['sitePrivileges'] == 1;
-                if(($p = $row['pageId']) != null){
+                if (($p = $row['pageId']) != null) {
                     $this->pagePrivilege[$p] = 1;
                 }
             }
@@ -206,13 +209,13 @@ class UserPrivilegesImpl implements UserPrivileges
     public function listPagePrivileges(PageOrder $pageOrder = null)
     {
         $this->initialize();
-        if($this->hasRootPrivileges() || $this->hasSitePrivileges()){
+        if ($this->hasRootPrivileges() || $this->hasSitePrivileges()) {
             return array();
         }
         $returnArray = array();
 
-        foreach($this->pagePrivilege as $key=>$val){
-            if($pageOrder instanceof PageOrder){
+        foreach ($this->pagePrivilege as $key => $val) {
+            if ($pageOrder instanceof PageOrder) {
                 $returnArray[] = $pageOrder->getPage($key);
             } else {
                 $returnArray[] = $key;

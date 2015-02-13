@@ -116,7 +116,6 @@ class MySQLDBImplTest extends CustomDatabaseTestCase
         } catch (Exception $e) {
             $exceptionWasThrown = true;
             $this->assertInstanceOf('PDOException', $e, 'Throw wrong exception');
-            $this->assertEquals(1045, $e->getCode(), 'Wrong error code');
 
         }
 
