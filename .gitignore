@@ -5,5 +5,4 @@ composer.lock
 pubspec.lock
 composer.phar
 .idea
-_common
 phpunit.xml
