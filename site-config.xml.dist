@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://christianbud.de/site-config"
+        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xsi:schemaLocation="http://christianbud.de/site-config common/xsd/site-config.xsd">
+    <facebookApp id="ID" secret="SECRET" />
+    <siteInfo>
+        <domain name="YOUR COMPANY" extension="EXTENSION"/>
+        <owner name="JOHN DOE" mail="test@example.com" username="root"/>
+    </siteInfo>
+    <AJAXTypeHandlers>
+        <class>ChristianBudde\cbweb\controller\ajax\BackendTypeHandlerImpl</class>
+    </AJAXTypeHandlers>
+    <defaultPages>
+        <page alias="" template="_login" id="login">Login</page>
+        <page alias="" template="_logout" id="logout">Log ud</page>
+        <page alias="" template="_500" id="_500">Der er sket en fejl (500)</page>
+    </defaultPages>
+    <templates path="templates/">
+        <template filename="main_template.twig">_main</template>
+        <template filename="logout_template.twig">_logout</template>
+        <template filename="login_template.twig">_login</template>
+        <template filename="error_404_template.twig">_404</template>
+        <template filename="error_400_template.twig">_500</template>
+    </templates>
+    <pageElements>
+        <class name="logout" >ChristianBudde\cbweb\view\page_element\LogoutPageElementImpl</class>
+        <class name="login_formula" >ChristianBudde\cbweb\view\page_element\LoginFormulaPageElementImpl</class>
+        <class name="title" >ChristianBudde\cbweb\view\page_element\TitlePageElementImpl</class>
+        <class name="style_script_head" >ChristianBudde\cbweb\view\page_element\HeadPageElementImpl</class>
+    </pageElements>
+    <MySQLConnection>
+        <host>DB HOST</host>
+        <database>DB NAME</database>
+        <username>DB USERNAME</username>
+        <password>DB PASSWORD</password>
+    </MySQLConnection>
+    <MailMySQLConnection>
+        <host>DB MAIL HOST</host>
+        <database>DB MAIL NAME</database>
+        <username>DB MAIL USERNAME</username>
+    </MailMySQLConnection>
+    <optimizers>
+        <class name="css" >ChristianBudde\cbweb\util\file\CSSYUICompressorOptimizerImpl</class>
+        <class name="js" >ChristianBudde\cbweb\util\file\JSYUICompressorOptimizerImpl</class>
+    </optimizers>
+    <enableUpdater>true</enableUpdater>
+    <debugMode>true</debugMode>
+    <tmpFolder path="TMP FOLDER PATH"/>
+    <preScripts>
+        <class >ChristianBudde\cbweb\util\script\UserLoginCheckPreScript</class>
+        <class >ChristianBudde\cbweb\util\script\UserLoginUpdateCheckPreScript</class>
+        <class >ChristianBudde\cbweb\util\script\RequireHTTPSPreScript</class>
+    </preScripts>
+    <log path="LOG FILE PATH " />
+</config>
