@@ -1,7 +1,7 @@
 library somePackage;
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
-import 'package:cb_common/core.dart';
+import 'package:part/core.dart';
 
 void main() {
   useHtmlConfiguration();
