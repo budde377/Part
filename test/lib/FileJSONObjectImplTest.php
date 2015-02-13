@@ -17,7 +17,7 @@ class FileJSONObjectImplTest extends PHPUnit_Framework_TestCase
 
     public function testConstructorChangesName()
     {
-        $file = new FileImpl(dirname(__FILE__) . '/stubs/fileStub');
+        $file = new FileImpl(dirname(__FILE__) . '/../stubs/fileStub');
         $object = new FileObjectImpl($file);
         $this->assertEquals('file', $object->getName());
         $this->assertEquals($file->getFilename(), $object->getVariable('filename'));

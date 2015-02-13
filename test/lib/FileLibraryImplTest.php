@@ -246,7 +246,7 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase
         $this->testDir->delete(Folder::DELETE_FOLDER_RECURSIVE);
         $lib = new FileLibraryImpl($this->testDir);
         $this->assertFalse($this->testDir->exists());
-        $f = new FileImpl(dirname(__FILE__) . "/stubs/fileStub");
+        $f = new FileImpl(dirname(__FILE__) . "/../stubs/fileStub");
         $lib->addToLibrary($this->user, $f);
         $this->assertTrue($this->testDir->exists());
     }

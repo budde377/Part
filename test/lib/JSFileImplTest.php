@@ -32,7 +32,7 @@ class JSFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testCopyReturnNullOnFileNotFound()
     {
-        $file = dirname(__FILE__) . '/stubs/noSuchFile';
+        $file = dirname(__FILE__) . '/../stubs/noSuchFile';
         $jsFile = new JSFileImpl($file);
         $this->assertFalse($jsFile->exists(), 'File did exists to begin with');
         $jsCopy = $jsFile->copy($file . '2');
@@ -41,7 +41,7 @@ class JSFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testSetMinimizerWillSetMinimizer()
     {
-        $file = dirname(__FILE__) . '/stubs/jsStub.js';
+        $file = dirname(__FILE__) . '/../stubs/jsStub.js';
         $jsFile = new JSFileImpl($file);
         $this->assertNull($jsFile->getMinimizer(), 'Minimizer was set');
         $optimizer = new StubOptimizerImpl(true);
@@ -51,7 +51,7 @@ class JSFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testMinimizeWillReturnFalseWithNoMinimizerSet()
     {
-        $file = dirname(__FILE__) . '/stubs/jsStub.js';
+        $file = dirname(__FILE__) . '/../stubs/jsStub.js';
         $jsFile = new JSFileImpl($file);
         $this->assertNull($jsFile->getMinimizer(), 'Minimizer was set');
         $ret = $jsFile->minimize();
@@ -60,7 +60,7 @@ class JSFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testMinimizeWillReturnFalseOnFileNotFound()
     {
-        $file = dirname(__FILE__) . '/stubs/notARealFile';
+        $file = dirname(__FILE__) . '/../stubs/notARealFile';
         $jsFile = new JSFileImpl($file);
         $optimizer = new StubOptimizerImpl(true);
         $jsFile->setMinimizer($optimizer);
@@ -70,7 +70,7 @@ class JSFileImplTest extends PHPUnit_Framework_TestCase
 
     public function testMinimizeWillReturnFalseIfMinimizeDoes()
     {
-        $file = dirname(__FILE__) . '/stubs/jsStub.js';
+        $file = dirname(__FILE__) . '/../stubs/jsStub.js';
         $jsFile = new JSFileImpl($file);
         $optimizer = new StubOptimizerImpl(false);
         $jsFile->setMinimizer($optimizer);

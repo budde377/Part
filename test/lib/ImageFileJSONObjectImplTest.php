@@ -16,7 +16,7 @@ class ImageFileJSONObjectImplTest extends PHPUnit_Framework_TestCase
 
     public function testConstructorSetsVariablesWhenImageFile()
     {
-        $file = new ImageFileImpl(dirname(__FILE__) . '/stubs/imageFileStub300x200.png');
+        $file = new ImageFileImpl(dirname(__FILE__) . '/../stubs/imageFileStub300x200.png');
         $object = new ImageFileObjectImpl($file);
         $this->assertEquals('image_file', $object->getName());
         $this->assertEquals($file->getFilename(), $object->getVariable('filename'));

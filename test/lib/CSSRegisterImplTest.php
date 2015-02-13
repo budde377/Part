@@ -29,7 +29,7 @@ class CSSRegisterImplTest extends PHPUnit_Framework_TestCase
     public function testRegisteredCSSFilesWillBeRegistered()
     {
         $cssRegister = new CSSRegisterImpl();
-        $cssFile = new CSSFileImpl(dirname(__FILE__) . '/stubs/cssStub.css');
+        $cssFile = new CSSFileImpl(dirname(__FILE__) . '/../stubs/cssStub.css');
 
         $cssRegister->registerCSSFile($cssFile);
         $registeredFiles = $cssRegister->getRegisteredFiles();
@@ -43,8 +43,8 @@ class CSSRegisterImplTest extends PHPUnit_Framework_TestCase
     public function testRegisteredCSSDuplicatesWillNotOccur()
     {
         $cssRegister = new CSSRegisterImpl();
-        $cssFile = new CSSFileImpl(dirname(__FILE__) . '/stubs/cssStub.css');
-        $cssFile2 = new CSSFileImpl(dirname(__FILE__) . '/stubs/cssStub.css');
+        $cssFile = new CSSFileImpl(dirname(__FILE__) . '/../stubs/cssStub.css');
+        $cssFile2 = new CSSFileImpl(dirname(__FILE__) . '/../stubs/cssStub.css');
 
         $cssRegister->registerCSSFile($cssFile);
         $cssRegister->registerCSSFile($cssFile2);

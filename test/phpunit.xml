@@ -1,7 +1,0 @@
-<phpunit bootstrap="../vendor/autoload.php">
-  <testsuites>
-    <testsuite name="ALL">
-      <directory>lib</directory>
-    </testsuite>
-  </testsuites>
-</phpunit>

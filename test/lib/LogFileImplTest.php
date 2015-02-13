@@ -25,8 +25,13 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->folder = new FolderImpl(dirname(__FILE__) . "/stubs/logFolder");
-        $this->logFile = new LogFileImpl(dirname(__FILE__) . "/stubs/logFile");
+
+        $parent = new FolderImpl("/tmp/cbweb_test/test");
+        $parent->create(true);
+
+        $this->folder = new FolderImpl($parent->getAbsolutePath()."/logFolder");
+
+        $this->logFile = new LogFileImpl($parent->getAbsolutePath()."/logFile");
         $this->logFile->delete();
 
     }
@@ -246,7 +251,7 @@ class LogFileImplTest extends PHPUnit_Framework_TestCase
         if ($this->dumpFile != null) {
             $this->dumpFile->delete();
         }
-        @$this->folder->delete(Folder::DELETE_FOLDER_RECURSIVE);
+        $this->folder->getParentFolder()->delete(Folder::DELETE_FOLDER_RECURSIVE);
     }
 
 

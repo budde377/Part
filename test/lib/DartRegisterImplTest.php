@@ -34,7 +34,7 @@ class DartRegisterImplTest extends PHPUnit_Framework_TestCase
 
     public function testRegisteredDartFilesWillBeRegistered()
     {
-        $dartFile = new DartFileImpl(dirname(__FILE__) . '/stubs/dartStub.dart');
+        $dartFile = new DartFileImpl(dirname(__FILE__) . '/../stubs/dartStub.dart');
 
         $this->register->registerDartFile($dartFile);
         $registeredFiles = $this->register->getRegisteredFiles();
@@ -47,8 +47,8 @@ class DartRegisterImplTest extends PHPUnit_Framework_TestCase
 
     public function testRegisteredDartDuplicatesWillNotOccur()
     {
-        $dartFile = new DartFileImpl(dirname(__FILE__) . '/stubs/dartStub.dart');
-        $dartFile2 = new DartFileImpl(dirname(__FILE__) . '/stubs/dartStub.dart');
+        $dartFile = new DartFileImpl(dirname(__FILE__) . '/../stubs/dartStub.dart');
+        $dartFile2 = new DartFileImpl(dirname(__FILE__) . '/../stubs/dartStub.dart');
 
 
         $this->register->registerDartFile($dartFile);

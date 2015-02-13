@@ -29,7 +29,7 @@ class JSRegisterImplTest extends PHPUnit_Framework_TestCase
     public function testRegisteredJSFilesWillBeRegistered()
     {
         $jsRegister = new JSRegisterImpl();
-        $jsFile = new JSFileImpl(dirname(__FILE__) . '/stubs/jsStub.js');
+        $jsFile = new JSFileImpl(dirname(__FILE__) . '/../stubs/jsStub.js');
 
         $jsRegister->registerJSFile($jsFile);
         $registeredFiles = $jsRegister->getRegisteredFiles();
@@ -43,8 +43,8 @@ class JSRegisterImplTest extends PHPUnit_Framework_TestCase
     public function testRegisteredJSDuplicatesWillNotOccur()
     {
         $jsRegister = new JSRegisterImpl();
-        $jsFile = new JSFileImpl(dirname(__FILE__) . '/stubs/jsStub.js');
-        $jsFile2 = new JSFileImpl(dirname(__FILE__) . '/stubs/jsStub.js');
+        $jsFile = new JSFileImpl(dirname(__FILE__) . '/../stubs/jsStub.js');
+        $jsFile2 = new JSFileImpl(dirname(__FILE__) . '/../stubs/jsStub.js');
 
         $jsRegister->registerJSFile($jsFile);
         $jsRegister->registerJSFile($jsFile2);

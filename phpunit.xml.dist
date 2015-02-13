@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpunit bootstrap="vendor/autoload.php" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.5/phpunit.xsd">
+    <php>
+        <var name="DB_HOST" value="HOST"/>
+        <var name="DB_USER" value="USER"/>
+        <var name="DB_PASSWORD" value="PASSWORD"/>
+        <var name="DB_NAME" value="DATABASE NAME"/>
+        <var name="DB_MAIL_HOST" value="MAIL HOST"/>
+        <var name="DB_MAIL_USER" value="MAIL USER"/>
+        <var name="DB_MAIL_PASSWORD" value="MAIL PASSWORD"/>
+        <var name="DB_MAIL_NAME" value="MAIL DATABASE NAME"/>
+    </php>
+    <testsuites>
+        <testsuite name="ALL">
+            <directory>test/lib</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
