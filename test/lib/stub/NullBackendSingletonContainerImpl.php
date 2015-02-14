@@ -122,7 +122,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
      * Will create and reuse an instance of Updater
      * @return mixed
      */
-    public function getUpdater()
+    public function getUpdaterInstance()
     {
         return null;
     }

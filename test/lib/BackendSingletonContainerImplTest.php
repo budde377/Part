@@ -148,9 +148,9 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
 
     public function testGetUpdaterWillReturnSameInstanceOfUpdater()
     {
-        $ret1 = $this->backContainer->getUpdater();
+        $ret1 = $this->backContainer->getUpdaterInstance();
         $this->assertInstanceOf('ChristianBudde\Part\model\updater\Updater', $ret1);
-        $ret2 = $this->backContainer->getUpdater();
+        $ret2 = $this->backContainer->getUpdaterInstance();
         $this->assertTrue($ret1 === $ret2);
     }
 
@@ -198,4 +198,68 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
 
     }
 
+
+    public function testMagicGetterWillGetOtherGetters()
+    {
+        $this->assertTrue($this->backContainer->getMailDomainLibraryInstance()  === $this->backContainer->mailDomainLibrary);
+        $this->assertTrue($this->backContainer->getAJAXServerInstance()  === $this->backContainer->AJAXServer);
+        $this->assertTrue($this->backContainer->getAJAXServerInstance()  === $this->backContainer->ajaxServer);
+        $this->assertTrue($this->backContainer->getAJAXServerInstance()  === $this->backContainer->ajaxserver);
+        $this->assertTrue($this->backContainer->getCacheControlInstance()  === $this->backContainer->cacheControl);
+        $this->assertTrue($this->backContainer->getConfigInstance()  === $this->backContainer->config);
+        $this->assertTrue($this->backContainer->getCSSRegisterInstance()  === $this->backContainer->CSSRegister);
+        $this->assertTrue($this->backContainer->getCSSRegisterInstance()  === $this->backContainer->cssregister);
+        $this->assertTrue($this->backContainer->getCurrentPageStrategyInstance()  === $this->backContainer->currentPageStrategy);
+        $this->assertTrue($this->backContainer->getDartRegisterInstance()  === $this->backContainer->dartRegister);
+        $this->assertTrue($this->backContainer->getDBInstance()  === $this->backContainer->db);
+        $this->assertTrue($this->backContainer->getDefaultPageLibraryInstance()  === $this->backContainer->defaultPageLibrary);
+        $this->assertTrue($this->backContainer->getFileLibraryInstance()  === $this->backContainer->fileLibrary);
+        $this->assertTrue($this->backContainer->getJSRegisterInstance()  === $this->backContainer->JSRegister);
+        $this->assertTrue($this->backContainer->getJSRegisterInstance()  === $this->backContainer->jsregister);
+        $this->assertTrue($this->backContainer->getLoggerInstance()  === $this->backContainer->logger);
+        $this->assertTrue($this->backContainer->getPageOrderInstance()  === $this->backContainer->pageOrder);
+        $this->assertTrue($this->backContainer->getSiteInstance()  === $this->backContainer->site);
+        $this->assertTrue($this->backContainer->getUpdaterInstance()  === $this->backContainer->updater);
+        $this->assertTrue($this->backContainer->getUserLibraryInstance()  === $this->backContainer->userLibrary);
+
+    }
+
+    public function testSetterWillNotChangeGetter(){
+        $this->backContainer->updater = "test";
+        $this->assertTrue($this->backContainer->getUpdaterInstance()  === $this->backContainer->updater);
+    }
+
+
+    public function testSetterWillSetNonReserved(){
+        $this->backContainer->nonReserved = "test";
+        $this->assertEquals('test', $this->backContainer->nonReserved);
+    }
+
+    public function testSetterIsCaseInsensitive(){
+        $this->backContainer->nonReserved = "test";
+        $this->backContainer->nonreserved = "test2";
+        $this->assertEquals('test2', $this->backContainer->nonReserved);
+    }
+
+
+    public function testIssetWorks(){
+        $this->assertFalse(isset($this->backContainer->nonReserved));
+        $this->assertFalse(isset($this->backContainer->nonreserved));
+        $this->backContainer->nonreserved = "test2";
+        $this->assertTrue(isset($this->backContainer->nonreserved));
+        $this->assertTrue(isset($this->backContainer->nonReserved));
+
+
+    }
+
+    public function testUnsetWorks(){
+        $this->backContainer->nonreserved = "test2";
+        $this->assertTrue(isset($this->backContainer->nonreserved));
+        $this->assertTrue(isset($this->backContainer->nonReserved));
+        unset($this->backContainer->nonreserved);
+        $this->assertFalse(isset($this->backContainer->nonReserved));
+        $this->assertFalse(isset($this->backContainer->nonreserved));
+
+
+    }
 }

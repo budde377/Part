@@ -93,7 +93,7 @@ class UserSettingsPageElementImpl extends PageElementImpl
 
     private function generateUpdateInformationMessage()
     {
-        $hidden = $this->container->getUpdater()->checkForUpdates(true)?"":"hidden";
+        $hidden = $this->container->getUpdaterInstance()->checkForUpdates(true)?"":"hidden";
         return "<div id='UpdateInformationMessage' $hidden>Siden kan opdateres. Klik <a href='#'>her</a> for at starte opdateringen.</div>";
     }
 

@@ -109,7 +109,7 @@ interface BackendSingletonContainer
      * Will create and reuse an instance of Updater
      * @return Updater
      */
-    public function getUpdater();
+    public function getUpdaterInstance();
 
     /**
      * Will create and reuse an instance of Variables.
@@ -137,5 +137,31 @@ interface BackendSingletonContainer
      * @return DomainLibrary
      */
     public function getMailDomainLibraryInstance();
+
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function __get($name);
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     * @return void
+     */
+    public function __set($name, $value);
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function __isset($name);
+
+    /**
+     * @param string $name
+     * @return void
+     */
+    public function __unset($name);
 
 }

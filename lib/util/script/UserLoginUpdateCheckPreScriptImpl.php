@@ -40,7 +40,7 @@ class UserLoginUpdateCheckPreScriptImpl implements  Script{
             return;
         }
 
-        $updater = $this->backendContainer->getUpdater();
+        $updater = $this->backendContainer->getUpdaterInstance();
 
         if(!$updater->isCheckOnLoginAllowed($user)){
             return;

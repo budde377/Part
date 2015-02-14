@@ -200,7 +200,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer
     /**
      * @return mixed
      */
-    public function getUpdater()
+    public function getUpdaterInstance()
     {
         return $this->updater;
     }

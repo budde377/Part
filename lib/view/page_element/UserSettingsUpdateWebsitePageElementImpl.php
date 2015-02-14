@@ -24,7 +24,7 @@ class UserSettingsUpdateWebsitePageElementImpl extends PageElementImpl
     public function __construct(BackendSingletonContainer $container)
     {
         $this->container = $container;
-        $this->updater = $container->getUpdater();
+        $this->updater = $container->getUpdaterInstance();
     }
 
     private function dateString($timestamp)
