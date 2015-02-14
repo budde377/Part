@@ -10,7 +10,7 @@ use ChristianBudde\Part\Website;
  * Time: 8:41 PM
  */
 
-class UserLoginUpdateCheckPreScript implements  Script{
+class UserLoginUpdateCheckPreScriptImpl implements  Script{
 
     /** @var  BackendSingletonContainer */
     private  $backendContainer;

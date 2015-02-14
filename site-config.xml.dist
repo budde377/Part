@@ -47,9 +47,9 @@
     <debugMode>true</debugMode>
     <tmpFolder path="TMP FOLDER PATH"/>
     <preScripts>
-        <class >ChristianBudde\Part\util\script\UserLoginCheckPreScript</class>
-        <class >ChristianBudde\Part\util\script\UserLoginUpdateCheckPreScript</class>
-        <class >ChristianBudde\Part\util\script\RequireHTTPSPreScript</class>
+        <class >ChristianBudde\Part\util\script\UserLoginCheckPreScriptImpl</class>
+        <class >ChristianBudde\Part\util\script\UserLoginUpdateCheckPreScriptImpl</class>
+        <class >ChristianBudde\Part\util\script\RequireHTTPSPreScriptImpl</class>
     </preScripts>
     <log path="LOG FILE PATH " />
 </config>
