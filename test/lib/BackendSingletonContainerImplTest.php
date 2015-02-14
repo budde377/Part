@@ -222,6 +222,7 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
         $this->assertTrue($this->backContainer->getUpdaterInstance()  === $this->backContainer->updater);
         $this->assertTrue($this->backContainer->getUserLibraryInstance()  === $this->backContainer->userLibrary);
 
+        $this->assertTrue(isset($this->backContainer->site));
     }
 
     public function testSetterWillNotChangeGetter(){

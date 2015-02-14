@@ -43,6 +43,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer
     private $fileLibraryInstance;
     private $logInstance;
     private $mailDomainLibraryInstance;
+    private $vars = [];
 
     /**
      * @param mixed $mailDomainLibraryInstance
@@ -311,4 +312,40 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer
         $this->logInstance = $logInstance;
     }
 
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        return $this->vars[$name];
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     * @return void
+     */
+    public function __set($name, $value)
+    {
+        $this->vars[$name] = $value;
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        return isset($name);
+    }
+
+    /**
+     * @param string $name
+     * @return void
+     */
+    public function __unset($name)
+    {
+        unset($this->vars[$name]);
+    }
 }

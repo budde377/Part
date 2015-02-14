@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part;
+
 use ChristianBudde\Part\controller\ajax\Server;
 use ChristianBudde\Part\controller\ajax\ServerImpl;
 use ChristianBudde\Part\log\Logger;
@@ -282,55 +283,55 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function __get($name)
     {
         $name = strtolower($name);
-        switch($name){
+        switch ($name) {
             case 'site':
                 return $this->getSiteInstance();
-            break;
+                break;
             case 'maildomainlibrary':
                 return $this->getMailDomainLibraryInstance();
-            break;
+                break;
             case 'ajaxserver':
                 return $this->getAJAXServerInstance();
-            break;
+                break;
             case 'cachecontrol':
                 return $this->getCacheControlInstance();
-            break;
+                break;
             case 'config':
                 return $this->getConfigInstance();
-            break;
+                break;
             case 'cssregister':
                 return $this->getCSSRegisterInstance();
-            break;
+                break;
             case 'currentpagestrategy':
                 return $this->getCurrentPageStrategyInstance();
-            break;
+                break;
             case 'dartregister':
                 return $this->getDartRegisterInstance();
-            break;
+                break;
             case 'db':
                 return $this->getDBInstance();
-            break;
+                break;
             case 'defaultpagelibrary':
                 return $this->getDefaultPageLibraryInstance();
-            break;
+                break;
             case 'jsregister':
                 return $this->getJSRegisterInstance();
-            break;
+                break;
             case 'filelibrary':
                 return $this->getFileLibraryInstance();
-            break;
+                break;
             case 'logger':
                 return $this->getLoggerInstance();
-            break;
+                break;
             case 'pageorder':
                 return $this->getPageOrderInstance();
-            break;
+                break;
             case 'updater':
                 return $this->getUpdaterInstance();
-            break;
+                break;
             case 'userlibrary':
                 return $this->getUserLibraryInstance();
-            break;
+                break;
 
         }
         return $this->dynamicInstances[$name];
@@ -352,7 +353,28 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
      */
     public function __isset($name)
     {
-        return isset($this->dynamicInstances[strtolower($name)]);
+        $preDefined = [
+            'site',
+            'maildomainlibrary',
+            'ajaxserver',
+            'cachecontrol',
+            'config',
+            'cssregister',
+            'currentpagestrategy',
+            'dartregister',
+            'db',
+            'defaultpagelibrary',
+            'jsregister',
+            'filelibrary',
+            'logger',
+            'pageorder',
+            'updater',
+            'userlibrary'];
+
+        $name = strtolower($name);
+
+
+        return in_array($name, $preDefined) || isset($this->dynamicInstances[$name]);
     }
 
     /**
