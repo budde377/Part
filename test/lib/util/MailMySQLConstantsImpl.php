@@ -13,6 +13,6 @@ class MailMySQLConstantsImpl extends MySQLConstantsImpl
 {
     function __construct()
     {
-        parent::__construct('localhost', 'test_postfix', 'test', 'x8Hp32vG4YEJwdK6');
+        parent::__construct($GLOBALS['DB_MAIL_HOST'], $GLOBALS['DB_MAIL_NAME'], $GLOBALS['DB_MAIL_USER'], $GLOBALS['DB_MAIL_PASSWORD']);
     }
 }

@@ -1,6 +1,9 @@
 # Part framework
 This framework has the recommended file structure of a website using it, but should be used with composer.
 
+## Build status
+[![Build Status](https://travis-ci.org/budde377/Part.svg?branch=master)](https://travis-ci.org/budde377/Part)
+
 ## Requirements
 For now the system has only been tested on machines running Ubuntu, but other linux distros should work as well. 
 

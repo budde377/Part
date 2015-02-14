@@ -114,6 +114,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
     public function testCreateDomainCreatesANewDomain()
     {
         $d = $this->domainLibrary->createDomain('test2.dk', $this->mailPass);
+        $this->assertNotNull($d);
         $this->assertTrue($d->exists());
     }
 

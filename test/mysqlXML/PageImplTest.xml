@@ -14,7 +14,7 @@
             <row>
                 <field name="time" >2000-01-01 00:00:01</field>
                 <field name="page_id">testpage</field>
-                <field name="id" xsi:nil="true"/>
+                <field name="id"/>
                 <field name="content">Some Content</field>
             </row>
         </table_data>
