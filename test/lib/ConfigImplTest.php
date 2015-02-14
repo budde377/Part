@@ -368,6 +368,63 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     }
 
+    public function testGetVariablesReturnsEmptyArrayOnNotPresent()
+    {
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        </config>");
+
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $this->assertEquals([], $config->getVariables());
+    }
+
+    public function testGetVariablesReflectsTheVariables()
+    {
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+            <variables>
+                <var key='KEY1' value='VALUE1' />
+                <var key='KEY2' value='VALUE2' />
+            </variables>
+        </config>");
+
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $this->assertEquals(['KEY1' => 'VALUE1', 'KEY2' => 'VALUE2'], $config->getVariables());
+    }
+
+    public function testArrayAccessIsRight()
+    {
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+            <variables>
+                <var key='KEY1' value='VALUE1' />
+                <var key='KEY2' value='VALUE2' />
+            </variables>
+        </config>");
+
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $this->assertEquals('VALUE2', $config['KEY2']);
+    }
+
+    public function testArrayAccessSetterDoesNotSet()
+    {
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+            <variables>
+                <var key='KEY1' value='VALUE1' />
+                <var key='KEY2' value='VALUE2' />
+            </variables>
+        </config>");
+
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $config['KEY2'] = 'VALUE3';
+        $this->assertEquals('VALUE2', $config['KEY2']);
+    }
+
 
     public function testGetAJAXRegistrableReturnEmptyArrayWithEmptyConfig()
     {
@@ -378,8 +435,6 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(is_array($registrable), 'getAJAXRegistrable did not return an array with empty config.');
         $this->assertTrue(empty($registrable), 'getAJAXRegistrable did not return an empty array with empty config.');
     }
-
-
 
 
     public function testGetAJAXTypeHandlersReturnEmptyArrayWithEmptyConfig()
@@ -710,6 +765,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $this->assertEquals("", $config->getTmpFolderPath());
     }
+
     public function testGetLogPathReturnsReturnsEmptyWhenNotDefined()
     {
         /** @var $configXML SimpleXMLElement */
@@ -735,7 +791,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $configXML = simplexml_load_string("<config>{$this->defaultOwner}
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $this->assertEquals(['id'=>'', 'secret'=>'', 'permanent_access_token'=>''],$config->getFacebookAppCredentials());
+        $this->assertEquals(['id' => '', 'secret' => '', 'permanent_access_token' => ''], $config->getFacebookAppCredentials());
     }
 
     public function testGetFacebookCredentialsIsRightArrayWhenDefined()
@@ -745,7 +801,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
             <facebookApp id='ID' secret='SECRET'/>
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $this->assertEquals(['id'=>'ID', 'secret'=>'SECRET', 'permanent_access_token'=>''], $config->getFacebookAppCredentials());
+        $this->assertEquals(['id' => 'ID', 'secret' => 'SECRET', 'permanent_access_token' => ''], $config->getFacebookAppCredentials());
     }
 
     public function testGetFacebookCredentialsIsRightArrayWhenDefinedWithToken()
@@ -755,7 +811,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
             <facebookApp id='ID' secret='SECRET' permanent_token='TOKEN'/>
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $this->assertEquals(['id'=>'ID', 'secret'=>'SECRET', 'permanent_access_token'=>'TOKEN'], $config->getFacebookAppCredentials());
+        $this->assertEquals(['id' => 'ID', 'secret' => 'SECRET', 'permanent_access_token' => 'TOKEN'], $config->getFacebookAppCredentials());
     }
 
 

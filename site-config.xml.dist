@@ -52,4 +52,7 @@
         <class >ChristianBudde\Part\util\script\RequireHTTPSPreScriptImpl</class>
     </preScripts>
     <log path="LOG FILE PATH " />
+    <variables>
+        <var key="" value="" />
+    </variables>
 </config>

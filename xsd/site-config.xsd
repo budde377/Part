@@ -70,6 +70,18 @@
                 </xs:element>
                 <xs:element name="tmpFolder" type="requiredPathAttribute" minOccurs="0"/>
                 <xs:element name="log" type="requiredPathAttribute" minOccurs="0" />
+                <xs:element name="variables" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence >
+                            <xs:element name="var" maxOccurs="unbounded" minOccurs="0">
+                                <xs:complexType>
+                                    <xs:attribute name="key" type="xs:string" use="required"/>
+                                    <xs:attribute name="value" type="xs:string" use="required"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
                 <xs:element name="facebookApp" minOccurs="0">
                     <xs:complexType>
                         <xs:attribute name="id" type="xs:string" use="required"/>
