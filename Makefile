@@ -30,11 +30,11 @@ install-composer: get-composer
 
 update-composer-dev: get-composer
 	@echo "### Updating composer ###"
-	php composer.phar update
+	php composer.phar update --prefer-source
 
 install-composer-dev: get-composer
 	@echo "### Installing composer ###"
-	php composer.phar install
+	php composer.phar install --prefer-source
 
 get-composer:
 	rm -f composer.phar
