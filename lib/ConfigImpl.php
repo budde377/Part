@@ -437,7 +437,7 @@ class ConfigImpl implements Config
     }
 
     /**
-     * @return array An assoc array with keys: `id` and `secret` which contains the facebook app id and secret respectively. Values are empty if element is not defined.
+     * @return array An assoc array with keys: `id`, `secret` and `permanent_access_token` which contains the facebook app id, secret and permanent access token respectively. Values are empty if element is not defined.
      */
     public function getFacebookAppCredentials()
     {
@@ -447,6 +447,7 @@ class ConfigImpl implements Config
 
         $id = $this->facebookAppCredentials = (string)$this->configFile->facebookApp['id'];
         $secret = $this->facebookAppCredentials = (string)$this->configFile->facebookApp['secret'];
-        return $this->facebookAppCredentials = ['id'=>$id, 'secret'=>$secret];
+        $token = $this->facebookAppCredentials = (string)$this->configFile->facebookApp['permanent_token'];
+        return $this->facebookAppCredentials = ['id'=>$id, 'secret'=>$secret, 'permanent_access_token'=>$token];
     }
 }

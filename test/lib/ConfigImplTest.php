@@ -735,7 +735,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $configXML = simplexml_load_string("<config>{$this->defaultOwner}
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $this->assertEquals(['id'=>'', 'secret'=>''],$config->getFacebookAppCredentials());
+        $this->assertEquals(['id'=>'', 'secret'=>'', 'permanent_access_token'=>''],$config->getFacebookAppCredentials());
     }
 
     public function testGetFacebookCredentialsIsRightArrayWhenDefined()
@@ -745,7 +745,17 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
             <facebookApp id='ID' secret='SECRET'/>
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $this->assertEquals(['id'=>'ID', 'secret'=>'SECRET'], $config->getFacebookAppCredentials());
+        $this->assertEquals(['id'=>'ID', 'secret'=>'SECRET', 'permanent_access_token'=>''], $config->getFacebookAppCredentials());
+    }
+
+    public function testGetFacebookCredentialsIsRightArrayWhenDefinedWithToken()
+    {
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("<config>{$this->defaultOwner}
+            <facebookApp id='ID' secret='SECRET' permanent_token='TOKEN'/>
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->assertEquals(['id'=>'ID', 'secret'=>'SECRET', 'permanent_access_token'=>'TOKEN'], $config->getFacebookAppCredentials());
     }
 
 
