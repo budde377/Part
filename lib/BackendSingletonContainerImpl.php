@@ -344,6 +344,10 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
      */
     public function __set($name, $value)
     {
+        if(is_callable($value)){
+            $value = $value($this);
+        }
+
         $this->dynamicInstances[strtolower($name)] = $value;
     }
 

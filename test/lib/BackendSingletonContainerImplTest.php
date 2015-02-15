@@ -10,6 +10,7 @@
 
 namespace ChristianBudde\Part\test;
 
+use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\BackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubConfigImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
@@ -261,6 +262,20 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
         $this->assertFalse(isset($this->backContainer->nonReserved));
         $this->assertFalse(isset($this->backContainer->nonreserved));
 
+    }
+
+    public function testSettingCallableWillCallCallable(){
+        $this->backContainer->callable = function(BackendSingletonContainer $c){
+            return $c;
+        };
+        $this->assertTrue($this->backContainer === $this->backContainer->callable);
+    }
+
+    public function testCallableValueIsCached(){
+        $this->backContainer->callable = function(){
+            return new StubConfigImpl();
+        };
+        $this->assertTrue($this->backContainer->callable === $this->backContainer->callable);
 
     }
 }
