@@ -122,7 +122,7 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
      * Will create and reuse an instance of Updater
      * @return mixed
      */
-    public function getUpdater()
+    public function getUpdaterInstance()
     {
         return null;
     }
@@ -162,6 +162,43 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
     public function getMailDomainLibraryInstance()
     {
         return null;
+    }
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     * @return void
+     */
+    public function __set($name, $value)
+    {
+
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function __isset($name)
+    {
+
+    }
+
+    /**
+     * @param string $name
+     * @return void
+     */
+    public function __unset($name)
+    {
+
     }
 }
 

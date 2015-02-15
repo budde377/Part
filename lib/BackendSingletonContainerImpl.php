@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part;
+
 use ChristianBudde\Part\controller\ajax\Server;
 use ChristianBudde\Part\controller\ajax\ServerImpl;
 use ChristianBudde\Part\log\Logger;
@@ -75,6 +76,8 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $log;
     /** @var  DomainLibrary */
     private $mailDomainLibrary;
+
+    private $dynamicInstances = [];
 
     public function __construct(Config $config)
     {
@@ -218,7 +221,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
      * Will create and reuse an instance of Updater
      * @return mixed
      */
-    public function getUpdater()
+    public function getUpdaterInstance()
     {
         if ($this->updater == null) {
             $this->updater = new GitUpdaterImpl($this->getConfigInstance()->getRootPath(), $this->getSiteInstance());
@@ -271,5 +274,124 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
         }
 
         return $this->mailDomainLibrary;
+    }
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        $name = strtolower($name);
+        switch ($name) {
+            case 'site':
+                return $this->getSiteInstance();
+                break;
+            case 'maildomainlibrary':
+                return $this->getMailDomainLibraryInstance();
+                break;
+            case 'ajaxserver':
+                return $this->getAJAXServerInstance();
+                break;
+            case 'cachecontrol':
+                return $this->getCacheControlInstance();
+                break;
+            case 'config':
+                return $this->getConfigInstance();
+                break;
+            case 'cssregister':
+                return $this->getCSSRegisterInstance();
+                break;
+            case 'currentpagestrategy':
+                return $this->getCurrentPageStrategyInstance();
+                break;
+            case 'dartregister':
+                return $this->getDartRegisterInstance();
+                break;
+            case 'db':
+                return $this->getDBInstance();
+                break;
+            case 'defaultpagelibrary':
+                return $this->getDefaultPageLibraryInstance();
+                break;
+            case 'jsregister':
+                return $this->getJSRegisterInstance();
+                break;
+            case 'filelibrary':
+                return $this->getFileLibraryInstance();
+                break;
+            case 'logger':
+                return $this->getLoggerInstance();
+                break;
+            case 'pageorder':
+                return $this->getPageOrderInstance();
+                break;
+            case 'updater':
+                return $this->getUpdaterInstance();
+                break;
+            case 'userlibrary':
+                return $this->getUserLibraryInstance();
+                break;
+
+        }
+        return $this->dynamicInstances[$name];
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     * @return void
+     */
+    public function __set($name, $value)
+    {
+
+        $name = strtolower($name);
+        if(isset($this->dynamicInstances[$name])){
+            return;
+        }
+        if(is_callable($value)){
+            $value = $value($this);
+        }
+
+        $this->dynamicInstances[$name] = $value;
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        $preDefined = [
+            'site',
+            'maildomainlibrary',
+            'ajaxserver',
+            'cachecontrol',
+            'config',
+            'cssregister',
+            'currentpagestrategy',
+            'dartregister',
+            'db',
+            'defaultpagelibrary',
+            'jsregister',
+            'filelibrary',
+            'logger',
+            'pageorder',
+            'updater',
+            'userlibrary'];
+
+        $name = strtolower($name);
+
+
+        return in_array($name, $preDefined) || isset($this->dynamicInstances[$name]);
+    }
+
+    /**
+     * @param string $name
+     * @return void
+     */
+    public function __unset($name)
+    {
+        unset($this->dynamicInstances[$name]);
     }
 }

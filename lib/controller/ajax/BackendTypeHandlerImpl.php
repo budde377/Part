@@ -536,7 +536,7 @@ class BackendTypeHandlerImpl implements TypeHandler
 
     private function setUpUpdaterHandler(Server $server)
     {
-        $server->registerHandler($updaterHandler = new GenericObjectTypeHandlerImpl($this->backend->getUpdater(), "Updater"));
+        $server->registerHandler($updaterHandler = new GenericObjectTypeHandlerImpl($this->backend->getUpdaterInstance(), "Updater"));
         $updaterHandler->addFunctionAuthFunction('Updater', 'update', $this->sitePrivilegesFunction);
         $updaterHandler->addFunctionAuthFunction('Updater', 'checkForUpdates', $this->sitePrivilegesFunction);
         $updaterHandler->addFunctionAuthFunction('Updater', 'allowCheckOnLogin', $this->sitePrivilegesFunction);

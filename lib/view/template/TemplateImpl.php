@@ -169,7 +169,7 @@ class TemplateImpl implements Template
             'debug_mode' => $this->config->isDebugMode(),
             'initialize' => $initialize,
             'last_modified' => max($currentPage->lastModified(), $site->lastModified()),
-            'updater' => $this->backendContainer->getUpdater(),
+            'updater' => $this->backendContainer->getUpdaterInstance(),
             'config' => $this->config,
             'backend_container' => $this->backendContainer
         ));
