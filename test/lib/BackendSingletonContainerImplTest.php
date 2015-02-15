@@ -239,8 +239,7 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
 
     public function testSetterIsCaseInsensitive(){
         $this->backContainer->nonReserved = "test";
-        $this->backContainer->nonreserved = "test2";
-        $this->assertEquals('test2', $this->backContainer->nonReserved);
+        $this->assertEquals('test', $this->backContainer->nonreserved);
     }
 
 
@@ -278,4 +277,13 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
         $this->assertTrue($this->backContainer->callable === $this->backContainer->callable);
 
     }
+
+    public function testSetterCannotOverwrite(){
+        $this->backContainer->v = 1;
+        $this->backContainer->v = 2;
+        $this->assertEquals(1, $this->backContainer->v);
+
+    }
+
+
 }
