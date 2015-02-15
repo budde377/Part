@@ -30,6 +30,7 @@ use ChristianBudde\Part\util\file\DartRegister;
 use ChristianBudde\Part\util\file\DartRegisterImpl;
 use ChristianBudde\Part\util\file\FileLibrary;
 use ChristianBudde\Part\util\file\FileLibraryImpl;
+use ChristianBudde\Part\util\file\Folder;
 use ChristianBudde\Part\util\file\FolderImpl;
 use ChristianBudde\Part\util\file\JSRegister;
 use ChristianBudde\Part\util\file\JSRegisterImpl;
@@ -332,6 +333,9 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
             case 'userlibrary':
                 return $this->getUserLibraryInstance();
                 break;
+            case 'tmpfolder':
+                return $this->getTmpFolderInstance();
+                break;
 
         }
         return $this->dynamicInstances[$name];
@@ -378,7 +382,8 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
             'logger',
             'pageorder',
             'updater',
-            'userlibrary'];
+            'userlibrary',
+            'tmpfolder'];
 
         $name = strtolower($name);
 
@@ -393,5 +398,15 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function __unset($name)
     {
         unset($this->dynamicInstances[$name]);
+    }
+
+    /**
+     * Will Create and reuse Folder with path pointing to tmp folder path from config
+     * null if the path is empty.
+     * @return Folder
+     */
+    public function getTmpFolderInstance()
+    {
+        return ($p = $this->getConfigInstance()->getTmpFolderPath()) != ""?new FolderImpl($p):null;
     }
 }

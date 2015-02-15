@@ -15,6 +15,7 @@ use ChristianBudde\Part\util\db\DB;
 use ChristianBudde\Part\util\file\CSSRegister;
 use ChristianBudde\Part\util\file\DartRegister;
 use ChristianBudde\Part\util\file\FileLibrary;
+use ChristianBudde\Part\util\file\Folder;
 use ChristianBudde\Part\util\file\JSRegister;
 
 /**
@@ -44,6 +45,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer
     private $logInstance;
     private $mailDomainLibraryInstance;
     private $vars = [];
+    private $tmpFolder;
 
     /**
      * @param mixed $mailDomainLibraryInstance
@@ -348,4 +350,25 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer
     {
         unset($this->vars[$name]);
     }
+
+    /**
+     * Will Create and reuse Folder with path pointing to tmp folder path from config
+     * null if the path is empty.
+     * @return Folder
+     */
+    public function getTmpFolderInstance()
+    {
+        return $this->tmpFolder;
+    }
+
+    /**
+     * @param mixed $tmpFolder
+     */
+    public function setTmpFolder($tmpFolder)
+    {
+        $this->tmpFolder = $tmpFolder;
+    }
+
+
+
 }
