@@ -330,6 +330,10 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer
      */
     public function __set($name, $value)
     {
+        if(is_callable($value)){
+            $this->vars[$name] = $value($this);
+            return;
+        }
         $this->vars[$name] = $value;
     }
 
