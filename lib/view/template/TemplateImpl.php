@@ -38,7 +38,6 @@ class TemplateImpl implements Template
     /**
      * @param PageElementFactory $pageElementFactory
      * @param BackendSingletonContainer $container
-     * @internal param \Config $config
      */
 
     public function __construct(PageElementFactory $pageElementFactory, BackendSingletonContainer $container)
