@@ -2,6 +2,9 @@
 namespace ChristianBudde\Part\util\db;
 
 use ChristianBudde\Part\Config;
+use ChristianBudde\Part\util\file\File;
+use ChristianBudde\Part\util\file\Folder;
+use ChristianBudde\Part\util\file\FolderImpl;
 use PDO;
 
 /**
@@ -19,6 +22,7 @@ class MySQLDBImpl implements DB
     private $host = null;
     private $password = null;
     private $username = null;
+    private $folders = [];
 
     /** @var PDO */
     private $mailConnection = null;
@@ -27,7 +31,7 @@ class MySQLDBImpl implements DB
     private $mailUsername = null;
     private $mailPassword = null;
 
-
+    private $version;
 
 
     public function __construct(Config $config)
@@ -39,6 +43,7 @@ class MySQLDBImpl implements DB
             $this->host = $connectionArray['host'];
             $this->password = $connectionArray['password'];
             $this->username = $connectionArray['user'];
+            $this->folders = $connectionArray['folders'];
         }
 
         $connectionArray = $config->getMailMySQLConnection();
@@ -83,5 +88,119 @@ class MySQLDBImpl implements DB
         }
 
         return $this->mailConnection;
+    }
+
+    /**
+     * Updates the database according to the sql files
+     * in the designated db folders.
+     *
+     * @return void
+     */
+    public function update()
+    {
+        $this->setUpVersion();
+        $connection = $this->getConnection();
+        foreach ($this->folders as $name => $path) {
+            $folder = new FolderImpl($path);
+            if(!$folder->exists()){
+                continue;
+            }
+            /** @var File[] $files */
+            $files = $folder->listFolder(Folder::LIST_FOLDER_FILES);
+            $fileNameVersionMap = [];
+            usort($files, function (File $a, File $b) use (&$fileNameVersionMap) {
+                $fileNameVersionMap[$a->getFilename()] = $an = $this->leadingNumber($a->getFilename());
+                $fileNameVersionMap[$b->getFilename()] = $bn = $this->leadingNumber($b->getFilename());
+                return $an - $bn;
+            });
+            $lastFile = null;
+            $version = $this->getVersion($name);
+            foreach ($files as $file) {
+                if($file->getExtension() != 'sql'){
+                    continue;
+                }
+
+                if($fileNameVersionMap[$file->getFilename()] <= $version){
+                    continue;
+                }
+                $stm = $connection->prepare($file->getContents());
+                $stm->execute();
+                $lastFile = $file;
+            }
+            if ($lastFile == null) {
+                continue;
+            }
+            $this->setVersion($name, $fileNameVersionMap[$lastFile->getFilename()]);
+
+        }
+    }
+
+    /**
+     * @param string $name
+     * @return array|string If $name is not empty a version string will be returned else an array containing
+     *                      name=>version entries.
+     */
+    public function getVersion($name = "")
+    {
+        $this->setUpVersion();
+        return empty($name) ? $this->version : (isset($this->version[$name])?$this->version[$name]:0);
+    }
+
+
+    private function leadingNumber($string)
+    {
+        preg_match("/^[0-9]+/", $string, $matches);
+        return intval($matches[0]);
+    }
+
+    private function setUpVersion()
+    {
+        if ($this->version != null) {
+            return;
+        }
+        $this->version = [];
+        try {
+            $stm = $this->getConnection()->query("SELECT * FROM _db_version");
+        } catch (\PDOException $e) {
+            return;
+        }
+        while ($r = $stm->fetch(PDO::FETCH_ASSOC)) {
+            $this->version[$r['name']] = $r['version'];
+        }
+
+
+    }
+
+    private function setVersion($name, $version)
+    {
+
+        $connection = $this->getConnection();
+        $connection->beginTransaction();
+        $connection->exec("
+        CREATE TABLE IF NOT EXISTS `_db_version` (
+        `name` VARCHAR(255) NOT NULL,
+        `version` INT(255) NOT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;");
+
+        try {
+            $connection->exec("
+            ALTER TABLE `_db_version`
+            ADD UNIQUE KEY `name` (`name`);");
+
+        } catch (\PDOException $p) {
+
+        }
+
+
+        $connection->commit();
+        $connection->prepare("
+        INSERT INTO _db_version
+          (name, version)
+        VALUES
+          (?, ?)
+        ON DUPLICATE KEY UPDATE
+  version     = VALUES(version)")->execute([$name, $version]);
+
+        $this->version[$name] = $version;
     }
 }

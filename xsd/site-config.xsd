@@ -134,6 +134,10 @@
                     <xs:selector xpath="t:folder" />
                     <xs:field xpath="@name" />
                 </xs:unique>
+                <xs:unique name="foldersPath">
+                    <xs:selector xpath="t:folder" />
+                    <xs:field xpath="@path" />
+                </xs:unique>
             </xs:element>
         </xs:all>
     </xs:complexType>

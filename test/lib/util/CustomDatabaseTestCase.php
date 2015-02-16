@@ -17,7 +17,7 @@ use PHPUnit_Extensions_Database_TestCase;
 class CustomDatabaseTestCase extends PHPUnit_Extensions_Database_TestCase
 {
 
-
+    /** @var  PDO */
     protected static $pdo;
     /** @var  MySQLConstants */
     protected static $mysqlOptions;

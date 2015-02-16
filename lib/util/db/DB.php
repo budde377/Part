@@ -23,4 +23,21 @@ interface DB
      */
     public function getMailConnection($password);
 
+
+    /**
+     * Updates the database according to the sql files
+     * in the designated db folders.
+     *
+     * @return void
+     */
+    public function update();
+
+
+    /**
+     * @param string $name
+     * @return array|string If $name is not empty a version string will be returned else an array containing
+     *                      name=>version entries.
+     */
+    public function getVersion($name = "");
+
 }
