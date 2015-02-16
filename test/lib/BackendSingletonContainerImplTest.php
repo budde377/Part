@@ -31,7 +31,8 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
             'host' => self::$mysqlOptions->getHost(),
             'user' => self::$mysqlOptions->getUsername(),
             'password' => self::$mysqlOptions->getPassword(),
-            'database' => self::$mysqlOptions->getDatabase());
+            'database' => self::$mysqlOptions->getDatabase(),
+            'folders' =>  []);
         $this->config = new StubConfigImpl();
         $this->config->setMysqlConnection($this->connectionArray);
         $this->backContainer = new BackendSingletonContainerImpl($this->config);

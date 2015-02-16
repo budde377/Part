@@ -65,7 +65,8 @@ class MailDomainImplTest extends CustomDatabaseTestCase
             'user' => self::$mysqlOptions->getUsername(),
             'database' => self::$mysqlOptions->getDatabase(),
             'host' => self::$mysqlOptions->getHost(),
-            'password' => self::$mysqlOptions->getPassword()
+            'password' => self::$mysqlOptions->getPassword(),
+            'folders' => []
         ));
         $this->db = new MySQLDBImpl($this->config);
         $this->databaseName = self::$mysqlOptions->getDatabase();
