@@ -6,7 +6,7 @@ before_script:
   - printf "\n" | pecl install imagick
   - composer install
   - mysql -e "CREATE DATABASE IF NOT EXISTS test_cms;" -uroot
-  - mysql "test_cms" < db/part/1-initial_setup_cms.sql
+  - make update-db
   - mysql -e "CREATE DATABASE IF NOT EXISTS test_postfix;" -uroot
   - mysql "test_postfix" < db/setup_postix.sql
 

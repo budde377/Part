@@ -102,35 +102,37 @@ class MySQLDBImpl implements DB
         $connection = $this->getConnection();
         foreach ($this->folders as $name => $path) {
             $folder = new FolderImpl($path);
-            if(!$folder->exists()){
+            if (!$folder->exists()) {
                 continue;
             }
             /** @var File[] $files */
             $files = $folder->listFolder(Folder::LIST_FOLDER_FILES);
-            $fileNameVersionMap = [];
-            usort($files, function (File $a, File $b) use (&$fileNameVersionMap) {
-                $fileNameVersionMap[$a->getFilename()] = $an = $this->leadingNumber($a->getFilename());
-                $fileNameVersionMap[$b->getFilename()] = $bn = $this->leadingNumber($b->getFilename());
-                return $an - $bn;
+
+            usort($files, function (File $a, File $b) {
+                return $this->leadingNumber($a->getFilename()) - $this->leadingNumber($b->getFilename());
             });
             $lastFile = null;
             $version = $this->getVersion($name);
             foreach ($files as $file) {
-                if($file->getExtension() != 'sql'){
+                if ($file->getExtension() != 'sql') {
                     continue;
                 }
 
-                if($fileNameVersionMap[$file->getFilename()] <= $version){
+                if ($this->leadingNumber($file->getFilename()) <= $version) {
                     continue;
                 }
-                $stm = $connection->prepare($file->getContents());
-                $stm->execute();
+
+                $stmt = $connection->prepare($file->getContents());
+                $stmt->execute();
+
+                while ($stmt->nextRowset()) ; //Polling row sets
+
                 $lastFile = $file;
             }
             if ($lastFile == null) {
                 continue;
             }
-            $this->setVersion($name, $fileNameVersionMap[$lastFile->getFilename()]);
+            $this->setVersion($name, $this->leadingNumber($lastFile->getFilename()));
 
         }
     }
@@ -140,20 +142,23 @@ class MySQLDBImpl implements DB
      * @return array|string If $name is not empty a version string will be returned else an array containing
      *                      name=>version entries.
      */
-    public function getVersion($name = "")
+    public
+    function getVersion($name = "")
     {
         $this->setUpVersion();
-        return empty($name) ? $this->version : (isset($this->version[$name])?$this->version[$name]:0);
+        return empty($name) ? $this->version : (isset($this->version[$name]) ? $this->version[$name] : 0);
     }
 
 
-    private function leadingNumber($string)
+    private
+    function leadingNumber($string)
     {
         preg_match("/^[0-9]+/", $string, $matches);
         return intval($matches[0]);
     }
 
-    private function setUpVersion()
+    private
+    function setUpVersion()
     {
         if ($this->version != null) {
             return;
@@ -171,7 +176,8 @@ class MySQLDBImpl implements DB
 
     }
 
-    private function setVersion($name, $version)
+    private
+    function setVersion($name, $version)
     {
 
         $connection = $this->getConnection();

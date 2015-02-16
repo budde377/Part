@@ -40,6 +40,7 @@ class MySQLDBImplTest extends CustomDatabaseTestCase
 
     private $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
     private $file;
+    private $folderPath2;
 
     public function setUp()
     {
@@ -55,6 +56,7 @@ class MySQLDBImplTest extends CustomDatabaseTestCase
         $this->mailDatabase = $opt->getDatabase();
         $this->mailPassword = $opt->getPassword();
         $folderPath = dirname(__FILE__) . "/../stubs/db_update";
+        $this->folderPath2 = $folderPath."_2";
         $this->configXML = simplexml_load_string("
         <config>
             {$this->defaultOwner}
@@ -238,6 +240,26 @@ class MySQLDBImplTest extends CustomDatabaseTestCase
             </MySQLConnection>
         </config>");
         $mysql->update();
+
+    }
+
+    public function testUpdateCanDoWithOneFile()
+    {
+        $mysql = $this->setUpMySQLFromXML("
+        <config>
+            {$this->defaultOwner}
+            <MySQLConnection>
+            <host>{$this->host}</host>
+            <database>{$this->database}</database>
+            <username>{$this->user}</username>
+            <password>{$this->pass}</password>
+                <folders>
+                <folder name='name' path='{$this->folderPath2}' />
+</folders>
+            </MySQLConnection>
+        </config>");
+        $mysql->update();
+        $this->assertEquals(['name'=>1], $mysql->getVersion());
 
     }
 

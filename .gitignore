@@ -6,3 +6,4 @@ pubspec.lock
 composer.phar
 .idea
 phpunit.xml
+site-config.xml

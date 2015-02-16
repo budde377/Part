@@ -24,25 +24,24 @@
         <template filename="error_400_template.twig">_500</template>
     </templates>
     <pageElements>
-
         <class name="logout" >ChristianBudde\Part\view\page_element\LogoutPageElementImpl</class>
         <class name="login_formula" >ChristianBudde\Part\view\page_element\LoginFormulaPageElementImpl</class>
         <class name="title" >ChristianBudde\Part\view\page_element\TitlePageElementImpl</class>
         <class name="style_script_head" >ChristianBudde\Part\view\page_element\HeadPageElementImpl</class>
     </pageElements>
     <MySQLConnection>
-        <host>DB HOST</host>
-        <database>DB NAME</database>
-        <username>DB USERNAME</username>
-        <password>DB PASSWORD</password>
+        <host>localhost</host>
+        <database>test</database>
+        <username>root</username>
+        <password></password>
         <folders>
             <folder path="db/part/" name="part" />
         </folders>
     </MySQLConnection>
     <MailMySQLConnection>
-        <host>DB MAIL HOST</host>
-        <database>DB MAIL NAME</database>
-        <username>DB MAIL USERNAME</username>
+        <host>localhost</host>
+        <database>test</database>
+        <username>root</username>
     </MailMySQLConnection>
     <optimizers>
         <class name="css" >ChristianBudde\Part\util\file\CSSYUICompressorOptimizerImpl</class>
@@ -58,7 +57,6 @@
     </preScripts>
     <log path="LOG FILE PATH " />
     <variables>
-        <var key="k" value="" />
         <var key="k" value="" />
     </variables>
 </config>

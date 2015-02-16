@@ -16,7 +16,15 @@ session_start();
 
 date_default_timezone_set("Europe/Copenhagen");
 /** @var $siteConfig SimpleXMLElement */
-$siteConfig = simplexml_load_file('../site-config.xml');
+
+if(file_exists('../site-config.xml')){
+    $siteConfig = simplexml_load_file('../site-config.xml');
+} else if (file_exists('../site-config.xml.dist')){
+    $siteConfig = simplexml_load_file('../site-config.xml.dist');
+} else{
+    die;
+}
+
 $config = new ChristianBudde\Part\ConfigImpl($siteConfig, '../');
 
 $factory = isset($factory) ? $factory : new ChristianBudde\Part\SiteFactoryImpl($config);
