@@ -23,7 +23,9 @@ class FormHandler {
       submitFunction = (_) {
         var h = FS.register.addType(FormHandler, this);
         var result = FS.register.runFunctionString(form.dataset['function-string']);
-
+        if (result is! core.FutureResponse) {
+          result = ajaxClient.callFunctionString(form.dataset['function-string'], form_data:formData);
+        }
         if (result is! core.FutureResponse) {
           h.remove();
           return true;
@@ -42,7 +44,7 @@ class FormHandler {
           unBlur();
 
           var notion = form.dataset[notion_selector];
-          if(notion != null){
+          if (notion != null) {
             changeNotion(notion, notion_type);
           }
 
@@ -111,6 +113,8 @@ class FormHandler {
   }
 
 
+  FormData get formData =>  new FormData(form);
+
   void changeNotion(String message, String notion_type) {
 
     if (notion_type != NOTION_TYPE_SUCCESS && notion_type != NOTION_TYPE_ERROR && notion_type != NOTION_TYPE_INFORMATION) {
@@ -160,7 +164,7 @@ class FormHandler {
       }
     });
 
-    if(ValidatingForm.hasValidator(form)){
+    if (ValidatingForm.hasValidator(form)) {
       validatingForm.validate(true);
     }
   }
@@ -264,13 +268,13 @@ class Validator<E extends Element> {
 
     if ((method.startsWith('pattern{') || method.startsWith("function-string{")) && method.endsWith("}") && new RegExp(r"[{}]").allMatches(method.replaceAll(r"\\", "").replaceAll(r"\{", "").replaceAll(r"\}", "")).length == 2) {
 
-      if(method.startsWith("p")){
+      if (method.startsWith("p")) {
         var content = method.substring(8, method.length - 1).replaceAll(r"\{", r"{").replaceAll(r"\}", "}");
         return (String value) => new RegExp(content).hasMatch(value);
       }
       var content = method.substring(16, method.length - 1).replaceAll(r"\{", r"{").replaceAll(r"\}", "}");
 
-      var f = (String value){
+      var f = (String value) {
         var h = FS.register.addType(Validator, this);
         var h1 = FS.register.addType(String, value);
         var h2 = FS.register.addAlias('_value', h1);
@@ -279,17 +283,17 @@ class Validator<E extends Element> {
         h2.removeWithTarget();
         h.remove();
 
-        if(r == null){
+        if (r == null) {
           return false;
         }
-        if(r is List || r is Map || r is String){
+        if (r is List || r is Map || r is String) {
           return r.length > 0;
         }
-        if(r is num){
+        if (r is num) {
           return r > 0;
         }
 
-        if(r is bool){
+        if (r is bool) {
           return r;
         }
 
@@ -298,7 +302,7 @@ class Validator<E extends Element> {
       };
 
 
-      return !hasForm?f:(String v){
+      return !hasForm ? f : (String v) {
         var h = FS.register.addType(ValidatingForm, validatingForm);
         var r = f(v);
         h.remove();
@@ -315,7 +319,7 @@ class Validator<E extends Element> {
       return _parseMethod(method.substring(1, method.length - 1).trim());
     } else if (method.contains("&&")) {
       return "&&".allMatches(method).fold(null, folder);
-    } else if(method.contains("||")){
+    } else if (method.contains("||")) {
       return "||".allMatches(method).fold(null, folder);
     }
 
@@ -566,9 +570,9 @@ class ValidatingForm {
 
   bool get valid => _validForm;
 
-  Validator operator[](String name) {
+  Validator operator [](String name) {
     var elm = element.querySelector('input:not([type=submit])[name=$name], textarea[name=$name], select[name=$name]');
-    return elm == null? elm: new Validator(elm);
+    return elm == null ? elm : new Validator(elm);
   }
 
 }

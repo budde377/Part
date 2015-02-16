@@ -2,6 +2,7 @@
 namespace ChristianBudde\Part\test\stub;
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\Config;
+use ChristianBudde\Part\util\file\Folder;
 
 
 /**
@@ -197,6 +198,16 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
      * @return void
      */
     public function __unset($name)
+    {
+
+    }
+
+    /**
+     * Will Create and reuse Folder with path pointing to tmp folder path from config
+     * null if the path is empty.
+     * @return Folder
+     */
+    public function getTmpFolderInstance()
     {
 
     }

@@ -14,6 +14,7 @@ use ChristianBudde\Part\util\db\DB;
 use ChristianBudde\Part\util\file\CSSRegister;
 use ChristianBudde\Part\util\file\DartRegister;
 use ChristianBudde\Part\util\file\FileLibrary;
+use ChristianBudde\Part\util\file\Folder;
 use ChristianBudde\Part\util\file\JSRegister;
 
 /**
@@ -133,10 +134,11 @@ interface BackendSingletonContainer
 
 
     /**
-     * Will Create and reuse instance of MailDomainLibrary.
-     * @return DomainLibrary
+     * Will Create and reuse Folder with path pointing to tmp folder path from config
+     * null if the path is empty.
+     * @return Folder
      */
-    public function getMailDomainLibraryInstance();
+    public function getTmpFolderInstance();
 
 
     /**
