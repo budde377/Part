@@ -17,12 +17,14 @@
     </defaultPages>
     <templates path="templates/">
         <template filename="main_template.twig">_main</template>
+
         <template filename="logout_template.twig">_logout</template>
         <template filename="login_template.twig">_login</template>
         <template filename="error_404_template.twig">_404</template>
         <template filename="error_400_template.twig">_500</template>
     </templates>
     <pageElements>
+
         <class name="logout" >ChristianBudde\Part\view\page_element\LogoutPageElementImpl</class>
         <class name="login_formula" >ChristianBudde\Part\view\page_element\LoginFormulaPageElementImpl</class>
         <class name="title" >ChristianBudde\Part\view\page_element\TitlePageElementImpl</class>
@@ -33,6 +35,9 @@
         <database>DB NAME</database>
         <username>DB USERNAME</username>
         <password>DB PASSWORD</password>
+        <folders>
+            <folder path="db/part/" name="part" />
+        </folders>
     </MySQLConnection>
     <MailMySQLConnection>
         <host>DB MAIL HOST</host>
@@ -53,6 +58,7 @@
     </preScripts>
     <log path="LOG FILE PATH " />
     <variables>
-        <var key="" value="" />
+        <var key="k" value="" />
+        <var key="k" value="" />
     </variables>
 </config>

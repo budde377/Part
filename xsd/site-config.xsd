@@ -2,6 +2,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            targetNamespace="http://christianbud.de/site-config"
            xmlns="http://christianbud.de/site-config"
+           xmlns:t="http://christianbud.de/site-config"
            elementFormDefault="qualified">
 
     <xs:element name="config">
@@ -27,44 +28,49 @@
                     </xs:complexType>
                 </xs:element>
                 <xs:element name="defaultPages" type="pageSequence" minOccurs="0">
-                    <xs:unique name="pageTitle">
-                        <xs:selector xpath="page"/>
-                        <xs:field xpath="@title"/>
+                    <xs:unique name="defaultPages">
+                        <xs:selector xpath="t:page"/>
+                        <xs:field xpath="@id"/>
                     </xs:unique>
                 </xs:element>
                 <xs:element name="preScripts" type="linkedValClassSequence" minOccurs="0">
                     <xs:unique name="preScriptName">
-                        <xs:selector xpath="class"/>
+                        <xs:selector xpath="t:class"/>
                         <xs:field xpath="."/>
                     </xs:unique>
                 </xs:element>
 
                 <xs:element name="AJAXTypeHandlers" type="linkedValClassSequence" minOccurs="0">
                     <xs:unique name="AJAXTypeHandlersName">
-                        <xs:selector xpath="class"/>
+                        <xs:selector xpath="t:class"/>
                         <xs:field xpath="."/>
                     </xs:unique>
                 </xs:element>
                 <xs:element name="postScripts" type="linkedValClassSequence" minOccurs="0">
                     <xs:unique name="postScriptName">
-                        <xs:selector xpath="class"/>
+                        <xs:selector xpath="t:class"/>
                         <xs:field xpath="."/>
                     </xs:unique>
                 </xs:element>
-                <xs:element name="templates" type="templateSequence" minOccurs="0"/>
+                <xs:element name="templates" type="templateSequence" minOccurs="0">
+                    <xs:unique name="templates">
+                        <xs:selector xpath="t:template"/>
+                        <xs:field xpath="."/>
+                    </xs:unique>
+                </xs:element>
                 <xs:element name="pageElements" type="namedLinkedValClassSequence" minOccurs="0">
                     <xs:unique name="pageElementName">
-                        <xs:selector xpath="class"/>
+                        <xs:selector xpath="t:class"/>
                         <xs:field xpath="@name"/>
                     </xs:unique>
                 </xs:element>
-                <xs:element name="MySQLConnection" type="dbConnectionWithPassword" minOccurs="0"/>
+                <xs:element name="MySQLConnection" type="dbConnectionWithPasswordAndFolder" minOccurs="0"/>
                 <xs:element name="MailMySQLConnection" type="dbConnection" minOccurs="0"/>
                 <xs:element name="debugMode" type="xs:boolean" minOccurs="0"/>
                 <xs:element name="enableUpdater" type="xs:boolean" minOccurs="0" />
                 <xs:element name="optimizers" type="namedLinkedValClassSequence" minOccurs="0">
                     <xs:unique name="optimizerName">
-                        <xs:selector xpath="class"/>
+                        <xs:selector xpath="t:class"/>
                         <xs:field xpath="@name"/>
                     </xs:unique>
                 </xs:element>
@@ -81,6 +87,10 @@
                             </xs:element>
                         </xs:sequence>
                     </xs:complexType>
+                    <xs:unique name="variables">
+                        <xs:selector xpath="t:var" />
+                        <xs:field xpath="@key" />
+                    </xs:unique>
                 </xs:element>
                 <xs:element name="facebookApp" minOccurs="0">
                     <xs:complexType>
@@ -103,13 +113,28 @@
         </xs:all>
     </xs:complexType>
 
-    <xs:complexType name="dbConnectionWithPassword">
+    <xs:complexType name="dbConnectionWithPasswordAndFolder">
         <xs:all>
             <xs:element name="host" type="xs:anyURI"/>
             <xs:element name="database" type="xs:string"/>
             <xs:element name="username" type="xs:string"/>
             <xs:element name="password" type="xs:string" />
-
+            <xs:element name="folders" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="folder" maxOccurs="unbounded" minOccurs="1">
+                            <xs:complexType>
+                                <xs:attribute name="path" type="xs:anyURI" />
+                                <xs:attribute name="name" type="xs:string" />
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+                <xs:unique name="folders">
+                    <xs:selector xpath="t:folder" />
+                    <xs:field xpath="@name" />
+                </xs:unique>
+            </xs:element>
         </xs:all>
     </xs:complexType>
 

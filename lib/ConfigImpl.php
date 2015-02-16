@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part;
+
 use ChristianBudde\Part\exception\InvalidXMLException;
 use DOMDocument;
 use SimpleXMLElement;
@@ -178,12 +179,21 @@ class ConfigImpl implements Config
     public function getMySQLConnection()
     {
 
+        if (empty($this->configFile->MySQLConnection)) {
+            return $this->mysql;
+        }
         if ($this->mysql === null && $this->configFile->MySQLConnection->getName()) {
             $this->mysql = array(
                 'user' => (string)$this->configFile->MySQLConnection->username,
                 'password' => (string)$this->configFile->MySQLConnection->password,
                 'database' => (string)$this->configFile->MySQLConnection->database,
-                'host' => (string)$this->configFile->MySQLConnection->host);
+                'host' => (string)$this->configFile->MySQLConnection->host,
+                'folders' =>[]);
+            if(!empty($this->configFile->MySQLConnection->folders)){
+                foreach($this->configFile->MySQLConnection->folders->folder as $folder){
+                    $this->mysql['folders'][(string) $folder['name']] = (string) $folder['path'];
+                }
+            }
         }
 
         return $this->mysql;
@@ -449,7 +459,7 @@ class ConfigImpl implements Config
         $id = $this->facebookAppCredentials = (string)$this->configFile->facebookApp['id'];
         $secret = $this->facebookAppCredentials = (string)$this->configFile->facebookApp['secret'];
         $token = $this->facebookAppCredentials = (string)$this->configFile->facebookApp['permanent_token'];
-        return $this->facebookAppCredentials = ['id'=>$id, 'secret'=>$secret, 'permanent_access_token'=>$token];
+        return $this->facebookAppCredentials = ['id' => $id, 'secret' => $secret, 'permanent_access_token' => $token];
     }
 
     /**
@@ -458,13 +468,13 @@ class ConfigImpl implements Config
     public function getVariables()
     {
 
-        if($this->variables !== null){
+        if ($this->variables !== null) {
             return $this->variables;
         }
         $variables = $this->configFile->variables->var;
-        $this->variables= [];
+        $this->variables = [];
 
-        if($variables == null){
+        if ($variables == null) {
             return $this->variables;
         }
 
