@@ -21,13 +21,13 @@ class FormHandler {
     if (form.dataset['function-string'] != null) {
 
       submitFunction = (_) {
-        var h = FS.register.addType(FormHandler, this);
+        var h = FS.register.addAlias('POST', FS.register.addType(FormHandler, this));
         var result = FS.register.runFunctionString(form.dataset['function-string']);
         if (result is! core.FutureResponse) {
           result = ajaxClient.callFunctionString(form.dataset['function-string'], form_data:formData);
         }
         if (result is! core.FutureResponse) {
-          h.remove();
+          h.removeWithTarget();
           return true;
         }
         blur();
@@ -40,7 +40,7 @@ class FormHandler {
             h2.remove();
 
           }
-          h.remove();
+          h.removeWithTarget();
           unBlur();
 
           var notion = form.dataset[notion_selector];
