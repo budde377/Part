@@ -124,8 +124,8 @@
                     <xs:sequence>
                         <xs:element name="folder" maxOccurs="unbounded" minOccurs="1">
                             <xs:complexType>
-                                <xs:attribute name="path" type="xs:anyURI" />
-                                <xs:attribute name="name" type="xs:string" />
+                                <xs:attribute name="path" type="xs:anyURI" use="required"/>
+                                <xs:attribute name="name" type="xs:string" use="required"/>
                             </xs:complexType>
                         </xs:element>
                     </xs:sequence>
