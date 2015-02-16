@@ -31,7 +31,7 @@
     </pageElements>
     <MySQLConnection>
         <host>localhost</host>
-        <database>test</database>
+        <database>test_cms</database>
         <username>root</username>
         <password></password>
         <folders>
@@ -40,7 +40,7 @@
     </MySQLConnection>
     <MailMySQLConnection>
         <host>localhost</host>
-        <database>test</database>
+        <database>test_postfix</database>
         <username>root</username>
     </MailMySQLConnection>
     <optimizers>
