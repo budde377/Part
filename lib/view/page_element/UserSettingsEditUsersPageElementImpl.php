@@ -88,6 +88,7 @@ class UserSettingsEditUsersPageElementImpl extends PageElementImpl
             $addUserForm->insertInputText("mail", "AddUserMailField", "", "E-Mail");
             $addUserForm->insertSelect("level", "AddUserLevelSelect", "Rettigheder", $select);
             /** @var $select SelectElement */
+            $select->setAttributes('class', 'no_fix_size');
             $select->insertOption("Side", "page");
             $select->insertOption("Website", "site");
             if ($this->currentUserPrivileges->hasRootPrivileges()) {

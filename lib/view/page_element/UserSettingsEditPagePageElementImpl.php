@@ -52,6 +52,7 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
         $pageForm->insertInputText("id", "EditPageEditIDField", $this->currentPage->getID(), "Side ID");
         /** @var $select SelectElement */
         $pageForm->insertSelect("template", "EditPageEditTemplateSelect", "Side type", $select);
+        $select->setAttributes('class', 'no_fix_size');
         foreach ($this->config->listTemplateNames() as $templateName) {
             if (substr($templateName, 0, 1) != "_") {
                 $option = $select->insertOption($templateName, $templateName);
@@ -98,6 +99,8 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
         $addUserAccessForm->setAttributes("class", "oneLineForm");
         $addUserAccessForm->setAttributes("id", "AddUserToPageForm");
         $addUserAccessForm->insertSelect("username", "EditPageAddUserSelect", "Vælg bruger", $select);
+        $select->setAttributes('class', 'no_fix_size');
+
         $select->insertOption('-- Bruger --', " ");
         foreach ($possibleUsers as $user) {
             /** @var $user User */

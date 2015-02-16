@@ -67,14 +67,14 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         data-on-success-function-string='FormHandler.clearForm()'>
             <label>
                 Domæne
-                <select name='from' data-validator-method='non-empty'>
+                <select name='from' data-validator-method='non-empty' class='no_fix_size'>
                     <option value=''>--Domæne--</option>
                     {$this->getDomainOptions(true)}
                 </select>
             </label>
             <label>
                 Peger på
-                <select  name='to' data-validator-method='non-empty'>
+                <select  name='to' data-validator-method='non-empty'  class='no_fix_size'>
                     <option value=''>--Domæne--</option>
                     {$this->getDomainOptions()}
                 </select>
@@ -98,7 +98,7 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
             <span class='at'>@</span>
             <label>
                 Domæne
-                <select name='domain' data-validator-method='non-empty'>
+                <select name='domain' data-validator-method='non-empty' class='no_fix_size'>
                     <option value=''>--Domæne--</option>
                     {$this->getDomainOptions()}
                 </select>

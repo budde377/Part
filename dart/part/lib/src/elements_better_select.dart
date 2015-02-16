@@ -1,6 +1,7 @@
 part of elements;
 
 class BetterSelect {
+
   static final Map<SelectElement, BetterSelect> _cached = new Map<SelectElement, BetterSelect>();
   final SelectElement element;
 
@@ -29,6 +30,7 @@ class BetterSelect {
       ..classes.add("current_selection")
       ..text = selectedString
       ..children.add(arrow);
+
     element
       ..classes.add("better_select_select")
       ..insertAdjacentElement("afterEnd", container)
@@ -37,8 +39,11 @@ class BetterSelect {
     container
       ..children.add(element)
       ..children.add(currentSelection)
-      ..classes.add("better_select")
-      ..style.width = "${width}px";
+      ..classes.add("better_select");
+    if (!element.classes.contains('no_fix_size')) {
+      container.style.width = "${width}px";
+    }
+
 
     disabled = element.disabled;
 
@@ -60,7 +65,7 @@ class BetterSelect {
   void update() {
     currentSelection.text = selectedString;
     currentSelection.children.add(arrow);
-    if(element.disabled){
+    if (element.disabled) {
       container.classes.add('disabled');
     } else {
       container.classes.remove('disabled');
