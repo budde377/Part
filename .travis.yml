@@ -10,3 +10,11 @@ before_script:
   - mysql -e "CREATE DATABASE IF NOT EXISTS test_postfix;" -uroot
   - mysql "test_postfix" < db/setup_postix.sql
 
+
+after_script:
+  - vendor/bin/test-reporter
+
+addons:
+  code_climate:
+    repo_token:
+      secure: "SOVD+gIc6Omp68zW3DJIB7oVIS1k/Ct+6QRl6NKw8RcSKVKJ4c9VD20L0cTXbr9qxOJFqIHMc9uRM/M/JXUEi80VXyA+WaP2TUFQujepqxV9J2kMWkG2XOspVWc1rJ96T4sl+2Kd81pTI4/XyU6cTeiuAip9UinZn8UuPtup30k="
