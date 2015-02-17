@@ -1046,5 +1046,10 @@ form.initial input.invalid {
     #UserSettingsContent .mail_form > form label{
         width: 100%;
     }
+
+
+    #UserSettingsContent p.text{
+	text-align:justify; 
+    }
 }
 
