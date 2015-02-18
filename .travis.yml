@@ -8,7 +8,7 @@ before_script:
   - mysql -e "CREATE DATABASE IF NOT EXISTS test_cms;" -uroot
   - make update-db
   - mysql -e "CREATE DATABASE IF NOT EXISTS test_postfix;" -uroot
-  - mysql "test_postfix" < db/setup_postix.sql
+  - mysql "test_postfix" < db/setup_postfix.sql
 
 after_script:
   - ./vendor/bin/test-reporter --stdout > codeclimate.json 
