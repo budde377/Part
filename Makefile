@@ -1,7 +1,10 @@
-update: install-composer update-pub update-dart update-db
+update: install-composer update-pub update-dart update-db delete-tmp-folder
 
 update-db:
 	php update_db.php
+
+delete-tmp-folder:
+	php remove_tmp.php
 
 update-pub:
 	@echo "### Upgrading PUB###"
