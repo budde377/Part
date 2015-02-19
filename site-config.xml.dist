@@ -33,7 +33,7 @@
         <host>localhost</host>
         <database>test_cms</database>
         <username>root</username>
-        <password></password>
+        <password/>
         <folders>
             <folder path="db/part/" name="part" />
         </folders>

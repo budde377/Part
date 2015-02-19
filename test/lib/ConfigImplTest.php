@@ -595,6 +595,28 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
             'folders'=>[]], $connArray);
     }
 
+    public function testGetMySQLConnectionWillReturnArrayWithInfoAsInConfigXMLEvenWhenEmptyPassword()
+    {
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+            <MySQLConnection>
+                <host>someHost</host>
+                <database>someDatabase</database>
+                <username>someUser</username>
+                <password />
+            </MySQLConnection>
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $connArray = $config->getMySQLConnection();
+        $this->assertEquals([
+            'user' => 'someUser',
+            'host' => 'someHost',
+            'password' => '',
+            'database' => 'someDatabase',
+            'folders'=>[]], $connArray);
+    }
+
     public function testGetMySQLConnectionWillAddFolderArrays()
     {
         /** @var $configXML SimpleXMLElement */
