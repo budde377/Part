@@ -109,54 +109,6 @@ CREATE TABLE IF NOT EXISTS `MailMailbox` (
   UNIQUE KEY `secondary_address_id` (`secondary_address_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Postfix Admin - Virtual Mailboxes';
 
---
--- Triggers/udløsere `MailMailbox`
---
-DROP TRIGGER IF EXISTS `mailbox_insert`;
-DELIMITER //
-CREATE TRIGGER `mailbox_insert` BEFORE INSERT ON `MailMailbox`
-FOR EACH ROW SET NEW.primary_address_id = IF(
-    NEW.primary_address_id = NEW.secondary_address_id,
-    NULL,
-    NEW.primary_address_id)
-//
-DELIMITER ;
-DROP TRIGGER IF EXISTS `mailbox_update`;
-DELIMITER //
-CREATE TRIGGER `mailbox_update` BEFORE UPDATE ON `MailMailbox`
-FOR EACH ROW SET NEW.primary_address_id = IF(
-    NEW.primary_address_id = NEW.secondary_address_id,
-    NULL,
-    NEW.primary_address_id)
-//
-DELIMITER ;
-
--- --------------------------------------------------------
-
---
--- Struktur-dump for tabellen `OrderedList`
---
-
-CREATE TABLE IF NOT EXISTS `OrderedList` (
-  `list_id` varchar(255) NOT NULL,
-  `element_id` varchar(255) NOT NULL,
-  `order` int(11) NOT NULL,
-  UNIQUE KEY `list_id` (`list_id`,`order`),
-  UNIQUE KEY `element_id` (`element_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Struktur-dump for tabellen `OrderedListElement`
---
-
-CREATE TABLE IF NOT EXISTS `OrderedListElement` (
-  `element_id` varchar(255) NOT NULL,
-  `key` varchar(255) NOT NULL,
-  `val` longtext NOT NULL,
-  UNIQUE KEY `element_id` (`element_id`,`key`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -329,11 +281,6 @@ ALTER TABLE `MailMailbox`
 ADD CONSTRAINT `MailMailbox_ibfk_1` FOREIGN KEY (`primary_address_id`) REFERENCES `MailAddress` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
 ADD CONSTRAINT `MailMailbox_ibfk_2` FOREIGN KEY (`secondary_address_id`) REFERENCES `MailAddress` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
---
--- Begrænsninger for tabel `OrderedListElement`
---
-ALTER TABLE `OrderedListElement`
-ADD CONSTRAINT `OrderedListElement_ibfk_1` FOREIGN KEY (`element_id`) REFERENCES `OrderedList` (`element_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Begrænsninger for tabel `PageContent`

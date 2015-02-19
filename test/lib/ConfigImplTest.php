@@ -587,15 +587,40 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         </config>");
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $connArray = $config->getMySQLConnection();
-        $this->assertArrayHasKey('user', $connArray, 'Did not have user entry');
-        $this->assertArrayHasKey('host', $connArray, 'Did not have host entry');
-        $this->assertArrayHasKey('password', $connArray, 'Did not have password entry');
-        $this->assertArrayHasKey('database', $connArray, 'Did not have database entry');
+        $this->assertEquals([
+            'user' => 'someUser',
+            'host' => 'someHost',
+            'password' => 'somePassword',
+            'database' => 'someDatabase',
+            'folders'=>[]], $connArray);
+    }
 
-        $this->assertEquals('someHost', $connArray['host'], 'Host was not right');
-        $this->assertEquals('someDatabase', $connArray['database'], 'Host was not right');
-        $this->assertEquals('somePassword', $connArray['password'], 'Host was not right');
-        $this->assertEquals('someUser', $connArray['user'], 'Host was not right');
+    public function testGetMySQLConnectionWillAddFolderArrays()
+    {
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+            <MySQLConnection>
+                <host>someHost</host>
+                <database>someDatabase</database>
+                <username>someUser</username>
+                <password>somePassword</password>
+                <folders>
+                    <folder name='name' path='path' />
+                    <folder name='name2' path='path2' />
+                </folders>
+            </MySQLConnection>
+        </config>");
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $connArray = $config->getMySQLConnection();
+        $this->assertEquals([
+            'user' => 'someUser',
+            'host' => 'someHost',
+            'password' => 'somePassword',
+            'database' => 'someDatabase',
+            'folders'=>[
+                'name'=>'path',
+                'name2'=>'path2']], $connArray);
 
     }
 

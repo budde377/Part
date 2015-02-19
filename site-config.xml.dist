@@ -17,6 +17,7 @@
     </defaultPages>
     <templates path="templates/">
         <template filename="main_template.twig">_main</template>
+
         <template filename="logout_template.twig">_logout</template>
         <template filename="login_template.twig">_login</template>
         <template filename="error_404_template.twig">_404</template>
@@ -29,15 +30,18 @@
         <class name="style_script_head" >ChristianBudde\Part\view\page_element\HeadPageElementImpl</class>
     </pageElements>
     <MySQLConnection>
-        <host>DB HOST</host>
-        <database>DB NAME</database>
-        <username>DB USERNAME</username>
-        <password>DB PASSWORD</password>
+        <host>localhost</host>
+        <database>test_cms</database>
+        <username>root</username>
+        <password></password>
+        <folders>
+            <folder path="db/part/" name="part" />
+        </folders>
     </MySQLConnection>
     <MailMySQLConnection>
-        <host>DB MAIL HOST</host>
-        <database>DB MAIL NAME</database>
-        <username>DB MAIL USERNAME</username>
+        <host>localhost</host>
+        <database>test_postfix</database>
+        <username>root</username>
     </MailMySQLConnection>
     <optimizers>
         <class name="css" >ChristianBudde\Part\util\file\CSSYUICompressorOptimizerImpl</class>
@@ -53,6 +57,6 @@
     </preScripts>
     <log path="LOG FILE PATH " />
     <variables>
-        <var key="" value="" />
+        <var key="k" value="" />
     </variables>
 </config>

@@ -6,6 +6,8 @@ use ChristianBudde\Part\ConfigImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 use ChristianBudde\Part\test\util\MailMySQLConstantsImpl;
 use ChristianBudde\Part\util\db\MySQLDBImpl;
+use ChristianBudde\Part\util\file\File;
+use ChristianBudde\Part\util\file\FileImpl;
 use Exception;
 use SimpleXMLElement;
 
@@ -37,6 +39,8 @@ class MySQLDBImplTest extends CustomDatabaseTestCase
 
 
     private $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
+    private $file;
+    private $folderPath2;
 
     public function setUp()
     {
@@ -51,7 +55,8 @@ class MySQLDBImplTest extends CustomDatabaseTestCase
         $this->mailUser = $opt->getUsername();
         $this->mailDatabase = $opt->getDatabase();
         $this->mailPassword = $opt->getPassword();
-
+        $folderPath = dirname(__FILE__) . "/../stubs/db_update";
+        $this->folderPath2 = $folderPath."_2";
         $this->configXML = simplexml_load_string("
         <config>
             {$this->defaultOwner}
@@ -60,11 +65,15 @@ class MySQLDBImplTest extends CustomDatabaseTestCase
             <database>{$this->database}</database>
             <username>{$this->user}</username>
             <password>{$this->pass}</password>
+            <folders>
+                    <folder path='{$folderPath}' name='cms' />
+                </folders>
             </MySQLConnection>
             <MailMySQLConnection >
                 <host>{$this->mailHost}</host>
                 <database>{$this->mailDatabase}</database>
                 <username>{$this->mailUser}</username>
+
             </MailMySQLConnection>
 
         </config>");
@@ -197,5 +206,88 @@ class MySQLDBImplTest extends CustomDatabaseTestCase
         }
         $this->assertTrue($exceptionWasThrown);
     }
+
+    public function testUpdateUpdatesTheDatabase()
+    {
+        $this->assertEquals([], $this->mysql->getVersion());
+        $this->mysql->update();
+        $this->assertEquals(1, $this->mysql->getConnection()->query("SHOW TABLES LIKE 'MyGuests'")->rowCount());
+        $this->assertEquals(['cms' => 2], $this->mysql->getVersion());
+        $this->assertEquals(2, $this->mysql->getVersion('cms'));
+    }
+
+    public function testVersionIsPersistent()
+    {
+        $this->mysql->update();
+        $this->mysql = new MySQLDBImpl($this->config);
+        $this->assertEquals(['cms' => 2], $this->mysql->getVersion());
+
+    }
+
+    public function testUpdateFolderNotExisting()
+    {
+        $mysql = $this->setUpMySQLFromXML("
+        <config>
+            {$this->defaultOwner}
+            <MySQLConnection>
+            <host>{$this->host}</host>
+            <database>{$this->database}</database>
+            <username>{$this->user}</username>
+            <password>{$this->pass}</password>
+                <folders>
+                <folder name='x' path='nonExisting' />
+</folders>
+            </MySQLConnection>
+        </config>");
+        $mysql->update();
+
+    }
+
+    public function testUpdateCanDoWithOneFile()
+    {
+        $mysql = $this->setUpMySQLFromXML("
+        <config>
+            {$this->defaultOwner}
+            <MySQLConnection>
+            <host>{$this->host}</host>
+            <database>{$this->database}</database>
+            <username>{$this->user}</username>
+            <password>{$this->pass}</password>
+                <folders>
+                <folder name='name' path='{$this->folderPath2}' />
+</folders>
+            </MySQLConnection>
+        </config>");
+        $mysql->update();
+        $this->assertEquals(['name'=>1], $mysql->getVersion());
+
+    }
+
+    public function testVersionIsZeroDefault(){
+        $this->assertEquals(0,         $this->mysql->getVersion('name'));
+    }
+
+    public function testUpdateWillOnlyRunNewerFiles(){
+        $f = new FileImpl(dirname(__FILE__).'/../stubs/3-insert-row.sql');
+        $this->file = $f->copy(dirname(__FILE__).'/../stubs/db_update/3-insert-row.sql');
+        $this->mysql->update();
+        $this->mysql->update();
+        $this->assertEquals(1, self::$pdo->query('SELECT * FROM MyGuests')->rowCount());
+
+    }
+
+
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+        self::$pdo->exec("DROP TABLE IF EXISTS MyGuests");
+        self::$pdo->exec("DROP TABLE IF EXISTS _db_version");
+
+        if($this->file instanceof File){
+            $this->file->delete();
+        }
+    }
+
 
 }

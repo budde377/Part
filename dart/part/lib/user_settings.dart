@@ -81,11 +81,11 @@ class UserSettingsInitializer extends core.Initializer {
     var order = pageOrder, userLib = userLibrary;
 
     FS.register
-      ..addType(PageOrder,pageOrder)
+      ..addType(PageOrder, pageOrder)
       ..addType(Page, pageOrder.currentPage)
-      ..addType(UserLibrary,userLibrary)
-      ..addType(User,userLibrary.userLoggedIn);
-    if(mailDomainLibraryAvailable){
+      ..addType(UserLibrary, userLibrary)
+      ..addType(User, userLibrary.userLoggedIn);
+    if (mailDomainLibraryAvailable) {
       FS.register
         ..addType(MailDomainLibrary, mailDomainLibrary)
         ..addType(MailDomain)
@@ -121,7 +121,12 @@ class UserSettingsInitializer extends core.Initializer {
 
 
 class UserSettingsDecorationInitializer extends core.Initializer {
-  var _expandLink = querySelector("#UserSettingsExpandLink"), _contractLink = querySelector("#UserSettingsContractLink"), _container = querySelector("#UserSettingsContainer"), _slideElement = querySelector("#UserSettingsContent > ul"), _slideMenuList = querySelector("#UserSettingsMenu > ul");
+  var
+  _expandLink = querySelector("#UserSettingsExpandLink"),
+  _contractLink = querySelector("#UserSettingsContractLink"),
+  _container = querySelector("#UserSettingsContainer"),
+  _slideElement = querySelector("#UserSettingsContent > ul"),
+  _slideMenuList = querySelector("#UserSettingsMenu > ul");
 
 
   bool get canBeSetUp => _expandLink != null && _contractLink != null && _container != null && _slideElement != null && _slideMenuList != null;
@@ -144,22 +149,20 @@ class UserSettingsDecorationInitializer extends core.Initializer {
     });
     _contractLink.onClick.listen((_) => expander.contract());
 
+    _slideElement.style.width = "${_slideElement.children.length*100}%";
 
-    var linkExpander = new UserSettingsExpandLinkExpandDecoration(_expandLink);
-    linkExpander.expandOnMouseOver = linkExpander.contractOnMouseOut = true;
-
-
-    var slider = new UserSettingsSlideDecoration();
-    var lis = _slideMenuList.querySelectorAll('ul > li');
-    var i = 0;
-    lis.forEach((LIElement li) {
-      var index = i;
-      li.onClick.listen((e) {
-        slider.goToIndex(index);
-        _slideMenuList.querySelector('.active').classes.remove('active');
-        li.classes.add('active');
+    _slideMenuList.onClick.listen((Event e){
+      var t = e.target;
+      if(!_slideMenuList.children.contains(t)){
+        return;
+      }
+      _slideElement.style.marginLeft = "${-100*_slideMenuList.children.indexOf(t)}%";
+      _slideMenuList.querySelectorAll('li.active').forEach((LIElement li){
+        li.classes.remove('active');
       });
-      i++;
+      t.classes.add('active');
     });
+
+
   }
 }

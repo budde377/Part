@@ -1,4 +1,7 @@
-update: install-composer update-pub update-dart
+update: install-composer update-pub update-dart update-db
+
+update-db:
+	php update_db.php
 
 update-pub:
 	@echo "### Upgrading PUB###"

@@ -11,6 +11,9 @@
         <var name="DB_MAIL_PASSWORD" value=""/>
         <var name="DB_MAIL_NAME" value="test_postfix"/>
     </php>
+    <logging>
+          <log type="coverage-clover" target="build/logs/clover.xml"/>
+    </logging>
     <testsuites>
         <testsuite name="ALL">
             <directory>test/lib</directory>

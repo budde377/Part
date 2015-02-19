@@ -1,61 +1,6 @@
 part of user_settings;
 
 
-class UserSettingsSlideDecoration extends SlideDecoration {
-
-  int _currentIndex = 0;
-
-  int _currentPosition = 0;
-
-  core.Animation currentAnimation;
-  static UserSettingsSlideDecoration _cache;
-
-  factory UserSettingsSlideDecoration(){
-    if (_cache == null) {
-      var lis = querySelectorAll('#UserSettingsMenu > ul > li');
-      var startIndex = 0, ii = 0;
-      lis.forEach((LIElement li) {
-        if (li.classes.contains('active')) {
-          startIndex = ii;
-        }
-        ii++;
-      });
-      _cache = new UserSettingsSlideDecoration._internal(querySelector("#UserSettingsContent > ul"), lis.length, startIndex);
-    }
-    return _cache;
-  }
-
-  UserSettingsSlideDecoration._internal(Element elementToSlide, int numIndex, [int startIndex = 0]):super(numIndex, elementToSlide){
-    if (startIndex <= 0 || startIndex >= numIndex) {
-      return;
-    }
-    _currentIndex = startIndex;
-    _currentPosition = -880 * startIndex;
-  }
-
-
-  void goToIndex(int index) {
-    var newPos = -880 * index;
-    if (currentAnimation != null) {
-      currentAnimation.stop();
-    }
-    var c = _currentPosition, ci = currentIndex;
-    currentAnimation = new core.Animation(new Duration(milliseconds:150 * (ci - index).abs()), (pct) {
-      element.style.marginLeft = "${c + (newPos - c) * pct}px";
-    }, (success) {
-      if (!success) {
-        element.style.marginLeft = "${newPos}px";
-      }
-    }).start();
-    _currentPosition = newPos;
-    _currentIndex = index;
-  }
-
-  int get currentIndex => _currentIndex;
-
-
-}
-
 class UserSettingsExpandDecoration extends ExpandDecoration {
   bool _expanded = false;
   bool _hasBeenInitialized = false;
@@ -124,28 +69,3 @@ class UserSettingsExpandDecoration extends ExpandDecoration {
   }
 
 }
-
-class UserSettingsExpandLinkExpandDecoration extends ExpandDecoration {
-  bool _expanded = false;
-
-  bool _hasBeenInitialized = false;
-
-  UserSettingsExpandLinkExpandDecoration(Element linkElement) : super(linkElement);
-
-  void initialize() {
-    if (_hasBeenInitialized) {
-      return;
-    }
-    _hasBeenInitialized = true;
-    expandAnimation = new core.Animation(new Duration(milliseconds:100), (double pct) {
-      element.style.height = "${(10 * pct + 60).toInt()}px";
-    });
-    contractAnimation = new core.Animation(new Duration(milliseconds:200), (double pct) {
-      element.style.height = "${(70 - 10 * pct).toInt()}px";
-    });
-  }
-
-  bool get expanded => _expanded;
-
-}
-

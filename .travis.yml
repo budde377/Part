@@ -6,7 +6,15 @@ before_script:
   - printf "\n" | pecl install imagick
   - composer install
   - mysql -e "CREATE DATABASE IF NOT EXISTS test_cms;" -uroot
-  - mysql "test_cms" < db/CMSDatabase.sql
+  - make update-db
   - mysql -e "CREATE DATABASE IF NOT EXISTS test_postfix;" -uroot
-  - mysql "test_postfix" < db/SetupPostfixViews.sql
+  - mysql "test_postfix" < db/setup_postfix.sql
 
+after_script:
+  - ./vendor/bin/test-reporter --stdout > codeclimate.json 
+  - "curl -X POST -d @codeclimate.json -H 'Content-Type: application/json' -H 'User-Agent: Code Climate (PHP Test Reporter v1.0.1-dev)' https://codeclimate.com/test_reports"
+
+addons:
+  code_climate:
+    repo_token:
+      secure: "SOVD+gIc6Omp68zW3DJIB7oVIS1k/Ct+6QRl6NKw8RcSKVKJ4c9VD20L0cTXbr9qxOJFqIHMc9uRM/M/JXUEi80VXyA+WaP2TUFQujepqxV9J2kMWkG2XOspVWc1rJ96T4sl+2Kd81pTI4/XyU6cTeiuAip9UinZn8UuPtup30k="
