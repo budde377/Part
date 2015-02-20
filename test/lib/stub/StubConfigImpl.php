@@ -14,7 +14,6 @@ class StubConfigImpl implements Config
 {
 
     private $variables;
-    private $AJAXRegistrable;
     private $templates;
     private $preScripts;
     private $postScripts;
@@ -148,24 +147,6 @@ class StubConfigImpl implements Config
         return $this->defaultPages;
     }
 
-    /**
-     * Will return AJAXRegistrable as an array, with the ClassName as key and an array containing "path" and "ajaxId" as value.
-     * The link should be relative to a root path provided.
-     * @return array
-     */
-    public function getAJAXRegistrable()
-    {
-        return $this->AJAXRegistrable;
-    }
-
-
-    /**
-     * @param mixed $AJAXRegistrable
-     */
-    public function setAJAXRegistrable($AJAXRegistrable)
-    {
-        $this->AJAXRegistrable = $AJAXRegistrable;
-    }
 
     /**
      * @return bool

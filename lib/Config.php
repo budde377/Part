@@ -63,12 +63,6 @@ interface Config extends \ArrayAccess
     public function getPostScripts();
 
 
-    /**
-     * Will return AJAXRegistrable as an array, with the num key and an array containing "class_name", "path" and "ajaxId" as value.
-     * The link should be relative to a root path provided.
-     * @return array
-     */
-    public function getAJAXRegistrable();
 
     /**
      * Will return AJAXTypeHandlers as an array, with the num key and an array containing "class_name" and "path" as value.

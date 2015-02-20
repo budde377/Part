@@ -25,7 +25,6 @@ class ConfigImpl implements Config
     private $pageElements = null;
     private $preScripts = null;
     private $postScripts = null;
-    private $ajaxRegistrable = null;
     private $optimizers = null;
     private $mysql = null;
     private $mailMysql = null;
@@ -130,28 +129,36 @@ class ConfigImpl implements Config
      */
     public function getPageElement($name)
     {
-        if ($this->pageElements === null && $this->configFile->pageElements->getName()) {
-            $this->pageElements = array();
-            $elements = $this->configFile->pageElements->class;
-            foreach ($elements as $element) {
-                $pageElementArray = [
-                    'name' => (string)$element['name'],
-                    'className' => (string)$element];
+        if ($this->pageElements == null) {
+            $this->pageElements = $this->buildClasses($this->configFile->pageElements->class);
+        }
 
-                if (isset($element['link'])) {
-                    $pageElementArray['link'] = $this->rootPath . (string)$element['link'];
 
-                }
+        return isset($this->pageElements[$name]) ? $this->pageElements[$name] : null;
 
-                $this->pageElements[(string)$element['name']] = $pageElementArray;
+    }
+
+    private function buildClasses($classesXML)
+    {
+        if (empty($classesXML)) {
+            return [];
+        }
+        $returnArray =  [];
+        foreach ($classesXML as $element) {
+            $elementArray = [
+                'name' => (string)$element['name'],
+                'className' => (string)$element];
+
+            if (isset($element['link'])) {
+                $elementArray['link'] = $this->getRootPath() . (string)$element['link'];
+
             }
+
+            $returnArray[(string)$element['name']] = $elementArray;
         }
 
-        if (isset($this->pageElements[$name])) {
-            return $this->pageElements[$name];
-        }
-        return null;
 
+        return $returnArray;
     }
 
     /**
@@ -160,25 +167,12 @@ class ConfigImpl implements Config
      */
     public function getOptimizer($name)
     {
-        if ($this->optimizers === null && $this->configFile->optimizers->getName()) {
-            $this->optimizers = array();
-            $optimizer = $this->configFile->optimizers->class;
-            foreach ($optimizer as $element) {
-                $ar = array(
-                    'name' => (string)$element['name'],
-                    'className' => (string)$element);
-                if (isset($element['link'])) {
-                    $ar['link'] = $this->rootPath . (string)$element['link'];
-                }
-                $this->optimizers[(string)$element['name']] = $ar;
-            }
-
+        if ($this->optimizers == null) {
+            $this->optimizers = $this->buildClasses($this->configFile->optimizers->class);
         }
 
-        if (isset($this->optimizers[$name])) {
-            return $this->optimizers[$name];
-        }
-        return null;
+
+        return isset($this->optimizers[$name]) ? $this->optimizers[$name] : null;
     }
 
     /**
@@ -267,36 +261,6 @@ class ConfigImpl implements Config
 
     }
 
-
-    /**
-     * Will return AJAXRegistrable as an array, with the num key and an array containing "class_name", "path" and "ajaxId" as value.
-     * The link should be relative to a root path provided.
-     * @return array
-     */
-    public function getAJAXRegistrable()
-    {
-
-        if ($this->ajaxRegistrable != null) {
-            return $this->ajaxRegistrable;
-        }
-
-        $this->ajaxRegistrable = array();
-
-        if (!$this->configFile->AJAXRegistrable->getName()) {
-            return $this->ajaxRegistrable;
-        }
-
-
-        foreach ($this->configFile->AJAXRegistrable->class as $registrable) {
-            $ar = array("class_name" => (string)$registrable,
-                "ajax_id" => (string)$registrable['ajax_id']);
-            if (isset($registrable['link'])) {
-                $ar['link'] = $this->rootPath . $registrable['link'];
-            }
-            $this->ajaxRegistrable[] = $ar;
-        }
-        return $this->ajaxRegistrable;
-    }
 
     /**
      * @return bool
@@ -439,11 +403,11 @@ class ConfigImpl implements Config
         foreach ($this->configFile->AJAXTypeHandlers->class as $handler) {
             $ar = array("class_name" => (string)$handler);
             if (isset($handler['link'])) {
-                $ar['link'] = $this->rootPath . $handler['link'];
+                $ar['link'] = $this->rootPath . "/" . $handler['link'];
             }
-            $this->ajaxRegistrable[] = $ar;
+            $this->ajaxTypeHandlers[] = $ar;
         }
-        return $this->ajaxRegistrable;
+        return $this->ajaxTypeHandlers;
     }
 
     /**

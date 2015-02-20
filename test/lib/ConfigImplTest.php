@@ -18,6 +18,12 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     private $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
 
+
+    private function setupConfig($configXml = null){
+        $rootPath = dirname(__FILE__) . '/';
+        return new ConfigImpl(simplexml_load_string($configXml == null?"<config>{$this->defaultOwner}</config>":$configXml), $rootPath);
+    }
+
     public function testSimpleXMLInputMustBeValidElseException()
     {
         $invalidConfigXML = simplexml_load_string("
@@ -55,95 +61,78 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetTemplateReturnNullWithTemplateNIL()
     {
-        $configXML = simplexml_load_string("
+        $config = $this->setupConfig("
         <config>{$this->defaultOwner}
         <templates path='folder'>
             <template filename='some_link'>main</template>
         </templates>
         </config>");
-        $rootPath = dirname(__FILE__) . '/';
-        $config = new ConfigImpl($configXML, $rootPath);
         $template = $config->getTemplate('nil');
         $this->assertNull($template, 'The template was not null with template NIL');
     }
 
     public function testGetTemplateFolderPathReturnsRightPath()
     {
-        $configXML = simplexml_load_string("
+
+        $config = $this->setupConfig("
         <config>{$this->defaultOwner}
         <templates path='folder'>
             <template filename='some_link'>main</template>
         </templates>
         </config>");
-        $rootPath = dirname(__FILE__) . '/';
-        $config = new ConfigImpl($configXML, $rootPath);
-        $this->assertEquals($config->getTemplateFolderPath('main'), "$rootPath/folder");
+        $this->assertEquals($config->getTemplateFolderPath('main'), "{$config->getRootPath()}/folder");
     }
 
     public function testGetTemplateFolderPathReturnsNullIfNotDefined()
     {
-        $configXML = simplexml_load_string("
-        <config>{$this->defaultOwner}</config>");
-        $rootPath = dirname(__FILE__) . '/';
-        $config = new ConfigImpl($configXML, $rootPath);
+        $config = $this->setupConfig();
         $this->assertNull($config->getTemplateFolderPath('not defined'));
     }
 
     public function testGetTemplateReturnLinkWithTemplateInList()
     {
-        $configXML = simplexml_load_string("
+        $config = $this->setupConfig("
         <config>{$this->defaultOwner}
         <templates path='folder'>
             <template filename='some_link'>main</template>
         </templates>
         </config>");
-        $rootPath = dirname(__FILE__) . '/';
-        $config = new ConfigImpl($configXML, $rootPath);
         $template = $config->getTemplate('main');
         $this->assertEquals('some_link', $template, 'The config did not return the right link.');
     }
 
     public function testGetPageElementReturnNullWithEmptyConfigXML()
     {
-        $emptyConfigXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
-        $rootPath = dirname(__FILE__) . '/';
-        $config = new ConfigImpl($emptyConfigXML, $rootPath);
+
+        $config = $this->setupConfig();
         $template = $config->getPageElement('main');
         $this->assertNull($template, 'The getPageElement was not null with empty config XML');
     }
 
+
     public function testGetPageElementReturnNullWithTemplateElementNIL()
     {
-        $configXML = simplexml_load_string("
+        $config = $this->setupConfig("
         <config>{$this->defaultOwner}
         <pageElements>
             <class name='someName' link='someLink'>SomeClassName</class>
         </pageElements>
         </config>");
-        $rootPath = dirname(__FILE__) . '/';
-        $config = new ConfigImpl($configXML, $rootPath);
         $template = $config->getPageElement('nil');
         $this->assertNull($template, 'The getPageElement was not null with pageElement NIL');
     }
 
     public function testGetPageElementReturnArrayWithElementInList()
     {
-        $configXML = simplexml_load_string("
+        $config = $this->setupConfig("
         <config>{$this->defaultOwner}
         <pageElements>
             <class name='someName' link='someLink'>SomeClassName</class>
         </pageElements>
         </config>");
-        $rootPath = dirname(__FILE__) . '/';
-        $config = new ConfigImpl($configXML, $rootPath);
         $element = $config->getPageElement('someName');
-        $this->assertTrue(is_array($element), 'The getPageElement did not return array with element in list');
-        $this->assertArrayHasKey('className', $element, 'The array did not contain key className');
-        $this->assertArrayHasKey('name', $element, 'The array did not contain key name');
-        $this->assertArrayHasKey('link', $element, 'The array did not contain key link');
-        $this->assertEquals('SomeClassName', $element['className'], 'The element[className] was not as expected');
-        $this->assertEquals('someName', $element['name'], 'The element[name] was not as expected');
-        $this->assertEquals($rootPath . 'someLink', $element['link'], 'The element[link] was not as expected');
+        $this->assertEquals(['name'=>'someName', 'className'=>'SomeClassName', 'link'=>$config->getRootPath().'someLink'], $element);
+
     }
 
     public function testGetPageElementReturnArrayWithElementInListButNoLink()
@@ -426,15 +415,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testGetAJAXRegistrableReturnEmptyArrayWithEmptyConfig()
-    {
-        $emptyConfigXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
-        $rootPath = dirname(__FILE__) . '/';
-        $config = new ConfigImpl($emptyConfigXML, $rootPath);
-        $registrable = $config->getAJAXRegistrable();
-        $this->assertTrue(is_array($registrable), 'getAJAXRegistrable did not return an array with empty config.');
-        $this->assertTrue(empty($registrable), 'getAJAXRegistrable did not return an empty array with empty config.');
-    }
+
 
 
     public function testGetAJAXTypeHandlersReturnEmptyArrayWithEmptyConfig()
@@ -450,29 +431,20 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetAJAXTypeHandlersHasEntrySpecifiedInConfig()
     {
         $path1 = "path1";
-        $configXML = simplexml_load_string("
+        $config = $this->setupConfig("
         <config>{$this->defaultOwner}
         <AJAXTypeHandlers>
         <class link='$path1'>main</class>
         <class >main2</class>
         </AJAXTypeHandlers>
         </config>");
-        $rootPath = dirname(__FILE__) . '/';
-        $config = new ConfigImpl($configXML, $rootPath);
+
         $registrable = $config->getAJAXTypeHandlers();
-        $this->assertArrayHasKey(0, $registrable, 'getAJAXTypeHandlers did not return array with right entrance');
-        $this->assertArrayHasKey(1, $registrable, 'getAJAXTypeHandlers did not return array with right entrance');
-        $this->assertTrue(is_array($registrable[0]));
-        $this->assertTrue(is_array($registrable[1]));
-        $this->assertArrayHasKey('link', $registrable[0]);
+        $this->assertEquals([
+            ['class_name'=>'main', 'link'=>$config->getRootPath().'/'.$path1],
+            ['class_name'=>'main2']
+            ], $registrable);
 
-        $this->assertArrayHasKey('class_name', $registrable[0]);
-        $this->assertEquals($registrable[0]['link'], $rootPath . $path1);
-        $this->assertEquals($registrable[0]['class_name'], 'main');
-        $this->assertArrayNotHasKey('link', $registrable[1]);
-
-        $this->assertArrayHasKey('class_name', $registrable[1]);
-        $this->assertEquals($registrable[1]['class_name'], 'main2');
     }
 
 
