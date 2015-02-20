@@ -25,17 +25,17 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
     private $customFunctions = [];
 
     private $authFunctions = [];
-    private $typeAuthFunctions = [];
-    private $functionAuthFunctions = [];
+    private $tAuthFunctions = [];
+    private $fnAuthFunctions = [];
 
     private $preCallFunctions = [];
-    private $typePreCallFunctions = [];
-    private $functionPreCallFunctions = [];
+    private $tPreCallFunctions = [];
+    private $fnPreCallFunctions = [];
 
 
     private $postCallFunctions = [];
-    private $typePostCallFunctions = [];
-    private $functionPostCallFunctions = [];
+    private $tPostCallFunctions = [];
+    private $fnPostCallFunctions = [];
 
     private $alias = [];
     private $hasBeenSetUp = [];
@@ -81,7 +81,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
             }
             return;
         }
-        $this->functionAuthFunctions[$type][$functionName][] = $function;
+        $this->fnAuthFunctions[$type][$functionName][] = $function;
     }
 
     /**
@@ -97,7 +97,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
             }
             return;
         }
-        $this->typeAuthFunctions[$type][] = $function;
+        $this->tAuthFunctions[$type][] = $function;
     }
 
     /**
@@ -153,7 +153,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
             return;
         }
 
-        $this->typePreCallFunctions[$type][] = $function;
+        $this->tPreCallFunctions[$type][] = $function;
     }
 
     /**
@@ -171,7 +171,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
             return;
         }
 
-        $this->typePostCallFunctions[$type][] = $function;
+        $this->tPostCallFunctions[$type][] = $function;
     }
 
     /**
@@ -190,7 +190,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
             return;
         }
 
-        $this->functionPreCallFunctions[$type][$name][] = $function;
+        $this->fnPreCallFunctions[$type][$name][] = $function;
     }
 
     /**
@@ -208,7 +208,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
             }
             return;
         }
-        $this->functionPostCallFunctions[$type][$name][] = $function;
+        $this->fnPostCallFunctions[$type][$name][] = $function;
     }
 
     /**
@@ -464,8 +464,8 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
 
         }
 
-        if (isset($this->typeAuthFunctions[$type])) {
-            foreach ($this->typeAuthFunctions[$type] as $f) {
+        if (isset($this->tAuthFunctions[$type])) {
+            foreach ($this->tAuthFunctions[$type] as $f) {
                 if (!$f($type, $instance, $name, $function->getArgs())) {
                     return false;
                 }
@@ -473,8 +473,8 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
             }
         }
 
-        if (isset($this->functionAuthFunctions[$type][$fn = $function->getName()])) {
-            foreach ($this->functionAuthFunctions[$type][$fn] as $f) {
+        if (isset($this->fnAuthFunctions[$type][$fn = $function->getName()])) {
+            foreach ($this->fnAuthFunctions[$type][$fn] as $f) {
                 if (!$f($type, $instance, $name, $function->getArgs())) {
                     return false;
                 }
@@ -491,15 +491,15 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
             $f($type, $instance, $functionName, $arguments);
         }
 
-        if (isset($this->typePreCallFunctions[$type])) {
-            foreach ($this->typePreCallFunctions[$type] as $f) {
+        if (isset($this->tPreCallFunctions[$type])) {
+            foreach ($this->tPreCallFunctions[$type] as $f) {
                 $f($type, $instance, $functionName, $arguments);
             }
         }
 
 
-        if (isset($this->functionPreCallFunctions[$type][$functionName])) {
-            foreach ($this->functionPreCallFunctions[$type][$functionName] as $f) {
+        if (isset($this->fnPreCallFunctions[$type][$functionName])) {
+            foreach ($this->fnPreCallFunctions[$type][$functionName] as $f) {
                 $f($type, $instance, $functionName, $arguments);
             }
         }
@@ -513,15 +513,15 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
             $f($type, $instance, $functionName, $result);
         }
 
-        if (isset($this->typePostCallFunctions[$type])) {
-            foreach ($this->typePostCallFunctions[$type] as $f) {
+        if (isset($this->tPostCallFunctions[$type])) {
+            foreach ($this->tPostCallFunctions[$type] as $f) {
                 $f($type, $instance, $functionName, $result);
             }
         }
 
 
-        if (isset($this->functionPostCallFunctions[$type][$functionName])) {
-            foreach ($this->functionPostCallFunctions[$type][$functionName] as $f) {
+        if (isset($this->fnPostCallFunctions[$type][$functionName])) {
+            foreach ($this->fnPostCallFunctions[$type][$functionName] as $f) {
                 $f($type, $instance, $functionName, $result);
             }
         }
