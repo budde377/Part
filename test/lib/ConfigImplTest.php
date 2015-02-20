@@ -53,9 +53,9 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testRootPathWillReturnRootPath()
     {
-        $p = dirname(__FILE__);
-        $config = new ConfigImpl(simplexml_load_string("<config>{$this->defaultOwner}</config>"), $p);
-        $this->assertEquals($p, $config->getRootPath());
+        $path = dirname(__FILE__);
+        $config = new ConfigImpl(simplexml_load_string("<config>{$this->defaultOwner}</config>"), $path);
+        $this->assertEquals($path, $config->getRootPath());
     }
 
     public function testGetTemplateReturnNullWithEmptyConfigXML()
