@@ -143,7 +143,7 @@ class ConfigImpl implements Config
         if (empty($classesXML)) {
             return [];
         }
-        $returnArray =  [];
+        $returnArray = [];
         foreach ($classesXML as $element) {
             $elementArray = [
                 'name' => (string)$element['name'],
@@ -181,20 +181,23 @@ class ConfigImpl implements Config
     public function getMySQLConnection()
     {
 
-        if (empty($this->configFile->MySQLConnection)) {
-            return $this->mysql;
+        if ($this->mysql != null) {
+            return $this->mysql === false ? null : $this->mysql;
         }
-        if ($this->mysql === null && $this->configFile->MySQLConnection->getName()) {
-            $this->mysql = array(
-                'user' => (string)$this->configFile->MySQLConnection->username,
-                'password' => (string)$this->configFile->MySQLConnection->password,
-                'database' => (string)$this->configFile->MySQLConnection->database,
-                'host' => (string)$this->configFile->MySQLConnection->host,
-                'folders' => []);
-            if (!empty($this->configFile->MySQLConnection->folders)) {
-                foreach ($this->configFile->MySQLConnection->folders->folder as $folder) {
-                    $this->mysql['folders'][(string)$folder['name']] = (string)$folder['path'];
-                }
+
+        if (empty($this->configFile->MySQLConnection)) {
+            $this->mysql = false;
+            return null;
+        }
+        $this->mysql = [
+            'user' => (string)$this->configFile->MySQLConnection->username,
+            'password' => (string)$this->configFile->MySQLConnection->password,
+            'database' => (string)$this->configFile->MySQLConnection->database,
+            'host' => (string)$this->configFile->MySQLConnection->host,
+            'folders' => []];
+        if (!empty($this->configFile->MySQLConnection->folders)) {
+            foreach ($this->configFile->MySQLConnection->folders->folder as $folder) {
+                $this->mysql['folders'][(string)$folder['name']] = (string)$folder['path'];
             }
         }
 
@@ -223,18 +226,20 @@ class ConfigImpl implements Config
      */
     public function getDefaultPages()
     {
-        if ($this->defaultPages === null) {
-            $this->defaultPages = array();
-            if ($this->configFile->defaultPages->getName()) {
-                foreach ($this->configFile->defaultPages->page as $page) {
-                    $title = (string)$page;
-                    $this->defaultPages[$title]["template"] = (string)$page["template"];
-                    $this->defaultPages[$title]["alias"] = (string)$page["alias"];
-                    $this->defaultPages[$title]["id"] = (string)$page["id"];
-                }
-
-            }
+        if ($this->defaultPages != null) {
+            return $this->defaultPages;
         }
+        $this->defaultPages = [];
+        if ($this->configFile->defaultPages->getName()) {
+            foreach ($this->configFile->defaultPages->page as $page) {
+                $title = (string)$page;
+                $this->defaultPages[$title]["template"] = (string)$page["template"];
+                $this->defaultPages[$title]["alias"] = (string)$page["alias"];
+                $this->defaultPages[$title]["id"] = (string)$page["id"];
+            }
+
+        }
+
         return $this->defaultPages;
     }
 
