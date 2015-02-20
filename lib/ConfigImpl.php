@@ -35,8 +35,7 @@ class ConfigImpl implements Config
     private $tmpFolderPath;
     private $log;
     private $ajaxTypeHandlers;
-    private $facebookAppCredentials;
-    private $templateFolders;
+    private $fbAppCredentials;
 
     /**
      * @param SimpleXMLElement $configFile
@@ -55,10 +54,12 @@ class ConfigImpl implements Config
         $dom = new DOMDocument(1, 'UTF-8');
         $dom->loadXML($configFile->asXML());
         $schema = dirname(__FILE__) . "/../xsd/site-config.xsd";
+        libxml_use_internal_errors(true);
 
-        if (!@$dom->schemaValidate($schema)) {
+        if (!$dom->schemaValidate($schema)) {
             throw new InvalidXMLException('site-config', 'ConfigXML');
         }
+        libxml_use_internal_errors(false);
 
         $this->configFile = $configFile;
         $this->rootPath = $rootPath;
@@ -85,16 +86,26 @@ class ConfigImpl implements Config
      */
     public function getPostScripts()
     {
-        if ($this->postScripts === null && $this->configFile->postScripts->getName()) {
-            $postScripts = $this->configFile->postScripts->class;
-            $this->postScripts = array();
-            foreach ($postScripts as $script) {
-                $this->postScripts[(string)$script] = isset($script['link']) ? $this->rootPath . $script['link'] : null;
-            }
-        } else if ($this->postScripts === null) {
-            $this->postScripts = array();
+        if ($this->postScripts != null) {
+            return $this->postScripts;
         }
-        return $this->postScripts;
+
+        return $this->postScripts = $this->getScripts($this->configFile->postScripts);
+    }
+
+    private function getScripts($scriptsXml)
+    {
+
+        if (!$scriptsXml) {
+            return [];
+        }
+
+        $scripts = [];
+        foreach ($scriptsXml->class as $scriptClass) {
+            $scripts[(string)$scriptClass] = isset($scriptClass['link']) ? $this->rootPath . $scriptClass['link'] : null;
+        }
+
+        return $scripts;
     }
 
     /**
@@ -104,16 +115,11 @@ class ConfigImpl implements Config
      */
     public function getPreScripts()
     {
-        if ($this->preScripts === null && $this->configFile->preScripts->getName()) {
-            $preScripts = $this->configFile->preScripts->class;
-            $this->preScripts = array();
-            foreach ($preScripts as $script) {
-                $this->preScripts[(string)$script] = isset($script['link']) ? $this->rootPath . $script['link'] : null;
-            }
-        } else if ($this->preScripts === null) {
-            $this->preScripts = array();
+        if ($this->preScripts != null) {
+            return $this->preScripts;
         }
-        return $this->preScripts;
+
+        return $this->preScripts = $this->getScripts($this->configFile->preScripts);
     }
 
 
@@ -128,16 +134,16 @@ class ConfigImpl implements Config
             $this->pageElements = array();
             $elements = $this->configFile->pageElements->class;
             foreach ($elements as $element) {
-                $ar = array(
+                $pageElementArray = [
                     'name' => (string)$element['name'],
-                    'className' => (string)$element);
+                    'className' => (string)$element];
 
                 if (isset($element['link'])) {
-                    $ar['link'] = $this->rootPath . (string)$element['link'];
+                    $pageElementArray['link'] = $this->rootPath . (string)$element['link'];
 
                 }
 
-                $this->pageElements[(string)$element['name']] = $ar;
+                $this->pageElements[(string)$element['name']] = $pageElementArray;
             }
         }
 
@@ -454,14 +460,14 @@ class ConfigImpl implements Config
      */
     public function getFacebookAppCredentials()
     {
-        if ($this->facebookAppCredentials !== null) {
-            return $this->facebookAppCredentials;
+        if ($this->fbAppCredentials !== null) {
+            return $this->fbAppCredentials;
         }
 
-        $id = $this->facebookAppCredentials = (string)$this->configFile->facebookApp['id'];
-        $secret = $this->facebookAppCredentials = (string)$this->configFile->facebookApp['secret'];
-        $token = $this->facebookAppCredentials = (string)$this->configFile->facebookApp['permanent_token'];
-        return $this->facebookAppCredentials = ['id' => $id, 'secret' => $secret, 'permanent_access_token' => $token];
+        $app_id = $this->fbAppCredentials = (string)$this->configFile->facebookApp['id'];
+        $secret = $this->fbAppCredentials = (string)$this->configFile->facebookApp['secret'];
+        $token = $this->fbAppCredentials = (string)$this->configFile->facebookApp['permanent_token'];
+        return $this->fbAppCredentials = ['id' => $app_id, 'secret' => $secret, 'permanent_access_token' => $token];
     }
 
     /**
@@ -560,8 +566,8 @@ class ConfigImpl implements Config
         $this->setUpTemplate();
         $result = [];
         foreach ($this->templateNamespace as $ns => $paths) {
-            foreach($paths as $path){
-                $path = $this->getRootPath()."/".$path;
+            foreach ($paths as $path) {
+                $path = $this->getRootPath() . "/" . $path;
                 if ($ns == "") {
                     $result[] = $path;
                 } else {
