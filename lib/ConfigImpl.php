@@ -20,7 +20,8 @@ class ConfigImpl implements Config
     private $rootPath;
 
     private $templates = null;
-    private $templatePath;
+    private $templatePath = [];
+    private $templateNamespace = [];
     private $pageElements = null;
     private $preScripts = null;
     private $postScripts = null;
@@ -242,17 +243,22 @@ class ConfigImpl implements Config
         if ($this->templates !== null) {
             return;
         }
-        $this->templates = array();
-        $templates = $this->configFile->templates;
 
-        if (!(string)$templates) {
+        $this->templates = [];
+        $templates = $this->configFile->templates;
+        if (!empty($templates)) {
+            $this->setUpTemplateHelper($templates);
             return;
         }
 
-        $this->templatePath = (string)$templates['path'];
-        foreach ($templates->template as $template) {
-            $this->templates[(string)$template] = (string)$template['filename'];
+        if (empty($this->configFile->templateCollection)) {
+            return;
         }
+
+        foreach ($this->configFile->templateCollection->templates as $templates) {
+            $this->setUpTemplateHelper($templates);
+        }
+
     }
 
 
@@ -289,8 +295,7 @@ class ConfigImpl implements Config
     /**
      * @return bool
      */
-    public
-    function isDebugMode()
+    public function isDebugMode()
     {
         if ($this->debugMode != null) {
             return $this->debugMode;
@@ -306,8 +311,7 @@ class ConfigImpl implements Config
     /**
      * @return string Root path
      */
-    public
-    function getRootPath()
+    public function getRootPath()
     {
         return $this->rootPath;
     }
@@ -315,8 +319,7 @@ class ConfigImpl implements Config
     /**
      * @return bool
      */
-    public
-    function isUpdaterEnabled()
+    public function isUpdaterEnabled()
     {
         if ($this->enableUpdater !== null) {
             return $this->enableUpdater;
@@ -332,8 +335,7 @@ class ConfigImpl implements Config
     /**
      * @return string String containing the domain (name.ext)
      */
-    public
-    function getDomain()
+    public function getDomain()
     {
         if ($this->domain !== null) {
             return $this->domain;
@@ -344,8 +346,7 @@ class ConfigImpl implements Config
     /**
      * @return Array containing owner information
      */
-    public
-    function getOwner()
+    public function getOwner()
     {
         if ($this->owner !== null) {
             return $this->owner;
@@ -360,13 +361,13 @@ class ConfigImpl implements Config
 
     /**
      * Will path relative to project root to templates.
+     * @param string $name The name of the template
      * @return string | null Null if template not defined
      */
-    public
-    function getTemplateFolderPath()
+    public function getTemplateFolderPath($name)
     {
         $this->setUpTemplate();
-        return $this->templatePath == null ? null : "{$this->rootPath}/{$this->templatePath}";
+        return !isset($this->templatePath[$name]) ? null : "{$this->rootPath}/{$this->templatePath[$name]}";
     }
 
     /**
@@ -555,19 +556,36 @@ class ConfigImpl implements Config
      */
     public function listTemplateFolders()
     {
-        if ($this->templateFolders != null) {
-            return $this->templateFolders;
+
+        $this->setUpTemplate();
+        $result = [];
+        foreach ($this->templateNamespace as $ns => $paths) {
+            foreach($paths as $path){
+                $path = $this->getRootPath()."/".$path;
+                if ($ns == "") {
+                    $result[] = $path;
+                } else {
+                    $result[] = ['path' => $path, 'namespace' => $ns];
+                }
+            }
         }
 
-        $this->templateFolders = [];
-        if (!$this->configFile->templateFolders->getName()) {
-            return [];
-        }
+        return $result;
+    }
 
+    private function setUpTemplateHelper($templates)
+    {
 
-        foreach ($this->configFile->templateFolders->folder as $folder) {
-            $this->templateFolders[] = $this->getRootPath() . "/" . $folder['path'];
+        $namespace = (string)$templates['namespace'];
+
+        if (!isset($this->templateNamespace[$namespace])) {
+            $this->templateNamespace[$namespace] = [];
         }
-        return $this->templateFolders;
+        $this->templateNamespace[$namespace][] = (string)$templates['path'];
+
+        foreach ($templates->template as $template) {
+            $this->templates[(string)$template] = (string)$template['filename'];
+            $this->templatePath[(string)$template] = (string)$templates['path'];
+        }
     }
 }

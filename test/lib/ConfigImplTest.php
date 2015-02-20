@@ -77,7 +77,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         </config>");
         $rootPath = dirname(__FILE__) . '/';
         $config = new ConfigImpl($configXML, $rootPath);
-        $this->assertEquals($config->getTemplateFolderPath(), "$rootPath/folder");
+        $this->assertEquals($config->getTemplateFolderPath('main'), "$rootPath/folder");
     }
 
     public function testGetTemplateFolderPathReturnsNullIfNotDefined()
@@ -86,7 +86,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         <config>{$this->defaultOwner}</config>");
         $rootPath = dirname(__FILE__) . '/';
         $config = new ConfigImpl($configXML, $rootPath);
-        $this->assertNull($config->getTemplateFolderPath());
+        $this->assertNull($config->getTemplateFolderPath('not defined'));
     }
 
     public function testGetTemplateReturnLinkWithTemplateInList()
@@ -567,18 +567,53 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['main', 'main2'], $templates);
     }
 
+    public function testUsingTemplateCollectionIsCool()
+    {
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        <templateCollection>
+        <templates path='folder'>
+            <template filename='some_link'>main</template>
+        </templates>
+        <templates path='folder2'>
+            <template filename='some_link2'>main2</template>
+        </templates>
+
+        </templateCollection>
+        </config>");
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $templates = $config->listTemplateNames();
+        $this->assertEquals(['main', 'main2'], $templates);
+    }
+
+    public function testUsingEmptyTemplatesIsAlsoCool()
+    {
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        <templates path='folder' />
+        </config>");
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $templates = $config->listTemplateFolders();
+        $this->assertEquals([$config->getRootPath().'/folder'], $templates);
+    }
+
     public function testTemplateFoldersWillReturnTemplateFolders()
     {
         $configXML = simplexml_load_string("
         <config>{$this->defaultOwner}
-        <templateFolders>
-            <folder path='somePath' />
-            <folder path='somePath2' />
-        </templateFolders>
+        <templateCollection>
+            <templates path='somePath' />
+            <templates path='somePath2' namespace='someNS'/>
+        </templateCollection>
         </config>");
         $rootPath = dirname(__FILE__) . '/';
         $config = new ConfigImpl($configXML, $rootPath);
-        $this->assertEquals([$config->getRootPath().'/somePath', $config->getRootPath().'/somePath2'], $config->listTemplateFolders());
+        $this->assertEquals([$config->getRootPath().'/somePath', ['path'=>$config->getRootPath().'/somePath2', 'namespace'=>'someNS']], $config->listTemplateFolders());
+        $this->assertTrue((string) $config->listTemplateFolders()[1]['namespace'] === $config->listTemplateFolders()[1]['namespace']);
+        $this->assertTrue((string) $config->listTemplateFolders()[1]['path'] === $config->listTemplateFolders()[1]['path']);
+        $this->assertTrue((string) $config->listTemplateFolders()[0] === $config->listTemplateFolders()[0]);
 
     }
 

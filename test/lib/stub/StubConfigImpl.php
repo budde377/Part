@@ -207,14 +207,6 @@ class StubConfigImpl implements Config
         return array();
     }
 
-    /**
-     * Will path relative to project root to templates.
-     * @return string | null Null if template not defined
-     */
-    public function getTemplateFolderPath()
-    {
-        return "";
-    }
 
     /**
      * @return string Path to the tmp folder
@@ -390,5 +382,15 @@ class StubConfigImpl implements Config
     public function listTemplateFolders()
     {
         return [];
+    }
+
+    /**
+     * Will path relative to project root to templates.
+     * @param string $name The name of the template
+     * @return null|string Null if template not defined
+     */
+    public function getTemplateFolderPath($name)
+    {
+        return "";
     }
 }

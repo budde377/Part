@@ -70,7 +70,8 @@ class TemplateImpl implements Template
      */
     public function setTemplateFromString($string)
     {
-        $this->setUpTwig(new Twig_Loader_String(), $string);
+        $fn = uniqid("string_file_");
+        $this->setUpTwig(new \Twig_Loader_Array([$fn=>$string]), $fn);
     }
 
 
@@ -84,23 +85,29 @@ class TemplateImpl implements Template
     {
         $filename = $this->config->getTemplate($name);
         if ($filename == null && $defaultIfNotFound != null) {
+            $name = $defaultIfNotFound;
             $filename = $this->config->getTemplate($defaultIfNotFound);
         }
         if ($filename === null) {
             throw new EntryNotFoundException($name, 'Config');
         }
-        $file = new FileImpl($this->config->getTemplateFolderPath() . "/" . $filename);
+        $file = new FileImpl($this->config->getTemplateFolderPath($name) . "/" . $filename);
         $this->setTemplate($file);
     }
 
 
     private function setUpTwig(Twig_LoaderInterface $loader, $renderTarget)
     {
-        $chain = [$loader];
+        $fsLoader = new Twig_Loader_Filesystem();
         foreach($this->config->listTemplateFolders() as $folder){
-            $chain[] = new Twig_Loader_Filesystem($folder);
+
+            if(is_array($folder)){
+                $fsLoader->addPath($folder['path'], $folder['namespace']);
+            } else {
+                $fsLoader->addPath($folder);
+            }
         }
-        $loaderChain = new Twig_Loader_Chain($chain);
+        $loaderChain = new Twig_Loader_Chain([$loader, $fsLoader]);
         $configArray = array('debug' => $this->twigDebug);
         if ($this->config->getTmpFolderPath() != null) {
             $tmpFolder = new FolderImpl($this->config->getTmpFolderPath() . '/twig/');

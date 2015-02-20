@@ -21,9 +21,10 @@ interface Config extends \ArrayAccess
 
     /**
      * Will path relative to project root to templates.
-     * @return string | null Null if template not defined
+     * @param string $name The name of the template
+     * @return null|string Null if template not defined
      */
-    public function getTemplateFolderPath();
+    public function getTemplateFolderPath($name);
 
     /**
      * Lists the folders where to look for other templates.
