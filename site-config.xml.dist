@@ -15,12 +15,8 @@
         <page alias="" template="_logout" id="logout">Log ud</page>
         <page alias="" template="_500" id="_500">Der er sket en fejl (500)</page>
     </defaultPages>
-    <templateFolders>
-        <folder path="common" namespace="ASD"/>
-    </templateFolders>
     <templates path="templates/">
         <template filename="main_template.twig">_main</template>
-
         <template filename="logout_template.twig">_logout</template>
         <template filename="login_template.twig">_login</template>
         <template filename="error_404_template.twig">_404</template>
