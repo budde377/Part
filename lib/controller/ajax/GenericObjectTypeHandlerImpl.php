@@ -44,44 +44,11 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
     function __construct($object)
     {
 
-        if (is_string($object)) {
-            $this->types[] = $object;
-            $i = false;
-            if (!class_exists($object) && !($i = interface_exists($object))) {
-                return;
-            }
-            $reflection = new ReflectionClass($object);
-            $sn = $reflection->getShortName();
-            if ($i && preg_match("/\\\\$sn/", $object)) {
-                $this->types[] = $sn;
-                $this->alias[$sn][] = $object;
-            }
-        } else {
-            $this->object = $object;
-            $reflection = new ReflectionClass($object);
+        $reflection = $this->setUpReflectionClass($object);
+        if ($reflection != null) {
+            $this->setupTypes($reflection);
         }
 
-
-        $this->types = array_merge($this->types, $reflection->getInterfaceNames());
-
-        $alias = array_values(array_map(function (ReflectionClass $class) {
-            $s = $class->getShortName();
-            $found = false;
-            foreach ($this->types as $t) {
-                if (preg_match("/\\\\$s/", $t)) {
-                    $this->alias[$s][] = $t;
-                    $found = true;
-                }
-            }
-
-
-            return $found ? $s : null;
-        }, $reflection->getInterfaces()));
-
-        $alias = array_filter($alias, function ($s) {
-            return $s != null;
-        });
-        $this->types = array_values(array_merge($this->types, $alias));
 
         if (func_num_args() == 1) {
             return;
@@ -275,7 +242,6 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
 
             foreach ($this->alias[$type] as $target) {
                 call_user_func_array([$this, "whitelistFunction"], array_merge([$target], func_get_args()));
-//                $this->whitelistFunction($target, $functionName);
             }
             return;
         }
@@ -317,8 +283,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         if (!class_exists($type) && !interface_exists($type)) {
             return;
         }
-        $r = new ReflectionClass($type);
-        $methods = $r->getMethods();
+        $methods = (new ReflectionClass($type))->getMethods();
         $this->functions[$type] = array_map(function (ReflectionMethod $method) {
             return $method->getName();
         }, $methods);
@@ -359,24 +324,15 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         if (isset($this->alias[$type])) {
             $result = [];
             foreach ($this->alias[$type] as $target) {
-                $l = $this->listFunctions($target);
-                $result = array_merge($result, $l);
+                $result = array_merge($result, $this->listFunctions($target));
             }
             return $result;
         }
-        if (isset($this->functionWhitelist[$type]) && count($this->functionWhitelist[$type]) > 0) {
-            $resultArray = array();
+        $result = $this->listWhitelistFunctions($type);
 
-            foreach ($this->functionWhitelist[$type] as $function) {
-                if ($this->hasRealFunction($type, $function)) {
-                    $resultArray[] = $function;
-                }
-            }
-            if (count($resultArray) > 0) {
-                return $resultArray;
-            }
+        if(count($result) > 0){
+            return $result;
         }
-        $result = [];
 
         if (isset($this->functions[$type])) {
             $result = $this->functions[$type];
@@ -408,8 +364,6 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         }
 
 
-        $instance = $instance == null ? $this->object : $instance;
-
 
         $name = $function->getName();
 
@@ -417,18 +371,18 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
             return false;
         }
 
+        $instance = $instance == null ? $this->object : $instance;
+
         $args = $function->getArgs();
         /** @var \ReflectionParameter[] $parameters */
         $parameters = null;
         $this->callPreCallFunctions($type, $instance, $name, $args);
 
         if (isset($this->customFunctions[$type][$name])) {
-            $f = new \ReflectionFunction($this->customFunctions[$type][$name]);
-            $parameters = $f->getParameters();
+            $parameters = (new \ReflectionFunction($this->customFunctions[$type][$name]))->getParameters();
             $args = array_merge([$instance], $args);
         } else if ($instance != null && isset($this->functions[$type]) && in_array($name, $this->functions[$type])) {
-            $m = new \ReflectionMethod($instance, $name);
-            $parameters = $m->getParameters();
+            $parameters = (new \ReflectionMethod($instance, $name))->getParameters();
         }
         if ($parameters === null) {
             return false;
@@ -606,31 +560,31 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
     {
 
 
-        $numRequiredParameters = 0;
+        $numReqParam = 0;
         $lastRequiredFound = false;
         foreach (array_reverse($parameters) as $param) {
             /** @var $param \ReflectionParameter */
 
             $lastRequiredFound = $lastRequiredFound || !$param->isOptional();
             if ($lastRequiredFound) {
-                $numRequiredParameters++;
+                $numReqParam++;
             }
         }
 
-        if ($numRequiredParameters > count($functionArgs)) {
+        if ($numReqParam > count($functionArgs)) {
             return false;
         }
 
-        foreach ($parameters as $k => $param) {
+        foreach ($parameters as $key => $param) {
             if ($param->isArray()) {
-                if (isset($functionArgs[$k]) && !is_array($functionArgs[$k])) {
+                if (isset($functionArgs[$key]) && !is_array($functionArgs[$key])) {
                     return false;
                 }
             }
-            if ($c = $param->getClass()) {
-                if (isset($functionArgs[$k])) {
+            if ($class = $param->getClass()) {
+                if (isset($functionArgs[$key])) {
 
-                    if (!is_a($functionArgs[$k], $c->getName())) {
+                    if (!is_a($functionArgs[$key], $class->getName())) {
                         return false;
                     } else {
                         continue;
@@ -655,13 +609,77 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
      * @param string $alias
      * @param array $target
      */
-    public function addAlias($alias, array $target){
-        $this->alias[$alias] = isset($this->alias[$alias])?array_merge($this->alias[$alias], $target):$target;
+    public function addAlias($alias, array $target)
+    {
+        $this->alias[$alias] = isset($this->alias[$alias]) ? array_merge($this->alias[$alias], $target) : $target;
 
-        if(in_array($alias, $this->types)){
+        if (in_array($alias, $this->types)) {
             return;
         }
         $this->types[] = $alias;
 
+    }
+
+    private function setUpReflectionClass($object)
+    {
+        if (is_string($object)) {
+            $this->types[] = $object;
+            $interface_exists = false;
+            if (!class_exists($object) && !($interface_exists = interface_exists($object))) {
+                return null;
+            }
+            $reflection = new ReflectionClass($object);
+            $short_name = $reflection->getShortName();
+            if ($interface_exists && preg_match("/\\\\$short_name/", $object)) {
+                $this->types[] = $short_name;
+                $this->alias[$short_name][] = $object;
+            }
+        } else {
+            $this->object = $object;
+            $reflection = new ReflectionClass($object);
+        }
+
+        return $reflection;
+    }
+
+    private function setupTypes(ReflectionClass $reflection)
+    {
+        $this->types = array_merge($this->types, $reflection->getInterfaceNames());
+
+        $alias = array_values(array_map(function (ReflectionClass $class) {
+            $short_name = $class->getShortName();
+            $found = false;
+            foreach ($this->types as $t) {
+                if (preg_match("/\\\\$short_name/", $t)) {
+                    $this->alias[$short_name][] = $t;
+                    $found = true;
+                }
+            }
+
+
+            return $found ? $short_name : null;
+        }, $reflection->getInterfaces()));
+
+        $alias = array_filter($alias, function ($short_name) {
+            return $short_name != null;
+        });
+        $this->types = array_values(array_merge($this->types, $alias));
+
+    }
+
+    private function listWhitelistFunctions($type)
+    {
+        if (!isset($this->functionWhitelist[$type]) || count($this->functionWhitelist[$type]) == 0) {
+            return [];
+        }
+        $resultArray = [];
+
+        foreach ($this->functionWhitelist[$type] as $function) {
+            if ($this->hasRealFunction($type, $function)) {
+                $resultArray[] = $function;
+            }
+        }
+
+        return $resultArray;
     }
 }
