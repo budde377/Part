@@ -58,6 +58,18 @@
                         <xs:field xpath="."/>
                     </xs:unique>
                 </xs:element>
+                <xs:element name="templateFolders" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="folder" type="requiredPathAttribute"
+                                    minOccurs="1" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                    <xs:unique name="templateFolders">
+                        <xs:selector xpath="t:folder" />
+                        <xs:field xpath="@path" />
+                    </xs:unique>
+                </xs:element>
                 <xs:element name="pageElements" type="namedLinkedValClassSequence" minOccurs="0">
                     <xs:unique name="pageElementName">
                         <xs:selector xpath="t:class"/>

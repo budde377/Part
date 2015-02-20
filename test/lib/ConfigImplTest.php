@@ -564,12 +564,22 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $rootPath = dirname(__FILE__) . '/';
         $config = new ConfigImpl($configXML, $rootPath);
         $templates = $config->listTemplateNames();
-        $this->assertTrue(is_array($templates), "Did not return array");
-        $this->assertEquals(2, count($templates), "Did not return empty array");
-        $this->assertArrayHasKey(0, $templates);
-        $this->assertArrayHasKey(1, $templates);
-        $this->assertEquals("main", $templates[0]);
-        $this->assertEquals("main2", $templates[1]);
+        $this->assertEquals(['main', 'main2'], $templates);
+    }
+
+    public function testTemplateFoldersWillReturnTemplateFolders()
+    {
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        <templateFolders>
+            <folder path='somePath' />
+            <folder path='somePath2' />
+        </templateFolders>
+        </config>");
+        $rootPath = dirname(__FILE__) . '/';
+        $config = new ConfigImpl($configXML, $rootPath);
+        $this->assertEquals([$config->getRootPath().'/somePath', $config->getRootPath().'/somePath2'], $config->listTemplateFolders());
+
     }
 
 
@@ -592,7 +602,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
             'host' => 'someHost',
             'password' => 'somePassword',
             'database' => 'someDatabase',
-            'folders'=>[]], $connArray);
+            'folders' => []], $connArray);
     }
 
     public function testGetMySQLConnectionWillReturnArrayWithInfoAsInConfigXMLEvenWhenEmptyPassword()
@@ -614,7 +624,7 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
             'host' => 'someHost',
             'password' => '',
             'database' => 'someDatabase',
-            'folders'=>[]], $connArray);
+            'folders' => []], $connArray);
     }
 
     public function testGetMySQLConnectionWillAddFolderArrays()
@@ -640,9 +650,9 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
             'host' => 'someHost',
             'password' => 'somePassword',
             'database' => 'someDatabase',
-            'folders'=>[
-                'name'=>'path',
-                'name2'=>'path2']], $connArray);
+            'folders' => [
+                'name' => 'path',
+                'name2' => 'path2']], $connArray);
 
     }
 

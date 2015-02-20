@@ -382,4 +382,13 @@ class StubConfigImpl implements Config
     {
         unset($this->variables[$offset]);
     }
+
+    /**
+     * Lists the folders where to look for other templates.
+     * @return string[]
+     */
+    public function listTemplateFolders()
+    {
+        return [];
+    }
 }

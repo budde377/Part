@@ -35,6 +35,7 @@ class ConfigImpl implements Config
     private $log;
     private $ajaxTypeHandlers;
     private $facebookAppCredentials;
+    private $templateFolders;
 
     /**
      * @param SimpleXMLElement $configFile
@@ -188,10 +189,10 @@ class ConfigImpl implements Config
                 'password' => (string)$this->configFile->MySQLConnection->password,
                 'database' => (string)$this->configFile->MySQLConnection->database,
                 'host' => (string)$this->configFile->MySQLConnection->host,
-                'folders' =>[]);
-            if(!empty($this->configFile->MySQLConnection->folders)){
-                foreach($this->configFile->MySQLConnection->folders->folder as $folder){
-                    $this->mysql['folders'][(string) $folder['name']] = (string) $folder['path'];
+                'folders' => []);
+            if (!empty($this->configFile->MySQLConnection->folders)) {
+                foreach ($this->configFile->MySQLConnection->folders->folder as $folder) {
+                    $this->mysql['folders'][(string)$folder['name']] = (string)$folder['path'];
                 }
             }
         }
@@ -545,5 +546,28 @@ class ConfigImpl implements Config
     public function offsetUnset($offset)
     {
 
+    }
+
+
+    /**
+     * Lists the folders where to look for other templates.
+     * @return string[]
+     */
+    public function listTemplateFolders()
+    {
+        if ($this->templateFolders != null) {
+            return $this->templateFolders;
+        }
+
+        $this->templateFolders = [];
+        if (!$this->configFile->templateFolders->getName()) {
+            return [];
+        }
+
+
+        foreach ($this->configFile->templateFolders->folder as $folder) {
+            $this->templateFolders[] = $this->getRootPath() . "/" . $folder['path'];
+        }
+        return $this->templateFolders;
     }
 }

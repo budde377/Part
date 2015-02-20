@@ -213,6 +213,21 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->template->setTemplateFromString("{%set t='World' %}Hello{{t}}");
         $this->assertEquals("HelloWorld", $this->template->render());
     }
+    public function testTemplatesUsesTemplateFolders()
+    {
+        $this->setUpConfig("
+        <config>
+            {$this->defaultOwner}
+            <templateFolders >
+                <folder path='stubs/' />
+            </templateFolders>
+        </config>");
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{% extends \"templateStub.twig\" %}");
+        $this->assertEquals(
+            file_get_contents(dirname(__FILE__).'/../stubs/templateStub.twig'),
+            $this->template->render());
+    }
 
     public function testDebugEnablesDebug()
     {

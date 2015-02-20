@@ -26,6 +26,12 @@ interface Config extends \ArrayAccess
     public function getTemplateFolderPath();
 
     /**
+     * Lists the folders where to look for other templates.
+     * @return string[]
+     */
+    public function listTemplateFolders();
+
+    /**
      * Will return a array containing all possible templates by name.
      * @return array
      */
