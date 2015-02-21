@@ -67,6 +67,16 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         $this->authFunctions[] = $function;
     }
 
+    private function appendToArrayOrCallForEachAlias($type, callable $base_case, callable $induction_case){
+        if(isset($this->alias[$type])){
+            foreach($this->alias[$type] as $target){
+                $induction_case($target);
+            }
+            return;
+        }
+        $base_case();
+    }
+
     /**
      * Adds an auth function of type: f(type, instance, function_name, arguments) => bool
      * @param string $type
@@ -75,13 +85,13 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
      */
     public function addFunctionAuthFunction($type, $functionName, callable $function)
     {
-        if (isset($this->alias[$type])) {
-            foreach ($this->alias[$type] as $target) {
-                $this->addFunctionAuthFunction($target, $functionName, $function);
-            }
-            return;
-        }
-        $this->fnAuthFunctions[$type][$functionName][] = $function;
+
+        $this->appendToArrayOrCallForEachAlias($type, function() use ($type, $functionName, $function){
+            $this->fnAuthFunctions[$type][$functionName][] = $function;
+        }, function($target) use ($functionName, $function){
+            $this->addFunctionAuthFunction($target, $functionName, $function);
+        });
+
     }
 
     /**
@@ -91,13 +101,12 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
      */
     public function addTypeAuthFunction($type, callable $function)
     {
-        if (isset($this->alias[$type])) {
-            foreach ($this->alias[$type] as $target) {
-                $this->addTypeAuthFunction($target, $function);
-            }
-            return;
-        }
-        $this->tAuthFunctions[$type][] = $function;
+        $this->appendToArrayOrCallForEachAlias($type, function() use ($type, $function){
+            $this->tAuthFunctions[$type][] = $function;
+        }, function($target) use ( $function){
+            $this->addTypeAuthFunction($target, $function);
+        });
+
     }
 
     /**
@@ -108,14 +117,13 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
      */
     public function addFunction($type, $name, callable $function)
     {
-        if (isset($this->alias[$type])) {
-            foreach ($this->alias[$type] as $target) {
-                $this->addFunction($target, $name, $function);
-            }
-            return;
-        }
 
-        $this->customFunctions[$type][$name] = $function;
+        $this->appendToArrayOrCallForEachAlias($type, function() use ($type, $name, $function){
+            $this->customFunctions[$type][$name] = $function;
+        }, function($target) use ( $function, $name){
+            $this->addFunction($target, $name, $function);
+        });
+
     }
 
     /**
@@ -164,14 +172,15 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
      */
     public function addTypePostCallFunction($type, callable $function)
     {
-        if (isset($this->alias[$type])) {
-            foreach ($this->alias[$type] as $target) {
-                $this->addTypePostCallFunction($target, $function);
-            }
-            return;
-        }
 
-        $this->tPostCallFunctions[$type][] = $function;
+        $this->appendToArrayOrCallForEachAlias($type, function() use ($type, $function){
+            $this->tPostCallFunctions[$type][] = $function;
+        }, function($target) use ( $function){
+            $this->addTypePostCallFunction($target, $function);
+        });
+
+
+
     }
 
     /**
@@ -183,14 +192,13 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
      */
     public function addFunctionPreCallFunction($type, $name, callable $function)
     {
-        if (isset($this->alias[$type])) {
-            foreach ($this->alias[$type] as $target) {
-                $this->addFunctionPreCallFunction($target, $name, $function);
-            }
-            return;
-        }
+        $this->appendToArrayOrCallForEachAlias($type, function() use ($type, $name, $function){
+            $this->fnPreCallFunctions[$type][$name][] = $function;
+        }, function($target) use ( $function, $name){
+            $this->addFunctionPreCallFunction($target, $name, $function);
+        });
 
-        $this->fnPreCallFunctions[$type][$name][] = $function;
+
     }
 
     /**
@@ -202,13 +210,13 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
      */
     public function addFunctionPostCallFunction($type, $name, callable $function)
     {
-        if (isset($this->alias[$type])) {
-            foreach ($this->alias[$type] as $target) {
-                $this->addFunctionPostCallFunction($target, $name, $function);
-            }
-            return;
-        }
-        $this->fnPostCallFunctions[$type][$name][] = $function;
+
+        $this->appendToArrayOrCallForEachAlias($type, function() use ($type, $name, $function){
+            $this->fnPostCallFunctions[$type][$name][] = $function;
+        }, function($target) use ( $function, $name){
+            $this->addFunctionPostCallFunction($target, $name, $function);
+        });
+
     }
 
     /**
@@ -241,7 +249,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         if (isset($this->alias[$type])) {
 
             foreach ($this->alias[$type] as $target) {
-                call_user_func_array([$this, "whitelistFunction"], array_merge([$target], func_get_args()));
+                call_user_func_array([$this, "whitelistFunction"], array_merge([$target], array_slice(func_get_args(), 1)));
             }
             return;
         }
@@ -457,75 +465,56 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
 
     private function checkAuth($type, $instance, $name, JSONFunction $function)
     {
-        foreach ($this->authFunctions as $f) {
-            if (!$f($type, $instance, $name, $function->getArgs())) {
-                return false;
-            }
 
-        }
-
-        if (isset($this->tAuthFunctions[$type])) {
-            foreach ($this->tAuthFunctions[$type] as $f) {
-                if (!$f($type, $instance, $name, $function->getArgs())) {
-                    return false;
+        try{
+            $this->callArraysOfCallFunctions(function($auth_func) use($type, $instance, $name, $function) {
+                if(!$auth_func($type, $instance, $name, $function->getArgs())){
+                    throw new \Exception();
                 }
+            },
+                $this->authFunctions,
+                isset($this->tAuthFunctions[$type])?$this->tAuthFunctions[$type]:[],
+                isset($this->fnAuthFunctions[$type][$function_name = $function->getName()])?$this->fnAuthFunctions[$type][$function_name]:[]);
 
-            }
+        } catch (\Exception $e){
+            return false;
         }
 
-        if (isset($this->fnAuthFunctions[$type][$fn = $function->getName()])) {
-            foreach ($this->fnAuthFunctions[$type][$fn] as $f) {
-                if (!$f($type, $instance, $name, $function->getArgs())) {
-                    return false;
-                }
-
-            }
-        }
 
         return true;
     }
 
     private function callPreCallFunctions($type, $instance, $functionName, &$arguments)
     {
-        foreach ($this->preCallFunctions as $f) {
-            $f($type, $instance, $functionName, $arguments);
-        }
 
-        if (isset($this->tPreCallFunctions[$type])) {
-            foreach ($this->tPreCallFunctions[$type] as $f) {
-                $f($type, $instance, $functionName, $arguments);
-            }
-        }
-
-
-        if (isset($this->fnPreCallFunctions[$type][$functionName])) {
-            foreach ($this->fnPreCallFunctions[$type][$functionName] as $f) {
-                $f($type, $instance, $functionName, $arguments);
-            }
-        }
-
+        $this->callArraysOfCallFunctions(function($function) use($type, $instance, $functionName, &$arguments) {
+            $function($type, $instance, $functionName, $arguments);
+        },
+            $this->preCallFunctions,
+            isset($this->tPreCallFunctions[$type])?$this->tPreCallFunctions[$type]:[],
+            isset($this->fnPreCallFunctions[$type][$functionName])?$this->fnPreCallFunctions[$type][$functionName]:[]);
 
     }
 
     private function callPostCallFunctions($type, $instance, $functionName, &$result)
     {
-        foreach ($this->postCallFunctions as $f) {
-            $f($type, $instance, $functionName, $result);
+        $this->callArraysOfCallFunctions(function($function) use($type, $instance, $functionName, &$result) {
+            $function($type, $instance, $functionName, $result);
+        },
+            $this->postCallFunctions,
+            isset($this->tPostCallFunctions[$type])?$this->tPostCallFunctions[$type]:[],
+            isset($this->fnPostCallFunctions[$type][$functionName])?$this->fnPostCallFunctions[$type][$functionName]:[]);
+
+
+    }
+
+    private function callArraysOfCallFunctions(callable $handler, array $array){
+        foreach($array as $function){
+            $handler($function);
         }
-
-        if (isset($this->tPostCallFunctions[$type])) {
-            foreach ($this->tPostCallFunctions[$type] as $f) {
-                $f($type, $instance, $functionName, $result);
-            }
+        if(func_num_args() > 2){
+            call_user_func_array([$this, 'callArraysOfCallFunctions'], array_merge([$handler], array_slice(func_get_args(),2)));
         }
-
-
-        if (isset($this->fnPostCallFunctions[$type][$functionName])) {
-            foreach ($this->fnPostCallFunctions[$type][$functionName] as $f) {
-                $f($type, $instance, $functionName, $result);
-            }
-        }
-
     }
 
     private function hasRealFunction($type, $function)
