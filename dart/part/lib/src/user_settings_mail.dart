@@ -99,3 +99,44 @@ class UserSettingsMailDomainLibrary implements MailDomainLibrary {
   MailDomain operator [](String key) => domainLibrary[key];
 
 }
+
+
+class NullMailDomainLibrary implements MailDomainLibrary {
+
+  final MailDomainLibrary _ajax_mail_domain_library;
+
+  static NullMailDomainLibrary _cache;
+
+  factory NullMailDomainLibrary() => _cache == null ? _cache = new NullMailDomainLibrary._internal() : _cache;
+
+  NullMailDomainLibrary._internal() : _ajax_mail_domain_library = new AJAXMailDomainLibrary([],
+      (MailDomainLibrary library, String domain_name) {
+    return null;
+  }, userLibrary);
+
+  Map<String, MailDomain> get domains => _ajax_mail_domain_library.domains;
+
+  void every(void f(K)) => _ajax_mail_domain_library.every(f);
+
+
+  Iterable<MailDomain> get elements => _ajax_mail_domain_library.elements;
+
+
+  Stream<MailDomain> get onUpdate => _ajax_mail_domain_library.onUpdate;
+
+
+  core.FutureResponse<MailDomain> createDomain(String domainName, String password) =>
+    _ajax_mail_domain_library.createDomain(domainName, password);
+
+
+  Stream<MailDomain> get onRemove => _ajax_mail_domain_library.onRemove;
+
+
+  Stream<MailDomain> get onAdd => _ajax_mail_domain_library.onAdd;
+
+
+  core.FutureResponse<MailDomain> deleteDomain(MailDomain domain, String password) => _ajax_mail_domain_library.deleteDomain;
+
+  MailDomain operator [](String key) => _ajax_mail_domain_library[key];
+
+}

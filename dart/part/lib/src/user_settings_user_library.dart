@@ -76,6 +76,62 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
 
   Future<core.Response<String>> userLogin(String username, String password) => _userLibrary.userLogin(username, password);
 
-  Future<core.Response> forgotPassword(String password) => _userLibrary.forgotPassword(password);
+  Future<core.Response> forgotPassword(String username) => _userLibrary.forgotPassword(username);
+
+}
+
+
+class NullUserLibrary implements UserLibrary{
+
+  final UserLibrary _ajax_user_library = new AJAXUserLibrary([], null, pageOrder);
+
+  static NullUserLibrary _cache;
+
+  factory NullUserLibrary() => _cache==null?_cache = new NullUserLibrary._internal():_cache;
+
+
+  NullUserLibrary._internal();
+
+  Stream<UserLibraryChangeEvent> get onChange =>_ajax_user_library.onChange;
+
+  Map<String, User> get pageUsers => _ajax_user_library.pageUsers;
+
+  Stream<User> get onAdd  => _ajax_user_library.onAdd;
+
+  Iterable<User> get elements => _ajax_user_library.elements;
+
+  void every(void f(K)) => _ajax_user_library.every(f);
+
+
+  core.FutureResponse forgotPassword(String username) => _ajax_user_library.forgotPassword(username);
+
+
+  Map<String, User> get siteUsers => _ajax_user_library.siteUsers;
+
+
+  Map<String, User> get rootUsers => _ajax_user_library.rootUsers;
+
+
+  core.FutureResponse<User> deleteUser(String username) => _ajax_user_library.deleteUser(username);
+
+
+  Stream<User> get onRemove => _ajax_user_library.onRemove;
+
+
+  core.FutureResponse<String> userLogin(String username, String password) => _ajax_user_library.userLogin(username, password);
+
+
+  Stream<User> get onUpdate => _ajax_user_library.onUpdate;
+
+
+  User get userLoggedIn => _ajax_user_library.userLoggedIn;
+
+
+  Map<String, User> get users => _ajax_user_library.users;
+
+
+  core.FutureResponse<User> createUser(String mail, String privileges) => _ajax_user_library.createUser(mail, privileges);
+
+
 
 }

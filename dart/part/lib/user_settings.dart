@@ -33,11 +33,12 @@ bool get userLibraryAvailable => pageOrderAvailable && querySelector('#UserList'
 
 bool get mailDomainLibraryAvailable => userLibraryAvailable && querySelector('#UserSettingsContent #UserSettingsEditMailDomainList') != null;
 
-PageOrder get pageOrder => pageOrderAvailable ? new UserSettingsJSONPageOrder() : null;
+PageOrder get pageOrder => pageOrderAvailable ? new UserSettingsJSONPageOrder() : new OnePageUserSettingsPageOrder();
 
-UserLibrary get userLibrary => userLibraryAvailable ? new UserSettingsJSONUserLibrary() : null;
 
-MailDomainLibrary get mailDomainLibrary => mailDomainLibraryAvailable ? new UserSettingsMailDomainLibrary() : null;
+UserLibrary get userLibrary => userLibraryAvailable ? new UserSettingsJSONUserLibrary() : new NullUserLibrary();
+
+MailDomainLibrary get mailDomainLibrary => mailDomainLibraryAvailable ? new UserSettingsMailDomainLibrary() : new NullMailDomainLibrary();
 
 
 String _errorMessage(int error_code) {
@@ -74,7 +75,7 @@ class UserSettingsInitializer extends core.Initializer {
   UserSettingsInitializer(this._initLib);
 
 
-  bool get canBeSetUp => pageOrderAvailable && userLibraryAvailable;
+  bool get canBeSetUp => querySelector('#UserSettingsContainer') != null && pageOrderAvailable && userLibraryAvailable;
 
   void setUp() {
     var client = new AJAXJSONClient();

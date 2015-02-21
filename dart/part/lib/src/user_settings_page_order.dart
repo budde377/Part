@@ -99,3 +99,87 @@ class UserSettingsJSONPageOrder implements PageOrder {
   Page operator [](String id) => _pageOrder[id];
 
 }
+
+class OnePageUserSettingsPageOrder implements PageOrder {
+
+  final PageOrder _ajax_page_order;
+
+  static PageOrder _cache;
+
+  factory OnePageUserSettingsPageOrder() => _cache == null ? _cache = new OnePageUserSettingsPageOrder._internal() : _cache;
+
+  OnePageUserSettingsPageOrder._internal(): _ajax_page_order = (() {
+    var current_page_element = querySelector("#UserSettingsCurrentPage");
+    var id = current_page_element.dataset['id'];
+    var title = current_page_element.dataset['title'];
+    var alias = current_page_element.dataset['alias'];
+    var template = current_page_element.dataset['template'];
+    var hidden = current_page_element.dataset['hidden'] == 'true';
+    return new AJAXPageOrder({
+        null:[new AJAXPage(id, title, template, alias, hidden)]
+    }, [], id);
+  })();
+
+  Page get currentPage => _ajax_page_order.currentPage;
+
+  List<Page> get currentPagePath => _ajax_page_order.currentPagePath;
+
+  List<Page> get inactivePages => _ajax_page_order.inactivePages;
+
+  Stream<PageOrderChange> get onChange => _ajax_page_order.onChange;
+
+  Iterable<Page> get elements => _ajax_page_order.elements;
+
+
+  Stream<Page> get onActivate => _ajax_page_order.onActivate;
+
+
+  core.FutureResponse<PageOrder> changePageOrder(List<String> page_id_list, {String parent_id}) =>
+  _ajax_page_order.changePageOrder(page_id_list, parent_id:parent_id);
+
+
+  List<Page> get activePages => _ajax_page_order.activePages;
+
+
+  Stream<Page> get onAdd => _ajax_page_order.onAdd;
+
+
+  Stream<Page> get onDeactivate => _ajax_page_order.onDeactivate;
+
+
+  void every(void f(K)) => _ajax_page_order.every(f);
+
+
+  bool pageExists(String page_id) => _ajax_page_order.pageExists(page_id);
+
+
+  List<Page> listPageOrder({String parent_id}) => _ajax_page_order.listPageOrder(parent_id:parent_id);
+
+
+  Map<String, Page> get pages => _ajax_page_order.pages;
+
+
+  bool isActive(String page_id) => _ajax_page_order.isActive(page_id);
+
+
+  List<Page> pagePath(String page_id) => _ajax_page_order.pagePath(page_id);
+
+
+  Stream<Page> get onRemove => _ajax_page_order.onRemove;
+
+
+  core.FutureResponse<Page> deactivatePage(String page_id) => _ajax_page_order.deactivatePage(page_id);
+
+
+  Stream<Page> get onUpdate => _ajax_page_order.onUpdate;
+
+
+  core.FutureResponse<Page> deletePage(String id) => _ajax_page_order.deletePage(id);
+
+
+  core.FutureResponse<Page> createPage(String title) => _ajax_page_order.createPage(title);
+
+  Page operator [](String id) => _ajax_page_order[id];
+
+}
+

@@ -37,7 +37,7 @@ abstract class UserLibrary extends GeneratorDependable<User>{
 
   FutureResponse<String> userLogin(String username, String password);
 
-  FutureResponse forgotPassword(String password);
+  FutureResponse forgotPassword(String username);
 
 }
 
@@ -181,7 +181,7 @@ class AJAXUserLibrary extends UserLibrary {
     return future;
   }
 
-  FutureResponse forgotPassword(String password) => ajaxClient.callFunctionString('UserLibrary.forgotPassword(${quoteString(password)})');
+  FutureResponse forgotPassword(String username) => ajaxClient.callFunctionString('UserLibrary.forgotPassword(${quoteString(username)})');
 
 
   Stream<User> get onAdd => onChange.where((UserLibraryChangeEvent evt)=>evt.type == UserLibraryChangeEvent.CHANGE_CREATE).map((UserLibraryChangeEvent evt) => evt.user);

@@ -78,4 +78,14 @@
     <div id="OnlineOfflineIndicator" class="no_select">
 
     </div>
+{% else %}
+    <div id="UserSettingsCurrentPage"
+         data-id="{{ current_page.id }}"
+         data-title="{{ current_page.title }}"
+         data-alias="{{ current_page.alias }}"
+         data-last_modified="{{ current_page.lastModified }}"
+         data-template="{{ current_page.template }}"
+         data-hidden="{{ current_page.hidden?'true':'false' }}"
+         hidden></div>
+
 {% endif %}
