@@ -17,12 +17,12 @@
     </defaultPages>
     <templates path="templates/">
         <template filename="main_template.twig">_main</template>
-
         <template filename="logout_template.twig">_logout</template>
         <template filename="login_template.twig">_login</template>
         <template filename="error_404_template.twig">_404</template>
         <template filename="error_400_template.twig">_500</template>
     </templates>
+
     <pageElements>
         <class name="logout" >ChristianBudde\Part\view\page_element\LogoutPageElementImpl</class>
         <class name="login_formula" >ChristianBudde\Part\view\page_element\LoginFormulaPageElementImpl</class>
@@ -33,7 +33,7 @@
         <host>localhost</host>
         <database>test_cms</database>
         <username>root</username>
-        <password></password>
+        <password/>
         <folders>
             <folder path="db/part/" name="part" />
         </folders>

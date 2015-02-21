@@ -21,9 +21,16 @@ interface Config extends \ArrayAccess
 
     /**
      * Will path relative to project root to templates.
-     * @return string | null Null if template not defined
+     * @param string $name The name of the template
+     * @return null|string Null if template not defined
      */
-    public function getTemplateFolderPath();
+    public function getTemplateFolderPath($name);
+
+    /**
+     * Lists the folders where to look for other templates.
+     * @return string[]
+     */
+    public function listTemplateFolders();
 
     /**
      * Will return a array containing all possible templates by name.
@@ -56,12 +63,6 @@ interface Config extends \ArrayAccess
     public function getPostScripts();
 
 
-    /**
-     * Will return AJAXRegistrable as an array, with the num key and an array containing "class_name", "path" and "ajaxId" as value.
-     * The link should be relative to a root path provided.
-     * @return array
-     */
-    public function getAJAXRegistrable();
 
     /**
      * Will return AJAXTypeHandlers as an array, with the num key and an array containing "class_name" and "path" as value.

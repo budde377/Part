@@ -14,7 +14,6 @@ class StubConfigImpl implements Config
 {
 
     private $variables;
-    private $AJAXRegistrable;
     private $templates;
     private $preScripts;
     private $postScripts;
@@ -148,24 +147,6 @@ class StubConfigImpl implements Config
         return $this->defaultPages;
     }
 
-    /**
-     * Will return AJAXRegistrable as an array, with the ClassName as key and an array containing "path" and "ajaxId" as value.
-     * The link should be relative to a root path provided.
-     * @return array
-     */
-    public function getAJAXRegistrable()
-    {
-        return $this->AJAXRegistrable;
-    }
-
-
-    /**
-     * @param mixed $AJAXRegistrable
-     */
-    public function setAJAXRegistrable($AJAXRegistrable)
-    {
-        $this->AJAXRegistrable = $AJAXRegistrable;
-    }
 
     /**
      * @return bool
@@ -207,14 +188,6 @@ class StubConfigImpl implements Config
         return array();
     }
 
-    /**
-     * Will path relative to project root to templates.
-     * @return string | null Null if template not defined
-     */
-    public function getTemplateFolderPath()
-    {
-        return "";
-    }
 
     /**
      * @return string Path to the tmp folder
@@ -381,5 +354,24 @@ class StubConfigImpl implements Config
     public function offsetUnset($offset)
     {
         unset($this->variables[$offset]);
+    }
+
+    /**
+     * Lists the folders where to look for other templates.
+     * @return string[]
+     */
+    public function listTemplateFolders()
+    {
+        return [];
+    }
+
+    /**
+     * Will path relative to project root to templates.
+     * @param string $name The name of the template
+     * @return null|string Null if template not defined
+     */
+    public function getTemplateFolderPath($name)
+    {
+        return "";
     }
 }

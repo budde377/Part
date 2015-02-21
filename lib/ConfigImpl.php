@@ -20,11 +20,11 @@ class ConfigImpl implements Config
     private $rootPath;
 
     private $templates = null;
-    private $templatePath;
+    private $templatePath = [];
+    private $templateNamespace = [];
     private $pageElements = null;
     private $preScripts = null;
     private $postScripts = null;
-    private $ajaxRegistrable = null;
     private $optimizers = null;
     private $mysql = null;
     private $mailMysql = null;
@@ -34,7 +34,7 @@ class ConfigImpl implements Config
     private $tmpFolderPath;
     private $log;
     private $ajaxTypeHandlers;
-    private $facebookAppCredentials;
+    private $fbAppCredentials;
 
     /**
      * @param SimpleXMLElement $configFile
@@ -53,10 +53,12 @@ class ConfigImpl implements Config
         $dom = new DOMDocument(1, 'UTF-8');
         $dom->loadXML($configFile->asXML());
         $schema = dirname(__FILE__) . "/../xsd/site-config.xsd";
+        libxml_use_internal_errors(true);
 
-        if (!@$dom->schemaValidate($schema)) {
+        if (!$dom->schemaValidate($schema)) {
             throw new InvalidXMLException('site-config', 'ConfigXML');
         }
+        libxml_use_internal_errors(false);
 
         $this->configFile = $configFile;
         $this->rootPath = $rootPath;
@@ -83,16 +85,26 @@ class ConfigImpl implements Config
      */
     public function getPostScripts()
     {
-        if ($this->postScripts === null && $this->configFile->postScripts->getName()) {
-            $postScripts = $this->configFile->postScripts->class;
-            $this->postScripts = array();
-            foreach ($postScripts as $script) {
-                $this->postScripts[(string)$script] = isset($script['link']) ? $this->rootPath . $script['link'] : null;
-            }
-        } else if ($this->postScripts === null) {
-            $this->postScripts = array();
+        if ($this->postScripts != null) {
+            return $this->postScripts;
         }
-        return $this->postScripts;
+
+        return $this->postScripts = $this->getScripts($this->configFile->postScripts);
+    }
+
+    private function getScripts($scriptsXml)
+    {
+
+        if (!$scriptsXml) {
+            return [];
+        }
+
+        $scripts = [];
+        foreach ($scriptsXml->class as $scriptClass) {
+            $scripts[(string)$scriptClass] = isset($scriptClass['link']) ? $this->rootPath . $scriptClass['link'] : null;
+        }
+
+        return $scripts;
     }
 
     /**
@@ -102,16 +114,11 @@ class ConfigImpl implements Config
      */
     public function getPreScripts()
     {
-        if ($this->preScripts === null && $this->configFile->preScripts->getName()) {
-            $preScripts = $this->configFile->preScripts->class;
-            $this->preScripts = array();
-            foreach ($preScripts as $script) {
-                $this->preScripts[(string)$script] = isset($script['link']) ? $this->rootPath . $script['link'] : null;
-            }
-        } else if ($this->preScripts === null) {
-            $this->preScripts = array();
+        if ($this->preScripts != null) {
+            return $this->preScripts;
         }
-        return $this->preScripts;
+
+        return $this->preScripts = $this->getScripts($this->configFile->preScripts);
     }
 
 
@@ -122,28 +129,36 @@ class ConfigImpl implements Config
      */
     public function getPageElement($name)
     {
-        if ($this->pageElements === null && $this->configFile->pageElements->getName()) {
-            $this->pageElements = array();
-            $elements = $this->configFile->pageElements->class;
-            foreach ($elements as $element) {
-                $ar = array(
-                    'name' => (string)$element['name'],
-                    'className' => (string)$element);
+        if ($this->pageElements == null) {
+            $this->pageElements = $this->buildClasses($this->configFile->pageElements->class);
+        }
 
-                if (isset($element['link'])) {
-                    $ar['link'] = $this->rootPath . (string)$element['link'];
 
-                }
+        return isset($this->pageElements[$name]) ? $this->pageElements[$name] : null;
 
-                $this->pageElements[(string)$element['name']] = $ar;
+    }
+
+    private function buildClasses($classesXML)
+    {
+        if (empty($classesXML)) {
+            return [];
+        }
+        $returnArray = [];
+        foreach ($classesXML as $element) {
+            $elementArray = [
+                'name' => (string)$element['name'],
+                'className' => (string)$element];
+
+            if (isset($element['link'])) {
+                $elementArray['link'] = $this->getRootPath() . (string)$element['link'];
+
             }
+
+            $returnArray[(string)$element['name']] = $elementArray;
         }
 
-        if (isset($this->pageElements[$name])) {
-            return $this->pageElements[$name];
-        }
-        return null;
 
+        return $returnArray;
     }
 
     /**
@@ -152,25 +167,12 @@ class ConfigImpl implements Config
      */
     public function getOptimizer($name)
     {
-        if ($this->optimizers === null && $this->configFile->optimizers->getName()) {
-            $this->optimizers = array();
-            $optimizer = $this->configFile->optimizers->class;
-            foreach ($optimizer as $element) {
-                $ar = array(
-                    'name' => (string)$element['name'],
-                    'className' => (string)$element);
-                if (isset($element['link'])) {
-                    $ar['link'] = $this->rootPath . (string)$element['link'];
-                }
-                $this->optimizers[(string)$element['name']] = $ar;
-            }
-
+        if ($this->optimizers == null) {
+            $this->optimizers = $this->buildClasses($this->configFile->optimizers->class);
         }
 
-        if (isset($this->optimizers[$name])) {
-            return $this->optimizers[$name];
-        }
-        return null;
+
+        return isset($this->optimizers[$name]) ? $this->optimizers[$name] : null;
     }
 
     /**
@@ -179,20 +181,23 @@ class ConfigImpl implements Config
     public function getMySQLConnection()
     {
 
-        if (empty($this->configFile->MySQLConnection)) {
-            return $this->mysql;
+        if ($this->mysql != null) {
+            return $this->mysql === false ? null : $this->mysql;
         }
-        if ($this->mysql === null && $this->configFile->MySQLConnection->getName()) {
-            $this->mysql = array(
-                'user' => (string)$this->configFile->MySQLConnection->username,
-                'password' => (string)$this->configFile->MySQLConnection->password,
-                'database' => (string)$this->configFile->MySQLConnection->database,
-                'host' => (string)$this->configFile->MySQLConnection->host,
-                'folders' =>[]);
-            if(!empty($this->configFile->MySQLConnection->folders)){
-                foreach($this->configFile->MySQLConnection->folders->folder as $folder){
-                    $this->mysql['folders'][(string) $folder['name']] = (string) $folder['path'];
-                }
+
+        if (empty($this->configFile->MySQLConnection)) {
+            $this->mysql = false;
+            return null;
+        }
+        $this->mysql = [
+            'user' => (string)$this->configFile->MySQLConnection->username,
+            'password' => (string)$this->configFile->MySQLConnection->password,
+            'database' => (string)$this->configFile->MySQLConnection->database,
+            'host' => (string)$this->configFile->MySQLConnection->host,
+            'folders' => []];
+        if (!empty($this->configFile->MySQLConnection->folders)) {
+            foreach ($this->configFile->MySQLConnection->folders->folder as $folder) {
+                $this->mysql['folders'][(string)$folder['name']] = (string)$folder['path'];
             }
         }
 
@@ -221,18 +226,20 @@ class ConfigImpl implements Config
      */
     public function getDefaultPages()
     {
-        if ($this->defaultPages === null) {
-            $this->defaultPages = array();
-            if ($this->configFile->defaultPages->getName()) {
-                foreach ($this->configFile->defaultPages->page as $page) {
-                    $title = (string)$page;
-                    $this->defaultPages[$title]["template"] = (string)$page["template"];
-                    $this->defaultPages[$title]["alias"] = (string)$page["alias"];
-                    $this->defaultPages[$title]["id"] = (string)$page["id"];
-                }
-
-            }
+        if ($this->defaultPages != null) {
+            return $this->defaultPages;
         }
+        $this->defaultPages = [];
+        if ($this->configFile->defaultPages->getName()) {
+            foreach ($this->configFile->defaultPages->page as $page) {
+                $title = (string)$page;
+                $this->defaultPages[$title]["template"] = (string)$page["template"];
+                $this->defaultPages[$title]["alias"] = (string)$page["alias"];
+                $this->defaultPages[$title]["id"] = (string)$page["id"];
+            }
+
+        }
+
         return $this->defaultPages;
     }
 
@@ -241,55 +248,29 @@ class ConfigImpl implements Config
         if ($this->templates !== null) {
             return;
         }
-        $this->templates = array();
-        $templates = $this->configFile->templates;
 
-        if (!(string)$templates) {
+        $this->templates = [];
+        $templates = $this->configFile->templates;
+        if (!empty($templates)) {
+            $this->setUpTemplateHelper($templates);
             return;
         }
 
-        $this->templatePath = (string)$templates['path'];
-        foreach ($templates->template as $template) {
-            $this->templates[(string)$template] = (string)$template['filename'];
+        if (empty($this->configFile->templateCollection)) {
+            return;
         }
+
+        foreach ($this->configFile->templateCollection->templates as $templates) {
+            $this->setUpTemplateHelper($templates);
+        }
+
     }
 
-
-    /**
-     * Will return AJAXRegistrable as an array, with the num key and an array containing "class_name", "path" and "ajaxId" as value.
-     * The link should be relative to a root path provided.
-     * @return array
-     */
-    public function getAJAXRegistrable()
-    {
-
-        if ($this->ajaxRegistrable != null) {
-            return $this->ajaxRegistrable;
-        }
-
-        $this->ajaxRegistrable = array();
-
-        if (!$this->configFile->AJAXRegistrable->getName()) {
-            return $this->ajaxRegistrable;
-        }
-
-
-        foreach ($this->configFile->AJAXRegistrable->class as $registrable) {
-            $ar = array("class_name" => (string)$registrable,
-                "ajax_id" => (string)$registrable['ajax_id']);
-            if (isset($registrable['link'])) {
-                $ar['link'] = $this->rootPath . $registrable['link'];
-            }
-            $this->ajaxRegistrable[] = $ar;
-        }
-        return $this->ajaxRegistrable;
-    }
 
     /**
      * @return bool
      */
-    public
-    function isDebugMode()
+    public function isDebugMode()
     {
         if ($this->debugMode != null) {
             return $this->debugMode;
@@ -305,8 +286,7 @@ class ConfigImpl implements Config
     /**
      * @return string Root path
      */
-    public
-    function getRootPath()
+    public function getRootPath()
     {
         return $this->rootPath;
     }
@@ -314,8 +294,7 @@ class ConfigImpl implements Config
     /**
      * @return bool
      */
-    public
-    function isUpdaterEnabled()
+    public function isUpdaterEnabled()
     {
         if ($this->enableUpdater !== null) {
             return $this->enableUpdater;
@@ -331,8 +310,7 @@ class ConfigImpl implements Config
     /**
      * @return string String containing the domain (name.ext)
      */
-    public
-    function getDomain()
+    public function getDomain()
     {
         if ($this->domain !== null) {
             return $this->domain;
@@ -343,8 +321,7 @@ class ConfigImpl implements Config
     /**
      * @return Array containing owner information
      */
-    public
-    function getOwner()
+    public function getOwner()
     {
         if ($this->owner !== null) {
             return $this->owner;
@@ -359,13 +336,13 @@ class ConfigImpl implements Config
 
     /**
      * Will path relative to project root to templates.
+     * @param string $name The name of the template
      * @return string | null Null if template not defined
      */
-    public
-    function getTemplateFolderPath()
+    public function getTemplateFolderPath($name)
     {
         $this->setUpTemplate();
-        return $this->templatePath == null ? null : "{$this->rootPath}/{$this->templatePath}";
+        return !isset($this->templatePath[$name]) ? null : "{$this->rootPath}/{$this->templatePath[$name]}";
     }
 
     /**
@@ -431,11 +408,11 @@ class ConfigImpl implements Config
         foreach ($this->configFile->AJAXTypeHandlers->class as $handler) {
             $ar = array("class_name" => (string)$handler);
             if (isset($handler['link'])) {
-                $ar['link'] = $this->rootPath . $handler['link'];
+                $ar['link'] = $this->rootPath . "/" . $handler['link'];
             }
-            $this->ajaxRegistrable[] = $ar;
+            $this->ajaxTypeHandlers[] = $ar;
         }
-        return $this->ajaxRegistrable;
+        return $this->ajaxTypeHandlers;
     }
 
     /**
@@ -452,14 +429,14 @@ class ConfigImpl implements Config
      */
     public function getFacebookAppCredentials()
     {
-        if ($this->facebookAppCredentials !== null) {
-            return $this->facebookAppCredentials;
+        if ($this->fbAppCredentials !== null) {
+            return $this->fbAppCredentials;
         }
 
-        $id = $this->facebookAppCredentials = (string)$this->configFile->facebookApp['id'];
-        $secret = $this->facebookAppCredentials = (string)$this->configFile->facebookApp['secret'];
-        $token = $this->facebookAppCredentials = (string)$this->configFile->facebookApp['permanent_token'];
-        return $this->facebookAppCredentials = ['id' => $id, 'secret' => $secret, 'permanent_access_token' => $token];
+        $app_id = $this->fbAppCredentials = (string)$this->configFile->facebookApp['id'];
+        $secret = $this->fbAppCredentials = (string)$this->configFile->facebookApp['secret'];
+        $token = $this->fbAppCredentials = (string)$this->configFile->facebookApp['permanent_token'];
+        return $this->fbAppCredentials = ['id' => $app_id, 'secret' => $secret, 'permanent_access_token' => $token];
     }
 
     /**
@@ -545,5 +522,45 @@ class ConfigImpl implements Config
     public function offsetUnset($offset)
     {
 
+    }
+
+
+    /**
+     * Lists the folders where to look for other templates.
+     * @return string[]
+     */
+    public function listTemplateFolders()
+    {
+
+        $this->setUpTemplate();
+        $result = [];
+        foreach ($this->templateNamespace as $ns => $paths) {
+            foreach ($paths as $path) {
+                $path = $this->getRootPath() . "/" . $path;
+                if ($ns == "") {
+                    $result[] = $path;
+                } else {
+                    $result[] = ['path' => $path, 'namespace' => $ns];
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    private function setUpTemplateHelper($templates)
+    {
+
+        $namespace = (string)$templates['namespace'];
+
+        if (!isset($this->templateNamespace[$namespace])) {
+            $this->templateNamespace[$namespace] = [];
+        }
+        $this->templateNamespace[$namespace][] = (string)$templates['path'];
+
+        foreach ($templates->template as $template) {
+            $this->templates[(string)$template] = (string)$template['filename'];
+            $this->templatePath[(string)$template] = (string)$templates['path'];
+        }
     }
 }

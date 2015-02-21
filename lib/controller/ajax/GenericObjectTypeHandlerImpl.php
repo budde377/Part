@@ -25,17 +25,17 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
     private $customFunctions = [];
 
     private $authFunctions = [];
-    private $typeAuthFunctions = [];
-    private $functionAuthFunctions = [];
+    private $tAuthFunctions = [];
+    private $fnAuthFunctions = [];
 
     private $preCallFunctions = [];
-    private $typePreCallFunctions = [];
-    private $functionPreCallFunctions = [];
+    private $tPreCallFunctions = [];
+    private $fnPreCallFunctions = [];
 
 
     private $postCallFunctions = [];
-    private $typePostCallFunctions = [];
-    private $functionPostCallFunctions = [];
+    private $tPostCallFunctions = [];
+    private $fnPostCallFunctions = [];
 
     private $alias = [];
     private $hasBeenSetUp = [];
@@ -44,44 +44,11 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
     function __construct($object)
     {
 
-        if (is_string($object)) {
-            $this->types[] = $object;
-            $i = false;
-            if (!class_exists($object) && !($i = interface_exists($object))) {
-                return;
-            }
-            $reflection = new ReflectionClass($object);
-            $sn = $reflection->getShortName();
-            if ($i && preg_match("/\\\\$sn/", $object)) {
-                $this->types[] = $sn;
-                $this->alias[$sn][] = $object;
-            }
-        } else {
-            $this->object = $object;
-            $reflection = new ReflectionClass($object);
+        $reflection = $this->setUpReflectionClass($object);
+        if ($reflection != null) {
+            $this->setupTypes($reflection);
         }
 
-
-        $this->types = array_merge($this->types, $reflection->getInterfaceNames());
-
-        $alias = array_values(array_map(function (ReflectionClass $class) {
-            $s = $class->getShortName();
-            $found = false;
-            foreach ($this->types as $t) {
-                if (preg_match("/\\\\$s/", $t)) {
-                    $this->alias[$s][] = $t;
-                    $found = true;
-                }
-            }
-
-
-            return $found ? $s : null;
-        }, $reflection->getInterfaces()));
-
-        $alias = array_filter($alias, function ($s) {
-            return $s != null;
-        });
-        $this->types = array_values(array_merge($this->types, $alias));
 
         if (func_num_args() == 1) {
             return;
@@ -100,6 +67,16 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         $this->authFunctions[] = $function;
     }
 
+    private function appendToArrayOrCallForEachAlias($type, callable $base_case, callable $induction_case){
+        if(isset($this->alias[$type])){
+            foreach($this->alias[$type] as $target){
+                $induction_case($target);
+            }
+            return;
+        }
+        $base_case();
+    }
+
     /**
      * Adds an auth function of type: f(type, instance, function_name, arguments) => bool
      * @param string $type
@@ -108,13 +85,13 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
      */
     public function addFunctionAuthFunction($type, $functionName, callable $function)
     {
-        if (isset($this->alias[$type])) {
-            foreach ($this->alias[$type] as $target) {
-                $this->addFunctionAuthFunction($target, $functionName, $function);
-            }
-            return;
-        }
-        $this->functionAuthFunctions[$type][$functionName][] = $function;
+
+        $this->appendToArrayOrCallForEachAlias($type, function() use ($type, $functionName, $function){
+            $this->fnAuthFunctions[$type][$functionName][] = $function;
+        }, function($target) use ($functionName, $function){
+            $this->addFunctionAuthFunction($target, $functionName, $function);
+        });
+
     }
 
     /**
@@ -124,13 +101,12 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
      */
     public function addTypeAuthFunction($type, callable $function)
     {
-        if (isset($this->alias[$type])) {
-            foreach ($this->alias[$type] as $target) {
-                $this->addTypeAuthFunction($target, $function);
-            }
-            return;
-        }
-        $this->typeAuthFunctions[$type][] = $function;
+        $this->appendToArrayOrCallForEachAlias($type, function() use ($type, $function){
+            $this->tAuthFunctions[$type][] = $function;
+        }, function($target) use ( $function){
+            $this->addTypeAuthFunction($target, $function);
+        });
+
     }
 
     /**
@@ -141,14 +117,13 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
      */
     public function addFunction($type, $name, callable $function)
     {
-        if (isset($this->alias[$type])) {
-            foreach ($this->alias[$type] as $target) {
-                $this->addFunction($target, $name, $function);
-            }
-            return;
-        }
 
-        $this->customFunctions[$type][$name] = $function;
+        $this->appendToArrayOrCallForEachAlias($type, function() use ($type, $name, $function){
+            $this->customFunctions[$type][$name] = $function;
+        }, function($target) use ( $function, $name){
+            $this->addFunction($target, $name, $function);
+        });
+
     }
 
     /**
@@ -186,7 +161,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
             return;
         }
 
-        $this->typePreCallFunctions[$type][] = $function;
+        $this->tPreCallFunctions[$type][] = $function;
     }
 
     /**
@@ -197,14 +172,15 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
      */
     public function addTypePostCallFunction($type, callable $function)
     {
-        if (isset($this->alias[$type])) {
-            foreach ($this->alias[$type] as $target) {
-                $this->addTypePostCallFunction($target, $function);
-            }
-            return;
-        }
 
-        $this->typePostCallFunctions[$type][] = $function;
+        $this->appendToArrayOrCallForEachAlias($type, function() use ($type, $function){
+            $this->tPostCallFunctions[$type][] = $function;
+        }, function($target) use ( $function){
+            $this->addTypePostCallFunction($target, $function);
+        });
+
+
+
     }
 
     /**
@@ -216,14 +192,13 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
      */
     public function addFunctionPreCallFunction($type, $name, callable $function)
     {
-        if (isset($this->alias[$type])) {
-            foreach ($this->alias[$type] as $target) {
-                $this->addFunctionPreCallFunction($target, $name, $function);
-            }
-            return;
-        }
+        $this->appendToArrayOrCallForEachAlias($type, function() use ($type, $name, $function){
+            $this->fnPreCallFunctions[$type][$name][] = $function;
+        }, function($target) use ( $function, $name){
+            $this->addFunctionPreCallFunction($target, $name, $function);
+        });
 
-        $this->functionPreCallFunctions[$type][$name][] = $function;
+
     }
 
     /**
@@ -235,13 +210,13 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
      */
     public function addFunctionPostCallFunction($type, $name, callable $function)
     {
-        if (isset($this->alias[$type])) {
-            foreach ($this->alias[$type] as $target) {
-                $this->addFunctionPostCallFunction($target, $name, $function);
-            }
-            return;
-        }
-        $this->functionPostCallFunctions[$type][$name][] = $function;
+
+        $this->appendToArrayOrCallForEachAlias($type, function() use ($type, $name, $function){
+            $this->fnPostCallFunctions[$type][$name][] = $function;
+        }, function($target) use ( $function, $name){
+            $this->addFunctionPostCallFunction($target, $name, $function);
+        });
+
     }
 
     /**
@@ -274,8 +249,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         if (isset($this->alias[$type])) {
 
             foreach ($this->alias[$type] as $target) {
-                call_user_func_array([$this, "whitelistFunction"], array_merge([$target], func_get_args()));
-//                $this->whitelistFunction($target, $functionName);
+                call_user_func_array([$this, "whitelistFunction"], array_merge([$target], array_slice(func_get_args(), 1)));
             }
             return;
         }
@@ -317,8 +291,7 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         if (!class_exists($type) && !interface_exists($type)) {
             return;
         }
-        $r = new ReflectionClass($type);
-        $methods = $r->getMethods();
+        $methods = (new ReflectionClass($type))->getMethods();
         $this->functions[$type] = array_map(function (ReflectionMethod $method) {
             return $method->getName();
         }, $methods);
@@ -359,24 +332,15 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         if (isset($this->alias[$type])) {
             $result = [];
             foreach ($this->alias[$type] as $target) {
-                $l = $this->listFunctions($target);
-                $result = array_merge($result, $l);
+                $result = array_merge($result, $this->listFunctions($target));
             }
             return $result;
         }
-        if (isset($this->functionWhitelist[$type]) && count($this->functionWhitelist[$type]) > 0) {
-            $resultArray = array();
+        $result = $this->listWhitelistFunctions($type);
 
-            foreach ($this->functionWhitelist[$type] as $function) {
-                if ($this->hasRealFunction($type, $function)) {
-                    $resultArray[] = $function;
-                }
-            }
-            if (count($resultArray) > 0) {
-                return $resultArray;
-            }
+        if(count($result) > 0){
+            return $result;
         }
-        $result = [];
 
         if (isset($this->functions[$type])) {
             $result = $this->functions[$type];
@@ -408,8 +372,6 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
         }
 
 
-        $instance = $instance == null ? $this->object : $instance;
-
 
         $name = $function->getName();
 
@@ -417,18 +379,18 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
             return false;
         }
 
+        $instance = $instance == null ? $this->object : $instance;
+
         $args = $function->getArgs();
         /** @var \ReflectionParameter[] $parameters */
         $parameters = null;
         $this->callPreCallFunctions($type, $instance, $name, $args);
 
         if (isset($this->customFunctions[$type][$name])) {
-            $f = new \ReflectionFunction($this->customFunctions[$type][$name]);
-            $parameters = $f->getParameters();
+            $parameters = (new \ReflectionFunction($this->customFunctions[$type][$name]))->getParameters();
             $args = array_merge([$instance], $args);
         } else if ($instance != null && isset($this->functions[$type]) && in_array($name, $this->functions[$type])) {
-            $m = new \ReflectionMethod($instance, $name);
-            $parameters = $m->getParameters();
+            $parameters = (new \ReflectionMethod($instance, $name))->getParameters();
         }
         if ($parameters === null) {
             return false;
@@ -503,75 +465,56 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
 
     private function checkAuth($type, $instance, $name, JSONFunction $function)
     {
-        foreach ($this->authFunctions as $f) {
-            if (!$f($type, $instance, $name, $function->getArgs())) {
-                return false;
-            }
 
-        }
-
-        if (isset($this->typeAuthFunctions[$type])) {
-            foreach ($this->typeAuthFunctions[$type] as $f) {
-                if (!$f($type, $instance, $name, $function->getArgs())) {
-                    return false;
+        try{
+            $this->callArraysOfCallFunctions(function($auth_func) use($type, $instance, $name, $function) {
+                if(!$auth_func($type, $instance, $name, $function->getArgs())){
+                    throw new \Exception();
                 }
+            },
+                $this->authFunctions,
+                isset($this->tAuthFunctions[$type])?$this->tAuthFunctions[$type]:[],
+                isset($this->fnAuthFunctions[$type][$function_name = $function->getName()])?$this->fnAuthFunctions[$type][$function_name]:[]);
 
-            }
+        } catch (\Exception $e){
+            return false;
         }
 
-        if (isset($this->functionAuthFunctions[$type][$fn = $function->getName()])) {
-            foreach ($this->functionAuthFunctions[$type][$fn] as $f) {
-                if (!$f($type, $instance, $name, $function->getArgs())) {
-                    return false;
-                }
-
-            }
-        }
 
         return true;
     }
 
     private function callPreCallFunctions($type, $instance, $functionName, &$arguments)
     {
-        foreach ($this->preCallFunctions as $f) {
-            $f($type, $instance, $functionName, $arguments);
-        }
 
-        if (isset($this->typePreCallFunctions[$type])) {
-            foreach ($this->typePreCallFunctions[$type] as $f) {
-                $f($type, $instance, $functionName, $arguments);
-            }
-        }
-
-
-        if (isset($this->functionPreCallFunctions[$type][$functionName])) {
-            foreach ($this->functionPreCallFunctions[$type][$functionName] as $f) {
-                $f($type, $instance, $functionName, $arguments);
-            }
-        }
-
+        $this->callArraysOfCallFunctions(function($function) use($type, $instance, $functionName, &$arguments) {
+            $function($type, $instance, $functionName, $arguments);
+        },
+            $this->preCallFunctions,
+            isset($this->tPreCallFunctions[$type])?$this->tPreCallFunctions[$type]:[],
+            isset($this->fnPreCallFunctions[$type][$functionName])?$this->fnPreCallFunctions[$type][$functionName]:[]);
 
     }
 
     private function callPostCallFunctions($type, $instance, $functionName, &$result)
     {
-        foreach ($this->postCallFunctions as $f) {
-            $f($type, $instance, $functionName, $result);
+        $this->callArraysOfCallFunctions(function($function) use($type, $instance, $functionName, &$result) {
+            $function($type, $instance, $functionName, $result);
+        },
+            $this->postCallFunctions,
+            isset($this->tPostCallFunctions[$type])?$this->tPostCallFunctions[$type]:[],
+            isset($this->fnPostCallFunctions[$type][$functionName])?$this->fnPostCallFunctions[$type][$functionName]:[]);
+
+
+    }
+
+    private function callArraysOfCallFunctions(callable $handler, array $array){
+        foreach($array as $function){
+            $handler($function);
         }
-
-        if (isset($this->typePostCallFunctions[$type])) {
-            foreach ($this->typePostCallFunctions[$type] as $f) {
-                $f($type, $instance, $functionName, $result);
-            }
+        if(func_num_args() > 2){
+            call_user_func_array([$this, 'callArraysOfCallFunctions'], array_merge([$handler], array_slice(func_get_args(),2)));
         }
-
-
-        if (isset($this->functionPostCallFunctions[$type][$functionName])) {
-            foreach ($this->functionPostCallFunctions[$type][$functionName] as $f) {
-                $f($type, $instance, $functionName, $result);
-            }
-        }
-
     }
 
     private function hasRealFunction($type, $function)
@@ -606,31 +549,31 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
     {
 
 
-        $numRequiredParameters = 0;
+        $numReqParam = 0;
         $lastRequiredFound = false;
         foreach (array_reverse($parameters) as $param) {
             /** @var $param \ReflectionParameter */
 
             $lastRequiredFound = $lastRequiredFound || !$param->isOptional();
             if ($lastRequiredFound) {
-                $numRequiredParameters++;
+                $numReqParam++;
             }
         }
 
-        if ($numRequiredParameters > count($functionArgs)) {
+        if ($numReqParam > count($functionArgs)) {
             return false;
         }
 
-        foreach ($parameters as $k => $param) {
+        foreach ($parameters as $key => $param) {
             if ($param->isArray()) {
-                if (isset($functionArgs[$k]) && !is_array($functionArgs[$k])) {
+                if (isset($functionArgs[$key]) && !is_array($functionArgs[$key])) {
                     return false;
                 }
             }
-            if ($c = $param->getClass()) {
-                if (isset($functionArgs[$k])) {
+            if ($class = $param->getClass()) {
+                if (isset($functionArgs[$key])) {
 
-                    if (!is_a($functionArgs[$k], $c->getName())) {
+                    if (!is_a($functionArgs[$key], $class->getName())) {
                         return false;
                     } else {
                         continue;
@@ -655,13 +598,77 @@ class GenericObjectTypeHandlerImpl implements TypeHandler
      * @param string $alias
      * @param array $target
      */
-    public function addAlias($alias, array $target){
-        $this->alias[$alias] = isset($this->alias[$alias])?array_merge($this->alias[$alias], $target):$target;
+    public function addAlias($alias, array $target)
+    {
+        $this->alias[$alias] = isset($this->alias[$alias]) ? array_merge($this->alias[$alias], $target) : $target;
 
-        if(in_array($alias, $this->types)){
+        if (in_array($alias, $this->types)) {
             return;
         }
         $this->types[] = $alias;
 
+    }
+
+    private function setUpReflectionClass($object)
+    {
+        if (is_string($object)) {
+            $this->types[] = $object;
+            $interface_exists = false;
+            if (!class_exists($object) && !($interface_exists = interface_exists($object))) {
+                return null;
+            }
+            $reflection = new ReflectionClass($object);
+            $short_name = $reflection->getShortName();
+            if ($interface_exists && preg_match("/\\\\$short_name/", $object)) {
+                $this->types[] = $short_name;
+                $this->alias[$short_name][] = $object;
+            }
+        } else {
+            $this->object = $object;
+            $reflection = new ReflectionClass($object);
+        }
+
+        return $reflection;
+    }
+
+    private function setupTypes(ReflectionClass $reflection)
+    {
+        $this->types = array_merge($this->types, $reflection->getInterfaceNames());
+
+        $alias = array_values(array_map(function (ReflectionClass $class) {
+            $short_name = $class->getShortName();
+            $found = false;
+            foreach ($this->types as $t) {
+                if (preg_match("/\\\\$short_name/", $t)) {
+                    $this->alias[$short_name][] = $t;
+                    $found = true;
+                }
+            }
+
+
+            return $found ? $short_name : null;
+        }, $reflection->getInterfaces()));
+
+        $alias = array_filter($alias, function ($short_name) {
+            return $short_name != null;
+        });
+        $this->types = array_values(array_merge($this->types, $alias));
+
+    }
+
+    private function listWhitelistFunctions($type)
+    {
+        if (!isset($this->functionWhitelist[$type]) || count($this->functionWhitelist[$type]) == 0) {
+            return [];
+        }
+        $resultArray = [];
+
+        foreach ($this->functionWhitelist[$type] as $function) {
+            if ($this->hasRealFunction($type, $function)) {
+                $resultArray[] = $function;
+            }
+        }
+
+        return $resultArray;
     }
 }

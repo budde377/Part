@@ -188,6 +188,20 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertContains("Hello World", $this->template->render());
     }
 
+    public function testCanAddStuff2()
+    {
+        $this->setUpConfig("
+        <config>
+            {$this->defaultOwner}
+            <templates path='/'>
+                <template filename='stubs/templateStub.twig'>main</template>
+            </templates>
+        </config>");
+
+        $this->template->setTemplateFromConfig('lololol', "main");
+        $this->assertContains("Hello World", $this->template->render());
+    }
+
     public function testWillThrowExceptionIfTemplateNotInConfig()
     {
         $this->setUpConfig();
@@ -212,6 +226,35 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->template->setTwigDebug(true);
         $this->template->setTemplateFromString("{%set t='World' %}Hello{{t}}");
         $this->assertEquals("HelloWorld", $this->template->render());
+    }
+    public function testTemplatesUsesTemplateFolders()
+    {
+        $this->setUpConfig("
+        <config>
+            {$this->defaultOwner}
+            <templateCollection >
+                <templates path='stubs/' />
+            </templateCollection>
+        </config>");
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{% include \"templateStub.twig\" %}");
+        $this->assertEquals(
+            file_get_contents(dirname(__FILE__).'/../stubs/templateStub.twig'),
+            $this->template->render());
+    }
+
+    public function testTemplatesUsesTemplateFoldersWithNamespace()
+    {
+        $this->setUpConfig("
+        <config>
+            {$this->defaultOwner}
+                <templates path='stubs/' namespace='Asd'/>
+        </config>");
+        $this->template->setTwigDebug(true);
+        $this->template->setTemplateFromString("{% include \"@Asd/templateStub.twig\" %}");
+        $this->assertEquals(
+            file_get_contents(dirname(__FILE__).'/../stubs/templateStub.twig'),
+            $this->template->render());
     }
 
     public function testDebugEnablesDebug()
