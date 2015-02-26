@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part;
+
 use ChristianBudde\Part\exception\ClassNotDefinedException;
 use ChristianBudde\Part\exception\ClassNotInstanceOfException;
 use ChristianBudde\Part\exception\FileNotFoundException;
@@ -38,35 +39,8 @@ class SiteFactoryImpl implements SiteFactory
      */
     public function buildPreScriptChain(BackendSingletonContainer $backendContainer)
     {
-        $chain = new ScriptChainImpl();
+        return $this->buildScriptChain($this->config->getPreScripts());
 
-        $preScriptArray = $this->config->getPreScripts();
-        foreach ($preScriptArray as $className => $location) {
-
-            if($location !== null){
-                if (!file_exists($location)) {
-                    throw new FileNotFoundException($location);
-                }
-                require_once $location;
-
-            }
-
-
-            if (!class_exists($className)) {
-                throw new ClassNotDefinedException($className);
-            }
-
-
-            $preScript = new $className($backendContainer);
-
-            if (!($preScript instanceof Script)) {
-                throw new ClassNotInstanceOfException($className, 'Script');
-            }
-
-            $chain->addScript($preScript);
-        }
-
-        return $chain;
     }
 
     /**
@@ -82,12 +56,18 @@ class SiteFactoryImpl implements SiteFactory
      */
     public function buildPostScriptChain(BackendSingletonContainer $backendContainer)
     {
+
+        return $this->buildScriptChain($this->config->getPostScripts());
+    }
+
+
+    private function buildScriptChain($scriptArray)
+    {
         $chain = new ScriptChainImpl();
 
-        $postScriptArray = $this->config->getPostScripts();
-        foreach ($postScriptArray as $className => $location) {
+        foreach ($scriptArray as $className => $location) {
 
-            if($location !== null){
+            if ($location !== null) {
                 if (!file_exists($location)) {
                     throw new FileNotFoundException($location);
                 }
@@ -110,7 +90,6 @@ class SiteFactoryImpl implements SiteFactory
 
         return $chain;
     }
-
 
     /**
      * Builds and returns a new Config
