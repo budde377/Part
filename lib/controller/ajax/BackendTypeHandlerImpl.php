@@ -36,16 +36,16 @@ class BackendTypeHandlerImpl implements TypeHandler
     private $userLibrary;
 
     /** @var callable  */
-    private $sitePrivilegesFunction;
+    private $sPrivilegesFunc;
 
-    private $userLoggedInAuthFunction;
+    private $userLgdInAuthFunc;
 
 
     function __construct(BackendSingletonContainer $backend)
     {
         $this->backend = $backend;
         $this->userLibrary = $backend->getUserLibraryInstance();
-        $this->sitePrivilegesFunction = function () {
+        $this->sPrivilegesFunc = function () {
             $currentUser = $this->userLibrary->getUserLoggedIn();
             if ($currentUser == null) {
                 return false;
@@ -55,7 +55,7 @@ class BackendTypeHandlerImpl implements TypeHandler
 
         };
 
-        $this->userLoggedInAuthFunction = function(){
+        $this->userLgdInAuthFunc = function(){
             return $this->userLibrary->getUserLoggedIn() != null;
         };
     }
@@ -420,10 +420,10 @@ class BackendTypeHandlerImpl implements TypeHandler
         $server->registerHandler($pageOrderHandler = new GenericObjectTypeHandlerImpl($this->backend->getPageOrderInstance()), 'PageOrder');
         $pageOrderHandler->addGetInstanceFunction('PageOrder');
 
-        $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'deletePage', $this->sitePrivilegesFunction);
-        $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'deactivatePage', $this->sitePrivilegesFunction);
-        $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'setPageOrder', $this->sitePrivilegesFunction);
-        $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'createPage', $this->sitePrivilegesFunction);
+        $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'deletePage', $this->sPrivilegesFunc);
+        $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'deactivatePage', $this->sPrivilegesFunc);
+        $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'setPageOrder', $this->sPrivilegesFunc);
+        $pageOrderHandler->addFunctionAuthFunction('PageOrder', 'createPage', $this->sPrivilegesFunc);
 
         $pageOrderHandler->addFunction('PageOrder', 'createPage', function(PageOrder $pageOrder, $title){
             if (strlen($title) == 0) {
@@ -471,7 +471,7 @@ class BackendTypeHandlerImpl implements TypeHandler
             'getInstance'
         );
 
-        $pagePrivilegesFunction = function ($type, Page $instance) {
+        $pagePrivilegesFunc = function ($type, Page $instance) {
             $currentUser = $this->userLibrary->getUserLoggedIn();
             if ($currentUser == null) {
                 return false;
@@ -480,15 +480,15 @@ class BackendTypeHandlerImpl implements TypeHandler
 
         };
 
-        $pageHandler->addFunctionAuthFunction('Page', 'setID', $pagePrivilegesFunction);
-        $pageHandler->addFunctionAuthFunction('Page', 'setTitle', $pagePrivilegesFunction);
-        $pageHandler->addFunctionAuthFunction('Page', 'setTemplate', $pagePrivilegesFunction);
-        $pageHandler->addFunctionAuthFunction('Page', 'setAlias', $pagePrivilegesFunction);
-        $pageHandler->addFunctionAuthFunction('Page', 'modify', $pagePrivilegesFunction);
+        $pageHandler->addFunctionAuthFunction('Page', 'setID', $pagePrivilegesFunc);
+        $pageHandler->addFunctionAuthFunction('Page', 'setTitle', $pagePrivilegesFunc);
+        $pageHandler->addFunctionAuthFunction('Page', 'setTemplate', $pagePrivilegesFunc);
+        $pageHandler->addFunctionAuthFunction('Page', 'setAlias', $pagePrivilegesFunc);
+        $pageHandler->addFunctionAuthFunction('Page', 'modify', $pagePrivilegesFunc);
 
-        $pageHandler->addFunctionAuthFunction('Page', 'delete', $this->sitePrivilegesFunction);
-        $pageHandler->addFunctionAuthFunction('Page', 'hide', $this->sitePrivilegesFunction);
-        $pageHandler->addFunctionAuthFunction('Page', 'show', $this->sitePrivilegesFunction);
+        $pageHandler->addFunctionAuthFunction('Page', 'delete', $this->sPrivilegesFunc);
+        $pageHandler->addFunctionAuthFunction('Page', 'hide', $this->sPrivilegesFunc);
+        $pageHandler->addFunctionAuthFunction('Page', 'show', $this->sPrivilegesFunc);
 
         $pageHandler->addGetInstanceFunction("Page");
 
@@ -501,9 +501,9 @@ class BackendTypeHandlerImpl implements TypeHandler
             return $this->userLibrary->getUserLoggedIn() != null;
         });
 
-        $logHandler->addFunctionAuthFunction("Logger", 'clearLog', $this->sitePrivilegesFunction);
-        $logHandler->addFunctionAuthFunction("Logger", 'listLog', $this->sitePrivilegesFunction);
-        $logHandler->addFunctionAuthFunction("Logger", 'getContextAt', $this->sitePrivilegesFunction);
+        $logHandler->addFunctionAuthFunction("Logger", 'clearLog', $this->sPrivilegesFunc);
+        $logHandler->addFunctionAuthFunction("Logger", 'listLog', $this->sPrivilegesFunc);
+        $logHandler->addFunctionAuthFunction("Logger", 'getContextAt', $this->sPrivilegesFunc);
     }
 
     private function setUpPageContentHandler(Server $server)
@@ -518,7 +518,7 @@ class BackendTypeHandlerImpl implements TypeHandler
     private function setUpSiteContentHandler(Server $server)
     {
         $server->registerHandler($siteContentHandler = new GenericObjectTypeHandlerImpl('ChristianBudde\Part\model\site\SiteContent'));
-        $siteContentHandler->addFunctionAuthFunction("SiteContent", "addContent", $this->sitePrivilegesFunction);
+        $siteContentHandler->addFunctionAuthFunction("SiteContent", "addContent", $this->sPrivilegesFunc);
         $siteContentHandler->addGetInstanceFunction('SiteContent');
     }
 
@@ -537,11 +537,11 @@ class BackendTypeHandlerImpl implements TypeHandler
     private function setUpUpdaterHandler(Server $server)
     {
         $server->registerHandler($updaterHandler = new GenericObjectTypeHandlerImpl($this->backend->getUpdaterInstance(), "Updater"));
-        $updaterHandler->addFunctionAuthFunction('Updater', 'update', $this->sitePrivilegesFunction);
-        $updaterHandler->addFunctionAuthFunction('Updater', 'checkForUpdates', $this->sitePrivilegesFunction);
-        $updaterHandler->addFunctionAuthFunction('Updater', 'allowCheckOnLogin', $this->sitePrivilegesFunction);
-        $updaterHandler->addFunctionAuthFunction('Updater', 'disallowCheckOnLogin', $this->sitePrivilegesFunction);
-        $updaterHandler->addFunctionAuthFunction('Updater', 'isCheckOnLoginAllowed', $this->sitePrivilegesFunction);
+        $updaterHandler->addFunctionAuthFunction('Updater', 'update', $this->sPrivilegesFunc);
+        $updaterHandler->addFunctionAuthFunction('Updater', 'checkForUpdates', $this->sPrivilegesFunc);
+        $updaterHandler->addFunctionAuthFunction('Updater', 'allowCheckOnLogin', $this->sPrivilegesFunc);
+        $updaterHandler->addFunctionAuthFunction('Updater', 'disallowCheckOnLogin', $this->sPrivilegesFunc);
+        $updaterHandler->addFunctionAuthFunction('Updater', 'isCheckOnLoginAllowed', $this->sPrivilegesFunc);
 
         $updaterHandler->addFunction('Updater', 'allowCheckOnLogin', function(Updater $instance){
             $user = $this->userLibrary->getUserLoggedIn();
@@ -773,9 +773,9 @@ class BackendTypeHandlerImpl implements TypeHandler
         $handler->whitelistType('MailDomainLibrary');
         $handler->addGetInstanceFunction('MailDomainLibrary');
         $server->registerHandler($handler);
-        $handler->addFunctionAuthFunction('MailDomainLibrary', 'deleteDomain', $this->sitePrivilegesFunction);
-        $handler->addFunctionAuthFunction('MailDomainLibrary', 'createDomain', $this->sitePrivilegesFunction);
-        $handler->addTypeAuthFunction('MailDomainLibrary', $this->userLoggedInAuthFunction);
+        $handler->addFunctionAuthFunction('MailDomainLibrary', 'deleteDomain', $this->sPrivilegesFunc);
+        $handler->addFunctionAuthFunction('MailDomainLibrary', 'createDomain', $this->sPrivilegesFunc);
+        $handler->addTypeAuthFunction('MailDomainLibrary', $this->userLgdInAuthFunc);
     }
 
     private function setupMailDomainHandler(Server $server)
@@ -802,13 +802,13 @@ class BackendTypeHandlerImpl implements TypeHandler
         $handler->addGetInstanceFunction('MailDomain');
 
         $server->registerHandler($handler);
-        $handler->addFunctionAuthFunction('MailDomain', 'clearAliasTarget', $this->sitePrivilegesFunction);
-        $handler->addFunctionAuthFunction('MailDomain', 'setAliasTarget', $this->sitePrivilegesFunction);
-        $handler->addFunctionAuthFunction('MailDomain', 'setDescription', $this->sitePrivilegesFunction);
-        $handler->addFunctionAuthFunction('MailDomain', 'activate', $this->sitePrivilegesFunction);
-        $handler->addFunctionAuthFunction('MailDomain', 'deactivate', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailDomain', 'clearAliasTarget', $this->sPrivilegesFunc);
+        $handler->addFunctionAuthFunction('MailDomain', 'setAliasTarget', $this->sPrivilegesFunc);
+        $handler->addFunctionAuthFunction('MailDomain', 'setDescription', $this->sPrivilegesFunc);
+        $handler->addFunctionAuthFunction('MailDomain', 'activate', $this->sPrivilegesFunc);
+        $handler->addFunctionAuthFunction('MailDomain', 'deactivate', $this->sPrivilegesFunc);
 
-        $handler->addTypeAuthFunction('MailDomainLibrary', $this->userLoggedInAuthFunction);
+        $handler->addTypeAuthFunction('MailDomainLibrary', $this->userLgdInAuthFunc);
 
     }
 
@@ -821,12 +821,12 @@ class BackendTypeHandlerImpl implements TypeHandler
 
         $server->registerHandler($handler);
 
-        $handler->addFunctionAuthFunction('MailAddressLibrary', 'createAddress', $this->sitePrivilegesFunction);
-        $handler->addFunctionAuthFunction('MailAddressLibrary', 'deleteAddress', $this->sitePrivilegesFunction);
-        $handler->addFunctionAuthFunction('MailAddressLibrary', 'createCatchallAddress', $this->sitePrivilegesFunction);
-        $handler->addFunctionAuthFunction('MailAddressLibrary', 'deleteCatchallAddress', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddressLibrary', 'createAddress', $this->sPrivilegesFunc);
+        $handler->addFunctionAuthFunction('MailAddressLibrary', 'deleteAddress', $this->sPrivilegesFunc);
+        $handler->addFunctionAuthFunction('MailAddressLibrary', 'createCatchallAddress', $this->sPrivilegesFunc);
+        $handler->addFunctionAuthFunction('MailAddressLibrary', 'deleteCatchallAddress', $this->sPrivilegesFunc);
 
-        $handler->addTypeAuthFunction('MailAddressLibrary', $this->userLoggedInAuthFunction);
+        $handler->addTypeAuthFunction('MailAddressLibrary', $this->userLgdInAuthFunc);
 
     }
 
@@ -862,12 +862,12 @@ class BackendTypeHandlerImpl implements TypeHandler
         $handler->addGetInstanceFunction('MailAddress');
         $server->registerHandler($handler);
 
-        $handler->addFunctionAuthFunction('MailAddress', 'setLocalPart', $this->sitePrivilegesFunction);
-        $handler->addFunctionAuthFunction('MailAddress', 'addOwner', $this->sitePrivilegesFunction);
-        $handler->addFunctionAuthFunction('MailAddress', 'removeOwner', $this->sitePrivilegesFunction);
+        $handler->addFunctionAuthFunction('MailAddress', 'setLocalPart', $this->sPrivilegesFunc);
+        $handler->addFunctionAuthFunction('MailAddress', 'addOwner', $this->sPrivilegesFunc);
+        $handler->addFunctionAuthFunction('MailAddress', 'removeOwner', $this->sPrivilegesFunc);
 
         $isOwnerAuthFunction = function($type, Address $instance){
-            $f = $this->sitePrivilegesFunction;
+            $f = $this->sPrivilegesFunc;
             if($f()){
                 return true;
             }
@@ -887,7 +887,7 @@ class BackendTypeHandlerImpl implements TypeHandler
         $handler->addFunctionAuthFunction('MailAddress', 'createMailbox', $isOwnerAuthFunction);
         $handler->addFunctionAuthFunction('MailAddress', 'deleteMailbox', $isOwnerAuthFunction);
 
-        $handler->addTypeAuthFunction('MailAddress', $this->userLoggedInAuthFunction);
+        $handler->addTypeAuthFunction('MailAddress', $this->userLgdInAuthFunc);
 
     }
 
@@ -908,9 +908,9 @@ class BackendTypeHandlerImpl implements TypeHandler
             );
         $handler->addGetInstanceFunction('Mailbox');
         $server->registerHandler($handler);
-        $handler->addTypeAuthFunction('Mailbox', $this->userLoggedInAuthFunction);
+        $handler->addTypeAuthFunction('Mailbox', $this->userLgdInAuthFunc);
         $isOwnerAuthFunction = function($type, Mailbox $instance){
-            $f = $this->sitePrivilegesFunction;
+            $f = $this->sPrivilegesFunc;
             if($f()){
                 return true;
             }
