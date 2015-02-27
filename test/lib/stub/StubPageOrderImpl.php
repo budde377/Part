@@ -1,6 +1,7 @@
 <?php
 namespace ChristianBudde\Part\test\stub;
 
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\controller\json\PageOrderObjectImpl;
 use ChristianBudde\Part\model\page\Page;
 use ChristianBudde\Part\model\page\PageOrder;
@@ -200,5 +201,13 @@ class StubPageOrderImpl implements PageOrder
     public function jsonSerialize()
     {
         return $this->jsonObjectSerialize()->jsonSerialize();
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }

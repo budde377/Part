@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\page;
+use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 use ChristianBudde\Part\controller\json\JSONObjectSerializable;
 
 
@@ -10,7 +11,7 @@ use ChristianBudde\Part\controller\json\JSONObjectSerializable;
  * Time: 10:59 AM
  * To change this template use File | Settings | File Templates.
  */
-interface PageOrder extends JSONObjectSerializable
+interface PageOrder extends JSONObjectSerializable, TypeHandlerGenerator
 {
 
     const LIST_ACTIVE = 1;

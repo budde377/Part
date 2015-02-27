@@ -6,6 +6,7 @@ namespace ChristianBudde\Part\model\mail;
  * Date: 7/8/14
  * Time: 6:02 PM
  */
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\controller\json\MailMailboxObjectImpl;
 use ChristianBudde\Part\util\db\DB;
 use ChristianBudde\Part\util\Observer;
@@ -282,5 +283,13 @@ class MailboxImpl implements Mailbox{
     function jsonSerialize()
     {
         return $this->jsonObjectSerialize()->jsonSerialize();
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }

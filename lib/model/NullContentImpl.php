@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 
 
 /**
@@ -109,5 +110,13 @@ class NullContentImpl implements Content{
     public function jsonSerialize()
     {
         return null;
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }

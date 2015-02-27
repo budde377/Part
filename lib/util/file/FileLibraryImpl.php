@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\util\file;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\model\user\User;
 
 /**
@@ -364,5 +365,13 @@ class FileLibraryImpl implements FileLibrary{
         $f = new FileImpl($folder->getAbsolutePath().'/'.$name);
         move_uploaded_file($file->getAbsoluteFilePath(),$f->getAbsoluteFilePath());
         return $f;
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }

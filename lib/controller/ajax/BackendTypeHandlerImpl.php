@@ -1,24 +1,7 @@
 <?php
 namespace ChristianBudde\Part\controller\ajax;
 use ChristianBudde\Part\BackendSingletonContainer;
-use ChristianBudde\Part\controller\function_string\ParserImpl;
 use ChristianBudde\Part\controller\json\JSONFunction;
-use ChristianBudde\Part\controller\json\Response;
-use ChristianBudde\Part\controller\json\ResponseImpl;
-use ChristianBudde\Part\model\mail\Address;
-use ChristianBudde\Part\model\mail\Mailbox;
-use ChristianBudde\Part\model\page\Page;
-use ChristianBudde\Part\model\page\PageContent;
-use ChristianBudde\Part\model\page\PageOrder;
-use ChristianBudde\Part\model\updater\Updater;
-use ChristianBudde\Part\model\user\User;
-use ChristianBudde\Part\model\user\UserLibrary;
-use ChristianBudde\Part\model\user\UserPrivileges;
-use ChristianBudde\Part\util\file\File;
-use ChristianBudde\Part\util\file\FileImpl;
-use ChristianBudde\Part\util\file\ImageFileImpl;
-use ChristianBudde\Part\util\mail\Mail;
-use ChristianBudde\Part\util\mail\MailImpl;
 use ChristianBudde\Part\util\traits\ValidationTrait;
 
 /**
@@ -33,31 +16,13 @@ class BackendTypeHandlerImpl implements TypeHandler
     use ValidationTrait;
 
     private $backend;
-    private $userLibrary;
 
-    /** @var callable  */
-    private $sPrivilegesFunc;
-
-    private $userLgdInAuthFunc;
 
 
     function __construct(BackendSingletonContainer $backend)
     {
         $this->backend = $backend;
-        $this->userLibrary = $backend->getUserLibraryInstance();
-        $this->sPrivilegesFunc = function () {
-            $currentUser = $this->userLibrary->getUserLoggedIn();
-            if ($currentUser == null) {
-                return false;
-            }
-            $privileges = $currentUser->getUserPrivileges();
-            return $privileges->hasSitePrivileges();
 
-        };
-
-        $this->userLgdInAuthFunc = function(){
-            return $this->userLibrary->getUserLoggedIn() != null;
-        };
     }
 
 
@@ -70,35 +35,49 @@ class BackendTypeHandlerImpl implements TypeHandler
      */
     public function setUp(Server $server, $type)
     {
+        $server->registerHandler($this->backend->getUserLibraryInstance()->generateTypeHandler());
+        $server->registerHandler($this->backend->getPageOrderInstance()->generateTypeHandler());
+        $server->registerHandler($this->backend->getLoggerInstance()->generateTypeHandler());
+        $server->registerHandler($this->backend->getUpdaterInstance()->generateTypeHandler());
+        $server->registerHandler($this->backend->getSiteInstance()->generateTypeHandler());
+
+        $server->registerHandler($this->backend->getFileLibraryInstance()->generateTypeHandler());
+
+        if($this->backend->getConfigInstance()->isMailManagementEnabled()){
+            $server->registerHandler($this->backend->getMailDomainLibraryInstance()->generateTypeHandler());
+        }
+        $server->registerHandler(new PostGetFilesArrayAccessTypeHandlerImpl());
+        $server->registerHandler(new ParserTypeHandlerImpl());
 
 
-        $this->setUpUserLibraryHandler($server);
-        $this->setUpUserHandler($server);
-        $this->setUpUserPrivilegesHandler($server);
-        $this->setUpPageOrderHandler($server);
-        $this->setUpPageHandler($server);
-        $this->setUpLoggerHandler($server);
-        $this->setUpUpdaterHandler($server);
+        //$this->setUpUserHandler($server);
+        //$this->setUpUserPrivilegesHandler($server);
 
-        $this->setUpPageContentHandler($server);
-        $this->setUpPageContentLibraryHandler($server);
-        $this->setUpSiteContentHandler($server);
-        $this->setUpSiteContentLibraryHandler($server);
+
+        //$this->setUpPageHandler($server);
+
+
+
+        //$this->setUpPageContentHandler($server);
+        //$this->setUpPageContentLibraryHandler($server);
+
+        //$this->setUpSiteContentHandler($server);
+
+
+        // $this->setUpSiteContentLibraryHandler($server);
 
         // Setup mail
-        if($this->backend->getConfigInstance()->isMailManagementEnabled()){
-            $this->setupMailDomainLibraryHandler($server);
-            $this->setupMailDomainHandler($server);
-            $this->setupMailAddressLibraryHandler($server);
-            $this->setupMailAddressHandler($server);
-            $this->setupMailMailboxHandler($server);
-        }
 
-        $this->setUpParserHandler($server);
+//            $this->setupMailDomainHandler($server);
+            // $this->setupMailAddressLibraryHandler($server);
+            // $this->setupMailAddressHandler($server);
+            // $this->setupMailMailboxHandler($server);
 
-        $this->setUpFileHandler($server);
 
-        $this->setUpArraysHandler($server);
+
+
+
+
 
 
     }
@@ -144,7 +123,7 @@ class BackendTypeHandlerImpl implements TypeHandler
     {
         return false;
     }
-
+/*
     private function setUpUserLibraryHandler(Server $server)
     {
 
@@ -406,10 +385,6 @@ class BackendTypeHandlerImpl implements TypeHandler
     }
 
 
-    /**
-     * @param User $user
-     * @return Callable
-     */
     private function isChildOfUser(User $user)
     {
         return in_array($user, $this->userLibrary->getChildren($this->userLibrary->getUserLoggedIn()));
@@ -928,5 +903,5 @@ class BackendTypeHandlerImpl implements TypeHandler
 
     }
 
-
+*/
 }

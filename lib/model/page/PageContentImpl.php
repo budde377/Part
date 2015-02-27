@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\page;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\controller\json\PageContentObjectImpl;
 use ChristianBudde\Part\util\db\DB;
 use PDO;
@@ -211,5 +212,13 @@ class PageContentImpl implements PageContent
     public function jsonSerialize()
     {
         return $this->jsonObjectSerialize()->jsonSerialize();
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }

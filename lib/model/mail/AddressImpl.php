@@ -1,6 +1,7 @@
 <?php
 namespace ChristianBudde\Part\model\mail;
 
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\controller\json\MailAddressObjectImpl;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserLibrary;
@@ -645,5 +646,13 @@ class AddressImpl implements Address, Observer
     function jsonSerialize()
     {
         return $this->jsonObjectSerialize()->jsonSerialize();
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }

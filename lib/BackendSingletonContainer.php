@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part;
+
 use ChristianBudde\Part\controller\ajax\Server;
 use ChristianBudde\Part\log\Logger;
 use ChristianBudde\Part\model\mail\DomainLibrary;
@@ -140,6 +141,12 @@ interface BackendSingletonContainer
      */
     public function getTmpFolderInstance();
 
+
+    /**
+     * Will Create and reuse instance of MailDomainLibrary.
+     * @return DomainLibrary
+     */
+    public function getMailDomainLibraryInstance();
 
     /**
      * @param string $name

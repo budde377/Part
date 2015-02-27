@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\user;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\controller\json\UserObjectImpl;
 use ChristianBudde\Part\model\Variables;
 use ChristianBudde\Part\util\db\DB;
@@ -511,5 +512,13 @@ class UserImpl implements User
     private function getUsernamePasswordHash()
     {
         return sha1($this->getUsername().$this->getPassword());
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }

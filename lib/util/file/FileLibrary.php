@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\util\file;
+use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 use ChristianBudde\Part\model\user\User;
 
 
@@ -10,7 +11,7 @@ use ChristianBudde\Part\model\user\User;
  * Time: 2:52 PM
  */
 
-interface FileLibrary {
+interface FileLibrary extends TypeHandlerGenerator{
 
     /**
      * Check if file is in library

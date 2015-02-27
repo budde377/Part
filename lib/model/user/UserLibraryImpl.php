@@ -1,9 +1,12 @@
 <?php
 namespace ChristianBudde\Part\model\user;
+
 use ArrayIterator;
 use ArrayObject;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\ajax\UserLibraryTypeHandlerImpl;
 use ChristianBudde\Part\controller\json\UserLibraryObjectImpl;
-use ChristianBudde\Part\util\db\DB;
 use ChristianBudde\Part\util\Observable;
 use ChristianBudde\Part\util\Observer;
 
@@ -16,6 +19,7 @@ use ChristianBudde\Part\util\Observer;
  */
 class UserLibraryImpl implements UserLibrary, Observer
 {
+    private $container;
     private $userList = array();
     private $database;
     private $connection;
@@ -24,10 +28,13 @@ class UserLibraryImpl implements UserLibrary, Observer
     /** @var  User */
     private $userLoggedIn;
 
-    public function __construct(DB $database)
+    private $typeHandler;
+
+    public function __construct(BackendSingletonContainer $container)
     {
-        $this->database = $database;
-        $this->connection = $database->getConnection();
+        $this->container = $container;
+        $this->database = $container->getDBInstance();
+        $this->connection = $this->database->getConnection();
         $this->initializeLibrary();
         $this->setUpIterator();
         $this->setUpUserLoggedIn();
@@ -116,11 +123,11 @@ class UserLibraryImpl implements UserLibrary, Observer
     public function getUserLoggedIn()
     {
 
-        if($this->userLoggedIn == null){
+        if ($this->userLoggedIn == null) {
             return null;
         }
 
-        if(!$this->userLoggedIn->isLoggedIn()){
+        if (!$this->userLoggedIn->isLoggedIn()) {
             return $this->userLoggedIn = null;
         }
 
@@ -186,7 +193,7 @@ class UserLibraryImpl implements UserLibrary, Observer
             /** @var $u User */
             if ($u->getParent() == $user->getUsername()) {
                 $returnArray[] = $u;
-                $returnArray = array_merge($returnArray,$this->getChildren($u));
+                $returnArray = array_merge($returnArray, $this->getChildren($u));
             }
         }
         return $returnArray;
@@ -284,11 +291,11 @@ class UserLibraryImpl implements UserLibrary, Observer
      */
     public function getUserSessionToken()
     {
-        if(($u = $this->getUserLoggedIn()) == null){
+        if (($u = $this->getUserLoggedIn()) == null) {
             return null;
         }
 
-        return isset($_SESSION['model-user-library-session-token'])?$_SESSION['model-user-library-session-token']:$_SESSION['model-user-library-session-token'] = $u->getUserToken();
+        return isset($_SESSION['model-user-library-session-token']) ? $_SESSION['model-user-library-session-token'] : $_SESSION['model-user-library-session-token'] = $u->getUserToken();
     }
 
     /**
@@ -303,12 +310,24 @@ class UserLibraryImpl implements UserLibrary, Observer
 
     private function setUpUserLoggedIn()
     {
-        foreach($this->userList as $user){
+        foreach ($this->userList as $user) {
             /** @var $user User */
-            if($user->isLoggedIn()){
+            if ($user->isLoggedIn()) {
                 $this->userLoggedIn = $user;
                 return;
             }
         }
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        return
+            $this->typeHandler == null?
+            $this->typeHandler = new UserLibraryTypeHandlerImpl($this->container, $this):
+            $this->typeHandler;
+
     }
 }

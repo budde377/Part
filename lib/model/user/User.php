@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\user;
+use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 use ChristianBudde\Part\controller\json\JSONObjectSerializable;
 use ChristianBudde\Part\model\Variables;
 use ChristianBudde\Part\util\Observable;
@@ -10,7 +11,7 @@ use ChristianBudde\Part\util\Observable;
  * Date: 22/07/12
  * Time: 14:25
  */
-interface User extends JSONObjectSerializable, Observable
+interface User extends JSONObjectSerializable, Observable, TypeHandlerGenerator
 {
     const EVENT_USERNAME_UPDATE = 1;
     const EVENT_DELETE = 2;

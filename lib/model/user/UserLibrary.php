@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\user;
+use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 use ChristianBudde\Part\controller\json\JSONObjectSerializable;
 use Iterator;
 
@@ -9,7 +10,7 @@ use Iterator;
  * Date: 22/07/12
  * Time: 14:26
  */
-interface UserLibrary extends Iterator, JSONObjectSerializable
+interface UserLibrary extends Iterator, JSONObjectSerializable, TypeHandlerGenerator
 {
     /**
      * @abstract

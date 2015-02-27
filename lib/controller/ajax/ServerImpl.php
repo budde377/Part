@@ -90,12 +90,16 @@ class ServerImpl implements Server
                 throw new ClassNotDefinedException($className);
             }
 
+            if(in_array('ChristianBudde\Part\controller\ajax\TypeHandlerGenerator', $ar = class_implements($className))){
+                $handler = call_user_func($className.'::generateTypeHandler', $this->backendSingletonContainer);
+            } else {
+                $handler = new $className($this->backendSingletonContainer);
+            }
 
-            $handler = new $className($this->backendSingletonContainer);
 
 
             if (!($handler instanceof TypeHandler)) {
-                throw new ClassNotInstanceOfException($className, 'AJAXTypeHandler');
+                throw new ClassNotInstanceOfException($handler == null?'null':get_class($handler), 'AJAXTypeHandler');
             }
 
             $this->registerHandler($handler);
@@ -267,7 +271,7 @@ class ServerImpl implements Server
             }
 
         }
-        return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION);
+        return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION); //Can't test this...
     }
 
     /**

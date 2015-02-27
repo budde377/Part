@@ -12,8 +12,8 @@ namespace ChristianBudde\Part\test;
 use ChristianBudde\Part\model\updater\GitUpdaterImpl;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
-use ChristianBudde\Part\test\stub\StubSiteImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 use ChristianBudde\Part\util\db\DB;
 
@@ -42,7 +42,7 @@ class GitUpdaterImplTest extends CustomDatabaseTestCase{
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
         $this->user = new UserImpl('root', $this->db);
-        $this->updater = new GitUpdaterImpl("/tmp/", new StubSiteImpl());
+        $this->updater = new GitUpdaterImpl(new StubBackendSingletonContainerImpl(), "/tmp/");
     }
 
     public function testUserCheckUpdateOnLoginIsTruePrDefault() {
@@ -64,6 +64,16 @@ class GitUpdaterImplTest extends CustomDatabaseTestCase{
         $this->updater->disallowCheckOnLogin($this->user);
         $user2 = new UserImpl('root', $this->db);
         $this->assertFalse($this->updater->isCheckOnLoginAllowed($user2));
+    }
+
+
+    public function testGenerateRightTypeHandler(){
+        $this->assertInstanceOf("ChristianBudde\\Part\\controller\\ajax\\UpdaterTypeHandlerImpl", $this->updater->generateTypeHandler());
+    }
+
+
+    public function testTypeHandlerIsReused(){
+        $this->assertTrue($this->updater->generateTypeHandler() === $this->updater->generateTypeHandler());
     }
 
 

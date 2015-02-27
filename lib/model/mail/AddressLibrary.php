@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\mail;
+use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 use ChristianBudde\Part\controller\json\JSONObjectSerializable;
 
 
@@ -10,7 +11,7 @@ use ChristianBudde\Part\controller\json\JSONObjectSerializable;
  * Time: 2:13 PM
  */
 
-interface AddressLibrary extends JSONObjectSerializable {
+interface AddressLibrary extends JSONObjectSerializable, TypeHandlerGenerator{
 
     /**
      * @return Address[] An array containing selected entries.

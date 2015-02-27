@@ -1,6 +1,9 @@
 <?php
 namespace ChristianBudde\Part\model\page;
+
 use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\controller\ajax\PageOrderTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\controller\json\PageOrderObjectImpl;
 use ChristianBudde\Part\exception\MalformedParameterException;
 use ChristianBudde\Part\util\Observable;
@@ -30,6 +33,7 @@ class PageOrderImpl implements PageOrder, Observer
     /** @var PDOStatement */
     private $deactivatePageStatement;
     private $backendContainer;
+    private $handler;
 
 
     public function __construct(BackendSingletonContainer $container)
@@ -196,12 +200,12 @@ class PageOrderImpl implements PageOrder, Observer
      */
     public function deactivatePage(Page $page)
     {
-        if($this->deactivatePageStatement == null){
+        if ($this->deactivatePageStatement == null) {
             $this->deactivatePageStatement = $this->connection->prepare("DELETE FROM PageOrder WHERE page_id = ?");
         }
 
         if ($this->findPage($page) == 'active') {
-            foreach($this->getPageOrder($page) as $p){
+            foreach ($this->getPageOrder($page) as $p) {
                 $this->deactivatePage($p);
             }
             $this->inactivePages[$page->getID()] = $this->activePages[$page->getID()];
@@ -434,8 +438,8 @@ class PageOrderImpl implements PageOrder, Observer
             /** @var $p Page */
             if ($p === $page) {
                 return array($p);
-            } else if (($ret = $this->recursiveCalculatePath($page, $p) )!== false) {
-                return array_merge(array($p),$ret);
+            } else if (($ret = $this->recursiveCalculatePath($page, $p)) !== false) {
+                return array_merge(array($p), $ret);
             }
         }
         return false;
@@ -471,5 +475,16 @@ class PageOrderImpl implements PageOrder, Observer
     public function jsonSerialize()
     {
         return $this->jsonObjectSerialize()->jsonSerialize();
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        return
+                $this->handler == null ?
+                $this->handler = new PageOrderTypeHandlerImpl($this->backendContainer, $this) :
+                $this->handler;
     }
 }

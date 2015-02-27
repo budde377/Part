@@ -1,10 +1,13 @@
 <?php
 namespace ChristianBudde\Part\test;
 
+use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\json\UserLibraryObjectImpl;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserImpl;
 use ChristianBudde\Part\model\user\UserLibraryImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
+use ChristianBudde\Part\test\stub\StubConfigImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 
@@ -22,6 +25,9 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
     /** @var $user UserLibraryImpl */
     private $library;
 
+    /** @var  BackendSingletonContainer */
+    private $container;
+
     function __construct($dataset = null)
     {
         parent::__construct(dirname(__FILE__) . '/../mysqlXML/UserLibraryImplTest.xml');
@@ -35,7 +41,10 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
         @session_start();
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->library = new UserLibraryImpl($this->db);
+        $this->container = new StubBackendSingletonContainerImpl();
+        $this->container->setDBInstance($this->db);
+        $this->container->setConfigInstance(new StubConfigImpl());
+        $this->library = new UserLibraryImpl($this->container);
     }
 
 
@@ -203,7 +212,7 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue($user->exists());
         $this->assertTrue($user->isLoggedIn());
 
-        $this->library = new UserLibraryImpl($this->db);
+        $this->library = new UserLibraryImpl($this->container);
         $loggedIn = $this->library->getUserLoggedIn();
         $this->assertTrue($loggedIn->getUsername() == $user->getUsername(), 'Did not return logged in user');
     }
@@ -372,6 +381,15 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
     public function testLibraryIsJSONObjectSerializable()
     {
         $this->assertEquals(new UserLibraryObjectImpl($this->library), $this->library->jsonObjectSerialize());
+    }
+
+
+    public function testGenerateTypeHandlerGenerates(){
+        $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\UserLibraryTypeHandlerImpl', $this->library->generateTypeHandler());
+    }
+
+    public function testGenerateTypeHandlerReusesInstance(){
+        $this->assertTrue($this->library->generateTypeHandler() === $this->library->generateTypeHandler());
     }
 
     private function userInList($ret, User $user)

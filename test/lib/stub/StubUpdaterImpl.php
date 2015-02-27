@@ -9,6 +9,7 @@
 namespace ChristianBudde\Part\test\stub;
 
 
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\model\updater\Updater;
 use ChristianBudde\Part\model\user\User;
 
@@ -89,5 +90,13 @@ class StubUpdaterImpl implements Updater{
     public function isCheckOnLoginAllowed(User $user)
     {
         return true;
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }

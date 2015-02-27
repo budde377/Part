@@ -2,6 +2,7 @@
 namespace ChristianBudde\Part\model\mail;
 
 use ChristianBudde\Part\Config;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\controller\json\MailDomainLibraryObjectImpl;
 use ChristianBudde\Part\model\user\UserLibrary;
 use ChristianBudde\Part\util\db\DB;
@@ -172,5 +173,13 @@ class DomainLibraryImpl implements DomainLibrary, Observer
     function jsonSerialize()
     {
         return $this->jsonObjectSerialize()->jsonSerialize();
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }

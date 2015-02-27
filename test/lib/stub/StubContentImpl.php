@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\test\stub;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\controller\json\ContentObjectImpl;
 use ChristianBudde\Part\model\Content;
 
@@ -135,5 +136,13 @@ class StubContentImpl implements Content
     public function jsonSerialize()
     {
         return $this->jsonObjectSerialize()->jsonSerialize();
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }

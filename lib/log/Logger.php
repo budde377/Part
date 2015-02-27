@@ -1,5 +1,7 @@
 <?php
 namespace ChristianBudde\Part\log;
+use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -7,7 +9,7 @@ namespace ChristianBudde\Part\log;
  * Time: 9:31 PM
  * To change this template use File | Settings | File Templates.
  */
-interface Logger
+interface Logger extends TypeHandlerGenerator
 {
 
 

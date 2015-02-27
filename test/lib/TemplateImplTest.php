@@ -213,6 +213,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
             /** @var $exception EntryNotFoundException */
             $exceptionWasThrown = true;
             $this->assertEquals('main', $exception->getEntry(), 'Could not find the right wrong entry');
+            $this->assertEquals('Config', $exception->getContext(), 'Could not find the right wrong entry');
 
         }
 

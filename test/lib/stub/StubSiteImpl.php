@@ -1,6 +1,7 @@
 <?php
 namespace ChristianBudde\Part\test\stub;
 
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\model\Content;
 use ChristianBudde\Part\model\ContentLibrary;
 use ChristianBudde\Part\model\site\Site;
@@ -66,6 +67,14 @@ class StubSiteImpl implements Site
     public function getContentLibrary()
     {
         return null;
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }
 

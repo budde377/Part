@@ -175,7 +175,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getUserLibraryInstance()
     {
         if ($this->userLibrary === null) {
-            $this->userLibrary = new UserLibraryImpl($this->getDBInstance());
+            $this->userLibrary = new UserLibraryImpl($this);
         }
         return $this->userLibrary;
     }
@@ -225,7 +225,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getUpdaterInstance()
     {
         if ($this->updater == null) {
-            $this->updater = new GitUpdaterImpl($this->getConfigInstance()->getRootPath(), $this->getSiteInstance());
+            $this->updater = new GitUpdaterImpl($this, $this->getConfigInstance()->getRootPath());
         }
         return $this->updater;
     }
@@ -259,7 +259,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
         }
 
 
-        $this->log = new LoggerImpl($this->getConfigInstance()->getLogPath());
+        $this->log = new LoggerImpl($this, $this->getConfigInstance()->getLogPath());
 
         return $this->log;
     }

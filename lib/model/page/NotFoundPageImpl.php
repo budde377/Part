@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\page;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\controller\json\PageObjectImpl;
 use ChristianBudde\Part\model\Content;
 use ChristianBudde\Part\model\ContentLibrary;
@@ -256,5 +257,13 @@ class NotFoundPageImpl implements Page
     public function jsonSerialize()
     {
         return $this->jsonObjectSerialize()->jsonSerialize();
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }

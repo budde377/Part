@@ -11,11 +11,14 @@ use ChristianBudde\Part\controller\json\ObjectImpl;
 use ChristianBudde\Part\controller\json\Response;
 use ChristianBudde\Part\controller\json\ResponseImpl;
 use ChristianBudde\Part\controller\json\TypeImpl;
+use ChristianBudde\Part\exception\FileNotFoundException;
 use ChristianBudde\Part\test\stub\NullPageElementImpl;
+use ChristianBudde\Part\test\stub\StubAJAXTypeHandlerGeneratorImpl;
 use ChristianBudde\Part\test\stub\StubAJAXTypeHandlerImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubConfigImpl;
 use ChristianBudde\Part\test\stub\StubPageContentImpl;
+use ChristianBudde\Part\test\stub\StubPageImpl;
 use ChristianBudde\Part\test\stub\StubUserLibraryImpl;
 use PHPUnit_Framework_TestCase;
 
@@ -98,14 +101,37 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
 
     }
 
+
+    public function testRegisterTypeHandlerGeneratorWillRegisterGenerated()
+    {
+        $this->config->setAJAXTypeHandlers([
+            ['class_name' => 'ChristianBudde\Part\test\stub\StubAJAXTypeHandlerGeneratorImpl'],
+            ['class_name' => 'ChristianBudde\Part\test\stub\StubAJAXTypeHandlerGeneratorImpl', 'path' => dirname(__FILE__) . '/stub/StubAJAXTypeHandlerImpl.php']
+        ]);
+        StubAJAXTypeHandlerGeneratorImpl::setHandler(new StubAJAXTypeHandlerImpl(1,2,3));
+        $this->server->registerHandlersFromConfig();
+
+
+        $this->assertEquals(3, count($_SESSION['type_handlers']));
+        $this->assertNotNull($r = $this->checkIfFunctionIsCalled('__construct', $_SESSION['type_handlers'][2]));
+        $this->assertEquals([1,2,3], $r['arguments']);
+        $this->assertNotNull($this->checkIfFunctionIsCalled('setUp', $_SESSION['type_handlers'][2]));
+
+    }
+
     public function testRegisterFromConfigWithWrongLinkWillThrowException()
     {
         $this->config->setAJAXTypeHandlers([
-            ['class_name' => 'ChristianBudde\Part\test\stub\StubAJAXTypeHandlerImpl', 'path' => '_stub/notarealink.php']
+            ['class_name' => 'ChristianBudde\Part\test\stub\StubAJAXTypeHandlerImpl', 'path' => $fn = '_stub/notarealink.php']
         ]);
 
-        $this->setExpectedException('ChristianBudde\Part\exception\FileNotFoundException');
-        $this->server->registerHandlersFromConfig();
+
+        try{
+            $this->server->registerHandlersFromConfig();
+        } catch(FileNotFoundException $e){
+            $this->assertEquals($fn, $e->getFileName());
+            $this->assertEquals( "AJAXTypeHandler class file", $e->getFileDesc());
+        }
 
     }
 
@@ -185,7 +211,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
 
         $this->server->registerHandler($this->handler1);
         $this->server->registerHandler($this->handler2);
-        $funcString = "someType.func()";
+        $funcString = "$type.func()";
         $func = new JSONFunctionImpl('func', new TypeImpl($type));
         /** @var \ChristianBudde\Part\controller\json\Response $r */
         $r = $this->server->handleFromFunctionString($funcString);
@@ -262,6 +288,53 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(Response::RESPONSE_TYPE_ERROR, $r->getResponseType());
         $this->assertEquals(Response::ERROR_CODE_NO_SUCH_FUNCTION, $r->getErrorCode());
     }
+
+    public function testWillSkipTypesWithoutHandler()
+    {
+
+        $type1 = 'SomeElement';
+        $this->handler1->types = [$type1];
+        $this->handler1->canHandle[$type1] = true;
+        $this->handler1->handle[$type1] = $instance1 = new StubPageImpl();
+
+        $this->server->registerHandler($this->handler1);
+
+        $func2 = new JSONFunctionImpl('func2', $func1 = new JSONFunctionImpl('func', new TypeImpl($type1)));
+        /** @var Response $r */
+        $r = $this->server->handleFromJSONString($func2->getAsJSONString());
+        $this->assertInstanceOf('ChristianBudde\Part\controller\json\Response', $r);
+        $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('canHandle', $this->handler1));
+
+        $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('handle', $this->handler1));
+        $this->assertEquals([$type1, $func1, null], $r1['arguments']);
+
+        $this->assertEquals(new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION), $r);
+    }
+
+
+    public function testWillCallImplementedGenerator()
+    {
+
+        $type1 = 'SomeElement';
+        $this->handler1->types = [$type1];
+        $this->handler1->canHandle[$type1] = true;
+        $this->handler1->handle[$type1] = $instance1 = new StubPageImpl();
+
+        $this->server->registerHandler($this->handler1);
+
+        $func2 = new JSONFunctionImpl('func2', $func1 = new JSONFunctionImpl('func', new TypeImpl($type1)));
+        /** @var Response $r */
+        $r = $this->server->handleFromJSONString($func2->getAsJSONString());
+        $this->assertInstanceOf('ChristianBudde\Part\controller\json\Response', $r);
+        $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('canHandle', $this->handler1));
+
+        $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('handle', $this->handler1));
+        $this->assertEquals([$type1, $func1, null], $r1['arguments']);
+
+        $this->assertEquals(new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION), $r);
+    }
+
+
 
     public function testHandleOnNestedFunctionsIsOk()
     {

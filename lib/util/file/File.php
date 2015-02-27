@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\util\file;
+use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 use ChristianBudde\Part\controller\json\JSONObjectSerializable;
 
 
@@ -10,7 +11,7 @@ use ChristianBudde\Part\controller\json\JSONObjectSerializable;
  * Time: 10:30 AM
  * To change this template use File | Settings | File Templates.
  */
-interface File extends JSONObjectSerializable
+interface File extends JSONObjectSerializable, TypeHandlerGenerator
 {
 
     const FILE_MODE_R_POINTER_AT_BEGINNING = 'rb';

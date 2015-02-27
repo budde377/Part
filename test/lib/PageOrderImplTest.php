@@ -601,6 +601,14 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
     }
 
+    public function testPageOrderGenerateRightTypeHandler(){
+        $this->assertInstanceOf("ChristianBudde\\Part\\controller\\ajax\\PageOrderTypeHandlerImpl", $this->pageOrder->generateTypeHandler());
+    }
+
+
+    public function testTypeHandlerIsReused(){
+        $this->assertTrue($this->pageOrder->generateTypeHandler() === $this->pageOrder->generateTypeHandler());
+    }
 
     public function getSetUpOperation()
     {

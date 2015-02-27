@@ -82,9 +82,6 @@ if ($config->isDebugMode()) {
 
         }
 
-        $log = new \ChristianBudde\Part\log\LoggerImpl($config->getLogPath());
-        $log->error("Exception: ".$exception->getMessage(), $exception->getTrace());
-
         if (!isset($_SERVER['REQUEST_URI']) || strpos($_SERVER['REQUEST_URI'], '_500') === false) {
             \ChristianBudde\Part\util\helper\HTTPHeaderHelper::redirectToLocation("/_500");
         }

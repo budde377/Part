@@ -7,6 +7,7 @@ namespace ChristianBudde\Part\model\mail;
  * Time: 11:17 PM
  */
 
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\controller\json\MailAddressLibraryObjectImpl;
 use ChristianBudde\Part\model\user\UserLibrary;
 use ChristianBudde\Part\util\db\DB;
@@ -261,5 +262,13 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
     function jsonSerialize()
     {
         return $this->jsonObjectSerialize()->jsonSerialize();
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }

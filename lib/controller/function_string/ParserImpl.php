@@ -97,6 +97,14 @@ class ParserImpl implements Parser
      */
     public function parse(array $tokens)
     {
+        return $this->parseExpect($tokens, function () {
+            return $this->expectProgram();
+        });
+    }
+
+
+    private function parseExpect(array $tokens, callable $expect)
+    {
         $this->tokens = [];
         $i = 0;
         foreach ($tokens as $t) {
@@ -110,15 +118,14 @@ class ParserImpl implements Parser
         $this->pointer = 0;
         $this->look_ahead = $this->tokens[0]['token'];
         $this->look_ahead_2 = $this->tokens[1]['token'];
-        try{
-            $program = $this->expectProgram();
+        try {
+            $result = $expect();
             $this->match(Lexer::T_EOF);
-        } catch(Exception $e){
+        } catch (Exception $e) {
             return null;
         }
-        return $program;
+        return $result;
     }
-
 
     /**
      * @param string $input
@@ -131,11 +138,13 @@ class ParserImpl implements Parser
 
     /**
      * @param array $tokens An assoc. array containing *match* and *token*
-     * @return Program
+     * @return array
      */
     public function parseArray(array $tokens)
     {
-        return $this->parseArray($tokens);
+        return $this->parseExpect($tokens, function () {
+            return $this->expectArray()->toArray()[0];
+        });
     }
 
     /**
@@ -328,7 +337,7 @@ class ParserImpl implements Parser
      */
     private function expectString()
     {
-        if($this->look_ahead == Lexer::T_SINGLE_QUOTED_STRING){
+        if ($this->look_ahead == Lexer::T_SINGLE_QUOTED_STRING) {
             return new SingleQuotedStringScalarImpl($this->match(Lexer::T_SINGLE_QUOTED_STRING));
 
 
@@ -374,10 +383,11 @@ class ParserImpl implements Parser
      * @return UnsignedNumScalar
      * @throws Exception
      */
-    private function expectUnsignedNum(){
+    private function expectUnsignedNum()
+    {
         $l = $this->look_ahead;
         $n = $this->match([Lexer::T_DOUBLE_NUMBER, Lexer::T_EXP_DOUBLE_NUMBER, Lexer::T_DECIMAL, Lexer::T_BINARY, Lexer::T_OCTAL, Lexer::T_HEXADECIMAL]);
-        switch($l){
+        switch ($l) {
             case Lexer::T_DOUBLE_NUMBER:
                 return new DoubleUnsignedNumScalarImpl($n);
             case Lexer::T_EXP_DOUBLE_NUMBER:
@@ -420,7 +430,7 @@ class ParserImpl implements Parser
         if ($this->look_ahead == Lexer::T_COMMA) {
             $this->match(Lexer::T_COMMA);
 
-            if($e instanceof NamedArrayEntry){
+            if ($e instanceof NamedArrayEntry) {
                 $e = new NamedArrayEntriesImpl($e->getName(), $e->getValue(), $this->expectArrayEntry());
             } else {
                 $e = new ArrayEntriesImpl($e, $this->expectArrayEntry());
@@ -456,7 +466,6 @@ class ParserImpl implements Parser
     {
         return new NameNotStartingWithUnderscoreImpl($this->match(Lexer::T_NAME_NOT_STARTING_WITH_UNDERSCORE));
     }
-
 
 
 }

@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\site;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\model\Content;
 use ChristianBudde\Part\model\ContentLibrary;
 use ChristianBudde\Part\model\SiteVariablesImpl;
@@ -75,5 +76,13 @@ class SiteImpl implements Site
         return $this->contentLibrary == null?
             $this->contentLibrary = new SiteContentLibraryImpl($this->db, $this):
             $this->contentLibrary;
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }

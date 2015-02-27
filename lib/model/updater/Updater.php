@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\updater;
+use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 use ChristianBudde\Part\model\user\User;
 
 /**
@@ -10,7 +11,7 @@ use ChristianBudde\Part\model\user\User;
  * To change this template use File | Settings | File Templates.
  */
 
-interface Updater {
+interface Updater extends TypeHandlerGenerator{
     /**
      * Will check if there exists a new update.
      * This must be blocking if using external program such as git.

@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model;
+use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 use ChristianBudde\Part\controller\json\JSONObjectSerializable;
 
 /**
@@ -10,7 +11,7 @@ use ChristianBudde\Part\controller\json\JSONObjectSerializable;
  * To change this template use File | Settings | File Templates.
  */
 
-interface Content extends JSONObjectSerializable{
+interface Content extends JSONObjectSerializable, TypeHandlerGenerator{
 
 
     /**

@@ -1,7 +1,9 @@
 <?php
 namespace ChristianBudde\Part\model\updater;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\ajax\UpdaterTypeHandlerImpl;
 use ChristianBudde\Part\model;
-use ChristianBudde\Part\model\site\Site;
 use ChristianBudde\Part\model\user\User;
 
 /**
@@ -21,19 +23,22 @@ class GitUpdaterImpl implements Updater
     private $currentVersion;
     private $canBeUpdated;
     private $branch;
+    private $container;
+    private $handler;
 
     /**
+     * @param BackendSingletonContainer $container
      * @param string $path
-     * @param Site $site
      * @param bool $subModule
      */
-    function __construct($path, Site $site, $subModule = false)
+    function __construct(BackendSingletonContainer $container, $path, $subModule = false)
     {
         $this->path = $path;
-        $this->site = $site;
+        $this->container = $container;
+        $this->site = $container->getSiteInstance();
         $this->subModuleUpdater = $subModule;
         foreach ($this->listSubModules() as $module) {
-            $this->subUpdaters[$module] = new GitUpdaterImpl("$path/$module", $site, true);
+            $this->subUpdaters[$module] = new GitUpdaterImpl($container, "$path/$module", true);
         }
     }
 
@@ -186,5 +191,13 @@ class GitUpdaterImpl implements Updater
     public function isCheckOnLoginAllowed(User $user)
     {
         return $user->getUserVariables()->getValue('model-updater-disallow-check-on-login') === null;
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        return $this->handler == null? $this->handler = new UpdaterTypeHandlerImpl($this->container, $this):$this->handler;
     }
 }

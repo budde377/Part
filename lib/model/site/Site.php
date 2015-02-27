@@ -6,6 +6,7 @@ namespace ChristianBudde\Part\model\site;
  * Date: 10/23/13
  * Time: 1:16 PM
  */
+use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 use ChristianBudde\Part\model\Content;
 
 /**
@@ -14,7 +15,7 @@ use ChristianBudde\Part\model\Content;
  * Date: 10/23/13
  * Time: 1:12 PM
  */
-interface Site
+interface Site extends TypeHandlerGenerator
 {
     /**
      * Returns and reuses instance of site scoped Content

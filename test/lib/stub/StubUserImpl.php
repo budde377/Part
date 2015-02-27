@@ -7,6 +7,7 @@
  */
 namespace ChristianBudde\Part\test\stub;
 
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\controller\json\UserObjectImpl;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserPrivileges;
@@ -269,5 +270,13 @@ class StubUserImpl implements User
 
     public function detachObserver(Observer $observer)
     {
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }

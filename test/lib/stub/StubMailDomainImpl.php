@@ -7,6 +7,7 @@
  */
 namespace ChristianBudde\Part\test\stub;
 
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\model\mail\Domain;
 use ChristianBudde\Part\util\Observer;
 
@@ -201,5 +202,13 @@ class StubMailDomainImpl implements Domain
      */
     function jsonSerialize()
     {
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }

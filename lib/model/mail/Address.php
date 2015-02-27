@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\mail;
+use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 use ChristianBudde\Part\controller\json\JSONObjectSerializable;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\util\Observable;
@@ -12,7 +13,7 @@ use ChristianBudde\Part\util\Observable;
  * Time: 2:19 PM
  */
 
-interface Address extends Observable, JSONObjectSerializable {
+interface Address extends Observable, JSONObjectSerializable, TypeHandlerGenerator {
 
     const EVENT_DELETE = 1;
     const EVENT_CHANGE_LOCAL_PART = 2;

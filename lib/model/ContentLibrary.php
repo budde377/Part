@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model;
+use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 
 
 /**
@@ -9,7 +10,7 @@ namespace ChristianBudde\Part\model;
  * Time: 9:31 PM
  */
 
-interface ContentLibrary {
+interface ContentLibrary extends TypeHandlerGenerator{
 
     /**
      * This will list site content.

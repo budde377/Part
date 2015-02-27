@@ -13,7 +13,6 @@ use Twig_Environment;
 use Twig_Extension_Debug;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
-use Twig_Loader_String;
 use Twig_LoaderInterface;
 
 /**

@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\mail;
+use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 use ChristianBudde\Part\controller\json\JSONObjectSerializable;
 
 
@@ -10,7 +11,7 @@ use ChristianBudde\Part\controller\json\JSONObjectSerializable;
  * Time: 9:27 AM
  */
 
-interface DomainLibrary extends JSONObjectSerializable{
+interface DomainLibrary extends JSONObjectSerializable, TypeHandlerGenerator{
 
     /**
      * List the domains in the library as an assoc array

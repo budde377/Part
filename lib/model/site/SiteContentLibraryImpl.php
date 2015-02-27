@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\site;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\model\Content;
 use ChristianBudde\Part\util\db\DB;
 use PDO;
@@ -105,5 +106,13 @@ class SiteContentLibraryImpl implements SiteContentLibrary
         }
 
         return $retArray;
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }

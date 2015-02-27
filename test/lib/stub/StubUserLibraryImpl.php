@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\test\stub;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\controller\json\UserLibraryObjectImpl;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserLibrary;
@@ -198,4 +199,11 @@ class StubUserLibraryImpl implements UserLibrary
     }
 
 
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
+    }
 }

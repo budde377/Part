@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\page;
+use ChristianBudde\Part\controller\ajax\TypeHandler;
 use ChristianBudde\Part\model\Content;
 use ChristianBudde\Part\util\db\DB;
 use PDO;
@@ -111,5 +112,13 @@ class PageContentLibraryImpl implements PageContentLibrary
     public function getPage()
     {
         return $this->page;
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        // TODO: Implement generateTypeHandler() method.
     }
 }
