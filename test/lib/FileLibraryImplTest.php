@@ -9,6 +9,7 @@
 namespace ChristianBudde\Part\test;
 
 use ChristianBudde\Part\model\user\User;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubConfigImpl;
 use ChristianBudde\Part\test\stub\StubUserImpl;
 use ChristianBudde\Part\util\file\File;
@@ -35,6 +36,8 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase
     private $user;
     /** @var  User */
     private $user2;
+    /** @var  StubBackendSingletonContainerImpl */
+    private $container;
 
     public function setUp()
     {
@@ -44,8 +47,8 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase
         $this->testDir = new FolderImpl(dirname(__FILE__) . "/../stubs/testFolderFileLibrary");
         $this->testDir->create();
         $this->config = new StubConfigImpl();
-
-        $this->lib = new FileLibraryImpl($this->testDir);
+        $this->container = new StubBackendSingletonContainerImpl();
+        $this->lib = new FileLibraryImpl($this->container, $this->testDir);
     }
 
     public function setupExistingFiles()
@@ -178,7 +181,7 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase
         $this->lib->addToWhitelist($f);
         $whitelist = $this->lib->getWhitelist();
         $this->assertEquals(1, count($whitelist));
-        $lib = new FileLibraryImpl($this->testDir);
+        $lib = new FileLibraryImpl($this->container, $this->testDir);
         $this->assertEquals(1, count($lib->getWhitelist()));
 
     }
@@ -203,7 +206,7 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase
         $f = $this->setupExistingFiles();
         $this->lib->addToWhitelist($f);
         $this->lib->removeFromWhitelist($f);
-        $lib = new FileLibraryImpl($this->testDir);
+        $lib = new FileLibraryImpl($this->container, $this->testDir);
         $this->assertFalse($lib->whitelistContainsFile($f));
     }
 
@@ -244,7 +247,7 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase
     public function testLibraryWillCreateLibFolderIfNotExists()
     {
         $this->testDir->delete(Folder::DELETE_FOLDER_RECURSIVE);
-        $lib = new FileLibraryImpl($this->testDir);
+        $lib = new FileLibraryImpl($this->container, $this->testDir);
         $this->assertFalse($this->testDir->exists());
         $f = new FileImpl(dirname(__FILE__) . "/../stubs/fileStub");
         $lib->addToLibrary($this->user, $f);
@@ -430,6 +433,11 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase
 
         $t2 = $this->lib->getWhitelistLastModified();
         $this->assertGreaterThan($t, $t2);
+    }
+
+
+    public function testGenerateTypeHandlerReusesInstance(){
+        $this->assertEquals($this->lib, $this->lib->generateTypeHandler());
     }
 
     public function createFile($name = null, $content = null)

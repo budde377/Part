@@ -8,6 +8,7 @@
 namespace ChristianBudde\Part\test;
 
 use ChristianBudde\Part\model\site\SiteImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 
@@ -18,6 +19,8 @@ class SiteImplTest extends CustomDatabaseTestCase
     private $db;
     /** @var  SiteImpl */
     private $site;
+    /** @var  StubBackendSingletonContainerImpl */
+    private $container;
 
     function __construct()
     {
@@ -30,7 +33,9 @@ class SiteImplTest extends CustomDatabaseTestCase
         parent::setUp();
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->site = new SiteImpl($this->db);
+        $this->container = new StubBackendSingletonContainerImpl();
+        $this->container->setDBInstance($this->db);
+        $this->site = new SiteImpl($this->container);
 
     }
 
@@ -65,10 +70,14 @@ class SiteImplTest extends CustomDatabaseTestCase
     {
         $t1 = $this->site->lastModified();
         $this->site->modify();
-        $site = new SiteImpl($this->db);
+        $site = new SiteImpl($this->container);
         $t2 = $site->lastModified();
         $this->assertGreaterThan($t1, $t2);
 
+    }
+
+    public function testGenerateTypeHandlerReusesInstance(){
+        $this->assertEquals($this->site, $this->site->generateTypeHandler());
     }
 
 

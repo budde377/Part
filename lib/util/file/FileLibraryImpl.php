@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\util\file;
+use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\model\user\User;
 
@@ -15,11 +16,12 @@ class FileLibraryImpl implements FileLibrary{
     private $filesDir;
     private $whiteList = array();
     private $whitelistFile;
+    private $container;
 
 
-    function __construct(Folder $filesDir)
+    function __construct(BackendSingletonContainer $container, Folder $filesDir)
     {
-//        $this->config = $config;
+        $this->container =  $container;
         $this->filesDir = $filesDir;
         $this->whitelistFile = new FileImpl($filesDir->getAbsolutePath()."/.whitelist");
         $this->loadWhitelist();
@@ -372,6 +374,6 @@ class FileLibraryImpl implements FileLibrary{
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
+        return $this->container->getTypeHandlerLibraryInstance()->getFileLibraryTypeHandlerInstance($this);
     }
 }

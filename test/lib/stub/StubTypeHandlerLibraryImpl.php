@@ -18,14 +18,21 @@ use ChristianBudde\Part\model\mail\Domain;
 use ChristianBudde\Part\model\mail\DomainLibrary;
 use ChristianBudde\Part\model\mail\Mailbox;
 use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\model\page\PageContent;
+use ChristianBudde\Part\model\page\PageContentLibrary;
 use ChristianBudde\Part\model\page\PageOrder;
+use ChristianBudde\Part\model\site\Site;
+use ChristianBudde\Part\model\site\SiteContent;
+use ChristianBudde\Part\model\site\SiteContentLibrary;
 use ChristianBudde\Part\model\updater\Updater;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserLibrary;
+use ChristianBudde\Part\util\file\File;
+use ChristianBudde\Part\util\file\FileLibrary;
+use ChristianBudde\Part\util\file\ImageFile;
 
 class StubTypeHandlerLibraryImpl implements TypeHandlerLibrary{
 
-    public $typeHandlers = [];
 
     /**
      * @param PageOrder $pageOrder
@@ -33,7 +40,7 @@ class StubTypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getPageOrderTypeHandlerInstance(PageOrder $pageOrder)
     {
-        return $this->typeHandlers['PageOrder'];
+        return $pageOrder;
     }
 
     /**
@@ -42,7 +49,7 @@ class StubTypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getUserLibraryTypeHandlerInstance(UserLibrary $userLibrary)
     {
-        return $this->typeHandlers['UserLibrary'];
+        return $userLibrary;
     }
 
     /**
@@ -51,7 +58,7 @@ class StubTypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getLoggerTypeHandlerInstance(Logger $logger)
     {
-        return $this->typeHandlers['Logger'];
+        return $logger;
     }
 
     /**
@@ -60,7 +67,7 @@ class StubTypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getUpdaterTypeHandlerInstance(Updater $updater)
     {
-        return $this->typeHandlers['Updater'];
+        return $updater;
     }
 
     /**
@@ -69,7 +76,7 @@ class StubTypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getPageTypeHandlerInstance(Page $page)
     {
-        return $this->typeHandlers['Page'];
+        return $page;
     }
 
     /**
@@ -78,7 +85,7 @@ class StubTypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getUserTypeHandlerInstance(User $user)
     {
-        return $this->typeHandlers['User'];
+        return $user;
     }
 
     /**
@@ -87,7 +94,7 @@ class StubTypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getMailDomainLibraryTypeHandlerInstance(DomainLibrary $library)
     {
-        return $this->typeHandlers['MailDomainLibrary'];
+        return $library;
     }
 
     /**
@@ -96,7 +103,7 @@ class StubTypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getMailDomainTypeHandlerInstance(Domain $domain)
     {
-        return $this->typeHandlers['MailDomain'];
+        return $domain;
     }
 
     /**
@@ -105,7 +112,7 @@ class StubTypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getMailAddressLibraryTypeHandlerInstance(AddressLibrary $address)
     {
-        return $this->typeHandlers['MailAddressLibrary'];
+        return $address;
     }
 
     /**
@@ -114,7 +121,7 @@ class StubTypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getMailAddressTypeHandlerInstance(Address $address)
     {
-        return $this->typeHandlers['MailAddress'];
+        return $address;
     }
 
     /**
@@ -123,6 +130,78 @@ class StubTypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getMailboxTypeHandlerInstance(Mailbox $mailbox)
     {
-        return $this->typeHandlers['Mailbox'];
+        return $mailbox;
+    }
+
+    /**
+     * @param Site $site
+     * @return TypeHandler
+     */
+    public function getSiteTypeHandlerInstance(Site $site)
+    {
+        return $site;
+    }
+
+    /**
+     * @param FileLibrary $library
+     * @return TypeHandler
+     */
+    public function getFileLibraryTypeHandlerInstance(FileLibrary $library)
+    {
+        return $library;
+    }
+
+    /**
+     * @param PageContent $content
+     * @return TypeHandler
+     */
+    public function getPageContentTypeHandlerInstance(PageContent $content)
+    {
+        return $content;
+    }
+
+    /**
+     * @param SiteContent $content
+     * @return TypeHandler
+     */
+    public function getSiteContentTypeHandlerInstance(SiteContent $content)
+    {
+        return $content;
+    }
+
+    /**
+     * @param SiteContentLibrary $content
+     * @return TypeHandler
+     */
+    public function getSiteContentLibraryTypeHandlerInstance(SiteContentLibrary $content)
+    {
+        return $content;
+    }
+
+    /**
+     * @param PageContentLibrary $content
+     * @return TypeHandler
+     */
+    public function getPageContentLibraryTypeHandlerInstance(PageContentLibrary $content)
+    {
+        return $content;
+    }
+
+    /**
+     * @param File $file
+     * @return TypeHandler
+     */
+    public function getFileTypeHandlerInstance(File $file)
+    {
+        return $file;
+    }
+
+    /**
+     * @param ImageFile $file
+     * @return TypeHandler
+     */
+    public function getImageFileTypeHandlerInstance(ImageFile $file)
+    {
+        return $file;
     }
 }

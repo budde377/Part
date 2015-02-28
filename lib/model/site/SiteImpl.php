@@ -1,11 +1,11 @@
 <?php
 namespace ChristianBudde\Part\model\site;
+use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\model\Content;
 use ChristianBudde\Part\model\ContentLibrary;
 use ChristianBudde\Part\model\SiteVariablesImpl;
 use ChristianBudde\Part\model\Variables;
-use ChristianBudde\Part\util\db\DB;
 
 
 /**
@@ -21,10 +21,12 @@ class SiteImpl implements Site
     private $variables;
     private $db;
     private $lastMod = 0 ;
+    private $container;
 
-    function __construct(DB $db)
+    function __construct(BackendSingletonContainer $container)
     {
-        $this->db = $db;
+        $this->container = $container;
+        $this->db = $container->getDBInstance();
     }
 
 
@@ -83,6 +85,6 @@ class SiteImpl implements Site
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
+        return $this->container->getTypeHandlerLibraryInstance()->getSiteTypeHandlerInstance($this);
     }
 }

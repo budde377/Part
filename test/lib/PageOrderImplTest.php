@@ -16,7 +16,6 @@ use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubCurrentPageStrategyImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\stub\StubPageImpl;
-use ChristianBudde\Part\test\stub\StubTypeHandlerLibraryImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 use ChristianBudde\Part\test\util\TruncateOperation;
 use PHPUnit_Extensions_Database_DataSet_IDataSet;
@@ -603,9 +602,8 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     }
 
     public function testGenerateTypeHandlerReusesInstance(){
-        $this->backendContainer->setTypeHandlerLibraryInstance($th = new StubTypeHandlerLibraryImpl());
-        $th->typeHandlers['PageOrder'] = 1337;
-        $this->assertEquals(1337, $this->pageOrder->generateTypeHandler());
+
+        $this->assertEquals( $this->pageOrder, $this->pageOrder->generateTypeHandler());
     }
 
     public function getSetUpOperation()

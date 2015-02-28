@@ -270,6 +270,6 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
+        return $this->container->getTypeHandlerLibraryInstance()->getMailAddressLibraryTypeHandlerInstance($this);
     }
 }

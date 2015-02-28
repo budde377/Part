@@ -389,8 +389,7 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
     }
 
     public function testGenerateTypeHandlerReusesInstance(){
-        $this->typeHandlerLibrary->typeHandlers['UserLibrary'] = 1337;
-        $this->assertEquals(1337, $this->library->generateTypeHandler());
+        $this->assertEquals($this->library, $this->library->generateTypeHandler());
     }
 
     private function userInList($ret, User $user)

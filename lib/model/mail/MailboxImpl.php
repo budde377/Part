@@ -292,6 +292,6 @@ class MailboxImpl implements Mailbox{
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
+        return $this->container->getTypeHandlerLibraryInstance()->getMailboxTypeHandlerInstance($this);
     }
 }

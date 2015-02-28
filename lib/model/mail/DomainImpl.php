@@ -489,6 +489,6 @@ class DomainImpl implements Domain, Observer
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
+        return $this->container->getTypeHandlerLibraryInstance()->getMailDomainTypeHandlerInstance($this);
     }
 }

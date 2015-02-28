@@ -177,6 +177,9 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
         $this->assertEquals($o = new MailDomainLibraryObjectImpl($this->domainLibrary), $this->domainLibrary->jsonObjectSerialize());
         $this->assertEquals($o->jsonSerialize(), $this->domainLibrary->jsonSerialize());
     }
+    public function testGenerateTypeHandlerReusesInstance(){
 
+        $this->assertEquals($this->domainLibrary, $this->domainLibrary->generateTypeHandler());
+    }
 
 }

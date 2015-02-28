@@ -14,7 +14,6 @@ use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
-use ChristianBudde\Part\test\stub\StubTypeHandlerLibraryImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 use ChristianBudde\Part\util\db\DB;
 
@@ -71,9 +70,7 @@ class GitUpdaterImplTest extends CustomDatabaseTestCase{
     }
 
     public function testGenerateTypeHandlerReusesInstance(){
-        $this->container->setTypeHandlerLibraryInstance($th = new StubTypeHandlerLibraryImpl());
-        $th->typeHandlers['Updater'] = 1337;
-        $this->assertEquals(1337, $this->updater->generateTypeHandler());
+        $this->assertEquals($this->updater, $this->updater->generateTypeHandler());
     }
 
 

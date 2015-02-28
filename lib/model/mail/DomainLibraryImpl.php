@@ -180,6 +180,6 @@ class DomainLibraryImpl implements DomainLibrary, Observer
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
+        return $this->container->getTypeHandlerLibraryInstance()->getMailDomainLibraryTypeHandlerInstance($this);
     }
 }

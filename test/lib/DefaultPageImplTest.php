@@ -20,6 +20,7 @@ class DefaultPageImplTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+
         $this->id = "someId";
         $this->template = "someTemplate";
         $this->title = "someTitle";

@@ -17,10 +17,18 @@ use ChristianBudde\Part\model\mail\Domain;
 use ChristianBudde\Part\model\mail\DomainLibrary;
 use ChristianBudde\Part\model\mail\Mailbox;
 use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\model\page\PageContent;
+use ChristianBudde\Part\model\page\PageContentLibrary;
 use ChristianBudde\Part\model\page\PageOrder;
+use ChristianBudde\Part\model\site\Site;
+use ChristianBudde\Part\model\site\SiteContent;
+use ChristianBudde\Part\model\site\SiteContentLibrary;
 use ChristianBudde\Part\model\updater\Updater;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserLibrary;
+use ChristianBudde\Part\util\file\File;
+use ChristianBudde\Part\util\file\FileLibrary;
+use ChristianBudde\Part\util\file\ImageFile;
 
 //TODO test this
 
@@ -123,5 +131,77 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
     public function getMailboxTypeHandlerInstance(Mailbox $mailbox)
     {
         // TODO: Implement getMailboxTypeHandlerInstance() method.
+    }
+
+    /**
+     * @param Site $site
+     * @return TypeHandler
+     */
+    public function getSiteTypeHandlerInstance(Site $site)
+    {
+        // TODO: Implement getSiteTypeHandlerInstance() method.
+    }
+
+    /**
+     * @param FileLibrary $library
+     * @return TypeHandler
+     */
+    public function getFileLibraryTypeHandlerInstance(FileLibrary $library)
+    {
+        // TODO: Implement getFileLibraryTypeHandlerInstance() method.
+    }
+
+    /**
+     * @param PageContent $content
+     * @return TypeHandler
+     */
+    public function getPageContentTypeHandlerInstance(PageContent $content)
+    {
+        // TODO: Implement getPageContentTypeHandlerInstance() method.
+    }
+
+    /**
+     * @param SiteContent $content
+     * @return TypeHandler
+     */
+    public function getSiteContentTypeHandlerInstance(SiteContent $content)
+    {
+        // TODO: Implement getSiteContentTypeHandlerInstance() method.
+    }
+
+    /**
+     * @param SiteContentLibrary $content
+     * @return TypeHandler
+     */
+    public function getSiteContentLibraryTypeHandlerInstance(SiteContentLibrary $content)
+    {
+        // TODO: Implement getSiteContentLibraryTypeHandlerInstance() method.
+    }
+
+    /**
+     * @param PageContentLibrary $content
+     * @return TypeHandler
+     */
+    public function getPageContentLibraryTypeHandlerInstance(PageContentLibrary $content)
+    {
+        // TODO: Implement getPageContentLibraryTypeHandlerInstance() method.
+    }
+
+    /**
+     * @param File $file
+     * @return TypeHandler
+     */
+    public function getFileTypeHandlerInstance(File $file)
+    {
+        // TODO: Implement getFileTypeHandlerInstance() method.
+    }
+
+    /**
+     * @param ImageFile $file
+     * @return TypeHandler
+     */
+    public function getImageFileTypeHandlerInstance(ImageFile $file)
+    {
+        // TODO: Implement getImageFileTypeHandlerInstance() method.
     }
 }

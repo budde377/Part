@@ -550,7 +550,10 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
         $this->address->addOwner($this->owner1);
         $this->assertEquals(0, count($this->address->listOwners()));
     }
+    public function testGenerateTypeHandlerReusesInstance(){
 
+        $this->assertEquals($this->address, $this->address->generateTypeHandler());
+    }
     private function cloneAddress(Address $address){
         return $this->createAddress($address->getLocalPart());
     }

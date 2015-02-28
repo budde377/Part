@@ -232,4 +232,9 @@ class MailMailboxImplTest extends CustomDatabaseTestCase
         $this->assertEquals($o = new MailMailboxObjectImpl($this->mailbox), $this->mailbox->jsonObjectSerialize());
         $this->assertEquals($o->jsonSerialize(), $this->mailbox->jsonSerialize());
     }
+
+    public function testGenerateTypeHandlerReusesInstance(){
+
+        $this->assertEquals($this->mailbox, $this->mailbox->generateTypeHandler());
+    }
 }

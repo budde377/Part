@@ -433,7 +433,10 @@ class MailDomainImplTest extends CustomDatabaseTestCase
         $this->assertEquals($o = new MailDomainObjectImpl($this->domain), $this->domain->jsonObjectSerialize());
         $this->assertEquals($o->jsonSerialize(), $this->domain->jsonSerialize());
     }
+    public function testGenerateTypeHandlerReusesInstance(){
 
+        $this->assertEquals($this->domain, $this->domain->generateTypeHandler());
+    }
     /**
      * @param DomainImpl $domain
      * @return \ChristianBudde\Part\model\mail\DomainImpl

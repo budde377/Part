@@ -250,4 +250,9 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
         $this->assertEquals($o = new MailAddressLibraryObjectImpl($this->addressLibrary), $this->addressLibrary->jsonObjectSerialize());
         $this->assertEquals($o->jsonSerialize(), $this->addressLibrary->jsonSerialize());
     }
+
+    public function testGenerateTypeHandlerReusesInstance(){
+
+        $this->assertEquals($this->addressLibrary, $this->addressLibrary->generateTypeHandler());
+    }
 }

@@ -49,6 +49,12 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer
     private $tmpFolder;
     private $handlerLibrary;
 
+    function __construct()
+    {
+        $this->handlerLibrary = new StubTypeHandlerLibraryImpl();
+    }
+
+
     /**
      * @param mixed $handlerLibrary
      */

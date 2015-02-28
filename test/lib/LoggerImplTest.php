@@ -4,7 +4,6 @@ namespace ChristianBudde\Part\test;
 use ChristianBudde\Part\log\Logger;
 use ChristianBudde\Part\log\LoggerImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
-use ChristianBudde\Part\test\stub\StubTypeHandlerLibraryImpl;
 use ChristianBudde\Part\util\file\Folder;
 use ChristianBudde\Part\util\file\FolderImpl;
 use ChristianBudde\Part\util\file\LogFileImpl;
@@ -139,9 +138,7 @@ class LoggerImplTest extends PHPUnit_Framework_TestCase
 
     }
     public function testGenerateTypeHandlerReusesInstance(){
-        $this->container->setTypeHandlerLibraryInstance($th = new StubTypeHandlerLibraryImpl());
-        $th->typeHandlers['Logger'] = 1337;
-        $this->assertEquals(1337, $this->logger->generateTypeHandler());
+        $this->assertEquals($this->logger, $this->logger->generateTypeHandler());
     }
 
     public function tearDown()
