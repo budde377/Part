@@ -7,7 +7,9 @@ use ChristianBudde\Part\BackendSingletonContainerImpl;
 use ChristianBudde\Part\ConfigImpl;
 use ChristianBudde\Part\controller\ajax\ServerImpl;
 use ChristianBudde\Part\controller\ajax\type_handler\BackendTypeHandlerImpl;
+use ChristianBudde\Part\controller\json\JSONFunctionImpl;
 use ChristianBudde\Part\controller\json\Response;
+use ChristianBudde\Part\controller\json\TypeImpl;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserLibrary;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
@@ -28,7 +30,7 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
     /** @var  UserLibrary */
     private $userLibrary;
     private $config;
-
+    /** @var  BackendTypeHandlerImpl */
     private $typeHandler;
     /** @var  User */
     private $rootUser;
@@ -94,6 +96,21 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
         $this->rootUser = $this->container->getUserLibraryInstance()->getUser('root');
         $this->rootUser->getUserPrivileges()->addRootPrivileges();
         $this->userLibrary = $this->container->getUserLibraryInstance();
+    }
+
+
+    public function testCanHandleIsFalse(){
+        $this->assertFalse($this->typeHandler->canHandle('User', new JSONFunctionImpl('getId', new TypeImpl('User'))));
+    }
+
+    public function testHandleGivesException(){
+        $this->setExpectedException('Exception');
+        $this->typeHandler->handle('User', new JSONFunctionImpl('getId', new TypeImpl('User')));
+    }
+
+    public function testHasNoType(){
+        $this->assertEquals([], $this->typeHandler->listTypes());
+        $this->assertFalse($this->typeHandler->hasType("User"));
     }
 
     public function setUpRootUserLogin($password = null)
