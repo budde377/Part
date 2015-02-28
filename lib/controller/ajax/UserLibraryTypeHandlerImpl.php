@@ -207,33 +207,33 @@ class UserLibraryTypeHandlerImpl extends GenericObjectTypeHandlerImpl
     {
         $username = explode('@', $mail);
         $username = $baseUsername = strtolower($username[0]);
-        $i = 2;
+        $post_fix = 2;
         while (!$instance->getUserLoggedIn()->isValidUsername($username)) {
-            $username = $baseUsername . '_' . $i;
-            $i++;
+            $username = $baseUsername . '_' . $post_fix;
+            $post_fix++;
         }
         return $username;
     }
 
-    private function assignUserPrivileges($privileges, User $user)
+    private function assignUserPrivileges($privilegesString, User $user)
     {
-        $p = $user->getUserPrivileges();
-        if ($privileges == 'root') {
-            $p->addRootPrivileges();
-        } else if ($privileges == 'site') {
-            $p->addSitePrivileges();
+        $privileges = $user->getUserPrivileges();
+        if ($privilegesString == 'root') {
+            $privileges->addRootPrivileges();
+        } else if ($privilegesString == 'site') {
+            $privileges->addSitePrivileges();
         }
     }
 
     private function sendMailToUser($user, $subject, $message)
     {
-        $m = new MailImpl();
-        $m->addReceiver($user);
-        $m->setSender("no-reply@{$this->domain}");
-        $m->setMailType(Mail::MAIL_TYPE_PLAIN);
-        $m->setSubject($subject);
-        $m->setMessage($message);
-        $m->sendMail();
+        $mail = new MailImpl();
+        $mail->addReceiver($user);
+        $mail->setSender("no-reply@{$this->domain}");
+        $mail->setMailType(Mail::MAIL_TYPE_PLAIN);
+        $mail->setSubject($subject);
+        $mail->setMessage($message);
+        $mail->sendMail();
     }
 
 

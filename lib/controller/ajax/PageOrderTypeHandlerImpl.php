@@ -44,18 +44,18 @@ class PageOrderTypeHandlerImpl extends GenericObjectTypeHandlerImpl
         if (strlen($title) == 0) {
             return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_PAGE_TITLE);
         }
-        $id = strtolower($title);
-        $id = $baseId = str_replace(' ', '_', $id);
-        $id = $baseId = preg_replace('/[^a-z0-9\-_]/', '', $id);
-        $i = 2;
-        while (($p = $pageOrder->createPage($id)) === false) {
-            $id = $baseId . "_" . $i;
-            $i++;
+        $page_id = strtolower($title);
+        $page_id = $baseId = str_replace(' ', '_', $page_id);
+        $page_id = $baseId = preg_replace('/[^a-z0-9\-_]/', '', $page_id);
+        $postfix = 2;
+        while (($page = $pageOrder->createPage($page_id)) === false) {
+            $page_id = $baseId . "_" . $postfix;
+            $postfix++;
         }
-        $p->setTitle($title);
-        $p->setTemplate('_main');
+        $page->setTitle($title);
+        $page->setTemplate('_main');
 
-        return $p;
+        return $page;
 
     }
 
