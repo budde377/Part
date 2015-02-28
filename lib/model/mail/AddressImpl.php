@@ -1,11 +1,10 @@
 <?php
 namespace ChristianBudde\Part\model\mail;
 
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\MailAddressObjectImpl;
 use ChristianBudde\Part\model\user\User;
-use ChristianBudde\Part\model\user\UserLibrary;
-use ChristianBudde\Part\util\db\DB;
 use ChristianBudde\Part\util\Observable;
 use ChristianBudde\Part\util\Observer;
 use ChristianBudde\Part\util\ObserverLibrary;
@@ -57,15 +56,17 @@ class AddressImpl implements Address, Observer
     private $removeOwnerStatement;
     private $owners = [];
     private $userLibrary;
+    private $container;
 
-    function __construct($localPart, DB $db, UserLibrary $userLibrary, AddressLibrary $addressLibrary)
+    function __construct(BackendSingletonContainer $container, $localPart, AddressLibrary $addressLibrary)
     {
+        $this->container = $container;
         $this->observerLibrary = new ObserverLibraryImpl($this);
         $this->addressLibrary = $addressLibrary;
-        $this->db = $db;
+        $this->db = $container->getDBInstance();
         $this->localPart = $localPart;
         $this->domainName = $addressLibrary->getDomain()->getDomainName();
-        $this->userLibrary = $userLibrary;
+        $this->userLibrary = $container->getUserLibraryInstance();
     }
 
 
@@ -328,7 +329,7 @@ class AddressImpl implements Address, Observer
             return $this->mailbox;
         }
 
-        $this->mailbox = new MailboxImpl($this, $this->db);
+        $this->mailbox = new MailboxImpl($this->container, $this, $this->db);
         $this->mailbox->attachObserver($this);
         $this->mailbox->setName($name);
         $this->mailbox->setPassword($password);
@@ -392,7 +393,7 @@ class AddressImpl implements Address, Observer
         $row = $this->existsStatement->fetch(PDO::FETCH_ASSOC);
 
         if($row['mailbox_id'] != null){
-            $this->mailbox = new MailboxImpl($this, $this->db);
+            $this->mailbox = new MailboxImpl($this->container, $this, $this->db);
             $this->mailbox->attachObserver($this);
         }
         $this->modified = strtotime($row['modified']);

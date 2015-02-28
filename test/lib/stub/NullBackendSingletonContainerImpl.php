@@ -2,6 +2,7 @@
 namespace ChristianBudde\Part\test\stub;
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\Config;
+use ChristianBudde\Part\controller\ajax\TypeHandlerLibrary;
 use ChristianBudde\Part\util\file\Folder;
 
 
@@ -208,6 +209,15 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
      * @return Folder
      */
     public function getTmpFolderInstance()
+    {
+
+    }
+
+    /**
+     * Will create and reuse instance of TypeHandlerLibrary.
+     * @return TypeHandlerLibrary
+     */
+    public function getTypeHandlerLibraryInstance()
     {
 
     }

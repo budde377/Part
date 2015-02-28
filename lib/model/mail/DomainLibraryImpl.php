@@ -1,11 +1,9 @@
 <?php
 namespace ChristianBudde\Part\model\mail;
 
-use ChristianBudde\Part\Config;
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\MailDomainLibraryObjectImpl;
-use ChristianBudde\Part\model\user\UserLibrary;
-use ChristianBudde\Part\util\db\DB;
 use ChristianBudde\Part\util\Observable;
 use ChristianBudde\Part\util\Observer;
 use PDO;
@@ -30,13 +28,15 @@ class DomainLibraryImpl implements DomainLibrary, Observer
     /** @var  PDO */
     private $connection;
     private $userLibrary;
+    private $container;
 
-    function __construct(Config $config, DB $db, UserLibrary $userLibrary)
+    function __construct(BackendSingletonContainer $container)
     {
-        $this->userLibrary = $userLibrary;
-        $this->databaseName = $config->getMySQLConnection()['database'];
-        $this->db = $db;
-        $this->connection = $db->getConnection();
+        $this->container = $container;
+        $this->userLibrary = $container->getUserLibraryInstance();
+        $this->databaseName = $container->getConfigInstance()->getMySQLConnection()['database'];
+        $this->db = $container->getDBInstance();
+        $this->connection = $this->db->getConnection();
     }
 
 
@@ -72,7 +72,7 @@ class DomainLibraryImpl implements DomainLibrary, Observer
     {
         $d = $this->getDomain($domain);
         if ($d == null) {
-            $d = new DomainImpl($domain, $this->databaseName, $this->db, $this->userLibrary, $this);
+            $d = new DomainImpl($this->container, $domain, $this);
 
             if($d->create($password)){
                 $this->domainList[$domain] =$d;
@@ -136,7 +136,7 @@ class DomainLibraryImpl implements DomainLibrary, Observer
         $this->domainList = array();
         foreach ($this->listDomainStatement->fetchAll(PDO::FETCH_ASSOC) as $d) {
             $domain = $d['domain'];
-            $d = ($this->domainList[$domain] = new DomainImpl($domain, $this->databaseName, $this->db, $this->userLibrary, $this));
+            $d = ($this->domainList[$domain] = new DomainImpl($this->container, $domain, $this));
             $d->attachObserver($this);
         }
 

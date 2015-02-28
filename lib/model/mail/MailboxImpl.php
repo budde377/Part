@@ -6,9 +6,9 @@ namespace ChristianBudde\Part\model\mail;
  * Date: 7/8/14
  * Time: 6:02 PM
  */
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\MailMailboxObjectImpl;
-use ChristianBudde\Part\util\db\DB;
 use ChristianBudde\Part\util\Observer;
 use ChristianBudde\Part\util\ObserverLibraryImpl;
 use ChristianBudde\Part\util\traits\EncryptionTrait;
@@ -37,12 +37,14 @@ class MailboxImpl implements Mailbox{
     private $created = 0;
     private $modified = 0;
     private $saveChangesStatement;
+    private $container;
 
-    function __construct(Address $address, DB $db)
+    function __construct(BackendSingletonContainer $container, Address $address)
     {
+        $this->container = $container;
         $this->observerLibrary = new ObserverLibraryImpl($this);
         $this->address = $address;
-        $this->db = $db;
+        $this->db = $container->getDBInstance();
     }
 
 

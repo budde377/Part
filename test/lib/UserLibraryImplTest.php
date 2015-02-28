@@ -9,6 +9,7 @@ use ChristianBudde\Part\model\user\UserLibraryImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubConfigImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
+use ChristianBudde\Part\test\stub\StubTypeHandlerLibraryImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 
 /**
@@ -27,6 +28,8 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
 
     /** @var  BackendSingletonContainer */
     private $container;
+    /** @var  StubTypeHandlerLibraryImpl */
+    private $typeHandlerLibrary;
 
     function __construct($dataset = null)
     {
@@ -42,6 +45,8 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
         $this->container = new StubBackendSingletonContainerImpl();
+        $this->container->setTypeHandlerLibraryInstance($this->typeHandlerLibrary = new StubTypeHandlerLibraryImpl());
+
         $this->container->setDBInstance($this->db);
         $this->container->setConfigInstance(new StubConfigImpl());
         $this->library = new UserLibraryImpl($this->container);
@@ -383,13 +388,9 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
         $this->assertEquals(new UserLibraryObjectImpl($this->library), $this->library->jsonObjectSerialize());
     }
 
-
-    public function testGenerateTypeHandlerGenerates(){
-        $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\UserLibraryTypeHandlerImpl', $this->library->generateTypeHandler());
-    }
-
     public function testGenerateTypeHandlerReusesInstance(){
-        $this->assertTrue($this->library->generateTypeHandler() === $this->library->generateTypeHandler());
+        $this->typeHandlerLibrary->typeHandlers['UserLibrary'] = 1337;
+        $this->assertEquals(1337, $this->library->generateTypeHandler());
     }
 
     private function userInList($ret, User $user)

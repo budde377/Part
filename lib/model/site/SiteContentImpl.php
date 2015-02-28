@@ -1,7 +1,7 @@
 <?php
 namespace ChristianBudde\Part\model\site;
 
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\SiteContentObjectImpl;
 use ChristianBudde\Part\util\db\DB;
 use PDO;

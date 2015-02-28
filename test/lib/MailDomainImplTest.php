@@ -11,6 +11,7 @@ use ChristianBudde\Part\Config;
 use ChristianBudde\Part\controller\json\MailDomainObjectImpl;
 use ChristianBudde\Part\model\mail\Domain;
 use ChristianBudde\Part\model\mail\DomainImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubConfigImpl;
 use ChristianBudde\Part\test\stub\StubMailDomainLibraryImpl;
 use ChristianBudde\Part\test\stub\StubObserverImpl;
@@ -44,6 +45,8 @@ class MailDomainImplTest extends CustomDatabaseTestCase
     private $databaseName;
     /** @var  StubUserLibraryImpl */
     private $userLibrary;
+    /** @var  StubBackendSingletonContainerImpl */
+    private $container;
 
     function __construct()
     {
@@ -54,6 +57,7 @@ class MailDomainImplTest extends CustomDatabaseTestCase
     public function setUp()
     {
         parent::setUp();
+        $this->container = new StubBackendSingletonContainerImpl();
         $this->config = new StubConfigImpl();
         $this->config->setMailMysqlConnection(array(
             'user' => self::$mailMySQLOptions->getUsername(),
@@ -68,16 +72,23 @@ class MailDomainImplTest extends CustomDatabaseTestCase
             'password' => self::$mysqlOptions->getPassword(),
             'folders' => []
         ));
+        $this->container->setConfigInstance($this->config);
+
         $this->db = new MySQLDBImpl($this->config);
+        $this->container->setDBInstance($this->db);
+
         $this->databaseName = self::$mysqlOptions->getDatabase();
         $this->domainLib = new StubMailDomainLibraryImpl();
+
         $this->userLibrary = $userLibrary = new StubUserLibraryImpl();
-        $this->domain = new DomainImpl('test.dk', $this->databaseName, $this->db, $userLibrary, $this->domainLib);
-        $this->domain2 = new DomainImpl('test2.dk', $this->databaseName, $this->db, $userLibrary, $this->domainLib);
+        $this->container->setUserLibraryInstance($this->userLibrary);
+
+        $this->domain = new DomainImpl($this->container, 'test.dk',$this->domainLib);
+        $this->domain2 = new DomainImpl($this->container, 'test2.dk', $this->domainLib);
         $this->domainLib->setDomainList(['test.dk'=>$this->domain, 'test2.dk'=>$this->domain2]);
         $this->modTime = strtotime("2000-01-01 13:00:00");
         $this->creaTime = strtotime("2000-01-01 12:00:00");
-        $this->nonCreatedDomain = new DomainImpl('non-existing.dk', $this->databaseName, $this->db, $userLibrary, $this->domainLib);
+        $this->nonCreatedDomain = new DomainImpl($this->container, 'non-existing.dk', $this->domainLib);
 
     }
 
@@ -429,7 +440,7 @@ class MailDomainImplTest extends CustomDatabaseTestCase
      */
     private function cloneDomain($domain)
     {
-        return new DomainImpl($domain->getDomainName(), $this->databaseName, $this->db, $this->userLibrary,  $this->domainLib);
+        return new DomainImpl($this->container, $domain->getDomainName(), $this->domainLib);
     }
 
 

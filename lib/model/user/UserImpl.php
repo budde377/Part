@@ -1,6 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\user;
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\UserObjectImpl;
 use ChristianBudde\Part\model\Variables;
 use ChristianBudde\Part\util\db\DB;

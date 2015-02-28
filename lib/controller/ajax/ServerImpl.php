@@ -1,6 +1,7 @@
 <?php
 namespace ChristianBudde\Part\controller\ajax;
 use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\function_string\ParserImpl;
 use ChristianBudde\Part\controller\json\CompositeFunction;
 use ChristianBudde\Part\controller\json\JSONFunction;

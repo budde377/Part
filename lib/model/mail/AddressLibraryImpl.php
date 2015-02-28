@@ -7,10 +7,9 @@ namespace ChristianBudde\Part\model\mail;
  * Time: 11:17 PM
  */
 
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\MailAddressLibraryObjectImpl;
-use ChristianBudde\Part\model\user\UserLibrary;
-use ChristianBudde\Part\util\db\DB;
 use ChristianBudde\Part\util\Observable;
 use ChristianBudde\Part\util\Observer;
 use PDO;
@@ -24,13 +23,15 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
 
     private $setupStatement;
     private $userLibrary;
+    private $container;
 
-    function __construct(Domain $domain, UserLibrary $userLibrary, DB $db)
+    function __construct(BackendSingletonContainer $container, Domain $domain)
     {
-        $this->db = $db;
+        $this->container = $container;
+        $this->db = $container->getDBInstance();
         $this->domain = $domain;
         $this->domainName = $domain->getDomainName();
-        $this->userLibrary = $userLibrary;
+        $this->userLibrary = $container->getUserLibraryInstance();
 
     }
 
@@ -116,7 +117,7 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
         if($this->hasAddressWithLocalPart($localPart)){
             return $this->getAddress($localPart);
         }
-        $a = new AddressImpl($localPart, $this->db, $this->userLibrary, $this);
+        $a = new AddressImpl($this->container, $localPart,  $this);
         $a->create();
         $this->addInstance($a);
         return $a;
@@ -147,7 +148,7 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
         if($this->hasCatchallAddress()){
             return $this->getCatchallAddress();
         }
-        $address = new AddressImpl('', $this->db, $this->userLibrary, $this);
+        $address = new AddressImpl($this->container, '', $this);
         $address->create();
         $this->addInstance($address);
         return $address;
@@ -203,7 +204,7 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
         $this->setupStatement->execute();
 
         foreach($this->setupStatement->fetchAll(PDO::FETCH_ASSOC) as $row){
-            $a = new AddressImpl($row['name'], $this->db,$this->userLibrary, $this);
+            $a = new AddressImpl($this->container, $row['name'], $this);
             $this->addInstance($a);
         }
 

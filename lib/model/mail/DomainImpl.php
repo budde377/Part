@@ -1,8 +1,8 @@
 <?php
 namespace ChristianBudde\Part\model\mail;
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\MailDomainObjectImpl;
-use ChristianBudde\Part\model\user\UserLibrary;
 use ChristianBudde\Part\util\db\DB;
 use ChristianBudde\Part\util\Observable;
 use ChristianBudde\Part\util\Observer;
@@ -49,16 +49,18 @@ class DomainImpl implements Domain, Observer
     private $hasBeenSetup = false;
     private $aliasHasBeenSetup = false;
     private $userLibrary;
+    private $container;
 
 
-    function __construct($domain, $database, DB $db,  UserLibrary $userLibrary, DomainLibrary $library)
+    function __construct(BackendSingletonContainer $container, $domain, DomainLibrary $library)
     {
-        $this->userLibrary = $userLibrary;
+        $this->container = $container;
+        $this->userLibrary = $container->getUserLibraryInstance();
         $this->observerLibrary = new ObserverLibraryImpl($this);
-        $this->db = $db;
+        $this->db = $container->getDBInstance();
         $this->domain = $domain;
         $this->library = $library;
-        $this->database = $database;
+        $this->database = $container->getConfigInstance()->getMySQLConnection()['database'];
     }
 
 
@@ -262,7 +264,7 @@ class DomainImpl implements Domain, Observer
      */
     public function getAddressLibrary()
     {
-        return $this->addressLibrary == null? $this->addressLibrary = new AddressLibraryImpl($this,$this->userLibrary, $this->db):$this->addressLibrary;
+        return $this->addressLibrary == null? $this->addressLibrary = new AddressLibraryImpl($this->container, $this,$this->userLibrary, $this->db):$this->addressLibrary;
     }
 
     /**

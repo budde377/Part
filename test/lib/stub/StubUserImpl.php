@@ -7,7 +7,7 @@
  */
 namespace ChristianBudde\Part\test\stub;
 
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\UserObjectImpl;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserPrivileges;
@@ -277,6 +277,5 @@ class StubUserImpl implements User
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
     }
 }

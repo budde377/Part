@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\controller\ajax;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\Response;
 
 /**

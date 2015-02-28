@@ -6,13 +6,14 @@
  * Time: 11:08 PM
  */
 
-namespace ChristianBudde\Part\controller\ajax;
+namespace ChristianBudde\Part\controller\ajax\type_handler;
 
 
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\log\Logger;
 use ChristianBudde\Part\util\traits\TypeHandlerTrait;
 
+//TODO test this
 class LoggerTypeHandlerImpl extends GenericObjectTypeHandlerImpl{
 
     use TypeHandlerTrait;

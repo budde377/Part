@@ -171,7 +171,13 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
         $ret2 = $this->backContainer->getFileLibraryInstance();
         $this->assertTrue($ret1 === $ret2);
     }
-
+    public function testGetTypeHandlerLibraryWillReturnSameSintacen()
+    {
+        $ret1 = $this->backContainer->getTypeHandlerLibraryInstance();
+        $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\TypeHandlerLibraryImpl', $ret1);
+        $ret2 = $this->backContainer->getTypeHandlerLibraryInstance();
+        $this->assertTrue($ret1 === $ret2);
+    }
     public function testGetLogWillReturnSameInstance()
     {
         $p = "/some/path";

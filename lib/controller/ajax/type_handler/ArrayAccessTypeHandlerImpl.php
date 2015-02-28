@@ -5,7 +5,8 @@
  * Date: 9/6/14
  * Time: 6:07 PM
  */
-namespace ChristianBudde\Part\controller\ajax;
+namespace ChristianBudde\Part\controller\ajax\type_handler;
+use ChristianBudde\Part\controller\ajax\Server;
 use ChristianBudde\Part\controller\json\JSONFunction;
 
 class ArrayAccessTypeHandlerImpl implements TypeHandler{

@@ -9,7 +9,7 @@
 namespace ChristianBudde\Part\test\stub;
 
 
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\model\updater\Updater;
 use ChristianBudde\Part\model\user\User;
 
@@ -97,6 +97,5 @@ class StubUpdaterImpl implements Updater{
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
     }
 }

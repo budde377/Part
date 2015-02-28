@@ -9,7 +9,7 @@
 namespace ChristianBudde\Part\test;
 
 
-use ChristianBudde\Part\controller\ajax\ParserTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\ParserTypeHandlerImpl;
 use ChristianBudde\Part\controller\json\JSONFunctionImpl;
 use ChristianBudde\Part\controller\json\TypeImpl;
 

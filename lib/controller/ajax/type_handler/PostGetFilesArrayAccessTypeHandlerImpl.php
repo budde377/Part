@@ -6,7 +6,7 @@
  * Time: 6:29 PM
  */
 
-namespace ChristianBudde\Part\controller\ajax;
+namespace ChristianBudde\Part\controller\ajax\type_handler;
 
 
 class PostGetFilesArrayAccessTypeHandlerImpl extends ArrayAccessTypeHandlerImpl{

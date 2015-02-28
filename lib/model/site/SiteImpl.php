@@ -1,6 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\site;
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\model\Content;
 use ChristianBudde\Part\model\ContentLibrary;
 use ChristianBudde\Part\model\SiteVariablesImpl;

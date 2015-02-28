@@ -1,8 +1,7 @@
 <?php
 namespace ChristianBudde\Part\log;
 use ChristianBudde\Part\BackendSingletonContainer;
-use ChristianBudde\Part\controller\ajax\LoggerTypeHandlerImpl;
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\util\file\DumpFile;
 use ChristianBudde\Part\util\file\LogFileImpl;
 use ChristianBudde\Part\util\file\StubLogFileImpl;
@@ -18,7 +17,6 @@ class LoggerImpl implements Logger
 {
 
     private $logFile;
-    private $handler;
     private $container;
 
     function __construct(BackendSingletonContainer $container, $filePath)
@@ -221,6 +219,6 @@ class LoggerImpl implements Logger
      */
     public function generateTypeHandler()
     {
-        return $this->handler == null? $this->handler = new LoggerTypeHandlerImpl($this->container, $this):$this->handler;
+        return $this->container->getTypeHandlerLibraryInstance()->getLoggerTypeHandlerInstance($this);
     }
 }

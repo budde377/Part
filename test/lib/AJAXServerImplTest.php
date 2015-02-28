@@ -30,7 +30,7 @@ use PHPUnit_Framework_TestCase;
  */
 class AJAXServerImplTest extends PHPUnit_Framework_TestCase
 {
-    /** @var  \ChristianBudde\Part\controller\ajax\ServerImpl */
+    /** @var  ServerImpl */
     private $server;
     /** @var  StubConfigImpl */
     private $config;

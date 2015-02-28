@@ -7,7 +7,7 @@
  */
 namespace ChristianBudde\Part\test\stub;
 
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\model\mail\Domain;
 use ChristianBudde\Part\util\Observer;
 
@@ -209,6 +209,5 @@ class StubMailDomainImpl implements Domain
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
     }
 }

@@ -11,6 +11,7 @@ use ChristianBudde\Part\Config;
 use ChristianBudde\Part\controller\json\MailDomainLibraryObjectImpl;
 use ChristianBudde\Part\model\mail\DomainImpl;
 use ChristianBudde\Part\model\mail\DomainLibraryImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubConfigImpl;
 use ChristianBudde\Part\test\stub\StubUserLibraryImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
@@ -29,6 +30,8 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
     private $databaseName;
 
     private $userLibrary;
+    /** @var StubBackendSingletonContainerImpl  */
+    private $container;
 
     function __construct()
     {
@@ -39,6 +42,8 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
     public function setUp()
     {
         parent::setUp();
+        $this->container = new StubBackendSingletonContainerImpl();
+
         $this->config = new StubConfigImpl();
         $this->config->setMailMysqlConnection(array(
             'user' => self::$mailMySQLOptions->getUsername(),
@@ -55,9 +60,16 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
             'password' => self::$mysqlOptions->getPassword(),
             'folders' => []
         ));
+
+        $this->container->setConfigInstance($this->config);
+
         $this->db = new MySQLDBImpl($this->config);
+        $this->container->setDBInstance($this->db);
+
         $this->userLibrary = new StubUserLibraryImpl();
-        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db, $this->userLibrary);
+        $this->container->setUserLibraryInstance($this->userLibrary);
+
+        $this->domainLibrary = new DomainLibraryImpl($this->container);
     }
 
 
@@ -104,7 +116,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
 
     public function testContainsDomainFailsOnDifferentDomain()
     {
-        $this->assertFalse($this->domainLibrary->containsDomain(new DomainImpl('test.dk', $this->databaseName, $this->db, $this->userLibrary, $this->domainLibrary)));
+        $this->assertFalse($this->domainLibrary->containsDomain(new DomainImpl($this->container, 'test.dk', $this->domainLibrary)));
     }
 
     public function testContainsReturnsTrueIfContains()
@@ -156,7 +168,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
 
     public function testWillNotDeleteInstancesNotInLibrary()
     {
-        $d = new DomainImpl('test.dk', $this->databaseName, $this->db, $this->userLibrary, $this->domainLibrary);
+        $d = new DomainImpl($this->container, 'test.dk', $this->domainLibrary);
         $this->domainLibrary->deleteDomain($d, $this->mailPass);
         $this->assertTrue($d->exists());
     }

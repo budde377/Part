@@ -1,6 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model;
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 
 
 /**
@@ -117,6 +117,5 @@ class NullContentImpl implements Content{
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
     }
 }

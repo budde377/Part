@@ -6,9 +6,10 @@
  * Time: 6:38 PM
  */
 
-namespace ChristianBudde\Part\controller\ajax;
+namespace ChristianBudde\Part\controller\ajax\type_handler;
 
 
+use ChristianBudde\Part\controller\ajax\Server;
 use ChristianBudde\Part\controller\function_string\ParserImpl;
 use ChristianBudde\Part\controller\json\JSONFunction;
 

@@ -4,6 +4,7 @@ namespace ChristianBudde\Part\test;
 use ChristianBudde\Part\log\Logger;
 use ChristianBudde\Part\log\LoggerImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
+use ChristianBudde\Part\test\stub\StubTypeHandlerLibraryImpl;
 use ChristianBudde\Part\util\file\Folder;
 use ChristianBudde\Part\util\file\FolderImpl;
 use ChristianBudde\Part\util\file\LogFileImpl;
@@ -25,13 +26,15 @@ class LoggerImplTest extends PHPUnit_Framework_TestCase
     private $folder;
     /** @var  LoggerImpl */
     private $logger;
+    /** @var  StubBackendSingletonContainerImpl */
+    private $container;
 
 
     public function setUp()
     {
         $this->folder = new FolderImpl('/tmp/testing' . time() . '/');
         $this->logFile = new LogFileImpl($this->folder->getAbsolutePath() . "/" . uniqid());
-        $this->logger = new LoggerImpl(new StubBackendSingletonContainerImpl(), $this->logFile->getAbsoluteFilePath());
+        $this->logger = new LoggerImpl($this->container = new StubBackendSingletonContainerImpl(), $this->logFile->getAbsoluteFilePath());
     }
 
     public function testLoggerLogsToLogFile()
@@ -135,17 +138,11 @@ class LoggerImplTest extends PHPUnit_Framework_TestCase
         $this->assertNull($this->logger->getContextAt(time() - 100));
 
     }
-
-    public function testGenerateRightTypeHandler(){
-        $this->assertInstanceOf("ChristianBudde\\Part\\controller\\ajax\\LoggerTypeHandlerImpl", $this->logger->generateTypeHandler());
+    public function testGenerateTypeHandlerReusesInstance(){
+        $this->container->setTypeHandlerLibraryInstance($th = new StubTypeHandlerLibraryImpl());
+        $th->typeHandlers['Logger'] = 1337;
+        $this->assertEquals(1337, $this->logger->generateTypeHandler());
     }
-
-
-    public function testTypeHandlerIsReused(){
-        $this->assertTrue($this->logger->generateTypeHandler() === $this->logger->generateTypeHandler());
-    }
-
-
 
     public function tearDown()
     {

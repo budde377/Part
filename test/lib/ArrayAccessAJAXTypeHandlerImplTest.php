@@ -7,7 +7,7 @@
  */
 namespace ChristianBudde\Part\test;
 
-use ChristianBudde\Part\controller\ajax\ArrayAccessTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\ArrayAccessTypeHandlerImpl;
 use ChristianBudde\Part\controller\function_string\ParserImpl;
 use ChristianBudde\Part\controller\json\JSONFunction;
 use PHPUnit_Framework_TestCase;
@@ -15,7 +15,7 @@ use PHPUnit_Framework_TestCase;
 class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase
 {
 
-    /** @var  \ChristianBudde\Part\controller\ajax\ArrayAccessTypeHandlerImpl */
+    /** @var  \ChristianBudde\Part\controller\ajax\type_handler\ArrayAccessTypeHandlerImpl */
     private $handler;
     private $parser;
     /** @var  JSONFunction */

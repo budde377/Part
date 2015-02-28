@@ -1,6 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\page;
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\PageContentObjectImpl;
 use ChristianBudde\Part\util\db\DB;
 use PDO;

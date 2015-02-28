@@ -2,8 +2,7 @@
 namespace ChristianBudde\Part\model\page;
 
 use ChristianBudde\Part\BackendSingletonContainer;
-use ChristianBudde\Part\controller\ajax\PageOrderTypeHandlerImpl;
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\PageOrderObjectImpl;
 use ChristianBudde\Part\exception\MalformedParameterException;
 use ChristianBudde\Part\util\Observable;
@@ -33,7 +32,6 @@ class PageOrderImpl implements PageOrder, Observer
     /** @var PDOStatement */
     private $deactivatePageStatement;
     private $backendContainer;
-    private $handler;
 
 
     public function __construct(BackendSingletonContainer $container)
@@ -482,9 +480,7 @@ class PageOrderImpl implements PageOrder, Observer
      */
     public function generateTypeHandler()
     {
-        return
-                $this->handler == null ?
-                $this->handler = new PageOrderTypeHandlerImpl($this->backendContainer, $this) :
-                $this->handler;
+        return $this->backendContainer->getTypeHandlerLibraryInstance()->getPageOrderTypeHandlerInstance($this);
+
     }
 }

@@ -9,7 +9,7 @@
 namespace ChristianBudde\Part\test;
 
 
-use ChristianBudde\Part\controller\ajax\PostGetFilesArrayAccessTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\PostGetFilesArrayAccessTypeHandlerImpl;
 use ChristianBudde\Part\controller\function_string\ParserImpl;
 
 class PostGetFilesArrayAccessAJAXTypeHandlerImplTest extends \PHPUnit_Framework_TestCase{

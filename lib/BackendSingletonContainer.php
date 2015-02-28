@@ -2,6 +2,7 @@
 namespace ChristianBudde\Part;
 
 use ChristianBudde\Part\controller\ajax\Server;
+use ChristianBudde\Part\controller\ajax\TypeHandlerLibrary;
 use ChristianBudde\Part\log\Logger;
 use ChristianBudde\Part\model\mail\DomainLibrary;
 use ChristianBudde\Part\model\page\CurrentPageStrategy;
@@ -132,6 +133,12 @@ interface BackendSingletonContainer
      * @return Logger
      */
     public function getLoggerInstance();
+
+    /**
+     * Will create and reuse instance of TypeHandlerLibrary.
+     * @return TypeHandlerLibrary
+     */
+    public function getTypeHandlerLibraryInstance();
 
 
     /**

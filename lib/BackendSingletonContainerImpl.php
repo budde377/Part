@@ -3,6 +3,8 @@ namespace ChristianBudde\Part;
 
 use ChristianBudde\Part\controller\ajax\Server;
 use ChristianBudde\Part\controller\ajax\ServerImpl;
+use ChristianBudde\Part\controller\ajax\TypeHandlerLibrary;
+use ChristianBudde\Part\controller\ajax\TypeHandlerLibraryImpl;
 use ChristianBudde\Part\log\Logger;
 use ChristianBudde\Part\log\LoggerImpl;
 use ChristianBudde\Part\model\mail\DomainLibrary;
@@ -79,6 +81,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $mailDomainLibrary;
 
     private $dynamicInstances = [];
+    private $typeHandlerLib;
 
     public function __construct(Config $config)
     {
@@ -271,7 +274,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getMailDomainLibraryInstance()
     {
         if ($this->mailDomainLibrary == null) {
-            $this->mailDomainLibrary = new DomainLibraryImpl($this->getConfigInstance(), $this->getDBInstance(), $this->getUserLibraryInstance());
+            $this->mailDomainLibrary = new DomainLibraryImpl($this, $this->getConfigInstance(), $this->getDBInstance(), $this->getUserLibraryInstance());
         }
 
         return $this->mailDomainLibrary;
@@ -350,10 +353,10 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     {
 
         $name = strtolower($name);
-        if(isset($this->dynamicInstances[$name])){
+        if (isset($this->dynamicInstances[$name])) {
             return;
         }
-        if(is_callable($value)){
+        if (is_callable($value)) {
             $value = $value($this);
         }
 
@@ -407,6 +410,15 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
      */
     public function getTmpFolderInstance()
     {
-        return ($p = $this->getConfigInstance()->getTmpFolderPath()) != ""?new FolderImpl($p):null;
+        return ($p = $this->getConfigInstance()->getTmpFolderPath()) != "" ? new FolderImpl($p) : null;
+    }
+
+    /**
+     * Will create and reuse instance of TypeHandlerLibrary.
+     * @return TypeHandlerLibrary
+     */
+    public function getTypeHandlerLibraryInstance()
+    {
+        return $this->typeHandlerLib == null ? $this->typeHandlerLib = new TypeHandlerLibraryImpl($this) : $this->typeHandlerLib;
     }
 }

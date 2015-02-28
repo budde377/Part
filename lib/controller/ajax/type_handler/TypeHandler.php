@@ -6,7 +6,8 @@
  * Time: 11:21 AM
  */
 
-namespace ChristianBudde\Part\controller\ajax;
+namespace ChristianBudde\Part\controller\ajax\type_handler;
+use ChristianBudde\Part\controller\ajax\Server;
 use ChristianBudde\Part\controller\json\JSONFunction;
 
 interface TypeHandler {

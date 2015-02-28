@@ -11,6 +11,7 @@ use ChristianBudde\Part\controller\json\MailAddressLibraryObjectImpl;
 use ChristianBudde\Part\model\mail\AddressImpl;
 use ChristianBudde\Part\model\mail\AddressLibraryImpl;
 use ChristianBudde\Part\model\mail\DomainLibraryImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubConfigImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\stub\StubUserLibraryImpl;
@@ -28,6 +29,8 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
     private $domain;
     private $mailPass;
     private $userLibrary;
+    /** @var StubBackendSingletonContainerImpl  */
+    private $container;
 
     function __construct()
     {
@@ -37,6 +40,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
     protected function setUp()
     {
         parent::setUp();
+        $this->container = new StubBackendSingletonContainerImpl();
 
         $this->config = new StubConfigImpl();
         $this->config->setMailMysqlConnection(array(
@@ -51,11 +55,16 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
             'host' => self::$mysqlOptions->getHost(),
             'password' => self::$mysqlOptions->getPassword()
         ));
+        $this->container->setConfigInstance($this->config);
 
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
+        $this->container->setDBInstance($this->db);
+
         $this->userLibrary = new StubUserLibraryImpl();
-        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db, $this->userLibrary);
+        $this->container->setUserLibraryInstance($this->userLibrary);
+
+        $this->domainLibrary = new DomainLibraryImpl($this->container);
         $this->domain = $this->domainLibrary->getDomain('test.dk');
         $this->addressLibrary = $this->domain->getAddressLibrary();
     }
@@ -129,7 +138,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
     public function testContainsReturnRightBool()
     {
-        $a = new AddressImpl('test', $this->db, new StubUserLibraryImpl(), $this->addressLibrary);
+        $a = new AddressImpl($this->container, 'test', $this->addressLibrary);
         $this->assertTrue($this->addressLibrary->contains($this->addressLibrary->getAddress('test')));
         $this->assertFalse($this->addressLibrary->contains($a));
 
@@ -170,7 +179,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
     public function testDeleteFromInstanceNotInLibDoesNothing()
     {
-        $a = new AddressImpl('test', $this->db, $this->userLibrary, $this->addressLibrary);
+        $a = new AddressImpl($this->container, 'test', $this->addressLibrary);
         $this->addressLibrary->deleteAddress($a);
         $this->assertTrue($a->exists());
     }

@@ -9,6 +9,8 @@
 namespace ChristianBudde\Part\controller\ajax;
 
 
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
+
 interface TypeHandlerGenerator {
 
 

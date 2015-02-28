@@ -4,8 +4,7 @@ namespace ChristianBudde\Part\model\user;
 use ArrayIterator;
 use ArrayObject;
 use ChristianBudde\Part\BackendSingletonContainer;
-use ChristianBudde\Part\controller\ajax\TypeHandler;
-use ChristianBudde\Part\controller\ajax\UserLibraryTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\UserLibraryObjectImpl;
 use ChristianBudde\Part\util\Observable;
 use ChristianBudde\Part\util\Observer;
@@ -28,7 +27,6 @@ class UserLibraryImpl implements UserLibrary, Observer
     /** @var  User */
     private $userLoggedIn;
 
-    private $typeHandler;
 
     public function __construct(BackendSingletonContainer $container)
     {
@@ -324,10 +322,6 @@ class UserLibraryImpl implements UserLibrary, Observer
      */
     public function generateTypeHandler()
     {
-        return
-            $this->typeHandler == null?
-            $this->typeHandler = new UserLibraryTypeHandlerImpl($this->container, $this):
-            $this->typeHandler;
-
+        return $this->container->getTypeHandlerLibraryInstance()->getUserLibraryTypeHandlerInstance($this);
     }
 }

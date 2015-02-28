@@ -12,6 +12,7 @@ use ChristianBudde\Part\model\mail\DomainLibraryImpl;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserLibrary;
 use ChristianBudde\Part\model\user\UserLibraryImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubConfigImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\stub\StubObserverImpl;
@@ -39,6 +40,8 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
     private $owner2;
     /** @var  UserLibrary */
     private $userLibrary;
+    /** @var  StubBackendSingletonContainerImpl */
+    private $container;
 
     function __construct()
     {
@@ -48,6 +51,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
     protected function setUp()
     {
         parent::setUp();
+        $this->container = new StubBackendSingletonContainerImpl();
 
         $this->config = new StubConfigImpl();
         $this->config->setMailMysqlConnection(array(
@@ -62,11 +66,16 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
             'host'=>self::$mysqlOptions->getHost(),
             'password'=>self::$mysqlOptions->getPassword()
         ));
+        $this->container->setConfigInstance($this->config);
 
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->userLibrary = new UserLibraryImpl($this->db);
-        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db, $this->userLibrary);
+        $this->container->setDBInstance($this->db);
+
+        $this->userLibrary = new UserLibraryImpl($this->container);
+        $this->container->setUserLibraryInstance($this->userLibrary);
+
+        $this->domainLibrary = new DomainLibraryImpl($this->container);
         $this->domain = $this->domainLibrary->getDomain('test.dk');
         $this->addressLibrary = $this->domain->getAddressLibrary();
         $this->address = $this->addressLibrary->getAddress('test');
@@ -555,7 +564,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
      */
     private function createAddress($string)
     {
-        return new AddressImpl($string, $this->db, $this->userLibrary, $this->addressLibrary);
+        return new AddressImpl($this->container, $string, $this->addressLibrary);
     }
 
 

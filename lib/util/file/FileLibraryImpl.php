@@ -1,6 +1,6 @@
 <?php
 namespace ChristianBudde\Part\util\file;
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\model\user\User;
 
 /**

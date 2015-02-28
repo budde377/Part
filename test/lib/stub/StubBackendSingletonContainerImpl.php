@@ -3,6 +3,7 @@ namespace ChristianBudde\Part\test\stub;
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\Config;
 use ChristianBudde\Part\controller\ajax\Server;
+use ChristianBudde\Part\controller\ajax\TypeHandlerLibrary;
 use ChristianBudde\Part\log\Logger;
 use ChristianBudde\Part\model\page\CurrentPageStrategy;
 use ChristianBudde\Part\model\page\DefaultPageLibrary;
@@ -46,6 +47,15 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer
     private $mailDomainLibraryInstance;
     private $vars = [];
     private $tmpFolder;
+    private $handlerLibrary;
+
+    /**
+     * @param mixed $handlerLibrary
+     */
+    public function setTypeHandlerLibraryInstance($handlerLibrary)
+    {
+        $this->handlerLibrary = $handlerLibrary;
+    }
 
     /**
      * @param mixed $mailDomainLibraryInstance
@@ -374,5 +384,12 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer
     }
 
 
-
+    /**
+     * Will create and reuse instance of TypeHandlerLibrary.
+     * @return TypeHandlerLibrary
+     */
+    public function getTypeHandlerLibraryInstance()
+    {
+        return $this->handlerLibrary;
+    }
 }

@@ -1,6 +1,7 @@
 <?php
-namespace ChristianBudde\Part\controller\ajax;
+namespace ChristianBudde\Part\controller\ajax\type_handler;
 use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\controller\ajax\Server;
 use ChristianBudde\Part\controller\json\JSONFunction;
 use ChristianBudde\Part\util\traits\ValidationTrait;
 

@@ -12,6 +12,7 @@ use ChristianBudde\Part\controller\json\MailMailboxObjectImpl;
 use ChristianBudde\Part\model\mail\DomainLibraryImpl;
 use ChristianBudde\Part\model\mail\Mailbox;
 use ChristianBudde\Part\model\mail\MailboxImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubConfigImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\stub\StubObserverImpl;
@@ -35,6 +36,8 @@ class MailMailboxImplTest extends CustomDatabaseTestCase
     private $nonExistingMailbox;
     /** @var  MailboxImpl */
     private $mailbox2;
+    /** @var  StubBackendSingletonContainerImpl */
+    private $container;
 
     function __construct()
     {
@@ -44,6 +47,8 @@ class MailMailboxImplTest extends CustomDatabaseTestCase
     public function setUp()
     {
         parent::setUp();
+        $this->container = new StubBackendSingletonContainerImpl();
+
         $this->config = new StubConfigImpl();
         $this->config->setMailMysqlConnection(array(
             'user' => self::$mailMySQLOptions->getUsername(),
@@ -56,16 +61,22 @@ class MailMailboxImplTest extends CustomDatabaseTestCase
             'host' => self::$mysqlOptions->getHost(),
             'password' => self::$mysqlOptions->getPassword()
         ));
+        $this->container->setConfigInstance($this->config);
 
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->domainLibrary = new DomainLibraryImpl($this->config, $this->db, new StubUserLibraryImpl());
+        $this->container->setDBInstance($this->db);
+
+        $this->container->setUserLibraryInstance(new StubUserLibraryImpl());
+
+        $this->domainLibrary = new DomainLibraryImpl($this->container);
         $this->domain = $this->domainLibrary->getDomain('test.dk');
         $this->addressLibrary = $this->domain->getAddressLibrary();
         $this->address = $this->addressLibrary->getAddress('test');
         $this->mailbox = $this->address->getMailbox();
-        $this->mailbox2 = new MailboxImpl($this->address, $this->db);
-        $this->nonExistingMailbox = new MailboxImpl($this->addressLibrary->getAddress('test2'), $this->db);
+
+        $this->mailbox2 = new MailboxImpl($this->container, $this->address);
+        $this->nonExistingMailbox = new MailboxImpl($this->container, $this->addressLibrary->getAddress('test2'));
     }
 
 
@@ -91,7 +102,7 @@ class MailMailboxImplTest extends CustomDatabaseTestCase
 
     public function testExistsIsFresh()
     {
-        $m = new MailboxImpl($this->address, $this->db);
+        $m = new MailboxImpl($this->container, $this->address);
         $m->delete();
         $this->assertFalse($this->mailbox->exists());
 

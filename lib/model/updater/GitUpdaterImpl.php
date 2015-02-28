@@ -1,8 +1,7 @@
 <?php
 namespace ChristianBudde\Part\model\updater;
 use ChristianBudde\Part\BackendSingletonContainer;
-use ChristianBudde\Part\controller\ajax\TypeHandler;
-use ChristianBudde\Part\controller\ajax\UpdaterTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\model;
 use ChristianBudde\Part\model\user\User;
 
@@ -24,7 +23,6 @@ class GitUpdaterImpl implements Updater
     private $canBeUpdated;
     private $branch;
     private $container;
-    private $handler;
 
     /**
      * @param BackendSingletonContainer $container
@@ -198,6 +196,6 @@ class GitUpdaterImpl implements Updater
      */
     public function generateTypeHandler()
     {
-        return $this->handler == null? $this->handler = new UpdaterTypeHandlerImpl($this->container, $this):$this->handler;
+        return $this->container->getTypeHandlerLibraryInstance()->getUpdaterTypeHandlerInstance($this);
     }
 }

@@ -7,7 +7,7 @@
  */
 namespace ChristianBudde\Part\test\stub;
 
-use ChristianBudde\Part\controller\ajax\TypeHandler;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\model\mail\Domain;
 use ChristianBudde\Part\model\mail\DomainLibrary;
 
@@ -99,6 +99,5 @@ class StubMailDomainLibraryImpl implements DomainLibrary
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
     }
 }
