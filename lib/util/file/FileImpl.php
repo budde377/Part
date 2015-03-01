@@ -1,7 +1,6 @@
 <?php
 namespace ChristianBudde\Part\util\file;
 
-use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\FileObjectImpl;
 use ChristianBudde\Part\util\traits\FilePathTrait;
 
@@ -287,11 +286,5 @@ class FileImpl implements File
         return $this->jsonObjectSerialize()->jsonSerialize();
     }
 
-    /**
-     * @return TypeHandler
-     */
-    public function generateTypeHandler()
-    {
-        // TODO: Implement generateTypeHandler() method.
-    }
+
 }
