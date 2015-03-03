@@ -6,12 +6,14 @@
  * Time: 6:38 PM
  */
 
-namespace ChristianBudde\Part\controller\ajax;
+namespace ChristianBudde\Part\util\file;
 
 
-use ChristianBudde\Part\util\file\ImageFile;
 
-class ImageFileTypeHandlerGeneratorImpl extends FileTypeHandlerGeneratorImpl{
+use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
+use ChristianBudde\Part\controller\ajax\TypeHandlerLibrary;
+
+class TypeHandlerGeneratorImageFileImpl extends ImageFileImpl implements TypeHandlerGenerator{
 
 
     private $typeHandlerLibrary;
@@ -19,6 +21,7 @@ class ImageFileTypeHandlerGeneratorImpl extends FileTypeHandlerGeneratorImpl{
 
     function __construct(TypeHandlerLibrary $typeHandlerLibrary, ImageFile $file)
     {
+        parent::__construct($file->getAbsoluteFilePath());
         $this->typeHandlerLibrary = $typeHandlerLibrary;
         $this->file = $file;
     }

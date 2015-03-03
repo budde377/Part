@@ -9,7 +9,27 @@
 namespace ChristianBudde\Part\controller\ajax;
 
 
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\controller\ajax\type_handler\FileLibraryTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\FileTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\ImageFileTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\LoggerTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\MailAddressLibraryTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\MailAddressTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\MailboxTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\MailDomainLibraryTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\MailDomainTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\PageContentLibraryTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\PageContentTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\PageOrderTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\PageTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\SiteContentLibraryTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\SiteContentTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\SiteTypeHandlerImpl;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
+use ChristianBudde\Part\controller\ajax\type_handler\UpdaterTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\UserLibraryTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\UserTypeHandlerImpl;
 use ChristianBudde\Part\log\Logger;
 use ChristianBudde\Part\model\mail\Address;
 use ChristianBudde\Part\model\mail\AddressLibrary;
@@ -30,9 +50,20 @@ use ChristianBudde\Part\util\file\File;
 use ChristianBudde\Part\util\file\FileLibrary;
 use ChristianBudde\Part\util\file\ImageFile;
 
-//TODO test this
 
-class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
+class TypeHandlerLibraryImpl implements TypeHandlerLibrary
+{
+
+
+    private $container;
+    private $keyArray = [];
+    private $valueArray = [];
+
+    function __construct(BackendSingletonContainer $container)
+    {
+        $this->container = $container;
+    }
+
 
     /**
      * @param PageOrder $pageOrder
@@ -40,7 +71,9 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getPageOrderTypeHandlerInstance(PageOrder $pageOrder)
     {
-        // TODO: Implement getPageOrderTypeHandlerInstance() method.
+        return $this->createInstance('PageOrder', $pageOrder, function () use ($pageOrder) {
+            return new PageOrderTypeHandlerImpl($this->container, $pageOrder);
+        });
     }
 
     /**
@@ -49,7 +82,9 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getUserLibraryTypeHandlerInstance(UserLibrary $userLibrary)
     {
-        // TODO: Implement getUserLibraryTypeHandlerInstance() method.
+        return $this->createInstance('UserLibrary', $userLibrary, function () use ($userLibrary) {
+            return new UserLibraryTypeHandlerImpl($this->container, $userLibrary);
+        });
     }
 
     /**
@@ -58,7 +93,9 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getLoggerTypeHandlerInstance(Logger $logger)
     {
-        // TODO: Implement getLoggerTypeHandlerInstance() method.
+        return $this->createInstance('Logger', $logger, function () use ($logger) {
+            return new LoggerTypeHandlerImpl($this->container, $logger);
+        });
     }
 
     /**
@@ -67,7 +104,9 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getUpdaterTypeHandlerInstance(Updater $updater)
     {
-        // TODO: Implement getUpdaterTypeHandlerInstance() method.
+        return $this->createInstance('Updater', $updater, function () use ($updater) {
+            return new UpdaterTypeHandlerImpl($this->container, $updater);
+        });
     }
 
     /**
@@ -76,7 +115,9 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getPageTypeHandlerInstance(Page $page)
     {
-        // TODO: Implement getPageTypeHandlerInstance() method.
+        return $this->createInstance('Page', $page, function () use ($page) {
+            return new PageTypeHandlerImpl($this->container, $page);
+        });
     }
 
     /**
@@ -85,7 +126,9 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getUserTypeHandlerInstance(User $user)
     {
-        // TODO: Implement getUserTypeHandlerInstance() method.
+        return $this->createInstance('User', $user, function () use ($user) {
+            return new UserTypeHandlerImpl($this->container, $user);
+        });
     }
 
     /**
@@ -94,7 +137,9 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getMailDomainLibraryTypeHandlerInstance(DomainLibrary $library)
     {
-        // TODO: Implement getMailDomainLibraryTypeHandlerInstance() method.
+        return $this->createInstance('MailDomainLibrary', $library, function () use ($library) {
+            return new MailDomainLibraryTypeHandlerImpl($this->container, $library);
+        });
     }
 
     /**
@@ -103,7 +148,9 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getMailDomainTypeHandlerInstance(Domain $domain)
     {
-        // TODO: Implement getMailDomainTypeHandlerInstance() method.
+        return $this->createInstance('MailDomain', $domain, function () use ($domain) {
+            return new MailDomainTypeHandlerImpl($this->container, $domain);
+        });
     }
 
     /**
@@ -112,7 +159,9 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getMailAddressLibraryTypeHandlerInstance(AddressLibrary $address)
     {
-        // TODO: Implement getMailAddressLibraryTypeHandlerInstance() method.
+        return $this->createInstance('MailAddressLibrary', $address, function () use ($address) {
+            return new MailAddressLibraryTypeHandlerImpl($this->container, $address);
+        });
     }
 
     /**
@@ -121,7 +170,9 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getMailAddressTypeHandlerInstance(Address $address)
     {
-        // TODO: Implement getMailAddressTypeHandlerInstance() method.
+        return $this->createInstance('MailAddress', $address, function () use ($address) {
+            return new MailAddressTypeHandlerImpl($this->container, $address);
+        });
     }
 
     /**
@@ -130,7 +181,9 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getMailboxTypeHandlerInstance(Mailbox $mailbox)
     {
-        // TODO: Implement getMailboxTypeHandlerInstance() method.
+        return $this->createInstance('Mailbox', $mailbox, function () use ($mailbox) {
+            return new MailboxTypeHandlerImpl($this->container, $mailbox);
+        });
     }
 
     /**
@@ -139,7 +192,9 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getSiteTypeHandlerInstance(Site $site)
     {
-        // TODO: Implement getSiteTypeHandlerInstance() method.
+        return $this->createInstance('Site', $site, function () use ($site) {
+            return new SiteTypeHandlerImpl($this->container, $site);
+        });
     }
 
     /**
@@ -148,7 +203,9 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getFileLibraryTypeHandlerInstance(FileLibrary $library)
     {
-        // TODO: Implement getFileLibraryTypeHandlerInstance() method.
+        return $this->createInstance('FileLibrary', $library, function () use ($library) {
+            return new FileLibraryTypeHandlerImpl($this->container, $library);
+        });
     }
 
     /**
@@ -157,7 +214,9 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getPageContentTypeHandlerInstance(PageContent $content)
     {
-        // TODO: Implement getPageContentTypeHandlerInstance() method.
+        return $this->createInstance('PageContent', $content, function () use ($content) {
+            return new PageContentTypeHandlerImpl($this->container, $content);
+        });
     }
 
     /**
@@ -166,25 +225,31 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getSiteContentTypeHandlerInstance(SiteContent $content)
     {
-        // TODO: Implement getSiteContentTypeHandlerInstance() method.
+        return $this->createInstance('SiteContent', $content, function () use ($content) {
+            return new SiteContentTypeHandlerImpl($this->container, $content);
+        });
     }
 
     /**
-     * @param SiteContentLibrary $content
+     * @param SiteContentLibrary $library
      * @return TypeHandler
      */
-    public function getSiteContentLibraryTypeHandlerInstance(SiteContentLibrary $content)
+    public function getSiteContentLibraryTypeHandlerInstance(SiteContentLibrary $library)
     {
-        // TODO: Implement getSiteContentLibraryTypeHandlerInstance() method.
+        return $this->createInstance('SiteContentLibrary', $library, function () use ($library) {
+            return new SiteContentLibraryTypeHandlerImpl($this->container, $library);
+        });
     }
 
     /**
-     * @param PageContentLibrary $content
+     * @param PageContentLibrary $library
      * @return TypeHandler
      */
-    public function getPageContentLibraryTypeHandlerInstance(PageContentLibrary $content)
+    public function getPageContentLibraryTypeHandlerInstance(PageContentLibrary $library)
     {
-        // TODO: Implement getPageContentLibraryTypeHandlerInstance() method.
+        return $this->createInstance('PageContentLibrary', $library, function () use ($library) {
+            return new PageContentLibraryTypeHandlerImpl($this->container, $library);
+        });
     }
 
     /**
@@ -193,7 +258,9 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getFileTypeHandlerInstance(File $file)
     {
-        // TODO: Implement getFileTypeHandlerInstance() method.
+        return $this->createInstance('File', $file, function () use ($file) {
+            return new FileTypeHandlerImpl($this->container, $file);
+        });
     }
 
     /**
@@ -202,6 +269,26 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary{
      */
     public function getImageFileTypeHandlerInstance(ImageFile $file)
     {
-        // TODO: Implement getImageFileTypeHandlerInstance() method.
+        return $this->createInstance('ImageFile', $file, function () use ($file) {
+            return new ImageFileTypeHandlerImpl($this->container, $file);
+        });
+    }
+
+    /**
+     * @param $string
+     * @param $instance
+     * @param callable $callback
+     * @return TypeHandler
+     */
+    private function createInstance($string, $instance, callable $callback)
+    {
+        if (!isset($this->keyArray[$string])) {
+            $this->keyArray[$string] = [];
+            $this->valueArray[$string] = [];
+        } else if(($k = array_search($instance, $this->keyArray, true)) !== false){
+            return $this->valueArray[$k];
+        }
+        $this->keyArray[] = $instance;
+        return $this->valueArray[] = $callback();
     }
 }
