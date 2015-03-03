@@ -156,7 +156,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getCurrentPageStrategyInstance()
     {
         if ($this->currentPageStrategy === null) {
-            $this->currentPageStrategy = new CurrentPageStrategyImpl($this->getPageOrderInstance(), $this->getDefaultPageLibraryInstance());
+            $this->currentPageStrategy = new CurrentPageStrategyImpl($this);
         }
         return $this->currentPageStrategy;
     }
@@ -191,7 +191,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getDefaultPageLibraryInstance()
     {
         if ($this->defaultPageLibrary === null) {
-            $this->defaultPageLibrary = new DefaultPageLibraryImpl($this->getConfigInstance());
+            $this->defaultPageLibrary = new DefaultPageLibraryImpl($this);
         }
 
         return $this->defaultPageLibrary;

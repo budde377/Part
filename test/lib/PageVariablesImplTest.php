@@ -11,6 +11,7 @@ namespace ChristianBudde\Part\test;
 use ChristianBudde\Part\model\page\Page;
 use ChristianBudde\Part\model\page\PageImpl;
 use ChristianBudde\Part\model\page\PageVariablesImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 
@@ -43,10 +44,12 @@ class PageVariablesImplTest extends CustomDatabaseTestCase
         parent::setUp();
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->existingUser = new PageImpl('testpage', $this->db);
+        $container = new StubBackendSingletonContainerImpl();
+        $container->setDBInstance($this->db);
+        $this->existingUser = new PageImpl($container, 'testpage');
         $this->existingVariables = new PageVariablesImpl($this->db, $this->existingUser);
-        $this->existingUser2 = new PageImpl('testpage2', $this->db);
-        $this->nonExistingUser = new PageImpl('nosuchpage', $this->db);
+        $this->existingUser2 = new PageImpl($container, 'testpage2');
+        $this->nonExistingUser = new PageImpl($container, 'nosuchpage');
         $this->nonExistingVariables = new PageVariablesImpl($this->db, $this->existingUser2);
         $this->nonExistingVariablesNonExistingPage = new PageVariablesImpl($this->db, $this->nonExistingUser);
 

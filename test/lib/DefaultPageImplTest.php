@@ -10,6 +10,7 @@
 namespace ChristianBudde\Part\test;
 
 use ChristianBudde\Part\model\page\DefaultPageImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use PHPUnit_Framework_TestCase;
 
 class DefaultPageImplTest extends PHPUnit_Framework_TestCase
@@ -25,7 +26,7 @@ class DefaultPageImplTest extends PHPUnit_Framework_TestCase
         $this->template = "someTemplate";
         $this->title = "someTitle";
         $this->alias = "/someAlias/";
-        $this->defaultPage = new DefaultPageImpl($this->id, $this->title, $this->template, $this->alias);
+        $this->defaultPage = new DefaultPageImpl(new StubBackendSingletonContainerImpl(), $this->id, $this->title, $this->template, $this->alias);
     }
 
     public function testVariables()
@@ -85,4 +86,9 @@ class DefaultPageImplTest extends PHPUnit_Framework_TestCase
 
     }
 
+
+
+    public function testGeneratorGeneratesRight(){
+        $this->assertTrue($this->defaultPage === $this->defaultPage->generateTypeHandler());
+    }
 }

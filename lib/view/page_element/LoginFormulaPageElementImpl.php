@@ -2,7 +2,6 @@
 namespace ChristianBudde\Part\view\page_element;
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\model\user\User;
-use ChristianBudde\Part\model\user\UserImpl;
 use ChristianBudde\Part\util\helper\HTTPHeaderHelper;
 use ChristianBudde\Part\view\html\FormElement;
 
@@ -97,10 +96,7 @@ class LoginFormulaPageElementImpl extends PageElementImpl
         if(count($this->userLibrary->listUsers()) == 0){
             $config = $this->container->getConfigInstance();
             $owner = $config->getOwner();
-            $user = new UserImpl($owner['username'], $this->container->getDBInstance());
-            $user->setMail($owner['mail']);
-            $user->setPassword("password");
-            $user->create();
+            $user = $this->userLibrary->createUser($owner['username'], "password", $owner['mail']);
             $user->getUserPrivileges()->addRootPrivileges();
         }
     }

@@ -14,6 +14,7 @@ use ChristianBudde\Part\controller\json\PageContentObjectImpl;
 use ChristianBudde\Part\model\page\Page;
 use ChristianBudde\Part\model\page\PageContentImpl;
 use ChristianBudde\Part\model\page\PageImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 use ChristianBudde\Part\util\db\DB;
@@ -36,6 +37,7 @@ class PageContentImplTest extends CustomDatabaseTestCase
     /** @var  Page */
     private $nonExistingPage;
     private $existingId2;
+    private $container;
 
     function __construct()
     {
@@ -48,13 +50,15 @@ class PageContentImplTest extends CustomDatabaseTestCase
         parent::setUp();
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->existingPage = new PageImpl('testpage', $this->db);
-        $this->existingContent = new PageContentImpl($this->db, $this->existingPage);
+        $this->container = new StubBackendSingletonContainerImpl();
+        $this->container->setDBInstance($this->db);
+        $this->existingPage = new PageImpl($this->container, 'testpage');
+        $this->existingContent = new PageContentImpl($this->container, $this->existingPage);
 
-        $this->existingContent2 = new PageContentImpl($this->db, $this->existingPage, $this->existingId2 = "Test");
+        $this->existingContent2 = new PageContentImpl($this->container, $this->existingPage, $this->existingId2 = "Test");
 
-        $this->nonExistingPage = new PageImpl('nonExisting', $this->db);
-        $this->nonExistingContent = new PageContentImpl($this->db, $this->nonExistingPage);
+        $this->nonExistingPage = new PageImpl($this->container, 'nonExisting');
+        $this->nonExistingContent = new PageContentImpl($this->container, $this->nonExistingPage);
     }
 
     public function testListContentWillReturnArray()
@@ -121,7 +125,7 @@ class PageContentImplTest extends CustomDatabaseTestCase
         $this->assertEquals(1, count($this->existingContent->listContentHistory()));
         $this->existingContent->addContent("ASD");
         $this->assertEquals(2, count($this->existingContent->listContentHistory()));
-        $this->existingContent = new PageContentImpl($this->db, $this->existingPage);
+        $this->existingContent = new PageContentImpl($this->container, $this->existingPage);
         $this->assertEquals(2, count($this->existingContent->listContentHistory()));
     }
 
@@ -232,6 +236,12 @@ class PageContentImplTest extends CustomDatabaseTestCase
         $this->assertEquals(new PageContentObjectImpl($this->existingContent2), $this->existingContent2->jsonObjectSerialize());
 
     }
+
+    public function testLibraryReturnsRightPageInstance()
+    {
+        $this->assertTrue($this->existingContent === $this->existingContent->generateTypeHandler());
+    }
+
 
 
 }

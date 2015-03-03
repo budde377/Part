@@ -237,7 +237,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         $pages = $this->pageOrder->listPages(PageOrder::LIST_ALL);
         /** @var $page \ChristianBudde\Part\model\page\Page */
         $page = array_pop($pages);
-        $altPage = new PageImpl($page->getID(), $this->db);
+        $altPage = new PageImpl($this->backendContainer, $page->getID());
         $altPage->delete();
 
         $deleteRet = $this->pageOrder->deletePage($page);
@@ -249,7 +249,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     public function testDeletePageNotGeneratedFromPageOrderReturnFalse()
     {
 
-        $page = new PageImpl('page', $this->db);
+        $page = new PageImpl($this->backendContainer, 'page');
         $this->assertTrue($page->exists());
         $this->assertFalse($this->pageOrder->deletePage($page));
     }
@@ -468,7 +468,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     public function testSetPageOrderReturnFalseOnPageNotInList()
     {
 
-        $newPage = new PageImpl('someId', $this->db);
+        $newPage = new PageImpl($this->backendContainer, 'someId');
         $setReturn = $this->pageOrder->setPageOrder($newPage, 3);
         $this->assertFalse($setReturn, 'Did not return false');
     }
@@ -476,7 +476,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     public function testSetPageOrderReturnFalseOnParentNotInList()
     {
 
-        $newPage = new PageImpl('page', $this->db);
+        $newPage = new PageImpl($this->backendContainer, 'page');
         $topOrder = $this->pageOrder->getPageOrder();
         $oldPage = $topOrder[0];
         $setReturn = $this->pageOrder->setPageOrder($oldPage, 3, $newPage);

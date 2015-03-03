@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\page;
+use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\PageObjectImpl;
 use ChristianBudde\Part\model\Content;
@@ -18,11 +19,12 @@ use ChristianBudde\Part\util\helper\HTTPHeaderHelper;
 class NotFoundPageImpl implements Page
 {
 
-    public function __construct()
+    public function __construct(BackendSingletonContainer $container)
     {
         if(!isset($_GET['ajax'])){
             HTTPHeaderHelper::setHeaderStatusCode(HTTPHeaderHelper::HTTPHeaderStatusCode404);
         }
+        $this->container = $container;
     }
 
     /**
@@ -264,6 +266,6 @@ class NotFoundPageImpl implements Page
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
+        return $this->container->getTypeHandlerLibraryInstance()->getPageTypeHandlerInstance($this);
     }
 }

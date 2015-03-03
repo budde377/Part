@@ -1,6 +1,7 @@
 <?php
 namespace ChristianBudde\Part\model\page;
 
+use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\util\traits\RequestTrait;
 
 /**
@@ -15,11 +16,14 @@ class CurrentPageStrategyImpl implements CurrentPageStrategy
     private $pageOrder;
     private $defaultPages;
     private $currentPagePath = null;
+    private $container;
 
-    public function __construct(PageOrder $pageOrder, DefaultPageLibrary $defaultPages)
+    public function __construct(BackendSingletonContainer $container)
     {
-        $this->defaultPages = $defaultPages;
-        $this->pageOrder = $pageOrder;
+
+        $this->container = $container;
+        $this->defaultPages = $container->getDefaultPageLibraryInstance();
+        $this->pageOrder = $container->getPageOrderInstance();
 
     }
 
@@ -109,7 +113,7 @@ class CurrentPageStrategyImpl implements CurrentPageStrategy
         }
 
         if (!count($returnArray)) {
-            $returnArray[] = new NotFoundPageImpl();
+            $returnArray[] = new NotFoundPageImpl($this->container);
         }
 
         $this->currentPagePath = $returnArray;

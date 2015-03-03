@@ -1,12 +1,12 @@
 <?php
 namespace ChristianBudde\Part\model\page;
+use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\PageObjectImpl;
 use ChristianBudde\Part\exception\MalformedParameterException;
 use ChristianBudde\Part\model\Content;
 use ChristianBudde\Part\model\ContentLibrary;
 use ChristianBudde\Part\model\Variables;
-use ChristianBudde\Part\util\db\DB;
 use ChristianBudde\Part\util\Observable;
 use ChristianBudde\Part\util\Observer;
 use PDO;
@@ -62,18 +62,21 @@ class PageImpl implements Page, Observable
 
     private $initialValuesHasBeenSet = false;
     private $observers = array();
+    private $container;
 
     /**
+     * @param BackendSingletonContainer $container
      * @param string $id
-     * @param \ChristianBudde\Part\util\db\DB $database
      * @throws MalformedParameterException
      */
-    public function __construct($id, DB $database)
+    public function __construct(BackendSingletonContainer $container, $id)
     {
         if (!$this->validID($id)) {
             throw new MalformedParameterException('RegEx[a-zA-Z0-9-_]+', 1);
         }
+        $database = $container->getDBInstance();
         $this->id = $id;
+        $this->container = $container;
         $this->database = $database;
         $this->connection = $database->getConnection();
 
@@ -451,7 +454,7 @@ class PageImpl implements Page, Observable
     public function getContentLibrary()
     {
         return $this->contentLibrary == null?
-            $this->contentLibrary = new PageContentLibraryImpl($this->database, $this):
+            $this->contentLibrary = new PageContentLibraryImpl($this->container, $this):
             $this->contentLibrary;
     }
 
@@ -481,6 +484,6 @@ class PageImpl implements Page, Observable
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
+        return $this->container->getTypeHandlerLibraryInstance()->getPageTypeHandlerInstance($this);
     }
 }

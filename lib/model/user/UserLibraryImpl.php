@@ -43,7 +43,7 @@ class UserLibraryImpl implements UserLibrary, Observer
     {
         $query = "SELECT username FROM User";
         foreach ($this->connection->query($query) as $row) {
-            $user = new UserImpl($row['username'], $this->database);
+            $user = new UserImpl($this->container, $row['username']);
             $user->attachObserver($this);
             $this->userList[$user->getUsername()] = $user;
         }
@@ -103,12 +103,21 @@ class UserLibraryImpl implements UserLibrary, Observer
      * @param User $parent
      * @return User | bool FALSE on failure else instance of User
      */
-    public function createUser($username, $password, $mail, User $parent)
+    public function createUser($username, $password, $mail, User $parent=null)
     {
-        $user = new UserImpl($username, $this->database);
-        if (!$user->setMail($mail) || !$user->setPassword($password) || !$user->setParent($parent->getUsername()) || !$user->create()) {
+        $user = new UserImpl($this->container, $username);
+        if (!$user->setMail($mail) || !$user->setPassword($password) ) {
             return false;
         }
+
+        if($parent != null && !$user->setParent($parent->getUsername())){
+            return false;
+        }
+
+        if(!$user->create()){
+            return false;
+        }
+
         $this->userList[$user->getUsername()] = $user;
         $user->attachObserver($this);
         $this->setUpIterator();

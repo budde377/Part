@@ -1,9 +1,9 @@
 <?php
 namespace ChristianBudde\Part\model\site;
 
+use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\SiteContentObjectImpl;
-use ChristianBudde\Part\util\db\DB;
 use PDO;
 use PDOStatement;
 
@@ -31,11 +31,13 @@ class SiteContentImpl implements SiteContent
     private $latestHasBeenSetUp = false;
     /** @var  PDOStatement */
     private $getContentAtPreparedStatement;
+    private $container;
 
 
-    public function __construct(DB $database, Site $site, $id = "")
+    public function __construct(BackendSingletonContainer $container, Site $site, $id = "")
     {
-        $this->db = $database;
+        $this->container = $container;
+        $this->db = $container->getDBInstance();
         $this->id = $id;
         $this->site = $site;
 
@@ -203,6 +205,6 @@ class SiteContentImpl implements SiteContent
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
+        return $this->container->getTypeHandlerLibraryInstance()->getSiteContentTypeHandlerInstance($this);
     }
 }

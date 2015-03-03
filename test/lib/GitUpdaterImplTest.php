@@ -43,8 +43,9 @@ class GitUpdaterImplTest extends CustomDatabaseTestCase{
         parent::setUp();
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->user = new UserImpl('root', $this->db);
         $this->container = new StubBackendSingletonContainerImpl();
+        $this->container->setDBInstance($this->db);
+        $this->user = new UserImpl($this->container, 'root');
         $this->updater = new GitUpdaterImpl($this->container, "/tmp/");
     }
 
@@ -65,7 +66,8 @@ class GitUpdaterImplTest extends CustomDatabaseTestCase{
 
     public function testEnableIsPersistent(){
         $this->updater->disallowCheckOnLogin($this->user);
-        $user2 = new UserImpl('root', $this->db);
+
+        $user2 = new UserImpl($this->container, 'root');
         $this->assertFalse($this->updater->isCheckOnLoginAllowed($user2));
     }
 

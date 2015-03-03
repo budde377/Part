@@ -1,8 +1,8 @@
 <?php
 namespace ChristianBudde\Part\model\site;
+use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\model\Content;
-use ChristianBudde\Part\util\db\DB;
 use PDO;
 
 
@@ -25,10 +25,11 @@ class SiteContentLibraryImpl implements SiteContentLibrary
     private $searchLibraryPreparedStatement;
 
 
-    function __construct(DB $db, Site $site)
+    function __construct(BackendSingletonContainer $container, Site $site)
     {
+        $this->container = $container;
         $this->site = $site;
-        $this->db = $db;
+        $this->db = $container->getDBInstance();
     }
 
 
@@ -59,7 +60,7 @@ class SiteContentLibraryImpl implements SiteContentLibrary
         $this->setUpList();
         return isset($this->idArray[$id]) ?
             $this->idArray[$id] :
-            $this->idArray[$id] = new SiteContentImpl($this->db, $this->site, $id);
+            $this->idArray[$id] = new SiteContentImpl($this->container, $this->site, $id);
 
     }
 
@@ -71,7 +72,7 @@ class SiteContentLibraryImpl implements SiteContentLibrary
                 $this->db->getConnection()->prepare("SELECT DISTINCT id FROM SiteContent");
             $this->listContentPreparedStatement->execute();
             foreach ($this->listContentPreparedStatement->fetchAll(PDO::FETCH_ASSOC) as $val) {
-                $this->idArray[$val["id"]] = new SiteContentImpl($this->db, $this->site, $val["id"]);
+                $this->idArray[$val["id"]] = new SiteContentImpl($this->container, $this->site, $val["id"]);
             }
 
         }
@@ -113,6 +114,6 @@ class SiteContentLibraryImpl implements SiteContentLibrary
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
+        return $this->container->getTypeHandlerLibraryInstance()->getSiteContentLibraryTypeHandlerInstance($this);
     }
 }

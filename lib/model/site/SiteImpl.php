@@ -76,7 +76,7 @@ class SiteImpl implements Site
     public function getContentLibrary()
     {
         return $this->contentLibrary == null?
-            $this->contentLibrary = new SiteContentLibraryImpl($this->db, $this):
+            $this->contentLibrary = new SiteContentLibraryImpl($this->container, $this):
             $this->contentLibrary;
     }
 

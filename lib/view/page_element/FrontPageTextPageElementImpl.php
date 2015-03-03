@@ -32,7 +32,7 @@ class FrontPageTextPageElementImpl extends PageElementImpl
     {
         parent::generateContent();
         $latest= null;
-        $pageContent = new PageContentImpl($this->container->getDBInstance(), $this->container->getCurrentPageStrategyInstance()->getCurrentPage(), "mainContent");
+        $pageContent = new PageContentImpl($this->container, $this->container->getCurrentPageStrategyInstance()->getCurrentPage(), "mainContent");
         if(($latest = $pageContent->latestContent()) != null){
             return "<div class='editable' id='mainContent'>$latest</div>";
         }

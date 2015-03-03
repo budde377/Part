@@ -1,8 +1,10 @@
 <?php
 namespace ChristianBudde\Part\test;
 
+use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\stub\StubObserverImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
@@ -26,6 +28,8 @@ class UserImplTest extends CustomDatabaseTestCase
     private $user;
     /** @var $user \ChristianBudde\Part\model\user\UserImpl */
     private $user2;
+    /** @var  BackendSingletonContainer */
+    private $container;
 
 
     function __construct($dataset = null)
@@ -45,8 +49,10 @@ class UserImplTest extends CustomDatabaseTestCase
         @session_start();
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->user = new UserImpl('someUser', $this->db);
-        $this->user2 = new UserImpl('root', $this->db);
+        $this->container = new StubBackendSingletonContainerImpl();
+        $this->container->setDBInstance($this->db);
+        $this->user = new UserImpl($this->container, 'someUser');
+        $this->user2 = new UserImpl($this->container, 'root');
     }
 
 
@@ -111,8 +117,8 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testCreateUserWillCreateDifferentIDs()
     {
-        $user1 = new UserImpl('test1', $this->db);
-        $user2 = new UserImpl('test2', $this->db);
+        $user1 = new UserImpl($this->container, 'test1');
+        $user2 = new UserImpl($this->container, 'test2');
         $this->assertNotEquals($user1->getUniqueId(), $user2->getUniqueId());
     }
 
@@ -136,7 +142,7 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testSetUsernameToCurrentWillReturnTrue()
     {
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $this->assertTrue($user->exists());
         $this->assertTrue($user->setUsername($user->getUsername()));
     }
@@ -168,7 +174,7 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testExistsWillReturnTrueIfExists()
     {
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $ret = $user->exists();
         $this->assertTrue($ret, 'Did not return true');
     }
@@ -191,7 +197,7 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testCreateExistingUserWillReturnFalse()
     {
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $ret = $user->create();
         $this->assertFalse($ret, 'Did not return false');
     }
@@ -212,7 +218,7 @@ class UserImplTest extends CustomDatabaseTestCase
         $username = 'someOtherUsername';
         $password = 'somePassword';
 
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
 
         $ret = $user->exists();
         $this->assertTrue($ret, 'User did not exists');
@@ -226,7 +232,7 @@ class UserImplTest extends CustomDatabaseTestCase
         $ret = $user->setUsername($username);
         $this->assertTrue($ret, 'Did not return true');
 
-        $user = new UserImpl('someOtherUsername', $this->db);
+        $user = new UserImpl($this->container, 'someOtherUsername');
 
         $ret = $user->exists();
         $this->assertTrue($ret, 'Did not return true');
@@ -238,7 +244,7 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testDeleteWillDelete()
     {
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $this->assertTrue($user->exists(), 'User does not exist');
         $ret = $user->delete();
         $this->assertTrue($ret, 'Delete did not return true');
@@ -259,7 +265,7 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testLoginWillReturnTrueOnSuccess()
     {
         $password = 'somePass';
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $user->setPassword($password);
         $ret = $user->login($password);
         $this->assertTrue($ret, 'Login failed');
@@ -268,7 +274,7 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testLoginWillReturnFalseOnInvalidPasswordGiven()
     {
         $password = 'somePass';
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $user->setPassword($password);
         $ret = $user->login($password . 'Other');
         $this->assertFalse($ret, 'Login did not fail');
@@ -277,7 +283,7 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testLoginWillReturnFalseOnMultipleLogin()
     {
         $password = 'somePass';
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $user->setPassword($password);
         $ret = $user->login($password);
         $this->assertTrue($ret, 'Login failed');
@@ -289,11 +295,11 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testLoginWillReturnFalseOnMultipleLoginDifferentInstances()
     {
         $password = 'somePass';
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $user->setPassword($password);
         $ret = $user->login($password);
         $this->assertTrue($ret, 'Login failed');
-        $user = new UserImpl('root2000', $this->db);
+        $user = new UserImpl($this->container, 'root2000');
         $user->setPassword($password);
         $user->setMail('test@test.dk');
         $ret = $user->create();
@@ -304,7 +310,7 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testIsLoggedInWillReturnFalseIfNotLoggedIn()
     {
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $this->assertTrue($user->exists(), 'User did not exist');
         $this->assertFalse($user->isLoggedIn(), 'Did not return false');
     }
@@ -312,7 +318,7 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testIsLoggedInWillReturnTrueIfLoggedIn()
     {
         $password = 'somePassword';
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $this->assertTrue($user->exists(), 'User did not exist');
         $ret = $user->setPassword($password);
         $this->assertTrue($ret, 'Password was not changed');
@@ -324,21 +330,21 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testIsLoggedInWillReturnTrueIfLoggedInOnDifferentInstances()
     {
         $password = 'somePassword';
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $this->assertTrue($user->exists(), 'User did not exist');
         $ret = $user->setPassword($password);
         $this->assertTrue($ret, 'Password was not changed');
         $ret = $user->login($password);
         $this->assertTrue($ret, 'Was not logged in');
 
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $this->assertTrue($user->isLoggedIn(), 'Did not return true');
     }
 
     public function testLogoutWillLogout()
     {
         $password = 'somePassword';
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $this->assertTrue($user->exists(), 'User did not exist');
         $ret = $user->setPassword($password);
         $this->assertTrue($ret, 'Password was not changed');
@@ -352,7 +358,7 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testLogoutWillOnlyLogoutCalledUser()
     {
         $password = 'somePassword';
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $this->assertTrue($user->exists(), 'User did not exist');
         $ret = $user->setPassword($password);
         $this->assertTrue($ret, 'Password was not changed');
@@ -374,14 +380,14 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testLogoutOnDifferentInstanceWillLogout()
     {
         $password = 'somePassword';
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $this->assertTrue($user->exists(), 'User did not exist');
         $ret = $user->setPassword($password);
         $this->assertTrue($ret, 'Password was not changed');
         $ret = $user->login($password);
         $this->assertTrue($ret, 'Was not logged in');
 
-        $user2 = new UserImpl('root', $this->db);
+        $user2 = new UserImpl($this->container, 'root');
         $user2->logout();
 
         $this->assertFalse($user->isLoggedIn(), 'User was logged in');
@@ -390,7 +396,7 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testGetLastLoginWillReturnLastTimeOfLogin()
     {
         $password = 'somePassword';
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $this->assertTrue($user->exists(), 'User did not exist');
         $ret = $user->setPassword($password);
         $this->assertTrue($ret, 'Password was not changed');
@@ -432,7 +438,7 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testChangePasswordWillPreserveLogin()
     {
         $password = 'somePassword';
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $user->setPassword($password);
         $ret = $user->login($password);
         $this->assertTrue($ret, 'User was not logged in');
@@ -443,7 +449,7 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testChangeUsernameWillPreserveLogin()
     {
         $password = 'somePassword';
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $user->setPassword($password);
         $ret = $user->login($password);
         $this->assertTrue($ret, 'User was not logged in');
@@ -454,11 +460,11 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testCreateTwoUsersCanBeDone()
     {
-        $user1 = new UserImpl('user1', $this->db);
+        $user1 = new UserImpl($this->container, 'user1');
         $user1->setMail('user1@test.dk');
         $user1->setPassword('user1');
 
-        $user2 = new UserImpl('user2', $this->db);
+        $user2 = new UserImpl($this->container, 'user2');
         $user2->setMail('user2@test.dk');
         $user2->setPassword('user2');
 
@@ -473,7 +479,7 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testDeleteWillNotifyObserver()
     {
         $observer = new StubObserverImpl();
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $user->attachObserver($observer);
         $this->assertFalse($observer->hasBeenCalled(), 'Observer has been called');
         $user->delete();
@@ -484,7 +490,7 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testLoginWillNotifyObserver()
     {
         $observer = new StubObserverImpl();
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $user->attachObserver($observer);
         $user->setPassword($pass = "pass");
         $this->assertFalse($observer->hasBeenCalled(), 'Observer has been called');
@@ -496,7 +502,7 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testChangePasswordWillNotLogoutAndLogin()
     {
         $observer = new StubObserverImpl();
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $user->setPassword($pass = "pass");
         $user->login($pass);
         $user->attachObserver($observer);
@@ -508,7 +514,7 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testChangeUsernameWillNotifyObserver()
     {
         $observer = new StubObserverImpl();
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $user->attachObserver($observer);
         $this->assertFalse($observer->hasBeenCalled(), 'Observer has been called');
         $user->setUsername('root2');
@@ -520,7 +526,7 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testChangeParentWillNotifyObserver()
     {
         $observer = new StubObserverImpl();
-        $user = new UserImpl('user2', $this->db);
+        $user = new UserImpl($this->container, 'user2');
         $user->attachObserver($observer);
         $this->assertFalse($observer->hasBeenCalled(), 'Observer has been called');
         $user->setParent('root');
@@ -532,7 +538,7 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testDetachObserverWillDetachObserver()
     {
         $observer = new StubObserverImpl();
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $user->attachObserver($observer);
         $user->detachObserver($observer);
         $user->delete();
@@ -547,7 +553,7 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testSetParentWillSetParent()
     {
-        $user = new UserImpl('testUser', $this->db);
+        $user = new UserImpl($this->container, 'testUser');
         $user->setMail('test@test.dk');
         $user->setPassword('SomePass');
         $ret = $user->setParent('root');
@@ -558,13 +564,13 @@ class UserImplTest extends CustomDatabaseTestCase
     public function testSetParentWillBePersistent()
     {
         $username = 'testUser';
-        $user = new UserImpl($username, $this->db);
+        $user = new UserImpl($this->container, $username);
         $user->setMail('test@test.dk');
         $user->setPassword('SomePass');
         $ret = $user->setParent('root');
         $this->assertTrue($ret);
         $user->create();
-        $user = new UserImpl($username, $this->db);
+        $user = new UserImpl($this->container, $username);
         $this->assertEquals('root', $user->getParent());
     }
 
@@ -577,7 +583,7 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testSetParentWillReturnFalseIfParentDoesNotExist()
     {
-        $user = new UserImpl('root', $this->db);
+        $user = new UserImpl($this->container, 'root');
         $ret = $user->setParent('notAUser');
         $this->assertFalse($ret);
         $this->assertNull($user->getParent());
@@ -585,14 +591,14 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testCircularParentingWillReturnFalse()
     {
-        $user = new UserImpl('root', $this->db);
-        $user2 = new UserImpl('user2', $this->db);
+        $user = new UserImpl($this->container, 'root');
+        $user2 = new UserImpl($this->container, 'user2');
         $user2->setMail('test@test.dk');
         $user2->setPassword('somePassword');
         $ret = $user2->setParent($user->getUsername());
         $this->assertTrue($ret);
         $user2->create();
-        $user3 = new UserImpl('user3', $this->db);
+        $user3 = new UserImpl($this->container, 'user3');
         $user3->setMail('test@test.dk');
         $user3->setPassword('somePassword');
         $ret = $user3->setParent($user2->getUsername());
@@ -605,8 +611,8 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testChangeUsernameOfParentWillWork()
     {
-        $user = new UserImpl('root', $this->db);
-        $user2 = new UserImpl('user2', $this->db);
+        $user = new UserImpl($this->container, 'root');
+        $user2 = new UserImpl($this->container, 'user2');
         $user2->setMail('test@test.dk');
         $user2->setPassword('somePassword');
         $user2->setParent($user->getUsername());
@@ -619,8 +625,8 @@ class UserImplTest extends CustomDatabaseTestCase
 
     public function testDeleteParentWillReturnFalse()
     {
-        $user = new UserImpl('root', $this->db);
-        $user2 = new UserImpl('user2', $this->db);
+        $user = new UserImpl($this->container, 'root');
+        $user2 = new UserImpl($this->container, 'user2');
         $user2->setMail('test@test.dk');
         $user2->setPassword('somePassword');
         $user2->setParent($user->getUsername());
@@ -685,6 +691,13 @@ class UserImplTest extends CustomDatabaseTestCase
         //$this->assertNotEquals($h1, $h3);
 
     }
+
+
+    public function testGenerateTypeHandlerReusesInstance(){
+
+        $this->assertEquals( $this->user, $this->user->generateTypeHandler());
+    }
+
 
     public function getSetUpOperation()
     {

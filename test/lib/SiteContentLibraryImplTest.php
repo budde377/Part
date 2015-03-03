@@ -8,8 +8,8 @@
  */
 namespace ChristianBudde\Part\test;
 
-use ChristianBudde\Part\model\page\PageContentLibraryImpl;
 use ChristianBudde\Part\model\site\SiteContentLibraryImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\stub\StubSiteImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
@@ -21,7 +21,7 @@ class SiteContentLibraryImplTest extends CustomDatabaseTestCase
 
     /** @var  DB */
     private $db;
-    /** @var  PageContentLibraryImpl */
+    /** @var  SiteContentLibraryImpl */
     private $existingContentLibrary;
 
     function __construct()
@@ -36,7 +36,9 @@ class SiteContentLibraryImplTest extends CustomDatabaseTestCase
         parent::setUp();
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->existingContentLibrary = new SiteContentLibraryImpl($this->db, $site);
+        $container = new StubBackendSingletonContainerImpl();
+        $container->setDBInstance($this->db);
+        $this->existingContentLibrary = new SiteContentLibraryImpl($container, $site);
     }
 
     public function testListPageContentLibraryWillList()
@@ -138,6 +140,11 @@ class SiteContentLibraryImplTest extends CustomDatabaseTestCase
     {
         $ar = $this->existingContentLibrary->searchLibrary("", 1110625218);
         $this->assertEquals(1, count($ar));
+    }
+
+    public function testReturnsRightInstance()
+    {
+        $this->assertTrue($this->existingContentLibrary=== $this->existingContentLibrary->generateTypeHandler());
     }
 
 }

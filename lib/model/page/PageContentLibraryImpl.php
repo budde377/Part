@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\page;
+use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\model\Content;
 use ChristianBudde\Part\util\db\DB;
@@ -23,9 +24,10 @@ class PageContentLibraryImpl implements PageContentLibrary
     private $idArray;
 
 
-    function __construct(DB $db, Page $page)
+    function __construct(BackendSingletonContainer $container, Page $page)
     {
-        $this->db = $db;
+        $this->container = $container;
+        $this->db = $container->getDBInstance();
         $this->page = $page;
     }
 
@@ -57,7 +59,7 @@ class PageContentLibraryImpl implements PageContentLibrary
         $this->setUpList();
         return isset($this->idArray[$id]) ?
             $this->idArray[$id] :
-            $this->idArray[$id] = new PageContentImpl($this->db, $this->page, $id);
+            $this->idArray[$id] = new PageContentImpl($this->container, $this->page, $id);
 
     }
 
@@ -69,7 +71,7 @@ class PageContentLibraryImpl implements PageContentLibrary
                 $this->db->getConnection()->prepare("SELECT DISTINCT id FROM PageContent WHERE page_id = ?");
             $this->listContentPreparedStatement->execute(array($this->page->getID()));
             foreach ($this->listContentPreparedStatement->fetchAll(PDO::FETCH_ASSOC) as $val) {
-                $this->idArray[$val["id"]] = new PageContentImpl($this->db, $this->page, $val["id"]);
+                $this->idArray[$val["id"]] = new PageContentImpl($this->container, $this->page, $val["id"]);
             }
 
         }
@@ -119,6 +121,6 @@ class PageContentLibraryImpl implements PageContentLibrary
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
+        return $this->container->getTypeHandlerLibraryInstance()->getPageContentLibraryTypeHandlerInstance($this);
     }
 }

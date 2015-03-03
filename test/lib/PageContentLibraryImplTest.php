@@ -11,6 +11,7 @@ namespace ChristianBudde\Part\test;
 use ChristianBudde\Part\model\page\Page;
 use ChristianBudde\Part\model\page\PageContentLibraryImpl;
 use ChristianBudde\Part\model\page\PageImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 use ChristianBudde\Part\util\db\DB;
@@ -41,10 +42,12 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
         parent::setUp();
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->existingPage = new PageImpl('testpage', $this->db);
-        $this->nonExistingPage = new PageImpl('nonExisting', $this->db);
-        $this->existingContentLibrary = new PageContentLibraryImpl($this->db, $this->existingPage);
-        $this->nonExistingContentLibrary = new PageContentLibraryImpl($this->db, $this->nonExistingPage);
+        $container = new StubBackendSingletonContainerImpl();
+        $container->setDBInstance($this->db);
+        $this->existingPage = new PageImpl($container, 'testpage');
+        $this->nonExistingPage = new PageImpl($container, 'nonExisting');
+        $this->existingContentLibrary = new PageContentLibraryImpl($container, $this->existingPage);
+        $this->nonExistingContentLibrary = new PageContentLibraryImpl($container, $this->nonExistingPage);
     }
 
     public function testListPageContentLibraryWillList()
@@ -160,5 +163,11 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
     {
         $this->assertTrue($this->existingPage === $this->existingContentLibrary->getPage());
     }
+
+    public function testReturnsRightInstance()
+    {
+        $this->assertTrue($this->existingContentLibrary=== $this->existingContentLibrary->generateTypeHandler());
+    }
+
 
 }

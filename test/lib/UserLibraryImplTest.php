@@ -115,6 +115,15 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
         $this->assertEquals(0, count($list), 'List was not covered');
     }
 
+    public function testCanCreateWithoutParent()
+    {
+        $user = $this->library->createUser($username = 'user4', 'password', $mail = 'test@test.dk');
+        $this->assertTrue($user->exists());
+        $this->assertEquals($username, $user->getUsername());
+        $this->assertEquals($mail, $user->getMail());
+        $this->assertNull($user->getParent());
+    }
+
 
     public function testCreateUserWillCreateUser()
     {
@@ -167,7 +176,7 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
 
     public function testDeleteUserOnUserNILWillReturnFalse()
     {
-        $user = new UserImpl('user1', $this->db);
+        $user = new UserImpl($this->container, 'user1');
         $this->assertTrue($user->exists(), 'User did not exist');
         $ret = $this->library->deleteUser($user);
         $this->assertFalse($ret);
@@ -211,7 +220,7 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
 
     public function testGetLoggedInWillReturnLoggedInWithUserLoggedInNotInInstance()
     {
-        $user = new UserImpl('user1', $this->db);
+        $user = new UserImpl($this->container, 'user1');
         $user->setPassword($password = "SomePass");
         $this->assertTrue($user->login($password));
         $this->assertTrue($user->exists());

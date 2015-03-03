@@ -46,7 +46,7 @@ class StubUserLibraryImpl implements UserLibrary
      * @param User $parent
      * @return User | bool FALSE on failure else instance of User
      */
-    public function createUser($username, $password, $mail, User $parent)
+    public function createUser($username, $password, $mail, User $parent=null)
     {
         return false;
     }

@@ -10,6 +10,7 @@ namespace ChristianBudde\Part\test;
 use ChristianBudde\Part\Config;
 use ChristianBudde\Part\model\page\DefaultPageLibraryImpl;
 use ChristianBudde\Part\model\page\Page;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubConfigImpl;
 use PHPUnit_Framework_TestCase;
 
@@ -34,7 +35,9 @@ class DefaultPageLibraryImplTest extends PHPUnit_Framework_TestCase
         $this->defaultPagesArray["page2"]["id"] = "p2";
         $this->defaultPagesArray["page2"]["template"] = "someTemplate2";
         $this->config->setDefaultPages($this->defaultPagesArray);
-        $this->pageLibrary = new DefaultPageLibraryImpl($this->config);
+        $container = new StubBackendSingletonContainerImpl();
+        $container->setConfigInstance($this->config);
+        $this->pageLibrary = new DefaultPageLibraryImpl($container);
     }
 
     public function testGetPageWillReturnNullIfNoMatch()

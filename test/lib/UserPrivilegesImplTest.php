@@ -5,6 +5,7 @@ use ChristianBudde\Part\controller\json\UserPrivilegesObjectImpl;
 use ChristianBudde\Part\model\page\PageImpl;
 use ChristianBudde\Part\model\user\UserImpl;
 use ChristianBudde\Part\model\user\UserPrivilegesImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\stub\StubPageImpl;
 use ChristianBudde\Part\test\stub\StubPageOrderImpl;
@@ -45,9 +46,11 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
         parent::setUp();
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->user = new UserImpl('root', $this->db);
-        $this->page1 = new PageImpl('page', $this->db);
-        $this->page2 = new PageImpl('page2', $this->db);
+        $container = new StubBackendSingletonContainerImpl();
+        $container->setDBInstance($this->db);
+        $this->user = new UserImpl($container, 'root');
+        $this->page1 = new PageImpl($container, 'page');
+        $this->page2 = new PageImpl($container, 'page2');
         $this->userPrivileges = new UserPrivilegesImpl($this->user, $this->db);
 
         $this->pageLibrary = new StubPageOrderImpl();

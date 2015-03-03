@@ -4,6 +4,7 @@ namespace ChristianBudde\Part\test;
 use ChristianBudde\Part\controller\json\SiteContentObjectImpl;
 use ChristianBudde\Part\model\site\SiteContentImpl;
 use ChristianBudde\Part\model\site\SiteImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\stub\StubSiteImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
@@ -30,6 +31,7 @@ class SiteContentImplTest extends CustomDatabaseTestCase
     private $existingContent2;
     /** @var  SiteContentImpl */
     private $nonExistingContent;
+    private $container;
 
 
     function __construct()
@@ -44,9 +46,11 @@ class SiteContentImplTest extends CustomDatabaseTestCase
         $this->site = new StubSiteImpl();
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->existingContent = new SiteContentImpl($this->db, $this->site);
-        $this->existingContent2 = new SiteContentImpl($this->db, $this->site, $this->existingId2 = "Test");
-        $this->nonExistingContent = new SiteContentImpl($this->db, $this->site, "NoContent");
+        $this->container = new StubBackendSingletonContainerImpl();
+        $this->container->setDBInstance($this->db);
+        $this->existingContent = new SiteContentImpl($this->container, $this->site);
+        $this->existingContent2 = new SiteContentImpl($this->container, $this->site, $this->existingId2 = "Test");
+        $this->nonExistingContent = new SiteContentImpl($this->container, $this->site, "NoContent");
     }
 
     public function testListContentWillReturnArray()
@@ -113,7 +117,7 @@ class SiteContentImplTest extends CustomDatabaseTestCase
         $this->assertEquals(1, count($this->existingContent->listContentHistory()));
         $this->existingContent->addContent("ASD");
         $this->assertEquals(2, count($this->existingContent->listContentHistory()));
-        $this->existingContent = new SiteContentImpl($this->db, $this->site);
+        $this->existingContent = new SiteContentImpl($this->container, $this->site);
         $this->assertEquals(2, count($this->existingContent->listContentHistory()));
     }
 
@@ -206,6 +210,12 @@ class SiteContentImplTest extends CustomDatabaseTestCase
     {
         $this->assertEquals(new SiteContentObjectImpl($this->existingContent2), $this->existingContent2->jsonObjectSerialize());
 
+    }
+
+
+    public function testLibraryReturnsRightPageInstance()
+    {
+        $this->assertTrue($this->existingContent === $this->existingContent->generateTypeHandler());
     }
 
 }

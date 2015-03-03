@@ -11,6 +11,7 @@ namespace ChristianBudde\Part\test;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserImpl;
 use ChristianBudde\Part\model\user\UserVariablesImpl;
+use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 
@@ -41,10 +42,12 @@ class UserVariablesImplTest extends CustomDatabaseTestCase
         parent::setUp();
         $this->db = new StubDBImpl();
         $this->db->setConnection(self::$pdo);
-        $this->existingUser = new UserImpl('testuser', $this->db);
+        $container = new StubBackendSingletonContainerImpl();
+        $container->setDBInstance($this->db);
+        $this->existingUser = new UserImpl($container, 'testuser');
         $this->existingVariables = new UserVariablesImpl($this->db, $this->existingUser);
-        $this->existingUser2 = new UserImpl('testuser2', $this->db);
-        $this->nonExistingUser = new UserImpl('nosuchuser', $this->db);
+        $this->existingUser2 = new UserImpl($container, 'testuser2');
+        $this->nonExistingUser = new UserImpl($container, 'nosuchuser');
         $this->nonExistingVariables = new UserVariablesImpl($this->db, $this->existingUser2);
         $this->nonExistingVariablesNonExistingUser = new UserVariablesImpl($this->db, $this->nonExistingUser);
 

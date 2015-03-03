@@ -47,7 +47,7 @@ class PageOrderImpl implements PageOrder, Observer
         $sql = "SELECT page_id FROM Page WHERE Page.page_id NOT IN (SELECT page_id FROM PageOrder)";
         $statement = $this->connection->query($sql);
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $page = new PageImpl($row['page_id'], $this->database);
+            $page = new PageImpl($this->backendContainer, $row['page_id']);
             $page->attachObserver($this);
             $this->inactivePages[$row['page_id']] = $page;
         }
@@ -55,7 +55,7 @@ class PageOrderImpl implements PageOrder, Observer
         $sql = "SELECT * FROM PageOrder ORDER BY parent_id,order_no";
         $statement = $this->connection->query($sql);
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $page = new PageImpl($row['page_id'], $this->database);
+            $page = new PageImpl($this->backendContainer, $row['page_id']);
             $page->attachObserver($this);
             $this->activePages[$row['page_id']] = $page;
             $this->pageOrder[$row['parent_id']][$row['order_no']] = $row['page_id'];
@@ -175,7 +175,7 @@ class PageOrderImpl implements PageOrder, Observer
     public function createPage($id)
     {
         try {
-            $page = new PageImpl($id, $this->database);
+            $page = new PageImpl($this->backendContainer, $id);
 
         } catch (Exception $e) {
             return false;

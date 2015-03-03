@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\page;
+use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\PageObjectImpl;
 use ChristianBudde\Part\model\Content;
@@ -16,8 +17,11 @@ class DefaultPageImpl implements Page
 {
 
     private $template,$title,$alias,$id;
-    public function __construct($id,$title,$template,$alias = null)
+    private $container;
+
+    public function __construct(BackendSingletonContainer $container, $id,$title,$template,$alias = null)
     {
+        $this->container = $container;
         $this->id = $id;
         $this->template = $template;
         $this->title = $title;
@@ -263,6 +267,6 @@ class DefaultPageImpl implements Page
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
+        return $this->container->getTypeHandlerLibraryInstance()->getPageTypeHandlerInstance($this);
     }
 }

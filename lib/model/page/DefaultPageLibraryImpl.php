@@ -1,8 +1,7 @@
 <?php
 namespace ChristianBudde\Part\model\page;
 use ArrayIterator;
-use ChristianBudde\Part\Config;
-
+use ChristianBudde\Part\BackendSingletonContainer;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -17,10 +16,12 @@ class DefaultPageLibraryImpl implements DefaultPageLibrary
     private $pages = array();
     /** @var ArrayIterator */
     private $iterator;
+    private $container;
 
-    function __construct(Config $config)
+    function __construct(BackendSingletonContainer $container)
     {
-        $this->config = $config;
+        $this->container = $container;
+        $this->config = $container->getConfigInstance();
         $this->initialize();
     }
 
@@ -29,6 +30,7 @@ class DefaultPageLibraryImpl implements DefaultPageLibrary
         $defaultPage = $this->config->getDefaultPages();
         foreach ($defaultPage as $title => $array) {
             $this->pages[$array['id']] = new DefaultPageImpl(
+                $this->container,
                 $array['id'],
                 $title,
                 $array['template'],

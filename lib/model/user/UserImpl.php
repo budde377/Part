@@ -1,9 +1,9 @@
 <?php
 namespace ChristianBudde\Part\model\user;
+use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\UserObjectImpl;
 use ChristianBudde\Part\model\Variables;
-use ChristianBudde\Part\util\db\DB;
 use ChristianBudde\Part\util\Observer;
 use ChristianBudde\Part\util\traits\RequestTrait;
 use ChristianBudde\Part\util\traits\ValidationTrait;
@@ -58,13 +58,15 @@ class UserImpl implements User
     private $observers = array();
     private $parent = null;
     private $parentID = null;
+    private $container;
 
 
-    public function __construct($username, DB $database)
+    public function __construct(BackendSingletonContainer $container, $username)
     {
+        $this->container = $container;
         $this->username = $username;
-        $this->database = $database;
-        $this->connection = $database->getConnection();
+        $this->database = $container->getDBInstance();
+        $this->connection = $this->database->getConnection();
     }
 
     /**
@@ -519,6 +521,6 @@ class UserImpl implements User
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
+        return $this->container->getTypeHandlerLibraryInstance()->getUserTypeHandlerInstance($this);
     }
 }

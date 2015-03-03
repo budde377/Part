@@ -1,8 +1,8 @@
 <?php
 namespace ChristianBudde\Part\model\page;
+use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\PageContentObjectImpl;
-use ChristianBudde\Part\util\db\DB;
 use PDO;
 use PDOStatement;
 
@@ -35,9 +35,10 @@ class PageContentImpl implements PageContent
     private $getContentAtPreparedStatement;
 
 
-    public function __construct(DB $database, Page $page, $id = "")
+    public function __construct(BackendSingletonContainer $container, Page $page, $id = "")
     {
-        $this->db = $database;
+        $this->container = $container;
+        $this->db = $container->getDBInstance();
         $this->page = $page;
         $this->id = $id;
     }
@@ -219,6 +220,6 @@ class PageContentImpl implements PageContent
      */
     public function generateTypeHandler()
     {
-        // TODO: Implement generateTypeHandler() method.
+        return $this->container->getTypeHandlerLibraryInstance()->getPageContentTypeHandlerInstance($this);
     }
 }
