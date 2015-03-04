@@ -30,16 +30,16 @@ class ServerImpl implements Server
 
     private $handlers = [];
 
-    private $backendSingletonContainer;
+    private $container;
 
     private $jsonParser;
     private $functionStringParser;
 
 
-    function __construct(BackendSingletonContainer $backendSingletonContainer)
+    function __construct(BackendSingletonContainer $container)
     {
 
-        $this->backendSingletonContainer = $backendSingletonContainer;
+        $this->container = $container;
         $this->jsonParser = new JSONParser();
         $this->functionStringParser = new ParserImpl();
 
@@ -74,7 +74,7 @@ class ServerImpl implements Server
      */
     public function registerHandlersFromConfig()
     {
-        $config = $this->backendSingletonContainer->getConfigInstance();
+        $config = $this->container->getConfigInstance();
         foreach ($config->getAJAXTypeHandlers() as $handlerArray) {
 
             if (isset($handlerArray['path'])) {
@@ -92,9 +92,9 @@ class ServerImpl implements Server
             }
 
             if (in_array('ChristianBudde\Part\controller\ajax\TypeHandlerGenerator', $ar = class_implements($className))) {
-                $handler = call_user_func($className . '::generateTypeHandler', $this->backendSingletonContainer);
+                $handler = call_user_func($className . '::generateTypeHandler', $this->container);
             } else {
-                $handler = new $className($this->backendSingletonContainer);
+                $handler = new $className($this->container);
             }
 
 
@@ -134,7 +134,7 @@ class ServerImpl implements Server
     private function wrapperHandler($input, $token)
     {
 
-        if (!$this->backendSingletonContainer->getUserLibraryInstance()->verifyUserSessionToken($token)) {
+        if (!$this->container->getUserLibraryInstance()->verifyUserSessionToken($token)) {
             return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_UNAUTHORIZED);
         }
 
