@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\controller\ajax;
+
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\function_string\ParserImpl;
@@ -33,7 +34,6 @@ class ServerImpl implements Server
 
     private $jsonParser;
     private $functionStringParser;
-
 
 
     function __construct(BackendSingletonContainer $backendSingletonContainer)
@@ -91,16 +91,15 @@ class ServerImpl implements Server
                 throw new ClassNotDefinedException($className);
             }
 
-            if(in_array('ChristianBudde\Part\controller\ajax\TypeHandlerGenerator', $ar = class_implements($className))){
-                $handler = call_user_func($className.'::generateTypeHandler', $this->backendSingletonContainer);
+            if (in_array('ChristianBudde\Part\controller\ajax\TypeHandlerGenerator', $ar = class_implements($className))) {
+                $handler = call_user_func($className . '::generateTypeHandler', $this->backendSingletonContainer);
             } else {
                 $handler = new $className($this->backendSingletonContainer);
             }
 
 
-
             if (!($handler instanceof TypeHandler)) {
-                throw new ClassNotInstanceOfException($handler == null?'null':get_class($handler), 'AJAXTypeHandler');
+                throw new ClassNotInstanceOfException($handler == null ? 'null' : get_class($handler), 'AJAXTypeHandler');
             }
 
             $this->registerHandler($handler);
@@ -132,9 +131,10 @@ class ServerImpl implements Server
      * @return Response
      */
 
-    private function wrapperHandler($input, $token){
+    private function wrapperHandler($input, $token)
+    {
 
-        if(!$this->backendSingletonContainer->getUserLibraryInstance()->verifyUserSessionToken($token)){
+        if (!$this->backendSingletonContainer->getUserLibraryInstance()->verifyUserSessionToken($token)) {
             return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_UNAUTHORIZED);
         }
 
@@ -145,15 +145,14 @@ class ServerImpl implements Server
         $result = $this->internalHandleProgram($input);
 
 
-
         if ($result === null) {
             $result = new ResponseImpl();
-        } else if(!(($r = $result) instanceof Response)) {
+        } else if (!(($r = $result) instanceof Response)) {
             $result = new ResponseImpl();
             $result->setPayload($r);
         }
 
-        if(($id = $input->getId()) != null){
+        if (($id = $input->getId()) != null) {
             $result->setID($id);
         }
         return $result;
@@ -167,28 +166,28 @@ class ServerImpl implements Server
     private function internalHandleProgram(Program $input)
     {
         $result = null;
-        if($input instanceof CompositeFunction){
+        if ($input instanceof CompositeFunction) {
 
 
-            if(($target = $input->getTarget()) instanceof Type){
+            if (($target = $input->getTarget()) instanceof Type) {
 
-                foreach($input->listFunctions() as $function){
+                foreach ($input->listFunctions() as $function) {
                     $result = $this->internalHandleFunction($function);
                 }
 
 
-            } else if($target instanceof JSONFunction) {
+            } else if ($target instanceof JSONFunction) {
 
                 $instance = $this->internalHandleFunction($target);
 
-                foreach($input->listFunctions() as $function){
+                foreach ($input->listFunctions() as $function) {
                     $result = $this->internalHandleFunction($function, $target, $instance);
                 }
 
             }
 
-        } else if($input instanceof JSONFunction){
-            $result =  $this->internalHandleFunction($input);
+        } else if ($input instanceof JSONFunction) {
+            $result = $this->internalHandleFunction($input);
         }
 
         return $result;
@@ -205,68 +204,92 @@ class ServerImpl implements Server
     {
 
 
-
         $target = $function->getTarget();
-        $types = [];
-        $instance = null;
 
+        $args = $this->internalHandleArguments($function);
+        if ($args instanceof Response) {
+            return $args;
+        }
+        $function = new JSONFunctionImpl($function->getName(), $target, $args);
+
+        if ($target instanceof Type) {
+            return $this->internalHandleFunctionBase($target, $function);
+
+        }
+
+        if ($target instanceof JSONFunction) {
+            return $this->internalHandleFunctionInduction($target, $targetOverride, $overrideInstance, $function);
+
+        }
+        return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_MALFORMED_REQUEST);
+
+
+    }
+
+    /**
+     * @param string $input
+     * @param string $token
+     * @return Response
+     */
+    public function handleFromFunctionString($input, $token = null)
+    {
+
+        return $this->wrapperHandler(($pr = $this->functionStringParser->parseString($input)) instanceof \ChristianBudde\Part\controller\function_string\ast\Program ? $pr->toJSONProgram() : null, $token);
+    }
+
+    private function buildType(ReflectionClass $reflection)
+    {
+        $result = [];
+
+        foreach ($i = $reflection->getInterfaces() as $class) {
+            $result[] = $class->getName();
+            $result = array_merge($result, $this->buildType($class));
+        }
+
+        if ($parent = $reflection->getParentClass()) {
+            $result = array_merge($result, $this->buildType($parent));
+        }
+
+
+        return array_unique($result);
+    }
+
+    private function internalHandleArguments(JSONFunction $function)
+    {
         $args = [];
-        foreach($function->getArgs() as $arg){
-            if(!($arg instanceof Program)){
+        foreach ($function->getArgs() as $arg) {
+            if (!($arg instanceof Program)) {
                 $args[] = $arg;
                 continue;
             }
 
             $argumentResponse = $this->internalHandleProgram($arg);
-            if($argumentResponse instanceof Response){
+            if ($argumentResponse instanceof Response) {
                 return $argumentResponse;
             }
 
             $args[] = $argumentResponse;
 
         }
+        return $args;
+    }
 
+    private function internalHandleFunctionBase(Type $target, JSONFunction $function)
+    {
 
-        $function = new JSONFunctionImpl($function->getName(), $target, $args);
-
-        $generatedHandler = null;
-
-        if ($target instanceof Type) {
-
-            if (!isset($this->handlers[$type = $target->getTypeString()])) {
-                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION);
-            }
-            $types[] = $target->getTypeString();
-
-        } else if ($target instanceof JSONFunction) {
-            $instance = $target == $targetOverride?$overrideInstance:$this->internalHandleFunction($target, $targetOverride, $overrideInstance);
-            if(is_array($instance)){
-                $types = ['array'];
-
-            } else {
-                if (!is_object($instance)) {
-                    return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION);
-                }
-
-                if ($instance instanceof Response) {
-                    return $instance;
-                }
-
-                if($instance instanceof TypeHandlerGenerator){
-                    $generatedHandler = $instance->generateTypeHandler();
-                }
-
-                $reflection = new ReflectionClass($instance);
-                $types = $this->buildType($reflection);
-            }
-
-        } else {
-            return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_MALFORMED_REQUEST);
+        if (!isset($this->handlers[$type = $target->getTypeString()])) {
+            return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION);
         }
 
+        return $this->handle([$target->getTypeString()], $function);
+    }
+
+
+    private function handle(array $types, JSONFunction $function, $instance = null, $generatedHandler = null)
+    {
         foreach ($types as $type) {
 
-            if($generatedHandler instanceof TypeHandler && $generatedHandler->canHandle($type, $function, $instance)){
+            if ($generatedHandler instanceof TypeHandler && $generatedHandler->canHandle($type, $function, $instance)) {
                 return $generatedHandler->handle($type, $function, $instance);
             }
             if (!isset($this->handlers[$type])) {
@@ -282,44 +305,36 @@ class ServerImpl implements Server
             }
 
         }
-        return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION); //Can't test this...
+
+        return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION);
     }
 
-    /**
-     * @param string $input
-     * @param string $token
-     * @return Response
-     */
-    public function handleFromFunctionString($input, $token = null)
+    private function internalHandleFunctionInduction(JSONFunction $target, $targetOverride, $overrideInstance, JSONFunction $function)
     {
+        $instance = $target == $targetOverride ? $overrideInstance : $this->internalHandleFunction($target, $targetOverride, $overrideInstance);
+        if (is_array($instance)) {
+            return $this->handle(['array'], $function, $instance);
 
-        return $this->wrapperHandler(($pr = $this->functionStringParser->parseString($input)) instanceof \ChristianBudde\Part\controller\function_string\ast\Program?$pr->toJSONProgram():null, $token);
-    }
-
-    private function buildType(ReflectionClass $reflection)
-    {
-        $result = [];
-
-        foreach($i = $reflection->getInterfaces() as $class){
-            $result[] = $class->getName();
-            $result = array_merge($result, $this->buildType($class));
         }
 
-        if($parent = $reflection->getParentClass()){
-            $result = array_merge($result, $this->buildType($parent));
+        if (!is_object($instance)) {
+            return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION);
         }
 
-        $r = [];
-
-        while(count($result)){
-            $e = array_pop($result);
-            if(in_array($e, $result)){
-                continue;
-            }
-            $r[] = $e;
+        if ($instance instanceof Response) {
+            return $instance;
         }
 
-        return $r;
+        if ($instance instanceof TypeHandlerGenerator) {
+            $generatedHandler = $instance->generateTypeHandler();
+        } else {
+            $generatedHandler = null;
+        }
+
+        $reflection = new ReflectionClass($instance);
+        $types = $this->buildType($reflection);
+
+        return $this->handle($types, $function, $instance, $generatedHandler);
     }
 
 
