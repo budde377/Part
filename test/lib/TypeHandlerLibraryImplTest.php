@@ -32,6 +32,7 @@ use ChristianBudde\Part\test\stub\StubSiteImpl;
 use ChristianBudde\Part\test\stub\StubUpdaterImpl;
 use ChristianBudde\Part\test\stub\StubUserImpl;
 use ChristianBudde\Part\test\stub\StubUserLibraryImpl;
+use ChristianBudde\Part\test\stub\StubUserPrivilegesImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 use ChristianBudde\Part\util\file\FileImpl;
 use ChristianBudde\Part\util\file\FileLibraryImpl;
@@ -135,6 +136,8 @@ class TypeHandlerLibraryImplTest extends CustomDatabaseTestCase
         $this->assertNotNull($result);
         $result = $this->typeHandlerLibrary->getUserTypeHandlerInstance(new StubUserImpl());
         $this->assertNotNull($result);
+        $result = $this->typeHandlerLibrary->getUserPrivilegesTypeHandlerInstance(new StubUserPrivilegesImpl(true, true, true));
+        $this->assertNotNull($result);
 
         $result = $this->typeHandlerLibrary->getSiteTypeHandlerInstance($site = new StubSiteImpl());
         $this->assertNotNull($result);
@@ -187,6 +190,8 @@ class TypeHandlerLibraryImplTest extends CustomDatabaseTestCase
         $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\type_handler\UserLibraryTypeHandlerImpl',$result);
         $result = $this->typeHandlerLibrary->getUserTypeHandlerInstance(new StubUserImpl());
         $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\type_handler\UserTypeHandlerImpl',$result);
+        $result = $this->typeHandlerLibrary->getUserPrivilegesTypeHandlerInstance(new StubUserPrivilegesImpl(true, true, true));
+        $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\type_handler\UserPrivilegesTypeHandlerImpl',$result);
 
         $result = $this->typeHandlerLibrary->getSiteTypeHandlerInstance($site = new StubSiteImpl());
         $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\type_handler\SiteTypeHandlerImpl',$result);
@@ -244,6 +249,9 @@ class TypeHandlerLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue($result !== $result2);
         $result = $this->typeHandlerLibrary->getUserTypeHandlerInstance(new StubUserImpl());
         $result2 = $this->typeHandlerLibrary->getUserTypeHandlerInstance(new StubUserImpl());
+        $this->assertTrue($result !== $result2);
+        $result = $this->typeHandlerLibrary->getUserPrivilegesTypeHandlerInstance(new StubUserPrivilegesImpl(true, true, true));
+        $result2 = $this->typeHandlerLibrary->getUserPrivilegesTypeHandlerInstance(new StubUserPrivilegesImpl(true, true, true));
         $this->assertTrue($result !== $result2);
 
         $result = $this->typeHandlerLibrary->getSiteTypeHandlerInstance($site = new StubSiteImpl());
@@ -314,6 +322,9 @@ class TypeHandlerLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue($result === $result2);
         $result = $this->typeHandlerLibrary->getUserTypeHandlerInstance($instance = new StubUserImpl());
         $result2 = $this->typeHandlerLibrary->getUserTypeHandlerInstance($instance);
+        $this->assertTrue($result === $result2);
+        $result = $this->typeHandlerLibrary->getUserPrivilegesTypeHandlerInstance($instance = new StubUserPrivilegesImpl(true, true, true));
+        $result2 = $this->typeHandlerLibrary->getUserPrivilegesTypeHandlerInstance($instance);
         $this->assertTrue($result === $result2);
 
         $result = $this->typeHandlerLibrary->getSiteTypeHandlerInstance($instance = $site = new StubSiteImpl());

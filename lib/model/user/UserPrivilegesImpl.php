@@ -1,10 +1,11 @@
 <?php
 namespace ChristianBudde\Part\model\user;
 
+use ChristianBudde\Part\BackendSingletonContainer;
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\UserPrivilegesObjectImpl;
 use ChristianBudde\Part\model\page\Page;
 use ChristianBudde\Part\model\page\PageOrder;
-use ChristianBudde\Part\util\db\DB;
 use PDO;
 use PDOException;
 
@@ -31,11 +32,13 @@ class UserPrivilegesImpl implements UserPrivileges
     private $revokeSiteStatement;
     private $revokePageStatement;
     private $revokeAllStatement;
+    private $container;
 
-    function __construct(User $user, DB $database)
+    function __construct(BackendSingletonContainer $container, User $user)
     {
+        $this->container = $container;
         $this->user = $user;
-        $this->connection = $database->getConnection();
+        $this->connection = $container->getDBInstance()->getConnection();
     }
 
 
@@ -252,5 +255,13 @@ class UserPrivilegesImpl implements UserPrivileges
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        return $this->container->getTypeHandlerLibraryInstance()->getUserPrivilegesTypeHandlerInstance($this);
     }
 }

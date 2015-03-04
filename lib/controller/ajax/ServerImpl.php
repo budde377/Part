@@ -290,8 +290,11 @@ class ServerImpl implements Server
     {
         foreach ($types as $type) {
 
-            if ($generatedHandler instanceof TypeHandler && $generatedHandler->canHandle($type, $function, $instance)) {
-                return $generatedHandler->handle($type, $function, $instance);
+            if ($generatedHandler instanceof TypeHandler) {
+                $generatedHandler->setUp($this, $type); //TODO test setup
+                if ($generatedHandler->canHandle($type, $function, $instance)) {
+                    return $generatedHandler->handle($type, $function, $instance);
+                }
             }
             if (!isset($this->handlers[$type])) {
                 continue;

@@ -27,7 +27,7 @@ class PageOrderTypeHandlerImpl extends GenericObjectTypeHandlerImpl
     function __construct(BackendSingletonContainer $container, PageOrder $order)
     {
 
-        parent::__construct($container, 'PageOrder');
+        parent::__construct($order, 'PageOrder');
         $this->container = $container;
 
         $this->addGetInstanceFunction('PageOrder');

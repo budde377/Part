@@ -29,6 +29,7 @@ use ChristianBudde\Part\controller\ajax\type_handler\SiteTypeHandlerImpl;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\ajax\type_handler\UpdaterTypeHandlerImpl;
 use ChristianBudde\Part\controller\ajax\type_handler\UserLibraryTypeHandlerImpl;
+use ChristianBudde\Part\controller\ajax\type_handler\UserPrivilegesTypeHandlerImpl;
 use ChristianBudde\Part\controller\ajax\type_handler\UserTypeHandlerImpl;
 use ChristianBudde\Part\log\Logger;
 use ChristianBudde\Part\model\mail\Address;
@@ -46,6 +47,7 @@ use ChristianBudde\Part\model\site\SiteContentLibrary;
 use ChristianBudde\Part\model\updater\Updater;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserLibrary;
+use ChristianBudde\Part\model\user\UserPrivileges;
 use ChristianBudde\Part\util\file\File;
 use ChristianBudde\Part\util\file\FileLibrary;
 use ChristianBudde\Part\util\file\ImageFile;
@@ -290,5 +292,16 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary
         }
         $this->keyArray[] = $instance;
         return $this->valueArray[] = $callback();
+    }
+
+    /**
+     * @param UserPrivileges $privileges
+     * @return TypeHandler
+     */
+    public function getUserPrivilegesTypeHandlerInstance(UserPrivileges $privileges)
+    {
+        return $this->createInstance('UserPrivileges', $privileges, function () use ($privileges) {
+            return new UserPrivilegesTypeHandlerImpl($this->container, $privileges);
+        });
     }
 }

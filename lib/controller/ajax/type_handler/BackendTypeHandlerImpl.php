@@ -38,13 +38,17 @@ class BackendTypeHandlerImpl implements TypeHandler
     public function setUp(Server $server, $type)
     {
         $server->registerHandler($this->backend->getUserLibraryInstance()->generateTypeHandler());
+        if(($user = $this->backend->getUserLibraryInstance()->getUserLoggedIn()) != null){
+            $server->registerHandler($user->generateTypeHandler());
+        }
         $server->registerHandler($this->backend->getPageOrderInstance()->generateTypeHandler());
+        if(($page = $this->backend->getPageOrderInstance()->getCurrentPage()) != null){
+            $server->registerHandler($page->generateTypeHandler());
+        }
         $server->registerHandler($this->backend->getLoggerInstance()->generateTypeHandler());
         $server->registerHandler($this->backend->getUpdaterInstance()->generateTypeHandler());
         $server->registerHandler($this->backend->getSiteInstance()->generateTypeHandler());
-
         $server->registerHandler($this->backend->getFileLibraryInstance()->generateTypeHandler());
-
         if($this->backend->getConfigInstance()->isMailManagementEnabled()){
             $server->registerHandler($this->backend->getMailDomainLibraryInstance()->generateTypeHandler());
         }

@@ -449,7 +449,7 @@ class UserImpl implements User
      */
     public function getUserPrivileges()
     {
-        return $this->userPrivileges == null ? $this->userPrivileges = new UserPrivilegesImpl($this, $this->database) : $this->userPrivileges;
+        return $this->userPrivileges == null ? $this->userPrivileges = new UserPrivilegesImpl($this->container, $this) : $this->userPrivileges;
     }
 
     /**

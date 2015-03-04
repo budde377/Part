@@ -14,13 +14,12 @@ use ChristianBudde\Part\model\site\SiteContentLibrary;
 
 class SiteContentLibraryTypeHandlerImpl extends GenericObjectTypeHandlerImpl{
 
-    private $container;
-    private $library;
+
 
     function __construct(BackendSingletonContainer $container, SiteContentLibrary $library)
     {
-        $this->container = $container;
-        $this->library = $library;
+        parent::__construct($library, "SiteContentLibrary");
+
     }
 
 

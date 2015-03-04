@@ -11,17 +11,27 @@ namespace ChristianBudde\Part\controller\ajax\type_handler;
 
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\model\page\PageContent;
+use ChristianBudde\Part\util\traits\TypeHandlerTrait;
 
 class PageContentTypeHandlerImpl extends GenericObjectTypeHandlerImpl{
 
     private $container;
-    private $content;
+
+    use TypeHandlerTrait;
 
     function __construct(BackendSingletonContainer $container, PageContent $content)
     {
         $this->container = $container;
-        $this->content = $content;
+        parent::__construct( $content);
+        $this->addFunctionAuthFunction("PageContent", "addContent", $this->wrapFunction([$this, 'userHasPagePrivilegesAuthFunction']));
+        $this->addGetInstanceFunction('PageContent');
     }
 
+
+    private function userHasPagePrivilegesAuthFunction($type, PageContent $instance) {
+        return
+            ($current = $this->container->getUserLibraryInstance()->getUserLoggedIn()) != null &&
+            $current->getUserPrivileges()->hasPagePrivileges($instance->getPage());
+    }
 
 }

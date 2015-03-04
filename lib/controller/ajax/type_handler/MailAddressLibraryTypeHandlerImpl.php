@@ -11,16 +11,24 @@ namespace ChristianBudde\Part\controller\ajax\type_handler;
 
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\model\mail\AddressLibrary;
+use ChristianBudde\Part\util\traits\TypeHandlerTrait;
 
 class MailAddressLibraryTypeHandlerImpl extends GenericObjectTypeHandlerImpl{
 
-    private $container;
-    private $library;
+    use TypeHandlerTrait;
 
     function __construct(BackendSingletonContainer $container, AddressLibrary $library)
     {
-        $this->container = $container;
-        $this->library = $library;
+
+        parent::__construct($library);
+        $this->addAlias('MailAddressLibrary', ['ChristianBudde\Part\model\mail\AddressLibrary']);
+        $this->whitelistType('MailAddressLibrary');
+        $this->addGetInstanceFunction('MailAddressLibrary');
+        $this->addFunctionAuthFunction('MailAddressLibrary', 'createAddress', $this->currentUserSitePrivilegesAuthFunction($container));
+        $this->addFunctionAuthFunction('MailAddressLibrary', 'deleteAddress', $this->currentUserSitePrivilegesAuthFunction($container));
+        $this->addFunctionAuthFunction('MailAddressLibrary', 'createCatchallAddress', $this->currentUserSitePrivilegesAuthFunction($container));
+        $this->addFunctionAuthFunction('MailAddressLibrary', 'deleteCatchallAddress', $this->currentUserSitePrivilegesAuthFunction($container));
+        $this->addTypeAuthFunction('MailAddressLibrary', $this->currentUserLoggedInAuthFunction($container));
     }
 
 

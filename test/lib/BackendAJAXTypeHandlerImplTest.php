@@ -235,8 +235,7 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
     }
 
     public function testUserGetInstance(){
-        $this->assertSuccessResponse($f = "User.getInstance()");
-        $this->assertResponsePayloadEquals($f, null);
+        $this->assertErrorResponse($f= "User.getInstance()", Response::ERROR_CODE_NO_SUCH_FUNCTION);
         $u = $this->setUpPageUserLogin();
         $this->setUpServer();
         $this->assertSuccessResponse($f);
@@ -452,7 +451,7 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
 
         $response = $this->server->handleFromFunctionString($functionString, $this->userLibrary->getUserSessionToken());
         $this->assertInstanceOf('ChristianBudde\Part\controller\json\Response', $response);
-        $this->assertEquals($response->getResponseType(), Response::RESPONSE_TYPE_SUCCESS);
+        $this->assertEquals(Response::RESPONSE_TYPE_SUCCESS, $response->getResponseType());
         return $response;
     }
 

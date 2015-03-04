@@ -34,6 +34,7 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
 
     /** @var  StubPageOrderImpl */
     private $pageLibrary;
+    private $container;
 
     function __construct($dataset = null)
     {
@@ -48,10 +49,11 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
         $this->db->setConnection(self::$pdo);
         $container = new StubBackendSingletonContainerImpl();
         $container->setDBInstance($this->db);
+        $this->container = $container;
         $this->user = new UserImpl($container, 'root');
         $this->page1 = new PageImpl($container, 'page');
         $this->page2 = new PageImpl($container, 'page2');
-        $this->userPrivileges = new UserPrivilegesImpl($this->user, $this->db);
+        $this->userPrivileges = new UserPrivilegesImpl($container, $this->user);
 
         $this->pageLibrary = new StubPageOrderImpl();
         $this->pageLibrary->setOrder(array(null => array($this->page1, $this->page2)));
@@ -120,7 +122,7 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
     public function testAddRootWillBePersistent()
     {
         $this->userPrivileges->addRootPrivileges();
-        $this->userPrivileges = new UserPrivilegesImpl($this->user, $this->db);
+        $this->userPrivileges = new UserPrivilegesImpl($this->container, $this->user);
         $this->assertTrue($this->userPrivileges->hasRootPrivileges());
     }
 
@@ -128,14 +130,14 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
     {
         $this->userPrivileges->addRootPrivileges();
         $this->userPrivileges->revokeRootPrivileges();
-        $this->userPrivileges = new UserPrivilegesImpl($this->user, $this->db);
+        $this->userPrivileges = new UserPrivilegesImpl($this->container, $this->user);
         $this->assertFalse($this->userPrivileges->hasRootPrivileges());
     }
 
     public function testAddSitePrivilegesWillBePersistent()
     {
         $this->userPrivileges->addSitePrivileges();
-        $this->userPrivileges = new UserPrivilegesImpl($this->user, $this->db);
+        $this->userPrivileges = new UserPrivilegesImpl($this->container, $this->user);
         $this->assertTrue($this->userPrivileges->hasSitePrivileges());
     }
 
@@ -143,14 +145,14 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
     {
         $this->userPrivileges->addSitePrivileges();
         $this->userPrivileges->revokeSitePrivileges();
-        $this->userPrivileges = new UserPrivilegesImpl($this->user, $this->db);
+        $this->userPrivileges = new UserPrivilegesImpl($this->container, $this->user);
         $this->assertFalse($this->userPrivileges->hasSitePrivileges());
     }
 
     public function testAddPagePrivilegesWillBePersistent()
     {
         $this->userPrivileges->addPagePrivileges($this->page1);
-        $this->userPrivileges = new UserPrivilegesImpl($this->user, $this->db);
+        $this->userPrivileges = new UserPrivilegesImpl($this->container, $this->user);
         $this->assertTrue($this->userPrivileges->hasPagePrivileges($this->page1));
     }
 
@@ -159,7 +161,7 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
     {
         $this->userPrivileges->addPagePrivileges($this->page1);
         $this->userPrivileges->revokePagePrivileges($this->page1);
-        $this->userPrivileges = new UserPrivilegesImpl($this->user, $this->db);
+        $this->userPrivileges = new UserPrivilegesImpl($this->container, $this->user);
         $this->assertFalse($this->userPrivileges->hasPagePrivileges($this->page1));
     }
 
@@ -204,7 +206,7 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
     {
         $this->setUpAllPrivileges();
         $this->userPrivileges->revokeAllPrivileges();
-        $this->userPrivileges = new UserPrivilegesImpl($this->user, $this->db);
+        $this->userPrivileges = new UserPrivilegesImpl($this->container, $this->user);
         $this->assertFalse($this->userPrivileges->hasRootPrivileges());
         $this->assertFalse($this->userPrivileges->hasSitePrivileges());
         $this->assertFalse($this->userPrivileges->hasPagePrivileges($this->page1));
@@ -225,7 +227,7 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
         $this->user->setUsername('someOtherValidUsername');
         $this->userPrivileges->addRootPrivileges();
         $this->assertTrue($this->userPrivileges->hasRootPrivileges());
-        $userPrivileges = new UserPrivilegesImpl($this->user, $this->db);
+        $userPrivileges = new UserPrivilegesImpl($this->container, $this->user);
         $this->assertTrue($userPrivileges->hasRootPrivileges());
     }
 
@@ -238,6 +240,10 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
 
     public function testGetUserIsUser(){
         $this->assertTrue($this->userPrivileges->getUser() === $this->user);
+    }
+
+    public function testGenerator(){
+        $this->assertTrue($this->userPrivileges->generateTypeHandler() === $this->userPrivileges);
     }
 
 }

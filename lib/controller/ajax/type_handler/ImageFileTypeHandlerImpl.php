@@ -16,6 +16,7 @@ class ImageFileTypeHandlerImpl extends GenericObjectTypeHandlerImpl{
 
     private $container;
     private $file;
+    //TODO implement this
 
     function __construct(BackendSingletonContainer $container, ImageFile $file)
     {

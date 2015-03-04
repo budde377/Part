@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\user;
+use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 use ChristianBudde\Part\controller\json\JSONObjectSerializable;
 use ChristianBudde\Part\model\page\Page;
 use ChristianBudde\Part\model\page\PageOrder;
@@ -10,7 +11,7 @@ use ChristianBudde\Part\model\page\PageOrder;
  * Date: 18/01/13
  * Time: 22:09
  */
-interface UserPrivileges extends JSONObjectSerializable
+interface UserPrivileges extends JSONObjectSerializable, TypeHandlerGenerator
 {
 
 

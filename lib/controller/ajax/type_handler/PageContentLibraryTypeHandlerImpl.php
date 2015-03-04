@@ -11,16 +11,18 @@ namespace ChristianBudde\Part\controller\ajax\type_handler;
 
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\model\page\PageContentLibrary;
+use ChristianBudde\Part\util\traits\TypeHandlerTrait;
 
 class PageContentLibraryTypeHandlerImpl extends GenericObjectTypeHandlerImpl{
 
     private $container;
-    private $library;
+
+    use TypeHandlerTrait;
 
     function __construct(BackendSingletonContainer $container, PageContentLibrary $library)
     {
-        $this->container = $container;
-        $this->library = $library;
+        parent::__construct($library);
+
     }
 
 

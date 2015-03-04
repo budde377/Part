@@ -8,6 +8,7 @@
  */
 namespace ChristianBudde\Part\test\stub;
 
+use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\UserPrivilegesObjectImpl;
 use ChristianBudde\Part\model\page\Page;
 use ChristianBudde\Part\model\page\PageOrder;
@@ -156,6 +157,14 @@ class StubUserPrivilegesImpl implements UserPrivileges
      * @return User
      */
     public function getUser()
+    {
+
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
     {
 
     }

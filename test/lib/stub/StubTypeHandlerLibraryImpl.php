@@ -27,6 +27,7 @@ use ChristianBudde\Part\model\site\SiteContentLibrary;
 use ChristianBudde\Part\model\updater\Updater;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserLibrary;
+use ChristianBudde\Part\model\user\UserPrivileges;
 use ChristianBudde\Part\util\file\File;
 use ChristianBudde\Part\util\file\FileLibrary;
 use ChristianBudde\Part\util\file\ImageFile;
@@ -203,5 +204,14 @@ class StubTypeHandlerLibraryImpl implements TypeHandlerLibrary{
     public function getImageFileTypeHandlerInstance(ImageFile $file)
     {
         return $file;
+    }
+
+    /**
+     * @param UserPrivileges $privileges
+     * @return TypeHandler
+     */
+    public function getUserPrivilegesTypeHandlerInstance(UserPrivileges $privileges)
+    {
+        return $privileges;
     }
 }

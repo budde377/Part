@@ -26,6 +26,7 @@ use ChristianBudde\Part\model\site\SiteContentLibrary;
 use ChristianBudde\Part\model\updater\Updater;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserLibrary;
+use ChristianBudde\Part\model\user\UserPrivileges;
 use ChristianBudde\Part\util\file\File;
 use ChristianBudde\Part\util\file\FileLibrary;
 use ChristianBudde\Part\util\file\ImageFile;
@@ -68,6 +69,12 @@ interface TypeHandlerLibrary
      * @return TypeHandler
      */
     public function getUserTypeHandlerInstance(User $user);
+
+    /**
+     * @param UserPrivileges $privileges
+     * @return TypeHandler
+     */
+    public function getUserPrivilegesTypeHandlerInstance(UserPrivileges $privileges);
 
     /**
      * @param DomainLibrary $library

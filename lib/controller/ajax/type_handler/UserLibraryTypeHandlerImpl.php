@@ -69,37 +69,36 @@ class UserLibraryTypeHandlerImpl extends GenericObjectTypeHandlerImpl
     }
 
 
-
-    private function userLogin(UserLibrary $instance, $username, $password)
+    private function userLogin()
     {
 
+        return function (UserLibrary $instance, $username, $password) {
+            if (($user = $instance->getUser($username)) == null && $this->validMail($username)) {
+                foreach ($instance->listUsers() as $u) {
+                    if ($user != null) {
+                        continue;
+                    }
+                    if ($u->getMail() !== trim($username)) {
+                        continue;
+                    }
+                    if (!$u->verifyLogin($password)) {
+                        continue;
+                    }
+                    $user = $u;
 
-        if (($user = $instance->getUser($username)) == null && $this->validMail($username)) {
-            foreach ($instance->listUsers() as $u) {
-                if ($user != null) {
-                    continue;
                 }
-                if ($u->getMail() !== trim($username)) {
-                    continue;
-                }
-                if (!$u->verifyLogin($password)) {
-                    continue;
-                }
-                $user = $u;
+            }
+
+            if ($user == null) {
+                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_LOGIN);
+            }
+
+            if ($user->login($password)) {
+                return $instance->getUserSessionToken();
 
             }
-        }
-
-        if ($user == null) {
             return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_LOGIN);
-        }
-
-        if ($user->login($password)) {
-            return $instance->getUserSessionToken();
-
-        }
-        return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_LOGIN);
-
+        };
 
     }
 
@@ -119,84 +118,88 @@ class UserLibraryTypeHandlerImpl extends GenericObjectTypeHandlerImpl
 
     }
 
-    private function createUserFromMail(UserLibrary $instance, $mail, $privileges)
+    private function createUserFromMail()
     {
+        return function (UserLibrary $instance, $mail, $privileges) {
+            if (!$this->validMail($mail)) {
+                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_MAIL);
+            }
+            $username = $this->usernameFromMail($mail, $instance);
+            $password = uniqid();
 
-        if (!$this->validMail($mail)) {
-            return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_MAIL);
-        }
-        $username = $this->usernameFromMail($mail, $instance);
-        $password = uniqid();
+            if (!($user = $instance->createUser($username, $password, $mail, $instance->getUserLoggedIn()))) {
+                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR);
+            }
 
-        if (!($user = $instance->createUser($username, $password, $mail, $instance->getUserLoggedIn()))) {
-            return new ResponseImpl(Response::RESPONSE_TYPE_ERROR);
-        }
-
-        $this->assignUserPrivileges($privileges, $user);
-
-
+            $this->assignUserPrivileges($privileges, $user);
 
 
-        $this->sendMailToUser($user,"Du er blevet oprettet som bruger på {$this->domain}", "Hej,\n" .
-            "Du er blevet oprettet som bruger på {$this->domain}.\n" .
-            "Du kan logge ind med følgende oplysninger:\n\n" .
+            $this->sendMailToUser($user, "Du er blevet oprettet som bruger på {$this->domain}", "Hej,\n" .
+                "Du er blevet oprettet som bruger på {$this->domain}.\n" .
+                "Du kan logge ind med følgende oplysninger:\n\n" .
 
-            "    Brugernavn: {$user->getUsername()}\n" .
-            "    Kodeord:    $password\n\n" .
+                "    Brugernavn: {$user->getUsername()}\n" .
+                "    Kodeord:    $password\n\n" .
 
-            "Vh\n" .
-            "Admin Jensen");
+                "Vh\n" .
+                "Admin Jensen");
 
 
-        return $user;
-
+            return $user;
+        };
     }
 
 
-    private function forgotPassword(UserLibrary $instance, $mail)
+    private function forgotPassword()
     {
 
-        $mail = trim($mail);
-        if (!$this->validMail($mail)) {
-            return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_MAIL);
-        }
-
-        foreach ($instance->listUsers() as $user) {
-            if ($user->getMail() == $mail) {
-                $password = uniqid();
-                $user->setPassword($password);
-
-                $this->sendMailToUser($user, "Kodeord nulstillet","Hej,\n" .
-                    "Dit kodeord på {$this->domain} er blevet nulstillet.\n" .
-                    "Du kan nu logge ind med følgende oplysninger:\n\n" .
-
-                    "    Brugernavn: {$user->getUsername()}\n" .
-                    "    Kodeord:    $password\n\n" .
-
-                    "Vh\n" .
-                    "Admin Jensen" );
+        return function (UserLibrary $instance, $mail) {
 
 
+            $mail = trim($mail);
+            if (!$this->validMail($mail)) {
+                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_MAIL);
             }
-        }
 
-        return new ResponseImpl();
+            foreach ($instance->listUsers() as $user) {
+                if ($user->getMail() == $mail) {
+                    $password = uniqid();
+                    $user->setPassword($password);
+
+                    $this->sendMailToUser($user, "Kodeord nulstillet", "Hej,\n" .
+                        "Dit kodeord på {$this->domain} er blevet nulstillet.\n" .
+                        "Du kan nu logge ind med følgende oplysninger:\n\n" .
+
+                        "    Brugernavn: {$user->getUsername()}\n" .
+                        "    Kodeord:    $password\n\n" .
+
+                        "Vh\n" .
+                        "Admin Jensen");
+
+
+                }
+            }
+
+            return new ResponseImpl();
+        };
     }
 
     private function addFunctions()
     {
         $this->addGetInstanceFunction('UserLibrary');
 
-        $this->addFunction("UserLibrary", "userLogin", $this->wrapFunction([$this, 'userLogin']));
+        $this->addFunction("UserLibrary", "userLogin", $this->userLogin());
 
-        $this->addFunction("UserLibrary", "createUserFromMail", $this->wrapFunction([$this, 'createUserFromMail']));
+        $this->addFunction("UserLibrary", "createUserFromMail", $this->createUserFromMail());
 
-        $this->addFunction('UserLibrary', 'forgotPassword', $this->wrapFunction([$this, 'forgotPassword']));
+        $this->addFunction('UserLibrary', 'forgotPassword', $this->forgotPassword());
     }
 
     private function addAuthFunctions()
     {
-        $this->addFunctionAuthFunction('UserLibrary', 'deleteUser', $this->wrapFunction([$this, 'isChildAuthFunction']));
+        $this->addFunctionAuthFunction('UserLibrary', 'deleteUser', function($type, UserLibrary $instance, $function, $args){
+            return $this->isChildAuthFunction($args[0], $instance->getUserLoggedIn(), $instance);
+        });
 
         $this->addFunctionAuthFunction('UserLibrary', 'createUserFromMail', $this->wrapFunction([$this, 'createUserFromMailAuthFunction']));
 

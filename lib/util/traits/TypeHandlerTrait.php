@@ -42,6 +42,8 @@ trait TypeHandlerTrait {
 
 
 
+
+
     private function isChildAuthFunction($child, $parent, $userLibrary)
     {
 
