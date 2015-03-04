@@ -26,6 +26,21 @@ class TypeHandlerGeneratorImageFileImplTest extends \PHPUnit_Framework_TestCase{
     }
 
 
+    public function testCopyReturnsRightInstance()
+    {
+
+        $this->assertNull($this->file->copy('test'));
+    }
+
+    public function testCopyReturnsRightInstanceOnSuccess()
+    {
+        $file = new TypeHandlerGeneratorImageFileImpl(new StubTypeHandlerLibraryImpl(), new ImageFileImpl("/tmp/".uniqid()));
+        $file->write("test");
+        $this->assertTrue($file->exists());
+        $file2 = $file->copy("/tmp/".uniqid());
+        $this->assertInstanceOf("ChristianBudde\\Part\\util\\file\\TypeHandlerGeneratorImageFileImpl",  $file2);
+    }
+
     public function testGenerator()
     {
 

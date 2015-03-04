@@ -33,4 +33,12 @@ class TypeHandlerGeneratorFileImpl extends FileImpl implements TypeHandlerGenera
     {
         return $this->typeHandlerLibrary->getFileTypeHandlerInstance($this->file);
     }
+
+    public function copy($path)
+    {
+        $file = parent::copy($path);
+        return $file == null?null:new TypeHandlerGeneratorFileImpl($this->typeHandlerLibrary, $file);
+    }
+
+
 }

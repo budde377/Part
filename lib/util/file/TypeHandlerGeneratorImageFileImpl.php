@@ -33,5 +33,39 @@ class TypeHandlerGeneratorImageFileImpl extends ImageFileImpl implements TypeHan
         return $this->typeHandlerLibrary->getImageFileTypeHandlerInstance($this->file);
     }
 
+    public function copy($path)
+    {
+        return $this->wrapImage(parent::copy($path));
+    }
+
+    public function mirrorVertical($saveAsNewFile = false)
+    {
+        return $this->wrapImage(parent::mirrorVertical($saveAsNewFile));
+    }
+
+    public function mirrorHorizontal($saveAsNewFile = false)
+    {
+        return $this->wrapImage(parent::mirrorHorizontal($saveAsNewFile));
+    }
+
+    public function rotate($degree, $saveAsNewFile = false)
+    {
+        return $this->wrapImage(parent::rotate($degree, $saveAsNewFile));
+    }
+
+    public function crop($x, $y, $width, $height, $saveAsNewFile = false)
+    {
+        return $this->wrapImage(parent::crop($x, $y, $width, $height, $saveAsNewFile));
+    }
+
+    public function forceSize($width, $height, $saveAsNewFile = false)
+    {
+        return $this->wrapImage(parent::forceSize($width, $height, $saveAsNewFile));
+    }
+
+
+    private function wrapImage($file){
+        return $file == null?null:new TypeHandlerGeneratorImageFileImpl($this->typeHandlerLibrary, $file);
+    }
 
 }

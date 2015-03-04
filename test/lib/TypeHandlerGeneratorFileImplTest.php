@@ -20,6 +20,22 @@ class TypeHandlerGeneratorFileImplTest extends \PHPUnit_Framework_TestCase{
     /** @var  FileImpl */
     private $file;
 
+    public function testCopyReturnsRightInstance()
+    {
+
+        $this->assertNull($this->file->copy('test'));
+    }
+
+    public function testCopyReturnsRightInstanceOnSuccess()
+    {
+        $file = new TypeHandlerGeneratorFileImpl(new StubTypeHandlerLibraryImpl(), new FileImpl("/tmp/".uniqid()));
+        $file->write("test");
+        $this->assertTrue($file->exists());
+        $file2 = $file->copy("/tmp/".uniqid());
+        $this->assertInstanceOf("ChristianBudde\\Part\\util\\file\\TypeHandlerGeneratorFileImpl",  $file2);
+    }
+
+
     protected function setUp()
     {
         $this->generator = new TypeHandlerGeneratorFileImpl(new StubTypeHandlerLibraryImpl(), $this->file = new FileImpl('nonExistingFile'));
@@ -37,6 +53,8 @@ class TypeHandlerGeneratorFileImplTest extends \PHPUnit_Framework_TestCase{
 
         $this->assertEquals($this->generator->getAbsoluteFilePath(),$this->file->getAbsoluteFilePath() );
     }
+
+
 
 
 }
