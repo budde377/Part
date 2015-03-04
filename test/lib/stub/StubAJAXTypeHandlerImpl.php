@@ -64,7 +64,7 @@ class StubAJAXTypeHandlerImpl implements TypeHandler
     public function canHandle($type, JSONFunction $function, $instance = null)
     {
         $this->calledMethods[] = ['method' => 'canHandle', 'arguments' => func_get_args()];
-        return $this->canHandle[$type];
+        return isset($this->canHandle[$type]) && $this->canHandle[$type];
     }
 
     /**

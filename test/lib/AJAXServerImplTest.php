@@ -312,6 +312,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
     }
 
 
+
     public function testWillCallImplementedGenerator()
     {
 
@@ -320,6 +321,11 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->handler1->canHandle[$type1] = true;
         $this->handler1->handle[$type1] = $instance1 = new StubPageImpl();
 
+        $type2 = 'ChristianBudde\Part\model\page\Page';
+        $instance1->handler->types = [$type2];
+        $instance1->handler->canHandle[$type2] = true;
+        $instance1->handler->handle[$type2] = 'success';
+
         $this->server->registerHandler($this->handler1);
 
         $func2 = new JSONFunctionImpl('func2', $func1 = new JSONFunctionImpl('func', new TypeImpl($type1)));
@@ -327,11 +333,12 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $r = $this->server->handleFromJSONString($func2->getAsJSONString());
         $this->assertInstanceOf('ChristianBudde\Part\controller\json\Response', $r);
         $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('canHandle', $this->handler1));
-
         $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('handle', $this->handler1));
+        $this->assertNotNull($this->checkIfFunctionIsCalled('canHandle',$instance1->handler));
+        $this->assertNotNull($this->checkIfFunctionIsCalled('handle', $instance1->handler));
         $this->assertEquals([$type1, $func1, null], $r1['arguments']);
 
-        $this->assertEquals(new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_NO_SUCH_FUNCTION), $r);
+        $this->assertEquals('success', $r->getPayload());
     }
 
 

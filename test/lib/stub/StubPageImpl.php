@@ -26,6 +26,12 @@ class StubPageImpl implements Page
     private $lastModified = -1;
     private $pageContent = array();
     private $variables;
+    public $handler;
+
+    function __construct()
+    {
+        $this->handler =  new StubAJAXTypeHandlerImpl();
+    }
 
 
     /**
@@ -271,5 +277,8 @@ class StubPageImpl implements Page
      */
     public function generateTypeHandler()
     {
+        return $this->handler;
     }
+
+
 }

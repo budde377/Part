@@ -17,7 +17,7 @@ trait TypeHandlerTrait {
 
     private function wrapFunction(callable $f){
         return function ()use ($f){
-            return $f();
+            return call_user_func_array($f, func_get_args());
         };
     }
 

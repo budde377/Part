@@ -229,6 +229,7 @@ class ServerImpl implements Server
 
         $function = new JSONFunctionImpl($function->getName(), $target, $args);
 
+        $generatedHandler = null;
 
         if ($target instanceof Type) {
 
@@ -251,6 +252,10 @@ class ServerImpl implements Server
                     return $instance;
                 }
 
+                if($instance instanceof TypeHandlerGenerator){
+                    $generatedHandler = $instance->generateTypeHandler();
+                }
+
                 $reflection = new ReflectionClass($instance);
                 $types = $this->buildType($reflection);
             }
@@ -260,15 +265,20 @@ class ServerImpl implements Server
         }
 
         foreach ($types as $type) {
+
+            if($generatedHandler instanceof TypeHandler && $generatedHandler->canHandle($type, $function, $instance)){
+                return $generatedHandler->handle($type, $function, $instance);
+            }
             if (!isset($this->handlers[$type])) {
                 continue;
             }
-            foreach ($this->handlers[$type] as $h) {
-                /** @var $h TypeHandler */
-                if (!$h->canHandle($type, $function, $instance)) {
+
+            foreach ($this->handlers[$type] as $handler) {
+                /** @var $handler TypeHandler */
+                if (!$handler->canHandle($type, $function, $instance)) {
                     continue;
                 }
-                return $h->handle($type, $function, $instance);
+                return $handler->handle($type, $function, $instance);
             }
 
         }
