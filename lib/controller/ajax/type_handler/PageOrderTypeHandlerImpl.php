@@ -37,27 +37,30 @@ class PageOrderTypeHandlerImpl extends GenericObjectTypeHandlerImpl
         $this->addFunctionAuthFunction('PageOrder', 'setPageOrder', $this->currentUserSitePrivilegesAuthFunction($this->container));
         $this->addFunctionAuthFunction('PageOrder', 'createPage', $this->currentUserSitePrivilegesAuthFunction($this->container));
 
-        $this->addFunction('PageOrder', 'createPage', $this->wrapFunction([$this, 'createPage']));
+        $this->addFunction('PageOrder', 'createPage', $this->createPage());
     }
 
 
-    private function createPage(PageOrder $pageOrder, $title)
+    private function createPage()
     {
-        if (strlen($title) == 0) {
-            return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_PAGE_TITLE);
-        }
-        $page_id = strtolower($title);
-        $page_id = $baseId = str_replace(' ', '_', $page_id);
-        $page_id = $baseId = preg_replace('/[^a-z0-9\-_]/', '', $page_id);
-        $postfix = 2;
-        while (($page = $pageOrder->createPage($page_id)) === false) {
-            $page_id = $baseId . "_" . $postfix;
-            $postfix++;
-        }
-        $page->setTitle($title);
-        $page->setTemplate('_main');
+        return function (PageOrder $pageOrder, $title) {
+            if (strlen($title) == 0) {
+                return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_INVALID_PAGE_TITLE);
+            }
+            $page_id = strtolower($title);
+            $page_id = $baseId = str_replace(' ', '_', $page_id);
+            $page_id = $baseId = preg_replace('/[^a-z0-9\-_]/', '', $page_id);
+            $postfix = 2;
+            while (($page = $pageOrder->createPage($page_id)) === false) {
+                $page_id = $baseId . "_" . $postfix;
+                $postfix++;
+            }
+            $page->setTitle($title);
+            $page->setTemplate('_main');
 
-        return $page;
+            return $page;
+
+        };
 
     }
 

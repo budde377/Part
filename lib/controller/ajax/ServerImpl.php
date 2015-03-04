@@ -91,12 +91,11 @@ class ServerImpl implements Server
                 throw new ClassNotDefinedException($className);
             }
 
-            if (in_array('ChristianBudde\Part\controller\ajax\TypeHandlerGenerator', $ar = class_implements($className))) {
-                $handler = call_user_func($className . '::generateTypeHandler', $this->container);
-            } else {
-                $handler = new $className($this->container);
-            }
+            $handler = new $className($this->container);
 
+            if($handler instanceof TypeHandlerGenerator){
+                $handler = $handler->generateTypeHandler();
+            }
 
             if (!($handler instanceof TypeHandler)) {
                 throw new ClassNotInstanceOfException($handler == null ? 'null' : get_class($handler), 'AJAXTypeHandler');
@@ -291,7 +290,7 @@ class ServerImpl implements Server
         foreach ($types as $type) {
 
             if ($generatedHandler instanceof TypeHandler) {
-                $generatedHandler->setUp($this, $type); //TODO test setup
+                $generatedHandler->setUp($this, $type);
                 if ($generatedHandler->canHandle($type, $function, $instance)) {
                     return $generatedHandler->handle($type, $function, $instance);
                 }

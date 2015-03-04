@@ -334,6 +334,7 @@ class AJAXServerImplTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('ChristianBudde\Part\controller\json\Response', $r);
         $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('canHandle', $this->handler1));
         $this->assertNotNull($r1 = $this->checkIfFunctionIsCalled('handle', $this->handler1));
+        $this->assertNotNull($this->checkIfFunctionIsCalled('setUp',$instance1->handler));
         $this->assertNotNull($this->checkIfFunctionIsCalled('canHandle',$instance1->handler));
         $this->assertNotNull($this->checkIfFunctionIsCalled('handle', $instance1->handler));
         $this->assertEquals([$type1, $func1, null], $r1['arguments']);
