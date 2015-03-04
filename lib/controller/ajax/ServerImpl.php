@@ -147,13 +147,13 @@ class ServerImpl implements Server
 
         if ($result === null) {
             $result = new ResponseImpl();
-        } else if (!(($r = $result) instanceof Response)) {
+        } else if (!(($result_payload = $result) instanceof Response)) {
             $result = new ResponseImpl();
-            $result->setPayload($r);
+            $result->setPayload($result_payload);
         }
 
-        if (($id = $input->getId()) != null) {
-            $result->setID($id);
+        if (($input_id = $input->getId()) != null) {
+            $result->setID($input_id);
         }
         return $result;
 
@@ -241,7 +241,7 @@ class ServerImpl implements Server
     {
         $result = [];
 
-        foreach ($i = $reflection->getInterfaces() as $class) {
+        foreach ($reflection->getInterfaces() as $class) {
             $result[] = $class->getName();
             $result = array_merge($result, $this->buildType($class));
         }
