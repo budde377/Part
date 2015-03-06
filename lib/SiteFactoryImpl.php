@@ -79,7 +79,7 @@ class SiteFactoryImpl implements SiteFactory
                 throw new ClassNotDefinedException($className);
             }
 
-            $preScript = new $className();
+            $preScript = new $className($this->buildBackendSingletonContainer($this->config));
 
             if (!($preScript instanceof Script)) {
                 throw new ClassNotInstanceOfException($className, 'Script');

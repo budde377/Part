@@ -14,6 +14,7 @@ use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\ConfigImpl;
 use ChristianBudde\Part\exception\ClassNotInstanceOfException;
 use ChristianBudde\Part\SiteFactoryImpl;
+use ChristianBudde\Part\test\stub\ForceExitException;
 use ChristianBudde\Part\test\stub\NullBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\ScriptHasRunException;
 use Exception;
@@ -225,6 +226,43 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
         $factory = new SiteFactoryImpl($config);
         $factory->buildPreScriptChain($this->backFactory);
+
+    }
+
+    public function testBuildPreScriptWillGiveRightArgumentToConstructor()
+    {
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        <preScripts>
+        <class>ChristianBudde\\Part\\test\\stub\\ConstructorStubScriptImpl</class>
+        </preScripts>
+        </config>");
+
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $factory = new SiteFactoryImpl($config);
+        try{
+            $factory->buildPreScriptChain($this->backFactory);
+        } catch (ForceExitException $e){
+            $this->assertInstanceOf('ChristianBudde\Part\BackendSingletonContainer', $e->data[0]);
+        }
+
+    }
+    public function testBuildPostScriptWillGiveRightArgumentToConstructor()
+    {
+        $configXML = simplexml_load_string("
+        <config>{$this->defaultOwner}
+        <postScripts>
+        <class>ChristianBudde\\Part\\test\\stub\\ConstructorStubScriptImpl</class>
+        </postScripts>
+        </config>");
+
+        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $factory = new SiteFactoryImpl($config);
+        try{
+            $factory->buildPostScriptChain($this->backFactory);
+        } catch (ForceExitException $e){
+            $this->assertInstanceOf('ChristianBudde\Part\BackendSingletonContainer', $e->data[0]);
+        }
 
     }
 

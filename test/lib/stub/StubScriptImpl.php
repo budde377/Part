@@ -18,6 +18,14 @@ class StubScriptImpl implements Script
     private $lastRunName = null;
     private $lastRunArgs = null;
 
+    public $constructorArgs;
+
+    function __construct()
+    {
+        $this->constructorArgs = func_get_args();
+    }
+
+
     /**
      * This function runs the script
      * @param $name string
