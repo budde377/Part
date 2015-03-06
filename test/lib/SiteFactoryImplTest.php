@@ -243,7 +243,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         try{
             $factory->buildPreScriptChain($this->backFactory);
         } catch (ForceExitException $e){
-            $this->assertInstanceOf('ChristianBudde\Part\BackendSingletonContainer', $e->data[0]);
+            $this->assertTrue($e->data[0] === $this->backFactory);
         }
 
     }
@@ -261,7 +261,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         try{
             $factory->buildPostScriptChain($this->backFactory);
         } catch (ForceExitException $e){
-            $this->assertInstanceOf('ChristianBudde\Part\BackendSingletonContainer', $e->data[0]);
+            $this->assertTrue($e->data[0] === $this->backFactory);
         }
 
     }
