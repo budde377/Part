@@ -39,7 +39,7 @@ class SiteFactoryImpl implements SiteFactory
      */
     public function buildPreScriptChain(BackendSingletonContainer $backendContainer)
     {
-        return $this->buildScriptChain($this->config->getPreScripts());
+        return $this->buildScriptChain($backendContainer, $this->config->getPreScripts());
 
     }
 
@@ -57,11 +57,11 @@ class SiteFactoryImpl implements SiteFactory
     public function buildPostScriptChain(BackendSingletonContainer $backendContainer)
     {
 
-        return $this->buildScriptChain($this->config->getPostScripts());
+        return $this->buildScriptChain($backendContainer, $this->config->getPostScripts());
     }
 
 
-    private function buildScriptChain($scriptArray)
+    private function buildScriptChain(BackendSingletonContainer $container, $scriptArray)
     {
         $chain = new ScriptChainImpl();
 
@@ -79,7 +79,7 @@ class SiteFactoryImpl implements SiteFactory
                 throw new ClassNotDefinedException($className);
             }
 
-            $preScript = new $className($this->buildBackendSingletonContainer($this->config));
+            $preScript = new $className($container);
 
             if (!($preScript instanceof Script)) {
                 throw new ClassNotInstanceOfException($className, 'Script');
