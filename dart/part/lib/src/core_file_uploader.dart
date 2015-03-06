@@ -153,7 +153,7 @@ class AJAXImageUploadStrategy extends UploadStrategy {
 
 
 
-    ajaxClient.callFunctionString("ImageFile.uploadFile(FILES['file'], $sizesString )", progress:progress, form_data:form_data).then((JSONResponse response) {
+    ajaxClient.callFunctionString("FileLibrary.uploadImageFile(FILES['file'], $sizesString )", progress:progress, form_data:form_data).then((JSONResponse response) {
       progress(1);
       var c = (String path) {
         fileProgress.path = path;
@@ -181,7 +181,7 @@ class AJAXFileUploadStrategy extends UploadStrategy {
     var completer = new Completer();
     var formData = new FormData();
     formData.appendBlob("file", fileProgress.file, fileProgress.file.name);
-    ajaxClient.callFunctionString("File.uploadFile(FILES['file'])", progress:progress, form_data:formData).then((JSONResponse response) {
+    ajaxClient.callFunctionString("FileLibrary.uploadFile(FILES['file'])", progress:progress, form_data:formData).then((JSONResponse response) {
       if (progress != null) {
         progress(1);
       }

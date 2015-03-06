@@ -34,6 +34,22 @@ trait TypeHandlerTrait {
     }
 
 
+
+    private function currentUserHasCurrentPagePrivileges(BackendSingletonContainer $container){
+        return function () use ($container) {
+            $user = $container->getUserLibraryInstance()->getUserLoggedIn();
+            if ($user == null) {
+                return false;
+            }
+            $page = $container->getPageOrderInstance()->getCurrentPage();
+            if($page == null){
+                return false;
+            }
+            return $user->getUserPrivileges()->hasPagePrivileges($page);
+        };
+    }
+
+
     private function currentUserLoggedInAuthFunction(BackendSingletonContainer $container){
         return function () use ($container) {
             return $container->getUserLibraryInstance()->getUserLoggedIn() != null;

@@ -33,7 +33,10 @@ class FileLibraryTypeHandlerImpl extends GenericObjectTypeHandlerImpl
         $this->container = $container;
 
         parent::__construct($library, 'FileLibrary');
-        $this->addTypeAuthFunction('FileLibrary', $this->currentUserLoggedInAuthFunction($this->container));
+        $this->addFunctionAuthFunction('FileLibrary', 'uploadFile',
+            $this->currentUserHasCurrentPagePrivileges($this->container));
+        $this->addFunctionAuthFunction('FileLibrary', 'uploadImageFile',
+            $this->currentUserHasCurrentPagePrivileges($this->container));
 
         $this->whitelistFunction('FileLibrary',
             'uploadFile',

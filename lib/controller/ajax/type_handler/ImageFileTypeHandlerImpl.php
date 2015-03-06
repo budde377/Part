@@ -11,18 +11,60 @@ namespace ChristianBudde\Part\controller\ajax\type_handler;
 
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\util\file\ImageFile;
+use ChristianBudde\Part\util\traits\TypeHandlerTrait;
 
-class ImageFileTypeHandlerImpl extends GenericObjectTypeHandlerImpl{
+class ImageFileTypeHandlerImpl extends FileTypeHandlerImpl
+{
+
+    use TypeHandlerTrait;
 
     private $container;
-    private $file;
-    //TODO implement this
 
     function __construct(BackendSingletonContainer $container, ImageFile $file)
     {
         $this->container = $container;
-        $this->file = $file;
+        parent::__construct($container, $file);
+        $this->whitelistType('ImageFile');
+
+
+        $this->addFunctionPreCallFunction('ImageFile', 'crop', $f = $this->createSpliceAndTrueEndPreFunction(4));
+        $this->addFunctionPreCallFunction('ImageFile', 'forceSize', $f = $this->createSpliceAndTrueEndPreFunction(2));
+        $this->addFunctionPreCallFunction('ImageFile', 'scaleToInnerBox', $f);
+        $this->addFunctionPreCallFunction('ImageFile', 'scaleToOuterBox', $f);
+        $this->addFunctionPreCallFunction('ImageFile', 'limitToInnerBox', $f);
+        $this->addFunctionPreCallFunction('ImageFile', 'limitToOuterBox', $f);
+        $this->addFunctionPreCallFunction('ImageFile', 'extendToInnerBox', $f);
+        $this->addFunctionPreCallFunction('ImageFile', 'extendToOuterBox', $f);
+        $this->addFunctionPreCallFunction('ImageFile', 'scaleToWidth', $f = $this->createSpliceAndTrueEndPreFunction(1));
+        $this->addFunctionPreCallFunction('ImageFile', 'scaleToHeight', $f);
+        $this->addFunctionPreCallFunction('ImageFile', 'rotate', $f);
+        $this->addFunctionPreCallFunction('ImageFile', 'mirrorHorizontal', $f = $this->createSpliceAndTrueEndPreFunction(0));
+        $this->addFunctionPreCallFunction('ImageFile', 'mirrorVertical', $f);
+
+        $this->addTypeAuthFunction('ImageFile', function ($type, $instance, $function)  {
+            return
+                !in_array($function, ['scaleToWidth',
+                    'scaleToHeight',
+                    'scaleToInnerBox',
+                    'scaleToOuterBox',
+                    'limitToInnerBox',
+                    'limitToOuterBox',
+                    'extendToInnerBox',
+                    'extendToOuterBox',
+                    'forceSize',
+                    'crop',
+                    'rotate',
+                    'mirrorVertical',
+                    'mirrorHorizontal']) ||
+                $this->currentUserHasCurrentPagePrivileges($this->container);
+        });
     }
 
-
+    private function createSpliceAndTrueEndPreFunction($length)
+    {
+        return function ($type, $instance, $functionName, &$arguments) use ($length) {
+            $arguments = array_splice($arguments, 0, $length);
+            $arguments[$length] = true;
+        };
+    }
 }

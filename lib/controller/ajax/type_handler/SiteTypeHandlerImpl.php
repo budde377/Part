@@ -11,17 +11,29 @@ namespace ChristianBudde\Part\controller\ajax\type_handler;
 
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\model\site\Site;
+use ChristianBudde\Part\util\traits\TypeHandlerTrait;
 
 class SiteTypeHandlerImpl extends GenericObjectTypeHandlerImpl{
 
-    // TODO implement
+    use TypeHandlerTrait;
+
     private $container;
-    private $site;
 
     function __construct(BackendSingletonContainer $container, Site $site)
     {
         $this->container = $container;
-        $this->site = $site;
+
+        parent::__construct($site, 'Site');
+
+        $this->whitelistFunction('Site',
+            'getContent',
+            'lastModified',
+            'modify',
+            'getContentLibrary');
+
+        $this->addFunctionAuthFunction('Site', 'modify', $this->currentUserSitePrivilegesAuthFunction($container));
+
+
     }
 
 
