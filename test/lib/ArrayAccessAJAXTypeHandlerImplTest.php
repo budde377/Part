@@ -55,7 +55,8 @@ class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase
 
     public function testHandleReturnsEntryInArray()
     {
-        $this->handler->addArray("POST", [1, 2, 3]);
+        $a = [1,2,3];
+        $this->handler->addArray("POST", $a);
         /** @var JSONFunction $f */
         $f = call_user_func($this->parser, 'POST.getVar(0)');
         $this->assertEquals(1, $this->handler->handle('POST', $f));
@@ -67,8 +68,8 @@ class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase
 
     public function testHasTypeWillReturnIfRight()
     {
-
-        $this->handler->addArray("POST", [1, 2, 3]);
+        $a = [1, 2, 3];
+        $this->handler->addArray("POST", $a);
         $this->assertTrue($this->handler->hasType('POST'));
         $this->assertTrue($this->handler->hasType('array'));
         $this->assertFalse($this->handler->hasType('NOT_POST'));
@@ -80,6 +81,18 @@ class ArrayAccessAJAXTypeHandlerImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($t);
         $this->assertFalse($this->handler->canHandle('array', $this->function));
         $this->assertEquals(1, $this->handler->handle('array', $this->function, $array));
+    }
+
+
+    public function testArrayPassByReference()
+    {
+        $array = [];
+        $this->handler->addArray('POST', $array);
+        $t = $this->handler->canHandle('POST', $this->function);
+        $this->assertTrue($t);
+        $array['id'] = 2;
+        $this->assertEquals(2, $this->handler->handle('POST', $this->function));
+
     }
 
 }

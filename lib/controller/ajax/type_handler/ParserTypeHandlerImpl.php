@@ -77,7 +77,8 @@ class ParserTypeHandlerImpl implements TypeHandler{
     {
         switch($function->getName()){
             case 'parseJson':
-                return json_decode($function->getArg(0));
+                return json_decode($function->getArg(0), true);
+
             case 'parseFunctionStringArray':
                 return (new ParserImpl())->parseArrayString($function->getArg(0));
         }

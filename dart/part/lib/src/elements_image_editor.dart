@@ -118,7 +118,7 @@ class ImageEditProperties {
 
 
   String toFunctionString() {
-    var src = url.split("/").toList().last;
+    var src = url.split("_files").toList()[1];
     var functionString = "FileLibrary.getImageFile(${core.quoteString(src)})";
 
     if (width != null && height != null) {

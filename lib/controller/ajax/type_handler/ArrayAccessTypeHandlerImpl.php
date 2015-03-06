@@ -74,8 +74,8 @@ class ArrayAccessTypeHandlerImpl implements TypeHandler{
      * @param string $type
      * @param array $array
      */
-    public function addArray($type, array $array)
+    public function addArray($type, array &$array)
     {
-        $this->arrays[$type] = $array;
+        $this->arrays[$type] = &$array;
     }
 }

@@ -410,6 +410,13 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
     }
 
 
+    public function testLoggerCanLogPost(){
+        $this->setUpPageUserLogin();
+        $_POST['a'] = 'test';
+        $_POST['b'] = '{"stact trace":"#0      ImageEditProperties.toFunctionString (package:part/src/elements_image_editor.dart:122:5)\n#1      ImageEditorHandler._setUpListeners.<anonymous closure> (package:part/src/elements_image_editor.dart:569:55)\n#2      _rootRunUnary (dart:async/zone.dart:906)\n#3      _CustomZone.runUnary (dart:async/zone.dart:804)\n#4      _CustomZone.runUnaryGuarded (dart:async/zone.dart:712)\n#5      _CustomZone.bindUnaryCallback.<anonymous closure> (dart:async/zone.dart:738)\n"}';
+        $this->assertSuccessResponse('Logger.log(8,Parser.parseJson(POST["a"]),Parser.parseJson(POST["b"]))');
+    }
+
 
     /**
      * @param $functionString

@@ -13,6 +13,7 @@ use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\json\Response;
 use ChristianBudde\Part\controller\json\ResponseImpl;
 use ChristianBudde\Part\util\file\File;
+use ChristianBudde\Part\util\file\FileImpl;
 use ChristianBudde\Part\util\file\FileLibrary;
 use ChristianBudde\Part\util\file\ImageFile;
 use ChristianBudde\Part\util\file\ImageFileImpl;
@@ -47,7 +48,7 @@ class FileLibraryTypeHandlerImpl extends GenericObjectTypeHandlerImpl
         $this->addFunction('FileLibrary', 'uploadFile', $this->uploadFile());
         $this->addFunction('FileLibrary', 'uploadImageFile', $this->uploadImageFile());
         $this->addFunction('FileLibrary', 'getFile', $this->getFile());
-        $this->addFunction('FileLibrary', 'getFile', $this->getImageFile());
+        $this->addFunction('FileLibrary', 'getImageFile', $this->getImageFile());
 
     }
 
@@ -59,7 +60,7 @@ class FileLibraryTypeHandlerImpl extends GenericObjectTypeHandlerImpl
             if ($file == null) {
                 return new ResponseImpl(Response::RESPONSE_TYPE_ERROR, Response::ERROR_CODE_COULD_NOT_CREATE_FILE);
             }
-            return $this->wrapFile($file);
+            return $this->filePath($file);
         };
     }
 
@@ -83,16 +84,25 @@ class FileLibraryTypeHandlerImpl extends GenericObjectTypeHandlerImpl
                 if ($val["dataURI"]) {
                     $result[$key] = $newFile->getDataURI();
                 } else {
-                    $result[$key] = $newFile;
+                    $result[$key] = $this->filePath($newFile);;
                 }
             }
-            return ["path" => $file, "sizes" => $result];
+            return ["path" => $this->filePath($file), "sizes" => $result];
         };
     }
 
     private function getFile()
     {
         return function (FileLibrary $library, $file_name) {
+
+            $file = new FileImpl($library->getFilesFolder()->getAbsolutePath().'/'.$file_name);
+            if($file->exists() && $library->containsFile($file)){
+                return $this->wrapFile($file);
+            }
+
+            if(strpos($file_name,"/") !== false){
+                return null;
+            }
 
             $fileList = $library->getFileList();
             foreach ($fileList as $file) {
@@ -178,5 +188,9 @@ class FileLibraryTypeHandlerImpl extends GenericObjectTypeHandlerImpl
             $file);
     }
 
+
+    private function filePath(File $file){
+        return $file->getParentFolder()->getName().'/'.$file->getFilename();
+    }
 
 }
