@@ -35,7 +35,7 @@ interface FileLibrary extends TypeHandlerGenerator{
 
     /**
      * @param \ChristianBudde\Part\model\user\User $user if null all files are returned else only files assoc with user are returned.
-     * @return array Returns all files in library.
+     * @return File[] Returns all files in library.
      */
     public function getFileList(User $user = null);
 
