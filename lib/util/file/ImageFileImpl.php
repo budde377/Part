@@ -50,9 +50,9 @@ class ImageFileImpl extends FileImpl implements ImageFile
      */
     public function getRatio()
     {
-        $h = $this->getHeight();
-        $w = $this->getWidth();
-        return $h == null ? null : $w / $h;
+        $height = $this->getHeight();
+        $width = $this->getWidth();
+        return $height == null ? null : $width / $height;
     }
 
     /**
@@ -87,13 +87,13 @@ class ImageFileImpl extends FileImpl implements ImageFile
      */
     public function scaleToInnerBox($width, $height, $saveAsNewFile = false)
     {
-        $wr = $width / $this->getWidth();
-        $hr = $height / $this->getHeight();
-        if ($wr > $hr) {
-            return $this->forceSize($this->getWidth() * $wr, 0, $saveAsNewFile);
+        $width_ratio = $width / $this->getWidth();
+        $height_ratio = $height / $this->getHeight();
+        if ($width_ratio > $height_ratio) {
+            return $this->forceSize($this->getWidth() * $width_ratio, 0, $saveAsNewFile);
         }
 
-        return $this->forceSize(0, $this->getHeight() * $hr, $saveAsNewFile);
+        return $this->forceSize(0, $this->getHeight() * $height_ratio, $saveAsNewFile);
 
 
     }
@@ -107,13 +107,13 @@ class ImageFileImpl extends FileImpl implements ImageFile
      */
     public function scaleToOuterBox($width, $height, $saveAsNewFile = false)
     {
-        $wr = $width == 0 ? $height / $this->getHeight() : $width / $this->getWidth();
-        $hr = $height == 0 ? $width / $this->getWidth() : $height / $this->getHeight();
-        if ($wr < $hr) {
-            return $this->forceSize($this->getWidth() * $wr, 0, $saveAsNewFile);
+        $width_ratio = $width == 0 ? $height / $this->getHeight() : $width / $this->getWidth();
+        $height_ratio = $height == 0 ? $width / $this->getWidth() : $height / $this->getHeight();
+        if ($width_ratio < $height_ratio) {
+            return $this->forceSize($this->getWidth() * $width_ratio, 0, $saveAsNewFile);
         }
 
-        return $this->forceSize(0, $this->getHeight() * $hr, $saveAsNewFile);
+        return $this->forceSize(0, $this->getHeight() * $height_ratio, $saveAsNewFile);
 
     }
 
@@ -126,29 +126,22 @@ class ImageFileImpl extends FileImpl implements ImageFile
      */
     public function forceSize($width, $height, $saveAsNewFile = false)
     {
-        $width  = $width <= 0?round($this->getRatio()*$height):$width;
-        $height = $height <= 0?round($width/$this->getRatio()):$height;
-
-        if ($saveAsNewFile) {
-            $fp = $this->getParentFolder()->getAbsolutePath() . '/' . $this->newForceImageSizeBasename($width, $height) . "." . $this->getExtension();
-            if (file_exists($fp)) {
-                return new ImageFileImpl($fp);
-            }
-            $f = $this->copy($fp);
-            $f->forceSize($width, $height);
-            return $f;
-
-        }
+        $width = $width <= 0 ? round($this->getRatio() * $height) : $width;
+        $height = $height <= 0 ? round($width / $this->getRatio()) : $height;
 
 
-        $this->updateInfo();
-        if ($this->imagick == null) {
-            return null;
-        }
-        $this->imagick->resizeimage($width, $height, Imagick::FILTER_CATROM, 1);
-        $this->imagick->writeimage($this->getAbsoluteFilePath());
-        $this->imagick = null;
-        return null;
+        return $this->modifyImageHelper(
+            function (Imagick $imagick) use ($width, $height) {
+                $imagick->resizeimage($width, $height, Imagick::FILTER_CATROM, 1);
+            },
+            function () use ($width, $height) {
+                return $this->newForceImageSizeBasename($width, $height);
+            },
+            function (ImageFile $file) use ($width, $height) {
+                $file->forceSize($width, $height);
+            },
+            $saveAsNewFile);
+
     }
 
     /**
@@ -163,29 +156,24 @@ class ImageFileImpl extends FileImpl implements ImageFile
      */
     public function crop($x, $y, $width, $height, $saveAsNewFile = false)
     {
-        if ($saveAsNewFile) {
-            $fp = $this->getParentFolder()->getAbsolutePath() . "/" . $this->newCropBasename($x, $y, $width, $height) . "." . $this->getExtension();
-            if (file_exists($fp)) {
-                return new ImageFileImpl($fp);
-            }
-            $f = $this->copy($fp);
-            $f->crop($x, $y, $width, $height);
-            return $f;
-        }
 
-        $this->updateInfo();
-        if ($this->imagick == null) {
-            return null;
-        }
-        $this->imagick->cropimage($width, $height, $x, $y);
-        $this->imagick->writeimage($this->getAbsoluteFilePath());
-        $this->imagick = null;
-        return null;
+        return $this->modifyImageHelper(
+            function (Imagick $imagick) use ($width, $height, $x, $y) {
+                $imagick->cropImage($width, $height, $x, $y);
+            },
+            function () use ($x, $y, $width, $height) {
+                return $this->newCropBasename($x, $y, $width, $height);
+            },
+            function (ImageFile $file) use ($x, $y, $width, $height) {
+                $file->crop($x, $y, $width, $height);
+            },
+            $saveAsNewFile);
+
     }
 
     public function copy($path)
     {
-        return ($s = parent::copy($path)) == null ? null : new ImageFileImpl($s->getAbsoluteFilePath());
+        return ($new_file = parent::copy($path)) == null ? null : new ImageFileImpl($new_file->getAbsoluteFilePath());
     }
 
 
@@ -199,7 +187,7 @@ class ImageFileImpl extends FileImpl implements ImageFile
     public function limitToOuterBox($width, $height, $saveAsNewFile = false)
     {
         if ($this->getWidth() < $width && $this->getHeight() < $height) {
-            return $saveAsNewFile?$this:null;
+            return $saveAsNewFile ? $this : null;
         }
         return $this->scaleToOuterBox($width, $height, $saveAsNewFile);
     }
@@ -214,9 +202,9 @@ class ImageFileImpl extends FileImpl implements ImageFile
     public function limitToInnerBox($width, $height, $saveAsNewFile = false)
     {
         if ($this->getWidth() < $width || $this->getHeight() < $height) {
-            return $saveAsNewFile?$this:null;
+            return $saveAsNewFile ? $this : null;
         }
-        return $this->scaleToInnerBox($width, $height ,$saveAsNewFile);
+        return $this->scaleToInnerBox($width, $height, $saveAsNewFile);
     }
 
     /**
@@ -229,7 +217,7 @@ class ImageFileImpl extends FileImpl implements ImageFile
     public function extendToInnerBox($width, $height, $saveAsNewFile = false)
     {
         if ($this->getWidth() >= $width && $this->getHeight() >= $height) {
-            return $saveAsNewFile?$this:null;
+            return $saveAsNewFile ? $this : null;
         }
         return $this->scaleToInnerBox($width, $height, $saveAsNewFile);
     }
@@ -245,7 +233,7 @@ class ImageFileImpl extends FileImpl implements ImageFile
     public function extendToOuterBox($width, $height, $saveAsNewFile = false)
     {
         if (($this->getWidth() >= $width && $width != 0) || ($this->getHeight() >= $height && $height != 0)) {
-            return $saveAsNewFile?$this:null;
+            return $saveAsNewFile ? $this : null;
         }
         return $this->scaleToOuterBox($width, $height, $saveAsNewFile);
 
@@ -259,24 +247,18 @@ class ImageFileImpl extends FileImpl implements ImageFile
     public function rotate($degree, $saveAsNewFile = false)
     {
 
-        if ($saveAsNewFile) {
-            $fp = $this->getParentFolder()->getAbsolutePath() . '/' . $this->newRotationBasename($degree) . "." . $this->getExtension();
-            if (file_exists($fp)) {
-                return new ImageFileImpl($fp);
-            }
-            $f = $this->copy($fp);
-            $f->rotate($degree);
-            return $f;
-        }
-        $this->updateInfo();
-        if ($this->imagick == null) {
-            return null;
-        }
-        $this->imagick->rotateimage("#000000", $degree);
-        $this->imagick->writeimage($this->getAbsoluteFilePath());
-        $this->imagick = null;
 
-        return null;
+        return $this->modifyImageHelper(
+            function (Imagick $imagick) use ($degree) {
+                $imagick->rotateimage("#000000", $degree);
+            },
+            function () use ($degree) {
+                return $this->newRotationBasename($degree);
+            },
+            function (ImageFile $file) use ($degree) {
+                $file->rotate($degree);
+            },
+            $saveAsNewFile);
     }
 
     /**
@@ -286,23 +268,44 @@ class ImageFileImpl extends FileImpl implements ImageFile
      */
     public function mirrorVertical($saveAsNewFile = false)
     {
-        if ($saveAsNewFile) {
-            $fp = $this->getParentFolder()->getAbsolutePath() . "/" . $this->newMirrorBasename(1, 0) . "." . $this->getExtension();
-            if (file_exists($fp)) {
-                return new ImageFileImpl($fp);
-            }
-            $f = $this->copy($fp);
-            $f->mirrorVertical();
-            return $f;
+
+        return $this->modifyImageHelper(
+            function (Imagick $imagick) {
+                $imagick->flopImage();
+            },
+            function () {
+                return $this->newMirrorBasename(1, 0);
+            },
+            function (ImageFile $file) {
+                $file->mirrorVertical();
+            },
+            $saveAsNewFile);
+    }
+
+    private function modifyImageHelper(callable $action, callable $basename_func, callable $new_file_action, $save_as_new_file)
+    {
+        if ($save_as_new_file) {
+            return $this->saveNewFileHelper($basename_func(), $new_file_action);
         }
         $this->updateInfo();
         if ($this->imagick == null) {
             return null;
         }
-        $this->imagick->flopimage();
+        $action($this->imagick);
         $this->imagick->writeimage($this->getAbsoluteFilePath());
         $this->imagick = null;
         return null;
+    }
+
+    private function saveNewFileHelper($basename, callable $action)
+    {
+        $file_path = $this->getParentFolder()->getAbsolutePath() . "/" . $basename . "." . $this->getExtension();
+        if (file_exists($file_path)) {
+            return new ImageFileImpl($file_path);
+        }
+        $new_file = $this->copy($file_path);
+        $action($new_file);
+        return $new_file;
     }
 
     /**
@@ -312,23 +315,17 @@ class ImageFileImpl extends FileImpl implements ImageFile
      */
     public function mirrorHorizontal($saveAsNewFile = false)
     {
-        if ($saveAsNewFile) {
-            $fp = $this->getParentFolder()->getAbsolutePath() . "/" . $this->newMirrorBasename(0, 1) . "." . $this->getExtension();
-            if (file_exists($fp)) {
-                return new ImageFileImpl($fp);
-            }
-            $f = $this->copy($fp);
-            $f->mirrorHorizontal();
-            return $f;
-        }
-        $this->updateInfo();
-        if ($this->imagick == null) {
-            return null;
-        }
-        $this->imagick->flipimage();
-        $this->imagick->writeimage($this->getAbsoluteFilePath());
-        $this->imagick = null;
-        return null;
+        return $this->modifyImageHelper(
+            function (Imagick $imagick) {
+                $imagick->flipimage();
+            },
+            function (){
+                return $this->newMirrorBasename(0, 1);
+            },
+            function (ImageFile $file) {
+                $file->mirrorHorizontal();
+            },
+            $saveAsNewFile);
     }
 
     private function newRotationBasename($degree)
