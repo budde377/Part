@@ -60,7 +60,7 @@ interface PageOrder extends JSONObjectSerializable, TypeHandlerGenerator
      * @abstract
      * Will list all pages in an array as instances of Page
      * @param int $listMode Must be of ListPageEnum
-     * @return array
+     * @return Page[]
      */
     public function listPages($listMode = PageOrder::LIST_ALL);
 

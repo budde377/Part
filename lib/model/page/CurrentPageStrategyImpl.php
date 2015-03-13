@@ -14,7 +14,7 @@ class CurrentPageStrategyImpl implements CurrentPageStrategy
 {
     use RequestTrait;
     private $pageOrder;
-    private $defaultPages;
+    private $defaultPagesLib;
     private $currentPagePath = null;
     private $container;
 
@@ -22,7 +22,7 @@ class CurrentPageStrategyImpl implements CurrentPageStrategy
     {
 
         $this->container = $container;
-        $this->defaultPages = $container->getDefaultPageLibraryInstance();
+        $this->defaultPagesLib = $container->getDefaultPageLibraryInstance();
         $this->pageOrder = $container->getPageOrderInstance();
 
     }
@@ -36,88 +36,24 @@ class CurrentPageStrategyImpl implements CurrentPageStrategy
     public function getCurrentPagePath()
     {
 
-        if ($this->currentPagePath !== null) {
+        if ($this->currentPagePath != null) {
             return $this->currentPagePath;
         }
 
-        $returnArray = array();
 
         $pageOrderArray = $this->pageOrder->getPageOrder();
-        $arrayCopy = $pageOrderArray;
-
-        if (($path = $this->GETValueOfIndexIfSetElseDefault('page', false)) !== false) {
-            $pathArray = explode('/', $path);
-            $emptyFilter = function($v)
-            {
-                return !empty($v);
-            };
-            $pathArray = array_filter($pathArray, $emptyFilter);
-            $firstPathElement = isset($pathArray[0]) && count($pathArray) == 1 ? $pathArray[0] : false;
-
-            $notFound = false;
-            $resultPage = null;
-            while (count($pathArray) && !$notFound) {
-                $path = array_shift($pathArray);
-                if ($resultPage !== null) {
-                    $returnArray[] = $resultPage;
-                }
-                $resultPage = null;
-                while (count($arrayCopy) && $resultPage == null) {
-                    /** @var $p Page */
-                    $p = array_shift($arrayCopy);
-                    if ($p->match($path)) {
-                        $resultPage = $p;
-                        $arrayCopy = $this->pageOrder->getPageOrder($p);
-                    }
-                }
-                $notFound = $resultPage == null;
-            }
+        $path = $this->GETValueOfIndexIfSetElseDefault('page', false);
 
 
-            if (!$notFound) {
-                $returnArray[] = $resultPage;
-            } else {
-                $returnArray = array();
-                if ($firstPathElement !== false) {
-
-                    $pageList = $this->pageOrder->listPages(PageOrder::LIST_INACTIVE);
-                    $inactiveNotFound = true;
-                    while ($inactiveNotFound && count($pageList)) {
-                        /** @var $inactivePage Page */
-                        $inactivePage = array_shift($pageList);
-                        if ($inactivePage->match($firstPathElement)) {
-                            $inactiveNotFound = false;
-                            $returnArray[] = $inactivePage;
-                        }
-                    }
-                    if($inactiveNotFound && $this->defaultPages !== null){
-                        $defaultPages = $this->defaultPages->listPages();
-                        $defaultPageNotFound = true;
-                        while(count($defaultPages) && $defaultPageNotFound){
-                            /** @var $page Page */
-                            $page = array_shift($defaultPages);
-                            if($page->match($firstPathElement)){
-                                $defaultPageNotFound = false;
-                                $returnArray[] = $page;
-                            }
-                        }
-
-                    }
-                }
-            }
-
-
-        } else if (count($arrayCopy)) {
-            $page = array_shift($arrayCopy);
-            $returnArray[] = $page;
+        if (!empty($path) && !empty($pagePath = $this->getPathArrayFromString($path, $pageOrderArray))) {
+            return $this->currentPagePath = $pagePath;
         }
 
-        if (!count($returnArray)) {
-            $returnArray[] = new NotFoundPageImpl($this->container);
+        if (!empty($pageOrderArray) && empty($path)) {
+            return $this->currentPagePath = [array_shift($pageOrderArray)];
         }
 
-        $this->currentPagePath = $returnArray;
-        return $returnArray;
+        return $this->currentPagePath = [new NotFoundPageImpl($this->container)];
     }
 
     /**
@@ -130,5 +66,73 @@ class CurrentPageStrategyImpl implements CurrentPageStrategy
 
 
     }
+
+    private function getPathArrayFromString($path, $pageOrderArray)
+    {
+        $pathArray = explode('/', $path);
+        $pathArray = array_filter($pathArray, function ($v) {
+            return !empty($v);
+        });
+        $activePagePath = $this->generatePathFromActivePages($pathArray, $pageOrderArray);
+
+        if (count($activePagePath) == count($pathArray)) {
+            return $activePagePath;
+        }
+
+        if(count($pathArray) != 1){
+            return [];
+        }
+        $page = $this->firstPageMatch($pathArray[0], $this->pageOrder->listPages(PageOrder::LIST_INACTIVE));
+        if($page != null){
+            return [$page];
+        }
+
+        if($this->defaultPagesLib == null){
+            return [];
+        }
+        $page = $this->firstPageMatch($pathArray[0], $this->defaultPagesLib->listPages());
+
+        return $page == null?[]:[$page];
+
+    }
+
+    /**
+     * @param string[] $path
+     * @param Page[] $pageOrder
+     * @return array
+     */
+    private function generatePathFromActivePages($path, $pageOrder)
+    {
+        if (empty($path)) {
+            return [];
+        }
+        $first_segment = array_shift($path);
+
+        if(($page = $this->firstPageMatch($first_segment, $pageOrder)) == null){
+            return [];
+        }
+
+        return array_merge([$page], $this->generatePathFromActivePages($path, $this->pageOrder->getPageOrder($page)));
+
+
+    }
+
+
+
+    /**
+     * @param string $segment
+     * @param Page[] $pages
+     * @return Page
+     */
+    private function firstPageMatch($segment, $pages)
+    {
+        foreach ($pages as $page) {
+            if ($page->match($segment)) {
+                return $page;
+            }
+        }
+        return null;
+    }
+
 
 }
