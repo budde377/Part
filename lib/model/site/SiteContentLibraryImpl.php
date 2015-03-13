@@ -25,10 +25,10 @@ class SiteContentLibraryImpl implements SiteContentLibrary
     private $searchLibraryPreparedStatement;
 
 
-    function __construct(BackendSingletonContainer $container, Site $site)
+    function __construct(BackendSingletonContainer $container)
     {
         $this->container = $container;
-        $this->site = $site;
+        $this->site = $container->getSiteInstance();
         $this->db = $container->getDBInstance();
     }
 
@@ -60,7 +60,7 @@ class SiteContentLibraryImpl implements SiteContentLibrary
         $this->setUpList();
         return isset($this->idArray[$id]) ?
             $this->idArray[$id] :
-            $this->idArray[$id] = new SiteContentImpl($this->container, $this->site, $id);
+            $this->idArray[$id] = new SiteContentImpl($this->container, $id);
 
     }
 
@@ -72,7 +72,7 @@ class SiteContentLibraryImpl implements SiteContentLibrary
                 $this->db->getConnection()->prepare("SELECT DISTINCT id FROM SiteContent");
             $this->listContentPreparedStatement->execute();
             foreach ($this->listContentPreparedStatement->fetchAll(PDO::FETCH_ASSOC) as $val) {
-                $this->idArray[$val["id"]] = new SiteContentImpl($this->container, $this->site, $val["id"]);
+                $this->idArray[$val["id"]] = new SiteContentImpl($this->container, $val["id"]);
             }
 
         }

@@ -7,7 +7,6 @@ use ChristianBudde\Part\exception\MalformedParameterException;
 use ChristianBudde\Part\model\Content;
 use ChristianBudde\Part\model\ContentLibrary;
 use ChristianBudde\Part\model\Variables;
-use ChristianBudde\Part\util\Observable;
 use ChristianBudde\Part\util\Observer;
 use PDO;
 use PDOException;
@@ -21,7 +20,7 @@ use PDOStatement;
  * Time: 9:15 PM
  * To change this template use File | Settings | File Templates.
  */
-class PageImpl implements Page, Observable
+class PageImpl implements Page
 {
 
     private $id;

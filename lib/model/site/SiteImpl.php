@@ -4,7 +4,6 @@ use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\model\Content;
 use ChristianBudde\Part\model\ContentLibrary;
-use ChristianBudde\Part\model\SiteVariablesImpl;
 use ChristianBudde\Part\model\Variables;
 
 
@@ -76,7 +75,7 @@ class SiteImpl implements Site
     public function getContentLibrary()
     {
         return $this->contentLibrary == null?
-            $this->contentLibrary = new SiteContentLibraryImpl($this->container, $this):
+            $this->contentLibrary = new SiteContentLibraryImpl($this->container):
             $this->contentLibrary;
     }
 

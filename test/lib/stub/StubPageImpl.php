@@ -7,6 +7,7 @@ use ChristianBudde\Part\model\Content;
 use ChristianBudde\Part\model\ContentLibrary;
 use ChristianBudde\Part\model\page\Page;
 use ChristianBudde\Part\model\Variables;
+use ChristianBudde\Part\util\Observer;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -281,4 +282,11 @@ class StubPageImpl implements Page
     }
 
 
+    public function attachObserver(Observer $observer)
+    {
+    }
+
+    public function detachObserver(Observer $observer)
+    {
+    }
 }

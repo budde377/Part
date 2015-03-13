@@ -9,26 +9,30 @@ namespace ChristianBudde\Part\model\user;
  */
 use ChristianBudde\Part\model\VariablesImpl;
 use ChristianBudde\Part\util\db\DB;
+use ChristianBudde\Part\util\Observable;
+use ChristianBudde\Part\util\Observer;
 
-class UserVariablesImpl extends VariablesImpl
+class UserVariablesImpl extends VariablesImpl implements Observer
 {
 
     private $user;
+    private $username;
 
     function __construct(DB $database, User $user)
     {
 
         $this->user = $user;
+        $user->attachObserver($this);
         $connection = $database->getConnection();
-        $username = $user->getUsername();
+        $this->username = $user->getUsername();
         $preparedUpdateValue = $connection->prepare("UPDATE UserVariables SET `value`= :value WHERE username = :username AND `key` = :key ");
-        $preparedUpdateValue->bindParam(':username', $username);
+        $preparedUpdateValue->bindParam(':username', $this->username);
         $preparedSetValue = $connection->prepare("INSERT INTO UserVariables (`key`, `value`, username) VALUES (:key, :value , :username )");
-        $preparedSetValue->bindParam(':username', $username);
+        $preparedSetValue->bindParam(':username', $this->username);
         $preparedRemoveKey = $connection->prepare("DELETE FROM UserVariables WHERE username = :username AND `key` = :key");
-        $preparedRemoveKey->bindParam(':username', $username);
+        $preparedRemoveKey->bindParam(':username', $this->username);
         $prepInitialize = $connection->prepare("SELECT `key`,`value` FROM UserVariables WHERE username = :username");
-        $prepInitialize->bindParam(':username', $username);
+        $prepInitialize->bindParam(':username', $this->username);
 
         parent::__construct($prepInitialize, $preparedRemoveKey, $preparedSetValue, $preparedUpdateValue);
     }
@@ -42,4 +46,8 @@ class UserVariablesImpl extends VariablesImpl
     }
 
 
+    public function onChange(Observable $subject, $changeType)
+    {
+        $this->username = $this->user->getUsername();
+    }
 }

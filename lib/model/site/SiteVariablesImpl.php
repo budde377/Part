@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\Part\model;
+namespace ChristianBudde\Part\model\site;
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -7,6 +7,7 @@ namespace ChristianBudde\Part\model;
  * Time: 3:46 PM
  * To change this template use File | Settings | File Templates.
  */
+use ChristianBudde\Part\model\VariablesImpl;
 use ChristianBudde\Part\util\db\DB;
 
 class SiteVariablesImpl extends VariablesImpl

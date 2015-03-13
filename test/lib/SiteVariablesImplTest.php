@@ -9,7 +9,7 @@
  */
 namespace ChristianBudde\Part\test;
 
-use ChristianBudde\Part\model\SiteVariablesImpl;
+use ChristianBudde\Part\model\site\SiteVariablesImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 

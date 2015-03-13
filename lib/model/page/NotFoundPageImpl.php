@@ -8,6 +8,7 @@ use ChristianBudde\Part\model\ContentLibrary;
 use ChristianBudde\Part\model\NullContentImpl;
 use ChristianBudde\Part\model\Variables;
 use ChristianBudde\Part\util\helper\HTTPHeaderHelper;
+use ChristianBudde\Part\util\Observer;
 
 
 /**
@@ -267,5 +268,13 @@ class NotFoundPageImpl implements Page
     public function generateTypeHandler()
     {
         return $this->container->getTypeHandlerLibraryInstance()->getPageTypeHandlerInstance($this);
+    }
+
+    public function attachObserver(Observer $observer)
+    {
+    }
+
+    public function detachObserver(Observer $observer)
+    {
     }
 }
