@@ -19,7 +19,6 @@ use ChristianBudde\Part\util\db\DB;
 class PageContentLibraryImplTest extends CustomDatabaseTestCase
 {
 
-
     /** @var  DB */
     private $db;
     /** @var  \ChristianBudde\Part\model\page\Page */
@@ -169,5 +168,12 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue($this->existingContentLibrary=== $this->existingContentLibrary->generateTypeHandler());
     }
 
+    public function testChangePageIdOk(){
+        $this->existingPage->setID("some_id");
+        $ar = $this->existingContentLibrary->searchLibrary("1");
+        $this->assertEquals(1, count($ar));
+        $this->assertArrayHasKey("Test", $ar);
+        $this->assertTrue($ar["Test"] === $this->existingContentLibrary->getContent("Test"));
+    }
 
 }
