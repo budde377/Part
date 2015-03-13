@@ -23,7 +23,7 @@ use PDOStatement;
 class PageImpl implements Page
 {
 
-    private $id;
+    private $page_id;
     private $title = '';
     private $template = '';
     private $alias = '';
@@ -38,28 +38,28 @@ class PageImpl implements Page
     private $contentLibrary;
     private $variables;
 
-    /** @var $existsStatement PDOStatement | null */
-    private $existsStatement = null;
-    /** @var $createStatement PDOStatement | null */
-    private $createStatement = null;
-    /** @var $deleteStatement PDOStatement | null */
-    private $deleteStatement;
-    /** @var $updateIDStatement PDOStatement | null */
-    private $updateIDStatement;
-    /** @var $updateTitleStatement PDOStatement | null */
-    private $updateTitleStatement;
-    /** @var $updateTemplateStatement PDOStatement | null */
-    private $updateTemplateStatement;
-    /** @var $updateAliasStatement PDOStatement | null */
-    private $updateAliasStatement;
-    /** @var $updateHiddenStatement PDOStatement | null */
-    private $updateHiddenStatement;
-    /** @var PDOStatement | null */
-    private $updateLastModifiedStatement;
+    /** @var $existsStm PDOStatement */
+    private $existsStm;
+    /** @var $createStm PDOStatement */
+    private $createStm;
+    /** @var $deleteStm PDOStatement */
+    private $deleteStm;
+    /** @var $updateIDStm PDOStatement */
+    private $updateIDStm;
+    /** @var $updateTitleStm PDOStatement */
+    private $updateTitleStm;
+    /** @var $updateTemplateStm PDOStatement */
+    private $updateTemplateStm;
+    /** @var $updateAliasStm PDOStatement */
+    private $updateAliasStm;
+    /** @var $updateHiddenStm PDOStatement */
+    private $updateHiddenStm;
+    /** @var PDOStatement */
+    private $updLastModStm;
 
 
 
-    private $initialValuesHasBeenSet = false;
+    private $isInitialized = false;
     private $observers = array();
     private $container;
 
@@ -74,7 +74,7 @@ class PageImpl implements Page
             throw new MalformedParameterException('RegEx[a-zA-Z0-9-_]+', 1);
         }
         $database = $container->getDBInstance();
-        $this->id = $id;
+        $this->page_id = $id;
         $this->container = $container;
         $this->database = $database;
         $this->connection = $database->getConnection();
@@ -86,7 +86,7 @@ class PageImpl implements Page
      */
     public function getID()
     {
-        return $this->id;
+        return $this->page_id;
     }
 
     /**
@@ -122,25 +122,25 @@ class PageImpl implements Page
      * Set the id of the page. The ID should be of type [a-zA-Z0-9-_]+
      * If the id does not conform to above, it will return FALSE, else, TRUE
      * Also the ID must be unique, if not it will fail and return FALSE
-     * @param $id string
+     * @param $page_id string
      * @return bool
      */
-    public function setID($id)
+    public function setID($page_id)
     {
-        if ($id == $this->id) {
+        if ($page_id == $this->page_id) {
             return true;
         }
 
-        if (!$this->isValidId($id)) {
+        if (!$this->isValidId($page_id)) {
             return false;
         }
 
 
-        if ($this->updateIDStatement === null) {
-            $this->updateIDStatement = $this->connection->prepare("UPDATE Page SET page_id = ? WHERE page_id = ?");
+        if ($this->updateIDStm === null) {
+            $this->updateIDStm = $this->connection->prepare("UPDATE Page SET page_id = ? WHERE page_id = ?");
         }
-        $this->updateIDStatement->execute(array($id, $this->id));
-        $this->id = $id;
+        $this->updateIDStm->execute(array($page_id, $this->page_id));
+        $this->page_id = $page_id;
 
         $this->notifyObservers(Page::EVENT_ID_UPDATE);
 
@@ -154,13 +154,13 @@ class PageImpl implements Page
     public function setTitle($title)
     {
 
-        if ($this->updateTitleStatement === null) {
-            $this->updateTitleStatement = $this->connection->prepare("UPDATE Page SET title = ? WHERE page_id = ?");
-            $this->updateTitleStatement->bindParam(1, $this->title);
-            $this->updateTitleStatement->bindParam(2, $this->id);
+        if ($this->updateTitleStm === null) {
+            $this->updateTitleStm = $this->connection->prepare("UPDATE Page SET title = ? WHERE page_id = ?");
+            $this->updateTitleStm->bindParam(1, $this->title);
+            $this->updateTitleStm->bindParam(2, $this->page_id);
         }
         $this->title = $title;
-        $this->updateTitleStatement->execute();
+        $this->updateTitleStm->execute();
     }
 
     /**
@@ -170,13 +170,13 @@ class PageImpl implements Page
      */
     public function setTemplate($template)
     {
-        if ($this->updateTemplateStatement === null) {
-            $this->updateTemplateStatement = $this->connection->prepare("UPDATE Page SET template = ? WHERE page_id = ?");
-            $this->updateTemplateStatement->bindParam(1, $this->template);
-            $this->updateTemplateStatement->bindParam(2, $this->id);
+        if ($this->updateTemplateStm === null) {
+            $this->updateTemplateStm = $this->connection->prepare("UPDATE Page SET template = ? WHERE page_id = ?");
+            $this->updateTemplateStm->bindParam(1, $this->template);
+            $this->updateTemplateStm->bindParam(2, $this->page_id);
         }
         $this->template = $template;
-        $this->updateTemplateStatement->execute();
+        $this->updateTemplateStm->execute();
     }
 
     /**
@@ -190,13 +190,13 @@ class PageImpl implements Page
             return false;
         }
 
-        if ($this->updateAliasStatement === null) {
-            $this->updateAliasStatement = $this->connection->prepare("UPDATE Page SET alias = ? WHERE page_id = ?");
-            $this->updateAliasStatement->bindParam(1, $this->alias);
-            $this->updateAliasStatement->bindParam(2, $this->id);
+        if ($this->updateAliasStm === null) {
+            $this->updateAliasStm = $this->connection->prepare("UPDATE Page SET alias = ? WHERE page_id = ?");
+            $this->updateAliasStm->bindParam(1, $this->alias);
+            $this->updateAliasStm->bindParam(2, $this->page_id);
         }
         $this->alias = $alias;
-        $this->updateAliasStatement->execute();
+        $this->updateAliasStm->execute();
 
         return true;
     }
@@ -207,18 +207,18 @@ class PageImpl implements Page
      */
     public function exists()
     {
-        return $this->IDExists($this->id);
+        return $this->IDExists($this->page_id);
     }
 
 
     private function IDExists($id)
     {
-        if ($this->existsStatement === null) {
-            $this->existsStatement = $this->connection->prepare("SELECT *, UNIX_TIMESTAMP(last_modified) AS last_modified FROM Page WHERE page_id=?");
+        if ($this->existsStm === null) {
+            $this->existsStm = $this->connection->prepare("SELECT *, UNIX_TIMESTAMP(last_modified) AS last_modified FROM Page WHERE page_id=?");
         }
 
-        $this->existsStatement->execute(array($id));
-        return $this->existsStatement->rowCount() > 0;
+        $this->existsStm->execute(array($id));
+        return $this->existsStm->rowCount() > 0;
     }
 
     /**
@@ -230,22 +230,22 @@ class PageImpl implements Page
     {
 
 
-        if ($this->createStatement === null) {
-            $this->createStatement = $this->connection->prepare("
+        if ($this->createStm === null) {
+            $this->createStm = $this->connection->prepare("
             INSERT INTO Page (page_id,template,title,alias,hidden)
             VALUES (?,?,?,?,?)");
-            $this->createStatement->bindParam(1, $this->id);
-            $this->createStatement->bindParam(2, $this->template);
-            $this->createStatement->bindParam(3, $this->title);
-            $this->createStatement->bindParam(4, $this->alias);
-            $this->createStatement->bindParam(5, $this->hidden);
+            $this->createStm->bindParam(1, $this->page_id);
+            $this->createStm->bindParam(2, $this->template);
+            $this->createStm->bindParam(3, $this->title);
+            $this->createStm->bindParam(4, $this->alias);
+            $this->createStm->bindParam(5, $this->hidden);
         }
         try {
-            $this->createStatement->execute();
+            $this->createStm->execute();
         } catch (PDOException $e) {
             return false;
         }
-        $rows = $this->createStatement->rowCount();
+        $rows = $this->createStm->rowCount();
         return $rows > 0;
     }
 
@@ -255,12 +255,12 @@ class PageImpl implements Page
      */
     public function delete()
     {
-        if ($this->deleteStatement === null) {
-            $this->deleteStatement = $this->connection->prepare("DELETE FROM Page WHERE page_id=?");
-            $this->deleteStatement->bindParam(1, $this->id);
+        if ($this->deleteStm === null) {
+            $this->deleteStm = $this->connection->prepare("DELETE FROM Page WHERE page_id=?");
+            $this->deleteStm->bindParam(1, $this->page_id);
         }
-        $this->deleteStatement->execute();
-        $success = $this->deleteStatement->rowCount() > 0;
+        $this->deleteStm->execute();
+        $success = $this->deleteStm->rowCount() > 0;
         if ($success) {
             $this->notifyObservers(Page::EVENT_DELETE);
         }
@@ -270,10 +270,10 @@ class PageImpl implements Page
 
     private function setInitialValues()
     {
-        if (!$this->initialValuesHasBeenSet && $this->exists()) {
-            $this->initialValuesHasBeenSet = true;
-            $result = $this->existsStatement->fetch(PDO::FETCH_ASSOC);
-            $this->id = $result['page_id'];
+        if (!$this->isInitialized && $this->exists()) {
+            $this->isInitialized = true;
+            $result = $this->existsStm->fetch(PDO::FETCH_ASSOC);
+            $this->page_id = $result['page_id'];
             $this->alias = $result['alias'];
             $this->title = $result['title'];
             $this->template = $result['template'];
@@ -290,7 +290,7 @@ class PageImpl implements Page
     public function match($id)
     {
 
-        return $id == $this->id || (strlen($this->getAlias()) && @preg_match($this->getAlias(), $id));
+        return $id == $this->page_id || (strlen($this->getAlias()) && @preg_match($this->getAlias(), $id));
 
     }
 
@@ -370,14 +370,14 @@ class PageImpl implements Page
         if($this->isHidden())
             return;
 
-        if($this->updateHiddenStatement === null){
-            $this->updateHiddenStatement = $this->connection->prepare("UPDATE Page SET hidden=? WHERE page_id = ?");
-            $this->updateHiddenStatement->bindParam(1, $this->hidden);
-            $this->updateHiddenStatement->bindParam(2, $this->id);
+        if($this->updateHiddenStm === null){
+            $this->updateHiddenStm = $this->connection->prepare("UPDATE Page SET hidden=? WHERE page_id = ?");
+            $this->updateHiddenStm->bindParam(1, $this->hidden);
+            $this->updateHiddenStm->bindParam(2, $this->page_id);
         }
 
         $this->hidden = 1;
-        $this->updateHiddenStatement->execute();
+        $this->updateHiddenStm->execute();
     }
 
     /**
@@ -390,14 +390,14 @@ class PageImpl implements Page
         if(!$this->isHidden())
             return;
 
-        if($this->updateHiddenStatement === null){
-            $this->updateHiddenStatement = $this->connection->prepare("UPDATE Page SET hidden=? WHERE page_id = ?");
-            $this->updateHiddenStatement->bindParam(1, $this->hidden);
-            $this->updateHiddenStatement->bindParam(2, $this->id);
+        if($this->updateHiddenStm === null){
+            $this->updateHiddenStm = $this->connection->prepare("UPDATE Page SET hidden=? WHERE page_id = ?");
+            $this->updateHiddenStm->bindParam(1, $this->hidden);
+            $this->updateHiddenStm->bindParam(2, $this->page_id);
         }
 
         $this->hidden = 0;
-        $this->updateHiddenStatement->execute();
+        $this->updateHiddenStm->execute();
     }
 
     /**
@@ -427,13 +427,13 @@ class PageImpl implements Page
      */
     public function modify()
     {
-        if($this->updateLastModifiedStatement == null){
-            $this->updateLastModifiedStatement = $this->connection->prepare("UPDATE Page SET last_modified=FROM_UNIXTIME(?) WHERE page_id=?");
-            $this->updateLastModifiedStatement->bindParam(1, $this->lastModified);
-            $this->updateLastModifiedStatement->bindParam(2, $this->id);
+        if($this->updLastModStm == null){
+            $this->updLastModStm = $this->connection->prepare("UPDATE Page SET last_modified=FROM_UNIXTIME(?) WHERE page_id=?");
+            $this->updLastModStm->bindParam(1, $this->lastModified);
+            $this->updLastModStm->bindParam(2, $this->page_id);
         }
         $this->lastModified = time();
-        $this->updateLastModifiedStatement->execute();
+        $this->updLastModStm->execute();
         return $this->lastModified;
 
     }
