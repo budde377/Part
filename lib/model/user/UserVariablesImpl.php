@@ -15,7 +15,6 @@ use ChristianBudde\Part\util\Observer;
 class UserVariablesImpl extends BindParamObserverVariablesImpl implements Observer
 {
 
-    private $user;
 
     function __construct(DB $database, User $user)
     {
@@ -29,19 +28,15 @@ class UserVariablesImpl extends BindParamObserverVariablesImpl implements Observ
             function (User $user) {
                 return $user->getUsername();
             },
+            function (User $user){
+                return $user->exists();
+            },
             "UPDATE UserVariables SET `value`= :value WHERE username = :username AND `key` = :key ",
             "INSERT INTO UserVariables (`key`, `value`, username) VALUES (:key, :value , :username )",
             "DELETE FROM UserVariables WHERE username = :username AND `key` = :key",
             "SELECT `key`,`value` FROM UserVariables WHERE username = :username");
     }
 
-    public function setValue($key, $value)
-    {
-        if (!$this->user->exists()) {
-            return;
-        }
-        parent::setValue($key, $value);
-    }
 
 
 }

@@ -19,12 +19,14 @@ abstract class BindParamObserverVariablesImpl extends VariablesImpl implements O
     private $observable;
     private $param;
     private $update_param;
+    private $set_check;
 
     /**
      * @param DB $database
      * @param Observable $observable
      * @param string $param_name
      * @param callable $update_param
+     * @param callable $set_check
      * @param $updateValStmStr
      * @param $setValStmStr
      * @param $removeKeyStmStr
@@ -34,12 +36,14 @@ abstract class BindParamObserverVariablesImpl extends VariablesImpl implements O
                          Observable $observable,
                          $param_name,
                          callable $update_param,
+                         callable $set_check,
                          $updateValStmStr,
                          $setValStmStr,
                          $removeKeyStmStr,
                          $initStmStr)
     {
         $this->update_param = $update_param;
+        $this->set_check = $set_check;
         $this->observable = $observable;
 
         $connection = $database->getConnection();
@@ -69,4 +73,16 @@ abstract class BindParamObserverVariablesImpl extends VariablesImpl implements O
         $updater = $this->update_param;
         $this->param = $updater($this->observable);
     }
+
+    public function setValue($key, $value)
+    {
+        $checker = $this->set_check;
+        if(!$checker($this->observable)){
+            return;
+        }
+
+        parent::setValue($key, $value);
+    }
+
+
 }

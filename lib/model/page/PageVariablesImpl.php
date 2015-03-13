@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\page;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: budde
@@ -13,7 +14,6 @@ use ChristianBudde\Part\util\Observer;
 
 class PageVariablesImpl extends BindParamObserverVariablesImpl implements Observer
 {
-    private $page;
 
     function __construct(DB $database, Page $page)
     {
@@ -23,8 +23,11 @@ class PageVariablesImpl extends BindParamObserverVariablesImpl implements Observ
             $database,
             $page,
             ":page_id",
-            function(Page $page){
+            function (Page $page) {
                 return $page->getID();
+            },
+            function (Page $page) {
+                return $page->exists();
             },
             "UPDATE PageVariables SET `value`= :value WHERE page_id = :page_id AND `key` = :key ",
             "INSERT INTO PageVariables (`key`, `value`, page_id) VALUES (:key, :value, :page_id )",
@@ -32,13 +35,6 @@ class PageVariablesImpl extends BindParamObserverVariablesImpl implements Observ
             "SELECT `key`,`value` FROM PageVariables WHERE page_id = :page_id");
     }
 
-    public function setValue($key, $value)
-    {
-        if(!$this->page->exists()){
-            return;
-        }
-        parent::setValue($key, $value);
-    }
 
 
 }
