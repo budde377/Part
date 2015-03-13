@@ -171,9 +171,9 @@ class PageImpl implements Page
     public function setTemplate($template)
     {
         if ($this->updateTemplateStm === null) {
-            $this->updateTemplateStm = $this->connection->prepare("UPDATE Page SET template = ? WHERE page_id = ?");
-            $this->updateTemplateStm->bindParam(1, $this->template);
-            $this->updateTemplateStm->bindParam(2, $this->page_id);
+            $this->updateTemplateStm = $this->connection->prepare("UPDATE Page SET template = :template WHERE page_id = :page_id");
+            $this->updateTemplateStm->bindParam(":template", $this->template);
+            $this->updateTemplateStm->bindParam(":page_id", $this->page_id);
         }
         $this->template = $template;
         $this->updateTemplateStm->execute();
@@ -191,9 +191,9 @@ class PageImpl implements Page
         }
 
         if ($this->updateAliasStm === null) {
-            $this->updateAliasStm = $this->connection->prepare("UPDATE Page SET alias = ? WHERE page_id = ?");
-            $this->updateAliasStm->bindParam(1, $this->alias);
-            $this->updateAliasStm->bindParam(2, $this->page_id);
+            $this->updateAliasStm = $this->connection->prepare("UPDATE Page SET alias = :alias WHERE page_id = :page_id");
+            $this->updateAliasStm->bindParam(":alias", $this->alias);
+            $this->updateAliasStm->bindParam(":page_id", $this->page_id);
         }
         $this->alias = $alias;
         $this->updateAliasStm->execute();
@@ -233,12 +233,12 @@ class PageImpl implements Page
         if ($this->createStm === null) {
             $this->createStm = $this->connection->prepare("
             INSERT INTO Page (page_id,template,title,alias,hidden)
-            VALUES (?,?,?,?,?)");
-            $this->createStm->bindParam(1, $this->page_id);
-            $this->createStm->bindParam(2, $this->template);
-            $this->createStm->bindParam(3, $this->title);
-            $this->createStm->bindParam(4, $this->alias);
-            $this->createStm->bindParam(5, $this->hidden);
+            VALUES (:page_id,:template,:title,:alias,:hidden)");
+            $this->createStm->bindParam(":page_id", $this->page_id);
+            $this->createStm->bindParam(":template", $this->template);
+            $this->createStm->bindParam(":title", $this->title);
+            $this->createStm->bindParam(":alias", $this->alias);
+            $this->createStm->bindParam(":hidden", $this->hidden);
         }
         try {
             $this->createStm->execute();
