@@ -329,6 +329,21 @@ class UserSettingsMailInitializer extends core.Initializer {
           results.add(_currently_editing.addOwner(u));
         });
 
+        var current_targets = _currently_editing.targets.toList();
+        targets.forEach((String target){
+          if(current_targets.contains(target)){
+            current_targets.remove(target);
+            return;
+          }
+
+          results.add(_currently_editing.addTarget(target));
+        });
+
+        current_targets.forEach((String target){
+          results.add(_currently_editing.removeTarget(target));
+        });
+
+
         if (has_mailbox) {
           if (!_currently_editing.hasMailbox) {
             results.add(_currently_editing.createMailbox(mailbox_name, mailbox_password));
@@ -342,6 +357,9 @@ class UserSettingsMailInitializer extends core.Initializer {
           }
         } else if (_currently_editing.hasMailbox) {
           results.add(_currently_editing.deleteMailbox());
+        }
+        if(results.length == 0){
+          return true;
         }
 
         formH.blur();
@@ -740,8 +758,12 @@ class UserSettingsMailInitializer extends core.Initializer {
     }, mailDomainList, (LIElement v, _) => mailDomainLibrary[v.dataset['domain-name']]);
 
     domainListGenerator.addHandler((MailDomain domain, LIElement li) {
+    var delete = li.querySelector('.delete');
+    if(delete == null){
+      return;
+    }
 
-      li.querySelector('.delete').onClick.listen((_) {
+    delete.onClick.listen((_) {
         var c = dialogContainer.password("Er du sikker på at du vil slette?");
         c.result.then((String s) {
           blurElement(mailDomainList);
