@@ -287,11 +287,11 @@ class TypeHandlerLibraryImpl implements TypeHandlerLibrary
         if (!isset($this->keyArray[$string])) {
             $this->keyArray[$string] = [];
             $this->valueArray[$string] = [];
-        } else if(($k = array_search($instance, $this->keyArray, true)) !== false){
-            return $this->valueArray[$k];
+        } else if(($k = array_search($instance, $this->keyArray[$string], true)) !== false){
+            return $this->valueArray[$string][$k];
         }
-        $this->keyArray[] = $instance;
-        return $this->valueArray[] = $callback();
+        $this->keyArray[$string][] = $instance;
+        return $this->valueArray[$string][] = $callback();
     }
 
     /**
