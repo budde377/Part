@@ -167,4 +167,24 @@ class UserVariablesImplTest extends CustomDatabaseTestCase
         $this->assertTrue($seen2);
     }
 
+
+    public function testSetValueWilLBePersistentOverPageIdChange()
+    {
+        $this->existingVariables->setValue("test3", "val3");
+        $this->existingUser->setUsername("some_other_id");
+        $this->assertEquals('some_other_id', $this->existingUser->getUsername());
+        $this->assertEquals(['test1', 'test2', 'test3'], $this->existingVariables->listKeys());
+        $this->assertEquals("val3", $this->existingVariables->getValue("test3"));
+    }
+
+
+    public function testCanSetValueAfterPageIdChange()
+    {
+        $this->existingUser->setUsername("some_other_id");
+        $this->existingVariables->setValue("test3", "val3");
+        $this->assertEquals('some_other_id', $this->existingUser->getUsername());
+        $this->assertEquals(['test1', 'test2', 'test3'], $this->existingVariables->listKeys());
+        $this->assertEquals("val3", $this->existingVariables->getValue("test3"));
+    }
+
 }

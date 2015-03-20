@@ -6,6 +6,7 @@ use ChristianBudde\Part\controller\json\PageObjectImpl;
 use ChristianBudde\Part\model\Content;
 use ChristianBudde\Part\model\NullContentImpl;
 use ChristianBudde\Part\model\Variables;
+use ChristianBudde\Part\util\Observer;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -268,5 +269,13 @@ class DefaultPageImpl implements Page
     public function generateTypeHandler()
     {
         return $this->container->getTypeHandlerLibraryInstance()->getPageTypeHandlerInstance($this);
+    }
+
+    public function attachObserver(Observer $observer)
+    {
+    }
+
+    public function detachObserver(Observer $observer)
+    {
     }
 }

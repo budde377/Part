@@ -38,7 +38,8 @@ class SiteContentLibraryImplTest extends CustomDatabaseTestCase
         $this->db->setConnection(self::$pdo);
         $container = new StubBackendSingletonContainerImpl();
         $container->setDBInstance($this->db);
-        $this->existingContentLibrary = new SiteContentLibraryImpl($container, $site);
+        $container->setSiteInstance($site);
+        $this->existingContentLibrary = new SiteContentLibraryImpl($container);
     }
 
     public function testListPageContentLibraryWillList()

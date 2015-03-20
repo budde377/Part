@@ -22,7 +22,6 @@ use ChristianBudde\Part\util\db\DB;
 class PageContentImplTest extends CustomDatabaseTestCase
 {
 
-
     /** @var  DB */
     private $db;
     /** @var  PageContentImpl */
@@ -242,6 +241,11 @@ class PageContentImplTest extends CustomDatabaseTestCase
         $this->assertTrue($this->existingContent === $this->existingContent->generateTypeHandler());
     }
 
+    public function testChangePageIdOk(){
+        $this->existingPage->setID("some_id");
+        $this->existingContent->addContent("Test");
+        $this->assertEquals("Test", $this->existingContent->latestContent());
+    }
 
 
 }

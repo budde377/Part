@@ -110,6 +110,7 @@ class TypeHandlerLibraryImplTest extends CustomDatabaseTestCase
     <log path='$logFile' />
 </config>"), $tmpFolder);
         $this->container = new BackendSingletonContainerImpl($this->config);
+
         $this->typeHandler = new BackendTypeHandlerImpl($this->container);
         $this->rootUser = $this->container->getUserLibraryInstance()->getUser('root');
         $this->rootUser->getUserPrivileges()->addRootPrivileges();
@@ -217,7 +218,7 @@ class TypeHandlerLibraryImplTest extends CustomDatabaseTestCase
         $result = $this->typeHandlerLibrary->getPageContentTypeHandlerInstance(new StubPageContentImpl());
         $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\type_handler\PageContentTypeHandlerImpl',$result);
 
-        $result = $this->typeHandlerLibrary->getSiteContentLibraryTypeHandlerInstance(new SiteContentLibraryImpl($this->container, $site));
+        $result = $this->typeHandlerLibrary->getSiteContentLibraryTypeHandlerInstance(new SiteContentLibraryImpl($this->container));
         $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\type_handler\SiteContentLibraryTypeHandlerImpl',$result);
         $result = $this->typeHandlerLibrary->getSiteContentTypeHandlerInstance(new StubSiteContentImpl());
         $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\type_handler\SiteContentTypeHandlerImpl',$result);
@@ -288,8 +289,8 @@ class TypeHandlerLibraryImplTest extends CustomDatabaseTestCase
         $result2 = $this->typeHandlerLibrary->getPageContentTypeHandlerInstance(new StubPageContentImpl());
         $this->assertTrue($result !== $result2);
 
-        $result = $this->typeHandlerLibrary->getSiteContentLibraryTypeHandlerInstance(new SiteContentLibraryImpl($this->container, $site));
-        $result2 = $this->typeHandlerLibrary->getSiteContentLibraryTypeHandlerInstance(new SiteContentLibraryImpl($this->container, $site));
+        $result = $this->typeHandlerLibrary->getSiteContentLibraryTypeHandlerInstance(new SiteContentLibraryImpl($this->container));
+        $result2 = $this->typeHandlerLibrary->getSiteContentLibraryTypeHandlerInstance(new SiteContentLibraryImpl($this->container));
         $this->assertTrue($result !== $result2);
         $result = $this->typeHandlerLibrary->getSiteContentTypeHandlerInstance(new StubSiteContentImpl());
         $result2 = $this->typeHandlerLibrary->getSiteContentTypeHandlerInstance(new StubSiteContentImpl());
@@ -361,7 +362,7 @@ class TypeHandlerLibraryImplTest extends CustomDatabaseTestCase
         $result2 = $this->typeHandlerLibrary->getPageContentTypeHandlerInstance($instance);
         $this->assertTrue($result === $result2);
 
-        $result = $this->typeHandlerLibrary->getSiteContentLibraryTypeHandlerInstance($instance = new SiteContentLibraryImpl($this->container, $site));
+        $result = $this->typeHandlerLibrary->getSiteContentLibraryTypeHandlerInstance($instance = new SiteContentLibraryImpl($this->container));
         $result2 = $this->typeHandlerLibrary->getSiteContentLibraryTypeHandlerInstance($instance);
         $this->assertTrue($result === $result2);
         $result = $this->typeHandlerLibrary->getSiteContentTypeHandlerInstance($instance = new StubSiteContentImpl());

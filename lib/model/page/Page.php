@@ -2,6 +2,7 @@
 namespace ChristianBudde\Part\model\page;
 use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 use ChristianBudde\Part\controller\json\JSONObjectSerializable;
+use ChristianBudde\Part\util\Observable;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -10,7 +11,7 @@ use ChristianBudde\Part\controller\json\JSONObjectSerializable;
  * Time: 10:59 AM
  * To change this template use File | Settings | File Templates.
  */
-interface Page extends JSONObjectSerializable, TypeHandlerGenerator
+interface Page extends JSONObjectSerializable, TypeHandlerGenerator, Observable
 {
 
     const EVENT_ID_UPDATE = 1;

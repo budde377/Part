@@ -30,8 +30,8 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
     public function generateContent()
     {
 
-        $ownerCheckList = $this->getPageUserList();
-        $ownerCheckListHidden = $ownerCheckList == "" ? "hidden" : "";
+        $ownerCheckList = $this->getPageUserList($hidden);
+        $ownerCheckListHidden = $hidden? "hidden" : "";
 
         $out = "
         <h3>Domæner</h3>
@@ -305,21 +305,25 @@ class UserSettingsEditMailPageElementImpl extends PageElementImpl
         return $result;
     }
 
-    private function getPageUserList()
+    private function getPageUserList(&$shouldBeHidden)
     {
 
 
         $result = "";
         $i = 0;
-
         $userLibrary = $this->backendContainer->getUserLibraryInstance();
-        foreach ($userLibrary->getChildren($userLibrary->getUserLoggedIn()) as $user) {
+
+        $children = $userLibrary->getChildren($userLibrary->getUserLoggedIn());
+        $shouldBeHidden = true;
+        foreach ($userLibrary->listUsers() as $user) {
             $privileges = $user->getUserPrivileges();
             if ($privileges->hasSitePrivileges()) {
                 continue;
             }
+            $hidden = in_array($user, $children)?"":"hidden";
+            $shouldBeHidden = $shouldBeHidden && $hidden == "hidden";
             $result .= "
-                       <li  data-user-name='{$user->getUsername()}' >
+                       <li  data-user-name='{$user->getUsername()}' $hidden>
                     <input type='checkbox' id='UserSettingsEditMailAddAddressFormAddUserCheck{$user->getUsername()}' data-function-string='.addOwner(_this)' name='user_{$user->getUsername()}' value='{$user->getUsername()}'/>
                     <label for='UserSettingsEditMailAddAddressFormAddUserCheck{$user->getUsername()}'>
                         {$user->getUsername()}

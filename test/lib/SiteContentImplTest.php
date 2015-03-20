@@ -48,9 +48,10 @@ class SiteContentImplTest extends CustomDatabaseTestCase
         $this->db->setConnection(self::$pdo);
         $this->container = new StubBackendSingletonContainerImpl();
         $this->container->setDBInstance($this->db);
-        $this->existingContent = new SiteContentImpl($this->container, $this->site);
-        $this->existingContent2 = new SiteContentImpl($this->container, $this->site, $this->existingId2 = "Test");
-        $this->nonExistingContent = new SiteContentImpl($this->container, $this->site, "NoContent");
+        $this->container->setSiteInstance($this->site);
+        $this->existingContent = new SiteContentImpl($this->container);
+        $this->existingContent2 = new SiteContentImpl($this->container, $this->existingId2 = "Test");
+        $this->nonExistingContent = new SiteContentImpl($this->container, "NoContent");
     }
 
     public function testListContentWillReturnArray()
@@ -117,7 +118,7 @@ class SiteContentImplTest extends CustomDatabaseTestCase
         $this->assertEquals(1, count($this->existingContent->listContentHistory()));
         $this->existingContent->addContent("ASD");
         $this->assertEquals(2, count($this->existingContent->listContentHistory()));
-        $this->existingContent = new SiteContentImpl($this->container, $this->site);
+        $this->existingContent = new SiteContentImpl($this->container);
         $this->assertEquals(2, count($this->existingContent->listContentHistory()));
     }
 

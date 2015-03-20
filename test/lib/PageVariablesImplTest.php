@@ -26,9 +26,9 @@ class PageVariablesImplTest extends CustomDatabaseTestCase
     /** @var  PageVariablesImpl */
     private $nonExistingVariablesNonExistingPage;
     /** @var  Page */
-    private $existingUser;
+    private $existingPage;
     /** @var  \ChristianBudde\Part\model\page\Page */
-    private $existingUser2;
+    private $existingPage2;
     /** @var  Page */
     private $nonExistingUser;
 
@@ -46,11 +46,11 @@ class PageVariablesImplTest extends CustomDatabaseTestCase
         $this->db->setConnection(self::$pdo);
         $container = new StubBackendSingletonContainerImpl();
         $container->setDBInstance($this->db);
-        $this->existingUser = new PageImpl($container, 'testpage');
-        $this->existingVariables = new PageVariablesImpl($this->db, $this->existingUser);
-        $this->existingUser2 = new PageImpl($container, 'testpage2');
+        $this->existingPage = new PageImpl($container, 'testpage');
+        $this->existingVariables = new PageVariablesImpl($this->db, $this->existingPage);
+        $this->existingPage2 = new PageImpl($container, 'testpage2');
         $this->nonExistingUser = new PageImpl($container, 'nosuchpage');
-        $this->nonExistingVariables = new PageVariablesImpl($this->db, $this->existingUser2);
+        $this->nonExistingVariables = new PageVariablesImpl($this->db, $this->existingPage2);
         $this->nonExistingVariablesNonExistingPage = new PageVariablesImpl($this->db, $this->nonExistingUser);
 
     }
@@ -119,7 +119,7 @@ class PageVariablesImplTest extends CustomDatabaseTestCase
     public function testRemoveIsPersistent()
     {
         $this->existingVariables->removeKey("test1");
-        $var = new PageVariablesImpl($this->db, $this->existingUser);
+        $var = new PageVariablesImpl($this->db, $this->existingPage);
         $this->assertEquals(1, count($var->listKeys()));
         $this->assertFalse($var->hasKey("test1"));
     }
@@ -135,10 +135,29 @@ class PageVariablesImplTest extends CustomDatabaseTestCase
     public function testSetValueWilLBePersistent()
     {
         $this->existingVariables->setValue("test3", "val3");
-        $var = new PageVariablesImpl($this->db, $this->existingUser);
+        $var = new PageVariablesImpl($this->db, $this->existingPage);
         $this->assertEquals(3, count($var->listKeys()));
         $this->assertTrue($var->hasKey("test3"));
         $this->assertEquals("val3", $var->getValue("test3"));
+    }
+
+    public function testSetValueWilLBePersistentOverPageIdChange()
+    {
+        $this->existingVariables->setValue("test3", "val3");
+        $this->existingPage->setID("some_other_id");
+        $this->assertEquals('some_other_id', $this->existingPage->getID());
+        $this->assertEquals(['test1', 'test2', 'test3'], $this->existingVariables->listKeys());
+        $this->assertEquals("val3", $this->existingVariables->getValue("test3"));
+    }
+
+
+    public function testCanSetValueAfterPageIdChange()
+    {
+        $this->existingPage->setID("some_other_id");
+        $this->existingVariables->setValue("test3", "val3");
+        $this->assertEquals('some_other_id', $this->existingPage->getID());
+        $this->assertEquals(['test1', 'test2', 'test3'], $this->existingVariables->listKeys());
+        $this->assertEquals("val3", $this->existingVariables->getValue("test3"));
     }
 
     public function testSetValueWillOverwrite()
