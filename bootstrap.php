@@ -15,7 +15,7 @@ if(file_exists('site-config.xml')){
     $siteConfig = simplexml_load_file('site-config.xml.dist');
 }
 
-if(isset($siteConfig)){
+if(isset($siteConfig, $GLOBALS['DB_NAME'], $GLOBALS['DB_HOST'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWORD'])){
 
     $config = new ChristianBudde\Part\ConfigImpl($siteConfig, ".");
 
@@ -28,8 +28,12 @@ if(isset($siteConfig)){
     $newConfig->setMysqlConnection($connection);
 
     $factory = isset($factory) ? $factory : new ChristianBudde\Part\SiteFactoryImpl($newConfig);
+    try{
+        $factory->buildBackendSingletonContainer($newConfig)->getDBInstance()->update();
 
-    $factory->buildBackendSingletonContainer($newConfig)->getDBInstance()->update();
+    } catch(PDOException $e){
+
+    }
 
     unset($siteConfig, $config, $factory, $newConfig, $connection);
 

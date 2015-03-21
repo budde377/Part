@@ -56,7 +56,11 @@ class CustomDatabaseTestCase extends PHPUnit_Extensions_Database_TestCase
     public function getSetUpOperation()
     {
         $cascadeTruncates = true;
-        return new PHPUnit_Extensions_Database_Operation_Composite(array(new TruncateOperation($cascadeTruncates), new InsertOperation($cascadeTruncates)));
+        return new PHPUnit_Extensions_Database_Operation_Composite(
+            [
+                new TruncateOperation($cascadeTruncates),
+                new InsertOperation($cascadeTruncates)
+            ]);
     }
 
 
@@ -76,6 +80,8 @@ class CustomDatabaseTestCase extends PHPUnit_Extensions_Database_TestCase
     {
         self::$pdo = null;
     }
+
+
 
 
 }
