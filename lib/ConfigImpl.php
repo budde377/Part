@@ -175,9 +175,7 @@ class ConfigImpl implements Config
         return isset($this->optimizers[$name]) ? $this->optimizers[$name] : null;
     }
 
-    /**
-     * @return array | null Array with entries host, user, password, prefix, database and File setupFile, or null if not specified
-     */
+
     public function getMySQLConnection()
     {
 

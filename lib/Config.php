@@ -87,13 +87,13 @@ interface Config extends \ArrayAccess
 
     /**
      * @abstract
-     * @return array | null Array with entries host, user, password, prefix, database and File setupFile, or null if not specified
+     * @return array A map with entries: host, user, database, password and a list of folders.
      */
     public function getMySQLConnection();
 
     /**
      * @abstract
-     * @return array | null Array with entries host, user, prefix, database and File setupFile, or null if not specified
+     * @return array A map with entries: host, user and database.
      */
 
     public function getMailMySQLConnection();
