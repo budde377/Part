@@ -1300,7 +1300,6 @@ class ContentEditor {
       ..button.classes.add('active')
       ..menu.classes.add('menu')
       ..showMenu();
-
   }
 
   Revision get currentRevision => _currentRevision;
@@ -1549,7 +1548,7 @@ class ContentEditor {
       return;
     }
     _addEscToQueue();
-
+    _updateToolbarPlaceholderPadding();
     element.contentEditable = "true";
     _closed = false;
     _onOpenChangeStreamController.add(isOpen);
@@ -1560,6 +1559,7 @@ class ContentEditor {
 
     if (_contentWrapper.parent != null) {
       _toolBarWrapper.hidden = false;
+      _updateBarPosition();
       return;
     }
 
@@ -1615,6 +1615,7 @@ class ContentEditor {
     element.contentEditable = "false";
     _closed = true;
     _onOpenChangeStreamController.add(isOpen);
+    _updateToolbarPlaceholderPadding();
 
   }
 
@@ -1696,7 +1697,9 @@ class ContentEditor {
   }
 
   void _updateToolbarPlaceholderPadding() {
-    if (_toolBarWrapper.classes.contains('floating')) {
+
+
+    if (_toolBarWrapper.classes.contains('floating') && !_toolBarWrapper.hidden) {
       _contentWrapper.style.paddingTop = _toolBarWrapper.getComputedStyle().height;
     } else {
       _contentWrapper.style.paddingTop = "";
