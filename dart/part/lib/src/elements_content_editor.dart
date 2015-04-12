@@ -70,6 +70,10 @@ class EditorCommandExecutor {
 
   void outdent() => _execCommand("outdent");
 
+  void insertHtml(String html) => _execCommand('insertHTML', value:html);
+
+  void insertFragment(DocumentFragment fragmet) => insertHtml(fragmet.innerHtml);
+
   void setFontSize(int size) => _execCommand('fontsize', value:"${Math.max(1, Math.min(7, size))}");
 
   void setForeColor(Color color) => _execCommand('foreColor', value:"#" + color.hex);
@@ -161,29 +165,29 @@ class EditorCommandExecutor {
 }
 
 
-abstract class EditorHandler {
+abstract class _EditorHandler {
   final DivElement element;
 
   final Element dataElement;
 
-  EditorHandler(this.element, this.dataElement);
+  _EditorHandler(this.element, this.dataElement);
 
 }
 
-class EditorGalleryHandler implements EditorHandler {
+class _EditorGalleryHandler implements _EditorHandler {
   final DivElement element;
 
   final Element dataElement = new ImageElement();
 
-  List<EditorImageHandler> _children = new List<EditorImageHandler>();
+  List<_EditorImageHandler> _children = new List<_EditorImageHandler>();
 
-  EditorImageHandler original;
+  _EditorImageHandler original;
 
   DivElement _imageCount = new DivElement(), _previewContent = new DivElement();
 
   InfoBox _infoBox;
 
-  EditorGalleryHandler(EditorImageHandler h) : element = h.element, original = h {
+  _EditorGalleryHandler(_EditorImageHandler h) : element = h.element, original = h {
     _infoBox = new InfoBox.elementContent(_previewContent);
     _children.add(h);
     element.classes.add('gallery');
@@ -194,22 +198,22 @@ class EditorGalleryHandler implements EditorHandler {
 
   }
 
-  void addHandlerToGallery(EditorHandler h) {
-    if (h is EditorGalleryHandler) {
-      EditorGalleryHandler hh = h;
+  void addHandlerToGallery(_EditorHandler h) {
+    if (h is _EditorGalleryHandler) {
+      _EditorGalleryHandler hh = h;
       _children.addAll(hh.children);
-    } else if (h is EditorImageHandler) {
+    } else if (h is _EditorImageHandler) {
       _children.add(h);
     }
     _imageCount.text = "${_children.length.toString()}";
     original._imageStandIn.style.backgroundImage = "url(${_children.last.dataElement.src})";
   }
 
-  List<EditorImageHandler> get children => new List<EditorImageHandler>.from(_children);
+  List<_EditorImageHandler> get children => new List<_EditorImageHandler>.from(_children);
 }
 
 
-class EditorFileHandler implements EditorHandler {
+class _EditorFileHandler implements _EditorHandler {
   final DivElement element = new DivElement();
 
   DivElement _fileStandIn = new DivElement();
@@ -221,11 +225,11 @@ class EditorFileHandler implements EditorHandler {
   core.FileProgress _fileProgress;
 
 
-  EditorFileHandler(AnchorElement dataElement) : this.dataElement = dataElement {
+  _EditorFileHandler(AnchorElement dataElement) : this.dataElement = dataElement {
     _setUp();
   }
 
-  EditorFileHandler.fileProgress(this.dataElement, core.FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
+  _EditorFileHandler.fileProgress(this.dataElement, core.FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
     var size = new SpanElement();
     size.text = core.sizeToString(fileProgress.file.size);
 
@@ -254,7 +258,7 @@ class EditorFileHandler implements EditorHandler {
   }
 }
 
-class EditorImageHandler implements EditorHandler {
+class _EditorImageHandler implements _EditorHandler {
   final DivElement element = new DivElement();
 
   DivElement _imageStandIn = new DivElement();
@@ -266,11 +270,11 @@ class EditorImageHandler implements EditorHandler {
   core.FileProgress _fileProgress;
 
 
-  EditorImageHandler(ImageElement dataElement) : this.dataElement = dataElement {
+  _EditorImageHandler(ImageElement dataElement) : this.dataElement = dataElement {
     _setUp();
   }
 
-  EditorImageHandler.fileProgress(this.dataElement, core.FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
+  _EditorImageHandler.fileProgress(this.dataElement, core.FileProgress fileProgress, void ready()): _fileProgress = fileProgress{
     _fileProgress.onProgress.listen((_) => progressBar.percentage = _fileProgress.progress);
     _fileProgress.onPathAvailable.listen((_) {
       dataElement.src = "/_files/" + _fileProgress.path;
@@ -295,23 +299,23 @@ class EditorImageHandler implements EditorHandler {
 }
 
 
-class EditorFileContainer {
-  static Map<Element, EditorFileContainer> _cache = new Map<Element, EditorFileContainer>();
+class _EditorFileContainer {
+  static Map<Element, _EditorFileContainer> _cache = new Map<Element, _EditorFileContainer>();
 
   final Element element, trashcan;
 
   Element _dragging;
 
-  StreamController<EditorFileContainer> _change_controller = new StreamController<EditorFileContainer>();
-  Stream<EditorFileContainer> _change_stream;
+  StreamController<_EditorFileContainer> _change_controller = new StreamController<_EditorFileContainer>();
+  Stream<_EditorFileContainer> _change_stream;
 
 
-  factory EditorFileContainer(Element element, Element trashCan) => _cache.putIfAbsent(element, () => new EditorFileContainer._internal(element, trashCan));
+  factory _EditorFileContainer(Element element, Element trashCan) => _cache.putIfAbsent(element, () => new _EditorFileContainer._internal(element, trashCan));
 
-  Map<Element, EditorHandler> _handlerMap = new Map<Element, EditorHandler>();
+  Map<Element, _EditorHandler> _handlerMap = new Map<Element, _EditorHandler>();
 
 
-  EditorFileContainer._internal(this.element, this.trashcan){
+  _EditorFileContainer._internal(this.element, this.trashcan){
     element.hidden = true;
     _change_stream = _change_controller.stream.asBroadcastStream();
 
@@ -330,14 +334,14 @@ class EditorFileContainer {
 
   }
 
-  EditorImageHandler addImage(ImageElement image, [core.FileProgress progress = null]) {
+  _EditorImageHandler addImage(ImageElement image, [core.FileProgress progress = null]) {
     element.hidden = false;
     var handler;
     if (progress == null) {
-      handler = new EditorImageHandler(image);
+      handler = new _EditorImageHandler(image);
       _setUpImageDrag(handler);
     } else {
-      handler = new EditorImageHandler.fileProgress(image, progress, () => _setUpImageDrag(handler));
+      handler = new _EditorImageHandler.fileProgress(image, progress, () => _setUpImageDrag(handler));
     }
     _handlerMap[handler.element] = handler;
     element.append(handler.element);
@@ -345,14 +349,14 @@ class EditorFileContainer {
     return handler;
   }
 
-  EditorFileHandler addFile(AnchorElement fileLink, [core.FileProgress progress = null]) {
+  _EditorFileHandler addFile(AnchorElement fileLink, [core.FileProgress progress = null]) {
     element.hidden = false;
     var handler;
     if (progress == null) {
-      handler = new EditorFileHandler(fileLink);
+      handler = new _EditorFileHandler(fileLink);
       _setUpDrag(handler);
     } else {
-      handler = new EditorFileHandler.fileProgress(fileLink, progress, () => _setUpDrag(handler));
+      handler = new _EditorFileHandler.fileProgress(fileLink, progress, () => _setUpDrag(handler));
     }
     _handlerMap[handler.element] = handler;
     element.append(handler.element);
@@ -361,7 +365,7 @@ class EditorFileContainer {
   }
 
 
-  void _setUpImageDrag(EditorImageHandler handler) {
+  void _setUpImageDrag(_EditorImageHandler handler) {
     _setUpDrag(handler);
     handler.element.onDragOver.listen((MouseEvent ev) {
       if (handler.element == _dragging) {
@@ -374,8 +378,8 @@ class EditorFileContainer {
         return;
       }
       var gallery;
-      if (!((gallery = _handlerMap[handler.element]) is EditorGalleryHandler)) {
-        gallery = new EditorGalleryHandler(handler);
+      if (!((gallery = _handlerMap[handler.element]) is _EditorGalleryHandler)) {
+        gallery = new _EditorGalleryHandler(handler);
         _handlerMap[handler.element] = gallery;
       }
 
@@ -385,7 +389,7 @@ class EditorFileContainer {
     });
   }
 
-  void _setUpDrag(EditorHandler handler) {
+  void _setUpDrag(_EditorHandler handler) {
     handler.element.draggable = true;
     handler.element.onDragStart.listen((MouseEvent ev) {
       ev.dataTransfer.setData("text/html", handler.dataElement.outerHtml);
@@ -402,14 +406,173 @@ class EditorFileContainer {
 
   }
 
-  Stream<EditorFileContainer> get onChange => _change_stream;
+  Stream<_EditorFileContainer> get onChange => _change_stream;
 
   void _notifyContentChange() => _change_controller.add(this);
 
 }
 
+_recursiveElementFind(Element element, bool check(Element)) {
+  if (element == null || check(element)) {
+    return element;
+  }
+  return _recursiveElementFind(element.parent, check);
+}
 
-class LinkImageHandler {
+
+abstract class EditorClickActionItem<T extends Element> {
+  final ContentEditor editor;
+  final ButtonElement button = new ButtonElement();
+  T target;
+  InfoBox infoBox;
+
+
+  EditorClickActionItem(this.editor);
+
+  void setUpButton(InfoBox infobox, T target) {
+    this.target = target;
+    this.infoBox = infobox;
+  }
+
+  T actionTarget(MouseEvent event);
+
+}
+
+class UnlinkEditorClickActionItem extends EditorClickActionItem<AnchorElement> {
+
+
+  UnlinkEditorClickActionItem(ContentEditor editor) : super(editor) {
+    button
+      ..classes.add('unlink')
+      ..onClick.listen((MouseEvent event) {
+      event.preventDefault();
+      _selectNode(target);
+      editor.executor.unlink();
+      infoBox.remove();
+      editor.executor.triggerCommandStateChangeListener();
+    });
+  }
+
+
+  AnchorElement actionTarget(MouseEvent event) => _recursiveElementFind(event.target, (Element element) => element is AnchorElement);
+
+
+}
+
+_selectNodeContents(Node node) {
+  var range = document.createRange();
+  range.selectNodeContents(node);
+  _selectRange(range);
+}
+
+_selectNode(Node node) {
+  var range = document.createRange();
+  range.selectNode(node);
+  _selectRange(range);
+}
+
+_selectRange(Range range) {
+  window.getSelection()
+    ..removeAllRanges()
+    ..addRange(range);
+}
+
+class OpenEditorClickActionItem extends EditorClickActionItem<AnchorElement> {
+
+
+  OpenEditorClickActionItem(ContentEditor editor) : super(editor) {
+    button
+      ..classes.add('open')
+      ..onClick.listen((MouseEvent event) {
+      event.preventDefault();
+      window.open(target.href, "_blank");
+      infoBox.remove();
+    });
+  }
+
+
+  AnchorElement actionTarget(MouseEvent event) => _recursiveElementFind(event.target, (Element element) => element is AnchorElement);
+
+
+}
+
+class ImageEditorClickActionItem extends EditorClickActionItem<ImageElement> {
+
+  ImageEditorClickActionItem(ContentEditor editor) : super(editor) {
+    button
+      ..classes.add('edit_image')
+      ..onClick.listen((MouseEvent event) {
+      event.preventDefault();
+      infoBox.remove();
+
+      var handler = new ImageEditorHandler.fromImage(target);
+      handler.editor.maxWidth = editor.element.clientWidth;
+      handler.editor.minWidth = 50;
+      handler.open();
+      handler.onEdit.listen((String path) {
+        target.src = path;
+        editor.element.dispatchEvent(new Event("input"));
+      });
+
+    });
+  }
+
+  ImageElement actionTarget(MouseEvent event) => _recursiveElementFind(event.target, (Element element) => element is ImageElement);
+
+}
+
+class EmbedVideoEditorClickActionItem extends EditorClickActionItem<AnchorElement> {
+
+  String _video_id;
+  Element _found_link;
+  InfoBox _info_box;
+  Function _videoFunction;
+
+  EmbedVideoEditorClickActionItem.youtube(ContentEditor editor) : super(editor) {
+    button.classes.add('youtube');
+    _videoFunction = core.youtubeVideoIdFromUrl;
+    setupListener((int width, int height) => '<iframe width="$width" height="$height" src="//www.youtube.com/embed/$_video_id?badge=0&amp;modestbranding=1&amp;controls=1&amp;autohide=1&amp;showinfo=0&amp;rel=0&amp;fs=0" frameborder="0" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe>');
+
+  }
+
+  EmbedVideoEditorClickActionItem.vimeo(ContentEditor editor) : super(editor){
+    button.classes.add('vimeo');
+    _videoFunction = core.vimeoVideoIdFromUrl;
+    setupListener((int width, int height) => '<iframe width="$width" height="$height" src="//player.vimeo.com/video/$_video_id?badge=0&amp;modestbranding=1&amp;controls=1&amp;autohide=1&amp;showinfo=0&amp;rel=0&amp;fs=0" frameborder="0" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe>');
+  }
+
+  void setupListener(String html(int width, int height)) {
+    button.onClick.listen((MouseEvent event) {
+      event.preventDefault();
+      var width = editor.element.clientWidth;
+      var height = (width * 9 / 16).ceil();
+      _selectNode(_found_link);
+      editor.executor.insertHtml(html(width, height));
+      _info_box.remove();
+      editor.executor.triggerCommandStateChangeListener();
+    });
+  }
+
+
+  void setUpButton(InfoBox infobox, AnchorElement target) {
+    _found_link = target;
+    _video_id = _videoFunction(target.href);
+    _info_box = infobox;
+  }
+
+  AnchorElement actionTarget(MouseEvent event) => _recursiveElementFind(event.target, _videoCheck);
+
+  bool _videoCheck(element) {
+    if (!(element is AnchorElement)) {
+      return false;
+    }
+    return _videoFunction(element.href) != null;
+  }
+
+
+}
+
+class _LinkImageHandler {
   final Element element;
 
   final ContentEditor editor;
@@ -426,8 +589,7 @@ class LinkImageHandler {
 
   ImageElement _foundImage;
 
-  LinkImageHandler(this.element, this.editor) {
-//    _imageEditor.open(element.querySelector('img'));
+  _LinkImageHandler(this.element, this.editor) {
     _enabled = editor.isOpen;
     editor.onOpenChange.listen((bool b) {
       _setUp();
@@ -441,41 +603,6 @@ class LinkImageHandler {
       return;
     }
 
-    _unlinkButton
-      ..classes.add('unlink')
-      ..onClick.listen((MouseEvent mev) {
-      mev.preventDefault();
-      _foundLink.insertAdjacentHtml("afterEnd", _foundLink.innerHtml);
-      _foundLink.remove();
-      _infoBox.remove();
-      editor.executor.triggerCommandStateChangeListener();
-    });
-
-    _youtubeButton
-      ..classes.add('youtube')
-      ..onClick.listen((MouseEvent mev) {
-      mev.preventDefault();
-      var id = core.youtubeVideoIdFromUrl(_foundLink.href);
-      var width = element.clientWidth;
-      var height = (width * 9 / 16).ceil();
-      _foundLink.insertAdjacentHtml("afterEnd", '<iframe width="$width" height="$height" src="//www.youtube.com/embed/$id?badge=0&amp;modestbranding=1&amp;controls=1&amp;autohide=1&amp;showinfo=0&amp;rel=0&amp;fs=0" frameborder="0" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe>');
-      _foundLink.remove();
-      _infoBox.remove();
-      editor.executor.triggerCommandStateChangeListener();
-    });
-
-    _vimeoButton
-      ..classes.add('vimeo')
-      ..onClick.listen((MouseEvent mev) {
-      mev.preventDefault();
-      var id = core.vimeoVideoIdFromUrl(_foundLink.href);
-      var width = element.clientWidth;
-      var height = (width * 9 / 16).ceil();
-      _foundLink.insertAdjacentHtml("afterEnd", '<iframe width="$width" height="$height" src="//player.vimeo.com/video/$id?badge=0&amp;modestbranding=1&amp;controls=1&amp;autohide=1&amp;showinfo=0&amp;rel=0&amp;fs=0" frameborder="0" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe>');
-      _foundLink.remove();
-      _infoBox.remove();
-      editor.executor.triggerCommandStateChangeListener();
-    });
     _openButton
       ..classes.add('open')
       ..onClick.listen((MouseEvent mev) {
@@ -558,14 +685,15 @@ class LinkImageHandler {
 
 }
 
+int _elementDepth(Element element) => element == null ? 0 : 1 + _elementDepth(element.parent);
 
-class EditorAction {
+class _EditorAction {
 
-  EditorAction(this.element, this.onClickAction, this.selectionStateChanger);
+  _EditorAction(this.element, this.onClickAction, this.selectionStateChanger);
 
-  EditorAction.elementFromHtmlString(String html, this.onClickAction, this.selectionStateChanger) : element = new Element.html(html);
+  _EditorAction.elementFromHtmlString(String html, this.onClickAction, this.selectionStateChanger) : element = new Element.html(html);
 
-  EditorAction.liElementWithInnerHtml(String innerHtml, this.onClickAction, this.selectionStateChanger, [List<String> element_class]) : element = new LIElement(){
+  _EditorAction.liElementWithInnerHtml(String innerHtml, this.onClickAction, this.selectionStateChanger, [List<String> element_class]) : element = new LIElement(){
     element.innerHtml = innerHtml;
     if (element_class != null) {
       element.classes.addAll(element_class);
@@ -577,8 +705,591 @@ class EditorAction {
   final Function onClickAction, selectionStateChanger;
 }
 
+abstract class EditorMenuItem {
+
+  final ButtonElement button;
+  final DivElement menu;
+  final ContentEditor editor;
+
+  Stream get onMenuChange => new StreamController().stream;
+
+
+  EditorMenuItem(this.editor): button = new ButtonElement(), menu = new DivElement() ;
+
+
+  void showMenu() {
+
+  }
+
+  void hideMenu() {
+
+  }
+
+
+  InfoBox addTitleToElement(String title, Element element, [bool verify()]) {
+    if (verify == null) {
+      verify = () => true;
+    }
+    var box = new InfoBox(title);
+    box
+      ..backgroundColor = InfoBox.COLOR_BLACK
+      ..reversed = true;
+    element
+      ..onMouseOver.listen((_) {
+      if (!verify()) {
+        return;
+      }
+      box.showBelowCenterOfElement(element);
+    })
+      ..onMouseOut.listen((_) => box.remove())
+      ..onClick.listen((_) => box.remove());
+    editor.onChange.listen((_) => box.remove());
+    return box;
+  }
+
+}
+
+class TextEditorMenuItem extends EditorMenuItem {
+
+  final EditorCommandExecutor executor;
+  final Element element;
+
+  MenuOverflowHandler menuHandler;
+
+  TextEditorMenuItem(ContentEditor editor) : super(editor), this.executor = editor.executor, this.element = editor.element {
+    button.classes.add('text');
+    addTitleToElement("Formater tekst", button);
+
+    menu.classes.add('text_menu');
+
+
+  }
+
+
+  void showMenu() {
+    if (menuHandler != null) {
+      return;
+    }
+    menuHandler = new MenuOverflowHandler(menu);
+    menuHandler.dropDown
+      ..preventDefaultOnClick = true
+      ..content.classes.add('submenu');
+
+
+    if (editor.editorMode == ContentEditor.EDITOR_MODE_NORMAL) {
+      menuHandler.addToMenu(_generateTextDropDownElement());
+      menuHandler.addToMenu(_generateSizeDropDownElement());
+      menuHandler.addToMenu(_generateColorDropDownElement());
+    }
+
+
+    _addTextIconToMenuHandler(menuHandler, "Fed skrift", "bold", () => executor.bold, executor.toggleBold);
+    _addTextIconToMenuHandler(menuHandler, "Kursiv skrift", "italic", () => executor.italic, executor.toggleItalic);
+    _addTextIconToMenuHandler(menuHandler, "Understreget skrift", "underline", () => executor.underline, executor.toggleUnderline);
+    _addTextIconToMenuHandler(menuHandler, "Uordnet liste", "u_list", () => executor.unorderedList, executor.toggleUnorderedList);
+    _addTextIconToMenuHandler(menuHandler, "Ordnet liste", "o_list", () => executor.orderedList, executor.toggleOrderedList);
+    _addTextIconToMenuHandler(menuHandler, "Juster venstre", "a_left", () => executor.alignLeft, executor.justifyLeft);
+    _addTextIconToMenuHandler(menuHandler, "Juster centreret", "a_center", () => executor.alignCenter, executor.justifyCenter);
+    _addTextIconToMenuHandler(menuHandler, "Juster højre", "a_right", () => executor.alignRight, executor.justifyRight);
+    _addTextIconToMenuHandler(menuHandler, "Juster lige", "a_just", () => executor.alignJust, executor.justifyFull);
+    _addTextIconToMenuHandler(menuHandler, "Indryk mere", "p_indent", null, executor.indent);
+    _addTextIconToMenuHandler(menuHandler, "Indryk mindre", "m_indent", null, executor.outdent);
+    _addTextIconToMenuHandler(menuHandler, "Hævet skrift", "superscript", () => executor.superScript, executor.toggleSuperScript);
+    _addTextIconToMenuHandler(menuHandler, "Sænket skrift", "subscript", () => executor.subScript, executor.toggleSubscript);
+    _addTextIconToMenuHandler(menuHandler, "Gennemstreget", "strikethrough", () => executor.strikeThrough, executor.toggleStrikeThrough);
+    _addTextIconToMenuHandler(menuHandler, "Indsæt link", "insert_link", null, _dialogLink);
+    _addTextIconToMenuHandler(menuHandler, "Fjern formatering", "no_format", null, _clearFormat);
+
+
+  }
+
+  _addTextIconToMenuHandler(MenuOverflowHandler menuHandler, String title, String clss, bool verify(), void action()) {
+    var button = new ButtonElement();
+    button
+      ..classes.add(clss);
+    addTitleToElement(title, button);
+    var trigger = () {
+    };
+    if (verify != null) {
+      executor.listenQueryCommandStateChange(() => verify() ? button.classes.add('active') : button.classes.remove('active'));
+      trigger = executor.triggerCommandStateChangeListener;
+    }
+    button.onClick.listen((_) {
+      action();
+      trigger();
+    });
+
+    menuHandler.addToMenu(button);
+
+  }
+
+
+  void _actionsSetup(EditorCommandExecutor executor, List<_EditorAction> actions, DropDown dropDown, dynamic state()) {
+    actions.forEach((_EditorAction a) {
+      if (a.onClickAction != null) {
+        a.element.onMouseDown.listen((_) {
+          a.onClickAction();
+          dropDown.close();
+        });
+      }
+    });
+    executor.listenQueryCommandStateChange(() {
+      var action = actions.firstWhere((_EditorAction a) => a.selectionStateChanger(state()), orElse:() => null);
+      dropDown.text = action == null ? dropDown.text : action.element.text;
+    });
+    dropDown.preventDefaultOnClick = true;
+
+  }
+
+  Element _generateTextDropDownElement() {
+    var actions = [
+        new _EditorAction.liElementWithInnerHtml("<h1>Overskift 1</h1>", executor.formatBlockH1, (String s) => s == "h1", ['t_h1']),
+        new _EditorAction.liElementWithInnerHtml("<h2>Overskift 2</h2>", executor.formatBlockH2, (String s) => s == "h2", ['t_h2']),
+        new _EditorAction.liElementWithInnerHtml("<h3>Overskrift 3</h3>", executor.formatBlockH3, (String s) => s == "h3", ['t_h3']),
+        new _EditorAction.liElementWithInnerHtml("<h4>Overskrift 4</h4>", executor.formatBlockH4, (String s) => s == "h4", ['t_h4']),
+        new _EditorAction.liElementWithInnerHtml("<h4>Overskrift 5</h4>", executor.formatBlockH5, (String s) => s == "h5", ['t_h5']),
+        new _EditorAction.liElementWithInnerHtml("<h4>Overskrift 6</h4>", executor.formatBlockH6, (String s) => s == "h6", ['t_h6']),
+        new _EditorAction.liElementWithInnerHtml("<p>Normal tekst</p>", executor.formatBlockP, (String s) => s == "p", ['t_p']),
+        new _EditorAction.liElementWithInnerHtml("<blockquote>Citat</blockquote>", executor.formatBlockBlockquote, (String s) => s == "blockquote", ['t_blockquote']),
+        new _EditorAction.liElementWithInnerHtml("<pre>Kode</pre>", executor.formatBlockPre, (String s) => s == "pre", ['t_pre'])];
+
+
+    var textType = new DropDown.fromLIList(actions.map((_EditorAction a) => a.element).toList());
+    _actionsSetup(executor, actions, textType, () => executor.blockState);
+    textType.element.classes.add('text_type');
+    textType.text = "Normal tekst";
+    return textType.element;
+  }
+
+
+  Element _generateSizeDropDownElement() {
+    var sizeActions = [
+        new _EditorAction.liElementWithInnerHtml(
+            "<font size='1'>Lille</font>",
+                () => executor.setFontSize(1),
+                (int s) => s == 1),
+        new _EditorAction.liElementWithInnerHtml(
+            "Normal",
+                () {
+              executor.setFontSize(3);
+              var fonts = element.querySelectorAll("font");
+              fonts.forEach((Element e) {
+                if (e.attributes['size'] != '3') {
+                  return;
+                }
+                e.attributes.remove("size");
+              });
+            },
+                (i) => ![1, 5, 7].contains(i)),
+        new _EditorAction.liElementWithInnerHtml(
+            "<font size='5'>Stor</font>",
+                () => executor.setFontSize(5),
+                (int s) => s == 5),
+        new _EditorAction.liElementWithInnerHtml(
+            "<font size='7'>Størst</font>",
+                () => executor.setFontSize(7),
+                (int s) => s == 7)];
+
+    var textSize = new DropDown.fromLIList(sizeActions.map((_EditorAction e) => e.element).toList());
+    textSize.element.classes.add('text_size');
+
+    _actionsSetup(executor, sizeActions, textSize, () => executor.blockState == "p" ? executor.fontSize : -1);
+    textSize.text = "Normal";
+    return textSize.element;
+  }
+
+
+  Element _generateColorDropDownElement() {
+    var
+    colorContent = new DivElement(),
+    colorSelect = new DropDown(colorContent),
+    textColorPalette = new ColorPalette(),
+    backgroundColorPalette = new ColorPalette(),
+    colorLabel1 = new DivElement(),
+    colorLabel2 = new DivElement();
+
+    colorLabel1
+      ..classes.add('color_label')
+      ..text = "Tekstfarve";
+    colorLabel2
+      ..classes.add('color_label')
+      ..text = "Baggrundsfarve";
+
+    colorSelect.element.classes.add('color');
+    colorSelect.preventDefaultOnClick = true;
+    colorSelect.text = " ";
+    colorContent
+      ..append(colorLabel1)
+      ..append(colorLabel2)
+      ..append(textColorPalette.element)
+      ..append(backgroundColorPalette.element);
+    colorSelect.dropDownBox.element.classes.add('color_select');
+
+    executor.listenQueryCommandStateChange(() {
+      textColorPalette.selected = executor.foreColor;
+      backgroundColorPalette.selected = executor.backColor;
+    });
+
+    textColorPalette.element.onChange.listen((_) {
+      if (textColorPalette.selected != null) {
+        executor.setForeColor(textColorPalette.selected);
+        colorSelect.close();
+      }
+    });
+
+    backgroundColorPalette.element.onChange.listen((_) {
+      if (backgroundColorPalette.selected != null) {
+        executor.setBackColor(backgroundColorPalette.selected);
+        colorSelect.close();
+      }
+    });
+    return colorSelect.element;
+  }
+
+  void _dialogLink() {
+    var dialog = new DialogContainer();
+
+    dialog.dialogBg.onMouseDown.listen((MouseEvent evt) {
+      evt.preventDefault();
+    });
+
+    var selection = window.getSelection();
+    if (!element.contains(selection.baseNode)) {
+      return;
+    }
+
+    var ranges = [];
+    for (var i = 0; i < selection.rangeCount; i++) {
+      ranges.add(selection.getRangeAt(i));
+    }
+
+    selection.removeAllRanges();
+    var box = dialog.text("Indtast link adresse", value:"http://");
+
+    box.result.then((String s) {
+      s = s.trim();
+      ranges.forEach((Range r) => selection.addRange(r));
+      if (s.length <= 0 || s == "http://") {
+        return;
+      }
+      var r = ranges.first;
+      var commonAncestorContainer = r.commonAncestorContainer;
+      var parent = commonAncestorContainer;
+
+      while (parent != null && parent.nodeType != Node.ELEMENT_NODE) {
+        parent = parent.parentNode;
+      }
+
+      var linksBefore = parent.querySelectorAll("a");
+
+      ranges.first.selectNode(element);
+      executor.createLink(s);
+
+      var linksAfter = parent.querySelectorAll("a");
+
+      linksAfter.forEach((AnchorElement a) {
+        if (!linksBefore.contains(a)) {
+          a.target = "_blank";
+        }
+      });
+    });
+  }
+
+  void _clearFormat() {
+    var selection = window.getSelection();
+    var range = selection.getRangeAt(0);
+    Element commonAncestor = range.commonAncestorContainer;
+    if (!(commonAncestor is Element)) {
+      executor.removeFormat();
+      return;
+    }
+    commonAncestor.querySelectorAll("*").forEach((Element elm) {
+      if (!element.contains(elm) || !selection.containsNode(elm, true)) {
+        return;
+      }
+      elm.attributes.remove("style");
+    });
+    executor.removeFormat();
+  }
+
+}
+
+class FileEditorMenuItem extends EditorMenuItem {
+
+  DivElement _uploadIconWrapper = new DivElement(),
+  _uploadIcon = new DivElement(),
+  _preview = new DivElement(),
+  _fileUploadElementWrapper = new DivElement();
+
+  FileUploadInputElement _fileUploadElement;
+
+  core.FileUploader _uploader;
+  _EditorFileContainer _file_container;
+
+  void _setUpFileUploadElement() {
+    if (_fileUploadElement != null) {
+      _fileUploadElement.remove();
+    }
+    _fileUploadElement = new FileUploadInputElement();
+    _fileUploadElement
+      ..hidden = true
+      ..multiple = true;
+    _fileUploadElementWrapper.append(_fileUploadElement);
+
+  }
+
+  FileEditorMenuItem.file(ContentEditor editor) : super(editor){
+    button.classes.add('file');
+    menu.classes.add('file_menu');
+    _preview.classes.add('image_preview');
+    setup(new core.AJAXFileUploadStrategy(),
+        (core.FileProgress fp, _EditorFileContainer container) => container.addFile(new AnchorElement(), fp));
+  }
+
+  FileEditorMenuItem.image(ContentEditor editor) : super(editor){
+    button.classes.add('image');
+    menu.classes.add('image_menu');
+    _preview.classes.add('image_preview');
+    setup(new core.AJAXImageUploadStrategy(
+        new core.ImageSize.scaleMethodLimitToOuterBox(editor.element.clientWidth, 500),
+        new core.ImageSize.scaleMethodLimitToOuterBox(70, 70, dataURI:true)),
+        (core.FileProgress fp, _EditorFileContainer container) => container.addImage(new ImageElement(), fp));
+  }
+
+  void setup(core.UploadStrategy strategy, void listener(core.FileProgress progress, _EditorFileContainer container)) {
+    addTitleToElement("Indsæt billede", button);
+    menu.classes.add('upload_menu');
+
+
+    _uploadIcon.classes.add('upload_icon');
+    _uploadIconWrapper
+      ..classes.add('upload_icon_wrapper')
+      ..append(_uploadIcon);
+
+
+    _setUpFileUploadElement();
+
+    _preview.classes.add('preview');
+
+
+    _uploader = new core.FileUploader(strategy);
+    _file_container = new _EditorFileContainer(new DivElement(), _uploadIcon);
+    _preview.append(_file_container.element);
+    _uploader.onFileAddedToQueue.listen((core.FileProgress fp) => listener(fp, _file_container));
+    menu
+      ..append(_fileUploadElementWrapper)
+      ..append(_preview)
+      ..append(_uploadIconWrapper);
+    _uploadIcon.onClick.listen((_) => _fileUploadElementWrapper.querySelector('input').click());
+    _fileUploadElementWrapper.onChange.listen((_) {
+      _uploader.uploadFiles(_fileUploadElement.files);
+      _setUpFileUploadElement();
+    });
+
+  }
+
+  Stream get onMenuChange => _file_container.onChange;
+
+}
+
+class HistoryEditorMenuItem extends EditorMenuItem {
+  StreamController _menuChangeController = new StreamController.broadcast();
+
+  final Calendar calendar = new Calendar();
+  final UListElement historyList = new UListElement();
+  final Map<TableCellElement, List<DateTime>> markMap = new Map<TableCellElement, List<DateTime>>();
+  final Map<TableCellElement, List<LIElement>> payloadCache = new Map<TableCellElement, List<LIElement>>();
+  final Map<Revision, LIElement> revisionElement = new Map<Revision, LIElement>();
+
+  Element _currentCellElement;
+  bool _has_been_setup = false;
+
+  HistoryEditorMenuItem(ContentEditor editor) : super(editor) {
+    button.classes.add('history');
+    addTitleToElement("Se historik", button);
+    menu.classes.add('history_menu');
+    historyList.classes.add("history_list");
+    menu
+      ..append(calendar.element)
+      ..append(historyList);
+
+
+  }
+
+
+  Element get _currentCell => _currentCellElement;
+
+  set _currentCell(Element cell) {
+    if (_currentCell != null) {
+      _currentCell.classes.remove('current');
+    }
+    _currentCellElement = cell;
+
+    cell.classes.add('current');
+  }
+
+  void showMenu() {
+    if (_has_been_setup) {
+      return;
+    }
+    _has_been_setup = true;
+    _blurMenu();
+    editor.content.changeTimes.then((List<DateTime> changeTimes) {
+      _unBlurMenu();
+      var last = new DateTime.fromMillisecondsSinceEpoch(0);
+
+      changeTimes.forEach((DateTime dt) => markMap.putIfAbsent(calendar.markDate(dt), () => []).add(dt));
+
+      markMap.forEach((TableCellElement cell, List<DateTime> times) {
+        _setUpCell(cell, times, changeTimes.last);
+        if (cell.classes.contains('today')) {
+          cell.click();
+        }
+      });
+
+      editor.content.onAddContent.listen((Revision r) {
+        var cell = calendar.markDate(r.time);
+        var li = _createLi(r);
+        if (cell == _currentCell) {
+          historyList.append(li);
+        }
+        li.classes.add("current");
+        payloadCache.putIfAbsent(cell, () => []).add(li);
+        markMap.putIfAbsent(cell, () => []).add(r.time);
+        _setUpCell(cell, [r.time]);
+        if (_currentCell == null && cell.classes.contains('today')) {
+          cell.click();
+        }
+      });
+    });
+  }
+
+  LIElement _createLi(Revision revision) {
+    if (revisionElement.containsKey(revision)) {
+      return revisionElement[revision];
+    }
+    var li = new LIElement(), dt = revision.time;
+    revisionElement[revision] = li;
+    li.text = _timeString(dt);
+    li.onMouseOver.listen((_) {
+      var subscription;
+      subscription = document.onMouseOut.listen((_) {
+        editor.hidePreview();
+        subscription.cancel();
+      });
+      editor.showPreview(revision);
+    });
+    li.onMouseOut.listen((MouseEvent ev) {
+      ev.preventDefault();
+    });
+    li.onClick.listen((_) {
+      _useRevision(revision);
+    });
+    editor.onChange.listen((_) {
+      if (editor.currentRevision == revision || editor.currentRevision == null || !li.classes.contains('current')) {
+        return;
+      }
+      li.classes.remove('current');
+    });
+    return li;
+  }
+
+
+  void _useRevision(Revision revision) {
+    if (revision == editor.currentRevision && !editor.changed) {
+      return;
+    }
+    var element = revisionElement[revision];
+    element.classes.add('current');
+    editor.useRevision(revision).then((bool success) {
+      if (success) {
+        return;
+      }
+      element.classes.remove('current');
+    });
+  }
+
+  String _timeString(DateTime dateTime) => "${dateTime.hour < 10 ? "0" + dateTime.hour.toString() : dateTime.hour}:${dateTime.minute < 10 ? "0" + dateTime.minute.toString() : dateTime.minute}:${dateTime.second < 10 ? "0" + dateTime.second.toString() : dateTime.second}";
+
+  Stream get onMenuChange => _menuChangeController.stream;
+
+  void _setUpCell(TableCellElement cell, List<DateTime> times, [lastTime = null]) {
+    var len = markMap[cell].length;
+    addTitleToElement("Gemt $len gang${len > 1 ? "e" : ""}", cell);
+    cell.onClick.listen((_) {
+      _currentCell = cell;
+      historyList.children.clear();
+      if (payloadCache.containsKey(cell)) {
+        historyList.children.addAll(payloadCache[cell]);
+        _menuChangeController.add(null);
+        return;
+      }
+      _blurMenu();
+      editor.content.listRevisions(from:times.first, to:times.last).then((List<Revision> revisions) {
+        _unBlurMenu();
+        var list = payloadCache[cell] = new List<LIElement>();
+        revisions.forEach((Revision revision) {
+          var li = _createLi(revision);
+          historyList.append(li);
+          list.add(li);
+        });
+        if (editor.currentRevision == null && revisions.last.time == lastTime) {
+          list.last.classes.add('current');
+        }
+        _menuChangeController.add(null);
+      });
+    });
+  }
+
+  void _blurMenu() {
+    menu.classes.add('blur');
+  }
+
+  void _unBlurMenu() {
+    menu.classes.remove('blur');
+  }
+
+}
+
+class CloseEditorMenuItem extends EditorMenuItem {
+
+
+  CloseEditorMenuItem(ContentEditor editor) : super(editor) {
+    button.classes.add('close');
+    addTitleToElement('Afslut redigering', button);
+    button.onClick.listen((_) => editor.close());
+
+  }
+
+  DivElement get menu => null;
+
+}
+
+class SaveEditorMenuItem extends EditorMenuItem {
+  InfoBox _saveBox;
+
+  SaveEditorMenuItem(ContentEditor editor) : super(editor) {
+    button.classes.add('save');
+    _saveBox = addTitleToElement('Gem ændringer', button, () => editor.changed);
+    editor.onChange.listen((_) {
+      if (editor.changed) {
+        button.classes.add('enabled');
+      } else {
+        button.classes.remove('enabled');
+        _saveBox.remove();
+      }
+    });
+
+    button.onClick.listen((_) => editor.save());
+
+  }
+
+  DivElement get menu => null;
+
+}
 
 class ContentEditor {
+
 
   static const int EDITOR_MODE_SIMPLE = 1;
   static const int EDITOR_MODE_NORMAL = 2;
@@ -595,44 +1306,133 @@ class ContentEditor {
 
   final int editorMode;
 
-  DivElement _contentWrapper = new DivElement(), _topBar, _toolBarPlaceholder = new DivElement(), _wrapper = new DivElement(), _preview = new DivElement();
+  DivElement
+  _contentWrapper = new DivElement(),
+  _toolBar = new DivElement(),
+  _toolBarWrapper = new DivElement(),
+  _preview = new DivElement();
 
-  Map<Element, Element> _elementToSubMenu = new Map<Element, Element>();
 
-  Content _currentContent;
+  final Content content;
 
   Revision _currentRevision;
 
   Revision _lastSavedRevision;
 
-  PropertyAnimation _previewAnimation;
+  StreamController<bool> _onContentChangeStreamController = new StreamController<bool>.broadcast();
 
-  StreamController<bool> _onContentChangeStreamController = new StreamController<bool>();
+  StreamController<bool> _onOpenChangeStreamController = new StreamController<bool>.broadcast();
 
-  Stream<bool> _onContentChangeStream;
+  StreamController<Element> _onSaveStreamController = new StreamController<Element>.broadcast();
 
-  StreamController<bool> _onOpenChangeStreamController = new StreamController<bool>();
+  List<EditorMenuItem> _menuItems = [];
 
-  Stream<bool> _onOpenChangeStream;
+  EditorMenuItem _currentMenuItem;
 
-  StreamController<Element> _onSaveStreamController = new StreamController<Element>();
+  List<EditorClickActionItem> _clickActionItems = [];
 
-  Stream<Element> _onSaveStream;
+  InfoBox _clickActionInfoBox;
 
+  DivElement _clickActionInfoBoxElement = new DivElement();
 
   bool _inputSinceSave = false, _closed = true;
 
   int _hash;
 
-  ContentEditor._internal(Element element, this._currentContent, this.editorMode) : this.element = element, executor = new EditorCommandExecutor(element){
+  ContentEditor._internal(Element element, this.content, this.editorMode) : this.element = element, executor = new EditorCommandExecutor(element){
 
-    _setUpStream();
-    _toolBarPlaceholder.classes.add('tool_bar_placeholder');
+    _setUpListeners();
     _contentWrapper.classes.add('edit_content_wrapper');
-    _wrapper.classes.add('tool_bar_wrapper');
+    _toolBarWrapper.classes.add('tool_bar_wrapper');
     _preview.classes.add('preview');
     _preview.hidden = true;
     _lastSavedRevision = new Revision(null, element.innerHtml);
+
+    addMenuItem(new TextEditorMenuItem(this));
+    if (editorMode == EDITOR_MODE_NORMAL) {
+      addMenuItem(new FileEditorMenuItem.image(this));
+      addMenuItem(new FileEditorMenuItem.file(this));
+    }
+    addMenuItem(new HistoryEditorMenuItem(this));
+    addMenuItem(new SaveEditorMenuItem(this));
+    addMenuItem(new CloseEditorMenuItem(this));
+
+    addClickActionItem(new UnlinkEditorClickActionItem(this));
+    addClickActionItem(new OpenEditorClickActionItem(this));
+    addClickActionItem(new EmbedVideoEditorClickActionItem.youtube(this));
+    addClickActionItem(new EmbedVideoEditorClickActionItem.vimeo(this));
+    addClickActionItem(new ImageEditorClickActionItem(this));
+  }
+
+  void addClickActionItem(EditorClickActionItem item) {
+    _clickActionItems.add(item);
+  }
+
+  void addMenuItem(EditorMenuItem item) {
+    _menuItems.add(item);
+    item.onMenuChange.listen((_) {
+      if (item != _currentMenuItem) {
+        return;
+      }
+      _updateToolbarPlaceholderPadding();
+    });
+    item.button.onClick.listen((_) => _toggleMenuItem(item));
+  }
+
+  void _toggleMenuItem(EditorMenuItem item) {
+    if (item == _currentMenuItem) {
+      _closeMenuItem();
+    } else {
+      _openMenuItem(item);
+    }
+    _updateToolbarPlaceholderPadding();
+  }
+
+  void _closeMenuItem() {
+    if (_currentMenuItem == null) {
+      return;
+    }
+
+    _currentMenuItem
+      ..hideMenu()
+      ..button.classes.remove('active')
+      ..menu.remove();
+    _currentMenuItem = null;
+  }
+
+  void _openMenuItem(EditorMenuItem item) {
+    if (item.menu == null) {
+      return;
+    }
+
+    _closeMenuItem();
+    _currentMenuItem = item;
+    _toolBarWrapper.append(item.menu);
+    item
+      ..button.classes.add('active')
+      ..menu.classes.add('menu')
+      ..showMenu();
+
+  }
+
+  Revision get currentRevision => _currentRevision;
+
+  Stream<bool> get onChange => _onContentChangeStreamController.stream;
+
+  Stream<bool> get onOpenChange => _onOpenChangeStreamController.stream;
+
+  Stream get onFormatBlock => executor.onFormatBlock;
+
+  Stream<Element> get onSave => _onSaveStreamController.stream;
+
+  bool get isOpen => !_closed;
+
+  void _setUpListeners() {
+    element.onInput.listen((_) {
+      _onContentChangeStreamController.add(true);
+      _inputSinceSave = true;
+    });
+
     element.onDoubleClick.listen((Event event) {
       if (!_closed) {
         return;
@@ -640,37 +1440,166 @@ class ContentEditor {
       window.getSelection().removeAllRanges();
       open();
     });
-    new LinkImageHandler(element, this);
 
-  }
-
-
-  Stream<bool> get onChange => _onContentChangeStream == null ? _onContentChangeStream = _onContentChangeStreamController.stream.asBroadcastStream() : _onContentChangeStream;
-
-  Stream<bool> get onOpenChange => _onOpenChangeStream == null ? _onOpenChangeStream = _onOpenChangeStreamController.stream.asBroadcastStream() : _onOpenChangeStream;
-
-  Stream get onFormatBlock => executor.onFormatBlock;
-
-  Stream<Element> get onSave => _onSaveStream == null ? _onSaveStream = _onSaveStreamController.stream.asBroadcastStream() : _onSaveStream;
-
-  bool get isOpen => !_closed;
-
-  void _setUpStream() {
-    element.onInput.listen((_) => _onContentChangeStreamController.add(true));
-    onChange.listen((bool b) {
-      if (b) {
-        _inputSinceSave = true;
-      }
+    content.onAddContent.listen((Revision revision) {
+      _currentRevision = revision;
+      _notifyChange();
     });
+
+    window.onBeforeUnload.listen((BeforeUnloadEvent event) {
+      if (_closed || !changed) {
+        return;
+      }
+      event.returnValue = "Du har ikke gemt dine ændringer.";
+    });
+
+    element.onKeyDown.listen(_keyDownHandler);
+    element.onPaste.listen(_pasteHandler);
+
+    element.onClick.listen(_clickActionHandler);
+
+    window
+      ..onScroll.listen((_) => _updateBarPosition())
+      ..onResize.listen((_) => _updateBarPosition());
   }
 
-  Future<bool> _useRevision(Revision rev) {
+  void _clickActionHandler(MouseEvent event) {
+    if (_closed) {
+      return;
+    }
+
+    if (_clickActionInfoBox == null) {
+      _clickActionInfoBox = new InfoBox.elementContent(_clickActionInfoBoxElement);
+      _clickActionInfoBox
+        ..backgroundColor = InfoBox.COLOR_GREYSCALE
+        ..removeOnESC = true
+        ..element.classes.add('edit_link_image_popup');
+    }
+
+    _clickActionInfoBox
+      ..remove();
+    _clickActionInfoBoxElement.children.clear();
+
+    var box_target, box_target_depth = 0;
+    _clickActionItems.forEach((EditorClickActionItem item) {
+      var target = item.actionTarget(event);
+      if (target == null) {
+        return;
+      }
+      var depth = _elementDepth(target);
+      if (depth < box_target_depth || box_target_depth == 0) {
+        box_target = target;
+        box_target_depth = depth;
+      }
+      item.setUpButton(_clickActionInfoBox, target);
+      _clickActionInfoBoxElement.append(item.button);
+    });
+    if (box_target == null) {
+      return;
+    }
+    _clickActionInfoBox.showAboveCenterOfElement(box_target);
+
+
+  }
+
+  void _pasteHandler(Event event) {
+    var selection = window.getSelection();
+    if (_closed || selection.rangeCount == 0) {
+      return;
+    }
+
+    var types = event.clipboardData.types;
+    var newHtml;
+    if (types.contains('text/html')) {
+      newHtml = event.clipboardData.getData('text/html');
+    } else if (types.contains('text/plain')) {
+      newHtml = event.clipboardData.getData('text/plain');
+    } else {
+      return;
+    }
+
+    executor.insertFragment(new DocumentFragment.html(newHtml));
+
+    event.preventDefault();
+
+
+  }
+
+  void _keyDownHandler(KeyboardEvent kev) {
+    if (!_closed && kev.keyCode == 83 && kev.ctrlKey) {
+      kev.preventDefault();
+      save();
+      return;
+    }
+
+    if (kev.keyCode != 32) {
+      return;
+    }
+    var selection = window.getSelection();
+    if (selection.rangeCount == 0) {
+      return;
+    }
+    var range = selection.getRangeAt(0);
+    var endOffset = range.endOffset;
+    if (range.startOffset != endOffset) {
+      return;
+    }
+    var parentNode = range.commonAncestorContainer;
+
+    var q = parentNode.parent;
+    while (q != null) {
+      if (q is AnchorElement) {
+        return;
+      }
+      q = q.parent;
+    }
+
+    var value = parentNode.nodeValue;
+    if (value == null) {
+      return;
+    }
+
+    var match = new RegExp(r"\s([^\s]+)$").firstMatch(" " + value.substring(0, endOffset));
+
+    if (match == null) {
+      return;
+    }
+
+    var m = match.group(1);
+
+    if (m.trim() != m) {
+      return;
+    }
+
+    if (!core.validUrl(m) && !core.validMail(m)) {
+      return;
+    }
+
+    var start = endOffset - m.length;
+    var t1 = new Text(value.substring(0, start)), t2 = new Text(" " + value.substring(endOffset));
+    var p = parentNode.parent;
+    p.insertBefore(t1, parentNode);
+    var anchor = new AnchorElement();
+    anchor.text = m;
+    anchor.href = (core.validMail(m) ? "mailto:" : "") + m;
+    anchor.target = "_blank";
+    p.insertBefore(anchor, parentNode);
+    p.insertBefore(t2, parentNode);
+    kev.preventDefault();
+    parentNode.remove();
+    selection.setPosition(t2, 1);
+
+
+  }
+
+  Future<bool> useRevision(Revision rev) {
     var completer = new Completer<bool>();
 
     if (changed && _inputSinceSave) {
-      var dialog = new DialogContainer();
-      var f = dialog.confirm("Du forsøger at hente en tidligere version af siden, <br /> uden at have gemt dine ændringer. <br /> Er du sikker på at du vil fortsætte?").result;
-      f.then((bool b) {
+      new DialogContainer()
+      .confirm("Du forsøger at hente en tidligere version af siden, <br /> uden at have gemt dine ændringer. <br /> Er du sikker på at du vil fortsætte?")
+      .result
+      .then((bool b) {
         if (!b) {
           completer.complete(false);
           return;
@@ -679,10 +1608,10 @@ class ContentEditor {
         _loadRevision(rev);
         completer.complete(true);
       });
-      return completer.future;
+    } else {
+      _loadRevision(rev);
+      completer.complete(true);
     }
-    _loadRevision(rev);
-    completer.complete(true);
     return completer.future;
   }
 
@@ -694,51 +1623,18 @@ class ContentEditor {
 
   }
 
-  void _showPreview(Revision rev) {
-    _animatePreview(rev);
+  void showPreview(Revision rev) {
+    _preview.setInnerHtml(rev.content, treeSanitizer:core.nullNodeTreeSanitizer);
+    _hidePreview(false);
 
   }
 
-  void _hidePreview() {
-    _animatePreview();
+  void hidePreview() {
+    _hidePreview(true);
 
   }
 
-  void _animatePreview([Revision content]) {
-    if (_previewAnimation == null) {
-      _previewAnimation = new HeightPropertyAnimation(_contentWrapper);
-      _previewAnimation.removePropertyOnComplete = true;
-    }
-    _contentWrapper.style.height = "${_contentWrapper.clientHeight.toString()}px";
-    _previewAnimation.stop();
-    var hidePreview = true;
-    if (content != null) {
-      _preview.setInnerHtml(content.content, treeSanitizer:core.nullNodeTreeSanitizer);
-      hidePreview = false;
-    }
-
-    element.hidden = !(_preview.hidden = hidePreview);
-    var images = hidePreview ? element.querySelectorAll("img") : _preview.querySelectorAll('img');
-    if (images.length > 0) {
-      var i = 0;
-      images.forEach((ImageElement e) {
-        e.onLoad.listen((_) {
-          i++;
-          if (i == images.length) {
-            _previewAnimation.animateTo(maxChildrenHeight(_contentWrapper).toString(), onComplete:_updateBarPosition);
-          }
-        });
-        if (e.complete) {
-          e.dispatchEvent(new Event('load', canBubble:false));
-        }
-
-      });
-
-    } else {
-      _previewAnimation.animateTo(maxChildrenHeight(_contentWrapper).toString(), onComplete:_updateBarPosition);
-
-    }
-  }
+  bool _hidePreview(bool hide) => element.hidden = !(_preview.hidden = hide);
 
   bool get changed => _currentHash != _hash;
 
@@ -751,143 +1647,51 @@ class ContentEditor {
   }
 
 
-  void open() {
+  void _addEscToQueue() {
+
     core.escQueue.add(() {
-      if (_closed) {
-        return false;
-      }
       close();
       return true;
     });
+  }
 
+  void open() {
 
     if (!_closed) {
       return;
     }
+    _addEscToQueue();
 
     element.contentEditable = "true";
     _closed = false;
     _onOpenChangeStreamController.add(isOpen);
+    _menuItems.forEach((EditorMenuItem item) {
+      _toolBar.append(item.button);
+    });
 
 
     if (_contentWrapper.parent != null) {
-      _updateBarPosition();
+      _toolBarWrapper.hidden = false;
       return;
     }
-    window.onBeforeUnload.listen((BeforeUnloadEvent event) {
-      if (_closed || !changed) {
-        return;
-      }
-      event.returnValue = "Du har ikke gemt dine ændringer.";
-    });
-    element.onKeyDown.listen((KeyboardEvent kev) {
-      if (_closed || kev.keyCode != 83 || !kev.ctrlKey) {
-        return;
-      }
-      kev.preventDefault();
-      save();
-    });
-
-    element.onKeyDown.listen((KeyboardEvent kev) {
-      if (kev.keyCode != 32) {
-        return;
-      }
-      var selection = window.getSelection();
-      if (selection.rangeCount == 0) {
-        return;
-      }
-      var range = selection.getRangeAt(0);
-      var endOffset = range.startOffset, startOffset = range.endOffset;
-      if (endOffset != startOffset) {
-        return;
-      }
-      var parentNode = range.commonAncestorContainer;
-
-      var q = parentNode.parent;
-      while (q != null) {
-        if (q is AnchorElement) {
-          return;
-        }
-        q = q.parent;
-      }
-
-      var regex = new RegExp(r"\s([^\s]+)$");
-      var value = parentNode.nodeValue;
-      if (value == null) {
-        return;
-      }
-
-      var match = regex.firstMatch(" " + value.substring(0, startOffset));
-
-      if (match == null) {
-        return;
-      }
-
-      var m = match.group(1);
-
-      if (m.trim() != m) {
-        return;
-      }
-      m = m.trim();
-
-      if (!core.validUrl(m) && !core.validMail(m)) {
-        return;
-      }
-
-      var start = startOffset - m.length;
-      var t1 = new Text(value.substring(0, start)), t2 = new Text(" " + value.substring(startOffset));
-      var p = parentNode.parent;
-      p.insertBefore(t1, parentNode);
-      var anchor = new AnchorElement();
-      anchor.text = m;
-      anchor.href = (core.validMail(m) ? "mailto:" : "") + m;
-      anchor.target = "_blank";
-      p.insertBefore(anchor, parentNode);
-      p.insertBefore(t2, parentNode);
-      kev.preventDefault();
-      parentNode.remove();
-      selection.setPosition(t2, 1);
 
 
-    });
+    _contentWrapper.append(_toolBarWrapper);
 
-    element.onPaste.listen((Event event) {
-      var selection = window.getSelection();
-      if (_closed || selection.rangeCount == 0) {
-        return;
-      }
+    _toolBarWrapper.append(_toolBar);
 
-      var types = event.clipboardData.types;
-      core.debug(types);
-      var newHtml;
-      if (types.contains('text/html')) {
-        newHtml = event.clipboardData.getData('text/html');
-      } else if (types.contains('text/plain')) {
-        newHtml = event.clipboardData.getData('text/plain');
-      } else {
-        return;
-      }
-
-      core.debug(newHtml);
-      selection
-        .getRangeAt(0)..deleteContents()..insertNode(new DocumentFragment.html(newHtml));
+    _toolBar
+      ..onMouseDown.listen((MouseEvent e) => e.preventDefault())
+      ..classes.add('tool_bar');
 
 
-      event.preventDefault();
-
-
-    });
-
-    _contentWrapper.append(_wrapper);
-    _wrapper.style.height = "0";
-    _wrapper.append(_topBar == null ? _topBar = _generateToolBar() : _topBar);
     element.insertAdjacentElement("afterEnd", _contentWrapper);
     _contentWrapper.append(element);
     element.insertAdjacentElement("afterEnd", _preview);
-    window.onScroll.listen((_) => _updateBarPosition());
-    window.onResize.listen((_) => _updateBarPosition());
+
     _saveCurrentHash();
     _updateBarPosition();
+
 
   }
 
@@ -896,31 +1700,33 @@ class ContentEditor {
       return;
     }
     if (changed) {
-      var dialog = new DialogContainer();
-      var c = dialog.confirm("Du har ikke gemt dine ændringer. <br /> Er du sikker på at du vil afslutte?").result;
-      c.then((bool b) {
-        if (b) {
+      new DialogContainer()
+      .confirm("Du har ikke gemt dine ændringer. <br /> Er du sikker på at du vil afslutte?")
+        ..result
+      .then((bool answer) {
+        core.debug(answer);
+        if (answer) {
           _loadRevision(_lastSavedRevision);
           close();
         } else {
-          open();
+          _addEscToQueue();
         }
+      })
+        ..onClose.listen((_) {
+        if(_closed){
+          return;
+        }
+        _addEscToQueue();
       });
       return;
     }
 
-    var b = _topBar.querySelector(".tool_bar button.active");
-    if (b != null) {
-      b.click();
-    }
+    _closeMenuItem();
 
-    _wrapper.style.height = "0";
-    _toolBarPlaceholder.style.height = "0";
-
+    _toolBarWrapper.hidden = true;
     element.contentEditable = "false";
     _closed = true;
     _onOpenChangeStreamController.add(isOpen);
-
 
   }
 
@@ -941,16 +1747,23 @@ class ContentEditor {
     var savingBar = new SavingBar();
     var jobId = savingBar.startJob();
     _inputSinceSave = false;
-    var l = headers;
-
-    l.forEach((Element h) {
-      h.id = "";
+    _updateHeaderIds();
+    _onSaveStreamController.add(element);
+    var html = element.innerHtml;
+    content.addContent(html).then((Revision rev) {
+      _saveCurrentHash();
+      savingBar.endJob(jobId);
+      _lastSavedRevision = rev;
     });
+  }
 
-    l.forEach((Element h) {
-      var id = h.text.replaceAll(new RegExp(r"[^a-zA-Z0-9]+"), "_");
+  void _updateHeaderIds() {
+
+    headers.forEach((Element header) {
+      header.id = "";
+      var id = header.text.replaceAll(new RegExp(r"[^a-zA-Z0-9]+"), "_");
       if (id.length == 0) {
-        h.remove();
+        header.remove();
         return;
       }
       var base = id;
@@ -959,15 +1772,7 @@ class ContentEditor {
         id = "${base}_$i";
         i++;
       }
-      h.id = id;
-    });
-    _onSaveStreamController.add(element);
-    var html = element.innerHtml;
-    _currentContent.addContent(html).then((Revision rev) {
-      _saveCurrentHash();
-      savingBar.endJob(jobId);
-      _lastSavedRevision = rev;
-
+      header.id = id;
     });
   }
 
@@ -975,597 +1780,44 @@ class ContentEditor {
     if (_closed) {
       return;
     }
-    var floatCandidate = window.scrollY > elementOffsetTop(_contentWrapper) + _contentWrapper.offsetHeight - _topBar.clientHeight;
-    _wrapper.style.removeProperty("top");
-    if (floatCandidate) {
-      _wrapper.style.width = "${_wrapper.clientWidth}px";
-      _wrapper.classes
-        ..remove('floating')
-        ..add('fixed');
-      _wrapper.style.top = "${_contentWrapper.offsetHeight - _topBar.clientHeight}px";
-    } else if (!_wrapper.classes.contains('floating') && window.scrollY > elementOffsetTop(_topBar) && !floatCandidate) {
-      _toolBarPlaceholder.style.height = "${_topBar.clientHeight}px";
-      _wrapper.insertAdjacentElement("afterEnd", _toolBarPlaceholder);
-      _wrapper.style.width = "${_wrapper.clientWidth}px";
-      _wrapper.classes
-        ..add('floating')
-        ..remove('fixed');
-    } else if (window.scrollY <= elementOffsetTop(_toolBarPlaceholder)) {
-      _toolBarPlaceholder.remove();
-      _wrapper
-        ..style.removeProperty("width")
-        ..classes.remove('floating')
-        ..classes.remove('fixed');
+    if (!_toolBarWrapper.classes.contains('floating')) {
+      if (!isTopVisible(_toolBarWrapper)) {
+        _toolBarWrapper.style.width = _toolBarWrapper.getComputedStyle().width;
+        _toolBarWrapper.classes.add('floating');
+        _updateToolbarPlaceholderPadding();
 
+      }
+      return;
     }
-    if (_wrapper.classes.contains('floating')) {
-      _wrapper.style.left = "${elementOffsetLeft(_contentWrapper) - window.scrollX}px";
+
+    if (window.scrollY <= _contentWrapper.documentOffset.y) {
+      _toolBarWrapper.classes.remove('floating');
+      _toolBarWrapper.style.removeProperty('width');
+      _updateToolbarPlaceholderPadding();
+      return;
+    }
+
+    var contentWrapperBottom = _contentWrapper.documentOffset.y + _contentWrapper.offsetHeight;
+
+    if (window.scrollY + _toolBarWrapper.offsetHeight >= contentWrapperBottom) {
+      _toolBarWrapper.classes.add('fixed');
     } else {
-      _wrapper.style.left = "";
-
+      _toolBarWrapper.classes.remove('fixed');
     }
-
-    _updatePlaceholder();
 
   }
 
-  void _updatePlaceholder() {
-    if (_closed) {
-      return;
+  void _updateToolbarPlaceholderPadding() {
+    if (_toolBarWrapper.classes.contains('floating')) {
+      _contentWrapper.style.paddingTop = _toolBarWrapper.getComputedStyle().height;
+    } else {
+      _contentWrapper.style.paddingTop = "";
     }
-
-    _wrapper.style.height = _topBar.getComputedStyle().height;
-    if (_toolBarPlaceholder.parent == null) {
-      return;
-    }
-    _toolBarPlaceholder.style.height = "${_topBar.clientHeight}px";
   }
 
-  void _setUpSubMenu(Element element, Element menu, Element subMenu, void menuFiller(Element)) {
-    _elementToSubMenu[element] = subMenu;
-    subMenu.classes.add('menu');
-    element.onClick.listen((_) {
-      var active = menu.querySelector('.active');
-      if (active == null) {
-        element.classes.add('active');
-        subMenu.hidden = false;
-      } else {
-        active.classes.remove('active');
-        if (active != element) {
-          _elementToSubMenu[active].hidden = true;
-          element.classes.add('active');
-
-        }
-        subMenu.hidden = active == element;
-
-      }
-
-      if (element.classes.contains('active')) {
-        core.escQueue.add(() {
-
-          if (!element.classes.contains('active')) {
-            return false;
-          }
-
-          element.click();
-          return true;
-        });
-      }
-
-      if (subMenu.parent == null) {
-        menu.parent.append(subMenu);
-        menuFiller(subMenu);
-      }
-      _updatePlaceholder();
-    });
-  }
-
-
-  DivElement _generateToolBar() {
-    var bar = new DivElement(), textEdit = new ButtonElement(), addImage = new ButtonElement(), addFile = new ButtonElement(), history = new ButtonElement(), saveElement = new ButtonElement(), closeElement = new ButtonElement(), wrapper = new DivElement(), textMenu = new DivElement(), imageMenu = new DivElement(), fileMenu = new DivElement(), historyMenu = new DivElement();
-
-    bar.onMouseDown.listen((MouseEvent e) => e.preventDefault());
-    textMenu.onMouseDown.listen((MouseEvent e) => e.preventDefault());
-
-    textEdit.classes.add('text');
-    _setUpSubMenu(textEdit, bar, textMenu, (Element e) => _fillTextMenu(e));
-    _addTitleToElement("Formater tekst", textEdit);
-    bar.append(textEdit);
-
-    if (editorMode == ContentEditor.EDITOR_MODE_NORMAL) {
-
-      addImage.classes.add('image');
-      _setUpSubMenu(addImage, bar, imageMenu, (Element e) => _fillUploadMenu(e, true));
-      _addTitleToElement("Indsæt billede", addImage);
-      bar.append(addImage);
-
-      addFile.classes.add('file');
-      _setUpSubMenu(addFile, bar, fileMenu, (Element e) => _fillUploadMenu(e));
-      _addTitleToElement("Indsæt fil", addFile);
-      bar.append(addFile);
-
-    }
-
-    history.classes.add('history');
-    _setUpSubMenu(history, bar, historyMenu, (Element e) => _fillHistoryMenu(e));
-    _addTitleToElement("Se historik", history);
-    bar.append(history);
-
-    closeElement.classes.add('close');
-    _addTitleToElement("Afslut redigering", closeElement);
-    closeElement.onClick.listen((_) => close());
-    bar.append(closeElement);
-
-    saveElement.classes.add('save');
-    var saveBox = new InfoBox("Gem ændringer");
-    saveBox
-      ..backgroundColor = InfoBox.COLOR_BLACK
-      ..reversed = true;
-    saveElement
-      ..onMouseOver.listen((_) {
-      if (changed) {
-        saveBox.showBelowCenterOfElement(saveElement);
-      }
-    })
-      ..onMouseOut.listen((_) => saveBox.remove())
-      ..onClick.listen((_) {
-      if (changed) {
-        save();
-      }
-      saveBox.remove();
-    });
-    bar.append(saveElement);
-
-    _currentContent.onAddContent.listen((_) => _notifyChange());
-
-    onChange.listen((_) {
-      if (changed) {
-        saveElement.classes.add('enabled');
-      } else {
-        saveElement.classes.remove('enabled');
-        saveBox.remove();
-      }
-    });
-
-
-    bar.classes.add('tool_bar');
-
-
-    wrapper.append(bar);
-
-
-    return wrapper;
-  }
 
   void _notifyChange() => _onContentChangeStreamController.add(false);
 
-  void _fillHistoryMenu(Element menu) {
-    var calendar = new Calendar(), historyList = new UListElement();
-    menu
-      ..classes.add('history_menu')
-      ..classes.add('loading');
-
-    historyList.classes.add("history_list");
-
-    _currentContent.changeTimes.then((List<DateTime> changeTimes) {
-      menu
-        ..classes.remove('loading')
-        ..append(calendar.element)
-        ..append(historyList);
-      _updatePlaceholder();
-
-      var last = new DateTime.fromMillisecondsSinceEpoch(0);
-      var markMap = new Map<TableCellElement, List<DateTime>>(), payloadCache = new Map<TableCellElement, List<LIElement>>();
-      changeTimes.forEach((DateTime dt) {
-        var el = calendar.markDate(dt);
-        markMap.putIfAbsent(el, () => []).add(dt);
-
-      });
-      var currentCell;
-      var createLi = (Revision revision, [UListElement historyList]) {
-        var li = new LIElement(), dt = revision.time;
-        li.text = "${dt.hour < 10 ? "0" + dt.hour.toString() : dt.hour}:${dt.minute < 10 ? "0" + dt.minute.toString() : dt.minute}:${dt.second < 10 ? "0" + dt.second.toString() : dt.second}";
-        if (historyList != null) {
-          historyList.append(li);
-        }
-        li.onMouseOver.listen((_) {
-          var ss;
-          ss = document.onMouseOut.listen((_) {
-            _hidePreview();
-            ss.cancel();
-          });
-          _showPreview(revision);
-        });
-        li.onMouseOut.listen((MouseEvent ev) {
-          ev.preventDefault();
-        });
-        li.onClick.listen((_) {
-          if (revision == _currentRevision && !changed) {
-            return;
-          }
-          li.classes.add('current');
-          _useRevision(revision).then((bool b) {
-            if (b) {
-              return;
-            }
-            li.classes.remove('current');
-          });
-        });
-        onChange.listen((_) {
-          if (_currentRevision == revision || _currentRevision == null || !li.classes.contains('current')) {
-            return;
-          }
-          li.classes.remove('current');
-        });
-        return li;
-      };
-      var setUp = (TableCellElement cell, List<DateTime> times) {
-        var len = markMap[cell].length;
-        var box = new InfoBox("Gemt $len gang${len > 1 ? "e" : ""}");
-        cell.onMouseOver.listen((_) => box.showBelowCenterOfElement(cell));
-        cell.onMouseOut.listen((_) => box.remove());
-        box.reversed = true;
-        box.backgroundColor = InfoBox.COLOR_BLACK;
-        cell.onClick.listen((_) {
-          if (currentCell != null) {
-            currentCell.classes.remove('current');
-          }
-          currentCell = cell;
-          cell.classes.add('current');
-          historyList.children.clear();
-          _updatePlaceholder();
-          if (payloadCache.containsKey(cell)) {
-            historyList.children.addAll(payloadCache[cell]);
-            _updatePlaceholder();
-            return;
-          }
-          historyList.classes.add('loading');
-          _currentContent.listRevisions(from:times.first, to:times.last).then((List<Revision> revisions) {
-            historyList.classes.remove('loading');
-            var l = payloadCache[cell] = new List<LIElement>();
-            revisions.forEach((Revision revision) {
-              var li = createLi(revision, historyList);
-              l.add(li);
-              if (_currentRevision == null && revision.time == changeTimes.last) {
-                li.classes.add('current');
-              }
-            });
-            _updatePlaceholder();
-          });
-        });
-      };
-      markMap.forEach((TableCellElement cell, List<DateTime> times) {
-        setUp(cell, times);
-        if (cell.classes.contains('today')) {
-          cell.click();
-        }
-      });
-      _currentContent.onAddContent.listen((Revision r) {
-        var c = calendar.markDate(r.time);
-        var li = createLi(r, c == currentCell ? historyList : null);
-        li.classes.add("current");
-        _currentRevision = r;
-        payloadCache.putIfAbsent(c, () => []).add(li);
-        markMap.putIfAbsent(c, () => []).add(r.time);
-        setUp(c, [r.time]);
-        if (currentCell == null && c.classes.contains('today')) {
-          c.click();
-        }
-        _notifyChange();
-      });
-    });
-
-  }
-
-
-  void _fillUploadMenu(DivElement menu, [bool images = false]) {
-    menu.classes.add('upload_menu');
-
-    var uploadIconWrapper = new DivElement(), uploadIcon = new DivElement(), fileUploadElementWrapper = new DivElement(), fileUploadElement = new FileUploadInputElement(), preview = new DivElement();
-    uploadIcon.classes.add('upload_icon');
-    uploadIconWrapper
-      ..classes.add('upload_icon_wrapper')
-      ..append(uploadIcon);
-
-    var setUpFileUpload = () {
-      var fileUploadElement = new FileUploadInputElement();
-      fileUploadElement
-        ..hidden = true
-        ..multiple = true;
-      fileUploadElementWrapper.append(fileUploadElement);
-
-      return fileUploadElement;
-    };
-
-    fileUploadElement = setUpFileUpload();
-//TODO Fix close fileupload with ESC
-    preview.classes.add('preview');
-
-    var uploadStrategy = images ? new core.AJAXImageUploadStrategy(new core.ImageSize.scaleMethodLimitToOuterBox(element.clientWidth, 500), new core.ImageSize.scaleMethodLimitToOuterBox(70, 70, dataURI:true)) : new core.AJAXFileUploadStrategy();
-    ;
-    var uploader = new core.FileUploader(uploadStrategy);
-    var container = new EditorFileContainer(new DivElement(), uploadIcon);
-    container.onChange.listen((_) {
-      _updatePlaceholder();
-    });
-
-    if (images) {
-      menu.classes.add('image_menu');
-      preview
-        ..classes.add('image_preview')
-        ..append(container.element);
-      uploader.onFileAddedToQueue.listen((core.FileProgress fp) => container.addImage(new ImageElement(), fp));
-    } else {
-      menu.classes.add('file_menu');
-      preview
-        ..classes.add('file_preview')
-        ..append(container.element);
-      uploader.onFileAddedToQueue.listen((core.FileProgress fp) => container.addFile(new AnchorElement(), fp));
-    }
-
-
-    menu
-      ..append(fileUploadElementWrapper)
-      ..append(preview)
-      ..append(uploadIconWrapper);
-    uploadIcon.onClick.listen((_) => fileUploadElementWrapper.querySelector('input').click());
-
-    fileUploadElementWrapper.onChange.listen((_) {
-      uploader.uploadFiles(fileUploadElementWrapper.querySelector('input').files);
-      fileUploadElement.remove();
-      fileUploadElement = setUpFileUpload();
-    });
-  }
-
-  void _fillTextMenu(DivElement menu) {
-
-    menu.classes.add('text_menu');
-
-    var menuHandler = new MenuOverflowHandler(menu);
-    menuHandler.dropDown
-      ..preventDefaultOnClick = true
-      ..content.classes.add('submenu');
-
-
-    var actionsSetup = (EditorCommandExecutor executor, List<EditorAction> actions, DropDown dropDown, dynamic state()) {
-      actions.forEach((EditorAction a) {
-        if (a.onClickAction != null) {
-          a.element.onMouseDown.listen((_) {
-            a.onClickAction();
-            dropDown.close();
-          });
-        }
-      });
-      executor.listenQueryCommandStateChange(() {
-        var action = actions.firstWhere((EditorAction a) => a.selectionStateChanger(state()), orElse:() => null);
-        dropDown.text = action == null ? dropDown.text : action.element.text;
-      });
-      dropDown.preventDefaultOnClick = true;
-
-    };
-
-    if (editorMode == ContentEditor.EDITOR_MODE_NORMAL) {
-
-
-      var actions = [
-          new EditorAction.liElementWithInnerHtml("<h1>Overskift 1</h1>", () => executor.formatBlockH1(), (String s) => s == "h1", ['t_h1']),
-          new EditorAction.liElementWithInnerHtml("<h2>Overskift 2</h2>", () => executor.formatBlockH2(), (String s) => s == "h2", ['t_h2']),
-          new EditorAction.liElementWithInnerHtml("<h3>Overskrift 3</h3>", () => executor.formatBlockH3(), (String s) => s == "h3", ['t_h3']),
-          new EditorAction.liElementWithInnerHtml("<h4>Overskrift 4</h4>", () => executor.formatBlockH4(), (String s) => s == "h4", ['t_h4']),
-          new EditorAction.liElementWithInnerHtml("<h4>Overskrift 5</h4>", () => executor.formatBlockH5(), (String s) => s == "h5", ['t_h5']),
-          new EditorAction.liElementWithInnerHtml("<h4>Overskrift 6</h4>", () => executor.formatBlockH6(), (String s) => s == "h6", ['t_h6']),
-          new EditorAction.liElementWithInnerHtml("<p>Normal tekst</p>", () => executor.formatBlockP(), (String s) => s == "p", ['t_p']),
-          new EditorAction.liElementWithInnerHtml("<blockquote>Citat</blockquote>", () => executor.formatBlockBlockquote(), (String s) => s == "blockquote", ['t_blockquote']),
-          new EditorAction.liElementWithInnerHtml("<pre>Kode</pre>", () => executor.formatBlockPre(), (String s) => s == "pre", ['t_pre'])];
-
-
-      var textType = new DropDown.fromLIList(actions.map((EditorAction a) => a.element).toList());
-
-      actionsSetup(executor, actions, textType, () => executor.blockState);
-
-      textType.element.classes.add('text_type');
-      textType.text = "Normal tekst";
-      menuHandler.addToMenu(textType.element);
-
-      var sizeActions = [new EditorAction.liElementWithInnerHtml("<font size='1'>Lille</font>", () => executor.setFontSize(1), (int s) => s == 1), new EditorAction.liElementWithInnerHtml("Normal", () {
-        executor.setFontSize(3);
-        var fonts = element.querySelectorAll("font");
-        fonts.forEach((Element e) => e.attributes['size'] == '3' ? (() {
-          e.attributes.remove("size");
-        })() : () {
-        });
-      }, (i) => ![1, 5, 7].contains(i)), new EditorAction.liElementWithInnerHtml("<font size='5'>Stor</font>", () => executor.setFontSize(5), (int s) => s == 5), new EditorAction.liElementWithInnerHtml("<font size='7'>Størst</font>", () => executor.setFontSize(7), (int s) => s == 7)];
-
-      var textSize = new DropDown.fromLIList(sizeActions.map((EditorAction e) => e.element).toList());
-      textSize.element.classes.add('text_size');
-
-      actionsSetup(executor, sizeActions, textSize, () => executor.blockState == "p" ? executor.fontSize : -1);
-
-      menuHandler.addToMenu(textSize.element);
-      textSize.text = "Normal";
-
-
-      var colorContent = new DivElement(), colorSelect = new DropDown(colorContent), textColorPalette = new ColorPalette(), backgroundColorPalette = new ColorPalette(), colorLabel1 = new DivElement(), colorLabel2 = new DivElement();
-
-      colorLabel1
-        ..classes.add('color_label')
-        ..text = "Tekstfarve";
-      colorLabel2
-        ..classes.add('color_label')
-        ..text = "Baggrundsfarve";
-
-      colorSelect.element.classes.add('color');
-      colorSelect.preventDefaultOnClick = true;
-      colorSelect.text = " ";
-      colorContent
-        ..append(colorLabel1)
-        ..append(colorLabel2)
-        ..append(textColorPalette.element)
-        ..append(backgroundColorPalette.element);
-      colorSelect.dropDownBox.element.classes.add('color_select');
-
-      executor.listenQueryCommandStateChange(() {
-        textColorPalette.selected = executor.foreColor;
-        backgroundColorPalette.selected = executor.backColor;
-      });
-
-      textColorPalette.element.onChange.listen((_) {
-        if (textColorPalette.selected != null) {
-          executor.setForeColor(textColorPalette.selected);
-          colorSelect.close();
-        }
-      });
-
-      backgroundColorPalette.element.onChange.listen((_) {
-        if (backgroundColorPalette.selected != null) {
-          executor.setBackColor(backgroundColorPalette.selected);
-          colorSelect.close();
-        }
-      });
-      menuHandler.addToMenu(colorSelect.element);
-
-    }
-    var dialog = new DialogContainer();
-
-    dialog.dialogBg.onMouseDown.listen((MouseEvent evt) {
-      evt.preventDefault();
-//      evt.preventDefault();
-    });
-
-    var dialogLink = () {
-
-      var selection = window.getSelection();
-      if (!element.contains(selection.baseNode)) {
-        return;
-      }
-
-      var ranges = [];
-      for (var i = 0; i < selection.rangeCount; i++) {
-        ranges.add(selection.getRangeAt(i));
-      }
-
-      selection.removeAllRanges();
-      var box = dialog.text("Indtast link adresse", value:"http://");
-
-      box.result.then((String s) {
-        s = s.trim();
-        ranges.forEach((Range r) => selection.addRange(r));
-        if (s.length <= 0 || s == "http://") {
-          return;
-        }
-        var r = ranges.first;
-        var commonAncestorContainer = r.commonAncestorContainer;
-        var parent = commonAncestorContainer;
-
-        while (parent != null && parent.nodeType != Node.ELEMENT_NODE) {
-          parent = parent.parentNode;
-        }
-
-        var linksBefore = parent.querySelectorAll("a");
-
-        ranges.first.selectNode(element);
-        executor.createLink(s);
-
-        var linksAfter = parent.querySelectorAll("a");
-
-        linksAfter.forEach((AnchorElement a) {
-          if (!linksBefore.contains(a)) {
-            a.target = "_blank";
-          }
-        });
-      });
-    };
-
-    var textIconMap = {
-        "bold":{
-            "title":"Fed skrift", "selChange":() => executor.bold, "func":() => executor.toggleBold()
-        }, "italic":{
-            "title":"Kursiv skrift", "selChange":() => executor.italic, "func":() => executor.toggleItalic()
-        }, "underline":{
-            "title":"Understreget skrift", "selChange":() => executor.underline, "func":() => executor.toggleUnderline()
-        }, "u_list":{
-            "title":"Uordnet liste", "selChange":() => executor.unorderedList, "func":() => executor.toggleUnorderedList()
-        }, "o_list":{
-            "title":"Ordnet liste", "selChange":() => executor.orderedList, "func":() => executor.toggleOrderedList()
-        }, "a_left":{
-            "title":"Juster venstre", "selChange":() => executor.alignLeft, "func":() => executor.justifyLeft()
-        }, "a_center":{
-            "title":"Juster centreret", "selChange":() => executor.alignCenter, "func":() => executor.justifyCenter()
-        }, "a_right":{
-            "title":"Juster højre", "selChange":() => executor.alignRight, "func":() => executor.justifyRight()
-        }, "a_just":{
-            "title":"Juster lige", "selChange":() => executor.alignJust, "func":() => executor.justifyFull()
-        }, "p_indent":{
-            "title":"Indryk mere", "selChange":null, "func":() => executor.indent()
-        }, "m_indent":{
-            "title":"Indryk mindre", "selChange":null, "func":() => executor.outdent()
-        }, "superscript":{
-            "title":"Hævet skrift", "selChange":() => executor.superScript, "func":() => executor.toggleSuperScript()
-        }, "subscript":{
-            "title":"Sænket skrift", "selChange":() => executor.subScript, "func":() => executor.toggleSubscript()
-        }, "strikethrough":{
-            "title":"Gennemstreget", "selChange":() => executor.strikeThrough, "func":() => executor.toggleStrikeThrough()
-        }, "insert_link":{
-            "title":"Indsæt link", "selChange":null, "func":dialogLink
-        }, "no_format":{
-            "title":"Fjern formatering", "selChange":null, "func":() {
-              var selection = window.getSelection();
-              var range = selection.getRangeAt(0);
-              Element commonAncestor = range.commonAncestorContainer;
-              if (!(commonAncestor is Element)) {
-                executor.removeFormat();
-                return;
-              }
-              commonAncestor.querySelectorAll("*").forEach((Element elm) {
-                if (!element.contains(elm) || !selection.containsNode(elm, true)) {
-                  return;
-                }
-                elm.attributes.remove("style");
-              });
-              executor.removeFormat();
-            }
-        }
-    };
-
-    textIconMap.forEach((String k, Map<String, dynamic> v) {
-      var b = new ButtonElement();
-      var i;
-      b
-        ..classes.add(k);
-      _addTitleToElement(v['title'], b);
-      var f = () {
-      };
-      if (v['selChange'] != null) {
-        executor.listenQueryCommandStateChange(() => v['selChange']() ? b.classes.add('active') : b.classes.remove('active'));
-        f = () => executor.triggerCommandStateChangeListener();
-      }
-      b.onClick.listen((_) {
-        v["func"]();
-        f();
-      });
-
-      menuHandler.addToMenu(b);
-
-    });
-
-
-  }
-
-  InfoBox _addTitleToElement(String title, Element e) {
-    var i = new InfoBox(title);
-    i
-      ..backgroundColor = InfoBox.COLOR_BLACK
-      ..reversed = true;
-    e
-      ..onMouseOver.listen((_) => i.showBelowCenterOfElement(e))
-      ..onMouseOut.listen((_) => i.remove())
-      ..onClick.listen((_) => i.remove());
-    onChange.listen((_) => i.remove());
-    return i;
-  }
-
-
-//  String get id => element.id;
 
 }
 

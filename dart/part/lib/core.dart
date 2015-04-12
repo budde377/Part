@@ -28,11 +28,11 @@ String sizeToString(int bytes) {
   return m[1] + m[2];
 }
 
-bool validMail(String string) => new RegExp(r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$', caseSensitive:false).hasMatch(string);
+bool validMail(String string) => new RegExp('^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}\$', caseSensitive:false).hasMatch(string);
 
-bool validUrl(String string) => new RegExp(r"^http(s)?://.+\.[a-z]{2,3}(/[.]*)?$", caseSensitive:false).hasMatch(string);
+bool validUrl(String string) => new RegExp("^http(s)?://.+\.[a-z]{2,3}(/[.0-9]*)?\$", caseSensitive:false).hasMatch(string);
 
-bool youtubeVideoIdFromUrl(String string) {
+String youtubeVideoIdFromUrl(String string) {
   var firstMatch = new RegExp(r"^http(s)?:\/\/www.youtube.com\/watch\?v=([^&#]+)", caseSensitive:false).firstMatch(string);
   if (firstMatch == null) {
     return null;
@@ -40,7 +40,7 @@ bool youtubeVideoIdFromUrl(String string) {
   return firstMatch[2];
 }
 
-bool vimeoVideoIdFromUrl(String string) {
+String vimeoVideoIdFromUrl(String string) {
   var firstMatch = new RegExp(r"^http(s)?:\/\/vimeo.com/([^&#]+)", caseSensitive:false).firstMatch(string);
   if (firstMatch == null) {
     return null;

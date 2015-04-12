@@ -250,7 +250,7 @@ class InfoBox extends FloatingBox{
 
 }
 
-class DropDown{
+class DropDown {
   static const int SHOW_BELOW_LEFT_OF_ELEMENT = 1,
             SHOW_BELOW_CENTER_OF_ELEMENT = 2,
             SHOW_BELOW_ALIGN_RIGHT = 3;

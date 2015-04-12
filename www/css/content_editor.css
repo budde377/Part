@@ -5,20 +5,14 @@
 }
 
 .edit_content_wrapper .tool_bar_wrapper {
-    height: 29px;
     overflow: hidden;
     transition-property: height, box-shadow;
     transition-duration: 0.1s;
     background-color: rgb(221, 221, 221);
 }
 
-.edit_content_wrapper .tool_bar_wrapper > div {
-    z-index: 1;
-    position: relative;
 
-}
-
-.edit_content_wrapper .tool_bar_wrapper.floating, .edit_content_wrapper .tool_bar_wrapper.fixed {
+.edit_content_wrapper .tool_bar_wrapper.floating:not(.fixed){
     z-index: 200;
     top: 0;
 }
@@ -30,6 +24,8 @@
 
 .edit_content_wrapper .tool_bar_wrapper.fixed {
     position: absolute;
+    bottom: 0;
+    width: 100%;
 }
 
 .edit_content_wrapper .tool_bar_placeholder {
@@ -486,18 +482,14 @@
     min-height: 148px;
 }
 
-.edit_content_wrapper .menu.history_menu.loading {
-    background: url(/_common/img/ajax-loader.gif) scroll no-repeat center center;
+.edit_content_wrapper .menu.history_menu.blur:after{
+    background-color: rgba(221,221,221,0.7);
 }
 
 .edit_content_wrapper .menu.history_menu .calendar {
     float: left;
 }
 
-.edit_content_wrapper .menu.history_menu ul.history_list.loading {
-    background: url(/_common/img/ajax-loader.gif) scroll no-repeat center center;
-    min-height: 148px;
-}
 
 .edit_content_wrapper .menu.history_menu ul.history_list {
     overflow: hidden;

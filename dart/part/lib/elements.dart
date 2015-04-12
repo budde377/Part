@@ -147,9 +147,9 @@ bool isTopVisible(Element element) => element.documentOffset.y > window.scrollY;
 
 Stream<bool> topOfElementVisibleStream(Element element) => core.functionStreamGenerator(()=>isTopVisible(element), [window.onResize, window.onScroll]);
 
-Stream<bool> childBottomInContainer(Element child, Element container) => core.functionStreamGenerator(()=>isChildBottomInContainer(child, container), [window.onResize, window.onScroll]);
+Stream<bool> childBottomInContainerStream(Element child, Element container) => core.functionStreamGenerator(()=>isChildBottomInContainer(child, container), [window.onResize, window.onScroll]);
 
-Stream<bool> childTopInContainer(Element child, Element container) => core.functionStreamGenerator(()=>isChildBottomInContainer(child, container), [window.onResize, window.onScroll]);
+Stream<bool> childTopInContainerStream(Element child, Element container) => core.functionStreamGenerator(()=>isChildBottomInContainer(child, container), [window.onResize, window.onScroll]);
 
 bool isChildBottomInContainer(Element child, Element container) => child.documentOffset.y + child.offsetHeight > container.documentOffset.y+container.offsetHeight;
 
