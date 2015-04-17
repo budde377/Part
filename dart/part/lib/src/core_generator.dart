@@ -72,8 +72,6 @@ class Generator<K, V> extends PairGeneratorDependable<K,V>{
   final StreamController<Pair<K, V>>
   _onBeforeAddController = new StreamController<Pair<K, V>>.broadcast(),
   _onBeforeRemoveController = new StreamController<Pair<K, V>>.broadcast(),
-  _onEmptyController = new StreamController<Pair<K, V>>.broadcast(),
-  _onNotEmptyController = new StreamController<Pair<K, V>>.broadcast(),
   _onAddController = new StreamController<Pair<K, V>>.broadcast(),
   _onUpdateController = new StreamController<Pair<K, V>>.broadcast(),
   _onRemoveController = new StreamController<Pair<K, V>>.broadcast();

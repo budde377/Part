@@ -124,8 +124,6 @@ abstract class UploadStrategy {
 class AJAXImageUploadStrategy extends UploadStrategy {
 
 
-  Map<String, ImageSize> _sizes;
-
   ImageSize _size, _preview;
 
   AJAXImageUploadStrategy(ImageSize size, ImageSize preview) {
@@ -204,7 +202,6 @@ class FileUploader {
 
   final UploadStrategy uploadStrategy;
 
-  FileReader _reader = new FileReader();
 
   List<File> _queue = new List<File>();
 

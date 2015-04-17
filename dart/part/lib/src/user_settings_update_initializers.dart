@@ -7,8 +7,6 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
 
   SpanElement _checkTime = querySelector("#UserSettingsContent .update_site span.check_time");
 
-  JSONClient _client = new AJAXJSONClient();
-
   DivElement _updateInformationMessage = querySelector("#UpdateInformationMessage");
 
   bool _canBeUpdated;
@@ -118,7 +116,7 @@ class UserSettingsUpdateSiteInitializer extends core.Initializer {
       loader.stopLoading();
       updateDone = true;
       _updateCheckButton();
-      var t = new Timer(new Duration(seconds:1), () {
+      new Timer(new Duration(seconds:1), () {
         window.location.reload();
       });
     });

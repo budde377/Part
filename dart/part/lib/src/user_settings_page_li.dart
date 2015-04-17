@@ -46,7 +46,6 @@ class UserSettingsActivePagesPath {
       li.li.parent.classes.add('showSubList');
       li.li.classes.add('hasSubList');
     });
-    var pageLi = new UserSettingsPageLi.fromPageId(page_id);
     activeList.classes.add('showSubList');
     _up.classes.remove('hidden');
     _updatePath();

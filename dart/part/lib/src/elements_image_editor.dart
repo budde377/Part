@@ -426,8 +426,6 @@ class ImageEditor {
 
   int get cropH => _cropShape == null ? null : _cropShape.cropH;
 
-  num _interval(num n, num min, num max) => Math.max(min, Math.min(max, n));
-
   CanvasShape get dotNE => _cropShape == null ? null : _cropShape.dotNE;
 
   CanvasShape get dotNW => _cropShape == null ? null : _cropShape.dotNW;
@@ -569,7 +567,7 @@ class ImageEditorHandler {
           return;
         }
         progress_bar.percentage = 1;
-        var t = new Timer(new Duration(milliseconds:500), () {
+        new Timer(new Duration(milliseconds:500), () {
           _savingBar.classes.remove("saving");
           progress_bar.bar.remove();
         });

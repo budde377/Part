@@ -40,8 +40,6 @@ class AJAXMailMailbox extends MailMailbox {
 
   String _name;
 
-  JSONClient _client = new AJAXJSONClient();
-
   StreamController
   _onDeleteController = new StreamController(),
   _onNameChangeController = new StreamController();

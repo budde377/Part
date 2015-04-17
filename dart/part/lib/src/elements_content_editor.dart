@@ -183,12 +183,10 @@ class _EditorGalleryHandler implements _EditorHandler {
 
   _EditorImageHandler original;
 
-  DivElement _imageCount = new DivElement(), _previewContent = new DivElement();
+  DivElement _imageCount = new DivElement();
 
-  InfoBox _infoBox;
 
   _EditorGalleryHandler(_EditorImageHandler h) : element = h.element, original = h {
-    _infoBox = new InfoBox.elementContent(_previewContent);
     _children.add(h);
     element.classes.add('gallery');
     element.append(_imageCount);
@@ -543,12 +541,6 @@ class UnlinkEditorClickActionItem extends EditorClickActionItem<AnchorElement> {
   AnchorElement actionTarget(MouseEvent event) => _recursiveElementFind(event.target, (Node element) => element is AnchorElement);
 
 
-}
-
-_selectNodeContents(Node node) {
-  var range = document.createRange();
-  range.selectNodeContents(node);
-  _selectRange(range);
 }
 
 _selectNode(Node node) {
@@ -1110,7 +1102,6 @@ class HistoryEditorMenuItem extends EditorMenuItem {
     _blurMenu();
     editor.content.changeTimes.then((List<DateTime> changeTimes) {
       _unBlurMenu();
-      var last = new DateTime.fromMillisecondsSinceEpoch(0);
 
       changeTimes.forEach((DateTime dt) => markMap.putIfAbsent(calendar.markDate(dt), () => []).add(dt));
 

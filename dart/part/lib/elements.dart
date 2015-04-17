@@ -76,8 +76,6 @@ class ExpanderElementHandler {
   final Element element;
   final Element expanderLink = new DivElement();
   static final _cache = new Map<Element, ExpanderElementHandler>();
-  Function _contractFunction = () {
-  };
 
   StreamController<ExpanderElementHandler>
   _onChangeController = new StreamController<ExpanderElementHandler>(),
