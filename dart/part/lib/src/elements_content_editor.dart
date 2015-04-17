@@ -412,11 +412,97 @@ class _EditorFileContainer {
 
 }
 
-_recursiveElementFind(Element element, bool check(Element)) {
+_recursiveElementFind(Node element, bool check(Node)) {
   if (element == null || check(element)) {
     return element;
   }
   return _recursiveElementFind(element.parent, check);
+}
+
+abstract class EditorKeyboardAction {
+  final ContentEditor editor;
+
+  EditorKeyboardAction(this.editor);
+
+  bool check(KeyboardEvent event);
+
+  void performAction(KeyboardEvent event);
+
+}
+
+
+class SaveEditorKeyboardAction extends EditorKeyboardAction {
+  SaveEditorKeyboardAction(ContentEditor editor) : super(editor);
+
+  bool check(KeyboardEvent event) => event.keyCode == 83 && event.ctrlKey;
+
+  void performAction(KeyboardEvent event) {
+    event.preventDefault();
+    editor.save();
+  }
+
+
+}
+
+class AddLinkEditorKeyboardAction extends EditorKeyboardAction {
+  AddLinkEditorKeyboardAction(ContentEditor editor) : super(editor);
+
+  String link;
+  Range range;
+  bool url;
+
+  bool check(KeyboardEvent event) {
+    if (event.keyCode != 32) {
+      return false;
+    }
+    var selection = window.getSelection();
+    if (selection.rangeCount == 0) {
+      return false;
+    }
+
+    range = selection.getRangeAt(0);
+    var endOffset = range.endOffset;
+    if (range.startOffset != endOffset || range.startContainer != range.endContainer) {
+      return false;
+    }
+
+    var parentNode = range.startContainer;
+
+    if (_recursiveElementFind(parentNode, (Node node) => node is AnchorElement) != null) {
+      return false;
+    }
+
+    var value = parentNode.nodeValue;
+    if (value == null) {
+      return false;
+    }
+
+    var match = new RegExp(r"\s([^\s]+)$").firstMatch(" " + value.substring(0, endOffset));
+    if (match == null) {
+      return false;
+    }
+
+    link = match.group(1);
+
+    return (url = core.validUrl(link)) || core.validMail(link);
+  }
+
+  void performAction(KeyboardEvent event) {
+    range.setStart(range.startContainer, range.endOffset - link.length);
+    var selection = window.getSelection();
+    selection
+      ..removeAllRanges()
+      ..addRange(range);
+
+    editor.executor.createLink(url ? link : "mailto:$link");
+    range.setStart(range.endContainer, range.endOffset);
+    selection
+      ..removeAllRanges()
+      ..addRange(range);
+
+    event.preventDefault();
+
+  }
 }
 
 
@@ -454,7 +540,7 @@ class UnlinkEditorClickActionItem extends EditorClickActionItem<AnchorElement> {
   }
 
 
-  AnchorElement actionTarget(MouseEvent event) => _recursiveElementFind(event.target, (Element element) => element is AnchorElement);
+  AnchorElement actionTarget(MouseEvent event) => _recursiveElementFind(event.target, (Node element) => element is AnchorElement);
 
 
 }
@@ -491,7 +577,7 @@ class OpenEditorClickActionItem extends EditorClickActionItem<AnchorElement> {
   }
 
 
-  AnchorElement actionTarget(MouseEvent event) => _recursiveElementFind(event.target, (Element element) => element is AnchorElement);
+  AnchorElement actionTarget(MouseEvent event) => _recursiveElementFind(event.target, (Node element) => element is AnchorElement);
 
 
 }
@@ -517,7 +603,7 @@ class ImageEditorClickActionItem extends EditorClickActionItem<ImageElement> {
     });
   }
 
-  ImageElement actionTarget(MouseEvent event) => _recursiveElementFind(event.target, (Element element) => element is ImageElement);
+  ImageElement actionTarget(MouseEvent event) => _recursiveElementFind(event.target, (Node element) => element is ImageElement);
 
 }
 
@@ -1176,6 +1262,33 @@ class SaveEditorMenuItem extends EditorMenuItem {
 
 }
 
+
+class DraftEditorMenuItem extends EditorMenuItem {
+
+  DraftEditorMenuItem(ContentEditor editor) : super(editor) {
+    button
+      ..classes.add('draft')
+      ..hidden = !editor.content.hasDraft
+      ..text = "Kladde findes"
+      ..onClick.listen((_) {
+      editor.useRevision(editor.content.draft);
+      editor.content.clearDraft();
+    })
+      ..onMouseEnter.listen((_) {
+      editor.showPreview(editor.content.draft);
+    })
+      ..onMouseLeave.listen((_) {
+      editor.hidePreview();
+    });
+
+    addTitleToElement("Brug kladde", button);
+
+    editor.content.onHasDraftChange.listen((bool b) => button.hidden = !b);
+  }
+
+  DivElement get menu => null;
+}
+
 class ContentEditor {
 
 
@@ -1219,6 +1332,8 @@ class ContentEditor {
 
   List<EditorClickActionItem> _clickActionItems = [];
 
+  List<EditorKeyboardAction> _keyDownActions = [];
+
   InfoBox _clickActionInfoBox;
 
   DivElement _clickActionInfoBoxElement = new DivElement();
@@ -1243,6 +1358,7 @@ class ContentEditor {
     }
     addMenuItem(new HistoryEditorMenuItem(this));
     addMenuItem(new SaveEditorMenuItem(this));
+    addMenuItem(new DraftEditorMenuItem(this));
     addMenuItem(new CloseEditorMenuItem(this));
 
     addClickActionItem(new UnlinkEditorClickActionItem(this));
@@ -1250,11 +1366,16 @@ class ContentEditor {
     addClickActionItem(new EmbedVideoEditorClickActionItem.youtube(this));
     addClickActionItem(new EmbedVideoEditorClickActionItem.vimeo(this));
     addClickActionItem(new ImageEditorClickActionItem(this));
+
+    addKeyDownAction(new SaveEditorKeyboardAction(this));
+    addKeyDownAction(new AddLinkEditorKeyboardAction(this));
   }
 
   void addClickActionItem(EditorClickActionItem item) {
     _clickActionItems.add(item);
   }
+
+  void addKeyDownAction(EditorKeyboardAction action) => _keyDownActions.add(action);
 
   void addMenuItem(EditorMenuItem item) {
     _menuItems.add(item);
@@ -1337,7 +1458,7 @@ class ContentEditor {
       if (_closed || !changed) {
         return;
       }
-      event.returnValue = "Du har ikke gemt dine ændringer.";
+      content.draft = _revisionNow;
     });
 
     element.onKeyDown.listen(_keyDownHandler);
@@ -1349,6 +1470,7 @@ class ContentEditor {
       ..onScroll.listen((_) => _updateBarPosition())
       ..onResize.listen((_) => _updateBarPosition());
   }
+
 
   void _clickActionHandler(MouseEvent event) {
     if (_closed) {
@@ -1413,69 +1535,15 @@ class ContentEditor {
   }
 
   void _keyDownHandler(KeyboardEvent kev) {
-    if (!_closed && kev.keyCode == 83 && kev.ctrlKey) {
-      kev.preventDefault();
-      save();
+    if (_closed) {
       return;
     }
-
-    if (kev.keyCode != 32) {
-      return;
-    }
-    var selection = window.getSelection();
-    if (selection.rangeCount == 0) {
-      return;
-    }
-    var range = selection.getRangeAt(0);
-    var endOffset = range.endOffset;
-    if (range.startOffset != endOffset) {
-      return;
-    }
-    var parentNode = range.commonAncestorContainer;
-
-    var q = parentNode.parent;
-    while (q != null) {
-      if (q is AnchorElement) {
+    _keyDownActions.forEach((EditorKeyboardAction action) {
+      if (!action.check(kev)) {
         return;
       }
-      q = q.parent;
-    }
-
-    var value = parentNode.nodeValue;
-    if (value == null) {
-      return;
-    }
-
-    var match = new RegExp(r"\s([^\s]+)$").firstMatch(" " + value.substring(0, endOffset));
-
-    if (match == null) {
-      return;
-    }
-
-    var m = match.group(1);
-
-    if (m.trim() != m) {
-      return;
-    }
-
-    if (!core.validUrl(m) && !core.validMail(m)) {
-      return;
-    }
-
-    var start = endOffset - m.length;
-    var t1 = new Text(value.substring(0, start)), t2 = new Text(" " + value.substring(endOffset));
-    var p = parentNode.parent;
-    p.insertBefore(t1, parentNode);
-    var anchor = new AnchorElement();
-    anchor.text = m;
-    anchor.href = (core.validMail(m) ? "mailto:" : "") + m;
-    anchor.target = "_blank";
-    p.insertBefore(anchor, parentNode);
-    p.insertBefore(t2, parentNode);
-    kev.preventDefault();
-    parentNode.remove();
-    selection.setPosition(t2, 1);
-
+      action.performAction(kev);
+    });
 
   }
 
@@ -1583,30 +1651,15 @@ class ContentEditor {
 
   }
 
+  Revision get _revisionNow => new Revision(new DateTime.now(), element.innerHtml);
+
   void close() {
     if (_closed) {
       return;
     }
     if (changed) {
-      new DialogContainer()
-      .confirm("Du har ikke gemt dine ændringer. <br /> Er du sikker på at du vil afslutte?")
-        ..result
-      .then((bool answer) {
-        core.debug(answer);
-        if (answer) {
-          _loadRevision(_lastSavedRevision);
-          close();
-        } else {
-          _addEscToQueue();
-        }
-      })
-        ..onClose.listen((_) {
-        if(_closed){
-          return;
-        }
-        _addEscToQueue();
-      });
-      return;
+      content.draft = _revisionNow;
+      _loadRevision(_lastSavedRevision);
     }
 
     _closeMenuItem();
