@@ -161,12 +161,12 @@ class Debugger {
     print("$_tabs$o");
   }
 
-  void insertTab(){
+  void insertTab() {
     _tabs += "\t";
   }
 
-  void removeTab(){
-    if(numTabs == 0){
+  void removeTab() {
+    if (numTabs == 0) {
       return;
     }
     _tabs = _tabs.substring(1);
@@ -180,14 +180,13 @@ class Debugger {
 
 Debugger get debugger => new Debugger();
 
-Object debug(Object o){
+Object debug(Object o) {
   debugger.debug(o);
   return o;
 }
 
 
-final double GOLDEN_RATIO = ((Math.sqrt(5)+1)/2);
-
+final double GOLDEN_RATIO = ((Math.sqrt(5) + 1) / 2);
 
 
 String dayNumberToName(int weekday) {
@@ -263,25 +262,45 @@ String monthNumberToName(int monthNumber) {
 
 String addLeadingZero(int i) => i < 10 ? "0$i" : "$i";
 
-String dateString(DateTime dt) {
+String dateString(DateTime time, [with_time=true]) {
   var now = new DateTime.now();
+  now = new DateTime(now.year, now.month, now.day);
+  time = new DateTime(time.year, time.month, time.day);
+  var diff = now.difference(time).inDays;
 
   var returnString = "";
-  if (now.day != dt.day || now.month != dt.month || now.year != dt.year) {
-    returnString = "${dayNumberToName(dt.weekday)} ";
-  } else {
-    returnString = "i dag ";
+
+  switch (diff) {
+    case 0:
+      returnString = "i dag ";
+      break;
+    case -1:
+      returnString = "i morgen";
+      break;
+    case 2:
+      returnString = "i forgårs";
+    break;
+    case 1:
+      returnString = "i går";
+      break;
+    case -2:
+      returnString = "i overmorgen";
+    break;
+  default:
+      returnString = "${dayNumberToName(time.weekday)} d. ${time.day}. ${monthNumberToName(time.month)} ${time.year} ";
+
   }
 
-  if (now.difference(dt).inDays > 7) {
-    returnString += "d. ${dt.day}. ${monthNumberToName(dt.month)} ${dt.year} ";
+
+
+  if (!with_time) {
+    return returnString.trim();
   }
 
-  returnString += "kl. ${addLeadingZero(dt.hour)}:${addLeadingZero(dt.minute)}";
+  returnString += "kl. ${addLeadingZero(time.hour)}:${addLeadingZero(time.minute)}";
 
   return returnString.trim();
 }
-
 
 
 class Pair<K, V> {
@@ -292,12 +311,12 @@ class Pair<K, V> {
 
 }
 
-String quoteString(String string, [String quote = '"']) => quote+(string.replaceAll(quote, r"\"+quote))+quote;
+String quoteString(String string, [String quote = '"']) => quote + (string.replaceAll(quote, r"\" + quote)) + quote;
 
 
 String upperCaseWords(String str) => str.replaceAllMapped(new RegExp("^([a-z\u00E0-\u00FC])|\\s([a-z\u00E0-\u00FC])"), (Match m) => m[0].toUpperCase());
 
-Stream functionStreamGenerator( fun(), Iterable<Stream> streams) {
+Stream functionStreamGenerator(fun(), Iterable<Stream> streams) {
   StreamController c = new StreamController<bool>();
   var last = fun();
   var f = (_) {

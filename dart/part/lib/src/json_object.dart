@@ -2,11 +2,11 @@ part of json;
 
 class JSONObject {
   final String name;
-  final Map<String, dynamic> variables = new Map();
+final Map<String, dynamic> variables = new Map();
 
-  JSONObject(String name) : this.name = name;
+JSONObject(String name) : this.name = name;
 
-  String get jsonString => JSON.encode({"type":"object", "name":name, "variables":variables});
+String get jsonString => JSON.encode({"type":"object", "name":name, "variables":variables});
 
 }
 

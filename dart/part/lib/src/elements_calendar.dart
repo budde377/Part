@@ -9,7 +9,10 @@ class Calendar {
 
   final TableElement table;
 
-  Map<int, TableCellElement> _cellMap = new Map<int, TableCellElement>();
+  DateTime _selectedDate;
+
+  Map<DateTime, TableCellElement> _cellMap = new Map<DateTime, TableCellElement>();
+  Map<TableCellElement, DateTime> _timeMap = new Map<TableCellElement, DateTime>();
 
   Calendar() : element = new DivElement(), nav = new DivElement(), leftNav = new DivElement(), rightNav = new DivElement(), table = new TableElement(), navText = new SpanElement() {
     date = _now;
@@ -45,17 +48,33 @@ class Calendar {
   this.element = element,
   nav = navDiv
   {
-    _cellMap = new Map.fromIterable(table.querySelectorAll('td'),
-    key:(TableCellElement td) => _dateTimeToInt(timeMapper(td)),
-    value:(TableCellElement td) => td);
-    _cellMap.forEach((_, TableCellElement td){
+    _cellMap =
+    new Map.fromIterable(
+        table.querySelectorAll('td'),
+        key:(TableCellElement td) => _normalizeDateTime(timeMapper(td)),
+        value:(TableCellElement td) => td);
+
+    _cellMap.forEach((DateTime time, TableCellElement td) {
+      _timeMap[td] = time;
       var dt = timeMapper(td);
-      if(timeMarker(dt)){
+      if (timeMarker(dt)) {
         markDate(dt);
       }
     });
 
     date = showing;
+  }
+
+  void set selectedDate(DateTime date) {
+    if(_selectedDate != null){
+      _createCell(_selectedDate).classes.remove('selected');
+    }
+    var cell = _createCell(date);
+    cell.classes.add('selected');
+    _selectedDate = date;
+  }
+  DateTime get selectedDate {
+    return _selectedDate;
   }
 
   bool get showNav => nav.hidden;
@@ -67,6 +86,7 @@ class Calendar {
     cell.classes.add('marked');
     return cell;
   }
+
 
   String _dateToString(DateTime dt) {
     var m = ["", "Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
@@ -99,23 +119,35 @@ class Calendar {
 
   }
 
-  int _dateTimeToInt(DateTime dt) => dt.year * 10000 + dt.month * 100 + dt.day;
+  DateTime _normalizeDateTime(DateTime dt) => new DateTime(dt.year, dt.month, dt.day);
 
-  TableCellElement _createCell(DateTime dt) {
-    var cell = _cellMap.putIfAbsent(_dateTimeToInt(dt), () => new TableCellElement());
+  TableCellElement _createCell(DateTime time) {
+    time = _normalizeDateTime(time);
+    var cell = _cellMap.putIfAbsent(time, () {
+      var cell = new TableCellElement();
+      _timeMap[cell] = time;
+      return cell;
+    });
+
     if (cell.text.length == 0) {
-      cell.text = "${dt.day}";
-      if (dt.day == _now.day && dt.month == _now.month && dt.year == _now.year) {
+      cell.text = "${time.day}";
+      if (time.day == _now.day && time.month == _now.month && time.year == _now.year) {
         cell.classes.add('today');
       }
 
     }
-    if (dt.month != _showDate.month) {
+    if (time.month != _showDate.month) {
       cell.classes.add('another_month');
     } else {
       cell.classes.remove('another_month');
     }
     return cell;
   }
+
+
+  DateTime timeFromCell(TableCellElement cell) => _timeMap[cell];
+
+
+  Stream<TableCellElement> get onClickCell => table.onClick.where((MouseEvent event) => event.target is TableCellElement).map((MouseEvent event) => event.target);
 }
 
