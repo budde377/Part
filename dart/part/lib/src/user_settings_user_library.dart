@@ -16,13 +16,11 @@ class UserSettingsJSONUserLibrary implements UserLibrary {
     var users = <User>[], currentUser = "";
 
     lis.forEach((LIElement li) {
-      var aElement = li.querySelector('.val'), privileges = li.querySelector('.privileges');
-      var username, mail, parent, lastLogin, t;
+      var username, mail, parent, lastLogin;
       parent = li.dataset["parent"];
       username = li.dataset["username"];
       mail = li.dataset["mail"];
       lastLogin = li.dataset["lastLogin"]== ""?null:int.parse(li.dataset["lastLogin"]);
-      var client = new AJAXJSONClient();
       var p = li.dataset["privileges"], privilege;
       switch(p){
         case "root":

@@ -78,7 +78,7 @@ class UserLibraryTypeHandlerImpl extends GenericObjectTypeHandlerImpl
                     if ($user != null) {
                         continue;
                     }
-                    if ($u->getMail() !== trim($username)) {
+                    if ($u->getMail() !== $username) {
                         continue;
                     }
                     if (!$u->verifyLogin($password)) {

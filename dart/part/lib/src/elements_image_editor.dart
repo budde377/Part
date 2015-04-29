@@ -426,8 +426,6 @@ class ImageEditor {
 
   int get cropH => _cropShape == null ? null : _cropShape.cropH;
 
-  num _interval(num n, num min, num max) => Math.max(min, Math.min(max, n));
-
   CanvasShape get dotNE => _cropShape == null ? null : _cropShape.dotNE;
 
   CanvasShape get dotNW => _cropShape == null ? null : _cropShape.dotNW;
@@ -460,8 +458,7 @@ class ImageEditorHandler {
 
   bool _saving = false;
 
-  StreamController<ImageEditProperties> _editStreamController = new StreamController<ImageEditProperties>();
-  Stream<ImageEditProperties> _stream;
+  StreamController<String> _editStreamController = new StreamController<String>.broadcast();
 
   factory ImageEditorHandler(ImageEditor ie) => _cache.putIfAbsent(ie, () => new ImageEditorHandler._internal(ie));
 
@@ -501,7 +498,7 @@ class ImageEditorHandler {
   }
 
 
-  Stream<ImageEditProperties> get onEdit => _stream == null ? _stream = _editStreamController.stream.asBroadcastStream() : _stream;
+  Stream<String> get onEdit => _editStreamController.stream;
 
   int _inDot(num x, num y) {
     var p = transformMirror(x, y);
@@ -553,31 +550,31 @@ class ImageEditorHandler {
     });
 
     _save.onClick.listen((_) {
-      var p = editor.properties;
+      var properties = editor.properties;
 
-      if (_properties == null || p == _properties || _saving) {
+      if (_properties == null || properties == _properties || _saving) {
         return;
       }
-      var pb = new ProgressBar();
-      pb.percentage = 0;
-      _savingBar.append(pb.bar);
+      var progress_bar = new ProgressBar();
+      progress_bar.percentage = 0;
+      _savingBar.append(progress_bar.bar);
       _savingBar.classes.add("saving");
       _saving = true;
 
 
-      ajaxClient.callFunctionString(p.toFunctionString() + ".getPath()").then((JSONResponse response) {
+      ajaxClient.callFunctionString(properties.toFunctionString() + ".getPath()").then((core.Response response) {
         if (response.type != core.Response.RESPONSE_TYPE_SUCCESS) {
           return;
         }
-        pb.percentage = 1;
-        var t = new Timer(new Duration(milliseconds:500), () {
+        progress_bar.percentage = 1;
+        new Timer(new Duration(milliseconds:500), () {
           _savingBar.classes.remove("saving");
-          pb.bar.remove();
+          progress_bar.bar.remove();
         });
-        editor.image.src = "/_files/" + response.payload;
-        _properties = p;
+        var path = "/_files/" + response.payload;
+        _properties = new ImageEditProperties.fromUrlString( path);
         _saving = false;
-        _editStreamController.add(p);
+        _editStreamController.add(path);
       });
 
     });

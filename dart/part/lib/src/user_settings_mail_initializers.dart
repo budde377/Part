@@ -574,7 +574,6 @@ class UserSettingsMailInitializer extends core.Initializer {
           });
         });
       });
-      var targetDomain = domain.aliasTarget;
 
       domain.onAliasTargetChange.listen((_) {
         if (domain.aliasTarget == null) {
@@ -624,11 +623,8 @@ class UserSettingsMailInitializer extends core.Initializer {
     }
 
     var vForm = new ValidatingForm(addDomainAliasForm);
-    var formH = vForm.formHandler;
 
     _hideInfoBoxesOnContract(vForm);
-
-    var domainOptionCheck = (MailDomain domain) => (OptionElement elm) => elm.value == domain.domainName;
 
     SelectElement selectFrom = addDomainAliasForm.querySelector("select[name=from]");
     SelectElement selectTo = addDomainAliasForm.querySelector("select[name=to]");

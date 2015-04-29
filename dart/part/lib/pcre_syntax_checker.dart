@@ -92,8 +92,6 @@ bool _checkGroup(String exp) => exp.startsWith("(") && exp.endsWith(")") && _che
 
 bool _checkNonCapturedGroup(String exp) => exp.startsWith("(?:") && exp.endsWith(")") && _checkRE(exp.substring(3, exp.length - 1));
 
-bool _checkCapturingSameNumberGroup(String exp) => exp.startsWith("(?|") && exp.endsWith(")") && _checkRE(exp.substring(3, exp.length - 1));
-
 bool _checkAny(String exp) => exp == ".";
 
 bool _checkEOS(String exp) => exp == '\$';

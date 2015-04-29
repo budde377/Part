@@ -1,30 +1,30 @@
 part of elements;
 
-abstract class FloatingBox{
-  final DivElement element =  new DivElement();
+abstract class FloatingBox {
+  final DivElement element = new DivElement();
   StreamSubscription _mouseDownSubscription;
   StreamController<Event> _removeController = new StreamController<Event>();
   bool _f = false, _removeOnESC;
 
-  FloatingBox(){
+  FloatingBox() {
     element.classes.add('floating_box');
   }
 
   bool get visible => element.parent != null;
 
-  Function _changeListener (void f()) => (_) {
-    if(visible){
+  Function _changeListener(void f()) => (_) {
+    if (visible) {
       f();
     }
   };
 
   bool get _fixed => _f;
 
-  set _fixed (bool b){
-    if(b == _fixed){
+  set _fixed(bool b) {
+    if (b == _fixed) {
       return;
     }
-    if(b){
+    if (b) {
       element.style.position = "fixed";
     } else {
       element.style.removeProperty("position");
@@ -33,25 +33,26 @@ abstract class FloatingBox{
   }
 
 
-  int _elementOffsetTop(Element e) => _elementOffset(e, (Element e)=>e.getComputedStyle().top, () => window.scrollY, (Element e) => e.offsetTop);
-  int _elementOffsetLeft(Element e) => _elementOffset(e, (Element e)=>e.getComputedStyle().left, () => window.scrollX, (Element e) => e.offsetLeft);
+  int _elementOffsetTop(Element e) => _elementOffset(e, (Element e) => e.getComputedStyle().top, () => window.scrollY, (Element e) => e.offsetTop);
 
-  int  _elementOffset(Element e, String computedStyleOffset(Element e), int scroll(), int offset(Element e)){
+  int _elementOffsetLeft(Element e) => _elementOffset(e, (Element e) => e.getComputedStyle().left, () => window.scrollX, (Element e) => e.offsetLeft);
+
+  int _elementOffset(Element e, String computedStyleOffset(Element e), int scroll(), int offset(Element e)) {
     var fixed = _fixed;
     var recursiveCall;
-    recursiveCall = (Element e){
-      if(e == null){
+    recursiveCall = (Element e) {
+      if (e == null) {
         return 0;
       }
       var computedOffset = computedStyleOffset(e).trim();
       var p = e.getComputedStyle().position;
       fixed = p == "fixed";
-      switch( computedOffset == "auto"?"static":p){
+      switch (computedOffset == "auto" ? "static" : p) {
         case "fixed":
-          var i = int.parse(computedOffset.substring(0, computedOffset.length-2));
+          var i = int.parse(computedOffset.substring(0, computedOffset.length - 2));
           return i;
         case "absolute":
-          return int.parse(computedOffset.substring(0, computedOffset.length-2)) + recursiveCall(e.offsetParent);
+          return int.parse(computedOffset.substring(0, computedOffset.length - 2)) + recursiveCall(e.offsetParent);
         default:
           return e == null ? 0 : offset(e) + recursiveCall(e.offsetParent);
 
@@ -64,44 +65,46 @@ abstract class FloatingBox{
 
   }
 
-  void showAboveCenterOfElement(Element e){
-    var s = () => showAt( _elementOffsetLeft(e)+e.offsetWidth~/2, _elementOffsetTop(e));
+  void showAboveCenterOfElement(Element e) {
+    var s = () => showAt(_elementOffsetLeft(e) + e.offsetWidth ~/ 2, _elementOffsetTop(e));
     s();
     _setUpChangeListener(_changeListener(s));
 
   }
 
-  void showAboveRightOfElement(Element e){
-    var s = () => showAt( _elementOffsetLeft(e)+e.offsetWidth, _elementOffsetTop(e));
+  void showAboveRightOfElement(Element e) {
+    var s = () => showAt(_elementOffsetLeft(e) + e.offsetWidth, _elementOffsetTop(e));
     s();
     _setUpChangeListener(_changeListener(s));
 
   }
 
-  void showBelowCenterOfElement(Element e){
-    var s = () => showAt( _elementOffsetLeft(e)+e.offsetWidth~/2, _elementOffsetTop(e)+e.offsetHeight);
+  void showBelowCenterOfElement(Element e) {
+    var s = () => showAt(_elementOffsetLeft(e) + e.offsetWidth ~/ 2, _elementOffsetTop(e) + e.offsetHeight);
     s();
     _setUpChangeListener(_changeListener(s));
 
   }
 
-  void _setUpChangeListener(void l(Event e)){
+  void _setUpChangeListener(void l(Event e)) {
     window.onResize.listen(l);
     window.onScroll.listen(l);
   }
 
-  void showBelowLeftOfElement(Element e){
-    var s = () => showAt(_elementOffsetLeft(e), _elementOffsetTop(e)+e.offsetHeight);
+  void showBelowLeftOfElement(Element e) {
+    var s = () => showAt(_elementOffsetLeft(e), _elementOffsetTop(e) + e.offsetHeight);
     s();
     _setUpChangeListener(_changeListener(s));
   }
-  void showBelowRightOfElement(Element e){
-    var s = () => showAt(_elementOffsetLeft(e)+e.offsetWidth, _elementOffsetTop(e)+e.offsetHeight);
+
+  void showBelowRightOfElement(Element e) {
+    var s = () => showAt(_elementOffsetLeft(e) + e.offsetWidth, _elementOffsetTop(e) + e.offsetHeight);
     s();
     _setUpChangeListener(_changeListener(s));
   }
- void showBelowAlignRightOfElement(Element e){
-    var s = () => showAt(_elementOffsetLeft(e)+e.offsetWidth-element.offsetWidth, _elementOffsetTop(e)+e.offsetHeight);
+
+  void showBelowAlignRightOfElement(Element e) {
+    var s = () => showAt(_elementOffsetLeft(e) + e.offsetWidth - element.offsetWidth, _elementOffsetTop(e) + e.offsetHeight);
     s();
     s();
     _setUpChangeListener(_changeListener(s));
@@ -110,12 +113,12 @@ abstract class FloatingBox{
 
   bool get removeOnESC => _removeOnESC == true;
 
-  set removeOnESC(bool b){
+  set removeOnESC(bool b) {
 
-    if(removeOnESC == b) {
+    if (removeOnESC == b) {
       return;
     }
-    if(_removeOnESC != null){
+    if (_removeOnESC != null) {
       _removeOnESC = b;
       return;
     }
@@ -123,11 +126,11 @@ abstract class FloatingBox{
 
   }
 
-  bool _escRemover(){
-    if(element.parent == null){
+  bool _escRemover() {
+    if (element.parent == null) {
       return false;
     }
-    if(_removeOnESC){
+    if (_removeOnESC) {
       remove();
       return true;
     }
@@ -136,13 +139,13 @@ abstract class FloatingBox{
 
   bool get removeOnMouseDownOutsideOfBox => _mouseDownSubscription != null;
 
-  set removeOnMouseDownOutsideOfBox(bool b){
-    if(b == removeOnMouseDownOutsideOfBox) {
+  set removeOnMouseDownOutsideOfBox(bool b) {
+    if (b == removeOnMouseDownOutsideOfBox) {
       return;
     }
-    if(b){
-      _mouseDownSubscription = window.onMouseDown.listen((MouseEvent e){
-        if(element.contains(e.target)){
+    if (b) {
+      _mouseDownSubscription = window.onMouseDown.listen((MouseEvent e) {
+        if (element.contains(e.target)) {
           return;
         }
         remove();
@@ -154,37 +157,37 @@ abstract class FloatingBox{
   }
 
 
-
-
   Stream<Event> get onRemove => _removeController.stream;
 
 
-  void remove(){
-    if(!visible){
+  void remove() {
+    if (!visible) {
       return;
     }
     _removeController.add(new Event("remove", canBubble:false, cancelable:false));
     element.remove();
   }
-  void showAt(int x, int y){
-    if(element.parent == null){
+
+  void showAt(int x, int y) {
+    if (element.parent == null) {
       querySelector('body').append(element);
     }
-    if(removeOnESC){
+    if (removeOnESC) {
       core.escQueue.add(_escRemover);
     }
     element.style.top = "${y}px";
     element.style.left = "${x}px";
-  }}
+  }
+}
 
 
-class InfoBox extends FloatingBox{
+class InfoBox extends FloatingBox {
 
   static const String COLOR_RED = "red";
   static const String COLOR_WHITE = "white";
   static const String COLOR_BLACK = "black";
   static const String COLOR_GREYSCALE = "greyscale";
-  final Element  content;
+  final Element content;
   DivElement _arrowElement = new DivElement();
 
   bool _reversed = false;
@@ -193,12 +196,12 @@ class InfoBox extends FloatingBox{
     _setUp();
   }
 
-  InfoBox(String infoHtml) : content = new DivElement(){
+  InfoBox(String infoHtml) : content = new DivElement() {
     content.innerHtml = infoHtml;
     _setUp();
   }
 
-  void _setUp(){
+  void _setUp() {
     element.classes.add('info_box');
     content.classes.add('text');
     _arrowElement.classes.add('arrow');
@@ -209,31 +212,31 @@ class InfoBox extends FloatingBox{
 
   String get infoHtml => content.innerHtml;
 
-  void set infoHtml(String html){
+  void set infoHtml(String html) {
     content.innerHtml = html;
   }
 
   bool get reversed => _reversed;
 
-       set reversed(bool b){
-         if(b == _reversed){
-           return;
-         }
-         element.classes.toggle('reversed');
-         element.append(_reversed?_arrowElement:content);
-         _reversed = b;
-       }
+  set reversed(bool b) {
+    if (b == _reversed) {
+      return;
+    }
+    element.classes.toggle('reversed');
+    element.append(_reversed ? _arrowElement : content);
+    _reversed = b;
+  }
 
 
-  String get backgroundColor => element.classes.contains('red')?COLOR_RED:(element.classes.contains('white')?COLOR_WHITE:(element.classes.contains(COLOR_GREYSCALE)?COLOR_GREYSCALE:COLOR_BLACK));
+  String get backgroundColor => element.classes.contains('red') ? COLOR_RED : (element.classes.contains('white') ? COLOR_WHITE : (element.classes.contains(COLOR_GREYSCALE) ? COLOR_GREYSCALE : COLOR_BLACK));
 
-  void set backgroundColor(String color){
+  void set backgroundColor(String color) {
     element.classes.remove(COLOR_RED);
     element.classes.remove(COLOR_BLACK);
-    switch(color){
+    switch (color) {
       case COLOR_RED:
         element.classes.add(COLOR_RED);
-      break;
+        break;
       case COLOR_BLACK:
         element.classes.add(COLOR_BLACK);
         break;
@@ -241,19 +244,20 @@ class InfoBox extends FloatingBox{
         element.classes.add(COLOR_GREYSCALE);
     }
   }
-  void showAt(int x, int y){
+
+  void showAt(int x, int y) {
     querySelector('body').append(element);
-    x = x-(element.clientWidth~/2);
-    y = y-(reversed ? 0: element.clientHeight-_arrowElement.clientHeight);
-    super.showAt(x,y);
+    x = x - (element.clientWidth ~/ 2);
+    y = y - (reversed ? 0 : element.clientHeight - _arrowElement.clientHeight);
+    super.showAt(x, y);
   }
 
 }
 
-class DropDown{
+class DropDown {
   static const int SHOW_BELOW_LEFT_OF_ELEMENT = 1,
-            SHOW_BELOW_CENTER_OF_ELEMENT = 2,
-            SHOW_BELOW_ALIGN_RIGHT = 3;
+  SHOW_BELOW_CENTER_OF_ELEMENT = 2,
+  SHOW_BELOW_ALIGN_RIGHT = 3;
 
   int _showMode = SHOW_BELOW_LEFT_OF_ELEMENT;
   final Element content;
@@ -263,7 +267,7 @@ class DropDown{
   DropDownBox _dropBox;
   static final Map<Element, DropDown> _cache = new Map<Element, DropDown>();
 
-  factory DropDown(element) => _cache.putIfAbsent(element, ()=>new DropDown._internal(element));
+  factory DropDown(element) => _cache.putIfAbsent(element, () => new DropDown._internal(element));
 
   factory DropDown.fromLIList(List<LIElement> lis){
     var ul = new UListElement();
@@ -281,13 +285,14 @@ class DropDown{
     _dropBox = new DropDownBox(content);
     _arrow.classes.add('arrow_down');
     _text.classes.add('text');
-    element..classes.add('drop_down')
-    ..append(_arrow);
-    _dropBox.onRemove.listen((_)=>element.classes.remove('active'));
+    element
+      ..classes.add('drop_down')
+      ..append(_arrow);
+    _dropBox.onRemove.listen((_) => element.classes.remove('active'));
     closeOnESC = true;
-    element.onClick.listen((_)=>toggle());
-    document.onMouseDown.listen((MouseEvent e){
-      if(element.contains(e.target) || _dropBox.element.contains(e.target)){
+    element.onClick.listen((_) => toggle());
+    document.onMouseDown.listen((MouseEvent e) {
+      if (element.contains(e.target) || _dropBox.element.contains(e.target)) {
         return;
       }
       close();
@@ -295,34 +300,35 @@ class DropDown{
   }
 
   void toggle() {
-    if(_dropBox.element.parent == null){
+    if (_dropBox.element.parent == null) {
       open();
     } else {
       close();
     }
   }
-  void open(){
-    switch(_showMode){
+
+  void open() {
+    switch (_showMode) {
       case SHOW_BELOW_LEFT_OF_ELEMENT:
         _dropBox.showBelowLeftOfElement(element);
-    break;
-    case SHOW_BELOW_CENTER_OF_ELEMENT:
-    _dropBox.showBelowCenterOfElement(element);
-    break;
-    case SHOW_BELOW_ALIGN_RIGHT:
-    _dropBox.showBelowAlignRightOfElement(element);
-    break;
+        break;
+      case SHOW_BELOW_CENTER_OF_ELEMENT:
+        _dropBox.showBelowCenterOfElement(element);
+        break;
+      case SHOW_BELOW_ALIGN_RIGHT:
+        _dropBox.showBelowAlignRightOfElement(element);
+        break;
 
     }
     element.classes.add('active');
   }
 
-  void close(){
+  void close() {
     _dropBox.remove();
   }
 
-  set text(String t){
-    if(t.length > 0){
+  set text(String t) {
+    if (t.length > 0) {
       _text.text = t;
       element.children.insert(0, _text);
     } else {
@@ -330,47 +336,44 @@ class DropDown{
     }
 
   }
-  String get text => _text.parent == null? "":_text.text;
+
+  String get text => _text.parent == null ? "" : _text.text;
 
   bool get preventDefaultOnClick => _preventDefaultDropBox != null;
 
-  set preventDefaultOnClick (bool b){
-    if(b == preventDefaultOnClick){
+  set preventDefaultOnClick(bool b) {
+    if (b == preventDefaultOnClick) {
       return;
     }
-    if(b){
+    if (b) {
       _preventDefaultDropBox = _dropBox.element.onMouseDown.listen((Event e) => e.preventDefault());
       _preventDefaultElement = element.onMouseDown.listen((Event e) => e.preventDefault());
     } else {
+      _preventDefaultDropBox.cancel();
+      _preventDefaultElement.cancel();
       _preventDefaultDropBox = _preventDefaultElement = null;
     }
   }
 
   bool get closeOnESC => _dropBox.removeOnESC;
-  set closeOnESC (bool b) => _dropBox.removeOnESC = b;
+
+  set closeOnESC(bool b) => _dropBox.removeOnESC = b;
 
   bool get closeOnMouseOutside => _dropBox.removeOnMouseDownOutsideOfBox;
-  set closeOnMouseOutside (bool b) => _dropBox.removeOnMouseDownOutsideOfBox = b;
+
+  set closeOnMouseOutside(bool b) => _dropBox.removeOnMouseDownOutsideOfBox = b;
 
   DropDownBox get dropDownBox => _dropBox;
 
 }
 
-class DropDownBox extends FloatingBox{
+class DropDownBox extends FloatingBox {
 
   final Element _content;
 
-  DropDownBox(this._content){
+  DropDownBox(this._content) {
     element.classes.add("drop_down_box");
     element.append(_content);
-  }
-
-  void _changeActive(LIElement newActive, List<LIElement> siblings){
-    siblings.forEach((LIElement e) => e.classes.remove('active'));
-    if(newActive == null){
-      return;
-    }
-    newActive.classes.add('active');
   }
 
 

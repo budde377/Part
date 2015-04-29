@@ -5,20 +5,14 @@
 }
 
 .edit_content_wrapper .tool_bar_wrapper {
-    height: 29px;
     overflow: hidden;
     transition-property: height, box-shadow;
     transition-duration: 0.1s;
     background-color: rgb(221, 221, 221);
 }
 
-.edit_content_wrapper .tool_bar_wrapper > div {
-    z-index: 1;
-    position: relative;
 
-}
-
-.edit_content_wrapper .tool_bar_wrapper.floating, .edit_content_wrapper .tool_bar_wrapper.fixed {
+.edit_content_wrapper .tool_bar_wrapper.floating:not(.fixed){
     z-index: 200;
     top: 0;
 }
@@ -30,6 +24,8 @@
 
 .edit_content_wrapper .tool_bar_wrapper.fixed {
     position: absolute;
+    bottom: 0;
+    width: 100%;
 }
 
 .edit_content_wrapper .tool_bar_placeholder {
@@ -46,87 +42,90 @@
     padding: 2px;
 }
 
-.edit_content_wrapper .tool_bar > button {
-    width: 27px;
+.edit_content_wrapper .tool_bar > button{
     margin: 0 10px 0 0;
     height: 25px;
-    background: transparent url(/_common/img/toolbar_icons.png?new=123) scroll no-repeat 4px -26px;
     float: left;
     cursor: pointer;
-    border-radius: 2px;
     border: 0;
     padding: 0;
+    background-color: transparent;
+}
+.edit_content_wrapper .tool_bar > button:not(.draft) {
+    width: 27px;
+    background: transparent url(/_common/img/toolbar_icons.png?new=123) scroll no-repeat 4px -26px;
+    border-radius: 2px;
 
 }
 
-.edit_content_wrapper .tool_bar > button:hover {
+.edit_content_wrapper .tool_bar > button:hover:not(.draft) {
     background-color: #d9d9d9;
     box-shadow: 0 1px 1px #aaa;
     background-position: -36px -26px;
 
 }
 
-.edit_content_wrapper .tool_bar > button.active {
+.edit_content_wrapper .tool_bar > button.active:not(.draft) {
     background-color: #FFFFFF;
     background-position: -116px -26px;
     box-shadow: inset 0 1px 3px #BBB;
 }
 
-.edit_content_wrapper .tool_bar > .image {
+.edit_content_wrapper .tool_bar > button.image {
     background-position: 4px -56px;
 }
 
-.edit_content_wrapper .tool_bar > .image:not(.enabled):hover {
+.edit_content_wrapper .tool_bar > button.image:not(.enabled):hover {
     background-position: -36px -56px;
 }
 
-.edit_content_wrapper .tool_bar > .image.active {
+.edit_content_wrapper .tool_bar > button.image.active {
     background-position: -116px -56px !important;
 }
 
-.edit_content_wrapper .tool_bar > .file {
+.edit_content_wrapper .tool_bar > button.file {
     background-position: 4px -116px;
 }
 
-.edit_content_wrapper .tool_bar > .file:not(.enabled):hover {
+.edit_content_wrapper .tool_bar > button.file:not(.enabled):hover {
     background-position: -36px -116px;
 }
 
-.edit_content_wrapper .tool_bar > .file.active {
+.edit_content_wrapper .tool_bar > button.file.active {
     background-position: -116px -116px !important;
 }
 
-.edit_content_wrapper .tool_bar > .history {
+.edit_content_wrapper .tool_bar > button.history {
     background-position: 4px 4px;
 }
 
-.edit_content_wrapper .tool_bar > .history:not(.enabled):hover {
+.edit_content_wrapper .tool_bar > button.history:not(.enabled):hover {
     background-position: -36px 4px;
 }
 
-.edit_content_wrapper .tool_bar > .history.active {
+.edit_content_wrapper .tool_bar > button.history.active {
     background-position: -116px 4px !important;
 }
 
-.edit_content_wrapper .tool_bar > .close {
+.edit_content_wrapper .tool_bar > button.close {
     background-position: 4px -146px;
     float: right;
     margin: 0;
 }
 
-.edit_content_wrapper .tool_bar > .close:not(.enabled):hover {
+.edit_content_wrapper .tool_bar > button.close:not(.enabled):hover {
     background-position: -36px -146px;
 }
 
-.edit_content_wrapper .tool_bar > .save {
+.edit_content_wrapper .tool_bar > button.save {
     background-position: -156px -86px;
 }
 
-.edit_content_wrapper .tool_bar > .save.active {
+.edit_content_wrapper .tool_bar > button.save.active {
     background-position: -116px -86px !important;
 }
 
-.edit_content_wrapper .tool_bar > .save:not(.enabled):hover {
+.edit_content_wrapper .tool_bar > button.save:not(.enabled):hover {
     border-color: transparent;
     background-color: transparent;
     cursor: default;
@@ -134,13 +133,21 @@
     background-position: -156px -86px;
 }
 
-.edit_content_wrapper .tool_bar > .save.enabled {
+.edit_content_wrapper .tool_bar > button.save.enabled {
     background-position: 4px -86px;
 }
 
-.edit_content_wrapper .tool_bar > .save.enabled:hover {
+.edit_content_wrapper .tool_bar > button.save.enabled:hover {
     background-position: -36px -86px;
 }
+.edit_content_wrapper .tool_bar > .draft{
+    background-image: none;
+    font-weight: normal;
+    font-size: 11px;
+    font-style: italic;
+    color: #a10000;
+}
+
 
 .edit_content_wrapper .menu {
     height: 25px;
@@ -486,18 +493,14 @@
     min-height: 148px;
 }
 
-.edit_content_wrapper .menu.history_menu.loading {
-    background: url(/_common/img/ajax-loader.gif) scroll no-repeat center center;
+.edit_content_wrapper .menu.history_menu.blur:after{
+    background-color: rgba(221,221,221,0.7);
 }
 
 .edit_content_wrapper .menu.history_menu .calendar {
     float: left;
 }
 
-.edit_content_wrapper .menu.history_menu ul.history_list.loading {
-    background: url(/_common/img/ajax-loader.gif) scroll no-repeat center center;
-    min-height: 148px;
-}
 
 .edit_content_wrapper .menu.history_menu ul.history_list {
     overflow: hidden;

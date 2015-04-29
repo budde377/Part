@@ -15,14 +15,14 @@ class UserSettingsMailDomainLibrary implements MailDomainLibrary {
   static AJAXMailDomainLibrary _generateLibrary() {
     var domainElementList = querySelectorAll("#UserSettingsContent #UserSettingsEditMailDomainList > li:not(.empty_list)");
     var domainNameList = domainElementList.map((LIElement li) => li.dataset['domain-name']);
-    var domainElementMap = new Map<String, LIElement>.fromIterables(domainNameList, domainElementList);
+    var domainElementMap = new Map<String, Element>.fromIterables(domainNameList, domainElementList);
 
 
     var addressLibraryGenerator = (MailDomain domain) {
       var addressElementList = querySelectorAll("#UserSettingsEditMailAddressLists > li > ul").firstWhere((UListElement ul) => ul.dataset['domain-name'] == domain.domainName).querySelectorAll("li:not(.empty_list)");
 
       var addressLPList = addressElementList.map((LIElement li) => li.dataset['local-part']);
-      var addressElementMap = new Map<String, LIElement>.fromIterables(addressLPList, addressElementList);
+      var addressElementMap = new Map<String, Element>.fromIterables(addressLPList, addressElementList);
 
       var addressGenerator = (MailAddressLibrary lib, String localPart) {
         var obj = addressElementMap[localPart];
@@ -135,7 +135,7 @@ class NullMailDomainLibrary implements MailDomainLibrary {
   Stream<MailDomain> get onAdd => _ajax_mail_domain_library.onAdd;
 
 
-  core.FutureResponse<MailDomain> deleteDomain(MailDomain domain, String password) => _ajax_mail_domain_library.deleteDomain;
+  core.FutureResponse<MailDomain> deleteDomain(MailDomain domain, String password) => _ajax_mail_domain_library.deleteDomain(domain, password);
 
   MailDomain operator [](String key) => _ajax_mail_domain_library[key];
 

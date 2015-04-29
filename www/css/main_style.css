@@ -229,6 +229,11 @@ input:not([type=radio]):not([type=checkbox]) {
     height: 30px;
 }
 
+input[readonly]:not([type=radio]):not([type=checkbox]){
+    background-color: #ECECEC;
+    color: #838383;
+}
+
 input:not([type=submit]):not(.initial).invalid {
     border-color: #ca0000;
     background-color: rgb(252, 239, 240);
@@ -682,11 +687,11 @@ ul.better_select_options > li:last-child {
 .full_background .cell {
     display: table-cell;
     vertical-align: middle;
-    width:400px;
+/*    width:400px;*/
 }
 
 .dialog_bg .dialog {
-
+    min-width: 400px;
     background: #fff;
     box-shadow: 0 0 5px #000;
     padding: 5%;

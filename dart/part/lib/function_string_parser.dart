@@ -1243,7 +1243,6 @@ class SimpleRegisterHandler extends RegisterHandler {
 
 class Register {
 
-  int _i = 0;
 
   static Register _cache;
 

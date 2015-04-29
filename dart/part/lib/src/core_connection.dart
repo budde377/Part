@@ -54,7 +54,6 @@ class Connection {
     var completer = new Completer<bool>();
     // Handle IE and more capable browsers
     var xhr = _buildRequest(completer);
-    var status;
 
 
     xhr.open("HEAD", "?rand=" + new DateTime.now().millisecondsSinceEpoch.toString());

@@ -148,7 +148,6 @@ class AJAXPageOrder extends PageOrder {
   void _removeFromPageOrder(String id) {
     if (_pageOrder.containsKey(id)) {
       var l = _pageOrder[id];
-      var i = 0;
       while (l.length > 0) {
         _removeFromPageOrder(l.removeAt(0));
       }

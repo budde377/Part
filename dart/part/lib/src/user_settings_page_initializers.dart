@@ -148,10 +148,11 @@ class UserSettingsEditPageFormInitializer extends core.Initializer {
     if (_editPageForm == null) {
       return;
     }
-    var submitButton = _editPageForm.querySelector('input[type=submit]');
     var validatingForm = new ValidatingForm(_editPageForm);
 
-    var editIdField = _editPageForm.querySelector('#EditPageEditIDField'), editAliasField = _editPageForm.querySelector('#EditPageEditAliasField'), editTitleField = _editPageForm.querySelector('#EditPageEditTitleField'), editTemplateSelect = _editPageForm.querySelector('#EditPageEditTemplateSelect');
+    var editIdField = _editPageForm.querySelector('#EditPageEditIDField'),
+    editAliasField = _editPageForm.querySelector('#EditPageEditAliasField'),
+    editTitleField = _editPageForm.querySelector('#EditPageEditTitleField');
 
 /* SET UP VALIDATOR */
 
