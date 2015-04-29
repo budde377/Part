@@ -36,6 +36,8 @@ class UserLoginUpdateCheckPreScriptImpl implements  Script{
             return;
         }
 
+        $this->backendContainer->getCacheControlInstance()->disableCache();
+
         if(!$user->getUserPrivileges()->hasSitePrivileges()){
             return;
         }
