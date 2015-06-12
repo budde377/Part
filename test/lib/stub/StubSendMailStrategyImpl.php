@@ -20,6 +20,7 @@ class StubSendMailStrategyImpl implements SendMailStrategy
     private $cc;
     private $subject;
     private $returnValue;
+    private $mailsSent = [];
 
 
     public function isCalled()
@@ -83,11 +84,23 @@ class StubSendMailStrategyImpl implements SendMailStrategy
         $this->subject = $subject;
         $this->message = $message;
         $this->additionalHeaders = $additionalHeaders;
+        $this->mailsSent[] = func_get_args();
         return $this->returnValue;
     }
+
+
+
 
     public function setReturnValue($returnValue)
     {
         $this->returnValue = $returnValue;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMailsSent()
+    {
+        return $this->mailsSent;
     }
 }

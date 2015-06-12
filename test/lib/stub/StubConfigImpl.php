@@ -27,6 +27,7 @@ class StubConfigImpl implements Config
     private $defaultPages = array();
     private $logPath;
     private $facebookAppCredentials;
+    private $domain = "";
 
     /**
      * @param array $defaultPages
@@ -177,8 +178,9 @@ class StubConfigImpl implements Config
      */
     public function getDomain()
     {
-        return "";
+        return $this->domain;
     }
+
 
     /**
      * @return Array containing owner information
@@ -373,5 +375,13 @@ class StubConfigImpl implements Config
     public function getTemplateFolderPath($name)
     {
         return "";
+    }
+
+    /**
+     * @param string $domain
+     */
+    public function setDomain($domain)
+    {
+        $this->domain = $domain;
     }
 }
