@@ -60,7 +60,7 @@ class WebsiteImpl implements Website
 
         //Decide output mode
         if ($id !== null) {
-            echo $ajax = $ajaxServer->handleFromFunctionString($id, $this->GETValueOfIndexIfSetElseDefault('token'))->getAsJSONString();
+            echo json_encode($ajaxServer->handleFromFunctionString($id, $this->GETValueOfIndexIfSetElseDefault('token')), $this->config->isDebugMode()?JSON_PRETTY_PRINT:0);
 
         } else if (!$cacheControl->setUpCache()) {
             echo $template->render();
