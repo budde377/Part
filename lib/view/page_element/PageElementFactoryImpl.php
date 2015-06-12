@@ -22,10 +22,10 @@ class PageElementFactoryImpl implements PageElementFactory
     private $cache = array();
     private $backendSingletonFactory;
 
-    public function __construct(Config $config, BackendSingletonContainer $backendSingletonFactory)
+    public function __construct(BackendSingletonContainer $backendSingletonFactory)
     {
         $this->backendSingletonFactory = $backendSingletonFactory;
-        $this->config = $config;
+        $this->config = $backendSingletonFactory->getConfigInstance();
     }
 
     /**

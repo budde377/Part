@@ -755,10 +755,10 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->backFactory->setSiteInstance($this->site);
 
         // Setting up null page element factory
-        $nullPageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
+
 
         // Setting up template
-        $this->template = new TemplateImpl($nullPageElementFactory, $this->backFactory);
+        $this->template = new TemplateImpl($this->backFactory);
     }
 
 

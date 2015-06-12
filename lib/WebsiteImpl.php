@@ -37,8 +37,7 @@ class WebsiteImpl implements Website
     public function generateSite()
     {
 
-        $elementFactory = new view\page_element\PageElementFactoryImpl($this->config, $this->backendContainer);
-        $template = new TemplateImpl($elementFactory, $this->backendContainer);
+        $template = new TemplateImpl($this->backendContainer);
         $pageStrategy = $this->backendContainer->getCurrentPageStrategyInstance();
 
 

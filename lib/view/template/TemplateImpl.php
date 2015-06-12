@@ -9,6 +9,7 @@ use ChristianBudde\Part\util\file\File;
 use ChristianBudde\Part\util\file\FileImpl;
 use ChristianBudde\Part\util\file\FolderImpl;
 use ChristianBudde\Part\view\page_element\PageElementFactory;
+use ChristianBudde\Part\view\page_element\PageElementFactoryImpl;
 use Twig_Environment;
 use Twig_Extension_Debug;
 use Twig_Loader_Chain;
@@ -35,14 +36,13 @@ class TemplateImpl implements Template
     private $renderTarget;
 
     /**
-     * @param PageElementFactory $pageElementFactory
      * @param BackendSingletonContainer $container
      */
 
-    public function __construct(PageElementFactory $pageElementFactory, BackendSingletonContainer $container)
+    public function __construct(BackendSingletonContainer $container)
     {
         $this->config = $container->getConfigInstance();
-        $this->pageElementFactory = $pageElementFactory;
+        $this->pageElementFactory = new PageElementFactoryImpl($container);
         $this->backendContainer = $container;
     }
 
