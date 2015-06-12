@@ -15,16 +15,21 @@ class SiteContentTwigNodeImpl extends Twig_Node{
     /**
      * @param int $line
      * @param int $tag
-     * @param null $id
+     * @param \Twig_Node_Expression $id
      */
-    function __construct( $line, $tag, $id = null)
+    function __construct( $line, $tag, \Twig_Node_Expression $id = null)
     {
-        parent::__construct(array(), array('id'=>$id), $line, $tag);
+        parent::__construct(array('id'=>$id), array(), $line, $tag);
     }
 
     public function compile(Twig_Compiler $compiler)
     {
-        $compiler->write("echo \$context['site']->getContent('{$this->getAttribute('id')}')->latestContent();")->raw("\n");
+        if($this->getNode('id') == null){
+            $compiler->write("echo \$context['site']->getContent('')->latestContent();")->raw("\n");
+        } else {
+            $compiler->write("echo \$context['site']->getContent(")->subcompile($this->getNode('id'))->write(")->latestContent();")->raw("\n");
+        }
+
     }
 
 

@@ -28,7 +28,9 @@ class SiteContentTwigTokenParserImpl extends Twig_TokenParser
             $stream->expect(Twig_Token::BLOCK_END_TYPE);
             return new SiteContentTwigNodeImpl($token->getLine(), $this->getTag());
         }
-        $name = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
+
+        $name = $this->parser->getExpressionParser()->parseExpression();
+        //$stream->expect(Twig_Token::NAME_TYPE)->getValue();
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
         return new SiteContentTwigNodeImpl( $token->getLine(), $this->getTag(), $name);
     }

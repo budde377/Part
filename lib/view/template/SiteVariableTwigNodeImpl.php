@@ -13,17 +13,20 @@ class SiteVariableTwigNodeImpl extends Twig_Node{
     /**
      * @param int $line
      * @param int $tag
-     * @param string $id
+     * @param \Twig_Node_Expression $id
      */
-    function __construct($line, $tag, $id)
+    function __construct($line, $tag, \Twig_Node_Expression $id)
     {
-        parent::__construct(array(), array('id'=>$id), $line, $tag);
+        parent::__construct(array('id'=>$id), [], $line, $tag);
 
     }
 
     public function compile(Twig_Compiler $compiler)
     {
-        $compiler->write("echo \$context['site']->getVariables()->getValue('{$this->getAttribute('id')}');")->raw("\n");
-
+        if($this->getNode('id') == null){
+            $compiler->write("echo \$context['site']->getVariables()->getValue('');")->raw("\n");
+        } else {
+            $compiler->write("echo \$context['site']->getVariables()->getValue(")->subcompile($this->getNode('id'))->write(");")->raw("\n");
+        }
     }
 } 

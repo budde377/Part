@@ -26,9 +26,9 @@ class SiteVariableTwigTokenParserImpl extends Twig_TokenParser{
     public function parse(Twig_Token $token)
     {
         $stream = $this->parser->getStream();
-        $name = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
+        $expr = $this->parser->getExpressionParser()->parseExpression();
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
-        return new SiteVariableTwigNodeImpl($token->getLine(), $this->getTag(), $name);
+        return new SiteVariableTwigNodeImpl($token->getLine(), $this->getTag(), $expr);
     }
 
     /**

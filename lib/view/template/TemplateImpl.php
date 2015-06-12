@@ -69,7 +69,7 @@ class TemplateImpl implements Template
      */
     public function setTemplateFromString($string)
     {
-        $fn = uniqid("string_file_");
+        $fn = md5($string);
         $this->setUpTwig(new \Twig_Loader_Array([$fn=>$string]), $fn);
     }
 

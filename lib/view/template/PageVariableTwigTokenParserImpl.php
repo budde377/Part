@@ -26,16 +26,14 @@ class PageVariableTwigTokenParserImpl extends Twig_TokenParser{
     public function parse(Twig_Token $token)
     {
         $stream = $this->parser->getStream();
-        $page_id = "";
-        $id = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
-        if($stream->getCurrent()->getType() == Twig_Token::PUNCTUATION_TYPE){
-            $page_id = $id;
-            $stream->expect(Twig_Token::PUNCTUATION_TYPE, "[");
-            $id = $stream->expect(Twig_Token::NAME_TYPE)->getValue();
-            $stream->expect(Twig_Token::PUNCTUATION_TYPE, "]");
+        $id = $page_id = null;
+
+        if($stream->getCurrent()->getType() != Twig_Token::BLOCK_END_TYPE){
+            $id = $this->parser->getExpressionParser()->parseExpression();
         }
+
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
-        return new PageVariableTwigNodeImpl($token->getLine(), $this->getTag(), $id, $page_id);
+        return new PageVariableTwigNodeImpl($token->getLine(), $this->getTag(), $id);
     }
 
     /**
