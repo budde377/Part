@@ -140,22 +140,26 @@ class TemplateImpl implements Template
     }
 
 
-    public function render()
+    /**
+     * @param array $context
+     * @return string
+     */
+    public function render(array $context = [])
     {
-        return $this->privateRender();
+        return $this->privateRender($context);
     }
 
     /**
      * This function will set the initialize flag in the template and not
      * return the result of render.
-     * @return void
+     * @param array $context
      */
-    public function onlyInitialize()
+    public function onlyInitialize(array $context = [])
     {
-        $this->privateRender(true);
+        $this->privateRender($context, true);
     }
 
-    private function privateRender($initialize = false)
+    private function privateRender(array $context, $initialize = false)
     {
         $userLib = $this->backendContainer->getUserLibraryInstance();
         $currentPageStrat = $this->backendContainer->getCurrentPageStrategyInstance();
@@ -163,7 +167,7 @@ class TemplateImpl implements Template
         $currentUser = $userLib->getUserLoggedIn();
         $currentPage = $currentPageStrat->getCurrentPage();
         $site = $this->backendContainer->getSiteInstance();
-        return $this->twig->render($this->renderTarget, array(
+        $renderContext = [
             'current_user' => $currentUser,
             'has_root_privileges' => $currentUser != null && $currentUser->getUserPrivileges()->hasRootPrivileges(),
             'has_site_privileges' => $currentUser != null && $currentUser->getUserPrivileges()->hasSitePrivileges(),
@@ -182,7 +186,10 @@ class TemplateImpl implements Template
             'updater' => $this->backendContainer->getUpdaterInstance(),
             'config' => $this->config,
             'backend_container' => $this->backendContainer
-        ));
+        ];
+
+
+        return $this->twig->render($this->renderTarget, $renderContext + $context);
 
     }
 }
