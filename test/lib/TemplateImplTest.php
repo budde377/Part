@@ -46,71 +46,21 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     private $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
 
-    protected function setUp()
+    public function testCustomContextWorks()
     {
-        $this->backFactory = $this->template = $this->rootPath = $this->currentPage = null;
-        @session_start();
-
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{{ receiver }}");
+        $this->assertEquals('', $this->template->render());
+        $this->assertEquals('bob', $this->template->render(['receiver' => 'bob']));
     }
 
-    protected function tearDown()
+
+    public function testCustomDoNotOverWrite()
     {
-        unset($this->template);
-        @session_destroy();
-    }
-
-    private function setUpConfig($config = null)
-    {
-        if ($config == null) {
-            $config = "
-            <config>{$this->defaultOwner}
-            <pageElements>
-                <class name='someElement' link='lib/stub/HelloPageElementImpl.php'>ChristianBudde\\Part\\test\\stub\\HelloPageElementImpl</class>
-                <class name='initElement' link='lib/stub/CheckInitializedPageElementImpl.php'>ChristianBudde\\Part\\test\\stub\\CheckInitializedPageElementImpl</class>
-            </pageElements>
-
-            </config>";
-        }
-
-        /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string($config);
-        $rootDir = new FolderImpl(dirname(__FILE__) . '/../');
-        $this->rootPath = $rootDir->getAbsolutePath() . "/";
-        $config = new ConfigImpl($configXML, $this->rootPath);
-
-        // Setting up pages
-        $this->currentPage = new StubPageImpl();
-
-        $this->inactivePage = new StubPageImpl();
-        $this->inactivePage->setID("someid");
-
-        // Setting up current page strategy
-        $currentPageStrategy = new StubCurrentPageStrategyImpl();
-        $currentPageStrategy->setCurrentPage($this->currentPage);
-
-
-        // Setting up order
-        $order = new StubPageOrderImpl();
-        $order->setInactiveList(array($this->inactivePage));
-
-
-        // Setting up site
-        $this->site = new StubSiteImpl();
-        $this->site->setVariables(new StubVariablesImpl());
-
-        // Setting up back factory
-        $this->backFactory = new StubBackendSingletonContainerImpl();
-        $this->backFactory->setCurrentPageStrategyInstance($currentPageStrategy);
-        $this->backFactory->setConfigInstance($config);
-        $this->backFactory->setUserLibraryInstance(new StubUserLibraryImpl());
-        $this->backFactory->setPageOrderInstance($order);
-        $this->backFactory->setSiteInstance($this->site);
-
-        // Setting up null page element factory
-        $nullPageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
-
-        // Setting up template
-        $this->template = new TemplateImpl($nullPageElementFactory, $this->backFactory);
+        $this->setUpConfig();
+        $this->template->setTemplateFromString("{{ has_site_privileges?'true':'false' }}");
+        $this->assertEquals('false', $this->template->render());
+        $this->assertEquals('false', $this->template->render(['has_site_privileges' => true]));
     }
 
     public function testWillThrowExceptionIfTemplateIsNotFound()
@@ -743,6 +693,75 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->site->getVariables()->setValue("foo", "Hello World2");
         $this->assertEquals("Hello World2", $this->template->render());
     }
+
+    protected function setUp()
+    {
+        $this->backFactory = $this->template = $this->rootPath = $this->currentPage = null;
+        @session_start();
+
+    }
+
+    protected function tearDown()
+    {
+        unset($this->template);
+        @session_destroy();
+    }
+
+    private function setUpConfig($config = null)
+    {
+        if ($config == null) {
+            $config = "
+            <config>{$this->defaultOwner}
+            <pageElements>
+                <class name='someElement' link='lib/stub/HelloPageElementImpl.php'>ChristianBudde\\Part\\test\\stub\\HelloPageElementImpl</class>
+                <class name='initElement' link='lib/stub/CheckInitializedPageElementImpl.php'>ChristianBudde\\Part\\test\\stub\\CheckInitializedPageElementImpl</class>
+            </pageElements>
+
+            </config>";
+        }
+
+        /** @var $configXML SimpleXMLElement */
+        $configXML = simplexml_load_string($config);
+        $rootDir = new FolderImpl(dirname(__FILE__) . '/../');
+        $this->rootPath = $rootDir->getAbsolutePath() . "/";
+        $config = new ConfigImpl($configXML, $this->rootPath);
+
+        // Setting up pages
+        $this->currentPage = new StubPageImpl();
+
+        $this->inactivePage = new StubPageImpl();
+        $this->inactivePage->setID("someid");
+
+        // Setting up current page strategy
+        $currentPageStrategy = new StubCurrentPageStrategyImpl();
+        $currentPageStrategy->setCurrentPage($this->currentPage);
+
+
+        // Setting up order
+        $order = new StubPageOrderImpl();
+        $order->setInactiveList(array($this->inactivePage));
+
+
+        // Setting up site
+        $this->site = new StubSiteImpl();
+        $this->site->setVariables(new StubVariablesImpl());
+
+        // Setting up back factory
+        $this->backFactory = new StubBackendSingletonContainerImpl();
+        $this->backFactory->setCurrentPageStrategyInstance($currentPageStrategy);
+        $this->backFactory->setConfigInstance($config);
+        $this->backFactory->setUserLibraryInstance(new StubUserLibraryImpl());
+        $this->backFactory->setPageOrderInstance($order);
+        $this->backFactory->setSiteInstance($this->site);
+
+        // Setting up null page element factory
+        $nullPageElementFactory = new PageElementFactoryImpl($config, $this->backFactory);
+
+        // Setting up template
+        $this->template = new TemplateImpl($nullPageElementFactory, $this->backFactory);
+    }
+
+
 
 }
 
