@@ -40,13 +40,18 @@ interface Template
     public function setTemplateFromString($string);
 
 
-
-    public function render();
+    /**
+     * Renders the given template with the provided content.
+     * Returns the result of the render
+     * @param array $context
+     * @return string
+     */
+    public function render(array $context = []);
 
     /**
      * This function will set the initialize flag in the template and not
      * return the result of render.
-     * @return void
+     * @param array $context
      */
-    public function onlyInitialize();
+    public function onlyInitialize(array $context = []);
 }
