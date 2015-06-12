@@ -63,7 +63,7 @@ class JSONContentPageFunctionGenerator extends AJAXContentFunctionGenerator {
 class JSONContentSiteFunctionGenerator extends AJAXContentFunctionGenerator {
 
   JSONContentSiteFunctionGenerator(String id) : super(
-      "SiteContentLibrary.getContent(${quoteString(id)})",
+      "Site.getContent(${quoteString(id)})",
       id,
       "SiteContent.$id");
 
