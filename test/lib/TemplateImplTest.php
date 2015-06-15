@@ -5,6 +5,7 @@ use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\ConfigImpl;
 use ChristianBudde\Part\exception\EntryNotFoundException;
 use ChristianBudde\Part\exception\FileNotFoundException;
+
 use ChristianBudde\Part\model\site\Site;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubCurrentPageStrategyImpl;
@@ -387,7 +388,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
-        $this->template->setTemplateFromString("{%page_element someElement%}");
+        $this->template->setTemplateFromString("{%page_element 'someElement'%}");
         $v = $this->template->render();
         $this->assertEquals("Hello World", $v);
     }
@@ -396,7 +397,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
-        $this->template->setTemplateFromString("{%page_element ChristianBudde.Part.test.stub.HelloPageElementImpl%}");
+        $this->template->setTemplateFromString("{%page_element '\\\\ChristianBudde\\\\Part\\\\test\\\\stub\\\\HelloPageElementImpl'%}");
         $v = $this->template->render();
         $this->assertEquals("Hello World", $v);
     }
@@ -405,7 +406,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
-        $this->template->setTemplateFromString("{%page_element ChristianBudde.Part.test.stub.HelloNamespacePageElementImpl  %}");
+        $this->template->setTemplateFromString("{%page_element '\\\\ChristianBudde\\\\Part\\\\test\\\\stub\\\\HelloNamespacePageElementImpl' %}");
         $v = $this->template->render();
         $this->assertEquals("Hello World", $v);
     }
@@ -413,7 +414,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     public function testTemplateBreakIfNoPageElement()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%page_element nonExistingElement%}");
+        $this->template->setTemplateFromString("{%page_element 'nonExistingElement'%}");
         $exception = false;
         try {
             $this->template->render();
@@ -427,28 +428,28 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     public function testTemplateInitializePageElementIsSupported()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%init_page_element someElement%}");
+        $this->template->setTemplateFromString("{%init_page_element 'someElement'%}");
         $this->assertEquals("", $this->template->render());
     }
 
     public function testTemplateInitializePageElementIsSupportedFromClassName()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%init_page_element ChristianBudde.Part.test.stub.HelloPageElementImpl%}");
+        $this->template->setTemplateFromString("{%init_page_element '\\\\ChristianBudde\\\\Part\\\\test\\\\stub\\\\HelloPageElementImpl'%}");
         $this->assertEquals("", $this->template->render());
     }
 
     public function testTemplateInitializePageElementIsSupportedFromClassNameWithNamespace()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%init_page_element ChristianBudde.Part.view.page_element.TitlePageElementImpl%}");
+        $this->template->setTemplateFromString("{%init_page_element '\\\\ChristianBudde\\\\Part\\\\view\\\\page_element\\\\TitlePageElementImpl'%}");
         $this->assertEquals("", $this->template->render());
     }
 
     public function testTemplateInitializePageElementDoesJustThat()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%init_page_element initElement%}");
+        $this->template->setTemplateFromString("{%init_page_element 'initElement'%}");
         $_SESSION['initialized'] = 0;
         $this->template->render();
         $this->assertEquals(1, $_SESSION['initialized']);
@@ -457,7 +458,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     public function testTemplateInitializePageElementCanBeCalledMultipleTimes()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%init_page_element initElement%}{%init_page_element initElement%}");
+        $this->template->setTemplateFromString("{%init_page_element 'initElement'%}{%init_page_element 'initElement'%}");
         $_SESSION['initialized'] = 0;
         $this->template->render();
         $this->assertEquals(1, $_SESSION['initialized']);
@@ -466,7 +467,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     public function testTemplateInitializePageElementAndPageElementCanBothBeDone()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%init_page_element initElement%}{%page_element initElement%}");
+        $this->template->setTemplateFromString("{%init_page_element 'initElement'%}{%page_element 'initElement'%}");
         $_SESSION['initialized'] = 0;
         $this->template->render();
         $this->assertEquals(1, $_SESSION['initialized']);
@@ -475,7 +476,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     public function testTemplateInitializeWillBeDoneOnPageElement()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%page_element initElement%}");
+        $this->template->setTemplateFromString("{%page_element 'initElement'%}");
         $_SESSION['initialized'] = 0;
         $this->assertEquals(0, $_SESSION['initialized']);
         $this->template->render();
@@ -485,7 +486,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     public function testTemplateInitializePageElementWillOnlyBeInitializedOnceOnOneInitAndOneUsage()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%init_page_element initElement%}{%page_element initElement%}");
+        $this->template->setTemplateFromString("{%init_page_element 'initElement'%}{%page_element 'initElement'%}");
         $_SESSION['initialized'] = 0;
         $this->assertEquals(0, $_SESSION['initialized']);
         $this->template->render();
@@ -495,7 +496,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     public function testInitPageElementWillBeDoneTwiceOnTwiceRender()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%init_page_element initElement%}");
+        $this->template->setTemplateFromString("{%init_page_element 'initElement'%}");
         $_SESSION['initialized'] = 0;
         $this->template->render();
         $this->template->render();
@@ -505,7 +506,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     public function testTemplateInitializePageElementBreaksOnElementNotFound()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%init_page_element nonExistingElement%}");
+        $this->template->setTemplateFromString("{%init_page_element 'nonExistingElement'%}");
         $exception = false;
         try {
             $this->template->render();
@@ -519,14 +520,14 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     public function testTemplateWillSupportPageContent()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%page_content someElement %}");
+        $this->template->setTemplateFromString("{%page_content 'someElement' %}");
         $this->assertEquals("", $this->template->render());
     }
 
     public function testTemplateWillSupportPageContentWithNoId()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%page_content asd%}");
+        $this->template->setTemplateFromString("{%page_content 'asd'%}");
         $this->assertEquals("", $this->template->render());
     }
 
@@ -534,7 +535,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     {
         $this->setUpConfig();
         $this->currentPage->getContent()->addContent("Hello World");
-        $this->template->setTemplateFromString("{%page_content%}");
+        $this->template->setTemplateFromString("{%page_content %}");
         $this->assertEquals("Hello World", $this->template->render());
     }
 
@@ -554,7 +555,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->setUpConfig();
         $c = "LOLSTRING";
         $this->inactivePage->getContent("SomeId")->addContent($c);
-        $this->template->setTemplateFromString("{%page_content someid[SomeId] %}");
+        $this->template->setTemplateFromString("{%page_content ['someid', 'SomeId'] %}");
         $r = $this->template->render();
         $this->assertEquals($c, $r);
     }
@@ -564,27 +565,44 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->setUpConfig();
         $c = "LOLSTRING";
         $this->inactivePage->getContent()->addContent($c);
-        $this->template->setTemplateFromString("{%page_content someid[] %}");
+        $this->template->setTemplateFromString("{%page_content ['someid', ''] %}");
         $r = $this->template->render();
         $this->assertEquals($c, $r);
 
     }
 
+
+
+
+
+    public function testPageContentWithPage()
+    {
+        $this->setUpConfig();
+        $c = "LOLSTRING";
+        $this->inactivePage->getContent('SomeId')->addContent($c);
+        $this->template->setTemplateFromString("{%page_content [page_order.getPage('someid'), 'SomeId'] %}");
+        $r = $this->template->render();
+        $this->assertEquals($c, $r);
+
+
+    }
+
+
     public function testTemplateWillReturnEmptyOnWrongId()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%page_content somenonexitingid[SomeId] %}");
+        $this->template->setTemplateFromString("{%page_content ['somenonexitingid', 'SomeId'] %}");
         $r = $this->template->render();
         $this->assertEquals("", $r);
     }
 
-
     public function testTemplateWillSupportSiteContent()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%site_content someElement %}");
+        $this->template->setTemplateFromString("{%site_content 'someElement' %}");
         $this->assertEquals("", $this->template->render());
     }
+
 
     public function testTemplateWillAddSiteContent()
     {
@@ -610,15 +628,14 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
     {
         $this->setUpConfig();
         $this->site->getContent("someid")->addContent("Hello World");
-        $this->template->setTemplateFromString("{%site_content someid%}");
+        $this->template->setTemplateFromString("{%site_content 'someid' %}");
         $this->assertEquals("Hello World", $this->template->render());
     }
-
 
     public function testTemplateWillSupportPageVariables()
     {
         $this->setUpConfig();
-        $this->template->setTemplateFromString("{%page_variable someElement %}");
+        $this->template->setTemplateFromString("{%page_variable 'someElement' %}");
         $this->assertEquals("", $this->template->render());
     }
 
@@ -629,20 +646,20 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("", $this->template->render());
     }
 
+
     public function testTemplateWillAddPageVariable()
     {
         $this->setUpConfig();
         $this->currentPage->getVariables()->setValue("asd", "Hello World");
-        $this->template->setTemplateFromString("{%page_variable asd%}");
+        $this->template->setTemplateFromString("{%page_variable 'asd' %}");
         $this->assertEquals("Hello World", $this->template->render());
     }
-
 
     public function testTemplateWillUpdatePageVariable()
     {
         $this->setUpConfig();
         $this->currentPage->getVariables()->setValue("foo", "Hello World");
-        $this->template->setTemplateFromString("{%page_variable foo%}");
+        $this->template->setTemplateFromString("{%page_variable 'foo'%}");
         $this->template->render();
         $this->currentPage->getVariables()->setValue("foo", "Hello World2");
         $this->assertEquals("Hello World2", $this->template->render());
@@ -655,9 +672,21 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $v = "Bar";
         $id = $this->inactivePage->getID();
         $this->inactivePage->getVariables()->setValue($k, $v);
-        $this->template->setTemplateFromString("{% page_variable {$id}[$k] %}");
+        $this->template->setTemplateFromString("{% page_variable ['{$id}', '$k'] %}");
         $this->assertEquals($v, $this->template->render());
     }
+
+    public function testTemplateSupportPageVariablesFromOtherPagesWithInstance()
+    {
+        $this->setUpConfig();
+        $k = "Foo";
+        $v = "Bar";
+        $id = $this->inactivePage->getID();
+        $this->inactivePage->getVariables()->setValue($k, $v);
+        $this->template->setTemplateFromString("{% page_variable [page_order.getPage('{$id}'), '$k'] %}");
+        $this->assertEquals($v, $this->template->render());
+    }
+
 
     public function testTemplateSupportPageVariablesFromOtherNonExistingPages()
     {
@@ -667,7 +696,6 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
 
     }
 
-
     public function testTemplateWillSupportSiteVariable()
     {
         $this->setUpConfig();
@@ -675,20 +703,20 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("", $this->template->render());
     }
 
+
     public function testTemplateWillAddSiteVariable()
     {
         $this->setUpConfig();
         $this->site->getVariables()->setValue("foo", "Hello World");
-        $this->template->setTemplateFromString("{%site_variable foo%}");
+        $this->template->setTemplateFromString("{%site_variable 'foo'%}");
         $this->assertEquals("Hello World", $this->template->render());
     }
-
 
     public function testTemplateWillUpdateSiteVariable()
     {
         $this->setUpConfig();
         $this->site->getVariables()->setValue("foo", "Hello World");
-        $this->template->setTemplateFromString("{%site_variable foo%}");
+        $this->template->setTemplateFromString("{%site_variable 'foo'%}");
         $this->template->render();
         $this->site->getVariables()->setValue("foo", "Hello World2");
         $this->assertEquals("Hello World2", $this->template->render());
