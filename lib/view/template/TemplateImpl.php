@@ -168,6 +168,7 @@ class TemplateImpl implements Template
         $currentPage = $currentPageStrat->getCurrentPage();
         $site = $this->backendContainer->getSiteInstance();
         $renderContext = [
+            'request' => ['get' => $_GET, 'post' => $_POST, 'session' => $_SESSION],
             'current_user' => $currentUser,
             'has_root_privileges' => $currentUser != null && $currentUser->getUserPrivileges()->hasRootPrivileges(),
             'has_site_privileges' => $currentUser != null && $currentUser->getUserPrivileges()->hasSitePrivileges(),
