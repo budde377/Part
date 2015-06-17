@@ -1,5 +1,7 @@
 update: install-composer update-pub update-dart update-db delete-tmp-folder
 
+update-dev: update-composer-dev update-pub-dev update-dart-dev update-db delete-tmp-folder
+
 update-db:
 	php update_db.php
 
