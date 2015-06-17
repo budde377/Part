@@ -1687,6 +1687,7 @@ class ContentEditor {
       _saveCurrentHash();
       savingBar.endJob(jobId);
       _lastSavedRevision = rev;
+      content.clearDraft();
     });
   }
 
