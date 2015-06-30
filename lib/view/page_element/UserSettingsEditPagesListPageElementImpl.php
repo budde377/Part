@@ -16,7 +16,7 @@ class UserSettingsEditPagesListPageElementImpl extends PageElementImpl
     private $pageOrder;
     private $currentPage;
     private $currentUser;
-    private $currentUserPrivileges;
+    private $cPrivileges;
 
     function __construct(BackendSingletonContainer $container)
     {
@@ -24,7 +24,7 @@ class UserSettingsEditPagesListPageElementImpl extends PageElementImpl
         $this->pageOrder = $container->getPageOrderInstance();
         $this->currentPage = $container->getCurrentPageStrategyInstance()->getCurrentPage();
         $this->currentUser = $container->getUserLibraryInstance()->getUserLoggedIn();
-        $this->currentUserPrivileges = $this->currentUser->getUserPrivileges();
+        $this->cPrivileges = $this->currentUser->getUserPrivileges();
     }
 
 
@@ -37,7 +37,7 @@ class UserSettingsEditPagesListPageElementImpl extends PageElementImpl
     {
         parent::generateContent();
 
-        $levelClass = !$this->currentUserPrivileges->hasRootPrivileges() && !$this->currentUserPrivileges->hasSitePrivileges()? 'levelPage':'draggable';
+        $levelClass = !$this->cPrivileges->hasRootPrivileges() && !$this->cPrivileges->hasSitePrivileges()? 'levelPage':'draggable';
 
         $output = "
         <div id='ActiveListPath'>
@@ -64,14 +64,14 @@ class UserSettingsEditPagesListPageElementImpl extends PageElementImpl
             $current = $page->getID() == $this->currentPage->getID()?'current':'';
             $pageId = $page->getID();
             $current .= $page->isHidden()?" ishidden":"";
-            $t = $page->isHidden()?"Vis":"Skjul";
+            $hideShow = $page->isHidden()?"Vis":"Skjul";
             $list .= "
             <li class='$current' {$this->pageDataSetGenerator($page)}>
                 <div class='padding'> &nbsp;</div>
                 <a href='$path$pageId' class='val'>{$page->getTitle()}</a>
                 <div class='link delete' title='Slet'>&nbsp;</div>
                 <div class='link activate' title='Deaktiver'>&nbsp;</div>
-                <div class='link showhide' title='$t'> &nbsp;</div>
+                <div class='link showhide' title='$hideShow'> &nbsp;</div>
                 <div class='link subpages' title='Undersider'>&nbsp;</div>
                 {$this->recursivePageListGenerator($page,"","",$path.$pageId."/")}
             </li>
