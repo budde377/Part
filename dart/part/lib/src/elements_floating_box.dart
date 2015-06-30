@@ -18,52 +18,11 @@ abstract class FloatingBox {
     }
   };
 
-  bool get _fixed => _f;
 
-  set _fixed(bool b) {
-    if (b == _fixed) {
-      return;
-    }
-    if (b) {
-      element.style.position = "fixed";
-    } else {
-      element.style.removeProperty("position");
-    }
-    _f = b;
-  }
+  int _elementOffsetTop(Element e) => e.documentOffset.x;
 
+  int _elementOffsetLeft(Element e) => e.documentOffset.y;
 
-  int _elementOffsetTop(Element e) => _elementOffset(e, (Element e) => e.getComputedStyle().top, () => window.scrollY, (Element e) => e.offsetTop);
-
-  int _elementOffsetLeft(Element e) => _elementOffset(e, (Element e) => e.getComputedStyle().left, () => window.scrollX, (Element e) => e.offsetLeft);
-
-  int _elementOffset(Element e, String computedStyleOffset(Element e), int scroll(), int offset(Element e)) {
-    var fixed = _fixed;
-    var recursiveCall;
-    recursiveCall = (Element e) {
-      if (e == null) {
-        return 0;
-      }
-      var computedOffset = computedStyleOffset(e).trim();
-      var p = e.getComputedStyle().position;
-      fixed = p == "fixed";
-      switch (computedOffset == "auto" ? "static" : p) {
-        case "fixed":
-          var i = int.parse(computedOffset.substring(0, computedOffset.length - 2));
-          return i;
-        case "absolute":
-          return int.parse(computedOffset.substring(0, computedOffset.length - 2)) + recursiveCall(e.offsetParent);
-        default:
-          return e == null ? 0 : offset(e) + recursiveCall(e.offsetParent);
-
-      }
-
-    };
-    var r = recursiveCall(e);
-    _fixed = fixed;
-    return r;
-
-  }
 
   void showAboveCenterOfElement(Element e) {
     var s = () => showAt(_elementOffsetLeft(e) + e.offsetWidth ~/ 2, _elementOffsetTop(e));
