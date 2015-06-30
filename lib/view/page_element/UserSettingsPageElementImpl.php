@@ -51,8 +51,8 @@ class UserSettingsPageElementImpl extends PageElementImpl
     {
         $this->config = $this->container->getConfigInstance();
         $this->currentUserPrivileges = $this->currentUser->getUserPrivileges();
-        $this->editPagePageElement = new UserSettingsEditPagePageElementImpl($this->container);
-        $this->editPagesPageElement = new view\page_element\UserSettingsEditPagesPageElementImpl($this->container);
+        $this->editPagePageElement = new UserSettingsPageUserListPageElementImpl($this->container);
+        $this->editPagesPageElement = new view\page_element\UserSettingsEditPagesListPageElementImpl($this->container);
         $this->editUserPageElement = new view\page_element\UserSettingsEditUserPageElementImpl($this->container);
         $this->editUsersPageElement = new view\page_element\UserSettingsEditUsersPageElementImpl($this->container);
         if($this->currentUserPrivileges->hasRootPrivileges()){

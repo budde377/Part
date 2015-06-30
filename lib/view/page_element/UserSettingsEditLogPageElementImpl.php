@@ -9,6 +9,7 @@ use ChristianBudde\Part\util\traits\DateTimeTrait;
  * User: budde
  * Date: 5/17/14
  * Time: 6:36 PM
+ * @deprecated
  */
 
 class UserSettingsEditLogPageElementImpl extends PageElementImpl{

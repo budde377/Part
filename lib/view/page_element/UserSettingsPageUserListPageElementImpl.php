@@ -13,8 +13,9 @@ use ChristianBudde\Part\view\html\SelectElement;
  * User: budde
  * Date: 19/01/13
  * Time: 16:11
+ * @deprecated
  */
-class UserSettingsEditPagePageElementImpl extends PageElementImpl
+class UserSettingsPageUserListPageElementImpl extends PageElementImpl
 {
     private $container;
     private $currentPage;
@@ -40,7 +41,7 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
     public function generateContent()
     {
         parent::generateContent();
-        $output = "
+/*        $output = "
         <h3>Rediger side egenskaber</h3>
         ";
 
@@ -50,7 +51,6 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
         $pageForm->setAttributes("class", "justDistribution");
         $pageForm->insertInputText("title", "EditPageEditTitleField", $this->currentPage->getTitle(), "Titel");
         $pageForm->insertInputText("id", "EditPageEditIDField", $this->currentPage->getID(), "Side ID");
-        /** @var $select SelectElement */
         $pageForm->insertSelect("template", "EditPageEditTemplateSelect", "Side type", $select);
         $select->setAttributes('class', 'no_fix_size');
         foreach ($this->config->listTemplateNames() as $templateName) {
@@ -76,6 +76,7 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
         $output .= "
         <h3>Administrer Brugerrettigheder</h3>
         ";
+         */
         $userList = "";
         $nonDeletableUsers = $deletableUsers = $possibleUsers = array();
         $this->generateUserList($nonDeletableUsers, $deletableUsers, $possibleUsers);
@@ -87,14 +88,14 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
         foreach ($deletableUsers as $user) {
             $userList .= "<li><span class='val'>{$user->getUsername()}</span><div class='delete link' title='Slet'>&nbsp;</div></li>";
         }
-        $output .= "
+        return "
         <ul class='colorList' id='PageUserList'>
             <li>{$this->currentUser->getUsername()}</li>
             $userList
         </ul>
         ";
 
-        $addUserAccessForm = new FormElementImpl(FormElement::FORM_METHOD_POST);
+        /*$addUserAccessForm = new FormElementImpl(FormElement::FORM_METHOD_POST);
         $addUserAccessForm->insertInputHidden("1", "addUserAccess");
         $addUserAccessForm->setAttributes("class", "oneLineForm");
         $addUserAccessForm->setAttributes("id", "AddUserToPageForm");
@@ -103,14 +104,12 @@ class UserSettingsEditPagePageElementImpl extends PageElementImpl
 
         $select->insertOption('-- Bruger --', " ");
         foreach ($possibleUsers as $user) {
-            /** @var $user User */
             $select->insertOption($user->getUsername(), $user->getUsername());
         }
         $addUserAccessForm->insertInputSubmit("Tilføj Bruger");
-        $output .= $addUserAccessForm->getHTMLString();
+        $output .= $addUserAccessForm->getHTMLString();*/
 
 
-        return $output;
     }
 
     private function generateUserList(array &$nonDeletableUsers = array(), array &$deletableUsers = array(), array &$possibleUsers = array())

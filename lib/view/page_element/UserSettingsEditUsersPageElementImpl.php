@@ -65,10 +65,9 @@ class UserSettingsEditUsersPageElementImpl extends PageElementImpl
         <h3>Brugere</h3>";
 
         $list = $this->userToLi($this->currentUser);
+
         $addUserForm = new FormElementImpl(FormElement::FORM_METHOD_POST);
-        if ($this->evaluateAddUserForm($status, $message)) {
-            $addUserForm->setNotion($message, $status);
-        }
+
         foreach ($this->userLibrary->getChildren($this->currentUser) as $user) {
             /** @var $user User */
             $list .= $this->userToLi($user);

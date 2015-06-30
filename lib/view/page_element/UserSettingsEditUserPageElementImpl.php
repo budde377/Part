@@ -10,6 +10,7 @@ use ChristianBudde\Part\view\html\FormElementImpl;
  * User: budde
  * Date: 20/01/13
  * Time: 17:24
+ * @deprecated
  */
 class UserSettingsEditUserPageElementImpl extends PageElementImpl
 {

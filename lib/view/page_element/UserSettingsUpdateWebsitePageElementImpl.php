@@ -10,6 +10,7 @@ use ChristianBudde\Part\util\traits\DateTimeTrait;
  * Date: 9/9/13
  * Time: 5:44 PM
  * To change this template use File | Settings | File Templates.
+ * @deprecated
  */
 class UserSettingsUpdateWebsitePageElementImpl extends PageElementImpl
 {
