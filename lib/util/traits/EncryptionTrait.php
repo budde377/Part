@@ -35,24 +35,22 @@ trait EncryptionTrait
 
 
     protected function generateRandomString($length = 10, $characters = null) {
-        $characters = $characters== null?'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ':$characters;
-        $randomString = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[rand(0, strlen($characters) - 1)];
-        }
-        return $randomString;
-    }
+        return $this->internalRandomString("rand", $length, $characters);
 
+    }
 
 
     protected function generateMtRandomString($length = 10, $characters = null) {
+        return $this->internalRandomString("mt_rand", $length, $characters);
+    }
+
+    private function internalRandomString(callable $method, $length = 10, $characters = null) {
         $characters = $characters== null?'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ':$characters;
         $randomString = '';
         for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[mt_rand(0, strlen($characters) - 1)];
+            $randomString .= $characters[$method(0, strlen($characters) - 1)];
         }
         return $randomString;
     }
-
 
 }
