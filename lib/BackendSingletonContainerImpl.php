@@ -355,7 +355,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
      */
     public function getTmpFolderInstance()
     {
-        return ($p = $this->getConfigInstance()->getTmpFolderPath()) != "" ? new FolderImpl($p) : null;
+        return ($path = $this->getConfigInstance()->getTmpFolderPath()) != "" ? new FolderImpl($path) : null;
     }
 
     /**

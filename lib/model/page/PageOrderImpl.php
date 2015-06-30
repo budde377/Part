@@ -30,7 +30,7 @@ class PageOrderImpl implements PageOrder, Observer
     private $pageOrder = array();
 
     /** @var PDOStatement */
-    private $deactivatePageStatement;
+    private $deactivatePgeStm;
     private $backendContainer;
 
 
@@ -198,8 +198,8 @@ class PageOrderImpl implements PageOrder, Observer
      */
     public function deactivatePage(Page $page)
     {
-        if ($this->deactivatePageStatement == null) {
-            $this->deactivatePageStatement = $this->connection->prepare("DELETE FROM PageOrder WHERE page_id = ?");
+        if ($this->deactivatePgeStm == null) {
+            $this->deactivatePgeStm = $this->connection->prepare("DELETE FROM PageOrder WHERE page_id = ?");
         }
 
         if ($this->findPage($page) == 'active') {
@@ -209,7 +209,7 @@ class PageOrderImpl implements PageOrder, Observer
             $this->inactivePages[$page->getID()] = $this->activePages[$page->getID()];
             unset($this->activePages[$page->getID()]);
             $this->removeIDFromSubLists($page->getID());
-            $this->deactivatePageStatement->execute(array($page->getID()));
+            $this->deactivatePgeStm->execute(array($page->getID()));
         }
     }
 
@@ -420,9 +420,9 @@ class PageOrderImpl implements PageOrder, Observer
      */
     public function getPagePath(Page $page)
     {
-        if (($r = $this->findPage($page)) == 'inactive') {
+        if (($status = $this->findPage($page)) == 'inactive') {
             return array();
-        } else if ($r == false) {
+        } else if ($status === false) {
             return false;
         }
 

@@ -12,14 +12,13 @@ namespace ChristianBudde\Part\controller\function_string\ast;
 
 use ChristianBudde\Part\controller\json\Program as JProgram;
 
-class CompositeFunctionProgramImpl implements Program{
+class CompositeFunctionProgramImpl extends ProgramImpl{
 
     private $compositeFunction;
-    private $type;
 
     function __construct(Type $type, CompositeFunction $compositeFunction)
     {
-        $this->type = $type;
+        parent::__construct($type);
         $this->compositeFunction = $compositeFunction;
     }
 
@@ -32,16 +31,6 @@ class CompositeFunctionProgramImpl implements Program{
     }
 
 
-
-    /**
-     * @return Type
-     */
-    public function getType()
-    {
-
-        return $this->type;
-    }
-
     /**
      * @return JProgram
      */
@@ -50,24 +39,4 @@ class CompositeFunctionProgramImpl implements Program{
         return $this->compositeFunction->toJSONCompositeFunction($this->getType()->toJSONTarget());
     }
 
-    public function toJSON()
-    {
-        return $this->toJSONProgram();
-    }
-
-    /**
-     * @return array
-     */
-    public function toArgumentArray()
-    {
-        return [$this->toJSON()];
-    }
-
-    /**
-     * @return array
-     */
-    public function toArray()
-    {
-        return [$this->toJSON()];
-    }
 }

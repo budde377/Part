@@ -12,14 +12,13 @@ namespace ChristianBudde\Part\controller\function_string\ast;
 
 use ChristianBudde\Part\controller\json\Program as JProgram;
 
-class FunctionChainProgramImpl implements Program{
+class FunctionChainProgramImpl extends ProgramImpl{
 
     private $functionChain;
-    private $type;
 
     function __construct(Type $type, FunctionChain $functionChain)
     {
-        $this->type = $type;
+        parent::__construct($type);
         $this->functionChain = $functionChain;
     }
 
@@ -34,14 +33,6 @@ class FunctionChainProgramImpl implements Program{
     }
 
 
-    /**
-     * @return Type
-     */
-    public function getType()
-    {
-
-        return $this->type;
-    }
 
     /**
      * @return JProgram
@@ -51,24 +42,4 @@ class FunctionChainProgramImpl implements Program{
         return $this->functionChain->toJSONFunction($this->type->toJSONTarget());
     }
 
-    public function toJSON()
-    {
-        return $this->toJSONProgram();
-    }
-
-    /**
-     * @return array
-     */
-    public function toArgumentArray()
-    {
-        return [$this->toJSON()];
-    }
-
-    /**
-     * @return array
-     */
-    public function toArray()
-    {
-        return [$this->toJSON()];
-    }
 }
