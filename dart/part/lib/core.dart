@@ -265,8 +265,7 @@ String addLeadingZero(int i) => i < 10 ? "0$i" : "$i";
 String dateString(DateTime time, [with_time=true]) {
   var now = new DateTime.now();
   now = new DateTime(now.year, now.month, now.day);
-  time = new DateTime(time.year, time.month, time.day);
-  var diff = now.difference(time).inDays;
+  var diff = now.difference(new DateTime(time.year, time.month, time.day)).inDays;
 
   var returnString = "";
 
