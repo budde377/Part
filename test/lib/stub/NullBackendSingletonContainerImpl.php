@@ -25,24 +25,6 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
         return null;
     }
 
-    /**
-     * This will return an css register, and reuse it from time to time
-     * @return \ChristianBudde\Part\util\file\CSSRegister
-     */
-    public function getCSSRegisterInstance()
-    {
-        return null;
-
-    }
-
-    /**
-     * This will return an js register, and reuse it from time to time
-     * @return \ChristianBudde\Part\util\file\JSRegister
-     */
-    public function getJSRegisterInstance()
-    {
-        return null;
-    }
 
     /**
      * This will return an ajax register, and reuse it from time to time
@@ -97,15 +79,6 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
      * @return \ChristianBudde\Part\model\page\DefaultPageLibrary
      */
     public function getDefaultPageLibraryInstance()
-    {
-        return null;
-    }
-
-    /**
-     * This will return an dart register, and reuse it from time to time
-     * @return \ChristianBudde\Part\util\file\DartRegister
-     */
-    public function getDartRegisterInstance()
     {
         return null;
     }

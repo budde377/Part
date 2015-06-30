@@ -8,7 +8,6 @@ use ChristianBudde\Part\exception\InvalidXMLException;
 use ChristianBudde\Part\util\file\File;
 use ChristianBudde\Part\util\file\FileImpl;
 use ChristianBudde\Part\util\file\FolderImpl;
-use ChristianBudde\Part\view\page_element\PageElementFactory;
 use ChristianBudde\Part\view\page_element\PageElementFactoryImpl;
 use Twig_Environment;
 use Twig_Extension_Debug;
@@ -177,9 +176,7 @@ class TemplateImpl implements Template
             'current_page' => $currentPage,
             'current_page_path' => $currentPageStrat->getCurrentPagePath(),
             'page_order' => $this->backendContainer->getPageOrderInstance(),
-            'css_register' => $this->backendContainer->getCSSRegisterInstance(),
             'page_element_factory' => $this->pageElementFactory,
-            'js_register' => $this->backendContainer->getJSRegisterInstance(),
             'site' => $site,
             'debug_mode' => $this->config->isDebugMode(),
             'initialize' => $initialize,

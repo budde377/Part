@@ -3,7 +3,6 @@ namespace ChristianBudde\Part\view\page_element;
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\util\helper\HTTPHeaderHelper;
-use ChristianBudde\Part\view\html\FormElement;
 
 
 /**
@@ -67,16 +66,16 @@ class LoginFormulaPageElementImpl extends PageElementImpl
         }
         if ($user == null) {
             $message = "Ugyldigt brugernavn";
-            $status = FormElement::NOTION_TYPE_ERROR;
+            $status = "error";
             return true;
         }
         $password = trim($_POST['password']);
         if (!$user->login($password)) {
             $message = "Ugyldigt kodeord";
-            $status = FormElement::NOTION_TYPE_ERROR;
+            $status = "error";
         } else {
             $message = "Du er nu logget ind";
-            $status = FormElement::NOTION_TYPE_SUCCESS;
+            $status = "success";
         }
         return true;
     }

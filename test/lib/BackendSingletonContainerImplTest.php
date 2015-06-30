@@ -47,35 +47,6 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
         $this->assertTrue($db1 == $db2, 'Did not reuse instance');
     }
 
-    public function testGetCSSRegisterReturnsSameInstanceOfCSSRegister()
-    {
-        $css1 = $this->backContainer->getCSSRegisterInstance();
-        $this->assertInstanceOf('ChristianBudde\Part\util\file\CSSRegister', $css1, 'Did not return instance of CSSRegister');
-        $this->config->setMysqlConnection(array('host' => 'lol', 'user' => 'lol', 'database' => '', 'password' => ''));
-        $css2 = $this->backContainer->getCSSRegisterInstance();
-        $this->assertTrue($css1 === $css2, 'Did not reuse instance');
-
-    }
-
-    public function testGetDartRegisterReturnsSameInstanceOfDartRegister()
-    {
-        $dart1 = $this->backContainer->getDartRegisterInstance();
-        $this->assertInstanceOf('ChristianBudde\Part\util\file\DartRegister', $dart1, 'Did not return instance of CSSRegister');
-        $this->config->setMysqlConnection(array('host' => 'lol', 'user' => 'lol', 'database' => '', 'password' => ''));
-        $dart2 = $this->backContainer->getDartRegisterInstance();
-        $this->assertTrue($dart1 === $dart2, 'Did not reuse instance');
-
-    }
-
-    public function testGetJSRegisterReturnsSameInstanceOfJSRegister()
-    {
-        $js1 = $this->backContainer->getJSRegisterInstance();
-        $this->assertInstanceOf('ChristianBudde\Part\util\file\JSRegister', $js1, 'Did not return instance of JSRegister');
-        $this->config->setMysqlConnection(array('host' => 'lol', 'user' => 'lol', 'database' => '', 'password' => ''));
-        $js2 = $this->backContainer->getJSRegisterInstance();
-        $this->assertTrue($js1 === $js2, 'Did not reuse instance');
-
-    }
 
     public function testGetAJAXServerReturnsSameInstanceOfAJAXServer()
     {
@@ -215,15 +186,10 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
         $this->assertTrue($this->backContainer->getAJAXServerInstance()  === $this->backContainer->ajaxserver);
         $this->assertTrue($this->backContainer->getCacheControlInstance()  === $this->backContainer->cacheControl);
         $this->assertTrue($this->backContainer->getConfigInstance()  === $this->backContainer->config);
-        $this->assertTrue($this->backContainer->getCSSRegisterInstance()  === $this->backContainer->CSSRegister);
-        $this->assertTrue($this->backContainer->getCSSRegisterInstance()  === $this->backContainer->cssregister);
         $this->assertTrue($this->backContainer->getCurrentPageStrategyInstance()  === $this->backContainer->currentPageStrategy);
-        $this->assertTrue($this->backContainer->getDartRegisterInstance()  === $this->backContainer->dartRegister);
         $this->assertTrue($this->backContainer->getDBInstance()  === $this->backContainer->db);
         $this->assertTrue($this->backContainer->getDefaultPageLibraryInstance()  === $this->backContainer->defaultPageLibrary);
         $this->assertTrue($this->backContainer->getFileLibraryInstance()  === $this->backContainer->fileLibrary);
-        $this->assertTrue($this->backContainer->getJSRegisterInstance()  === $this->backContainer->JSRegister);
-        $this->assertTrue($this->backContainer->getJSRegisterInstance()  === $this->backContainer->jsregister);
         $this->assertTrue($this->backContainer->getLoggerInstance()  === $this->backContainer->logger);
         $this->assertTrue($this->backContainer->getPageOrderInstance()  === $this->backContainer->pageOrder);
         $this->assertTrue($this->backContainer->getSiteInstance()  === $this->backContainer->site);

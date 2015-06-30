@@ -1,7 +1,6 @@
 <?php
 namespace ChristianBudde\Part\view\page_element;
 use ChristianBudde\Part\BackendSingletonContainer;
-use ChristianBudde\Part\Config;
 use ChristianBudde\Part\exception\ClassNotDefinedException;
 use ChristianBudde\Part\exception\ClassNotInstanceOfException;
 use ChristianBudde\Part\exception\FileNotFoundException;

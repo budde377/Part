@@ -13,11 +13,8 @@ use ChristianBudde\Part\model\updater\Updater;
 use ChristianBudde\Part\model\user\UserLibrary;
 use ChristianBudde\Part\util\CacheControl;
 use ChristianBudde\Part\util\db\DB;
-use ChristianBudde\Part\util\file\CSSRegister;
-use ChristianBudde\Part\util\file\DartRegister;
 use ChristianBudde\Part\util\file\FileLibrary;
 use ChristianBudde\Part\util\file\Folder;
-use ChristianBudde\Part\util\file\JSRegister;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -38,30 +35,10 @@ interface BackendSingletonContainer
 
     /**
      * @abstract
-     * This will return an css register, and reuse it from time to time
-     * @return CSSRegister
-     */
-    public function getCSSRegisterInstance();
-
-    /**
-     * @abstract
-     * This will return an js register, and reuse it from time to time
-     * @return JSRegister
-     */
-    public function getJSRegisterInstance();
-
-    /**
-     * @abstract
      * This will return an ajax register, and reuse it from time to time
      * @return Server
      */
     public function getAJAXServerInstance();
-
-    /**
-     * This will return an dart register, and reuse it from time to time
-     * @return DartRegister
-     */
-    public function getDartRegisterInstance();
 
 
     /**

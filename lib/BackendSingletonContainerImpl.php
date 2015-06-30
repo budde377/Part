@@ -26,16 +26,10 @@ use ChristianBudde\Part\util\CacheControl;
 use ChristianBudde\Part\util\CacheControlImpl;
 use ChristianBudde\Part\util\db\DB;
 use ChristianBudde\Part\util\db\MySQLDBImpl;
-use ChristianBudde\Part\util\file\CSSRegister;
-use ChristianBudde\Part\util\file\CSSRegisterImpl;
-use ChristianBudde\Part\util\file\DartRegister;
-use ChristianBudde\Part\util\file\DartRegisterImpl;
 use ChristianBudde\Part\util\file\FileLibrary;
 use ChristianBudde\Part\util\file\FileLibraryImpl;
 use ChristianBudde\Part\util\file\Folder;
 use ChristianBudde\Part\util\file\FolderImpl;
-use ChristianBudde\Part\util\file\JSRegister;
-use ChristianBudde\Part\util\file\JSRegisterImpl;
 use ChristianBudde\Part\util\file\LogFile;
 
 /**
@@ -51,10 +45,6 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $config;
     /** @var $database null | DB */
     private $database = null;
-    /** @var $cssRegister null | CSSRegister */
-    private $cssRegister = null;
-    /** @var $jsRegister null | JSRegister */
-    private $jsRegister;
     /** @var null | Server */
     private $ajaxServer;
     /** @var $pageOrder null | PageOrder */
@@ -65,8 +55,6 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $userLibrary;
     /** @var DefaultPageLibrary */
     private $defaultPageLibrary;
-    /** @var DartRegister */
-    private $dartRegister;
     /** @var  CacheControl */
     private $cacheControl;
     /** @var  Updater */
@@ -101,29 +89,6 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
         return $this->database;
     }
 
-    /**
-     * This will return an css register, and reuse it from time to time
-     * @return CSSRegister
-     */
-    public function getCSSRegisterInstance()
-    {
-        if ($this->cssRegister === null) {
-            $this->cssRegister = new CSSRegisterImpl();
-        }
-        return $this->cssRegister;
-    }
-
-    /**
-     * This will return an js register, and reuse it from time to time
-     * @return JSRegister
-     */
-    public function getJSRegisterInstance()
-    {
-        if ($this->jsRegister === null) {
-            $this->jsRegister = new JSRegisterImpl();
-        }
-        return $this->jsRegister;
-    }
 
     /**
      * This will return an ajax register, and reuse it from time to time
@@ -197,17 +162,6 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
         return $this->defaultPageLibrary;
     }
 
-    /**
-     * This will return an dart register, and reuse it from time to time
-     * @return DartRegister
-     */
-    public function getDartRegisterInstance()
-    {
-        if ($this->dartRegister === null) {
-            $this->dartRegister = new DartRegisterImpl();
-        }
-        return $this->dartRegister;
-    }
 
     /**
      * Will create and reuse an instance of CacheControl
@@ -303,23 +257,14 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
             case 'config':
                 return $this->getConfigInstance();
                 break;
-            case 'cssregister':
-                return $this->getCSSRegisterInstance();
-                break;
             case 'currentpagestrategy':
                 return $this->getCurrentPageStrategyInstance();
-                break;
-            case 'dartregister':
-                return $this->getDartRegisterInstance();
                 break;
             case 'db':
                 return $this->getDBInstance();
                 break;
             case 'defaultpagelibrary':
                 return $this->getDefaultPageLibraryInstance();
-                break;
-            case 'jsregister':
-                return $this->getJSRegisterInstance();
                 break;
             case 'filelibrary':
                 return $this->getFileLibraryInstance();

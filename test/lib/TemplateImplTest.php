@@ -5,7 +5,6 @@ use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\ConfigImpl;
 use ChristianBudde\Part\exception\EntryNotFoundException;
 use ChristianBudde\Part\exception\FileNotFoundException;
-
 use ChristianBudde\Part\model\site\Site;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubCurrentPageStrategyImpl;
@@ -16,7 +15,6 @@ use ChristianBudde\Part\test\stub\StubUserLibraryImpl;
 use ChristianBudde\Part\test\stub\StubVariablesImpl;
 use ChristianBudde\Part\util\file\FileImpl;
 use ChristianBudde\Part\util\file\FolderImpl;
-use ChristianBudde\Part\view\page_element\PageElementFactoryImpl;
 use ChristianBudde\Part\view\template\TemplateImpl;
 use Exception;
 use PHPUnit_Framework_TestCase;
@@ -310,25 +308,7 @@ class TemplateImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(strpos($v, "backend_container") !== false);
     }
 
-    public function testTemplateAddsCSSRegister()
-    {
-        $this->setUpConfig();
-        $this->template->setTwigDebug(true);
-        $this->template->setTemplateFromString("{{ dump() }}");
-        $v = $this->template->render();
-        $this->assertTrue(strpos($v, "css_register") !== false);
-    }
-
-    public function testTemplateAddsJSRegister()
-    {
-        $this->setUpConfig();
-        $this->template->setTwigDebug(true);
-        $this->template->setTemplateFromString("{{ dump() }}");
-        $v = $this->template->render();
-        $this->assertTrue(strpos($v, "js_register") !== false);
-    }
-
-    public function testTemplateAddsPageElementFacoty()
+    public function testTemplateAddsPageElementFactory()
     {
         $this->setUpConfig();
         $this->template->setTwigDebug(true);
