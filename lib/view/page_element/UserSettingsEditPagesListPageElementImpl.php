@@ -2,9 +2,6 @@
 namespace ChristianBudde\Part\view\page_element;
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\model\page\Page;
-use ChristianBudde\Part\model\page\PageOrder;
-use ChristianBudde\Part\view\html\FormElement;
-use ChristianBudde\Part\view\html\FormElementImpl;
 
 /**
  * Created by JetBrains PhpStorm.
