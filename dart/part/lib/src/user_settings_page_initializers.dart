@@ -121,6 +121,7 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
         pageUserLis = _pageUserList.querySelectorAll('li');
         _addListener(newLi);
         deco.unBlur();
+        deco.validatingForm.validate();
       });
 
       return false;
