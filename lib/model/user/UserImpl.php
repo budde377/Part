@@ -29,7 +29,7 @@ class UserImpl implements User
     private $mail;
     private $password;
     private $lastLogin;
-    private $id;
+    private $userId;
 
     private $userPrivileges;
     private $userVariables;
@@ -51,8 +51,8 @@ class UserImpl implements User
     private $deleteStatement;
     /** @var $lastLoginStatement PDOStatement | null */
     private $lastLoginStatement;
-    /** @var $circularParentingStatement PDOStatement | null */
-    private $circularParentingStatement;
+    /** @var $cParentStm PDOStatement | null */
+    private $cParentStm;
 
     private $valuesHasBeenSet = false;
     private $observers = array();
@@ -209,7 +209,7 @@ class UserImpl implements User
             $this->createStatement->bindParam(1, $this->username);
             $this->createStatement->bindParam(2, $this->mail);
             $this->createStatement->bindParam(3, $this->password);
-            $this->createStatement->bindParam(4, $this->id);
+            $this->createStatement->bindParam(4, $this->userId);
             $this->createStatement->bindParam(5, $this->parentID);
         }
         try {
@@ -310,14 +310,14 @@ class UserImpl implements User
             $this->username = $result['username'];
             $this->lastLogin = ($r = $result['lastLogin']) == null ? null : intval($r);
             $this->parentID = $result['parent'];
-            $this->id = $result['id'];
+            $this->userId = $result['id'];
             $statement = $this->connection->prepare("SELECT username FROM User WHERE id=?");
             $statement->execute(array($this->parentID));
             $result = $statement->fetch(PDO::FETCH_ASSOC);
             $this->parent = isset($result['username']) ? $result['username'] : null;
 
-        } else if($this->id == null){
-            $this->id = uniqid('', true);
+        } else if($this->userId == null){
+            $this->userId = uniqid('', true);
         }
     }
 
@@ -394,8 +394,8 @@ class UserImpl implements User
 
     private function detectCircularParenting($parentID)
     {
-        if ($this->circularParentingStatement == null) {
-            $this->circularParentingStatement = $this->connection->prepare("SELECT parent FROM User WHERE id = ?");
+        if ($this->cParentStm == null) {
+            $this->cParentStm = $this->connection->prepare("SELECT parent FROM User WHERE id = ?");
         }
         $failure = false;
         $success = false;
@@ -403,11 +403,11 @@ class UserImpl implements User
             if ($parentID == null) {
                 $success = true;
             }
-            if ($parentID == $this->id) {
+            if ($parentID == $this->userId) {
                 $failure = true;
             }
-            $this->circularParentingStatement->execute(array($parentID));
-            $result = $this->circularParentingStatement->fetch(PDO::FETCH_ASSOC);
+            $this->cParentStm->execute(array($parentID));
+            $result = $this->cParentStm->fetch(PDO::FETCH_ASSOC);
             $parentID = $result['parent'];
 
         }
@@ -459,7 +459,7 @@ class UserImpl implements User
     public function getUniqueId()
     {
         $this->setInitialValues();
-        return $this->id;
+        return $this->userId;
     }
 
     /**
