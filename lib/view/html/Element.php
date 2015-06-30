@@ -1,9 +1,11 @@
 <?php
-namespace ChristianBudde\Part\view\html;/**
+namespace ChristianBudde\Part\view\html;
+/**
  * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 25/07/12
  * Time: 14:52
+ * @deprecated
  */
 interface Element
 {

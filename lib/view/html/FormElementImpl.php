@@ -8,6 +8,7 @@ use ChristianBudde\Part\exception\MalformedParameterException;
  * User: budde
  * Date: 25/07/12
  * Time: 15:34
+ * @deprecated
  */
 class FormElementImpl implements FormElement
 {
