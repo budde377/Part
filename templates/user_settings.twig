@@ -360,7 +360,8 @@
                                 {% set addr_list = addr_list | merge([domain.addressLibrary.catchallAddress]) %}
                             {% endif %}
                             {% if addr_list | length %}
-                                {% set addresses = addresses | merge({domain.domainname: addr_list}) %}
+                                {% set domain_name = domain.domainname %}
+                                {% set addresses = addresses | merge({domain_name : addr_list}) %}
                             {% endif %}
                         {% endfor %}
                         <ul id="UserSettingsEditMailAddressLists" {{ addresses | length?"":"hidden" }}>
@@ -426,13 +427,13 @@
                                 {% set children = user_lib.getChildren(current_user) %}
                                 {% set ownerCheckListHidden = true%}
                                 {% for child in children %}
-                                    {% set %}
+                                    {% set ownerCheckListHidden = ownerCheckListHidden and (child.userprivileges.hasSitePrivileges) %}
                                 {% endfor %}
-                                <label id='UserSettingsEditMailAddAddressUserCheckListLabel' $ownerCheckListHidden>
+                               <label id='UserSettingsEditMailAddAddressUserCheckListLabel' {{ ownerCheckListHidden?"hidden":"" }}>
                                     Vælg brugere
                                 </label>
                                 <ul class='owner_check_list' id='UserSettingsEditMailAddAddressUserCheckList'
-                                    $ownerCheckListHidden>
+                                        {{ ownerCheckListHidden?"hidden":"" }}>
                                     {% for user in user_lib %}
                                         {% if not user.userPrivileges.hasSitePrivileges %}
                                             <li data-user-name="{{ user.username }}" {{ user in children?'':'hidden'}}>
@@ -483,7 +484,6 @@
 
                             </form>
                         </div>
-                        {% page_element "\\ChristianBudde\\Part\\view\\page_element\\UserSettingsEditMailPageElementImpl" %}
 
                     </li>
                 {% endif %}
