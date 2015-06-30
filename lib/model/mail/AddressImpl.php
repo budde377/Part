@@ -29,7 +29,7 @@ class AddressImpl implements Address, Observer
     private $observerLibrary;
 
     private $localPart;
-    private $db;
+    private $database;
     private $addressLibrary;
     private $active = true;
     private $hasBeenSetup = false;
@@ -37,7 +37,7 @@ class AddressImpl implements Address, Observer
     /** @var  Mailbox */
     private $mailbox;
     private $aliasList;
-    private $id;
+    private $addressId;
 
     private $modified = 0;
     private $created = 0;
@@ -48,9 +48,9 @@ class AddressImpl implements Address, Observer
     private $saveStatement;
     private $setupAliasStatement;
     private $removeAliasStatement;
-    private $updateLastModifiedStatement;
+    private $updLastModStm;
     private $addTargetStatement;
-    private $clearTargetsStatement;
+    private $clearTargetsStm;
     private $setUpOwnerStatement;
     private $addOwnerStatement;
     private $removeOwnerStatement;
@@ -63,7 +63,7 @@ class AddressImpl implements Address, Observer
         $this->container = $container;
         $this->observerLibrary = new ObserverLibraryImpl($this);
         $this->addressLibrary = $addressLibrary;
-        $this->db = $container->getDBInstance();
+        $this->database = $container->getDBInstance();
         $this->localPart = $localPart;
         $this->domainName = $addressLibrary->getDomain()->getDomainName();
         $this->userLibrary = $container->getUserLibraryInstance();
@@ -137,7 +137,7 @@ class AddressImpl implements Address, Observer
     public function exists()
     {
         if ($this->existsStatement == null) {
-            $this->existsStatement = $this->db->getConnection()->prepare("SELECT * FROM MailAddress WHERE domain = :domain AND name = :local_part");
+            $this->existsStatement = $this->database->getConnection()->prepare("SELECT * FROM MailAddress WHERE domain = :domain AND name = :local_part");
             $this->existsStatement->bindParam("domain", $this->domainName);
             $this->existsStatement->bindParam("local_part", $this->localPart);
         }
@@ -156,13 +156,13 @@ class AddressImpl implements Address, Observer
     {
 
         $this->setUp();
-        if($this->id == null){
+        if($this->addressId == null){
             return;
         }
 
         if($this->deleteStatement == null){
-            $this->deleteStatement = $this->db->getConnection()->prepare("DELETE FROM MailAddress WHERE id = :id");
-            $this->deleteStatement->bindParam('id', $this->id);
+            $this->deleteStatement = $this->database->getConnection()->prepare("DELETE FROM MailAddress WHERE id = :id");
+            $this->deleteStatement->bindParam('id', $this->addressId);
         }
         $this->deleteStatement->execute();
         $this->callObservers(Address::EVENT_DELETE);
@@ -182,15 +182,15 @@ class AddressImpl implements Address, Observer
         }
 
         if($this->createStatement == null){
-            $this->createStatement = $this->db->getConnection()->prepare("
+            $this->createStatement = $this->database->getConnection()->prepare("
             INSERT INTO MailAddress (name, domain, id, mailbox_id, created, modified, active)
             VALUES (:name, :domain, :id, NULL, NOW(), NOW(), :active)");
         }
-        $this->id = uniqid('address', true);
+        $this->addressId = uniqid('address', true);
         $this->createStatement->execute(array(
             ':name'=>$this->localPart,
             ':domain'=>$this->domainName,
-            ':id'=>$this->id,
+            ':id'=>$this->addressId,
             ':active'=>$this->active?1:0));
 
         $this->loadTimestamps();
@@ -248,10 +248,10 @@ class AddressImpl implements Address, Observer
             return;
         }
         if($this->addTargetStatement == null){
-            $this->addTargetStatement = $this->db->getConnection()->prepare("INSERT INTO MailAlias (address_id, target) VALUES (:id, :target)");
+            $this->addTargetStatement = $this->database->getConnection()->prepare("INSERT INTO MailAlias (address_id, target) VALUES (:id, :target)");
 
         }
-        $this->addTargetStatement->execute(array('id'=>$this->id, 'target'=>$address));
+        $this->addTargetStatement->execute(array('id'=>$this->addressId, 'target'=>$address));
         $this->aliasList[$address] = $address;
     }
 
@@ -269,12 +269,12 @@ class AddressImpl implements Address, Observer
         }
 
         if($this->removeAliasStatement == null){
-            $this->removeAliasStatement = $this->db->getConnection()->prepare("DELETE FROM MailAlias WHERE address_id = :id AND target = :target");
+            $this->removeAliasStatement = $this->database->getConnection()->prepare("DELETE FROM MailAlias WHERE address_id = :id AND target = :target");
         }
 
 
 
-        $this->removeAliasStatement->execute(array(':id' => $this->id, ':target'=> $address));
+        $this->removeAliasStatement->execute(array(':id' => $this->addressId, ':target'=> $address));
         unset($this->aliasList[$address]);
         $this->updateLastModified();
     }
@@ -286,11 +286,11 @@ class AddressImpl implements Address, Observer
     public function clearTargets()
     {
         $this->setUp();
-        if($this->clearTargetsStatement == null){
-            $this->clearTargetsStatement = $this->db->getConnection()->prepare("DELETE FROM MailAlias WHERE address_id = :id");
-            $this->clearTargetsStatement->bindParam("id", $this->id);
+        if($this->clearTargetsStm == null){
+            $this->clearTargetsStm = $this->database->getConnection()->prepare("DELETE FROM MailAlias WHERE address_id = :id");
+            $this->clearTargetsStm->bindParam("id", $this->addressId);
         }
-        $this->clearTargetsStatement->execute();
+        $this->clearTargetsStm->execute();
         $this->aliasList = [];
     }
 
@@ -329,7 +329,7 @@ class AddressImpl implements Address, Observer
             return $this->mailbox;
         }
 
-        $this->mailbox = new MailboxImpl($this->container, $this, $this->db);
+        $this->mailbox = new MailboxImpl($this->container, $this, $this->database);
         $this->mailbox->attachObserver($this);
         $this->mailbox->setName($name);
         $this->mailbox->setPassword($password);
@@ -393,12 +393,12 @@ class AddressImpl implements Address, Observer
         $row = $this->existsStatement->fetch(PDO::FETCH_ASSOC);
 
         if($row['mailbox_id'] != null){
-            $this->mailbox = new MailboxImpl($this->container, $this, $this->db);
+            $this->mailbox = new MailboxImpl($this->container, $this, $this->database);
             $this->mailbox->attachObserver($this);
         }
         $this->modified = strtotime($row['modified']);
         $this->created = strtotime($row['created']);
-        $this->id = $row['id'];
+        $this->addressId = $row['id'];
         $this->active = $row['active'] == 1;
 
     }
@@ -409,7 +409,7 @@ class AddressImpl implements Address, Observer
     private function saveAddress()
     {
         if($this->saveStatement == null){
-            $this->saveStatement = $this->db->getConnection()->prepare("
+            $this->saveStatement = $this->database->getConnection()->prepare("
             UPDATE MailAddress SET name = :name, active = :active, modified = NOW() WHERE id = :id");
         }
 
@@ -417,7 +417,7 @@ class AddressImpl implements Address, Observer
         try{
             $this->saveStatement->execute(array(
                 ':name'=>$this->localPart,
-                ':id'=>$this->id,
+                ':id'=>$this->addressId,
                 ':active'=>$this->active?1:0));
 
 
@@ -432,11 +432,11 @@ class AddressImpl implements Address, Observer
     }
 
     private function updateLastModified(){
-        if($this->updateLastModifiedStatement == null){
-            $this->updateLastModifiedStatement = $this->db->getConnection()->prepare("UPDATE MailAddress SET modified = NOW() WHERE id = :id");
-            $this->updateLastModifiedStatement->bindParam('id', $this->id);
+        if($this->updLastModStm == null){
+            $this->updLastModStm = $this->database->getConnection()->prepare("UPDATE MailAddress SET modified = NOW() WHERE id = :id");
+            $this->updLastModStm->bindParam('id', $this->addressId);
         }
-        $this->updateLastModifiedStatement->execute();
+        $this->updLastModStm->execute();
         $this->loadTimestamps();
     }
 
@@ -463,8 +463,8 @@ class AddressImpl implements Address, Observer
         $this->setUp();
 
         if($this->setupAliasStatement == null){
-            $this->setupAliasStatement = $this->db->getConnection()->prepare("SELECT target FROM MailAlias WHERE address_id = :id ORDER BY target ASC");
-            $this->setupAliasStatement->bindParam("id", $this->id);
+            $this->setupAliasStatement = $this->database->getConnection()->prepare("SELECT target FROM MailAlias WHERE address_id = :id ORDER BY target ASC");
+            $this->setupAliasStatement->bindParam("id", $this->addressId);
         }
 
 
@@ -502,15 +502,15 @@ class AddressImpl implements Address, Observer
             if($changeType == User::EVENT_DELETE){
                 $subject->detachObserver($this);
             } else if($changeType == User::EVENT_USERNAME_UPDATE){
-                $k = array_search($subject, $this->owners);
-                if($k === false){
+                $userKey = array_search($subject, $this->owners);
+                if($userKey === false){
                     return;
                 }
-                if($k == $subject->getUsername()){
+                if($userKey == $subject->getUsername()){
                     return;
                 }
-                $this->owners[$subject->getUsername()] = $this->owners[$k];
-                unset($this->owners[$k]);
+                $this->owners[$subject->getUsername()] = $this->owners[$userKey];
+                unset($this->owners[$userKey]);
 
 
             }
@@ -531,7 +531,7 @@ class AddressImpl implements Address, Observer
     public function getId()
     {
         $this->setUp();
-        return $this->id;
+        return $this->addressId;
     }
 
     /**
@@ -546,7 +546,7 @@ class AddressImpl implements Address, Observer
         }
 
         if($this->addOwnerStatement == null){
-            $this->addOwnerStatement = $this->db->getConnection()->prepare("INSERT INTO MailAddressUserOwnership (address_id, username) VALUES (?, ?)");
+            $this->addOwnerStatement = $this->database->getConnection()->prepare("INSERT INTO MailAddressUserOwnership (address_id, username) VALUES (?, ?)");
         }
         $this->addOwnerStatement->execute(array($this->getId(), $owner->getUsername()));
         $this->owners[$owner->getUsername()] = $owner;
@@ -568,7 +568,7 @@ class AddressImpl implements Address, Observer
         }
 
         if($this->removeOwnerStatement == null){
-            $this->removeOwnerStatement= $this->db->getConnection()->prepare("DELETE FROM MailAddressUserOwnership WHERE address_id = ? AND username = ?");
+            $this->removeOwnerStatement= $this->database->getConnection()->prepare("DELETE FROM MailAddressUserOwnership WHERE address_id = ? AND username = ?");
         }
         $this->removeOwnerStatement->execute(array($this->getId(), $owner->getUsername()));
 
@@ -617,7 +617,7 @@ class AddressImpl implements Address, Observer
     private function setUpOwners()
     {
         if($this->setUpOwnerStatement == null){
-            $this->setUpOwnerStatement = $this->db->getConnection()->prepare("SELECT username FROM MailAddressUserOwnership WHERE address_id = ?");
+            $this->setUpOwnerStatement = $this->database->getConnection()->prepare("SELECT username FROM MailAddressUserOwnership WHERE address_id = ?");
             $this->setUpOwnerStatement->execute(array($this->getId()));
             foreach($this->setUpOwnerStatement->fetchAll(PDO::FETCH_NUM) as $row ){
                 $username = $row[0];
