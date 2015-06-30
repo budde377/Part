@@ -28,6 +28,48 @@
                         <div class='inactiveFilter' title='Du kan ikke redigere denne side'>&nbsp;</div>
                     {% endif %}
                     <h2>Rediger Side</h2>
+
+                    <h3>Rediger side egenskaber</h3>
+
+                    <form action="#" method="post" id="EditPageForm" class="justDistribution initial">
+                        <div class="text"><label for="EditPageEditTitleField">Titel</label>
+                            <input type="text"
+                                   name="title"
+                                   value="Hjem"
+                                   id="EditPageEditTitleField"
+                                   class="valid initial">
+                        </div>
+                        <div class="text"><label for="EditPageEditIDField">Side ID</label><input type="text" name="id"
+                                                                                                 value="hjem"
+                                                                                                 id="EditPageEditIDField"
+                                                                                                 class="valid initial">
+                        </div>
+                        <div class="select"><label for="EditPageEditTemplateSelect">Side type</label>
+
+                            <div class="better_select">
+                                <select name="template" id="EditPageEditTemplateSelect" size="1"
+                                        class="no_fix_size better_select_select valid initial">
+                                    <option value="Kontakt">Kontakt</option>
+                                    <option value="Nyhed">Nyhed</option>
+                                    <option value="Standard">Standard</option>
+                                    <option value="Hjem" selected="selected">Hjem</option>
+                                </select>
+
+                                <div class="current_selection">Hjem
+                                    <div class="arrow_down"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text">
+                            <label for="EditPageEditAliasField">Alias (regexp)</label>
+                            <input type="text"
+                                   name="alias"
+                                   value=""
+                                   id="EditPageEditAliasField"
+                                   class="valid initial">
+                        </div>
+                        <div class="submit"><input value="Rediger" type="submit"></div>
+                    </form>
                     {% page_element "\\ChristianBudde\\Part\\view\\page_element\\UserSettingsEditPagePageElementImpl" %}
                 </li>
                 <li>

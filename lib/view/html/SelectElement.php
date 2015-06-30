@@ -7,6 +7,7 @@ namespace ChristianBudde\Part\view\html;
  * User: budde
  * Date: 31/08/12
  * Time: 21:22
+ * @deprecated
  */
 interface SelectElement extends Element
 {

@@ -7,6 +7,7 @@ namespace ChristianBudde\Part\view\html;
  * User: budde
  * Date: 25/07/12
  * Time: 14:53
+ * @deprecated
  */
 interface FormElement extends Element
 {
