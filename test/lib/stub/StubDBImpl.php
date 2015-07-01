@@ -11,7 +11,7 @@ use PDO;
  * Time: 10:32 PM
  * To change this template use File | Settings | File Templates.
  */
-class StubDBImpl implements DB
+class StubDBImpl implements DB,\Serializable
 {
 
     /**
@@ -70,5 +70,30 @@ class StubDBImpl implements DB
      */
     public function getVersion($name = "")
     {
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+        return "";
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+
     }
 }
