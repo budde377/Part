@@ -266,8 +266,7 @@ ORDER BY parent_id,order_no");
         }
 
         $deleteStm = $this->connection->prepare("DELETE FROM Page WHERE page_id=?");
-        $deleteStm->bindParam(1, $page->getID());
-        $deleteStm->execute();
+        $deleteStm->execute([$page->getID()]);
         if (!$deleteStm->rowCount() > 0) {
             return false;
         }
