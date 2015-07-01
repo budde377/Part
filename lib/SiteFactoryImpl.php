@@ -18,6 +18,9 @@ use ChristianBudde\Part\util\script\ScriptChainImpl;
 class SiteFactoryImpl implements SiteFactory
 {
     private $config;
+    private $preScriptChain;
+    private $postScriptChain;
+    private $backendContainer;
 
     public function __construct(Config $config)
     {
@@ -31,15 +34,14 @@ class SiteFactoryImpl implements SiteFactory
      * in some config (it must be ready to run).
      *
      *
-     * @param BackendSingletonContainer $backendContainer
      * @throws ClassNotDefinedException
      * @throws FileNotFoundException
      * @throws ClassNotInstanceOfException
      * @return ScriptChain
      */
-    public function buildPreScriptChain(BackendSingletonContainer $backendContainer)
+    public function buildPreScriptChain()
     {
-        return $this->buildScriptChain($backendContainer, $this->config->getPreScripts());
+        return $this->preScriptChain == null ? $this->preScriptChain = $this->buildScriptChain($this->buildBackendSingletonContainer(), $this->config->getPreScripts()) : $this->preScriptChain;
 
     }
 
@@ -48,16 +50,15 @@ class SiteFactoryImpl implements SiteFactory
      * in some config (it must be ready to run).
      *
      *
-     * @param BackendSingletonContainer $backendContainer
      * @throws ClassNotDefinedException
      * @throws FileNotFoundException
      * @throws ClassNotInstanceOfException
      * @return ScriptChain
      */
-    public function buildPostScriptChain(BackendSingletonContainer $backendContainer)
+    public function buildPostScriptChain()
     {
 
-        return $this->buildScriptChain($backendContainer, $this->config->getPostScripts());
+        return $this->postScriptChain == null?$this->postScriptChain = $this->buildScriptChain($this->buildBackendSingletonContainer(), $this->config->getPostScripts()):$this->postScriptChain;
     }
 
 
@@ -97,17 +98,16 @@ class SiteFactoryImpl implements SiteFactory
      */
     public function buildConfig()
     {
-        return clone $this->config;
+        return $this->config;
     }
 
 
     /**
      * Builds a new BackendSingletonContainer and returns it.
-     * @param Config $config
      * @return BackendSingletonContainer
      */
-    public function buildBackendSingletonContainer(Config $config)
+    public function buildBackendSingletonContainer()
     {
-        return new BackendSingletonContainerImpl($config);
+        return $this->backendContainer == null?$this->backendContainer = new BackendSingletonContainerImpl($this->buildConfig()):$this->backendContainer;
     }
 }

@@ -231,12 +231,13 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         </preScripts>
         </config>");
         try{
-            $this->factory->buildPreScriptChain($this->backFactory);
+            $this->factory->buildPreScriptChain();
         } catch (ForceExitException $e){
-            $this->assertTrue($e->data[0] === $this->backFactory);
+            $this->assertTrue($e->data[0] === $this->factory->buildBackendSingletonContainer());
         }
 
     }
+
     public function testBuildPostScriptWillGiveRightArgumentToConstructor()
     {
         $this->setupFactory("
@@ -248,7 +249,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         try{
             $this->factory->buildPostScriptChain($this->backFactory);
         } catch (ForceExitException $e){
-            $this->assertTrue($e->data[0] === $this->backFactory);
+            $this->assertTrue($e->data[0] === $this->factory->buildBackendSingletonContainer());
         }
 
     }
@@ -291,7 +292,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('ChristianBudde\Part\Config', $retConfig, 'Did not return Config');
     }
 
-    public function testBuildConfigWillReturnNewInstanceOfConfig()
+    public function testBuildConfigWillReturnSameInstanceOfConfig()
     {
         /** @var $configXML SimpleXMLElement */
         $this->setupFactory("
@@ -299,11 +300,11 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         </config>");
         $retConfig = $this->factory->buildConfig();
         $secRetConfig = $this->factory->buildConfig();
-        $this->assertFalse(($this->config === $retConfig), 'Did not return a new instance of Config');
-        $this->assertFalse(($retConfig === $secRetConfig), 'Did not return a new instance of Config');
+        $this->assertTrue(($this->config === $retConfig), 'Did not return a new instance of Config');
+        $this->assertTrue(($retConfig === $secRetConfig), 'Did not return a new instance of Config');
     }
 
-    public function testBuildBackendSingletonContainerReturnNewInstanceOfThat()
+    public function testBuildBackendSingletonContainerReturnSameInstanceOfThat()
     {
         /** @var $configXML SimpleXMLElement */
         $this->setupFactory("
@@ -311,7 +312,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         </config>");
         $ret = $this->factory->buildBackendSingletonContainer($this->config);
         $ret2 = $this->factory->buildBackendSingletonContainer($this->config);
-        $this->assertFalse(($ret === $ret2), 'Did not return a new instance of container');
+        $this->assertTrue(($ret === $ret2), 'Did not return a new instance of container');
     }
 
 

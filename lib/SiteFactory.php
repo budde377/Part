@@ -16,20 +16,18 @@ interface SiteFactory
      * @abstract
      * Builds a new PreScriptChain and returns it. This must contain prescripts specified
      * in some config (it must be ready to run).
-     * @param BackendSingletonContainer $backendContainer
      * @return ScriptChain
      */
-    public function buildPreScriptChain(BackendSingletonContainer $backendContainer);
+    public function buildPreScriptChain();
 
 
     /**
      * @abstract
      * Builds a new PostScriptChain and returns it. This must contain prescripts specified
      * in some config (it must be ready to run).
-     * @param BackendSingletonContainer $backendContainer
      * @return ScriptChain
      */
-    public function buildPostScriptChain(BackendSingletonContainer $backendContainer);
+    public function buildPostScriptChain();
 
     /**
      * @abstract
@@ -42,10 +40,9 @@ interface SiteFactory
     /**
      * @abstract
      * Builds a new BackendSingletonContainer and returns it.
-     * @param Config $config
      * @return BackendSingletonContainer
      */
-    public function buildBackendSingletonContainer(Config $config);
+    public function buildBackendSingletonContainer();
 
 
 }
