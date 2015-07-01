@@ -14,7 +14,7 @@ use PDO;
  * Time: 10:09 AM
  * To change this template use File | Settings | File Templates.
  */
-class MySQLDBImpl implements DB
+class MySQLDBImpl implements DB, \Serializable
 {
     /** @var  PDO */
     private $connection = null;
@@ -150,15 +150,13 @@ class MySQLDBImpl implements DB
     }
 
 
-    private
-    function leadingNumber($string)
+    private function leadingNumber($string)
     {
         preg_match("/^[0-9]+/", $string, $matches);
         return intval($matches[0]);
     }
 
-    private
-    function setUpVersion()
+    private function setUpVersion()
     {
         if ($this->version != null) {
             return;
@@ -176,8 +174,7 @@ class MySQLDBImpl implements DB
 
     }
 
-    private
-    function setVersion($name, $version)
+    private function setVersion($name, $version)
     {
 
         $connection = $this->getConnection();
@@ -208,5 +205,44 @@ class MySQLDBImpl implements DB
   version     = VALUES(version)")->execute([$name, $version]);
 
         $this->version[$name] = $version;
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+        return serialize([
+            $this->database, $this->host, $this->password, $this->username, $this->folders,
+            $this->mailDatabase, $this->mailHost, $this->mailUsername, $this->mailPassword,
+            $this->version
+        ]);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+        $array = unserialize($serialized);
+        $this->database = $array[0];
+        $this->host = $array[1];
+        $this->password = $array[2];
+        $this->username= $array[3];
+        $this->folders= $array[4];
+        $this->mailDatabase= $array[5];
+        $this->mailHost= $array[6];
+        $this->mailUsername= $array[7];
+        $this->mailPassword= $array[8];
+        $this->version= $array[9];
     }
 }

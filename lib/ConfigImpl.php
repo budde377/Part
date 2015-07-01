@@ -11,7 +11,7 @@ use SimpleXMLElement;
  * Date: 5/15/12
  * Time: 9:01 AM
  */
-class ConfigImpl implements Config
+class ConfigImpl implements Config, \Serializable
 {
     private $variables;
     private $owner;
@@ -560,5 +560,77 @@ class ConfigImpl implements Config
             $this->templates[(string)$template] = (string)$template['filename'];
             $this->templatePath[(string)$template] = (string)$templates['path'];
         }
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+        return serialize(
+            [
+                $this->variables,
+                $this->owner,
+                $this->domain,
+                $this->configFile->asXML(),
+                $this->rootPath,
+                $this->templates,
+                $this->templatePath,
+                $this->templateNamespace,
+                $this->pageElements,
+                $this->preScripts,
+                $this->postScripts,
+                $this->optimizers,
+                $this->mysql,
+                $this->mailMysql,
+                $this->debugMode,
+                $this->defaultPages,
+                $this->enableUpdater,
+                $this->tmpFolderPath,
+                $this->log,
+                $this->ajaxTypeHandlers,
+                $this->fbAppCredentials
+            ]);
+
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+
+        $array = unserialize($serialized);
+        $this->variables = $array[0];
+        $this->owner = $array[1];
+        $this->domain = $array[2];
+        $this->configFile = simplexml_load_string($array[3]);
+        $this->rootPath = $array[4];
+        $this->templates = $array[5];
+        $this->templatePath = $array[6];
+        $this->templateNamespace = $array[7];
+        $this->pageElements = $array[8];
+        $this->preScripts = $array[9];
+        $this->postScripts = $array[10];
+        $this->optimizers = $array[11];
+        $this->mysql = $array[12];
+        $this->mailMysql = $array[13];
+        $this->debugMode = $array[14];
+        $this->defaultPages = $array[15];
+        $this->enableUpdater = $array[16];
+        $this->tmpFolderPath = $array[17];
+        $this->log = $array[18];
+        $this->ajaxTypeHandlers = $array[19];
+        $this->fbAppCredentials = $array[20];
+
     }
 }

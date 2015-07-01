@@ -43,15 +43,15 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
 {
 
     private $config;
-    /** @var $database null | DB */
+    /** @var $database DB */
     private $database = null;
-    /** @var null | Server */
+    /** @var Server */
     private $ajaxServer;
-    /** @var $pageOrder null | PageOrder */
+    /** @var $pageOrder PageOrder */
     private $pageOrder;
-    /** @var $pageOrder null | CurrentPageStrategy */
+    /** @var $pageOrder  CurrentPageStrategy */
     private $currentPageStrategy;
-    /** @var $userLibrary null | UserLibrary */
+    /** @var $userLibrary UserLibrary */
     private $userLibrary;
     /** @var DefaultPageLibrary */
     private $defaultPageLibrary;

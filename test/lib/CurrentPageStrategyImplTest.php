@@ -7,6 +7,7 @@
  */
 namespace ChristianBudde\Part\test;
 
+use ChristianBudde\Part\model\page\CurrentPageStrategy;
 use ChristianBudde\Part\model\page\CurrentPageStrategyImpl;
 use ChristianBudde\Part\model\page\DefaultPageImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
@@ -24,6 +25,8 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
     /** @var array */
     private $defaultPageArray;
     private $container;
+    /** @var  CurrentPageStrategyImpl */
+    private $strategy;
 
     protected function setUp()
     {
@@ -34,13 +37,26 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
         $this->container->setDefaultPageLibraryInstance($this->defaultPageLibrary);
         $this->pageOrder = new StubPageOrderImpl();
         $this->container->setPageOrderInstance($this->pageOrder);
+        $this->strategy = New CurrentPageStrategyImpl($this->container);
+
+    }
+
+    public function testSerialize()
+    {
+        $page = $this->strategy->getCurrentPage();
+        $string = serialize($this->strategy);
+        $_GET['page'] = 'p2';
+        /** @var CurrentPageStrategy $strategy */
+        $strategy = unserialize($string);
+        $this->assertEquals($this->defaultPageArray['p2'], $strategy->getCurrentPage());
+        $this->assertNotEquals($page, $strategy->getCurrentPage());
+
     }
 
     public function testCurrentPageWillReturnInstanceOfPageWithNoPagesIndPageOrder()
     {
 
-        $strategy = New CurrentPageStrategyImpl($this->container);
-        $page = $strategy->getCurrentPage();
+        $page = $this->strategy->getCurrentPage();
         $this->assertTrue(is_object($page), 'Did not return an object');
         $this->assertInstanceOf('ChristianBudde\Part\model\page\Page', $page, 'Page was not an instance of Page');
 
@@ -49,8 +65,8 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
     public function testCurrentPagePathWillReturnArrayWithOnePage()
     {
 
-        $strategy = New CurrentPageStrategyImpl($this->container);
-        $path = $strategy->getCurrentPagePath();
+
+        $path = $this->strategy->getCurrentPagePath();
         $this->assertTrue(is_array($path), 'Did not return an array');
         $this->assertArrayHasKey(0, $path, 'Did not have index 0');
         $this->assertInstanceOf('ChristianBudde\Part\model\page\Page', $path[0]);
@@ -70,9 +86,8 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
 
         $this->pageOrder->setOrder($order);
 
-        $strategy = New CurrentPageStrategyImpl($this->container);
 
-        $currentPage = $strategy->getCurrentPage();
+        $currentPage = $this->strategy->getCurrentPage();
 
         $this->assertTrue($page1 === $currentPage, 'Did not return right page');
 
@@ -91,9 +106,8 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
 
         $this->pageOrder->setOrder($order);
 
-        $strategy = New CurrentPageStrategyImpl($this->container);
 
-        $currentPagePath = $strategy->getCurrentPagePath();
+        $currentPagePath = $this->strategy->getCurrentPagePath();
         $this->assertTrue(is_array($currentPagePath), 'Did not return an array');
         $this->assertArrayHasKey(0, $currentPagePath, 'Did not have index 0');
         $this->assertTrue($page1 === $currentPagePath[0], "Did not return array of right format");
@@ -128,9 +142,8 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
 
         $this->pageOrder->setOrder($order);
 
-        $strategy = New CurrentPageStrategyImpl($this->container);
 
-        $currentPage = $strategy->getCurrentPage();
+        $currentPage = $this->strategy->getCurrentPage();
 
         $this->assertTrue($page2 === $currentPage, 'Did not return right page');
     }
@@ -163,9 +176,8 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
 
         $this->pageOrder->setOrder($order);
 
-        $strategy = New CurrentPageStrategyImpl($this->container);
 
-        $currentPagePath = $strategy->getCurrentPagePath();
+        $currentPagePath = $this->strategy->getCurrentPagePath();
         $this->assertTrue(is_array($currentPagePath), 'Did not return an array');
         $this->assertArrayHasKey(0, $currentPagePath, 'Did not have index 0');
         $this->assertTrue($page2 === $currentPagePath[0], "Did not return array of right format");
@@ -202,8 +214,8 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
 
         $this->pageOrder->setOrder($order);
 
-        $strategy = New CurrentPageStrategyImpl($this->container);
-        $currentPage = $strategy->getCurrentPage();
+
+        $currentPage = $this->strategy->getCurrentPage();
 
         $this->assertTrue($subPage2 === $currentPage, 'Did not return right page');
 
@@ -240,9 +252,8 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
 
         $this->pageOrder->setOrder($order);
 
-        $strategy = New CurrentPageStrategyImpl($this->container);
 
-        $currentPagePath = $strategy->getCurrentPagePath();
+        $currentPagePath = $this->strategy->getCurrentPagePath();
         $this->assertTrue(is_array($currentPagePath), 'Did not return an array');
         $this->assertArrayHasKey(0, $currentPagePath, 'Did not have index 0');
         $this->assertArrayHasKey(1, $currentPagePath, 'Did not have index 0');
@@ -283,9 +294,8 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
 
         $this->pageOrder->setOrder($order);
 
-        $strategy = new CurrentPageStrategyImpl($this->container);
 
-        $currentPagePath = $strategy->getCurrentPagePath();
+        $currentPagePath = $this->strategy->getCurrentPagePath();
         $this->assertTrue(is_array($currentPagePath), 'Did not return an array');
         $this->assertArrayHasKey(0, $currentPagePath, 'Did not have index 0');
         $this->assertArrayNotHasKey(1, $currentPagePath, 'Did not have index 0');
@@ -326,9 +336,8 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
 
         $this->pageOrder->setOrder($order);
 
-        $strategy = New CurrentPageStrategyImpl($this->container);
 
-        $currentPage = $strategy->getCurrentPage();
+        $currentPage = $this->strategy->getCurrentPage();
 
         $this->assertFalse($page2 === $currentPage, 'Did not return right page');
         $this->assertFalse($page1 === $currentPage, 'Did not return right page');
@@ -355,8 +364,7 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
 
         $this->pageOrder->setOrder($order);
 
-        $strategy = New CurrentPageStrategyImpl($this->container);
-        $currentPage = $strategy->getCurrentPage();
+        $currentPage = $this->strategy->getCurrentPage();
 
         $this->assertTrue($subPage1 === $currentPage, 'Did not return right page');
     }
@@ -379,9 +387,7 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
 
         $this->pageOrder->setOrder($order);
 
-        $strategy = new CurrentPageStrategyImpl($this->container);
-
-        $currentPagePath = $strategy->getCurrentPagePath();
+        $currentPagePath = $this->strategy->getCurrentPagePath();
         $this->assertTrue(is_array($currentPagePath), 'Did not return an array');
         $this->assertArrayHasKey(0, $currentPagePath, 'Did not have index 0');
         $this->assertArrayHasKey(1, $currentPagePath, 'Did not have index 0');
@@ -408,9 +414,7 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
         $this->pageOrder->setOrder($order);
         $this->pageOrder->setInactiveList(array($page2));
 
-        $strategy = New CurrentPageStrategyImpl($this->container);
-
-        $currentPagePath = $strategy->getCurrentPagePath();
+        $currentPagePath = $this->strategy->getCurrentPagePath();
         $this->assertTrue(is_array($currentPagePath), 'Did not return an array');
         $this->assertArrayHasKey(0, $currentPagePath, 'Did not have index 0');
         $this->assertTrue($page2 === $currentPagePath[0], "Did not return array of right format");
@@ -435,9 +439,8 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
         $this->pageOrder->setOrder($order);
         $this->pageOrder->setInactiveList(array($page2));
 
-        $strategy = New CurrentPageStrategyImpl($this->container);
 
-        $currentPagePath = $strategy->getCurrentPagePath();
+        $currentPagePath = $this->strategy->getCurrentPagePath();
         $this->assertTrue(is_array($currentPagePath), 'Did not return an array');
         $this->assertArrayHasKey(0, $currentPagePath, 'Did not have index 0');
         $this->assertTrue($this->defaultPageArray["p2"] === $currentPagePath[0], "Did not return array of right format");

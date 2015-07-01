@@ -26,36 +26,51 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     /** @var $backFactory BackendSingletonContainer */
     private $backFactory;
     private $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
+    /** @var  SiteFactoryImpl */
+    private $factory;
+    private $config;
 
     protected function setUp()
     {
         $this->backFactory = new NullBackendSingletonContainerImpl();
     }
 
+    private function setupFactory($config = null){
+
+        if($config == null){
+            $config = "<config>{$this->defaultOwner}</config>";
+        }
+        $configXML = simplexml_load_string($config);
+        $this->config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
+        $this->factory = new SiteFactoryImpl($this->config);
+
+    }
+
+    public function testCanSerialize()
+    {
+        $this->setupFactory();
+        $string = serialize($this->factory);
+    }
+
     public function testBuildPreAndPostScriptWillReturnScriptChainOnEmptyConfig()
     {
-        $configXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
-        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $factory = new SiteFactoryImpl($config);
+        $this->setupFactory();
 
-        $this->assertInstanceOf('ChristianBudde\Part\util\script\ScriptChain', $factory->buildPostScriptChain($this->backFactory), 'The buildPostScriptChain return must be instance of ScriptChain');
-        $this->assertInstanceOf('ChristianBudde\Part\util\script\ScriptChain', $factory->buildPreScriptChain($this->backFactory), 'The buildPreScriptChain return must be instance of ScriptChain');
+        $this->assertInstanceOf('ChristianBudde\Part\util\script\ScriptChain', $this->factory->buildPostScriptChain($this->backFactory), 'The buildPostScriptChain return must be instance of ScriptChain');
+        $this->assertInstanceOf('ChristianBudde\Part\util\script\ScriptChain', $this->factory->buildPreScriptChain($this->backFactory), 'The buildPreScriptChain return must be instance of ScriptChain');
 
     }
 
     public function testBuildPreScriptWillReturnScriptChainWithScriptsSpecifiedInConfig()
     {
 
-        $configXML = simplexml_load_string("
+        $this->setupFactory("
         <config>{$this->defaultOwner}
         <preScripts>
         <class link='stub/ExceptionStubScriptImpl.php'>ChristianBudde\Part\\test\stub\ExceptionStubScriptImpl</class>
         </preScripts>
         </config>");
-
-        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $factory = new SiteFactoryImpl($config);
-        $preScripts = $factory->buildPreScriptChain($this->backFactory);
+        $preScripts = $this->factory->buildPreScriptChain($this->backFactory);
 
         $exceptionWasThrown = false;
         try {
@@ -75,16 +90,13 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     public function testBuildPreScriptWillReturnScriptChainWithScriptsSpecifiedInConfigButNoLink()
     {
 
-        $configXML = simplexml_load_string("
+        $this->setupFactory("
         <config>{$this->defaultOwner}
         <preScripts>
         <class>ChristianBudde\\Part\\test\\stub\\ExceptionStubScriptImpl</class>
         </preScripts>
         </config>");
-
-        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $factory = new SiteFactoryImpl($config);
-        $preScripts = $factory->buildPreScriptChain($this->backFactory);
+        $preScripts = $this->factory->buildPreScriptChain($this->backFactory);
 
         $exceptionWasThrown = false;
         try {
@@ -104,19 +116,16 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     public function testBuildPreScriptWillThrowExceptionWithNotScriptInConfig()
     {
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string("
+        $this->setupFactory("
         <config>{$this->defaultOwner}
         <preScripts>
         <class link='stub/NullPageElementImpl.php'>ChristianBudde\\Part\\test\\stub\\NullPageElementImpl</class>
         </preScripts>
         </config>");
 
-        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $factory = new SiteFactoryImpl($config);
-
         $exceptionWasThrown = false;
         try {
-            $factory->buildPreScriptChain($this->backFactory);
+            $this->factory->buildPreScriptChain($this->backFactory);
         } catch (Exception $exception) {
             $this->assertInstanceOf('ChristianBudde\Part\exception\ClassNotInstanceOfException', $exception, 'The wrong exception was thrown.');
             /** @var $exception \ChristianBudde\Part\exception\ClassNotInstanceOfException */
@@ -132,19 +141,16 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     public function testBuildPostScriptWillThrowExceptionWithNotScriptInConfig()
     {
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string("
+        $this->setupFactory("
         <config>{$this->defaultOwner}
         <postScripts>
         <class link='stub/NullPageElementImpl.php'>ChristianBudde\\Part\\test\\stub\\NullPageElementImpl</class>
         </postScripts>
         </config>");
 
-        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $factory = new SiteFactoryImpl($config);
-
         $exceptionWasThrown = false;
         try {
-            $factory->buildPostScriptChain($this->backFactory);
+            $this->factory->buildPostScriptChain($this->backFactory);
         } catch (Exception $exception) {
             $this->assertInstanceOf('ChristianBudde\Part\exception\ClassNotInstanceOfException', $exception, 'The wrong exception was thrown.');
             /** @var $exception ClassNotInstanceOfException */
@@ -159,16 +165,13 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     public function testBuildPostScriptWillReturnScriptChainWithScriptsSpecifiedInConfig()
     {
 
-        $configXML = simplexml_load_string("
+        $this->setupFactory("
         <config>{$this->defaultOwner}
         <postScripts>
         <class link='stub/ExceptionStubScriptImpl.php'>ChristianBudde\\Part\\test\\stub\\ExceptionStubScriptImpl</class>
         </postScripts>
         </config>");
-
-        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $factory = new SiteFactoryImpl($config);
-        $postScripts = $factory->buildPostScriptChain($this->backFactory);
+        $postScripts = $this->factory->buildPostScriptChain($this->backFactory);
 
         $this->setExpectedException('ChristianBudde\\Part\\test\\stub\\ScriptHasRunException');
         $postScripts->run('PostScript', null);
@@ -178,16 +181,13 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     public function testBuildPostScriptWillReturnScriptChainWithScriptsSpecifiedInConfigButNoLink()
     {
 
-        $configXML = simplexml_load_string("
+        $this->setupFactory("
         <config>{$this->defaultOwner}
         <postScripts>
         <class>ChristianBudde\\Part\\test\\stub\\ExceptionStubScriptImpl</class>
         </postScripts>
         </config>");
-
-        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $factory = new SiteFactoryImpl($config);
-        $postScripts = $factory->buildPostScriptChain($this->backFactory);
+        $postScripts = $this->factory->buildPostScriptChain($this->backFactory);
 
         $this->setExpectedException('ChristianBudde\\Part\\test\\stub\\ScriptHasRunException');
         $postScripts->run('PostScript', null);
@@ -196,52 +196,42 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
 
     public function testBuildPreScriptWillThrowExceptionIfFileNotFound()
     {
+        $this->setExpectedException('ChristianBudde\Part\exception\FileNotFoundException');
 
-        $configXML = simplexml_load_string("
+        $this->setupFactory("
         <config>{$this->defaultOwner}
         <preScripts>
         <class link='stubs/ThisFileIsNotFound.php'>ChristianBudde\\Part\\test\\stub\\ScriptExceptionStubImpl</class>
         </preScripts>
         </config>");
-
-        $this->setExpectedException('ChristianBudde\Part\exception\FileNotFoundException');
-
-        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $factory = new SiteFactoryImpl($config);
-        $factory->buildPreScriptChain($this->backFactory);
+        $this->factory->buildPreScriptChain($this->backFactory);
 
     }
 
     public function testBuildPreScriptWillThrowExceptionIfScriptClassIsNotDefined()
     {
-        $configXML = simplexml_load_string("
+        $this->setExpectedException('ChristianBudde\Part\exception\ClassNotDefinedException');
+
+        $this->setupFactory("
         <config>{$this->defaultOwner}
         <preScripts>
         <class link='stub/ExceptionStubScriptImpl.php'>WrongClassName</class>
         </preScripts>
         </config>");
-
-        $this->setExpectedException('ChristianBudde\Part\exception\ClassNotDefinedException');
-
-        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $factory = new SiteFactoryImpl($config);
-        $factory->buildPreScriptChain($this->backFactory);
+        $this->factory->buildPreScriptChain($this->backFactory);
 
     }
 
     public function testBuildPreScriptWillGiveRightArgumentToConstructor()
     {
-        $configXML = simplexml_load_string("
+        $this->setupFactory("
         <config>{$this->defaultOwner}
         <preScripts>
         <class>ChristianBudde\\Part\\test\\stub\\ConstructorStubScriptImpl</class>
         </preScripts>
         </config>");
-
-        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $factory = new SiteFactoryImpl($config);
         try{
-            $factory->buildPreScriptChain($this->backFactory);
+            $this->factory->buildPreScriptChain($this->backFactory);
         } catch (ForceExitException $e){
             $this->assertTrue($e->data[0] === $this->backFactory);
         }
@@ -249,17 +239,14 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     }
     public function testBuildPostScriptWillGiveRightArgumentToConstructor()
     {
-        $configXML = simplexml_load_string("
+        $this->setupFactory("
         <config>{$this->defaultOwner}
         <postScripts>
         <class>ChristianBudde\\Part\\test\\stub\\ConstructorStubScriptImpl</class>
         </postScripts>
         </config>");
-
-        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $factory = new SiteFactoryImpl($config);
         try{
-            $factory->buildPostScriptChain($this->backFactory);
+            $this->factory->buildPostScriptChain($this->backFactory);
         } catch (ForceExitException $e){
             $this->assertTrue($e->data[0] === $this->backFactory);
         }
@@ -269,77 +256,63 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     public function testBuildPostScriptWillThrowExceptionIfFileNotFound()
     {
 
-        $configXML = simplexml_load_string("
+        $this->setExpectedException('ChristianBudde\Part\exception\FileNotFoundException');
+
+        $this->setupFactory("
         <config>{$this->defaultOwner}
         <postScripts>
         <class link='stubs/ThisFileIsNotFound.php'>ScriptExceptionStubImpl</class>
         </postScripts>
         </config>");
-
-        $this->setExpectedException('ChristianBudde\Part\exception\FileNotFoundException');
-
-        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $factory = new SiteFactoryImpl($config);
-        $factory->buildPostScriptChain($this->backFactory);
+        $this->factory->buildPostScriptChain($this->backFactory);
 
     }
 
     public function testBuildPostScriptWillThrowExceptionIfScriptClassIsNotDefined()
     {
-        $configXML = simplexml_load_string("
+        $this->setExpectedException('ChristianBudde\Part\exception\ClassNotDefinedException');
+        $this->setupFactory("
         <config>{$this->defaultOwner}
         <postScripts>
         <class link='stub/ExceptionStubScriptImpl.php'>WrongClassName</class>
         </postScripts>
         </config>");
-
-        $this->setExpectedException('ChristianBudde\Part\exception\ClassNotDefinedException');
-
-        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $factory = new SiteFactoryImpl($config);
-        $factory->buildPostScriptChain($this->backFactory);
+        $this->factory->buildPostScriptChain($this->backFactory);
 
     }
 
     public function testBuildConfigWillReturnInstanceOfConfig()
     {
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string("
+        $this->setupFactory("
         <config>{$this->defaultOwner}
         </config>");
-
-        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $factory = new SiteFactoryImpl($config);
-        $retConfig = $factory->buildConfig();
+        $retConfig = $this->factory->buildConfig();
         $this->assertInstanceOf('ChristianBudde\Part\Config', $retConfig, 'Did not return Config');
     }
 
     public function testBuildConfigWillReturnNewInstanceOfConfig()
     {
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string("
+        $this->setupFactory("
         <config>{$this->defaultOwner}
         </config>");
-
-        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $factory = new SiteFactoryImpl($config);
-        $retConfig = $factory->buildConfig();
-        $secRetConfig = $factory->buildConfig();
-        $this->assertFalse(($config === $retConfig), 'Did not return a new instance of Config');
+        $retConfig = $this->factory->buildConfig();
+        $secRetConfig = $this->factory->buildConfig();
+        $this->assertFalse(($this->config === $retConfig), 'Did not return a new instance of Config');
         $this->assertFalse(($retConfig === $secRetConfig), 'Did not return a new instance of Config');
     }
 
     public function testBuildBackendSingletonContainerReturnNewInstanceOfThat()
     {
         /** @var $configXML SimpleXMLElement */
-        $configXML = simplexml_load_string("
+        $this->setupFactory("
         <config>{$this->defaultOwner}
         </config>");
-
-        $config = new ConfigImpl($configXML, dirname(__FILE__) . '/');
-        $factory = new SiteFactoryImpl($config);
-        $ret = $factory->buildBackendSingletonContainer($config);
-        $ret2 = $factory->buildBackendSingletonContainer($config);
+        $ret = $this->factory->buildBackendSingletonContainer($this->config);
+        $ret2 = $this->factory->buildBackendSingletonContainer($this->config);
         $this->assertFalse(($ret === $ret2), 'Did not return a new instance of container');
     }
+
+
 }

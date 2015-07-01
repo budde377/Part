@@ -16,10 +16,10 @@ use ChristianBudde\Part\util\Observer;
  * Date: 22/07/12
  * Time: 14:29
  */
-class UserLibraryImpl implements UserLibrary, Observer
+class UserLibraryImpl implements UserLibrary, Observer, \Serializable
 {
     private $container;
-    private $userList = array();
+    private $userList = [];
     private $database;
     private $connection;
     /** @var $userListIterator ArrayIterator */
@@ -332,5 +332,34 @@ class UserLibraryImpl implements UserLibrary, Observer
     public function generateTypeHandler()
     {
         return $this->container->getTypeHandlerLibraryInstance()->getUserLibraryTypeHandlerInstance($this);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+        return serialize([$this->container, $this->userList, $this->database, $this->connection]);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+        $array = unserialize($serialized);
+        $this->container = $array[0];
+        $this->userList = $array[1];
+        $this->database = $array[2];
+        $this->connection = $array[3];
     }
 }

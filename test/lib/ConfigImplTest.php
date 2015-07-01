@@ -19,6 +19,13 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     private $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
     /** @var  ConfigImpl */
     private $config;
+
+    public function testCanSerialize()
+    {
+
+        serialize($this->config);
+    }
+
     protected function setUp()
     {
         parent::setUp();
