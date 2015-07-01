@@ -26,6 +26,10 @@ if(file_exists('../site-config.xml')){
 }
 
 $config = new ChristianBudde\Part\ConfigImpl($siteConfig, '../');
+$cachePath = $config->getTmpFolderPath().'/cache/siteFactory';
+if($config->isCacheEnabled() && file_exists($cachePath)){
+    $factory = unserialize(file_get_contents($cachePath));
+}
 
 $factory = isset($factory) ? $factory : new ChristianBudde\Part\SiteFactoryImpl($config);
 
@@ -91,3 +95,7 @@ if ($config->isDebugMode()) {
 }
 
 unset($website);
+
+if($config->isCacheEnabled()){
+    file_put_contents($cachePath, serialize($factory));
+}

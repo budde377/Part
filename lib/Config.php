@@ -112,6 +112,11 @@ interface Config extends \ArrayAccess
     /**
      * @return bool
      */
+    public function isCacheEnabled();
+
+    /**
+     * @return bool
+     */
     public function isUpdaterEnabled();
 
     /**

@@ -35,6 +35,7 @@ class ConfigImpl implements Config, \Serializable
     private $log;
     private $ajaxTypeHandlers;
     private $fbAppCredentials;
+    private $enableCache;
 
     /**
      * @param SimpleXMLElement $configFile
@@ -306,6 +307,21 @@ class ConfigImpl implements Config, \Serializable
     }
 
     /**
+     * @return bool
+     */
+    public function isCacheEnabled()
+    {
+        if ($this->enableCache !== null) {
+            return $this->enableCache;
+        }
+        if (!$this->configFile->enableCache->getName()) {
+            return $this->enableCache = false;
+        }
+
+        return $this->enableCache = (string)$this->configFile->enableCache == "true";
+    }
+
+    /**
      * @return string String containing the domain (name.ext)
      */
     public function getDomain()
@@ -508,6 +524,7 @@ class ConfigImpl implements Config, \Serializable
 
     }
 
+
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Offset to unset
@@ -521,7 +538,6 @@ class ConfigImpl implements Config, \Serializable
     {
 
     }
-
 
     /**
      * Lists the folders where to look for other templates.
@@ -589,6 +605,7 @@ class ConfigImpl implements Config, \Serializable
                 $this->debugMode,
                 $this->defaultPages,
                 $this->enableUpdater,
+                $this->enableCache,
                 $this->tmpFolderPath,
                 $this->log,
                 $this->ajaxTypeHandlers,
@@ -627,10 +644,11 @@ class ConfigImpl implements Config, \Serializable
         $this->debugMode = $array[14];
         $this->defaultPages = $array[15];
         $this->enableUpdater = $array[16];
-        $this->tmpFolderPath = $array[17];
-        $this->log = $array[18];
-        $this->ajaxTypeHandlers = $array[19];
-        $this->fbAppCredentials = $array[20];
+        $this->enableCache= $array[17];
+        $this->tmpFolderPath = $array[18];
+        $this->log = $array[19];
+        $this->ajaxTypeHandlers = $array[20];
+        $this->fbAppCredentials = $array[21];
 
     }
 }

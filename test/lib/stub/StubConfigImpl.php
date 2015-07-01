@@ -384,4 +384,12 @@ class StubConfigImpl implements Config
     {
         $this->domain = $domain;
     }
+
+    /**
+     * @return bool
+     */
+    public function isCacheEnabled()
+    {
+        return false;
+    }
 }

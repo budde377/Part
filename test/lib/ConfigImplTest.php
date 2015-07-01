@@ -685,6 +685,33 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($config->isDebugMode());
 
     }
+    public function testIsCacheEnabledWillReturnFalseOnEmpty()
+    {
+        /** @var $configXML SimpleXMLElement */
+        $config = $this->setupConfig("<config>{$this->defaultOwner}</config>");
+        $this->assertFalse($config->isCacheEnabled());
+
+    }
+
+    public function testIsCacheEnabledWillReturnFalseOnFalse()
+    {
+        /** @var $configXML SimpleXMLElement */
+        $config =  $this->setupConfig("<config>{$this->defaultOwner}
+        <enableCache>false</enableCache>
+        </config>");
+        $this->assertFalse($config->isCacheEnabled());
+
+    }
+
+    public function testIsCacheEnabledWillReturnTrueOnTrue()
+    {
+        /** @var $configXML SimpleXMLElement */
+        $config =  $this->setupConfig("<config>{$this->defaultOwner}
+        <enableCache>true</enableCache>
+        </config>");
+        $this->assertTrue($config->isCacheEnabled());
+
+    }
 
     public function testIsUpdaterEnabledWillReturnTrueOnEmpty()
     {
