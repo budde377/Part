@@ -10,7 +10,7 @@ namespace ChristianBudde\Part\test;
 
 use ChristianBudde\Part\model\page\Page;
 use ChristianBudde\Part\model\page\PageContentLibraryImpl;
-use ChristianBudde\Part\model\page\PageImpl;
+use ChristianBudde\Part\model\page\PageOrderImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
@@ -43,8 +43,10 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
         $this->db->setConnection(self::$pdo);
         $container = new StubBackendSingletonContainerImpl();
         $container->setDBInstance($this->db);
-        $this->existingPage = new PageImpl($container, 'testpage');
-        $this->nonExistingPage = new PageImpl($container, 'nonExisting');
+        $pageOrder = new PageOrderImpl($container);
+        $this->existingPage = $pageOrder->getPage('testpage');
+        $this->nonExistingPage = $pageOrder->createPage('nonExisting');
+        $this->nonExistingPage->delete();
         $this->existingContentLibrary = new PageContentLibraryImpl($container, $this->existingPage);
         $this->nonExistingContentLibrary = new PageContentLibraryImpl($container, $this->nonExistingPage);
     }

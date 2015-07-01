@@ -67,9 +67,13 @@ interface PageOrder extends JSONObjectSerializable, TypeHandlerGenerator
     /**
      * @abstract
      * @param string $id must satisfy syntax of Page id
-     * @return bool | Page Returns FALSE on invalid id or other error, else instance of Page
+     * @param string $title
+     * @param string $template
+     * @param string $alias
+     * @param bool $hidden
+     * @return bool|Page Returns FALSE on invalid id or other error, else instance of Page
      */
-    public function createPage($id);
+    public function createPage($id, $title='', $template = '', $alias = '', $hidden = false);
 
 
     /**

@@ -237,7 +237,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         $pages = $this->pageOrder->listPages(PageOrder::LIST_ALL);
         /** @var $page \ChristianBudde\Part\model\page\Page */
         $page = array_pop($pages);
-        $altPage = new PageImpl($this->backendContainer, $page->getID());
+        $altPage = new PageImpl($this->backendContainer, $this->pageOrder, $page->getID(), $page->getTitle(), $page->getTemplate(), $page->getAlias(), $page->lastModified(), $page->isHidden());
         $altPage->delete();
 
         $deleteRet = $this->pageOrder->deletePage($page);
@@ -249,7 +249,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     public function testDeletePageNotGeneratedFromPageOrderReturnFalse()
     {
 
-        $page = new PageImpl($this->backendContainer, 'page');
+        $page = new PageImpl($this->backendContainer, $this->pageOrder, 'page', '', '', '', 0, false);
         $this->assertTrue($page->exists());
         $this->assertFalse($this->pageOrder->deletePage($page));
     }
@@ -442,8 +442,8 @@ class PageOrderImplTest extends CustomDatabaseTestCase
         $newTopPageOrder = $this->pageOrder->getPageOrder();
         $newSubPageOrder = $this->pageOrder->getPageOrder($topPage);
 
-        $this->assertEquals(0, count($newSubPageOrder), 'SubPageOrder was longer than expected');
-        $this->assertTrue($subPage === $newTopPageOrder[0], 'SubPage was not appended in right place');
+        $this->assertEquals([], $newSubPageOrder, 'SubPageOrder was longer than expected');
+        $this->assertEquals([$topPage, $subPage], $newTopPageOrder, 'SubPage was not appended in right place');
 
     }
 
@@ -468,7 +468,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     public function testSetPageOrderReturnFalseOnPageNotInList()
     {
 
-        $newPage = new PageImpl($this->backendContainer, 'someId');
+        $newPage = new PageImpl($this->backendContainer, $this->pageOrder, 'someId', '', '', '', 0, false);
         $setReturn = $this->pageOrder->setPageOrder($newPage, 3);
         $this->assertFalse($setReturn, 'Did not return false');
     }
@@ -476,7 +476,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     public function testSetPageOrderReturnFalseOnParentNotInList()
     {
 
-        $newPage = new PageImpl($this->backendContainer, 'page');
+        $newPage = new PageImpl($this->backendContainer, $this->pageOrder,  'page', '', '', '', 0, false);
         $topOrder = $this->pageOrder->getPageOrder();
         $oldPage = $topOrder[0];
         $setReturn = $this->pageOrder->setPageOrder($oldPage, 3, $newPage);

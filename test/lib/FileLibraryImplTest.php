@@ -61,7 +61,7 @@ class FileLibraryImplTest extends PHPUnit_Framework_TestCase
 
     public function testAddFileAddsFile()
     {
-        $this->assertEquals(0, count($this->lib->getFileList()));
+        $this->assertEquals([], $this->lib->getFileList());
         $this->setupExistingFiles();
         $this->assertEquals(1, count($this->lib->getFileList()));
         $this->assertEquals(1, count($this->lib->getFileList($this->user)));

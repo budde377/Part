@@ -9,7 +9,7 @@
 namespace ChristianBudde\Part\test;
 
 use ChristianBudde\Part\model\page\Page;
-use ChristianBudde\Part\model\page\PageImpl;
+use ChristianBudde\Part\model\page\PageOrderImpl;
 use ChristianBudde\Part\model\page\PageVariablesImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
@@ -30,7 +30,7 @@ class PageVariablesImplTest extends CustomDatabaseTestCase
     /** @var  \ChristianBudde\Part\model\page\Page */
     private $existingPage2;
     /** @var  Page */
-    private $nonExistingUser;
+    private $nonExistingPage;
 
 
     function __construct($dataset = null)
@@ -46,12 +46,14 @@ class PageVariablesImplTest extends CustomDatabaseTestCase
         $this->db->setConnection(self::$pdo);
         $container = new StubBackendSingletonContainerImpl();
         $container->setDBInstance($this->db);
-        $this->existingPage = new PageImpl($container, 'testpage');
+        $pageOrder = new PageOrderImpl($container);
+        $this->existingPage = $pageOrder->getPage('testpage');
         $this->existingVariables = new PageVariablesImpl($this->db, $this->existingPage);
-        $this->existingPage2 = new PageImpl($container, 'testpage2');
-        $this->nonExistingUser = new PageImpl($container, 'nosuchpage');
+        $this->existingPage2 = $pageOrder->getPage('testpage2');
+        $this->nonExistingPage = $pageOrder->createPage('nosuchpage');
+        $this->nonExistingPage->delete();
         $this->nonExistingVariables = new PageVariablesImpl($this->db, $this->existingPage2);
-        $this->nonExistingVariablesNonExistingPage = new PageVariablesImpl($this->db, $this->nonExistingUser);
+        $this->nonExistingVariablesNonExistingPage = new PageVariablesImpl($this->db, $this->nonExistingPage);
 
     }
 
@@ -77,7 +79,7 @@ class PageVariablesImplTest extends CustomDatabaseTestCase
 
     public function testGetListOfNonExistingPageReturnsArray()
     {
-        $var = new PageVariablesImpl($this->db, $this->nonExistingUser);
+        $var = new PageVariablesImpl($this->db, $this->nonExistingPage);
         $this->assertTrue(is_array($var->listKeys()));
         $this->assertEquals(0, count($var->listKeys()));
     }

@@ -2,7 +2,7 @@
 namespace ChristianBudde\Part\test;
 
 use ChristianBudde\Part\controller\json\UserPrivilegesObjectImpl;
-use ChristianBudde\Part\model\page\PageImpl;
+use ChristianBudde\Part\model\page\PageOrderImpl;
 use ChristianBudde\Part\model\user\UserImpl;
 use ChristianBudde\Part\model\user\UserPrivilegesImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
@@ -51,8 +51,9 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
         $container->setDBInstance($this->db);
         $this->container = $container;
         $this->user = new UserImpl($container, 'root');
-        $this->page1 = new PageImpl($container, 'page');
-        $this->page2 = new PageImpl($container, 'page2');
+        $pageOrder = new PageOrderImpl($container);
+        $this->page1 = $pageOrder->getPage('page');
+        $this->page2 = $pageOrder->getPage('page2');
         $this->userPrivileges = new UserPrivilegesImpl($container, $this->user);
 
         $this->pageLibrary = new StubPageOrderImpl();
@@ -238,11 +239,13 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
         $this->assertEquals(new UserPrivilegesObjectImpl($this->userPrivileges), $o);
     }
 
-    public function testGetUserIsUser(){
+    public function testGetUserIsUser()
+    {
         $this->assertTrue($this->userPrivileges->getUser() === $this->user);
     }
 
-    public function testGenerator(){
+    public function testGenerator()
+    {
         $this->assertTrue($this->userPrivileges->generateTypeHandler() === $this->userPrivileges);
     }
 

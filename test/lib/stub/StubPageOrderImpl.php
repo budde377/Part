@@ -82,14 +82,7 @@ class StubPageOrderImpl implements PageOrder
         return $returnArray;
     }
 
-    /**
-     * @param string $id must satisfy syntax of Page id
-     * @return bool | \ChristianBudde\Part\model\page\Page Returns FALSE on invalid id or other error, else instance of Page
-     */
-    public function createPage($id)
-    {
-        return false;
-    }
+
 
     /**
      * This will delete a page from page order and in general
@@ -208,5 +201,18 @@ class StubPageOrderImpl implements PageOrder
      */
     public function generateTypeHandler()
     {
+    }
+
+    /**
+     * @param string $id must satisfy syntax of Page id
+     * @param string $title
+     * @param string $template
+     * @param string $alias
+     * @param bool $hidden
+     * @return bool|Page Returns FALSE on invalid id or other error, else instance of Page
+     */
+    public function createPage($id, $title = '', $template = '', $alias = '', $hidden = false)
+    {
+        return false;
     }
 }

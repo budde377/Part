@@ -5,8 +5,6 @@ use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\PageContentObjectImpl;
 use ChristianBudde\Part\model\ContentImpl;
-use ChristianBudde\Part\util\Observable;
-use ChristianBudde\Part\util\Observer;
 
 
 /**
@@ -16,7 +14,7 @@ use ChristianBudde\Part\util\Observer;
  * Time: 22:45
  * To change this template use File | Settings | File Templates.
  */
-class PageContentImpl extends ContentImpl implements PageContent, Observer
+class PageContentImpl extends ContentImpl implements PageContent
 {
 
     private $page;
@@ -28,7 +26,6 @@ class PageContentImpl extends ContentImpl implements PageContent, Observer
         $connection = $container->getDBInstance()->getConnection();
         $this->container = $container;
         $this->page = $page;
-        $page->attachObserver($this);
         $this->page_id = $page->getID();
 
         $addContentStm = $connection->prepare("
@@ -90,6 +87,7 @@ class PageContentImpl extends ContentImpl implements PageContent, Observer
         if(!$this->page->exists()){
             return null;
         }
+        $this->updatePageId();
         return parent::addContent($content);
     }
 
@@ -120,8 +118,52 @@ class PageContentImpl extends ContentImpl implements PageContent, Observer
         return $this->container->getTypeHandlerLibraryInstance()->getPageContentTypeHandlerInstance($this);
     }
 
-    public function onChange(Observable $subject, $changeType)
+    private function updatePageId()
     {
         $this->page_id = $this->page->getID();
     }
+
+    public function latestContent()
+    {
+        $this->updatePageId();
+        return parent::latestContent();
+    }
+
+    public function latestTime()
+    {
+        $this->updatePageId();
+        return parent::latestTime();
+    }
+
+    public function listContentHistory($from = null, $to = null, $onlyTimestamps = false)
+    {
+        $this->updatePageId();
+        return parent::listContentHistory($from, $to, $onlyTimestamps);
+    }
+
+    public function getContentAt($time)
+    {
+        $this->updatePageId();
+        return parent::getContentAt($time);
+    }
+
+    public function containsSubString($string, $fromTime = null)
+    {
+        $this->updatePageId();
+        return parent::containsSubString($string, $fromTime);
+    }
+
+    public function getId()
+    {
+        $this->updatePageId();
+        return parent::getId();
+    }
+
+    public function jsonSerialize()
+    {
+        $this->updatePageId();
+        return parent::jsonSerialize();
+    }
+
+
 }

@@ -4,8 +4,6 @@ namespace ChristianBudde\Part\model\page;
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\model\ContentLibraryImpl;
-use ChristianBudde\Part\util\Observable;
-use ChristianBudde\Part\util\Observer;
 
 /**
  * Created by PhpStorm.
@@ -13,7 +11,7 @@ use ChristianBudde\Part\util\Observer;
  * Date: 3/3/14
  * Time: 10:10 PM
  */
-class PageContentLibraryImpl extends ContentLibraryImpl implements PageContentLibrary, Observer
+class PageContentLibraryImpl extends ContentLibraryImpl implements PageContentLibrary
 {
     private $page;
     private $page_id;
@@ -23,7 +21,6 @@ class PageContentLibraryImpl extends ContentLibraryImpl implements PageContentLi
     {
         $this->container = $container;
         $this->page = $page;
-        $page->attachObserver($this);
         $this->page_id = $page->getID();
 
         $connection = $container->getDBInstance()->getConnection();
@@ -63,8 +60,22 @@ class PageContentLibraryImpl extends ContentLibraryImpl implements PageContentLi
         return $this->container->getTypeHandlerLibraryInstance()->getPageContentLibraryTypeHandlerInstance($this);
     }
 
-    public function onChange(Observable $subject, $changeType)
+    public function listContents($time = 0)
+    {
+        $this->updatePageId();
+        return parent::listContents($time);
+    }
+
+    public function searchLibrary($string, $time = null)
+    {
+        $this->updatePageId();
+        return parent::searchLibrary($string, $time);
+    }
+
+    private function updatePageId()
     {
         $this->page_id = $this->page->getID();
     }
+
+
 }

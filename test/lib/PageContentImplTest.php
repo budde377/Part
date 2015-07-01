@@ -13,7 +13,7 @@ namespace ChristianBudde\Part\test;
 use ChristianBudde\Part\controller\json\PageContentObjectImpl;
 use ChristianBudde\Part\model\page\Page;
 use ChristianBudde\Part\model\page\PageContentImpl;
-use ChristianBudde\Part\model\page\PageImpl;
+use ChristianBudde\Part\model\page\PageOrderImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
@@ -37,6 +37,8 @@ class PageContentImplTest extends CustomDatabaseTestCase
     private $nonExistingPage;
     private $existingId2;
     private $container;
+    /** @var  PageOrderImpl */
+    private $pageOrder;
 
     function __construct()
     {
@@ -51,12 +53,14 @@ class PageContentImplTest extends CustomDatabaseTestCase
         $this->db->setConnection(self::$pdo);
         $this->container = new StubBackendSingletonContainerImpl();
         $this->container->setDBInstance($this->db);
-        $this->existingPage = new PageImpl($this->container, 'testpage');
+        $this->pageOrder = new PageOrderImpl($this->container);
+        $this->existingPage = $this->pageOrder->getPage('testpage');
         $this->existingContent = new PageContentImpl($this->container, $this->existingPage);
 
         $this->existingContent2 = new PageContentImpl($this->container, $this->existingPage, $this->existingId2 = "Test");
 
-        $this->nonExistingPage = new PageImpl($this->container, 'nonExisting');
+        $this->nonExistingPage = $this->pageOrder->createPage('nonExisting');
+        $this->nonExistingPage->delete();
         $this->nonExistingContent = new PageContentImpl($this->container, $this->nonExistingPage);
     }
 
@@ -135,12 +139,6 @@ class PageContentImplTest extends CustomDatabaseTestCase
     }
 
 
-    public function testCanAddContentToNewPage()
-    {
-        $this->nonExistingPage->create();
-        $this->nonExistingContent->addContent("ASD");
-        $this->assertEquals(1, count($this->nonExistingContent->listContentHistory()));
-    }
 
     public function testLatestContentWillReturnLatestContent()
     {

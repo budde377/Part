@@ -9,11 +9,10 @@
 namespace ChristianBudde\Part\test;
 
 use ChristianBudde\Part\exception\MalformedParameterException;
-use ChristianBudde\Part\model\page\Page;
 use ChristianBudde\Part\model\page\PageImpl;
+use ChristianBudde\Part\model\page\PageOrderImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
-use ChristianBudde\Part\test\stub\StubObserverImpl;
 use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 use Exception;
 
@@ -27,6 +26,8 @@ class PageImplTest extends CustomDatabaseTestCase
     /** @var PageImpl */
     private $testPage2;
     private $container;
+    /** @var  PageOrderImpl */
+    private $pageOrder;
 
 
     function __construct()
@@ -42,15 +43,18 @@ class PageImplTest extends CustomDatabaseTestCase
         $this->db->setConnection(self::$pdo);
         $this->container = new StubBackendSingletonContainerImpl();
         $this->container->setDBInstance($this->db);
-        $this->testPage = new PageImpl($this->container, 'testpage');
-        $this->testPage2 = new PageImpl($this->container, 'testpage2');
+        $this->pageOrder = new PageOrderImpl($this->container);
+        $this->testPage = $this->createPage('testpage');
+        $this->testPage2 = $this->createPage('testpage2');
     }
+
+
 
 
     public function testGetIDWillReturnIDGivenInConstructorAndReflectChangesInSetTitle()
     {
 
-        $page = new PageImpl($this->container, 'someID');
+        $page = $this->createPage('someID');
         $this->assertEquals('someID', $page->getID(), "ID's did not match.");
         $newID = 'nonExistingID';
         $ret = $page->setID($newID);
@@ -61,14 +65,14 @@ class PageImplTest extends CustomDatabaseTestCase
 
     public function testIsEditableWillBeTrue()
     {
-        $page = new PageImpl($this->container, 'someID');
+        $page =  $this->createPage('someID');
         $this->assertTrue($page->isEditable());
     }
 
 
     public function testGetTitleWillReflectChangesInSetTitle()
     {
-        $page = new PageImpl($this->container, 'someID');
+        $page =  $this->createPage('someID');
         $oldTitle = $page->getTitle();
         $this->assertTrue(is_string($oldTitle), 'Did not return string');
         $newTitle = 'newTitle';
@@ -79,7 +83,7 @@ class PageImplTest extends CustomDatabaseTestCase
 
     public function testGetTemplateWillReflectChangesInSetTemplate()
     {
-        $page = new PageImpl($this->container, 'someID');
+        $page = $this->createPage('someID');
         $oldTemplate = $page->getTemplate();
         $this->assertTrue(is_string($oldTemplate), 'Did not return string');
         $newTemplate = 'newTemplate';
@@ -89,7 +93,7 @@ class PageImplTest extends CustomDatabaseTestCase
 
     public function testGetAliasWillReflectChangesInSetAlias()
     {
-        $page = new PageImpl($this->container, 'someID');
+        $page = $this->createPage('someID');
         $oldAlias = $page->getAlias();
         $this->assertTrue(is_string($oldAlias), 'Did not return string');
         $newAlias = '/newAlias/';
@@ -107,18 +111,18 @@ class PageImplTest extends CustomDatabaseTestCase
 
     public function testExistsWillBeFalseIfPageDoesNotExistsInDatabase()
     {
-        $page = new PageImpl($this->container, 'notAValidId');
+        $page = $this->createPage('notAValidId');
+        $page->delete();
         $this->assertFalse($page->exists(), 'Did not return false when page does not exists');
     }
 
 
     public function testCreateWillReturnTrueIfSuccess()
     {
-        $page = new PageImpl($this->container, 'idDoesNotExists');
+        $page = $this->createPage('idDoesNotExists');
+        $page->delete();
         $this->assertFalse($page->exists(), 'Page did exist');
-        $createRet = $page->create();
-        $this->assertTrue($page->exists(), 'Page was not created');
-        $this->assertTrue($createRet, 'Did not return true');
+
     }
 
 
@@ -126,7 +130,7 @@ class PageImplTest extends CustomDatabaseTestCase
     {
 
         $this->assertTrue($this->testPage->exists(), 'Did not exists');
-        $this->assertFalse($this->testPage->create(), 'Did not return true when exists');
+        $this->assertFalse($this->pageOrder->createPage($this->testPage->getID()), 'Did not return true when exists');
     }
 
     public function testDeleteWillReturnTrueOnSuccess()
@@ -139,7 +143,8 @@ class PageImplTest extends CustomDatabaseTestCase
 
     public function testDeleteWillReturnFalseOnFailure()
     {
-        $page = new PageImpl($this->container, 'idDoesNotExists');
+        $page = $this->createPage('idDoesNotExists');
+        $page->delete();
         $this->assertFalse($page->exists(), 'Did exist');
         $this->assertFalse($page->delete(), 'Did not return false');
     }
@@ -162,7 +167,7 @@ class PageImplTest extends CustomDatabaseTestCase
         $this->testPage->setTemplate($newString);
         $this->testPage->setTitle($newString);
 
-        $newPage = new PageImpl($this->container, 'string');
+        $newPage = $this->createPage('string');
         $this->assertTrue($newPage->exists(), 'Did not exists');
         $this->assertEquals('/' . $newString . '/', $newPage->getAlias(), 'Alias did not match');
         $this->assertEquals($newString, $newPage->getID(), 'ID did not match');
@@ -174,7 +179,7 @@ class PageImplTest extends CustomDatabaseTestCase
 
     public function testSetIDMustNotContainIllegalCharactersOrBeEmpty()
     {
-        $page = new PageImpl($this->container, 'somePage');
+        $page = $this->createPage('somePage');
         $oldID = $page->getID();
         $idRet = $page->setID('illegalID**"")=?');
         $this->assertFalse($idRet, 'Did not return false');
@@ -188,13 +193,13 @@ class PageImplTest extends CustomDatabaseTestCase
         $exceptionWasThrown = false;
 
         try {
-            new PageImpl($this->container, 'illegalID**"""');
+            new PageImpl($this->container, $this->pageOrder, 'invalidId***', '', '', '',0,false);
 
         } catch (Exception $e) {
             $exceptionWasThrown = true;
             $this->assertInstanceOf('ChristianBudde\Part\exception\MalformedParameterException', $e, 'Exception was of wrong instance');
             /** @var $e MalformedParameterException */
-            $this->assertEquals(1, $e->getParameterNumber(), 'Wrong parameter no');
+            $this->assertEquals(2, $e->getParameterNumber(), 'Wrong parameter no');
             $this->assertEquals('RegEx[a-zA-Z0-9-_]+', $e->getExpectedType(), 'Wrong type');
         }
 
@@ -203,8 +208,7 @@ class PageImplTest extends CustomDatabaseTestCase
 
     public function testSetIDMustReturnFalseWithChangeToExistingID()
     {
-        $page = new PageImpl($this->container, 'somePage');
-        $page->create();
+        $page = $this->createPage('somePage');
         $idRet = $page->setID('testpage');
         $this->assertFalse($idRet, 'setID did not return false');
         $this->assertEquals('somePage', $page->getID(), 'ID was changed');
@@ -220,7 +224,7 @@ class PageImplTest extends CustomDatabaseTestCase
 
     public function testSetAliasMustMatchPatternOfPregMatch()
     {
-        $page = new PageImpl($this->container, 'somePage');
+        $page = $this->createPage('somePage');
         $idRet = $page->setAlias('nonValidPattern');
         $this->assertFalse($idRet, 'setAlias did not return false');
         $this->assertEquals('', $page->getAlias(), 'Did change alias');
@@ -229,7 +233,7 @@ class PageImplTest extends CustomDatabaseTestCase
 
     public function testSetAliasCanBeEmpty()
     {
-        $page = new PageImpl($this->container, 'somePage');
+        $page = $this->createPage('somePage');
         $idRet = $page->setAlias('');
         $this->assertTrue($idRet, 'setAlias did not return false');
         $this->assertEquals('', $page->getAlias(), 'Did change alias');
@@ -239,7 +243,7 @@ class PageImplTest extends CustomDatabaseTestCase
     public function testMatchWillReturnTrueIfCurrentIDGiven()
     {
         $id = 'tespage';
-        $page = new PageImpl($this->container, $id);
+        $page = $this->createPage( $id);
         $match = $page->match($id);
         $this->assertTrue($match, 'Did not return true on match');
     }
@@ -247,7 +251,7 @@ class PageImplTest extends CustomDatabaseTestCase
 
     public function testMatchWillReturnFalseIfNonIdDoesNotMatchAlias()
     {
-        $page = new PageImpl($this->container, 'somePage');
+        $page = $this->createPage('somePage');
         $match = $page->match('stringThatDoesNotMatchEmptyAlias');
         $this->assertFalse($match, 'Did not return false on no match');
 
@@ -255,52 +259,13 @@ class PageImplTest extends CustomDatabaseTestCase
 
     public function testMatchWillReturnTrueIfNonIdDoesMatchAlias()
     {
-        $page = new PageImpl($this->container, 'somePage');
+        $page = $this->createPage('somePage');
         $page->setAlias('/stringThatDoesMatchEmptyAlias/');
         $match = $page->match('stringThatDoesMatchEmptyAlias');
         $this->assertTrue($match, 'Did return false on match');
 
     }
 
-    public function testChangeIDWillCallObserver()
-    {
-        $page = new PageImpl($this->container, 'somePage');
-        $observer1 = new StubObserverImpl();
-        $observer2 = new StubObserverImpl();
-        $page->attachObserver($observer1);
-        $page->attachObserver($observer2);
-
-        $page->setID('anotherID');
-        $this->assertTrue($observer1->hasBeenCalled());
-        $this->assertTrue($observer2->hasBeenCalled());
-        $this->assertTrue($observer1->getLastCallSubject() == $observer2->getLastCallSubject());
-        $this->assertTrue($observer1->getLastCallType() == $observer2->getLastCallType());
-        $this->assertTrue($observer1->getLastCallSubject() === $page);
-        $this->assertTrue($observer1->getLastCallType() == Page::EVENT_ID_UPDATE);
-    }
-
-    public function testDetachObserverWillDetachObserver()
-    {
-        $page = new PageImpl($this->container, 'somePage');
-        $observer1 = new StubObserverImpl();
-        $observer2 = new StubObserverImpl();
-        $page->attachObserver($observer1);
-        $page->attachObserver($observer2);
-        $page->detachObserver($observer2);
-        $page->setID('anotherID');
-        $this->assertTrue($observer1->hasBeenCalled());
-        $this->assertFalse($observer2->hasBeenCalled());
-    }
-
-    public function testDeleteWillCallObserver()
-    {
-        $observer1 = new StubObserverImpl();
-        $this->testPage->attachObserver($observer1);
-        $this->testPage->delete();
-        $this->assertTrue($observer1->hasBeenCalled());
-        $this->assertTrue($this->testPage === $observer1->getLastCallSubject());
-        $this->assertEquals(Page::EVENT_DELETE, $observer1->getLastCallType());
-    }
 
     public function testValidatorWillValidate()
     {
@@ -334,20 +299,10 @@ class PageImplTest extends CustomDatabaseTestCase
     {
         $this->assertFalse($this->testPage->isHidden());
         $this->testPage->hide();
-        $page = new PageImpl($this->container, 'testpage');
+        $page = $this->createPage('testpage');
         $this->assertTrue($page->isHidden());
     }
 
-    public function testCreateWillSaveHidden()
-    {
-        $id = 'nonExistingID';
-        $page = new PageImpl($this->container, $id);
-        $page->hide();
-        $page->create();
-        $this->assertTrue($page->isHidden());
-        $page = new PageImpl($this->container, $id);
-        $this->assertTrue($page->isHidden());
-    }
 
     public function testGetContentReturnsInstanceOfContent()
     {
@@ -411,6 +366,11 @@ class PageImplTest extends CustomDatabaseTestCase
     public function testLibraryReturnsRightPageInstance()
     {
         $this->assertTrue($this->testPage === $this->testPage->generateTypeHandler());
+    }
+
+    private function createPage($id)
+    {
+        return ($page = $this->pageOrder->getPage($id)) != null?$page: $this->pageOrder->createPage($id);
     }
 
 }

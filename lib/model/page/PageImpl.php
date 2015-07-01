@@ -4,11 +4,10 @@ namespace ChristianBudde\Part\model\page;
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\PageObjectImpl;
+use ChristianBudde\Part\exception\MalformedParameterException;
 use ChristianBudde\Part\model\Content;
 use ChristianBudde\Part\model\ContentLibrary;
 use ChristianBudde\Part\model\Variables;
-use ChristianBudde\Part\util\Observer;
-use PDOException;
 
 
 /**
@@ -37,22 +36,26 @@ class PageImpl implements Page
     private $variables;
 
 
-    private $observers = [];
     private $container;
     private $pageOrder;
 
     /**
      * @param BackendSingletonContainer $container
-     * @param PageOrder $pageOrder
+     * @param PageOrderImpl $pageOrder
      * @param string $id
      * @param string $title
      * @param string $template
      * @param string $alias
      * @param int $lastModified
      * @param bool $hidden
+     * @throws MalformedParameterException
      */
-    public function __construct(BackendSingletonContainer $container, PageOrder $pageOrder, $id, $title, $template, $alias, $lastModified, $hidden)
+    public function __construct(BackendSingletonContainer $container, PageOrderImpl $pageOrder, $id, $title, $template, $alias, $lastModified, $hidden)
     {
+        if(!$this->validID($id)){
+            throw new MalformedParameterException('RegEx[a-zA-Z0-9-_]+', 2);
+        }
+
         $this->pageOrder = $pageOrder;
         $database = $container->getDBInstance();
         $this->page_id = $id;
@@ -118,13 +121,11 @@ class PageImpl implements Page
             return false;
         }
 
+        if(!$this->pageOrder->changeId($this, $page_id)){
+            return false;
+        }
 
-        $updateIDStm = $this->connection->prepare("UPDATE Page SET page_id = ? WHERE page_id = ?");
-        $updateIDStm->execute(array($page_id, $this->page_id));
         $this->page_id = $page_id;
-
-        $this->notifyObservers(Page::EVENT_ID_UPDATE);
-
         return true;
     }
 
@@ -194,31 +195,6 @@ class PageImpl implements Page
         return $existsStm->rowCount() > 0;
     }
 
-    /**
-     * Will try and create the Page, if success will return TRUE, else FALSE.
-     * If already exists will return FALSE.
-     * @return bool
-     */
-    public function create()
-    {
-
-
-        $createStm = $this->connection->prepare("
-            INSERT INTO Page (page_id,template,title,alias,hidden)
-            VALUES (:page_id,:template,:title,:alias,:hidden)");
-        $createStm->bindParam(":page_id", $this->page_id);
-        $createStm->bindParam(":template", $this->template);
-        $createStm->bindParam(":title", $this->title);
-        $createStm->bindParam(":alias", $this->alias);
-        $createStm->bindParam(":hidden", $this->hidden);
-        try {
-            $createStm->execute();
-        } catch (PDOException $e) {
-            return false;
-        }
-        $rows = $createStm->rowCount();
-        return $rows > 0;
-    }
 
     /**
      * Will delete the page from persistent storage
@@ -250,27 +226,6 @@ class PageImpl implements Page
     }
 
 
-    public function attachObserver(Observer $observer)
-    {
-        $this->observers[] = $observer;
-    }
-
-    private function notifyObservers($type)
-    {
-        foreach ($this->observers as $observer) {
-            /** @var $observer \ChristianBudde\Part\util\Observer */
-            $observer->onChange($this, $type);
-        }
-    }
-
-    public function detachObserver(Observer $observer)
-    {
-        foreach ($this->observers as $key => $ob) {
-            if ($ob === $observer) {
-                unset($this->observers[$key]);
-            }
-        }
-    }
 
     /**
      * Return TRUE if is editable, else FALSE
@@ -306,7 +261,7 @@ class PageImpl implements Page
      */
     public function isHidden()
     {
-        return $this->hidden;
+        return boolval($this->hidden);
     }
 
     /**
