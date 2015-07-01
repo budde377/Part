@@ -1,16 +1,14 @@
 <?php
 namespace ChristianBudde\Part\model\page;
+
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\PageObjectImpl;
-use ChristianBudde\Part\exception\MalformedParameterException;
 use ChristianBudde\Part\model\Content;
 use ChristianBudde\Part\model\ContentLibrary;
 use ChristianBudde\Part\model\Variables;
 use ChristianBudde\Part\util\Observer;
-use PDO;
 use PDOException;
-use PDOStatement;
 
 
 /**
@@ -30,7 +28,7 @@ class PageImpl implements Page
 
     private $lastModified = -1;
 
-    private $hidden = 0;
+    private $hidden = false;
 
     private $database;
     private $connection;
@@ -38,43 +36,31 @@ class PageImpl implements Page
     private $contentLibrary;
     private $variables;
 
-    /** @var $existsStm PDOStatement */
-    private $existsStm;
-    /** @var $createStm PDOStatement */
-    private $createStm;
-    /** @var $deleteStm PDOStatement */
-    private $deleteStm;
-    /** @var $updateIDStm PDOStatement */
-    private $updateIDStm;
-    /** @var $updateTitleStm PDOStatement */
-    private $updateTitleStm;
-    /** @var $updateTemplateStm PDOStatement */
-    private $updateTemplateStm;
-    /** @var $updateAliasStm PDOStatement */
-    private $updateAliasStm;
-    /** @var $updateHiddenStm PDOStatement */
-    private $updateHiddenStm;
-    /** @var PDOStatement */
-    private $updLastModStm;
 
-
-
-    private $isInitialized = false;
-    private $observers = array();
+    private $observers = [];
     private $container;
+    private $pageOrder;
 
     /**
      * @param BackendSingletonContainer $container
+     * @param PageOrder $pageOrder
      * @param string $id
-     * @throws MalformedParameterException
+     * @param string $title
+     * @param string $template
+     * @param string $alias
+     * @param int $lastModified
+     * @param bool $hidden
      */
-    public function __construct(BackendSingletonContainer $container, $id)
+    public function __construct(BackendSingletonContainer $container, PageOrder $pageOrder, $id, $title, $template, $alias, $lastModified, $hidden)
     {
-        if (!$this->validID($id)) {
-            throw new MalformedParameterException('RegEx[a-zA-Z0-9-_]+', 1);
-        }
+        $this->pageOrder = $pageOrder;
         $database = $container->getDBInstance();
         $this->page_id = $id;
+        $this->title = $title;
+        $this->template = $template;
+        $this->alias = $alias;
+        $this->lastModified = $lastModified;
+        $this->hidden = $hidden;
         $this->container = $container;
         $this->database = $database;
         $this->connection = $database->getConnection();
@@ -94,7 +80,6 @@ class PageImpl implements Page
      */
     public function getTitle()
     {
-        $this->setInitialValues();
         return $this->title;
     }
 
@@ -104,7 +89,6 @@ class PageImpl implements Page
      */
     public function getTemplate()
     {
-        $this->setInitialValues();
         return $this->template;
     }
 
@@ -114,7 +98,6 @@ class PageImpl implements Page
      */
     public function getAlias()
     {
-        $this->setInitialValues();
         return $this->alias;
     }
 
@@ -136,10 +119,8 @@ class PageImpl implements Page
         }
 
 
-        if ($this->updateIDStm === null) {
-            $this->updateIDStm = $this->connection->prepare("UPDATE Page SET page_id = ? WHERE page_id = ?");
-        }
-        $this->updateIDStm->execute(array($page_id, $this->page_id));
+        $updateIDStm = $this->connection->prepare("UPDATE Page SET page_id = ? WHERE page_id = ?");
+        $updateIDStm->execute(array($page_id, $this->page_id));
         $this->page_id = $page_id;
 
         $this->notifyObservers(Page::EVENT_ID_UPDATE);
@@ -154,13 +135,11 @@ class PageImpl implements Page
     public function setTitle($title)
     {
 
-        if ($this->updateTitleStm === null) {
-            $this->updateTitleStm = $this->connection->prepare("UPDATE Page SET title = ? WHERE page_id = ?");
-            $this->updateTitleStm->bindParam(1, $this->title);
-            $this->updateTitleStm->bindParam(2, $this->page_id);
-        }
+        $updateTitleStm = $this->connection->prepare("UPDATE Page SET title = ? WHERE page_id = ?");
+        $updateTitleStm->bindParam(1, $this->title);
+        $updateTitleStm->bindParam(2, $this->page_id);
         $this->title = $title;
-        $this->updateTitleStm->execute();
+        $updateTitleStm->execute();
     }
 
     /**
@@ -170,13 +149,11 @@ class PageImpl implements Page
      */
     public function setTemplate($template)
     {
-        if ($this->updateTemplateStm === null) {
-            $this->updateTemplateStm = $this->connection->prepare("UPDATE Page SET template = :template WHERE page_id = :page_id");
-            $this->updateTemplateStm->bindParam(":template", $this->template);
-            $this->updateTemplateStm->bindParam(":page_id", $this->page_id);
-        }
+        $updateTemplateStm = $this->connection->prepare("UPDATE Page SET template = :template WHERE page_id = :page_id");
+        $updateTemplateStm->bindParam(":template", $this->template);
+        $updateTemplateStm->bindParam(":page_id", $this->page_id);
         $this->template = $template;
-        $this->updateTemplateStm->execute();
+        $updateTemplateStm->execute();
     }
 
     /**
@@ -190,13 +167,11 @@ class PageImpl implements Page
             return false;
         }
 
-        if ($this->updateAliasStm === null) {
-            $this->updateAliasStm = $this->connection->prepare("UPDATE Page SET alias = :alias WHERE page_id = :page_id");
-            $this->updateAliasStm->bindParam(":alias", $this->alias);
-            $this->updateAliasStm->bindParam(":page_id", $this->page_id);
-        }
+        $updateAliasStm = $this->connection->prepare("UPDATE Page SET alias = :alias WHERE page_id = :page_id");
+        $updateAliasStm->bindParam(":alias", $this->alias);
+        $updateAliasStm->bindParam(":page_id", $this->page_id);
         $this->alias = $alias;
-        $this->updateAliasStm->execute();
+        $updateAliasStm->execute();
 
         return true;
     }
@@ -213,12 +188,10 @@ class PageImpl implements Page
 
     private function IDExists($id)
     {
-        if ($this->existsStm === null) {
-            $this->existsStm = $this->connection->prepare("SELECT *, UNIX_TIMESTAMP(last_modified) AS last_modified FROM Page WHERE page_id=?");
-        }
 
-        $this->existsStm->execute(array($id));
-        return $this->existsStm->rowCount() > 0;
+        $existsStm = $this->connection->prepare("SELECT *, UNIX_TIMESTAMP(last_modified) AS last_modified FROM Page WHERE page_id=?");
+        $existsStm->execute(array($id));
+        return $existsStm->rowCount() > 0;
     }
 
     /**
@@ -230,22 +203,20 @@ class PageImpl implements Page
     {
 
 
-        if ($this->createStm === null) {
-            $this->createStm = $this->connection->prepare("
+        $createStm = $this->connection->prepare("
             INSERT INTO Page (page_id,template,title,alias,hidden)
             VALUES (:page_id,:template,:title,:alias,:hidden)");
-            $this->createStm->bindParam(":page_id", $this->page_id);
-            $this->createStm->bindParam(":template", $this->template);
-            $this->createStm->bindParam(":title", $this->title);
-            $this->createStm->bindParam(":alias", $this->alias);
-            $this->createStm->bindParam(":hidden", $this->hidden);
-        }
+        $createStm->bindParam(":page_id", $this->page_id);
+        $createStm->bindParam(":template", $this->template);
+        $createStm->bindParam(":title", $this->title);
+        $createStm->bindParam(":alias", $this->alias);
+        $createStm->bindParam(":hidden", $this->hidden);
         try {
-            $this->createStm->execute();
+            $createStm->execute();
         } catch (PDOException $e) {
             return false;
         }
-        $rows = $this->createStm->rowCount();
+        $rows = $createStm->rowCount();
         return $rows > 0;
     }
 
@@ -255,32 +226,11 @@ class PageImpl implements Page
      */
     public function delete()
     {
-        if ($this->deleteStm === null) {
-            $this->deleteStm = $this->connection->prepare("DELETE FROM Page WHERE page_id=?");
-            $this->deleteStm->bindParam(1, $this->page_id);
-        }
-        $this->deleteStm->execute();
-        $success = $this->deleteStm->rowCount() > 0;
-        if ($success) {
-            $this->notifyObservers(Page::EVENT_DELETE);
-        }
-        return $success;
+
+        return $this->pageOrder->deletePage($this);
 
     }
 
-    private function setInitialValues()
-    {
-        if (!$this->isInitialized && $this->exists()) {
-            $this->isInitialized = true;
-            $result = $this->existsStm->fetch(PDO::FETCH_ASSOC);
-            $this->page_id = $result['page_id'];
-            $this->alias = $result['alias'];
-            $this->title = $result['title'];
-            $this->template = $result['template'];
-            $this->lastModified = intval($result['last_modified']);
-            $this->hidden = $result['hidden'];
-        }
-    }
 
     /**
      * This will return TRUE if the $id match the page else FALSE.
@@ -348,7 +298,7 @@ class PageImpl implements Page
      */
     public function isValidAlias($alias)
     {
-        return strlen($alias)==0 || @preg_match($alias,'') !== false;
+        return strlen($alias) == 0 || @preg_match($alias, '') !== false;
     }
 
     /**
@@ -356,8 +306,7 @@ class PageImpl implements Page
      */
     public function isHidden()
     {
-        $this->setInitialValues();
-        return $this->hidden > 0;
+        return $this->hidden;
     }
 
     /**
@@ -367,17 +316,14 @@ class PageImpl implements Page
      */
     public function hide()
     {
-        if($this->isHidden())
+        if ($this->isHidden())
             return;
 
-        if($this->updateHiddenStm === null){
-            $this->updateHiddenStm = $this->connection->prepare("UPDATE Page SET hidden=? WHERE page_id = ?");
-            $this->updateHiddenStm->bindParam(1, $this->hidden);
-            $this->updateHiddenStm->bindParam(2, $this->page_id);
-        }
-
-        $this->hidden = 1;
-        $this->updateHiddenStm->execute();
+        $updateHiddenStm = $this->connection->prepare("UPDATE Page SET hidden=? WHERE page_id = ?");
+        $updateHiddenStm->bindParam(1, $this->hidden);
+        $updateHiddenStm->bindParam(2, $this->page_id);
+        $this->hidden = true;
+        $updateHiddenStm->execute();
     }
 
     /**
@@ -387,17 +333,14 @@ class PageImpl implements Page
      */
     public function show()
     {
-        if(!$this->isHidden())
+        if (!$this->isHidden())
             return;
 
-        if($this->updateHiddenStm === null){
-            $this->updateHiddenStm = $this->connection->prepare("UPDATE Page SET hidden=? WHERE page_id = ?");
-            $this->updateHiddenStm->bindParam(1, $this->hidden);
-            $this->updateHiddenStm->bindParam(2, $this->page_id);
-        }
-
-        $this->hidden = 0;
-        $this->updateHiddenStm->execute();
+        $updateHiddenStm = $this->connection->prepare("UPDATE Page SET hidden=? WHERE page_id = ?");
+        $updateHiddenStm->bindParam(1, $this->hidden);
+        $updateHiddenStm->bindParam(2, $this->page_id);
+        $this->hidden = false;
+        $updateHiddenStm->execute();
     }
 
     /**
@@ -417,7 +360,6 @@ class PageImpl implements Page
      */
     public function lastModified()
     {
-        $this->setInitialValues();
         return $this->lastModified;
     }
 
@@ -427,13 +369,11 @@ class PageImpl implements Page
      */
     public function modify()
     {
-        if($this->updLastModStm == null){
-            $this->updLastModStm = $this->connection->prepare("UPDATE Page SET last_modified=FROM_UNIXTIME(?) WHERE page_id=?");
-            $this->updLastModStm->bindParam(1, $this->lastModified);
-            $this->updLastModStm->bindParam(2, $this->page_id);
-        }
+        $updLastModStm = $this->connection->prepare("UPDATE Page SET last_modified=FROM_UNIXTIME(?) WHERE page_id=?");
+        $updLastModStm->bindParam(1, $this->lastModified);
+        $updLastModStm->bindParam(2, $this->page_id);
         $this->lastModified = time();
-        $this->updLastModStm->execute();
+        $updLastModStm->execute();
         return $this->lastModified;
 
     }
@@ -443,7 +383,7 @@ class PageImpl implements Page
      */
     public function getVariables()
     {
-        return $this->variables == null? $this->variables = new PageVariablesImpl($this->database, $this):$this->variables;
+        return $this->variables == null ? $this->variables = new PageVariablesImpl($this->database, $this) : $this->variables;
     }
 
     /**
@@ -452,8 +392,8 @@ class PageImpl implements Page
      */
     public function getContentLibrary()
     {
-        return $this->contentLibrary == null?
-            $this->contentLibrary = new PageContentLibraryImpl($this->container, $this):
+        return $this->contentLibrary == null ?
+            $this->contentLibrary = new PageContentLibraryImpl($this->container, $this) :
             $this->contentLibrary;
     }
 

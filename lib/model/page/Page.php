@@ -15,7 +15,6 @@ interface Page extends JSONObjectSerializable, TypeHandlerGenerator, Observable
 {
 
     const EVENT_ID_UPDATE = 1;
-    const EVENT_DELETE = 2;
 
     /**
      * @return bool Return TRUE if the page has been marked as hidden, else false

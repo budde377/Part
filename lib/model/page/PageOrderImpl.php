@@ -25,12 +25,12 @@ class PageOrderImpl implements PageOrder, Observer
     private $database;
     private $connection;
 
-    private $inactivePages = array();
-    private $activePages = array();
-    private $pageOrder = array();
+    private $inactivePages = [];
+    private $activePages = [];
+    private $pageOrder = [];
 
     /** @var PDOStatement */
-    private $deactivatePgeStm;
+    private $deactivatePageStatement;
     private $backendContainer;
 
 
@@ -44,24 +44,45 @@ class PageOrderImpl implements PageOrder, Observer
 
     private function initializePageOrder()
     {
-        $sql = "SELECT page_id FROM Page WHERE Page.page_id NOT IN (SELECT page_id FROM PageOrder)";
-        $statement = $this->connection->query($sql);
+        $this->initializeInactivePageOrder();
+        $this->initializeActivePageOrder();
+    }
+
+
+    private function initializeActivePageOrder()
+    {
+        $statement = $this
+            ->connection
+            ->query("SELECT page_id,parent_id FROM PageOrder ORDER BY parent_id,order_no");
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $page = new PageImpl($this->backendContainer, $row['page_id']);
-            $page->attachObserver($this);
+            $page = $this->createPageInstance($row['page_id']);
+            $this->activePages[$row['page_id']] = $page;
+            $this->pageOrder[$row['parent_id']][] = $row['page_id'];
+        }
+
+    }
+
+    private function initializeInactivePageOrder()
+    {
+
+        $statement = $this
+            ->connection
+            ->query("SELECT * FROM Page WHERE Page.page_id NOT IN (SELECT page_id FROM PageOrder)");
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $page = $this->createPageInstance($row['page_id'], $row['title'], $row['template'], $row['alias'], $row['last_modified'], boolval($row['hidden']));
             $this->inactivePages[$row['page_id']] = $page;
         }
 
-        $sql = "SELECT * FROM PageOrder ORDER BY parent_id,order_no";
-        $statement = $this->connection->query($sql);
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $page = new PageImpl($this->backendContainer, $row['page_id']);
-            $page->attachObserver($this);
-            $this->activePages[$row['page_id']] = $page;
-            $this->pageOrder[$row['parent_id']][$row['order_no']] = $row['page_id'];
-        }
     }
 
+
+    private function createPageInstance($id, $title, $template, $alias, $lastMod, $hidden)
+    {
+        $page = new PageImpl($this->backendContainer, $this, $id, $title, $template, $alias, $lastMod, $hidden);
+        $page->attachObserver($this);
+        return $page;
+
+    }
 
     /**
      * This will return pageOrder. If null is given, it will return top-level
@@ -77,13 +98,13 @@ class PageOrderImpl implements PageOrder, Observer
         if ($parentPage instanceof Page) {
             $parentPageString = $parentPage->getID();
         } else {
-            $parentPageString = null;
+            $parentPageString = '';
         }
-        $retArray = array();
         if (!isset($this->pageOrder[$parentPageString]) || !is_array($this->pageOrder[$parentPageString])) {
-            return $retArray;
+            return [];
         }
-        ksort($this->pageOrder[$parentPageString]);
+
+        $retArray = [];
         foreach ($this->pageOrder[$parentPageString] as $id) {
             $retArray[] = $this->activePages[$id];
         }
@@ -107,17 +128,16 @@ class PageOrderImpl implements PageOrder, Observer
 
         if ($parentPage instanceof Page) {
             if ($this->findPage($parentPage) !== false) {
-                $parentPageID = $parentPage->getID();
-
+                $parentPageId = $parentPage->getID();
             } else {
                 return false;
             }
         } else {
-            $parentPageID = null;
+            $parentPageId = '';
         }
 
         $findPage = $this->findPage($page);
-        if ($findPage === false || $this->detectLoop($page->getID(), $parentPageID)) {
+        if ($findPage === false || $this->detectLoop($page->getID(), $parentPageId)) {
             return false;
         }
 
@@ -130,7 +150,7 @@ class PageOrderImpl implements PageOrder, Observer
 
         }
 
-        $this->insertPageID($page->getID(), $place, $parentPageID);
+        $this->insertPageID($page->getID(), $place, $parentPageId);
 
         return true;
     }
@@ -174,10 +194,9 @@ class PageOrderImpl implements PageOrder, Observer
      */
     public function createPage($id)
     {
-        try {
-            $page = new PageImpl($this->backendContainer, $id);
+        $page = new PageImpl($this->backendContainer, $this, $id, '', '', '', 0, false);
 
-        } catch (Exception $e) {
+        if (!$page->isValidId($id)) {
             return false;
         }
 
@@ -198,8 +217,8 @@ class PageOrderImpl implements PageOrder, Observer
      */
     public function deactivatePage(Page $page)
     {
-        if ($this->deactivatePgeStm == null) {
-            $this->deactivatePgeStm = $this->connection->prepare("DELETE FROM PageOrder WHERE page_id = ?");
+        if ($this->deactivatePageStatement == null) {
+            $this->deactivatePageStatement = $this->connection->prepare("DELETE FROM PageOrder WHERE page_id = ?");
         }
 
         if ($this->findPage($page) == 'active') {
@@ -209,9 +228,10 @@ class PageOrderImpl implements PageOrder, Observer
             $this->inactivePages[$page->getID()] = $this->activePages[$page->getID()];
             unset($this->activePages[$page->getID()]);
             $this->removeIDFromSubLists($page->getID());
-            $this->deactivatePgeStm->execute(array($page->getID()));
+            $this->deactivatePageStatement->execute(array($page->getID()));
         }
     }
+
 
     /**
      * This will delete a page from page order and in general
@@ -225,8 +245,10 @@ class PageOrderImpl implements PageOrder, Observer
             return false;
         }
 
-        $deleteRet = $page->delete();
-        if (!$deleteRet) {
+        $deleteStm = $this->connection->prepare("DELETE FROM Page WHERE page_id=?");
+        $deleteStm->bindParam(1, $page->getID());
+        $deleteStm->execute();
+        if (!$deleteStm->rowCount() > 0) {
             return false;
         }
         if ($findPage == 'active') {
@@ -237,7 +259,6 @@ class PageOrderImpl implements PageOrder, Observer
 
         return true;
     }
-
 
     /**
      * @param Page $page
@@ -259,39 +280,30 @@ class PageOrderImpl implements PageOrder, Observer
 
         if ($subject instanceof Page && ($findPage = $this->findPage($subject)) !== false) {
             /** @var $subject Page */
-            switch ($changeType) {
-                case Page::EVENT_DELETE:
-                    if (!$subject->exists()) {
-                        if ($findPage == 'active') {
-                            unset($this->activePages[$subject->getID()]);
-                        } else {
-                            unset($this->inactivePages[$subject->getID()]);
-                        }
-                    }
-                    break;
-                case Page::EVENT_ID_UPDATE:
-                    if ($findPage == 'active') {
-                        $key = $this->updateKey($subject, $this->activePages);
-                        $newKey = $subject->getID();
-                        $pageOrderCopy = $this->pageOrder;
-                        foreach ($pageOrderCopy as $parent_id => $orderArray) {
-                            foreach ($orderArray as $order => $page_id) {
-                                if ($page_id == $key) {
-                                    $this->pageOrder[$parent_id][$order] = $newKey;
-                                }
-                            }
-
-                            if ($parent_id == $key) {
-                                $this->pageOrder[$newKey] = $this->pageOrder[$parent_id];
-                                unset($this->pageOrder[$parent_id]);
-                            }
-                        }
-
-                    } else {
-                        $this->updateKey($subject, $this->inactivePages);
-                    }
-                    break;
+            if ($changeType != Page::EVENT_ID_UPDATE) {
+                return;
             }
+            if ($findPage == 'active') {
+                $key = $this->updateKey($subject, $this->activePages);
+                $newKey = $subject->getID();
+                $pageOrderCopy = $this->pageOrder;
+                foreach ($pageOrderCopy as $parent_id => $orderArray) {
+                    foreach ($orderArray as $order => $page_id) {
+                        if ($page_id == $key) {
+                            $this->pageOrder[$parent_id][$order] = $newKey;
+                        }
+                    }
+
+                    if ($parent_id == $key) {
+                        $this->pageOrder[$newKey] = $this->pageOrder[$parent_id];
+                        unset($this->pageOrder[$parent_id]);
+                    }
+                }
+
+            } else {
+                $this->updateKey($subject, $this->inactivePages);
+            }
+
         }
 
     }
@@ -336,8 +348,13 @@ class PageOrderImpl implements PageOrder, Observer
         return $loopDetected;
     }
 
+    private function insertPageID($pageId, $place, $parentId)
+    {
 
-    private function insertPageID($pageID, $place, $parentPageID)
+
+    }
+
+    private function insertPageIDOld($pageID, $place, $parentPageID)
     {
 
         $newArray = array();
@@ -420,9 +437,9 @@ class PageOrderImpl implements PageOrder, Observer
      */
     public function getPagePath(Page $page)
     {
-        if (($status = $this->findPage($page)) == 'inactive') {
+        if (($r = $this->findPage($page)) == 'inactive') {
             return array();
-        } else if ($status === false) {
+        } else if ($r == false) {
             return false;
         }
 
@@ -453,6 +470,7 @@ class PageOrderImpl implements PageOrder, Observer
         return $this->backendContainer->getCurrentPageStrategyInstance()->getCurrentPage();
     }
 
+
     /**
      * Serializes the object to an instance of JSONObject.
      * @return Object
@@ -461,7 +479,6 @@ class PageOrderImpl implements PageOrder, Observer
     {
         return new PageOrderObjectImpl($this);
     }
-
 
     /**
      * (PHP 5 &gt;= 5.4.0)<br/>
