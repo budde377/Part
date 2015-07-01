@@ -97,5 +97,8 @@ if ($config->isDebugMode()) {
 unset($website);
 
 if($config->isCacheEnabled()){
+    if(!file_exists($dir = dirname($cachePath))){
+        mkdir($dir, 0777, true);
+    }
     file_put_contents($cachePath, serialize($factory));
 }
