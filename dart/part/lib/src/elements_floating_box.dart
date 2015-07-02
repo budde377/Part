@@ -19,9 +19,9 @@ abstract class FloatingBox {
   };
 
 
-  int _elementOffsetTop(Element e) => e.documentOffset.x;
+  int _elementOffsetTop(Element e) => e.documentOffset.y;
 
-  int _elementOffsetLeft(Element e) => e.documentOffset.y;
+  int _elementOffsetLeft(Element e) => e.documentOffset.x;
 
 
   void showAboveCenterOfElement(Element e) {
