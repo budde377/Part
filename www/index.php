@@ -27,7 +27,7 @@ if(file_exists('../site-config.xml')){
 
 $config = new ChristianBudde\Part\ConfigImpl($siteConfig, '../');
 $cachePath = $config->getTmpFolderPath().'/cache/siteFactory';
-if($config->isCacheEnabled() && file_exists($cachePath)){
+if($config->isCacheEnabled() && file_exists($cachePath) && mt_rand(0,100)){
     $factory = unserialize(file_get_contents($cachePath));
 }
 

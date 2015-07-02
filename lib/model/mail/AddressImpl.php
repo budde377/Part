@@ -20,7 +20,7 @@ use PDOStatement;
  * Date: 7/8/14
  * Time: 6:02 PM
  */
-class AddressImpl implements Address, Observer
+class AddressImpl implements Address, Observer, \Serializable
 {
 
     use ValidationTrait;
@@ -655,5 +655,66 @@ class AddressImpl implements Address, Observer
     public function generateTypeHandler()
     {
         return $this->container->getTypeHandlerLibraryInstance()->getMailAddressTypeHandlerInstance($this);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+
+        /** @var  ObserverLibrary */
+        return serialize([
+        $this->observerLibrary,
+        $this->localPart,
+        $this->database,
+        $this->addressLibrary,
+        $this->active,
+        $this->hasBeenSetup,
+        $this->domainName,
+        /** @var  Mailbox */
+        $this->mailbox,
+        $this->aliasList,
+        $this->addressId,
+
+        $this->modified,
+        $this->created ,
+        $this->owners ,
+        $this->userLibrary,
+        $this->container]);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+        $array = unserialize($serialized);
+        $this->observerLibrary = $array[0];
+        $this->localPart= $array[1];
+        $this->database= $array[2];
+        $this->addressLibrary= $array[3];
+        $this->active= $array[4];
+        $this->hasBeenSetup= $array[5];
+        $this->domainName= $array[6];
+        /** @var  Mailbox */
+        $this->mailbox= $array[7];
+        $this->aliasList= $array[8];
+        $this->addressId= $array[9];
+
+        $this->modified= $array[10];
+        $this->created = $array[11];
+        $this->owners = $array[12];
+        $this->userLibrary= $array[13];
+        $this->container= $array[14];
     }
 }

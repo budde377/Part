@@ -561,6 +561,11 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
         $this->assertEquals($o = new \ChristianBudde\Part\controller\json\MailAddressObjectImpl($this->address), $this->address->jsonObjectSerialize());
         $this->assertEquals($o->jsonSerialize(), $this->address->jsonSerialize());
     }
+
+    public function tearDown(){
+        parent::tearDown();
+        serialize($this->address);
+    }
     /**
      * @param string $string
      * @return AddressImpl

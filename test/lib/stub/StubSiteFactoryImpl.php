@@ -2,7 +2,6 @@
 namespace ChristianBudde\Part\test\stub;
 
 use ChristianBudde\Part\BackendSingletonContainer;
-use ChristianBudde\Part\Config;
 use ChristianBudde\Part\SiteFactory;
 use ChristianBudde\Part\util\script\ScriptChain;
 use ChristianBudde\Part\util\script\ScriptChainImpl;
@@ -33,10 +32,9 @@ class StubSiteFactoryImpl implements SiteFactory
     /**
      * Builds a new PreScriptChain and returns it. This must contain prescripts specified
      * in some config (it must be ready to run).
-     * @param BackendSingletonContainer $backendContainer
      * @return \ChristianBudde\Part\util\script\ScriptChain
      */
-    public function buildPreScriptChain(BackendSingletonContainer $backendContainer)
+    public function buildPreScriptChain()
     {
         return $this->preScriptChain;
     }
@@ -44,10 +42,9 @@ class StubSiteFactoryImpl implements SiteFactory
     /**
      * Builds a new PostScriptChain and returns it. This must contain prescripts specified
      * in some config (it must be ready to run).
-     * @param BackendSingletonContainer $backendContainer
      * @return \ChristianBudde\Part\util\script\ScriptChain
      */
-    public function buildPostScriptChain(BackendSingletonContainer $backendContainer)
+    public function buildPostScriptChain()
     {
         return $this->postScriptChain;
     }
@@ -89,10 +86,9 @@ class StubSiteFactoryImpl implements SiteFactory
 
     /**
      * Builds a new BackendSingletonContainer and returns it.
-     * @param Config $config
      * @return BackendSingletonContainer
      */
-    public function buildBackendSingletonContainer(Config $config)
+    public function buildBackendSingletonContainer()
     {
         return $this->backendSingletonContainer;
     }
