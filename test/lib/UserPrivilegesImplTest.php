@@ -9,7 +9,7 @@ use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\stub\StubPageImpl;
 use ChristianBudde\Part\test\stub\StubPageOrderImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 use ChristianBudde\Part\util\db\DB;
 
 /**
@@ -18,7 +18,7 @@ use ChristianBudde\Part\util\db\DB;
  * Date: 19/01/13
  * Time: 10:32
  */
-class UserPrivilegesImplTest extends CustomDatabaseTestCase
+class UserPrivilegesImplTest extends SerializeCustomDatabaseTestCase
 {
 
     /** @var \ChristianBudde\Part\model\user\User */
@@ -38,7 +38,7 @@ class UserPrivilegesImplTest extends CustomDatabaseTestCase
 
     function __construct($dataset = null)
     {
-        parent::__construct(dirname(__FILE__) . '/../mysqlXML/UserPrivilegesImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/UserPrivilegesImplTest.xml', $this->userPrivileges);
     }
 
 

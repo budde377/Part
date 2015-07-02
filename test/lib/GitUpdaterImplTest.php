@@ -14,10 +14,10 @@ use ChristianBudde\Part\model\user\User;
 use ChristianBudde\Part\model\user\UserImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 use ChristianBudde\Part\util\db\DB;
 
-class GitUpdaterImplTest extends CustomDatabaseTestCase{
+class GitUpdaterImplTest extends SerializeCustomDatabaseTestCase{
 
 
 
@@ -34,7 +34,7 @@ class GitUpdaterImplTest extends CustomDatabaseTestCase{
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__) . '/../mysqlXML/GitUpdaterImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/GitUpdaterImplTest.xml', $this->updater);
     }
 
 

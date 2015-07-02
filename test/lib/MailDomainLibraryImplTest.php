@@ -14,10 +14,10 @@ use ChristianBudde\Part\model\mail\DomainLibraryImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubConfigImpl;
 use ChristianBudde\Part\test\stub\StubUserLibraryImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 use ChristianBudde\Part\util\db\MySQLDBImpl;
 
-class MailDomainLibraryImplTest extends CustomDatabaseTestCase
+class MailDomainLibraryImplTest extends SerializeCustomDatabaseTestCase
 {
 
     /** @var  Config */
@@ -35,7 +35,7 @@ class MailDomainLibraryImplTest extends CustomDatabaseTestCase
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__) . '/../mysqlXML/MailDomainLibraryImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/MailDomainLibraryImplTest.xml', $this->domainLibrary);
     }
 
 

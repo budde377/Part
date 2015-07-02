@@ -16,9 +16,8 @@ use PDOException;
  * Date: 18/01/13
  * Time: 22:29
  */
-class UserPrivilegesImpl implements UserPrivileges
+class UserPrivilegesImpl implements UserPrivileges, \Serializable
 {
-    private $connection;
     /** @var User */
     private $user;
     private $rootPrivilege = 0;
@@ -38,7 +37,6 @@ class UserPrivilegesImpl implements UserPrivileges
     {
         $this->container = $container;
         $this->user = $user;
-        $this->connection = $container->getDBInstance()->getConnection();
     }
 
 
@@ -49,7 +47,7 @@ class UserPrivilegesImpl implements UserPrivileges
     public function addRootPrivileges()
     {
         if ($this->addRootPrivilegeStatement == null) {
-            $this->addRootPrivilegeStatement = $this->connection->prepare("
+            $this->addRootPrivilegeStatement = $this->container->getDBInstance()->getConnection()->prepare("
               INSERT INTO UserPrivileges (username, rootPrivileges, sitePrivileges, pageId) VALUES (?,1,0,NULL)");
         }
         $this->addRootPrivilegeStatement->execute(array($this->user->getUsername()));
@@ -63,7 +61,7 @@ class UserPrivilegesImpl implements UserPrivileges
     public function addSitePrivileges()
     {
         if ($this->addSitePrivilegeStatement == null) {
-            $this->addSitePrivilegeStatement = $this->connection->prepare("
+            $this->addSitePrivilegeStatement = $this->container->getDBInstance()->getConnection()->prepare("
               INSERT INTO UserPrivileges (username, rootPrivileges, sitePrivileges, pageId) VALUES (?,0,1,NULL)");
         }
         $this->addSitePrivilegeStatement->execute(array($this->user->getUsername()));
@@ -78,7 +76,7 @@ class UserPrivilegesImpl implements UserPrivileges
     public function addPagePrivileges(Page $page)
     {
         if ($this->addPagePrivilegeStatement == null) {
-            $this->addPagePrivilegeStatement = $this->connection->prepare("
+            $this->addPagePrivilegeStatement = $this->container->getDBInstance()->getConnection()->prepare("
               INSERT INTO UserPrivileges (username, rootPrivileges, sitePrivileges, pageId) VALUES (?,0,0,?)");
         }
         $success = true;
@@ -128,7 +126,7 @@ class UserPrivilegesImpl implements UserPrivileges
     {
         if ($this->revokeRootStatement == null) {
             $this->revokeRootStatement =
-                $this->connection->prepare("DELETE FROM UserPrivileges WHERE username = ? AND rootPrivileges = 1");
+                $this->container->getDBInstance()->getConnection()->prepare("DELETE FROM UserPrivileges WHERE username = ? AND rootPrivileges = 1");
             $u = $this->user->getUsername();
             $this->revokeRootStatement->bindParam(1, $u);
         }
@@ -144,7 +142,7 @@ class UserPrivilegesImpl implements UserPrivileges
     {
         if ($this->revokeSiteStatement == null) {
             $this->revokeSiteStatement =
-                $this->connection->prepare("DELETE FROM UserPrivileges WHERE username = ? AND sitePrivileges = 1");
+                $this->container->getDBInstance()->getConnection()->prepare("DELETE FROM UserPrivileges WHERE username = ? AND sitePrivileges = 1");
             $u = $this->user->getUsername();
             $this->revokeSiteStatement->bindParam(1, $u);
         }
@@ -161,7 +159,7 @@ class UserPrivilegesImpl implements UserPrivileges
     {
         if ($this->revokePageStatement == null) {
             $this->revokePageStatement =
-                $this->connection->prepare("DELETE FROM UserPrivileges WHERE username = ? AND pageId = ?");
+                $this->container->getDBInstance()->getConnection()->prepare("DELETE FROM UserPrivileges WHERE username = ? AND pageId = ?");
         }
         $this->revokePageStatement->execute(array($this->user->getUsername(), $page->getID()));
         unset($this->pagePrivilege[$page->getID()]);
@@ -175,7 +173,7 @@ class UserPrivilegesImpl implements UserPrivileges
     {
         if ($this->revokeAllStatement == null) {
             $this->revokeAllStatement =
-                $this->connection->prepare("DELETE FROM UserPrivileges WHERE username = ?");
+                $this->container->getDBInstance()->getConnection()->prepare("DELETE FROM UserPrivileges WHERE username = ?");
             $u = $this->user->getUsername();
             $this->revokeAllStatement->bindParam(1, $u);
         }
@@ -187,7 +185,7 @@ class UserPrivilegesImpl implements UserPrivileges
     private function initialize()
     {
         if (!$this->valuesHasBeenSet) {
-            $stm = $this->connection->prepare("SELECT * FROM UserPrivileges WHERE username = ?");
+            $stm = $this->container->getDBInstance()->getConnection()->prepare("SELECT * FROM UserPrivileges WHERE username = ?");
             $stm->execute(array($this->user->getUsername()));
             foreach ($stm->fetchAll(PDO::FETCH_ASSOC) as $row) {
                 $this->rootPrivilege = $this->rootPrivilege || $row['rootPrivileges'] == 1;
@@ -263,5 +261,44 @@ class UserPrivilegesImpl implements UserPrivileges
     public function generateTypeHandler()
     {
         return $this->container->getTypeHandlerLibraryInstance()->getUserPrivilegesTypeHandlerInstance($this);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+        return serialize([
+            $this->user,
+            $this->rootPrivilege,
+            $this->sitePrivilege,
+            $this->pagePrivilege,
+            $this->valuesHasBeenSet,
+            $this->container
+        ]);
+
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+        $array = unserialize($serialized);
+        $this->user = $array[0];
+        $this->rootPrivilege = $array[1];
+        $this->sitePrivilege = $array[2];
+        $this->pagePrivilege = $array[3];
+        $this->valuesHasBeenSet = $array[4];
+        $this->container = $array[5];
     }
 }

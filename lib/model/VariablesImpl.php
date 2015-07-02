@@ -17,13 +17,13 @@ use Traversable;
 abstract class VariablesImpl implements Variables{
 
     /** @var  PDOStatement */
-    private $preparedRemoveKey;
+    protected $preparedRemoveKey;
     /** @var  PDOStatement */
-    private $preparedSetValue;
+    protected $preparedSetValue;
     /** @var  PDOStatement */
-    private $preparedUpdateValue;
+    protected $preparedUpdateValue;
     /** @var  PDOStatement */
-    private $preparedInitialize;
+    protected $preparedInitialize;
 
 
     private $map;

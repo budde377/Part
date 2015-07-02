@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\user;
+
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\UserObjectImpl;
@@ -17,13 +18,12 @@ use PDOStatement;
  * Date: 22/07/12
  * Time: 14:29
  */
-class UserImpl implements User
+class UserImpl implements User, \Serializable
 {
     use RequestTrait;
     use ValidationTrait;
 
     private $database;
-    private $connection;
 
     private $username;
     private $mail;
@@ -35,23 +35,23 @@ class UserImpl implements User
     private $userVariables;
 
 
-    /** @var $existsStatement PDOStatement | null */
+    /** @var $existsStatement PDOStatement */
     private $existsStatement;
-    /** @var $createStatement PDOStatement | null */
+    /** @var $createStatement PDOStatement */
     private $createStatement;
-    /** @var $setUsernameStatement PDOStatement | null */
+    /** @var $setUsernameStatement PDOStatement */
     private $setUsernameStatement;
-    /** @var $setParentStatement PDOStatement | null */
+    /** @var $setParentStatement PDOStatement */
     private $setParentStatement;
-    /** @var $setMailStatement PDOStatement | null */
+    /** @var $setMailStatement PDOStatement */
     private $setMailStatement;
-    /** @var $setPasswordStatement PDOStatement | null */
+    /** @var $setPasswordStatement PDOStatement */
     private $setPasswordStatement;
-    /** @var $deleteStatement PDOStatement | null */
+    /** @var $deleteStatement PDOStatement */
     private $deleteStatement;
-    /** @var $lastLoginStatement PDOStatement | null */
+    /** @var $lastLoginStatement PDOStatement */
     private $lastLoginStatement;
-    /** @var $cParentStm PDOStatement | null */
+    /** @var $cParentStm PDOStatement */
     private $cParentStm;
 
     private $valuesHasBeenSet = false;
@@ -66,7 +66,6 @@ class UserImpl implements User
         $this->container = $container;
         $this->username = $username;
         $this->database = $container->getDBInstance();
-        $this->connection = $this->database->getConnection();
     }
 
     /**
@@ -94,7 +93,7 @@ class UserImpl implements User
      */
     public function setUsername($username)
     {
-        if($username == $this->username){
+        if ($username == $this->username) {
             return true;
         }
         if ($this->usernameExists($username)) {
@@ -102,7 +101,7 @@ class UserImpl implements User
         }
 
         if ($this->setUsernameStatement === null) {
-            $this->setUsernameStatement = $this->connection->prepare("UPDATE User SET username = ? WHERE username = ?");
+            $this->setUsernameStatement = $this->database->getConnection()->prepare("UPDATE User SET username = ? WHERE username = ?");
         }
         $wasLoggedIn = $this->isLoggedIn();
 
@@ -128,7 +127,7 @@ class UserImpl implements User
         }
 
         if ($this->setMailStatement === null) {
-            $this->setMailStatement = $this->connection->prepare("UPDATE User SET mail = ? WHERE username = ?");
+            $this->setMailStatement = $this->database->getConnection()->prepare("UPDATE User SET mail = ? WHERE username = ?");
             $this->setMailStatement->bindParam(1, $this->mail);
             $this->setMailStatement->bindParam(2, $this->username);
         }
@@ -144,12 +143,12 @@ class UserImpl implements User
      */
     public function setPassword($password)
     {
-        if(!$this->isValidPassword($password)){
+        if (!$this->isValidPassword($password)) {
             return false;
         }
 
         if ($this->setPasswordStatement === null) {
-            $this->setPasswordStatement = $this->connection->prepare("UPDATE User SET password=? WHERE username=?");
+            $this->setPasswordStatement = $this->database->getConnection()->prepare("UPDATE User SET password=? WHERE username=?");
             $this->setPasswordStatement->bindParam(1, $this->password);
             $this->setPasswordStatement->bindParam(2, $this->username);
         }
@@ -182,12 +181,12 @@ class UserImpl implements User
     public function delete()
     {
         if ($this->deleteStatement == null) {
-            $this->deleteStatement = $this->connection->prepare("DELETE FROM User WHERE username = ?");
+            $this->deleteStatement = $this->database->getConnection()->prepare("DELETE FROM User WHERE username = ?");
             $this->deleteStatement->bindParam(1, $this->username);
         }
-        try{
+        try {
             $this->deleteStatement->execute();
-        } catch (PDOException $exception){
+        } catch (PDOException $exception) {
             return false;
         }
         if ($this->exists()) {
@@ -204,7 +203,7 @@ class UserImpl implements User
     public function create()
     {
         if ($this->createStatement == null) {
-            $this->createStatement = $this->connection->prepare("
+            $this->createStatement = $this->database->getConnection()->prepare("
             INSERT INTO User (username,mail,password,id,parent) VALUES (?,?,?,?,?)");
             $this->createStatement->bindParam(1, $this->username);
             $this->createStatement->bindParam(2, $this->mail);
@@ -254,7 +253,7 @@ class UserImpl implements User
         }
 
         if ($this->lastLoginStatement === null) {
-            $this->lastLoginStatement = $this->connection->prepare("UPDATE User SET lastLogin = FROM_UNIXTIME(?) WHERE username = ?");
+            $this->lastLoginStatement = $this->database->getConnection()->prepare("UPDATE User SET lastLogin = FROM_UNIXTIME(?) WHERE username = ?");
             $this->lastLoginStatement->bindParam(1, $this->lastLogin);
             $this->lastLoginStatement->bindParam(2, $this->username);
 
@@ -292,7 +291,7 @@ class UserImpl implements User
     private function usernameExists($username)
     {
         if ($this->existsStatement === null) {
-            $this->existsStatement = $this->connection->prepare("SELECT *,UNIX_TIMESTAMP(lastLogin) as lastLogin
+            $this->existsStatement = $this->database->getConnection()->prepare("SELECT *,UNIX_TIMESTAMP(lastLogin) AS lastLogin
             FROM User WHERE username=? ");
         }
 
@@ -311,12 +310,12 @@ class UserImpl implements User
             $this->lastLogin = ($r = $result['lastLogin']) == null ? null : intval($r);
             $this->parentID = $result['parent'];
             $this->userId = $result['id'];
-            $statement = $this->connection->prepare("SELECT username FROM User WHERE id=?");
+            $statement = $this->database->getConnection()->prepare("SELECT username FROM User WHERE id=?");
             $statement->execute(array($this->parentID));
             $result = $statement->fetch(PDO::FETCH_ASSOC);
             $this->parent = isset($result['username']) ? $result['username'] : null;
 
-        } else if($this->userId == null){
+        } else if ($this->userId == null) {
             $this->userId = uniqid('', true);
         }
     }
@@ -381,7 +380,7 @@ class UserImpl implements User
             return false;
         }
         if ($this->setParentStatement == null) {
-            $this->setParentStatement = $this->connection->prepare("UPDATE User SET parent = ? WHERE username = ?");
+            $this->setParentStatement = $this->database->getConnection()->prepare("UPDATE User SET parent = ? WHERE username = ?");
             $this->setParentStatement->bindParam(1, $this->parentID);
             $this->setParentStatement->bindParam(2, $this->username);
         }
@@ -395,7 +394,7 @@ class UserImpl implements User
     private function detectCircularParenting($parentID)
     {
         if ($this->cParentStm == null) {
-            $this->cParentStm = $this->connection->prepare("SELECT parent FROM User WHERE id = ?");
+            $this->cParentStm = $this->database->getConnection()->prepare("SELECT parent FROM User WHERE id = ?");
         }
         $failure = false;
         $success = false;
@@ -467,7 +466,7 @@ class UserImpl implements User
      */
     public function getUserVariables()
     {
-        return $this->userVariables == null?$this->userVariables = new UserVariablesImpl($this->database, $this): $this->userVariables;
+        return $this->userVariables == null ? $this->userVariables = new UserVariablesImpl($this->database, $this) : $this->userVariables;
     }
 
     /**
@@ -508,12 +507,12 @@ class UserImpl implements User
      */
     public function getUserToken()
     {
-        return sha1($this->getUniqueId().$this->getLastLogin());
+        return sha1($this->getUniqueId() . $this->getLastLogin());
     }
 
     private function getUsernamePasswordHash()
     {
-        return sha1($this->getUsername().$this->getPassword());
+        return sha1($this->getUsername() . $this->getPassword());
     }
 
     /**
@@ -522,5 +521,58 @@ class UserImpl implements User
     public function generateTypeHandler()
     {
         return $this->container->getTypeHandlerLibraryInstance()->getUserTypeHandlerInstance($this);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+        return serialize([
+            $this->database,
+            $this->username,
+            $this->mail,
+            $this->password,
+            $this->lastLogin,
+            $this->userId,
+            $this->userPrivileges,
+            $this->userVariables,
+            $this->valuesHasBeenSet,
+            $this->observers,
+            $this->parent,
+            $this->container,
+            $this->parentID
+        ]);
+
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+        $array = unserialize($serialized);
+        $this->database = $array[0];
+        $this->username = $array[1];
+        $this->mail = $array[2];
+        $this->password = $array[3];
+        $this->lastLogin = $array[4];
+        $this->userId = $array[5];
+        $this->userPrivileges = $array[6];
+        $this->userVariables = $array[7];
+        $this->valuesHasBeenSet = $array[8];
+        $this->observers = $array[9];
+        $this->parent = $array[10];
+        $this->container = $array[11];
+        $this->parentID = $array[12];
     }
 }

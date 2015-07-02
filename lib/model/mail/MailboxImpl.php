@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\mail;
+
 /**
  * Created by PhpStorm.
  * User: budde
@@ -15,7 +16,8 @@ use ChristianBudde\Part\util\traits\EncryptionTrait;
 use PDO;
 use PDOStatement;
 
-class MailboxImpl implements Mailbox{
+class MailboxImpl implements Mailbox, \Serializable
+{
 
 
     use EncryptionTrait;
@@ -78,13 +80,13 @@ class MailboxImpl implements Mailbox{
     {
         $password = trim($password);
 
-        if($password == ""){
+        if ($password == "") {
             return;
         }
 
         $this->setUp();
 
-        $this->password = crypt($password, "$1$".$this->generateMtRandomString()."$");
+        $this->password = crypt($password, "$1$" . $this->generateMtRandomString() . "$");
         $this->saveChanges();
 
     }
@@ -95,11 +97,11 @@ class MailboxImpl implements Mailbox{
      */
     public function delete()
     {
-        if($this->deleteStatement == null){
+        if ($this->deleteStatement == null) {
             $this->deleteStatement = $this->db->getConnection()->prepare("DELETE FROM MailMailbox WHERE secondary_address_id = :id ");
 
         }
-        $this->deleteStatement->execute(array(':id'=>$this->address->getId()));
+        $this->deleteStatement->execute(array(':id' => $this->address->getId()));
         $this->observerLibrary->callObservers(Mailbox::EVENT_DELETE);
     }
 
@@ -108,11 +110,11 @@ class MailboxImpl implements Mailbox{
      */
     public function exists()
     {
-        if($this->existsStatement == null){
+        if ($this->existsStatement == null) {
             $this->existsStatement = $this->db->getConnection()->prepare("SELECT * FROM MailMailbox WHERE secondary_address_id = :id");
         }
 
-        $this->existsStatement->execute(array(':id'=>$this->address->getId()));
+        $this->existsStatement->execute(array(':id' => $this->address->getId()));
         return $this->existsStatement->rowCount() > 0;
     }
 
@@ -122,13 +124,13 @@ class MailboxImpl implements Mailbox{
      */
     public function create()
     {
-        if($this->exists()){
+        if ($this->exists()) {
             return;
         }
 
         $uniqueAddress = $this->address->getAddressLibrary()->createAddress($id = uniqid("mail"));
 
-        if($this->createStatement1 == null){
+        if ($this->createStatement1 == null) {
             $this->createStatement1 = $this->db->getConnection()->prepare("
             INSERT INTO MailMailbox (primary_address_id, secondary_address_id, password, name, created, modified, id)
             VALUES (:primary_id, :secondary_id, :password, :name, NOW(), NOW(), :id)");
@@ -138,22 +140,22 @@ class MailboxImpl implements Mailbox{
         $primaryId = $uniqueAddress->getId();
         $secondaryId = $this->address->getId();
 
-        if($this->password == null){
+        if ($this->password == null) {
             $this->setPassword(uniqid('password', true));
         }
 
 
         $this->createStatement1->execute(array(
-            ':primary_id'=>$primaryId,
-            ':secondary_id'=>$secondaryId,
-            ':password'=>$this->password,
-            ':name'=>$this->name,
+            ':primary_id' => $primaryId,
+            ':secondary_id' => $secondaryId,
+            ':password' => $this->password,
+            ':name' => $this->name,
             ':id' => $id));
 
         $this->createStatement2->execute(array(
-            'mail_id'=>$id,
-            ':id1'=> $primaryId,
-            ':id2'=>$secondaryId
+            'mail_id' => $id,
+            ':id1' => $primaryId,
+            ':id2' => $secondaryId
         ));
 
         $this->setUp(true);
@@ -215,11 +217,11 @@ class MailboxImpl implements Mailbox{
     private function setUp($force = false)
     {
 
-        if($this->hasBeenSetup && !$force){
+        if ($this->hasBeenSetup && !$force) {
             return;
         }
         $this->hasBeenSetup = true;
-        if(!$this->exists()){
+        if (!$this->exists()) {
             return;
         }
 
@@ -231,8 +233,6 @@ class MailboxImpl implements Mailbox{
         $this->password = $row['password'];
 
     }
-
-
 
 
     /**
@@ -255,14 +255,14 @@ class MailboxImpl implements Mailbox{
 
     private function saveChanges()
     {
-        if($this->saveChangesStatement == null){
+        if ($this->saveChangesStatement == null) {
             $this->saveChangesStatement = $this->db->getConnection()->prepare("
             UPDATE MailMailbox
             SET name = :name, password = :password, modified = NOW()
             WHERE secondary_address_id = :id");
         }
 
-        $this->saveChangesStatement->execute(array(':name'=>$this->name, ':password'=>$this->password, ':id'=>$this->address->getId()));
+        $this->saveChangesStatement->execute(array(':name' => $this->name, ':password' => $this->password, ':id' => $this->address->getId()));
         $this->setUp(true);
     }
 
@@ -293,5 +293,50 @@ class MailboxImpl implements Mailbox{
     public function generateTypeHandler()
     {
         return $this->container->getTypeHandlerLibraryInstance()->getMailboxTypeHandlerInstance($this);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+        return serialize([
+            $this->observerLibrary,
+            $this->address,
+            $this->db,
+            $this->name,
+            $this->password,
+            $this->hasBeenSetup,
+            $this->created,
+            $this->modified,
+            $this->container
+        ]);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+        $array = unserialize($serialized);
+        $this->observerLibrary = $array[0];
+            $this->address = $array[1];
+            $this->db = $array[2];
+            $this->name = $array[3];
+            $this->password = $array[4];
+            $this->hasBeenSetup = $array[5];
+            $this->created = $array[6];
+            $this->modified = $array[7];
+            $this->container = $array[8];
+
     }
 }

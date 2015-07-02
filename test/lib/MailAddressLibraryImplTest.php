@@ -15,9 +15,9 @@ use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubConfigImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\stub\StubUserLibraryImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 
-class MailAddressLibraryImplTest extends CustomDatabaseTestCase
+class MailAddressLibraryImplTest extends SerializeCustomDatabaseTestCase
 {
 
 
@@ -34,7 +34,7 @@ class MailAddressLibraryImplTest extends CustomDatabaseTestCase
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__) . '/../mysqlXML/MailAddressLibraryImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/MailAddressLibraryImplTest.xml', $this->addressLibrary);
     }
 
     protected function setUp()

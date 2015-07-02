@@ -7,7 +7,6 @@ use ChristianBudde\Part\controller\json\MailDomainLibraryObjectImpl;
 use ChristianBudde\Part\util\Observable;
 use ChristianBudde\Part\util\Observer;
 use PDO;
-use PDOStatement;
 
 /**
  * Created by PhpStorm.
@@ -23,10 +22,6 @@ class DomainLibraryImpl implements DomainLibrary, Observer
     private $db;
     /** @var  array */
     private $domainList;
-    /** @var  PDOStatement */
-    private $listDomainStatement;
-    /** @var  PDO */
-    private $connection;
     private $userLibrary;
     private $container;
 
@@ -36,7 +31,6 @@ class DomainLibraryImpl implements DomainLibrary, Observer
         $this->userLibrary = $container->getUserLibraryInstance();
         $this->databaseName = $container->getConfigInstance()->getMySQLConnection()['database'];
         $this->db = $container->getDBInstance();
-        $this->connection = $this->db->getConnection();
     }
 
 
@@ -74,14 +68,14 @@ class DomainLibraryImpl implements DomainLibrary, Observer
         if ($d == null) {
             $d = new DomainImpl($this->container, $domain, $this);
 
-            if($d->create($password)){
-                $this->domainList[$domain] =$d;
+            if ($d->create($password)) {
+                $this->domainList[$domain] = $d;
                 $d->attachObserver($this);
                 return $d;
             }
 
         } else {
-            if($d->create($password)){
+            if ($d->create($password)) {
                 return $d;
             }
         }
@@ -111,7 +105,7 @@ class DomainLibraryImpl implements DomainLibrary, Observer
 
     public function onChange(Observable $subject, $changeType)
     {
-        if(!($subject instanceof DomainImpl) || !$this->containsDomain($subject) || $changeType != Domain::EVENT_DELETE){
+        if (!($subject instanceof DomainImpl) || !$this->containsDomain($subject) || $changeType != Domain::EVENT_DELETE) {
             return;
         }
 
@@ -126,15 +120,13 @@ class DomainLibraryImpl implements DomainLibrary, Observer
             return;
         }
 
-        if ($this->listDomainStatement == null) {
-            $this->listDomainStatement =
-                $this->connection->prepare("
+        $listDomainStatement =
+            $this->container->getDBInstance()->getConnection()->prepare("
                 SELECT domain
                 FROM MailDomain");
-        }
-        $this->listDomainStatement->execute();
+        $listDomainStatement->execute();
         $this->domainList = array();
-        foreach ($this->listDomainStatement->fetchAll(PDO::FETCH_ASSOC) as $d) {
+        foreach ($listDomainStatement->fetchAll(PDO::FETCH_ASSOC) as $d) {
             $domain = $d['domain'];
             $d = ($this->domainList[$domain] = new DomainImpl($this->container, $domain, $this));
             $d->attachObserver($this);

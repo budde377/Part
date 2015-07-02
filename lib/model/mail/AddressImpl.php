@@ -92,7 +92,7 @@ class AddressImpl implements Address, Observer, \Serializable
         $this->setUp();
         $oldName = $this->localPart;
         $this->localPart = $localPart;
-        if(!$this->saveAddress()){
+        if (!$this->saveAddress()) {
             $this->localPart = $oldName;
             return false;
         }
@@ -146,7 +146,7 @@ class AddressImpl implements Address, Observer, \Serializable
 
         return $this->existsStatement->rowCount() > 0;
 
-   }
+    }
 
     /**
      * Deletes an address
@@ -156,11 +156,11 @@ class AddressImpl implements Address, Observer, \Serializable
     {
 
         $this->setUp();
-        if($this->addressId == null){
+        if ($this->addressId == null) {
             return;
         }
 
-        if($this->deleteStatement == null){
+        if ($this->deleteStatement == null) {
             $this->deleteStatement = $this->database->getConnection()->prepare("DELETE FROM MailAddress WHERE id = :id");
             $this->deleteStatement->bindParam('id', $this->addressId);
         }
@@ -170,6 +170,7 @@ class AddressImpl implements Address, Observer, \Serializable
         $this->owners = [];
         $this->aliasList = [];
     }
+
     /**
      * Creates an address
      * @return void
@@ -177,21 +178,21 @@ class AddressImpl implements Address, Observer, \Serializable
     public function create()
     {
 
-        if($this->exists()){
+        if ($this->exists()) {
             return;
         }
 
-        if($this->createStatement == null){
+        if ($this->createStatement == null) {
             $this->createStatement = $this->database->getConnection()->prepare("
             INSERT INTO MailAddress (name, domain, id, mailbox_id, created, modified, active)
             VALUES (:name, :domain, :id, NULL, NOW(), NOW(), :active)");
         }
         $this->addressId = uniqid('address', true);
         $this->createStatement->execute(array(
-            ':name'=>$this->localPart,
-            ':domain'=>$this->domainName,
-            ':id'=>$this->addressId,
-            ':active'=>$this->active?1:0));
+            ':name' => $this->localPart,
+            ':domain' => $this->domainName,
+            ':id' => $this->addressId,
+            ':active' => $this->active ? 1 : 0));
 
         $this->loadTimestamps();
     }
@@ -241,17 +242,17 @@ class AddressImpl implements Address, Observer, \Serializable
     public function addTarget($address)
     {
         $address = trim($address);
-        if(!$this->validMail($address)){
+        if (!$this->validMail($address)) {
             return;
         }
-        if($this->hasTarget($address)){
+        if ($this->hasTarget($address)) {
             return;
         }
-        if($this->addTargetStatement == null){
+        if ($this->addTargetStatement == null) {
             $this->addTargetStatement = $this->database->getConnection()->prepare("INSERT INTO MailAlias (address_id, target) VALUES (:id, :target)");
 
         }
-        $this->addTargetStatement->execute(array('id'=>$this->addressId, 'target'=>$address));
+        $this->addTargetStatement->execute(array('id' => $this->addressId, 'target' => $address));
         $this->aliasList[$address] = $address;
     }
 
@@ -264,17 +265,16 @@ class AddressImpl implements Address, Observer, \Serializable
     {
         $this->setUpAlias();
         $address = trim($address);
-        if(!$this->hasTarget($address)){
+        if (!$this->hasTarget($address)) {
             return;
         }
 
-        if($this->removeAliasStatement == null){
+        if ($this->removeAliasStatement == null) {
             $this->removeAliasStatement = $this->database->getConnection()->prepare("DELETE FROM MailAlias WHERE address_id = :id AND target = :target");
         }
 
 
-
-        $this->removeAliasStatement->execute(array(':id' => $this->addressId, ':target'=> $address));
+        $this->removeAliasStatement->execute(array(':id' => $this->addressId, ':target' => $address));
         unset($this->aliasList[$address]);
         $this->updateLastModified();
     }
@@ -286,7 +286,7 @@ class AddressImpl implements Address, Observer, \Serializable
     public function clearTargets()
     {
         $this->setUp();
-        if($this->clearTargetsStm == null){
+        if ($this->clearTargetsStm == null) {
             $this->clearTargetsStm = $this->database->getConnection()->prepare("DELETE FROM MailAlias WHERE address_id = :id");
             $this->clearTargetsStm->bindParam("id", $this->addressId);
         }
@@ -321,11 +321,11 @@ class AddressImpl implements Address, Observer, \Serializable
      */
     public function createMailbox($name, $password)
     {
-        if(!$this->exists()){
+        if (!$this->exists()) {
             return null;
         }
 
-        if($this->hasMailbox()){
+        if ($this->hasMailbox()) {
             return $this->mailbox;
         }
 
@@ -343,7 +343,7 @@ class AddressImpl implements Address, Observer, \Serializable
      */
     public function deleteMailbox()
     {
-        if(!$this->hasMailbox()){
+        if (!$this->hasMailbox()) {
             return;
         }
 
@@ -392,7 +392,7 @@ class AddressImpl implements Address, Observer, \Serializable
 
         $row = $this->existsStatement->fetch(PDO::FETCH_ASSOC);
 
-        if($row['mailbox_id'] != null){
+        if ($row['mailbox_id'] != null) {
             $this->mailbox = new MailboxImpl($this->container, $this, $this->database);
             $this->mailbox->attachObserver($this);
         }
@@ -408,20 +408,20 @@ class AddressImpl implements Address, Observer, \Serializable
      */
     private function saveAddress()
     {
-        if($this->saveStatement == null){
+        if ($this->saveStatement == null) {
             $this->saveStatement = $this->database->getConnection()->prepare("
             UPDATE MailAddress SET name = :name, active = :active, modified = NOW() WHERE id = :id");
         }
 
 
-        try{
+        try {
             $this->saveStatement->execute(array(
-                ':name'=>$this->localPart,
-                ':id'=>$this->addressId,
-                ':active'=>$this->active?1:0));
+                ':name' => $this->localPart,
+                ':id' => $this->addressId,
+                ':active' => $this->active ? 1 : 0));
 
 
-        } catch (PDOException $e){
+        } catch (PDOException $e) {
             return false;
         }
 
@@ -431,8 +431,9 @@ class AddressImpl implements Address, Observer, \Serializable
         return true;
     }
 
-    private function updateLastModified(){
-        if($this->updLastModStm == null){
+    private function updateLastModified()
+    {
+        if ($this->updLastModStm == null) {
             $this->updLastModStm = $this->database->getConnection()->prepare("UPDATE MailAddress SET modified = NOW() WHERE id = :id");
             $this->updLastModStm->bindParam('id', $this->addressId);
         }
@@ -456,13 +457,13 @@ class AddressImpl implements Address, Observer, \Serializable
 
     private function setUpAlias()
     {
-        if($this->aliasList != null){
+        if ($this->aliasList != null) {
             return;
         }
 
         $this->setUp();
 
-        if($this->setupAliasStatement == null){
+        if ($this->setupAliasStatement == null) {
             $this->setupAliasStatement = $this->database->getConnection()->prepare("SELECT target FROM MailAlias WHERE address_id = :id ORDER BY target ASC");
             $this->setupAliasStatement->bindParam("id", $this->addressId);
         }
@@ -472,7 +473,7 @@ class AddressImpl implements Address, Observer, \Serializable
 
         $this->aliasList = array();
 
-        foreach($this->setupAliasStatement->fetchAll(PDO::FETCH_NUM) as $row){
+        foreach ($this->setupAliasStatement->fetchAll(PDO::FETCH_NUM) as $row) {
             $this->aliasList[$row[0]] = $row[0];
         }
     }
@@ -491,22 +492,22 @@ class AddressImpl implements Address, Observer, \Serializable
     public function onChange(Observable $subject, $changeType)
     {
 
-        if($subject instanceof Mailbox){
-            if($this->mailbox !== $subject || $changeType != Mailbox::EVENT_DELETE){
+        if ($subject instanceof Mailbox) {
+            if ($this->mailbox !== $subject || $changeType != Mailbox::EVENT_DELETE) {
                 return;
             }
             $this->mailbox->detachObserver($this);
             $this->mailbox = null;
 
-        } else if($subject instanceof User ){
-            if($changeType == User::EVENT_DELETE){
+        } else if ($subject instanceof User) {
+            if ($changeType == User::EVENT_DELETE) {
                 $subject->detachObserver($this);
-            } else if($changeType == User::EVENT_USERNAME_UPDATE){
+            } else if ($changeType == User::EVENT_USERNAME_UPDATE) {
                 $userKey = array_search($subject, $this->owners);
-                if($userKey === false){
+                if ($userKey === false) {
                     return;
                 }
-                if($userKey == $subject->getUsername()){
+                if ($userKey == $subject->getUsername()) {
                     return;
                 }
                 $this->owners[$subject->getUsername()] = $this->owners[$userKey];
@@ -541,11 +542,11 @@ class AddressImpl implements Address, Observer, \Serializable
      */
     public function addOwner(User $owner)
     {
-        if($this->isOwner($owner) || !$this->exists()){
+        if ($this->isOwner($owner) || !$this->exists()) {
             return;
         }
 
-        if($this->addOwnerStatement == null){
+        if ($this->addOwnerStatement == null) {
             $this->addOwnerStatement = $this->database->getConnection()->prepare("INSERT INTO MailAddressUserOwnership (address_id, username) VALUES (?, ?)");
         }
         $this->addOwnerStatement->execute(array($this->getId(), $owner->getUsername()));
@@ -563,12 +564,12 @@ class AddressImpl implements Address, Observer, \Serializable
     public function removeOwner(User $owner)
     {
 
-        if(!$this->isOwner($owner)){
+        if (!$this->isOwner($owner)) {
             return;
         }
 
-        if($this->removeOwnerStatement == null){
-            $this->removeOwnerStatement= $this->database->getConnection()->prepare("DELETE FROM MailAddressUserOwnership WHERE address_id = ? AND username = ?");
+        if ($this->removeOwnerStatement == null) {
+            $this->removeOwnerStatement = $this->database->getConnection()->prepare("DELETE FROM MailAddressUserOwnership WHERE address_id = ? AND username = ?");
         }
         $this->removeOwnerStatement->execute(array($this->getId(), $owner->getUsername()));
 
@@ -599,13 +600,13 @@ class AddressImpl implements Address, Observer, \Serializable
 
         $this->setUpOwners();
         $returnArray = array();
-        if($instances){
-            foreach($this->owners as $key=>$val){
+        if ($instances) {
+            foreach ($this->owners as $key => $val) {
                 $returnArray[] = $this->userLibrary->getUser($key);
             }
 
         } else {
-            foreach($this->owners as $key=>$val){
+            foreach ($this->owners as $key => $val) {
                 $returnArray[] = $key;
             }
 
@@ -616,10 +617,10 @@ class AddressImpl implements Address, Observer, \Serializable
 
     private function setUpOwners()
     {
-        if($this->setUpOwnerStatement == null){
+        if ($this->setUpOwnerStatement == null) {
             $this->setUpOwnerStatement = $this->database->getConnection()->prepare("SELECT username FROM MailAddressUserOwnership WHERE address_id = ?");
             $this->setUpOwnerStatement->execute(array($this->getId()));
-            foreach($this->setUpOwnerStatement->fetchAll(PDO::FETCH_NUM) as $row ){
+            foreach ($this->setUpOwnerStatement->fetchAll(PDO::FETCH_NUM) as $row) {
                 $username = $row[0];
                 $this->owners[$username] = $user = $this->userLibrary->getUser($username);
                 $user->attachObserver($this);
@@ -668,23 +669,21 @@ class AddressImpl implements Address, Observer, \Serializable
 
         /** @var  ObserverLibrary */
         return serialize([
-        $this->observerLibrary,
-        $this->localPart,
-        $this->database,
-        $this->addressLibrary,
-        $this->active,
-        $this->hasBeenSetup,
-        $this->domainName,
-        /** @var  Mailbox */
-        $this->mailbox,
-        $this->aliasList,
-        $this->addressId,
-
-        $this->modified,
-        $this->created ,
-        $this->owners ,
-        $this->userLibrary,
-        $this->container]);
+            $this->observerLibrary,
+            $this->localPart,
+            $this->database,
+            $this->addressLibrary,
+            $this->active,
+            $this->hasBeenSetup,
+            $this->domainName,
+            $this->mailbox,
+            $this->aliasList,
+            $this->addressId,
+            $this->modified,
+            $this->created,
+            $this->owners,
+            $this->userLibrary,
+            $this->container]);
     }
 
     /**
@@ -700,21 +699,21 @@ class AddressImpl implements Address, Observer, \Serializable
     {
         $array = unserialize($serialized);
         $this->observerLibrary = $array[0];
-        $this->localPart= $array[1];
-        $this->database= $array[2];
-        $this->addressLibrary= $array[3];
-        $this->active= $array[4];
-        $this->hasBeenSetup= $array[5];
-        $this->domainName= $array[6];
+        $this->localPart = $array[1];
+        $this->database = $array[2];
+        $this->addressLibrary = $array[3];
+        $this->active = $array[4];
+        $this->hasBeenSetup = $array[5];
+        $this->domainName = $array[6];
         /** @var  Mailbox */
-        $this->mailbox= $array[7];
-        $this->aliasList= $array[8];
-        $this->addressId= $array[9];
+        $this->mailbox = $array[7];
+        $this->aliasList = $array[8];
+        $this->addressId = $array[9];
 
-        $this->modified= $array[10];
+        $this->modified = $array[10];
         $this->created = $array[11];
         $this->owners = $array[12];
-        $this->userLibrary= $array[13];
-        $this->container= $array[14];
+        $this->userLibrary = $array[13];
+        $this->container = $array[14];
     }
 }

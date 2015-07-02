@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\mail;
+
 /**
  * Created by PhpStorm.
  * User: budde
@@ -14,24 +15,20 @@ use ChristianBudde\Part\util\Observable;
 use ChristianBudde\Part\util\Observer;
 use PDO;
 
-class AddressLibraryImpl implements AddressLibrary, Observer{
+class AddressLibraryImpl implements AddressLibrary, Observer
+{
 
-    private $db;
     private $domain;
     private $addressList;
     private $domainName;
 
-    private $setupStatement;
-    private $userLibrary;
     private $container;
 
     function __construct(BackendSingletonContainer $container, Domain $domain)
     {
         $this->container = $container;
-        $this->db = $container->getDBInstance();
         $this->domain = $domain;
         $this->domainName = $domain->getDomainName();
-        $this->userLibrary = $container->getUserLibraryInstance();
 
     }
 
@@ -43,8 +40,8 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
     {
         $this->setUpLibrary();
         $a = array();
-        foreach($this->addressList as $k=>$v){
-            if($k == ""){
+        foreach ($this->addressList as $k => $v) {
+            if ($k == "") {
                 continue;
             }
             $a[$k] = $v;
@@ -68,7 +65,7 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      */
     public function hasAddress(Address $address)
     {
-        return array_search($address, $this->addressList, true ) !== false;
+        return array_search($address, $this->addressList, true) !== false;
     }
 
     /**
@@ -80,12 +77,12 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
     {
         $localPart = trim($localPart);
 
-        if($localPart == ''){
+        if ($localPart == '') {
             return null;
         }
 
         $this->setUpLibrary();
-        return isset($this->addressList[$localPart])?$this->addressList[$localPart]:null;
+        return isset($this->addressList[$localPart]) ? $this->addressList[$localPart] : null;
 
     }
 
@@ -96,12 +93,12 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      */
     public function deleteAddress(Address $address)
     {
-        if($address === $this->getCatchallAddress()){
+        if ($address === $this->getCatchallAddress()) {
             $this->deleteCatchallAddress();
             return;
         }
 
-        if(!$this->contains($address)){
+        if (!$this->contains($address)) {
             return;
         }
 
@@ -114,10 +111,10 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      */
     public function createAddress($localPart)
     {
-        if($this->hasAddressWithLocalPart($localPart)){
+        if ($this->hasAddressWithLocalPart($localPart)) {
             return $this->getAddress($localPart);
         }
-        $a = new AddressImpl($this->container, $localPart,  $this);
+        $a = new AddressImpl($this->container, $localPart, $this);
         $a->create();
         $this->addInstance($a);
         return $a;
@@ -137,7 +134,7 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      */
     public function getCatchallAddress()
     {
-        return $this->hasCatchallAddress()?$this->addressList['']:null;
+        return $this->hasCatchallAddress() ? $this->addressList[''] : null;
     }
 
     /**
@@ -145,7 +142,7 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      */
     public function createCatchallAddress()
     {
-        if($this->hasCatchallAddress()){
+        if ($this->hasCatchallAddress()) {
             return $this->getCatchallAddress();
         }
         $address = new AddressImpl($this->container, '', $this);
@@ -159,7 +156,7 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
      */
     public function deleteCatchallAddress()
     {
-        if(!$this->hasCatchallAddress()){
+        if (!$this->hasCatchallAddress()) {
             return;
         }
 
@@ -185,25 +182,25 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
 
     private function setUpLibrary($force = false)
     {
-        if($this->addressList != null && !$force){
+        if ($this->addressList != null && !$force) {
             return;
         }
 
         $this->addressList = array();
-
-        if($this->setupStatement == null){
-            $this->setupStatement = $this->db->getConnection()->prepare("
+        $setupStatement = $this->container
+            ->getDBInstance()
+            ->getConnection()
+            ->prepare("
             SELECT name
             FROM MailAddress
             WHERE
             (mailbox_id IS NULL OR (SELECT COUNT(id) FROM MailMailbox WHERE mailbox_id = id AND MailAddress.id = secondary_address_id) > 0 )
             AND domain = :domain ");
-            $this->setupStatement->bindParam('domain', $this->domainName);
-        }
+        $setupStatement->bindParam('domain', $this->domainName);
 
-        $this->setupStatement->execute();
+        $setupStatement->execute();
 
-        foreach($this->setupStatement->fetchAll(PDO::FETCH_ASSOC) as $row){
+        foreach ($setupStatement->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $a = new AddressImpl($this->container, $row['name'], $this);
             $this->addInstance($a);
         }
@@ -227,17 +224,17 @@ class AddressLibraryImpl implements AddressLibrary, Observer{
 
     public function onChange(Observable $subject, $changeType)
     {
-        if(!($subject instanceof Address) || !$this->contains($subject)){
-         //todo fix
-         return;
+        if (!($subject instanceof Address) || !$this->contains($subject)) {
+            //todo fix
+            return;
         }
 
-        if($changeType == Address::EVENT_DELETE){
+        if ($changeType == Address::EVENT_DELETE) {
             unset($this->addressList[$subject->getLocalPart()]);
             $subject->detachObserver($this);
         }
 
-        if($changeType == Address::EVENT_CHANGE_LOCAL_PART){
+        if ($changeType == Address::EVENT_CHANGE_LOCAL_PART) {
             $oldKey = array_search($subject, $this->addressList, true);
             $this->addressList[$subject->getLocalPart()] = $this->addressList[$oldKey];
             unset($this->addressList[$oldKey]);

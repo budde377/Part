@@ -7,7 +7,7 @@ use ChristianBudde\Part\model\user\UserImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\stub\StubObserverImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 use ChristianBudde\Part\test\util\TruncateOperation;
 use PHPUnit_Extensions_Database_DataSet_IDataSet;
 use PHPUnit_Extensions_Database_DB_IDatabaseConnection;
@@ -20,7 +20,7 @@ use PHPUnit_Extensions_Database_Operation_Factory;
  * Date: 22/07/12
  * Time: 14:35
  */
-class UserImplTest extends CustomDatabaseTestCase
+class UserImplTest extends SerializeCustomDatabaseTestCase
 {
     /** @var $db StubDBImpl */
     private $db;
@@ -34,7 +34,7 @@ class UserImplTest extends CustomDatabaseTestCase
 
     function __construct($dataset = null)
     {
-        parent::__construct(dirname(__FILE__) . '/../mysqlXML/UserImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/UserImplTest.xml', $this->user);
     }
 
 

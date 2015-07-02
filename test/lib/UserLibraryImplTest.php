@@ -10,7 +10,7 @@ use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubConfigImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\stub\StubTypeHandlerLibraryImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -18,7 +18,7 @@ use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
  * Date: 23/07/12
  * Time: 16:49
  */
-class UserLibraryImplTest extends CustomDatabaseTestCase
+class UserLibraryImplTest extends SerializeCustomDatabaseTestCase
 {
 
     /** @var $db StubDBImpl */
@@ -33,7 +33,7 @@ class UserLibraryImplTest extends CustomDatabaseTestCase
 
     function __construct($dataset = null)
     {
-        parent::__construct(dirname(__FILE__) . '/../mysqlXML/UserLibraryImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/UserLibraryImplTest.xml', $this->library);
     }
 
 

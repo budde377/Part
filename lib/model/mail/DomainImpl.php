@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\model\mail;
+
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\controller\json\MailDomainObjectImpl;
@@ -16,7 +17,7 @@ use PDOException;
  * Date: 7/7/14
  * Time: 1:23 PM
  */
-class DomainImpl implements Domain, Observer
+class DomainImpl implements Domain, Observer, \Serializable
 {
     private $observerLibrary;
     private $addressLibrary;
@@ -90,7 +91,7 @@ class DomainImpl implements Domain, Observer
     public function activate()
     {
         $this->setupDomain();
-        if($this->isActive()){
+        if ($this->isActive()) {
             return;
         }
 
@@ -104,7 +105,7 @@ class DomainImpl implements Domain, Observer
     public function deactivate()
     {
         $this->setupDomain();
-        if(!$this->isActive()){
+        if (!$this->isActive()) {
             return;
         }
         $this->active = false;
@@ -173,11 +174,11 @@ class DomainImpl implements Domain, Observer
      */
     public function create($password)
     {
-        if($this->exists()){
+        if ($this->exists()) {
             return true;
         }
 
-        try{
+        try {
             if ($this->createStatement1 == null) {
                 $this->createStatement1 =
                     $this->db
@@ -192,7 +193,7 @@ class DomainImpl implements Domain, Observer
 
             $this->createViews($password);
 
-        } catch (PDOException $e){
+        } catch (PDOException $e) {
             return false;
         }
 
@@ -207,7 +208,7 @@ class DomainImpl implements Domain, Observer
 
         }
 
-        $this->createStatement2->execute(array($this->domain, $this->desc, $this->active?1:0));
+        $this->createStatement2->execute(array($this->domain, $this->desc, $this->active ? 1 : 0));
         $this->setupDomain(true);
         return $this->exists();
     }
@@ -220,11 +221,11 @@ class DomainImpl implements Domain, Observer
     public function delete($password)
     {
 
-        if(!$this->exists()){
+        if (!$this->exists()) {
             return true;
         }
 
-        try{
+        try {
             if ($this->deleteStatement1 == null) {
                 $this->deleteStatement1 =
                     $this->db
@@ -237,10 +238,9 @@ class DomainImpl implements Domain, Observer
 
             $this->createViews($password);
 
-        } catch (PDOException $e){
+        } catch (PDOException $e) {
             return false;
         }
-
 
 
         if ($this->deleteStatement2 == null) {
@@ -253,7 +253,7 @@ class DomainImpl implements Domain, Observer
         }
 
         $success = $this->deleteStatement2->execute();
-        if($success){
+        if ($success) {
             $this->callObservers();
         }
         return $success;
@@ -264,7 +264,7 @@ class DomainImpl implements Domain, Observer
      */
     public function getAddressLibrary()
     {
-        return $this->addressLibrary == null? $this->addressLibrary = new AddressLibraryImpl($this->container, $this,$this->userLibrary, $this->db):$this->addressLibrary;
+        return $this->addressLibrary == null ? $this->addressLibrary = new AddressLibraryImpl($this->container, $this, $this->userLibrary, $this->db) : $this->addressLibrary;
     }
 
     /**
@@ -284,21 +284,21 @@ class DomainImpl implements Domain, Observer
     {
         $this->setupAlias();
 
-        if($this === $domain){
+        if ($this === $domain) {
             return;
         }
 
-        if(!$domain->exists()){
+        if (!$domain->exists()) {
             return;
         }
 
-        if(!$this->library->containsDomain($domain)){
+        if (!$this->library->containsDomain($domain)) {
             return;
         }
 
         $t = $domain->getAliasTarget();
-        while($t != null){
-            if($t === $this){
+        while ($t != null) {
+            if ($t === $this) {
                 return;
             }
             $t = $t->getAliasTarget();
@@ -326,7 +326,7 @@ class DomainImpl implements Domain, Observer
     public function clearAliasTarget()
     {
         $this->setupAlias();
-        if($this->aliasTarget == null){
+        if ($this->aliasTarget == null) {
             return;
         }
         $this->aliasTarget->detachObserver($this);
@@ -383,7 +383,7 @@ class DomainImpl implements Domain, Observer
 
     public function onChange(Observable $subject, $changeType)
     {
-        if($subject !== $this->aliasTarget || $changeType != Domain::EVENT_DELETE){
+        if ($subject !== $this->aliasTarget || $changeType != Domain::EVENT_DELETE) {
             return;
         }
         $this->clearAliasTarget();
@@ -392,12 +392,12 @@ class DomainImpl implements Domain, Observer
 
     private function callObservers()
     {
-       $this->observerLibrary->callObservers(Domain::EVENT_DELETE);
+        $this->observerLibrary->callObservers(Domain::EVENT_DELETE);
     }
 
     private function createViews($password)
     {
-        if($this->createViewsStatement == null){
+        if ($this->createViewsStatement == null) {
             $this->createViewsStatement = $this->db->getMailConnection($password)->prepare("CALL procCreateViews()");
         }
         $this->createViewsStatement->execute();
@@ -405,12 +405,12 @@ class DomainImpl implements Domain, Observer
 
     private function setupAlias($force = false)
     {
-        if($this->aliasHasBeenSetup && !$force){
+        if ($this->aliasHasBeenSetup && !$force) {
             return;
         }
         $this->aliasHasBeenSetup = true;
 
-        if($this->setupDomainStatement == null){
+        if ($this->setupDomainStatement == null) {
             $this->setupDomainStatement = $this->db->getConnection()->prepare("
             SELECT target_domain
             FROM MailDomainAlias
@@ -418,7 +418,7 @@ class DomainImpl implements Domain, Observer
             $this->setupDomainStatement->bindParam('domain', $this->domain);
         }
         $this->setupDomainStatement->execute();
-        if($this->setupDomainStatement->rowCount() == 0){
+        if ($this->setupDomainStatement->rowCount() == 0) {
             return;
         }
 
@@ -430,30 +430,30 @@ class DomainImpl implements Domain, Observer
 
     private function saveChanges()
     {
-        if(!$this->exists()){
+        if (!$this->exists()) {
             return;
         }
-        if($this->saveChangesStatement == null){
+        if ($this->saveChangesStatement == null) {
             $this->saveChangesStatement =
                 $this->db->getConnection()->prepare("UPDATE MailDomain SET active = ?, description= ?, modified = NOW() WHERE `domain`= ?");
         }
 
-        $this->saveChangesStatement->execute(array($this->active?1:0, $this->desc, $this->domain));
+        $this->saveChangesStatement->execute(array($this->active ? 1 : 0, $this->desc, $this->domain));
         $this->setupDomain(true);
 
     }
 
     private function saveAliasChanges()
     {
-        if(!$this->isAliasDomain()){
-            if($this->saveAliasChangesStatement1 == null){
+        if (!$this->isAliasDomain()) {
+            if ($this->saveAliasChangesStatement1 == null) {
                 $this->saveAliasChangesStatement1 = $this->db->getConnection()->prepare("DELETE FROM MailDomainAlias WHERE alias_domain = :domain");
                 $this->saveAliasChangesStatement1->bindParam('domain', $this->domain);
             }
 
             $this->saveAliasChangesStatement1->execute();
         } else {
-            if($this->saveAliasChangesStatement2 == null){
+            if ($this->saveAliasChangesStatement2 == null) {
                 $this->saveAliasChangesStatement2 = $this->db->getConnection()->prepare("
                 INSERT INTO MailDomainAlias (alias_domain, target_domain, created, modified)
                 VALUES (?,?,NOW(), NOW()) ON DUPLICATE KEY UPDATE target_domain = ?, modified = NOW()");
@@ -490,5 +490,60 @@ class DomainImpl implements Domain, Observer
     public function generateTypeHandler()
     {
         return $this->container->getTypeHandlerLibraryInstance()->getMailDomainTypeHandlerInstance($this);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+        return serialize([
+            $this->observerLibrary,
+            $this->addressLibrary,
+            $this->domain,
+            $this->db,
+            $this->library,
+            $this->database,
+            $this->active,
+            $this->desc,
+            $this->aliasTarget,
+            $this->createdTime,
+            $this->modifiedTime,
+            $this->hasBeenSetup,
+            $this->aliasHasBeenSetup,
+            $this->userLibrary,
+            $this->container]);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+        $array = unserialize($serialized);
+        $this->observerLibrary = $array[0];
+        $this->addressLibrary = $array[1];
+        $this->domain = $array[2];
+        $this->db = $array[3];
+        $this->library = $array[4];
+        $this->database = $array[5];
+        $this->active = $array[6];
+        $this->desc = $array[7];
+        $this->aliasTarget = $array[8];
+        $this->createdTime = $array[9];
+        $this->modifiedTime = $array[10];
+        $this->hasBeenSetup = $array[11];
+        $this->aliasHasBeenSetup = $array[12];
+        $this->userLibrary = $array[13];
+        $this->container = $array[14];
     }
 }

@@ -13,9 +13,9 @@ use ChristianBudde\Part\model\user\UserImpl;
 use ChristianBudde\Part\model\user\UserVariablesImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 
-class UserVariablesImplTest extends CustomDatabaseTestCase
+class UserVariablesImplTest extends SerializeCustomDatabaseTestCase
 {
 
     private $db;
@@ -34,7 +34,7 @@ class UserVariablesImplTest extends CustomDatabaseTestCase
 
     function __construct($dataset = null)
     {
-        parent::__construct(dirname(__FILE__) . '/../mysqlXML/UserVariablesImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/UserVariablesImplTest.xml', $this->existingVariables);
     }
 
     public function setUp()

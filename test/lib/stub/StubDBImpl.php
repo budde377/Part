@@ -14,19 +14,21 @@ use PDO;
 class StubDBImpl implements DB,\Serializable
 {
 
+
+
     /**
      * @var $connection PDO
      */
-    private $connection;
+    static $connection;
 
-    private $mailConnection;
+    static $mailConnection;
 
     /**
      * @param PDO $mailConnection
      */
     public function setMailConnection($mailConnection)
     {
-        $this->mailConnection = $mailConnection;
+        self::$mailConnection = $mailConnection;
     }
 
     /**
@@ -34,12 +36,12 @@ class StubDBImpl implements DB,\Serializable
      */
     public function getConnection()
     {
-        return $this->connection;
+        return self::$connection;
     }
 
     public function setConnection(PDO $connection)
     {
-        $this->connection = $connection;
+        self::$connection = $connection;
     }
 
 
@@ -49,7 +51,7 @@ class StubDBImpl implements DB,\Serializable
      */
     public function getMailConnection($password)
     {
-        return $this->connection;
+        return self::$connection;
     }
 
     /**

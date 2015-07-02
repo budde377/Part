@@ -21,7 +21,6 @@ class UserLibraryImpl implements UserLibrary, Observer, \Serializable
     private $container;
     private $userList = [];
     private $database;
-    private $connection;
     /** @var $userListIterator ArrayIterator */
     private $userListIterator;
     /** @var  User */
@@ -32,7 +31,6 @@ class UserLibraryImpl implements UserLibrary, Observer, \Serializable
     {
         $this->container = $container;
         $this->database = $container->getDBInstance();
-        $this->connection = $this->database->getConnection();
         $this->initializeLibrary();
         $this->setUpIterator();
         $this->setUpUserLoggedIn();
@@ -42,7 +40,7 @@ class UserLibraryImpl implements UserLibrary, Observer, \Serializable
     private function initializeLibrary()
     {
         $query = "SELECT username FROM User";
-        foreach ($this->connection->query($query) as $row) {
+        foreach ($this->container->getDBInstance()->getConnection()->query($query) as $row) {
             $user = new UserImpl($this->container, $row['username']);
             $user->attachObserver($this);
             $this->userList[$user->getUsername()] = $user;
@@ -75,7 +73,7 @@ class UserLibraryImpl implements UserLibrary, Observer, \Serializable
         ) {
             return false;
         }
-        $this->connection->beginTransaction();
+        $this->container->getDBInstance()->getConnection()->beginTransaction();
         $children = $this->getChildren($user);
         $success = true;
         foreach ($children as $child) {
@@ -85,10 +83,10 @@ class UserLibraryImpl implements UserLibrary, Observer, \Serializable
         $success = $success && $user->delete();
 
         if ($success) {
-            $this->connection->commit();
+            $this->container->getDBInstance()->getConnection()->commit();
             $this->setUpIterator();
         } else {
-            $this->connection->rollBack();
+            $this->container->getDBInstance()->getConnection()->rollBack();
         }
         return $success;
     }
@@ -342,7 +340,10 @@ class UserLibraryImpl implements UserLibrary, Observer, \Serializable
      */
     public function serialize()
     {
-        return serialize([$this->container, $this->userList, $this->database, $this->connection]);
+        return serialize([
+            $this->container,
+            $this->userList,
+            $this->database]);
     }
 
     /**
@@ -360,6 +361,5 @@ class UserLibraryImpl implements UserLibrary, Observer, \Serializable
         $this->container = $array[0];
         $this->userList = $array[1];
         $this->database = $array[2];
-        $this->connection = $array[3];
     }
 }

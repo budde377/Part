@@ -16,9 +16,9 @@ use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubConfigImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\stub\StubObserverImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 
-class MailAddressImplTest extends CustomDatabaseTestCase{
+class MailAddressImplTest extends SerializeCustomDatabaseTestCase{
 
     private $config;
     /** @var  AddressLibrary */
@@ -45,7 +45,7 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__).'/../mysqlXML/MailAddressImplTest.xml');
+        parent::__construct(dirname(__FILE__).'/../mysqlXML/MailAddressImplTest.xml', $this->address);
     }
 
     protected function setUp()
@@ -562,10 +562,6 @@ class MailAddressImplTest extends CustomDatabaseTestCase{
         $this->assertEquals($o->jsonSerialize(), $this->address->jsonSerialize());
     }
 
-    public function tearDown(){
-        parent::tearDown();
-        serialize($this->address);
-    }
     /**
      * @param string $string
      * @return AddressImpl
