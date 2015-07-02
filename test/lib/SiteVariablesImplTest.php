@@ -11,9 +11,9 @@ namespace ChristianBudde\Part\test;
 
 use ChristianBudde\Part\model\site\SiteVariablesImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 
-class SiteVariablesImplTest extends CustomDatabaseTestCase
+class SiteVariablesImplTest extends SerializeCustomDatabaseTestCase
 {
 
     private $db;
@@ -22,7 +22,7 @@ class SiteVariablesImplTest extends CustomDatabaseTestCase
 
     function __construct($dataset = null)
     {
-        parent::__construct(dirname(__FILE__) . '/../mysqlXML/SiteVariablesImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/SiteVariablesImplTest.xml', $this->existingVariables);
     }
 
 

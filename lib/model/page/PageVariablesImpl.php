@@ -11,27 +11,20 @@ namespace ChristianBudde\Part\model\page;
 use ChristianBudde\Part\model\VariablesImpl;
 use ChristianBudde\Part\util\db\DB;
 
-class PageVariablesImpl extends VariablesImpl
+class PageVariablesImpl extends VariablesImpl implements \Serializable
 {
 
     private $page_id;
     private $page;
+    private $database;
 
     function __construct(DB $database, Page $page)
     {
         $this->page_id = $page->getID();
         $this->page = $page;
-        $connection = $database->getConnection();
-        $preparedUpdateValue = $connection->prepare("UPDATE PageVariables SET `value`= :value WHERE page_id = :page_id AND `key` = :key");
-        $preparedUpdateValue->bindParam('page_id', $this->page_id);
-        $preparedSetValue = $connection->prepare("INSERT INTO PageVariables (`key`, `value`, page_id) VALUES (:key, :value, :page_id )");
-        $preparedSetValue->bindParam('page_id', $this->page_id);
-        $preparedRemoveKey = $connection->prepare("DELETE FROM PageVariables WHERE page_id = :page_id AND `key` = :key");
-        $preparedRemoveKey->bindParam('page_id', $this->page_id);
-        $prepInitialize = $connection->prepare("SELECT `key`,`value` FROM PageVariables WHERE page_id = :page_id");
-        $prepInitialize->bindParam('page_id', $this->page_id);
+        $this->database = $database;
 
-        parent::__construct($prepInitialize, $preparedRemoveKey, $preparedSetValue, $preparedUpdateValue);
+        $this->setupVariable();
     }
 
     public function getValue($key)
@@ -78,5 +71,47 @@ class PageVariablesImpl extends VariablesImpl
         $this->page_id = $this->page->getID();
     }
 
+    private function setupVariable()
+    {
+        $connection = $this->database->getConnection();
+        $this->preparedUpdateValue= $connection->prepare("UPDATE PageVariables SET `value`= :value WHERE page_id = :page_id AND `key` = :key");
+        $this->preparedUpdateValue->bindParam('page_id', $this->page_id);
+        $this->preparedSetValue = $connection->prepare("INSERT INTO PageVariables (`key`, `value`, page_id) VALUES (:key, :value, :page_id )");
+        $this->preparedSetValue->bindParam('page_id', $this->page_id);
+        $this->preparedRemoveKey = $connection->prepare("DELETE FROM PageVariables WHERE page_id = :page_id AND `key` = :key");
+        $this->preparedRemoveKey->bindParam('page_id', $this->page_id);
+        $this->preparedInitialize= $connection->prepare("SELECT `key`,`value` FROM PageVariables WHERE page_id = :page_id");
+        $this->preparedInitialize->bindParam('page_id', $this->page_id);
 
+    }
+
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+        return serialize([$this->database, $this->page, $this->page_id]);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+        $array = unserialize($serialized);
+        $this->database = $array[0];
+        $this->page = $array[1];
+        $this->page_id = $array[2];
+        $this->setupVariable();
+    }
 }

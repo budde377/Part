@@ -11,7 +11,7 @@ use ChristianBudde\Part\model\ContentLibraryImpl;
  * Date: 3/3/14
  * Time: 10:53 PM
  */
-class SiteContentLibraryImpl extends ContentLibraryImpl implements SiteContentLibrary
+class SiteContentLibraryImpl extends ContentLibraryImpl implements SiteContentLibrary,\Serializable
 {
 
 
@@ -21,8 +21,21 @@ class SiteContentLibraryImpl extends ContentLibraryImpl implements SiteContentLi
     function __construct(BackendSingletonContainer $container)
     {
         $this->container = $container;
+        $this->setup();
+    }
 
-        $connection = $container->getDBInstance()->getConnection();
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        return $this->container->getTypeHandlerLibraryInstance()->getSiteContentLibraryTypeHandlerInstance($this);
+    }
+
+    private function setup()
+    {
+        $connection = $this->container->getDBInstance()->getConnection();
 
         $listContentStm = $connection->prepare("SELECT DISTINCT id FROM SiteContent");
         $searchLibStm = $connection->prepare("
@@ -35,12 +48,29 @@ class SiteContentLibraryImpl extends ContentLibraryImpl implements SiteContentLi
         });
     }
 
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+        return serialize($this->container);
+    }
 
     /**
-     * @return TypeHandler
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
      */
-    public function generateTypeHandler()
+    public function unserialize($serialized)
     {
-        return $this->container->getTypeHandlerLibraryInstance()->getSiteContentLibraryTypeHandlerInstance($this);
+        $this->container = unserialize($serialized);
+        $this->setup();
     }
 }

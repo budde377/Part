@@ -16,11 +16,11 @@ use ChristianBudde\Part\test\stub\StubConfigImpl;
 use ChristianBudde\Part\test\stub\StubMailDomainLibraryImpl;
 use ChristianBudde\Part\test\stub\StubObserverImpl;
 use ChristianBudde\Part\test\stub\StubUserLibraryImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 use ChristianBudde\Part\util\db\DB;
 use ChristianBudde\Part\util\db\MySQLDBImpl;
 
-class MailDomainImplTest extends CustomDatabaseTestCase
+class MailDomainImplTest extends SerializeCustomDatabaseTestCase
 {
 
     /** @var  DomainImpl */
@@ -50,7 +50,7 @@ class MailDomainImplTest extends CustomDatabaseTestCase
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__) . '/../mysqlXML/MailDomainImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/MailDomainImplTest.xml', $this->domain);
     }
 
 

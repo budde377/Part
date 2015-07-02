@@ -12,10 +12,10 @@ use ChristianBudde\Part\model\site\SiteContentLibraryImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\stub\StubSiteImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 use ChristianBudde\Part\util\db\DB;
 
-class SiteContentLibraryImplTest extends CustomDatabaseTestCase
+class SiteContentLibraryImplTest extends SerializeCustomDatabaseTestCase
 {
 
 
@@ -26,7 +26,7 @@ class SiteContentLibraryImplTest extends CustomDatabaseTestCase
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__) . '/../mysqlXML/SiteContentLibraryImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/SiteContentLibraryImplTest.xml', $this->existingContentLibrary);
 
     }
 

@@ -16,14 +16,14 @@ use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubCurrentPageStrategyImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\stub\StubPageImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 use ChristianBudde\Part\test\util\TruncateOperation;
 use PHPUnit_Extensions_Database_DataSet_IDataSet;
 use PHPUnit_Extensions_Database_DB_IDatabaseConnection;
 use PHPUnit_Extensions_Database_Operation_Composite;
 use PHPUnit_Extensions_Database_Operation_Factory;
 
-class PageOrderImplTest extends CustomDatabaseTestCase
+class PageOrderImplTest extends SerializeCustomDatabaseTestCase
 {
 
 
@@ -38,7 +38,7 @@ class PageOrderImplTest extends CustomDatabaseTestCase
     function __construct()
     {
         $fn = dirname(__FILE__) . '/../mysqlXML/PageOrderImplTest.xml';
-        parent::__construct($fn);
+        parent::__construct($fn, $this->pageOrder);
     }
 
 

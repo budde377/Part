@@ -16,10 +16,10 @@ use ChristianBudde\Part\model\page\PageContentImpl;
 use ChristianBudde\Part\model\page\PageOrderImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 use ChristianBudde\Part\util\db\DB;
 
-class PageContentImplTest extends CustomDatabaseTestCase
+class PageContentImplTest extends SerializeCustomDatabaseTestCase
 {
 
     /** @var  DB */
@@ -42,7 +42,7 @@ class PageContentImplTest extends CustomDatabaseTestCase
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__) . '/../mysqlXML/PageContentImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/PageContentImplTest.xml', $this->existingContent);
     }
 
 

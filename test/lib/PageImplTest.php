@@ -13,10 +13,10 @@ use ChristianBudde\Part\model\page\PageImpl;
 use ChristianBudde\Part\model\page\PageOrderImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 use Exception;
 
-class PageImplTest extends CustomDatabaseTestCase
+class PageImplTest extends SerializeCustomDatabaseTestCase
 {
 
     /** @var $db StubDBImpl */
@@ -32,7 +32,7 @@ class PageImplTest extends CustomDatabaseTestCase
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__) . '/../mysqlXML/PageImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/PageImplTest.xml', $this->testPage);
     }
 
 

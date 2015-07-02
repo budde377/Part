@@ -7,7 +7,7 @@ use ChristianBudde\Part\model\site\SiteImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
 use ChristianBudde\Part\test\stub\StubSiteImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 use ChristianBudde\Part\util\db\DB;
 
 /**
@@ -17,7 +17,7 @@ use ChristianBudde\Part\util\db\DB;
  * Time: 11:41 AM
  * To change this template use File | Settings | File Templates.
  */
-class SiteContentImplTest extends CustomDatabaseTestCase
+class SiteContentImplTest extends SerializeCustomDatabaseTestCase
 {
     public $existingId2;
 
@@ -36,7 +36,7 @@ class SiteContentImplTest extends CustomDatabaseTestCase
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__) . '/../mysqlXML/SiteContentImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/SiteContentImplTest.xml', $this->existingContent);
     }
 
 

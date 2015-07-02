@@ -3,8 +3,8 @@ namespace ChristianBudde\Part\test;
 
 use ChristianBudde\Part\Config;
 use ChristianBudde\Part\ConfigImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
 use ChristianBudde\Part\test\util\MailMySQLConstantsImpl;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 use ChristianBudde\Part\util\db\MySQLDBImpl;
 use ChristianBudde\Part\util\file\File;
 use ChristianBudde\Part\util\file\FileImpl;
@@ -18,7 +18,7 @@ use SimpleXMLElement;
  * Time: 7:30 PM
  * To change this template use File | Settings | File Templates.
  */
-class MySQLDBImplTest extends CustomDatabaseTestCase
+class MySQLDBImplTest extends SerializeCustomDatabaseTestCase
 {
 
     private $host;
@@ -41,6 +41,12 @@ class MySQLDBImplTest extends CustomDatabaseTestCase
     private $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
     private $file;
     private $folderPath2;
+
+    function __construct()
+    {
+        parent::__construct(null, $this->database);
+    }
+
 
     public function setUp()
     {

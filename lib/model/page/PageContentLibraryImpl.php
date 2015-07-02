@@ -11,7 +11,7 @@ use ChristianBudde\Part\model\ContentLibraryImpl;
  * Date: 3/3/14
  * Time: 10:10 PM
  */
-class PageContentLibraryImpl extends ContentLibraryImpl implements PageContentLibrary
+class PageContentLibraryImpl extends ContentLibraryImpl implements PageContentLibrary, \Serializable
 {
     private $page;
     private $page_id;
@@ -23,23 +23,7 @@ class PageContentLibraryImpl extends ContentLibraryImpl implements PageContentLi
         $this->page = $page;
         $this->page_id = $page->getID();
 
-        $connection = $container->getDBInstance()->getConnection();
-
-        $listContentStm = $connection->prepare("
-          SELECT DISTINCT id
-          FROM PageContent
-          WHERE page_id = :page_id");
-        $listContentStm->bindParam(":page_id", $this->page_id);
-
-        $searchLibStm = $connection->prepare("
-          SELECT DISTINCT id
-          FROM PageContent
-          WHERE page_id = :page_id AND content LIKE :like AND time >= FROM_UNIXTIME(:time)");
-        $searchLibStm->bindParam(":page_id", $this->page_id);
-
-        parent::__construct($listContentStm, $searchLibStm, function ($id) {
-            return new PageContentImpl($this->container, $this->page, $id);
-        });
+        $this->setup();
     }
 
 
@@ -78,4 +62,53 @@ class PageContentLibraryImpl extends ContentLibraryImpl implements PageContentLi
     }
 
 
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+        return serialize([$this->page, $this->page_id, $this->container]);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+        $array = unserialize($serialized);
+        $this->page = $array[0];
+        $this->page_id = $array[1];
+        $this->container = $array[2];
+        $this->setup();
+    }
+
+    private function setup()
+    {
+        $connection = $this->container->getDBInstance()->getConnection();
+
+        $listContentStm = $connection->prepare("
+          SELECT DISTINCT id
+          FROM PageContent
+          WHERE page_id = :page_id");
+        $listContentStm->bindParam(":page_id", $this->page_id);
+
+        $searchLibStm = $connection->prepare("
+          SELECT DISTINCT id
+          FROM PageContent
+          WHERE page_id = :page_id AND content LIKE :like AND time >= FROM_UNIXTIME(:time)");
+        $searchLibStm->bindParam(":page_id", $this->page_id);
+
+        parent::__construct($listContentStm, $searchLibStm, function ($id) {
+            return new PageContentImpl($this->container, $this->page, $id);
+        });
+    }
 }

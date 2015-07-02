@@ -20,20 +20,18 @@ class PageOrderImpl implements PageOrder
 {
 
     private $database;
-    private $connection;
 
     private $inactivePages = [];
     private $activePages = [];
     private $pageOrder = [];
 
-    private $backendContainer;
+    private $container;
 
 
     public function __construct(BackendSingletonContainer $container)
     {
         $this->database = $container->getDBInstance();
-        $this->connection = $this->database->getConnection();
-        $this->backendContainer = $container;
+        $this->container = $container;
         $this->initializeInactivePageOrder();
         $this->initializeActivePageOrder();
     }
@@ -41,8 +39,7 @@ class PageOrderImpl implements PageOrder
 
     private function initializeActivePageOrder()
     {
-        $statement = $this
-            ->connection
+        $statement = $this->container->getDBInstance()->getConnection()
             ->query("
 SELECT Page.page_id, Page.title, Page.template, Page.alias,UNIX_TIMESTAMP(Page.last_modified) as last_modified, Page.hidden,PageOrder.parent_id
 FROM Page INNER JOIN PageOrder ON Page.page_id = PageOrder.page_id
@@ -58,8 +55,7 @@ ORDER BY parent_id,order_no");
     private function initializeInactivePageOrder()
     {
 
-        $statement = $this
-            ->connection
+        $statement = $this->container->getDBInstance()->getConnection()
             ->query("SELECT *,UNIX_TIMESTAMP(Page.last_modified) as last_modified FROM Page WHERE Page.page_id NOT IN (SELECT page_id FROM PageOrder)");
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $page = $this->createPageInstance($row['page_id'], $row['title'], $row['template'], $row['alias'], $row['last_modified'], $row['hidden']);
@@ -71,7 +67,7 @@ ORDER BY parent_id,order_no");
 
     private function createPageInstance($id, $title, $template, $alias, $lastMod, $hidden)
     {
-        $page = new PageImpl($this->backendContainer, $this, $id, $title, $template, $alias, $lastMod, $hidden);
+        $page = new PageImpl($this->container, $this, $id, $title, $template, $alias, $lastMod, $hidden);
         return $page;
 
     }
@@ -141,9 +137,9 @@ ORDER BY parent_id,order_no");
         } else {
             $this->activatePageId($page->getID());
         }
-        $this->connection->beginTransaction();
+        $this->container->getDBInstance()->getConnection()->beginTransaction();
         $this->insertPageID($page->getID(), $place, $parentPageId);
-        $this->connection->commit();
+        $this->container->getDBInstance()->getConnection()->commit();
         return true;
     }
 
@@ -195,11 +191,11 @@ ORDER BY parent_id,order_no");
         }
 
         try{
-            $page = new PageImpl($this->backendContainer, $this, $id,$title, $template, $alias, 0, $hidden);
+            $page = new PageImpl($this->container, $this, $id,$title, $template, $alias, 0, $hidden);
         } catch (MalformedParameterException $e){
             return false;
         }
-        $createStm = $this->connection->prepare("
+        $createStm = $this->container->getDBInstance()->getConnection()->prepare("
             INSERT INTO Page (page_id,template,title,alias,hidden)
             VALUES (:page_id,:template,:title,:alias,:hidden)");
         try {
@@ -228,7 +224,7 @@ ORDER BY parent_id,order_no");
         if (!$this->isActive($page)) {
             return;
         }
-        $this->connection->prepare("DELETE FROM PageOrder WHERE page_id = :id OR parent_id = :id")->execute(['id'=>$page->getID()]);
+        $this->container->getDBInstance()->getConnection()->prepare("DELETE FROM PageOrder WHERE page_id = :id OR parent_id = :id")->execute(['id'=>$page->getID()]);
         $this->removeIDFromSubLists($page->getID());
         $this->deactivatePageId($page->getID());
 
@@ -265,7 +261,7 @@ ORDER BY parent_id,order_no");
             return false;
         }
 
-        $deleteStm = $this->connection->prepare("DELETE FROM Page WHERE page_id=?");
+        $deleteStm = $this->container->getDBInstance()->getConnection()->prepare("DELETE FROM Page WHERE page_id=?");
         $deleteStm->execute([$page->getID()]);
         if (!$deleteStm->rowCount() > 0) {
             return false;
@@ -333,10 +329,10 @@ ORDER BY parent_id,order_no");
             $this->insertPageID($order[$place], $place + 1, $parentId);
         }
         if (empty($parentId)) {
-            $stm = $this->connection->prepare("INSERT INTO PageOrder (page_id, order_no, parent_id) VALUES (:page_id, :order_no, NULL) ON DUPLICATE KEY UPDATE order_no = :order_no, parent_id = NULL");
+            $stm = $this->container->getDBInstance()->getConnection()->prepare("INSERT INTO PageOrder (page_id, order_no, parent_id) VALUES (:page_id, :order_no, NULL) ON DUPLICATE KEY UPDATE order_no = :order_no, parent_id = NULL");
             $stm->execute(['page_id' => $pageId, 'order_no' => $place]);
         } else {
-            $stm = $this->connection->prepare("INSERT INTO PageOrder (page_id, order_no, parent_id) VALUES (:page_id, :order_no, :parent_id) ON DUPLICATE KEY UPDATE order_no = :order_no, parent_id = :parent_id ");
+            $stm = $this->container->getDBInstance()->getConnection()->prepare("INSERT INTO PageOrder (page_id, order_no, parent_id) VALUES (:page_id, :order_no, :parent_id) ON DUPLICATE KEY UPDATE order_no = :order_no, parent_id = :parent_id ");
             $stm->execute(['page_id' => $pageId, 'order_no' => $place, 'parent_id' => $parentId]);
         }
         $this->pageOrder[$parentId][$place] = $pageId;
@@ -407,7 +403,7 @@ ORDER BY parent_id,order_no");
      */
     public function getCurrentPage()
     {
-        return $this->backendContainer->getCurrentPageStrategyInstance()->getCurrentPage();
+        return $this->container->getCurrentPageStrategyInstance()->getCurrentPage();
     }
 
 
@@ -437,7 +433,7 @@ ORDER BY parent_id,order_no");
      */
     public function generateTypeHandler()
     {
-        return $this->backendContainer->getTypeHandlerLibraryInstance()->getPageOrderTypeHandlerInstance($this);
+        return $this->container->getTypeHandlerLibraryInstance()->getPageOrderTypeHandlerInstance($this);
 
     }
 
@@ -454,7 +450,7 @@ ORDER BY parent_id,order_no");
             $this->activePages[$page_id] = $this->activePages[$page->getID()];
             unset($this->activePages[$page->getID()]);
         }
-        $updateIDStm = $this->connection->prepare("UPDATE Page SET page_id = ? WHERE page_id = ?");
+        $updateIDStm = $this->container->getDBInstance()->getConnection()->prepare("UPDATE Page SET page_id = ? WHERE page_id = ?");
         $updateIDStm->execute([$page_id, $page->getID()]);
 
         return true;

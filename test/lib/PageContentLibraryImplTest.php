@@ -13,10 +13,10 @@ use ChristianBudde\Part\model\page\PageContentLibraryImpl;
 use ChristianBudde\Part\model\page\PageOrderImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 use ChristianBudde\Part\util\db\DB;
 
-class PageContentLibraryImplTest extends CustomDatabaseTestCase
+class PageContentLibraryImplTest extends SerializeCustomDatabaseTestCase
 {
 
     /** @var  DB */
@@ -32,7 +32,7 @@ class PageContentLibraryImplTest extends CustomDatabaseTestCase
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__) . '/../mysqlXML/PageContentImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/PageContentImplTest.xml', $this->existingContentLibrary);
 
     }
 

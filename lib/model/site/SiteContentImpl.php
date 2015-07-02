@@ -13,18 +13,43 @@ use ChristianBudde\Part\model\ContentImpl;
  * Date: 10/23/13
  * Time: 12:54 PM
  */
-class SiteContentImpl extends ContentImpl implements SiteContent
+class SiteContentImpl extends ContentImpl implements SiteContent, \Serializable
 {
 
     private $container;
 
 
-    public function __construct(BackendSingletonContainer $container, $id = "")
+    public function __construct(BackendSingletonContainer $container, $content_id = "")
     {
-        $connection = $container->getDBInstance()->getConnection();
         $this->container = $container;
+        $this->content_id = $content_id;
+        $this->setup();
+    }
+
+
+    /**
+     * Serializes the object to an instance of JSONObject.
+     * @return Object
+     */
+    public function jsonObjectSerialize()
+    {
+        return new SiteContentObjectImpl($this);
+    }
+
+    /**
+     * @return TypeHandler
+     */
+    public function generateTypeHandler()
+    {
+        return $this->container->getTypeHandlerLibraryInstance()->getSiteContentTypeHandlerInstance($this);
+    }
+
+    private function setup()
+    {
+        $connection = $this->container->getDBInstance()->getConnection();
+
         parent::__construct(
-            $id,
+            $this->content_id,
             function () {
                 return $this->container->getSiteInstance()->modify();
             },
@@ -56,21 +81,31 @@ class SiteContentImpl extends ContentImpl implements SiteContent
 
     }
 
-
     /**
-     * Serializes the object to an instance of JSONObject.
-     * @return Object
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
      */
-    public function jsonObjectSerialize()
+    public function serialize()
     {
-        return new SiteContentObjectImpl($this);
+        return serialize([$this->container, $this->content_id]);
     }
 
     /**
-     * @return TypeHandler
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
      */
-    public function generateTypeHandler()
+    public function unserialize($serialized)
     {
-        return $this->container->getTypeHandlerLibraryInstance()->getSiteContentTypeHandlerInstance($this);
+        $array = unserialize($serialized);
+        $this->container = $array[0];
+        $this->content_id = $array[1];
+        $this->setup();
     }
 }

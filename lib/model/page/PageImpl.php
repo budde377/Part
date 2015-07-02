@@ -17,25 +17,18 @@ use ChristianBudde\Part\model\Variables;
  * Time: 9:15 PM
  * To change this template use File | Settings | File Templates.
  */
-class PageImpl implements Page
+class PageImpl implements Page, \Serializable
 {
 
     private $page_id;
     private $title = '';
     private $template = '';
     private $alias = '';
-
     private $lastModified = -1;
-
     private $hidden = false;
-
     private $database;
-    private $connection;
-
     private $contentLibrary;
     private $variables;
-
-
     private $container;
     private $pageOrder;
 
@@ -52,7 +45,7 @@ class PageImpl implements Page
      */
     public function __construct(BackendSingletonContainer $container, PageOrderImpl $pageOrder, $id, $title, $template, $alias, $lastModified, $hidden)
     {
-        if(!$this->validID($id)){
+        if (!$this->validID($id)) {
             throw new MalformedParameterException('RegEx[a-zA-Z0-9-_]+', 2);
         }
 
@@ -66,7 +59,6 @@ class PageImpl implements Page
         $this->hidden = $hidden;
         $this->container = $container;
         $this->database = $database;
-        $this->connection = $database->getConnection();
 
     }
 
@@ -121,7 +113,7 @@ class PageImpl implements Page
             return false;
         }
 
-        if(!$this->pageOrder->changeId($this, $page_id)){
+        if (!$this->pageOrder->changeId($this, $page_id)) {
             return false;
         }
 
@@ -136,7 +128,7 @@ class PageImpl implements Page
     public function setTitle($title)
     {
 
-        $updateTitleStm = $this->connection->prepare("UPDATE Page SET title = ? WHERE page_id = ?");
+        $updateTitleStm = $this->container->getDBInstance()->getConnection()->prepare("UPDATE Page SET title = ? WHERE page_id = ?");
         $updateTitleStm->bindParam(1, $this->title);
         $updateTitleStm->bindParam(2, $this->page_id);
         $this->title = $title;
@@ -150,7 +142,7 @@ class PageImpl implements Page
      */
     public function setTemplate($template)
     {
-        $updateTemplateStm = $this->connection->prepare("UPDATE Page SET template = :template WHERE page_id = :page_id");
+        $updateTemplateStm = $this->container->getDBInstance()->getConnection()->prepare("UPDATE Page SET template = :template WHERE page_id = :page_id");
         $updateTemplateStm->bindParam(":template", $this->template);
         $updateTemplateStm->bindParam(":page_id", $this->page_id);
         $this->template = $template;
@@ -168,7 +160,7 @@ class PageImpl implements Page
             return false;
         }
 
-        $updateAliasStm = $this->connection->prepare("UPDATE Page SET alias = :alias WHERE page_id = :page_id");
+        $updateAliasStm = $this->container->getDBInstance()->getConnection()->prepare("UPDATE Page SET alias = :alias WHERE page_id = :page_id");
         $updateAliasStm->bindParam(":alias", $this->alias);
         $updateAliasStm->bindParam(":page_id", $this->page_id);
         $this->alias = $alias;
@@ -190,7 +182,7 @@ class PageImpl implements Page
     private function IDExists($id)
     {
 
-        $existsStm = $this->connection->prepare("SELECT *, UNIX_TIMESTAMP(last_modified) AS last_modified FROM Page WHERE page_id=?");
+        $existsStm = $this->container->getDBInstance()->getConnection()->prepare("SELECT *, UNIX_TIMESTAMP(last_modified) AS last_modified FROM Page WHERE page_id=?");
         $existsStm->execute(array($id));
         return $existsStm->rowCount() > 0;
     }
@@ -224,7 +216,6 @@ class PageImpl implements Page
     {
         return preg_match('/^[a-z0-9-_]+$/i', $id);
     }
-
 
 
     /**
@@ -274,7 +265,7 @@ class PageImpl implements Page
         if ($this->isHidden())
             return;
 
-        $updateHiddenStm = $this->connection->prepare("UPDATE Page SET hidden=? WHERE page_id = ?");
+        $updateHiddenStm = $this->container->getDBInstance()->getConnection()->prepare("UPDATE Page SET hidden=? WHERE page_id = ?");
         $updateHiddenStm->bindParam(1, $this->hidden);
         $updateHiddenStm->bindParam(2, $this->page_id);
         $this->hidden = true;
@@ -291,7 +282,7 @@ class PageImpl implements Page
         if (!$this->isHidden())
             return;
 
-        $updateHiddenStm = $this->connection->prepare("UPDATE Page SET hidden=? WHERE page_id = ?");
+        $updateHiddenStm = $this->container->getDBInstance()->getConnection()->prepare("UPDATE Page SET hidden=? WHERE page_id = ?");
         $updateHiddenStm->bindParam(1, $this->hidden);
         $updateHiddenStm->bindParam(2, $this->page_id);
         $this->hidden = false;
@@ -324,7 +315,7 @@ class PageImpl implements Page
      */
     public function modify()
     {
-        $updLastModStm = $this->connection->prepare("UPDATE Page SET last_modified=FROM_UNIXTIME(?) WHERE page_id=?");
+        $updLastModStm = $this->container->getDBInstance()->getConnection()->prepare("UPDATE Page SET last_modified=FROM_UNIXTIME(?) WHERE page_id=?");
         $updLastModStm->bindParam(1, $this->lastModified);
         $updLastModStm->bindParam(2, $this->page_id);
         $this->lastModified = time();
@@ -379,5 +370,56 @@ class PageImpl implements Page
     public function generateTypeHandler()
     {
         return $this->container->getTypeHandlerLibraryInstance()->getPageTypeHandlerInstance($this);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+
+
+        return serialize([
+            $this->page_id,
+            $this->title,
+            $this->template,
+            $this->alias,
+            $this->lastModified,
+            $this->hidden,
+            $this->database,
+            $this->contentLibrary,
+            $this->variables,
+            $this->container,
+            $this->pageOrder
+        ]);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+        $array = unserialize($serialized);
+
+        $this->page_id = $array[0];
+        $this->title = $array[1];
+        $this->template = $array[2];
+        $this->alias = $array[3];
+        $this->lastModified = $array[4];
+        $this->hidden = $array[5];
+        $this->database = $array[6];
+        $this->contentLibrary = $array[7];
+        $this->variables = $array[8];
+        $this->container = $array[9];
+        $this->pageOrder = $array[10];
     }
 }

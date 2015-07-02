@@ -10,9 +10,9 @@ namespace ChristianBudde\Part\test;
 use ChristianBudde\Part\model\site\SiteImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\test\stub\StubDBImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\test\util\SerializeCustomDatabaseTestCase;
 
-class SiteImplTest extends CustomDatabaseTestCase
+class SiteImplTest extends SerializeCustomDatabaseTestCase
 {
 
 
@@ -24,7 +24,7 @@ class SiteImplTest extends CustomDatabaseTestCase
 
     function __construct()
     {
-        parent::__construct(dirname(__FILE__) . '/../mysqlXML/SiteImplTest.xml');
+        parent::__construct(dirname(__FILE__) . '/../mysqlXML/SiteImplTest.xml', $this->site);
     }
 
 
