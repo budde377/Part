@@ -2,189 +2,237 @@ part of user_settings;
 
 String idFromAnchor(AnchorElement val) => val.href.substring(val.href.lastIndexOf("/") + 1);
 
-class UserSettingsJSONPageOrder implements PageOrder {
+class UserSettingsJSONPageOrder extends PageOrder {
 
-  final PageOrder _pageOrder;
+  PageOrder _page_order;
+  List<Page> _pages = [];
+  Map<String, List<String>> _order = {};
+  Iterable<String> _inactive = [];
+  String _current;
+
   static final UserSettingsJSONPageOrder _cache = new UserSettingsJSONPageOrder._internal(querySelector("#ActivePageList"), querySelector("#InactivePageList"));
 
   factory UserSettingsJSONPageOrder() => _cache;
 
-  UserSettingsJSONPageOrder._internal(UListElement activePageList, UListElement inactivePageList) : _pageOrder = new AJAXPageOrder(_listToPageOrder(activePageList), _listToPages(inactivePageList), (() {
-    var v;
-    return (v = activePageList.querySelector('li.current')) == null ?
-    ((v = inactivePageList.querySelector('li.current')) == null ? null : v.dataset["id"]) : v.dataset["id"];
-  })());
+  UserSettingsJSONPageOrder._internal(UListElement activePageList, UListElement inactivePageList){
+    _build_page_order(activePageList, inactivePageList);
+    _page_order = new AJAXPageOrder(_pages, _order, _inactive, _current);
+  }
 
+  void _build_page_order(UListElement activePageList, UListElement inactivePageList) {
+    _inactive = inactivePageList.children.map(_element_to_object).where((element) => element != null).map((Page p) => p.id);
+    _order[null] = _recursive_build_order(activePageList);
+  }
 
-  static Map<String, List<Page>> _listToPageOrder(UListElement list) {
-    var returnMap = {
-    };
-    var recursiveMapBuilder;
-    recursiveMapBuilder = (UListElement list, [String parent]) {
-      var l = _listToPages(list);
-      if (l.length == 0) {
+  List<String> _recursive_build_order(UListElement uListElement) {
+    if (uListElement == null) {
+      return [];
+    }
+    var list = [];
+    uListElement.children.forEach((LIElement li) {
+      var page = _element_to_object(li);
+      if (page == null) {
         return;
       }
-      returnMap[parent] = l;
-      list.children.forEach((LIElement e) {
-        if (e.dataset.containsKey("id")) {
-          recursiveMapBuilder(e.querySelector('ul'), e.dataset["id"]);
-        }
-      });
-    };
-    recursiveMapBuilder(list);
-
-    return returnMap;
-  }
-
-  static List<Page> _listToPages(UListElement list) {
-    var lis = list.children.where((Element e) => !e.classes.contains('emptyListInfo'));
-    var returnList = <Page>[];
-    lis.forEach((LIElement li) {
-      var id = li.dataset["id"];
-      var title = li.dataset["title"];
-      var template = li.dataset["template"];
-      var alias = li.dataset["alias"];
-      var hidden = li.dataset["hidden"] == "true";
-      var page = new AJAXPage(id, title, template, alias, hidden);
-
-      returnList.add(page);
+      list.add(page.id);
+      _order[page.id] = _recursive_build_order(li.querySelector('ul'));
     });
-    return returnList;
+
+    return list;
   }
 
+  Page _element_to_object(LIElement li) {
+    if (!li.dataset.containsKey('id')) {
+      return null;
+    }
+    var page = new AJAXPage(li.dataset['id'], li.dataset['title'], li.dataset['template'], li.dataset['alias'], li.dataset['hidden'] == "true");
+    _pages.add(page);
+    if (li.classes.contains('current')) {
+      _current = page.id;
+    }
+    return page;
+  }
 
-  Page get currentPage => _pageOrder.currentPage;
+  @override
+  Page operator [](String id) => _page_order[id];
 
-  List<Page> get currentPagePath => _pageOrder.currentPagePath;
+  @override
+  Iterable<Page> get activePages => _page_order.activePages;
 
-  List<Page> pagePath(String page_id) => _pageOrder.pagePath(page_id);
+  @override
+  core.FutureResponse<Page> changePageOrder(Page page, {int place: PageOrder.PAGE_ORDER_POSITION_LAST, Page parent: null}) => _page_order.changePageOrder(page, place:place, parent:parent);
 
-  List<Page> get activePages => _pageOrder.activePages;
+  @override
+  core.FutureResponse<Page> createPage(String title) => _page_order.createPage(title);
 
-  List<Page> get inactivePages => _pageOrder.inactivePages;
+  @override
+  Page get currentPage => _page_order.currentPage;
 
-  bool isActive(String page_id) => _pageOrder.isActive(page_id);
+  @override
+  List<Page> get currentPagePath => _page_order.currentPagePath;
 
-  Map<String, Page> get pages => _pageOrder.pages;
+  core.FutureResponse<Page> deactivatePage(Page page) => _page_order.deactivatePage(page);
 
-  List<Page> listPageOrder({String parent_id:null}) => _pageOrder.listPageOrder(parent_id:parent_id);
+  @override
+  core.FutureResponse<Page> deletePage(Page page) => _page_order.deletePage(page);
 
-  bool pageExists(String page_id) => _pageOrder.pageExists(page_id);
+  @override
+  Iterable<Page> get elements => _page_order.elements;
 
-  Future<core.Response<Page>> deactivatePage(String page_id) => _pageOrder.deactivatePage(page_id);
+  @override
+  Iterable<Page> get inactivePages => _page_order.inactivePages;
 
-  Future<core.Response<PageOrder>> changePageOrder(List<String> page_id_list, {String parent_id:null}) => _pageOrder.changePageOrder(page_id_list, parent_id:parent_id);
+  @override
+  bool isActive(Page page) => _page_order.isActive(page);
 
-  Future<core.Response<Page>> createPage(String title) => _pageOrder.createPage(title);
+  @override
+  List<Page> listPageOrder([Page parent = null]) => _page_order.listPageOrder(parent);
 
-  Stream<PageOrderChange> get onChange => _pageOrder.onChange;
+  @override
+  Page nextPage(Page page) => _page_order.nextPage(page);
 
-  Stream<Page> get onUpdate => _pageOrder.onUpdate;
+  @override
+  Stream<Page> get onActivate => _page_order.onActivate;
 
-  Stream<Page> get onAdd => _pageOrder.onAdd;
+  @override
+  Stream<Page> get onAdd => _page_order.onAdd;
 
-  Stream<Page> get onRemove => _pageOrder.onRemove;
+  @override
+  Stream<Page> get onChangeOrder => _page_order.onChangeOrder;
 
-  Stream<Page> get onDeactivate => _pageOrder.onDeactivate;
+  @override
+  Stream<Page> get onCreate => _page_order.onCreate;
 
-  Stream<Page> get onActivate => _pageOrder.onActivate;
+  @override
+  Stream<Page> get onDeactivate => _page_order.onDeactivate;
 
-  Iterable<Page> get elements => _pageOrder.elements;
+  @override
+  Stream<Page> get onDelete => _page_order.onDelete;
 
-  void every(void f(User)) => _pageOrder.every(f);
+  @override
+  Stream<Page> get onRemove => _page_order.onRemove;
 
-  Future<core.Response<Page>> deletePage(String id) => _pageOrder.deletePage(id);
+  @override
+  Stream<Page> get onUpdate => _page_order.onUpdate;
 
-  Page operator [](String id) => _pageOrder[id];
+  @override
+  bool pageExists(Page page) => _page_order.pageExists(page);
 
-  core.GeneratorDependable<Page> pageOrderView([Page parent = null])=> _pageOrder.pageOrderView(parent);
+  @override
+  core.GeneratorDependable<Page> pageOrderView([Page parent_page = null]) => _page_order.pageOrderView(parent_page);
 
+  @override
+  List<Page> pagePath(Page page) => _page_order.pagePath(page);
+
+  @override
+  Map<String, Page> get pages => _page_order.pages;
+
+  @override
+  Page parentPage(Page page) => _page_order.parentPage(page);
+
+  @override
+  Page previousPage(Page page) => _page_order.previousPage(page);
 }
 
-class OnePageUserSettingsPageOrder implements PageOrder {
+class OnePageUserSettingsPageOrder extends PageOrder {
 
-  final PageOrder _ajax_page_order;
+  PageOrder _page_order;
 
   static PageOrder _cache;
 
   factory OnePageUserSettingsPageOrder() => _cache == null ? _cache = new OnePageUserSettingsPageOrder._internal() : _cache;
 
-  OnePageUserSettingsPageOrder._internal(): _ajax_page_order = (() {
+  OnePageUserSettingsPageOrder._internal(){
     var current_page_element = querySelector("#UserSettingsCurrentPage");
     var id = current_page_element.dataset['id'];
     var title = current_page_element.dataset['title'];
     var alias = current_page_element.dataset['alias'];
     var template = current_page_element.dataset['template'];
     var hidden = current_page_element.dataset['hidden'] == 'true';
-    return new AJAXPageOrder({
-        null:[new AJAXPage(id, title, template, alias, hidden)]
-    }, [], id);
-  })();
+    var active = current_page_element.dataset['active'] == 'true';
 
-  Page get currentPage => _ajax_page_order.currentPage;
+    _page_order = new AJAXPageOrder([new AJAXPage(id, title, template, alias, hidden)], active ? {null:[id]} : {}, active ? [] : [id], id);
+  }
 
-  List<Page> get currentPagePath => _ajax_page_order.currentPagePath;
+  @override
+  Page operator [](String id) => _page_order[id];
 
-  List<Page> get inactivePages => _ajax_page_order.inactivePages;
+  @override
+  Iterable<Page> get activePages => _page_order.activePages;
 
-  Stream<PageOrderChange> get onChange => _ajax_page_order.onChange;
+  @override
+  core.FutureResponse<Page> changePageOrder(Page page, {int place: PageOrder.PAGE_ORDER_POSITION_LAST, Page parent: null}) => _page_order.changePageOrder(page, place:place, parent:parent);
 
-  Iterable<Page> get elements => _ajax_page_order.elements;
+  @override
+  core.FutureResponse<Page> createPage(String title) => _page_order.createPage(title);
 
+  @override
+  Page get currentPage => _page_order.currentPage;
 
-  Stream<Page> get onActivate => _ajax_page_order.onActivate;
+  @override
+  List<Page> get currentPagePath => _page_order.currentPagePath;
 
+  core.FutureResponse<Page> deactivatePage(Page page) => _page_order.deactivatePage(page);
 
-  core.FutureResponse<PageOrder> changePageOrder(List<String> page_id_list, {String parent_id}) =>
-  _ajax_page_order.changePageOrder(page_id_list, parent_id:parent_id);
+  @override
+  core.FutureResponse<Page> deletePage(Page page) => _page_order.deletePage(page);
 
+  @override
+  Iterable<Page> get elements => _page_order.elements;
 
-  List<Page> get activePages => _ajax_page_order.activePages;
+  @override
+  Iterable<Page> get inactivePages => _page_order.inactivePages;
 
+  @override
+  bool isActive(Page page) => _page_order.isActive(page);
 
-  Stream<Page> get onAdd => _ajax_page_order.onAdd;
+  @override
+  List<Page> listPageOrder([Page parent = null]) => _page_order.listPageOrder(parent);
 
+  @override
+  Page nextPage(Page page) => _page_order.nextPage(page);
 
-  Stream<Page> get onDeactivate => _ajax_page_order.onDeactivate;
+  @override
+  Stream<Page> get onActivate => _page_order.onActivate;
 
+  @override
+  Stream<Page> get onAdd => _page_order.onAdd;
 
-  void every(void f(K)) => _ajax_page_order.every(f);
+  @override
+  Stream<Page> get onChangeOrder => _page_order.onChangeOrder;
 
+  @override
+  Stream<Page> get onCreate => _page_order.onCreate;
 
-  bool pageExists(String page_id) => _ajax_page_order.pageExists(page_id);
+  @override
+  Stream<Page> get onDeactivate => _page_order.onDeactivate;
 
+  @override
+  Stream<Page> get onDelete => _page_order.onDelete;
 
-  List<Page> listPageOrder({String parent_id}) => _ajax_page_order.listPageOrder(parent_id:parent_id);
+  @override
+  Stream<Page> get onRemove => _page_order.onRemove;
 
+  @override
+  Stream<Page> get onUpdate => _page_order.onUpdate;
 
-  Map<String, Page> get pages => _ajax_page_order.pages;
+  @override
+  bool pageExists(Page page) => _page_order.pageExists(page);
 
+  @override
+  core.GeneratorDependable<Page> pageOrderView([Page parent_page = null]) => _page_order.pageOrderView(parent_page);
 
-  bool isActive(String page_id) => _ajax_page_order.isActive(page_id);
+  @override
+  List<Page> pagePath(Page page) => _page_order.pagePath(page);
 
+  @override
+  Map<String, Page> get pages => _page_order.pages;
 
-  List<Page> pagePath(String page_id) => _ajax_page_order.pagePath(page_id);
+  @override
+  Page parentPage(Page page) => _page_order.parentPage(page);
 
-
-  Stream<Page> get onRemove => _ajax_page_order.onRemove;
-
-
-  core.FutureResponse<Page> deactivatePage(String page_id) => _ajax_page_order.deactivatePage(page_id);
-
-
-  Stream<Page> get onUpdate => _ajax_page_order.onUpdate;
-
-
-  core.FutureResponse<Page> deletePage(String id) => _ajax_page_order.deletePage(id);
-
-
-  core.FutureResponse<Page> createPage(String title) => _ajax_page_order.createPage(title);
-
-  Page operator [](String id) => _ajax_page_order[id];
-
-  core.GeneratorDependable<Page> pageOrderView([Page parent = null])=> _ajax_page_order.pageOrderView(parent);
-
+  @override
+  Page previousPage(Page page) => _page_order.previousPage(page);
 
 }
 

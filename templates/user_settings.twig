@@ -586,6 +586,7 @@
          data-last_modified="{{ current_page.lastModified }}"
          data-template="{{ current_page.template }}"
          data-hidden="{{ current_page.hidden?'true':'false' }}"
+         data-inactive="{{ page_order.isActive(current_page)?'true':'false'}}"
          hidden></div>
 
 {% endif %}
