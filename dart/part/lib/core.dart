@@ -5,6 +5,7 @@ import "dart:math" as Math;
 import "dart:async";
 
 import 'json.dart';
+import 'dart:convert';
 
 part "src/core_animation.dart";
 part "src/core_keep_alive.dart";
