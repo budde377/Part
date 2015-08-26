@@ -98,6 +98,8 @@ class UserSettingsJSONPageOrder implements PageOrder {
 
   Page operator [](String id) => _pageOrder[id];
 
+  core.GeneratorDependable<Page> pageOrderView([Page parent = null])=> _pageOrder.pageOrderView(parent);
+
 }
 
 class OnePageUserSettingsPageOrder implements PageOrder {
@@ -180,6 +182,9 @@ class OnePageUserSettingsPageOrder implements PageOrder {
   core.FutureResponse<Page> createPage(String title) => _ajax_page_order.createPage(title);
 
   Page operator [](String id) => _ajax_page_order[id];
+
+  core.GeneratorDependable<Page> pageOrderView([Page parent = null])=> _ajax_page_order.pageOrderView(parent);
+
 
 }
 
