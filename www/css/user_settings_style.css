@@ -437,7 +437,7 @@ form.initial input.invalid {
 #UserSettingsContent .showSubList {
     padding: 0 !important;
     margin: 0 !important;
-    width: auto !important;
+    width: 100%;
 }
 
 #UserSettingsContent .showSubList > li:not(.hasSubList) {
