@@ -31,7 +31,6 @@ class PageOrderTypeHandlerImpl extends GenericObjectTypeHandlerImpl
         $this->container = $container;
 
         $this->addGetInstanceFunction('PageOrder');
-
         $this->addFunctionAuthFunction('PageOrder', 'deletePage', $this->currentUserSitePrivilegesAuthFunction($this->container));
         $this->addFunctionAuthFunction('PageOrder', 'deactivatePage', $this->currentUserSitePrivilegesAuthFunction($this->container));
         $this->addFunctionAuthFunction('PageOrder', 'setPageOrder', $this->currentUserSitePrivilegesAuthFunction($this->container));

@@ -1,6 +1,6 @@
 part of core;
 
-class Response<V>{
+class Response<V> {
   static const RESPONSE_TYPE_SUCCESS = "success";
   static const RESPONSE_TYPE_ERROR = "error";
 
@@ -40,19 +40,20 @@ class Response<V>{
   final V payload;
 
   Response.success([V payload = null]): this.type = Response.RESPONSE_TYPE_SUCCESS, this.payload = payload, this.error_code = 0;
+
   Response.error(this.error_code): this.type = Response.RESPONSE_TYPE_ERROR, this.payload = null;
 
 }
 
-class FutureResponse<K> implements Future<Response<K>>{
+class FutureResponse<K> implements Future<Response<K>> {
 
   final Future<Response<K>> future;
 
   FutureResponse(Future<Response<K>> this.future);
 
-  factory FutureResponse.error(int error_code) => new FutureResponse.fromComputation(()=>new Response<K>.error(error_code));
+  factory FutureResponse.error(int error_code) => new FutureResponse.fromComputation(() => new Response<K>.error(error_code));
 
-  factory FutureResponse.success([K payload=null]) => new FutureResponse.fromComputation(()=>new Response<K>.success(payload));
+  factory FutureResponse.success([K payload=null]) => new FutureResponse.fromComputation(() => new Response<K>.success(payload));
 
   factory FutureResponse.fromComputation(computation()) => new FutureResponse<K>(new Future<Response<K>>(computation));
 
@@ -73,13 +74,14 @@ class FutureResponse<K> implements Future<Response<K>>{
 
   Future timeout(Duration timeLimit, {onTimeout()}) => future.timeout(timeLimit, onTimeout:onTimeout);
 
-  Future thenResponse({onSuccess(Response<K> value), onError(Response<K> value)}) => then((Response<K> value){
-    if(onSuccess != null && value.type == Response.RESPONSE_TYPE_SUCCESS){
-      onSuccess(value);
-    } else if(onError!= null && value.type == Response.RESPONSE_TYPE_ERROR){
-      onError(value);
+  FutureResponse thenResponse({Response onSuccess(Response<K> value), Response onError(Response<K> value)}) => new FutureResponse(then((Response<K> value) {
+    if (onSuccess != null && value.type == Response.RESPONSE_TYPE_SUCCESS) {
+      return onSuccess(value);
     }
-  });
-
+    if (onError != null && value.type == Response.RESPONSE_TYPE_ERROR) {
+      return onError(value);
+    }
+    return value;
+  }));
 
 }
