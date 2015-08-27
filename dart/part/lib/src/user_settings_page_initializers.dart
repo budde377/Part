@@ -131,8 +131,6 @@ class UserSettingsPageUserListFormInitializer extends core.Initializer {
 }
 
 
-
-
 class UserSettingsEditPageFormInitializer extends core.Initializer {
   PageOrder _order;
 
@@ -162,7 +160,9 @@ class UserSettingsEditPageFormInitializer extends core.Initializer {
       ..errorMessage = "Titlen kan ikke være tom";
 
     new Validator(editIdField)
-      ..addValueValidator((String value) => (_order.currentPage != null && value == _order.currentPage.id) || (new RegExp(r'^[0-9a-z\-_]+$', caseSensitive:false).hasMatch(value) && !_order.pageExists(value)))
+      ..addValueValidator((String value) =>
+    (_order.currentPage != null && value == _order.currentPage.id) ||
+    (new RegExp(r'^[0-9a-z\-_]+$', caseSensitive:false).hasMatch(value) && _order[value] != null))
       ..errorMessage = "ID kan kun indeholde symbolder a-z, 0-9, - eller _";
     new Validator(editAliasField)
       ..addValueValidator((String value) => value == "" || PCRE.checkPCRE(value))

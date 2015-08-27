@@ -2,7 +2,6 @@ name: part
 author: Christian Budde Christensen <christi@n-bud.de>
 version: 0.9.1
 dev_dependencies:
-    unittest: '>=0.0.0 <1.0.0'
     browser: '>=0.0.0 <1.0.0'
 dependencies:
     markdown: '>=0.0.0 <1.0.0'

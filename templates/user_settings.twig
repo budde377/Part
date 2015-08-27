@@ -136,9 +136,7 @@
                                 <div class='link activate' title='Aktiver'> &nbsp; </div>
                             </li>
                         {% endfor %}
-                        {% if no_inactive %}
-                            <li class='emptyListInfo'> Der er ingen inaktive sider</li>
-                        {% endif %}
+                        <li class='empty'> Der er ingen inaktive sider</li>
                     </ul>
                     {% if has_site_privileges %}
                         <form class="oneLineForm" id="EditPagesForm">

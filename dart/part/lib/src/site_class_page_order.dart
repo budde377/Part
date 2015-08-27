@@ -61,6 +61,8 @@ abstract class PageOrder extends GeneratorDependable<Page> {
 
   GeneratorDependable<Page> pageOrderView([Page parent_page= null]);
 
+  GeneratorDependable<Page> get inactivePageOrderView;
+
   Page operator [](String id);
 
 }
@@ -75,12 +77,10 @@ class AJAXPageOrder extends PageOrder {
   StreamController
   _onUpdateStreamController = new StreamController.broadcast(),
   _onActivateStreamController = new StreamController.broadcast(),
-  _onAddStreamController = new StreamController.broadcast(),
   _onChangeOrderStreamController = new StreamController.broadcast(),
   _onCreateStreamController = new StreamController.broadcast(),
   _onDeactivateStreamController = new StreamController.broadcast(),
-  _onDeleteStreamController = new StreamController.broadcast(),
-  _onRemoveStreamController = new StreamController.broadcast();
+  _onDeleteStreamController = new StreamController.broadcast();
 
   AJAXPageOrder(Iterable<Page> pages, Map<String, List<String>> page_order_map, Iterable<String> inactive_pages, String current_page_id) {
     _updatePagesMap(pages);
@@ -123,7 +123,7 @@ class AJAXPageOrder extends PageOrder {
   Stream<Page> get onActivate => _onActivateStreamController.stream;
 
   @override
-  Stream<Page> get onAdd => _onAddStreamController.stream;
+  Stream<Page> get onAdd => onCreate;
 
   @override
   Stream<Page> get onChangeOrder => _onChangeOrderStreamController.stream;
@@ -138,13 +138,16 @@ class AJAXPageOrder extends PageOrder {
   Stream<Page> get onDelete => _onDeleteStreamController.stream;
 
   @override
-  Stream<Page> get onRemove => _onRemoveStreamController.stream;
+  Stream<Page> get onRemove => onDelete;
 
   @override
   Stream<Page> get onUpdate => _onUpdateStreamController.stream;
 
   @override
   Map<String, Page> get pages => new Map.from(_pages);
+
+  @override
+  GeneratorDependable<Page> get inactivePageOrderView => new _InactivePageOrderViewGeneratorDependable(this);
 
   @override
   FutureResponse<Page> changePageOrder(Page page, {int place: PageOrder.PAGE_ORDER_POSITION_LAST, Page parent:null}) =>
@@ -158,7 +161,24 @@ class AJAXPageOrder extends PageOrder {
   ..getPageOrder(
     ${parent == null ? "" : quoteString(parent.id)})""")
   .thenResponse(onSuccess:(Response<List<JSONObject>> response) {
-    _order[parent] = response.payload.map((JSONObject object) => _pages[object.variables['id']]);
+    var new_order = response.payload.map((JSONObject object) => _pages[object.variables['id']]);
+    // Updating previous parents
+    new_order.forEach((Page page) {
+      if (_inactive_pages.contains(page)) {
+        _inactive_pages.remove(page);
+        _onActivateStreamController.add(page);
+        return;
+      }
+
+      var old_parent = parentPage(page);
+      if (old_parent == parent) {
+        return;
+      }
+      _order[old_parent].remove(page);
+      _onChangeOrderStreamController.add(old_parent);
+    });
+    //Setting new order
+    _order[parent] = new_order;
     _onChangeOrderStreamController.add(parent);
     return new Response.success(parent);
   });
@@ -168,6 +188,7 @@ class AJAXPageOrder extends PageOrder {
   .callFunctionString("PageOrder.createPage(${quoteString(title)})")
   .thenResponse(onSuccess:(Response response) {
     var page = new AJAXPage(
+        this,
         response.payload.variables['id'],
         response.payload.variables['title'],
         response.payload.variables['template'],
@@ -185,36 +206,49 @@ class AJAXPageOrder extends PageOrder {
   FutureResponse<Page> deactivatePage(Page page) => ajaxClient
   .callFunctionString("PageOrder.deactivatePage(PageOrder.getPage(${quoteString(page.id)}))")
   .thenResponse(onSuccess:(Response response) {
-    if(isActive(page)){
-      var parent = parentPage(page);
-      _order[parent].remove(page);
-      _onChangeOrderStreamController.add(parent);
-      _onDeactivateStreamController.add(page);
+    if (isActive(page)) {
+      _innerDeactivate(page, parentPage(page));
     }
     return new Response.success(page);
   });
+
+  void _innerDeactivate(Page page, Page parent) {
+    _order[parent].remove(page);
+    if (_order.containsKey(page)) {
+      _order[page].forEach((Page sub_page) => _innerDeactivate(sub_page, page));
+    }
+    _onChangeOrderStreamController.add(parent);
+    _onDeactivateStreamController.add(page);
+  }
 
   @override
   FutureResponse<Page> deletePage(Page page) => ajaxClient
   .callFunctionString("PageOrder.deletePage(PageOrder.getPage(${quoteString(page.id)}))")
   .thenResponse(onSuccess:(Response response) {
+    _innerDelete(page);
+    return new Response.success(page);
+  });
+
+  void _innerDelete(Page page) {
     if (isActive(page)) {
       var parent = parentPage(page);
-      _onChangeOrderStreamController.add(parent);
       _order[parent].remove(page);
+      if (_order.containsKey(page)) {
+        _order[page].forEach((Page sub_page) => _innerDeactivate(sub_page, page));
+      }
+      _onChangeOrderStreamController.add(parent);
     } else {
       _inactive_pages.remove(page);
     }
     _pages.remove(page.id);
     _onDeleteStreamController.add(page);
-    return new Response.success(page);
-  });
+  }
 
   @override
   bool isActive(Page page) => pageExists(page) && !_inactive_pages.contains(page);
 
   @override
-  List<Page> listPageOrder([Page parent = null]) => _order.containsKey(parent)?_order[parent].toList():[];
+  List<Page> listPageOrder([Page parent = null]) => _order.containsKey(parent) ? _order[parent].toList() : [];
 
   @override
   bool pageExists(Page page) => _pages.containsValue(page);
@@ -257,6 +291,40 @@ class AJAXPageOrder extends PageOrder {
   }
 }
 
+class _InactivePageOrderViewGeneratorDependable extends GeneratorDependable<Page> {
+
+  static final Map<PageOrder, _InactivePageOrderViewGeneratorDependable> _cache = {};
+
+  final PageOrder page_order;
+
+  final StreamController<Page>
+  _onAddStreamController = new StreamController.broadcast(),
+  _onRemoveStreamController = new StreamController.broadcast();
+
+  factory _InactivePageOrderViewGeneratorDependable(PageOrder page_order) => _cache.putIfAbsent(page_order, () => new _InactivePageOrderViewGeneratorDependable.internal(page_order));
+
+  _InactivePageOrderViewGeneratorDependable.internal(this.page_order){
+    page_order
+      ..onAdd.listen(_onAddStreamController.add)
+      ..onDeactivate.listen(_onAddStreamController.add)
+      ..onDelete.listen(_onRemoveStreamController.add)
+      ..onActivate.listen(_onRemoveStreamController.add);
+
+  }
+
+  @override
+  Iterable<Page> get elements => page_order.inactivePages;
+
+  @override
+  Stream<Page> get onAdd => _onAddStreamController.stream.where(elements.contains);
+
+  @override
+  Stream<Page> get onRemove => _onRemoveStreamController.stream;
+
+  @override
+  Stream<Page> get onUpdate => page_order.onUpdate.where(elements.contains);
+}
+
 class _PageOrderViewGeneratorDependable extends GeneratorDependable<Page> {
   final PageOrder pageOrder;
   final Page page;
@@ -272,9 +340,9 @@ class _PageOrderViewGeneratorDependable extends GeneratorDependable<Page> {
     _elements = pageOrder.listPageOrder(page);
     pageOrder.onChangeOrder.where((Page p) => p == page).listen((Page parent) {
       var new_order = pageOrder.listPageOrder(page);
-      if(_elements.length < new_order.length){
+      if (_elements.length < new_order.length) {
         onRemoveController.add(new_order.firstWhere((Page p) => !_elements.contains(p)));
-      } else if(_elements.length > new_order.length){
+      } else if (_elements.length > new_order.length) {
         onAddController.add(_elements.firstWhere((Page p) => !new_order.contains(p)));
       }
       _elements = new_order;

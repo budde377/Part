@@ -45,7 +45,13 @@ class UserSettingsJSONPageOrder extends PageOrder {
     if (!li.dataset.containsKey('id')) {
       return null;
     }
-    var page = new AJAXPage(li.dataset['id'], li.dataset['title'], li.dataset['template'], li.dataset['alias'], li.dataset['hidden'] == "true");
+    var page = new AJAXPage(
+        this,
+        li.dataset['id'],
+        li.dataset['title'],
+        li.dataset['template'],
+        li.dataset['alias'],
+        li.dataset['hidden'] == "true");
     _pages.add(page);
     if (li.classes.contains('current')) {
       _current = page.id;
@@ -132,6 +138,9 @@ class UserSettingsJSONPageOrder extends PageOrder {
 
   @override
   Page previousPage(Page page) => _page_order.previousPage(page);
+
+  @override
+  core.GeneratorDependable<Page> get inactivePageOrderView => _page_order.inactivePageOrderView;
 }
 
 class OnePageUserSettingsPageOrder extends PageOrder {
@@ -151,7 +160,10 @@ class OnePageUserSettingsPageOrder extends PageOrder {
     var hidden = current_page_element.dataset['hidden'] == 'true';
     var active = current_page_element.dataset['active'] == 'true';
 
-    _page_order = new AJAXPageOrder([new AJAXPage(id, title, template, alias, hidden)], active ? {null:[id]} : {}, active ? [] : [id], id);
+    _page_order = new AJAXPageOrder(
+        [new AJAXPage(this, id, title, template, alias, hidden)],
+        active ? {null:[id]} : {},
+        active ? [] : [id], id);
   }
 
   @override
@@ -234,5 +246,7 @@ class OnePageUserSettingsPageOrder extends PageOrder {
   @override
   Page previousPage(Page page) => _page_order.previousPage(page);
 
+  @override
+  core.GeneratorDependable<Page> get inactivePageOrderView => _page_order.inactivePageOrderView;
 }
 

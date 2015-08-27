@@ -519,14 +519,24 @@ form.initial input.invalid {
     background-image: url(/_common/img/eye.png);
 }
 
-#InactivePageList li:not(.emptyListInfo) {
+#InactivePageList li:not(.empty) {
     padding-right: 30px;
     padding-left: 0;
 }
 
-#ActivePageList li:not(.emptyListInfo) {
+#ActivePageList li:not(.empty) {
     padding-left: 0;
 }
+
+#InactivePageList li.empty, #ActivePageList li.empty{
+    display: none;
+}
+
+#InactivePageList li.empty:only-child, #ActivePageList li.empty:only-child{
+    display: block;
+}
+
+
 
 #InactivePageList .padding, #ActivePageList .padding {
     border: 4px solid transparent;

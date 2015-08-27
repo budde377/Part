@@ -104,15 +104,15 @@ class AJAXMailAddress extends MailAddress {
   _onDeleteController;
 
   Stream
-  _onLocalPartChangeStream ,
-  _onMailboxChangeStream ,
-  _onAddTargetStream ,
-  _onRemoveTargetStream ,
-  _onTargetChangeStream ,
-  _onAddOwnerStream ,
-  _onOwnerChangeStream ,
-  _onRemoveOwnerStream ,
-  _onActiveChangeStream ,
+  _onLocalPartChangeStream,
+  _onMailboxChangeStream,
+  _onAddTargetStream,
+  _onRemoveTargetStream,
+  _onTargetChangeStream,
+  _onAddOwnerStream,
+  _onOwnerChangeStream,
+  _onRemoveOwnerStream,
+  _onActiveChangeStream,
   _onDeleteStream;
 
 
@@ -122,8 +122,8 @@ class AJAXMailAddress extends MailAddress {
   this.domainLibrary = addressLibrary.domainLibrary,
   this.domain = addressLibrary.domain,
   this._targets = targets == null ? [] : targets.toList(),
-  this._owners = owners == null? [] : owners.toList(),
-  this._lastModified = (last_modified == null ? new DateTime.fromMillisecondsSinceEpoch(0) : last_modified){
+  this._owners = owners == null ? [] : owners.toList(),
+  this._lastModified = (last_modified == null ? new DateTime.fromMillisecondsSinceEpoch(0) : last_modified) {
     _mailbox = mailboxGenerator(this);
   }
 
@@ -149,10 +149,10 @@ class AJAXMailAddress extends MailAddress {
 
   String get _functionStringSelector => "MailDomainLibrary.getDomain(${quoteString(domain.domainName)}).getAddressLibrary().getAddress(${quoteString(localPart)})";
 
-  FutureResponse<String> changeLocalPart(String localPart){
+  FutureResponse<String> changeLocalPart(String localPart) {
     var completer = new Completer();
-    ajaxClient.callFunctionString(_functionStringSelector+"..setLocalPart(${quoteString(localPart)})..getInstance()").then((Response<JSONObject> response){
-      if(response.type != Response.RESPONSE_TYPE_SUCCESS){
+    ajaxClient.callFunctionString(_functionStringSelector + "..setLocalPart(${quoteString(localPart)})..getInstance()").then((Response<JSONObject> response) {
+      if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         completer.complete(response);
         return;
       }
@@ -168,17 +168,17 @@ class AJAXMailAddress extends MailAddress {
     return new FutureResponse(completer.future);
   }
 
-  void set _lastChangeInSeconds(int time){
-    _lastModified = new DateTime.fromMillisecondsSinceEpoch(time*1000);
+  void set _lastChangeInSeconds(int time) {
+    _lastModified = new DateTime.fromMillisecondsSinceEpoch(time * 1000);
   }
 
-  FutureResponse<MailMailbox> createMailbox(String name, String password){
-    if(hasMailbox){
+  FutureResponse<MailMailbox> createMailbox(String name, String password) {
+    if (hasMailbox) {
       return new FutureResponse.success(mailbox);
     }
     var completer = new Completer();
-    ajaxClient.callFunctionString(_functionStringSelector+"..createMailbox(${quoteString(name)}, ${quoteString(password)})..getInstance()").then((Response<JSONObject> response){
-      if(response.type != Response.RESPONSE_TYPE_SUCCESS){
+    ajaxClient.callFunctionString(_functionStringSelector + "..createMailbox(${quoteString(name)}, ${quoteString(password)})..getInstance()").then((Response<JSONObject> response) {
+      if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         completer.complete(response);
         return;
       }
@@ -194,13 +194,13 @@ class AJAXMailAddress extends MailAddress {
     return new FutureResponse(completer.future);
   }
 
-  FutureResponse<MailMailbox> deleteMailbox(){
-    if(hasMailbox){
+  FutureResponse<MailMailbox> deleteMailbox() {
+    if (hasMailbox) {
       return new FutureResponse.success(mailbox);
     }
     var completer = new Completer();
-    ajaxClient.callFunctionString(_functionStringSelector+"..deleteMailbox()..getInstance()").then((Response<JSONObject> response){
-      if(response.type != Response.RESPONSE_TYPE_SUCCESS){
+    ajaxClient.callFunctionString(_functionStringSelector + "..deleteMailbox()..getInstance()").then((Response<JSONObject> response) {
+      if (response.type != Response.RESPONSE_TYPE_SUCCESS) {
         completer.complete(response);
         return;
       }
@@ -219,157 +219,119 @@ class AJAXMailAddress extends MailAddress {
 
   List<String> get targets => new List.from(_targets, growable:false);
 
-  FutureResponse<String> addTarget(String target){
+  FutureResponse<String> addTarget(String target) {
     target = target.trim();
-    if(targets.contains(target)){
+    if (targets.contains(target)) {
       return new FutureResponse.success(target);
     }
 
-    var completer = new Completer();
-
-    ajaxClient.callFunctionString(_functionStringSelector+"..addTarget(${quoteString(target)})..getInstance()").thenResponse(onSuccess:(Response<JSONObject> r){
+    return ajaxClient.callFunctionString(_functionStringSelector + "..addTarget(${quoteString(target)})..getInstance()").thenResponse(onSuccess:(Response<JSONObject> r) {
 
       _targets.add(target);
       _lastChangeInSeconds = r.payload.variables['last_modified'];
-      completer.complete(new Response.success(target));
       _onTargetChangeController.add(target);
       _onAddTargetController.add(target);
-
-
-    }, onError:completer.complete);
-
-    return new FutureResponse(completer.future);
+      return new Response.success(target);
+    });
   }
 
-  FutureResponse<String> removeTarget(String target){
+  FutureResponse<String> removeTarget(String target) {
     target = target.trim();
-    if(!targets.contains(target)){
+    if (!targets.contains(target)) {
       return new FutureResponse.success(target);
     }
-
-    var completer = new Completer();
-
-    ajaxClient.callFunctionString(_functionStringSelector+"..removeTarget(${quoteString(target)})..getInstance()").thenResponse(onSuccess:(Response<JSONObject> r){
-
-
+    return ajaxClient.callFunctionString(_functionStringSelector + "..removeTarget(${quoteString(target)})..getInstance()").thenResponse(onSuccess:(Response<JSONObject> r) {
       _targets.remove(target);
       _lastChangeInSeconds = r.payload.variables['last_modified'];
-      completer.complete(new Response.success(target));
       _onTargetChangeController.add(target);
       _onAddTargetController.add(target);
-
-    }, onError:completer.complete);
-
-    return new FutureResponse(completer.future);
+      return new Response.success(target);
+    });
   }
 
   FutureResponse<MailAddress> delete() => addressLibrary.deleteAddress(this);
 
   List<User> get owners => new List.from(_owners);
 
-  FutureResponse<User> addOwner(User user){
-    if(owners.contains(user)){
+  FutureResponse<User> addOwner(User user) {
+    if (owners.contains(user)) {
       return new FutureResponse.success(user);
     }
 
-    var completer = new Completer();
-
-    ajaxClient.callFunctionString(_functionStringSelector+"..addOwner(UserLibrary.getUser(${quoteString(user.username)}))..getInstance()").thenResponse(onSuccess:(Response<JSONObject> r){
+    return ajaxClient.callFunctionString(_functionStringSelector + "..addOwner(UserLibrary.getUser(${quoteString(user.username)}))..getInstance()").thenResponse(onSuccess:(Response<JSONObject> r) {
 
       _owners.add(user);
       _lastChangeInSeconds = r.payload.variables['last_modified'];
-      completer.complete(new Response.success(user));
       _onAddOwnerController.add(user);
       _onOwnerChangeController.add(user);
-
-
-    }, onError:completer.complete);
-
-    return new FutureResponse(completer.future);
+      return new Response.success(user);
+    });
   }
 
-  FutureResponse<User> removeOwner(User user){
-    if(!owners.contains(user)){
+  FutureResponse<User> removeOwner(User user) {
+    if (!owners.contains(user)) {
       return new FutureResponse.success(user);
     }
 
-    var completer = new Completer();
-
-    ajaxClient.callFunctionString(_functionStringSelector+"..removeUser(UserLibrary.getUser(${quoteString(user.username)}))..getInstance()").thenResponse(onSuccess:(Response<JSONObject> r){
+    return ajaxClient.callFunctionString(_functionStringSelector + "..removeUser(UserLibrary.getUser(${quoteString(user.username)}))..getInstance()").thenResponse(onSuccess:(Response<JSONObject> r) {
 
       _owners.remove(user);
       _lastChangeInSeconds = r.payload.variables['last_modified'];
-      completer.complete(new Response.success(user));
       _onRemoveOwnerController.add(user);
       _onOwnerChangeController.add(user);
-
-    }, onError:completer.complete);
-
-    return new FutureResponse(completer.future);
+      return new Response.success(user);
+    });
   }
 
   DateTime get lastModified => _lastModified;
 
   bool get active => _active;
 
-  FutureResponse<MailAddress> deactivate(){
-    var completer = new Completer();
+  FutureResponse<MailAddress> deactivate() =>
+  ajaxClient.callFunctionString(_functionStringSelector + "..deactivate()..getInstance()").thenResponse(onSuccess:(Response<JSONObject> r) {
 
-    ajaxClient.callFunctionString(_functionStringSelector+"..deactivate()..getInstance()").thenResponse(onSuccess:(Response<JSONObject> r){
+    _active = r.payload.variables['active'];
+    _lastChangeInSeconds = r.payload.variables['last_modified'];
+    _onActiveChangeController.add(active);
+    return new Response.success(active);
+  });
 
-      _active = r.payload.variables['active'];
-      _lastChangeInSeconds = r.payload.variables['last_modified'];
-      completer.complete(new Response.success(active));
-      _onActiveChangeController.add(active);
-
-    }, onError:completer.complete);
-
-    return new FutureResponse(completer.future);
-  }
-
-  FutureResponse<MailAddress> activate(){
-    var completer = new Completer();
-
-    ajaxClient.callFunctionString(_functionStringSelector+"..activate()..getInstance()").thenResponse(onSuccess:(Response<JSONObject> r){
-
-      _active = r.payload.variables['active'];
-      _lastChangeInSeconds = r.payload.variables['last_modified'];
-      completer.complete(new Response.success(active));
-      _onActiveChangeController.add(active);
-
-    }, onError:completer.complete);
-
-    return new FutureResponse(completer.future);
-
-  }
-
-  FutureResponse<MailAddress> toggleActive() => active?deactivate():activate();
-
-  Stream<MailAddress> get onLocalPartChange => _onLocalPartChangeStream == null?_onLocalPartChangeStream = _onLocalPartChangeController.stream.asBroadcastStream(): _onLocalPartChangeStream;
-
-  Stream<MailMailbox> get onMailboxChange => _onMailboxChangeStream == null?_onMailboxChangeStream = _onMailboxChangeController.stream.asBroadcastStream(): _onMailboxChangeStream;
-
-  Stream<String> get onAddTarget => _onAddTargetStream == null?_onAddTargetStream = _onAddTargetController.stream.asBroadcastStream(): _onAddTargetStream;
-
-  Stream<String> get onRemoveTarget => _onRemoveTargetStream == null?_onRemoveTargetStream = _onRemoveTargetController.stream.asBroadcastStream(): _onRemoveTargetStream;
-
-  Stream<User> get onAddOwner => _onAddOwnerStream == null?_onAddOwnerStream = _onAddOwnerController.stream.asBroadcastStream(): _onAddOwnerStream;
-
-  Stream<User> get onRemoveOwner => _onRemoveOwnerStream == null?_onRemoveOwnerStream = _onRemoveOwnerController.stream.asBroadcastStream(): _onRemoveOwnerStream;
-
-  Stream<bool> get onActiveChange => _onActiveChangeStream == null?_onActiveChangeStream = _onActiveChangeController.stream.asBroadcastStream(): _onActiveChangeStream;
-
-  Stream<String> get onTargetChange=> _onTargetChangeStream == null?_onTargetChangeStream = _onTargetChangeController.stream.asBroadcastStream(): _onTargetChangeStream;
-
-  Stream<User> get onOwnerChange => _onOwnerChangeStream == null?_onOwnerChangeStream = _onOwnerChangeController.stream.asBroadcastStream():_onOwnerChangeStream;
+  FutureResponse<MailAddress> activate() =>
+  ajaxClient.callFunctionString(_functionStringSelector + "..activate()..getInstance()").thenResponse(onSuccess:(Response<JSONObject> r) {
+    _active = r.payload.variables['active'];
+    _lastChangeInSeconds = r.payload.variables['last_modified'];
+    _onActiveChangeController.add(active);
+    return new Response.success(active);
+  });
 
 
-  Stream<MailAddress> get onDelete{
-    if(_onDeleteController == null){
+  FutureResponse<MailAddress> toggleActive() => active ? deactivate() : activate();
+
+  Stream<MailAddress> get onLocalPartChange => _onLocalPartChangeStream == null ? _onLocalPartChangeStream = _onLocalPartChangeController.stream.asBroadcastStream() : _onLocalPartChangeStream;
+
+  Stream<MailMailbox> get onMailboxChange => _onMailboxChangeStream == null ? _onMailboxChangeStream = _onMailboxChangeController.stream.asBroadcastStream() : _onMailboxChangeStream;
+
+  Stream<String> get onAddTarget => _onAddTargetStream == null ? _onAddTargetStream = _onAddTargetController.stream.asBroadcastStream() : _onAddTargetStream;
+
+  Stream<String> get onRemoveTarget => _onRemoveTargetStream == null ? _onRemoveTargetStream = _onRemoveTargetController.stream.asBroadcastStream() : _onRemoveTargetStream;
+
+  Stream<User> get onAddOwner => _onAddOwnerStream == null ? _onAddOwnerStream = _onAddOwnerController.stream.asBroadcastStream() : _onAddOwnerStream;
+
+  Stream<User> get onRemoveOwner => _onRemoveOwnerStream == null ? _onRemoveOwnerStream = _onRemoveOwnerController.stream.asBroadcastStream() : _onRemoveOwnerStream;
+
+  Stream<bool> get onActiveChange => _onActiveChangeStream == null ? _onActiveChangeStream = _onActiveChangeController.stream.asBroadcastStream() : _onActiveChangeStream;
+
+  Stream<String> get onTargetChange => _onTargetChangeStream == null ? _onTargetChangeStream = _onTargetChangeController.stream.asBroadcastStream() : _onTargetChangeStream;
+
+  Stream<User> get onOwnerChange => _onOwnerChangeStream == null ? _onOwnerChangeStream = _onOwnerChangeController.stream.asBroadcastStream() : _onOwnerChangeStream;
+
+
+  Stream<MailAddress> get onDelete {
+    if (_onDeleteController == null) {
       _onDeleteController = new StreamController();
       _onDeleteStream = _onDeleteController.stream.asBroadcastStream();
-      addressLibrary.onRemove.listen((MailAddress address){
-        if(address != this){
+      addressLibrary.onRemove.listen((MailAddress address) {
+        if (address != this) {
           return;
         }
         _onDeleteController.add(address);

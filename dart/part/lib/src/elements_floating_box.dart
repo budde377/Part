@@ -4,7 +4,7 @@ abstract class FloatingBox {
   final DivElement element = new DivElement();
   StreamSubscription _mouseDownSubscription;
   StreamController<Event> _removeController = new StreamController<Event>();
-  bool _f = false, _removeOnESC;
+  bool _removeOnESC;
 
   FloatingBox() {
     element.classes.add('floating_box');

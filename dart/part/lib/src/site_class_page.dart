@@ -20,21 +20,35 @@ abstract class Page {
 
   bool get hidden;
 
-  // bool get editable;
-
   FutureResponse<Page> changeInfo({String id, String title, String template, String alias, bool hidden});
 
   Stream<Page> get onChange;
 
   Content operator [](String id);
 
+  FutureResponse<Page> delete();
+
+  Page get next;
+
+  Page get previous;
+
+  Page get parent;
+
+  List<Page> get path;
+
+  bool get active;
+
+  bool get exists;
+
+
 }
 
 class AJAXPage extends Page {
+  final PageOrder page_order;
+
   String _id, _title, _template, _alias;
 
   bool _hidden = false;
-
 
   Map<String, Content> _content = new Map<String, Content>();
 
@@ -53,7 +67,7 @@ class AJAXPage extends Page {
 
   Stream<Page> _changeStream;
 
-  AJAXPage(String id, String title, String template, String alias, bool hidden) {
+  AJAXPage(this.page_order, String id, String title, String template, String alias, bool hidden) {
     _id = id;
     _title = title;
     _template = template;
@@ -63,10 +77,10 @@ class AJAXPage extends Page {
 
   FutureResponse<Page> changeInfo({String id:null, String title:null, String template:null, String alias:null, bool hidden:null}) {
     var functionString = "";
-    functionString += id == null || id == _id? "" : "..setID(${quoteString(id)})";
-    functionString += title == null || title == _title? "" : "..setTitle(${quoteString(title)})";
-    functionString += template == null || template == _template? "" : "..setTemplate(${quoteString(template)})";
-    functionString += alias == null || alias == _alias? "" : "..setAlias(${quoteString(alias)})";
+    functionString += id == null || id == _id ? "" : "..setID(${quoteString(id)})";
+    functionString += title == null || title == _title ? "" : "..setTitle(${quoteString(title)})";
+    functionString += template == null || template == _template ? "" : "..setTemplate(${quoteString(template)})";
+    functionString += alias == null || alias == _alias ? "" : "..setAlias(${quoteString(alias)})";
 
     if (hidden && !_hidden) {
       functionString += "..hide()";
@@ -105,4 +119,25 @@ class AJAXPage extends Page {
 
   Stream<Page> get onChange => _changeStream == null ? _changeStream = _changeController.stream.asBroadcastStream() : _changeStream;
 
+
+  @override
+  bool get active => page_order.isActive(this);
+
+  @override
+  FutureResponse<Page> delete() => page_order.deletePage(this);
+
+  @override
+  bool get exists => page_order.pageExists(this);
+
+  @override
+  Page get next => page_order.nextPage(this);
+
+  @override
+  Page get parent => page_order.parentPage(this);
+
+  @override
+  List<Page> get path => page_order.pagePath(this);
+
+  @override
+  Page get previous => page_order.previousPage(this);
 }

@@ -45,8 +45,8 @@ class AJAXMailMailbox extends MailMailbox {
   _onNameChangeController = new StreamController();
 
   Stream
-  _onDeleteStream ,
-  _onNameChangeStream ;
+  _onDeleteStream,
+  _onNameChangeStream;
 
 
   AJAXMailMailbox(MailAddress address, {String name, DateTime lastModified}):
@@ -71,49 +71,38 @@ class AJAXMailMailbox extends MailMailbox {
   String get _functionStringSelector => "MailDomainLibrary.getDomain(${quoteString(domain.domainName)}).getAddressLibrary().getAddress(${quoteString(address.localPart)}).getMailbox()";
 
   FutureResponse<MailMailbox> changeInfo({String name, String password}) {
-
-    var completer = new Completer<Response<MailMailbox>>();
-
     String functionString = _functionStringSelector;
+    //Setting name
     if (name != null && name != _name) {
       functionString += "..setName(${quoteString(name)})";
     }
-
+    //Setting password
     if (password != null) {
       functionString += "..setPassword(${quoteString(password)})";
     }
-
     functionString += "..getInstance()";
-
-    ajaxClient.callFunctionString(functionString).thenResponse(onSuccess:(Response<JSONObject> response) {
+    return ajaxClient.callFunctionString(functionString).thenResponse(onSuccess:(Response<JSONObject> response) {
       var n = response.payload.variables['name'];
       if (_name != n) {
         _name = n;
         _lastModified = new DateTime.fromMillisecondsSinceEpoch(response.payload.variables['last_modified'] * 1000);
-        completer.complete(this);
-        _onNameChangeController.add(this);
-      } else {
-        completer.complete(this);
+        _onNameChangeController.add(this); //TODO removed suspicious control flow
       }
+      return new Response.success(this);
+    });
 
-    }, onError:completer.complete);
-
-    return new FutureResponse(completer.future);
   }
 
-  FutureResponse<MailMailbox> delete() {
-    var completer = new Completer();
-    address.deleteMailbox().thenResponse(onSuccess:(Response<MailMailbox> r){
-      completer.complete(r.payload);
-      _onDeleteController.add(r.payload);
-    }, onError: completer.complete);
+  FutureResponse<MailMailbox> delete()  =>
+    address.deleteMailbox().thenResponse(onSuccess:(Response<MailMailbox> response) {
+      _onDeleteController.add(response.payload);
+      return response;
+    });
 
-    return new FutureResponse(completer.future);
-  }
 
-  Stream<MailMailbox> get onDelete => _onDeleteStream == null?_onDeleteStream = _onDeleteController.stream.asBroadcastStream(): _onDeleteStream;
+  Stream<MailMailbox> get onDelete => _onDeleteStream == null ? _onDeleteStream = _onDeleteController.stream.asBroadcastStream() : _onDeleteStream;
 
-  Stream<MailMailbox> get onNameChange => _onNameChangeStream == null?_onNameChangeStream = _onNameChangeController.stream.asBroadcastStream(): _onNameChangeStream;
+  Stream<MailMailbox> get onNameChange => _onNameChangeStream == null ? _onNameChangeStream = _onNameChangeController.stream.asBroadcastStream() : _onNameChangeStream;
 
 
   DateTime get lastModified => _lastModified;
