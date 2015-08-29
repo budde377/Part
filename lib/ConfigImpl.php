@@ -420,11 +420,11 @@ class ConfigImpl implements Config
 
 
         foreach ($this->configFile->AJAXTypeHandlers->class as $handler) {
-            $ar = array("class_name" => (string)$handler);
+            $class_array = array("class_name" => (string)$handler);
             if (isset($handler['link'])) {
-                $ar['link'] = $this->rootPath . "/" . $handler['link'];
+                $class_array['link'] = $this->rootPath . "/" . $handler['link'];
             }
-            $this->ajaxTypeHandlers[] = $ar;
+            $this->ajaxTypeHandlers[] = $class_array;
         }
         return $this->ajaxTypeHandlers;
     }
