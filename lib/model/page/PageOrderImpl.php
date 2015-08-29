@@ -320,10 +320,10 @@ ORDER BY parent_id,order_no");
         return $loopDetected;
     }
 
-    private function insertPageID($pageId, $place, $parentId)
+    private function insertPageID($pageId, $place, $parent_id)
     {
 
-        $order = $this->pageOrder[$parentId];
+        $order = $this->pageOrder[$parent_id];
 
         if ($place == PageOrder::PAGE_ORDER_LAST) {
             $place = count($order);
@@ -333,21 +333,21 @@ ORDER BY parent_id,order_no");
         }
         $new_order_array = array_merge(array_slice($order, 0, $place), [$pageId], array_slice($order,$place));
 
-        if (empty($parentId)) {
+        if (empty($parent_id)) {
             $stm = $this->connection->prepare("INSERT INTO PageOrder (page_id, order_no, parent_id) VALUES (:page_id, :order_no, NULL) ON DUPLICATE KEY UPDATE order_no = :order_no, parent_id = NULL");
             $array = [];
         } else {
             $stm = $this->connection->prepare("INSERT INTO PageOrder (page_id, order_no, parent_id) VALUES (:page_id, :order_no, :parent_id) ON DUPLICATE KEY UPDATE order_no = :order_no, parent_id = :parent_id ");
-            $array = ['parent_id' => $parentId];
+            $array = ['parent_id' => $parent_id];
         }
-
+        $this->connection->prepare("DELETE FROM PageOrder WHERE  parent_id = :parent_id")->execute(['parent_id' => $parent_id]);
         foreach ($new_order_array as $current_place => $page_id) {
             $array['page_id'] = $page_id;
             $array['order_no'] = $current_place;
             $stm->execute($array);
         }
 
-        $this->pageOrder[$parentId] = $new_order_array;
+        $this->pageOrder[$parent_id] = $new_order_array;
 
     }
 
