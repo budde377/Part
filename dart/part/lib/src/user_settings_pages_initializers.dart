@@ -129,7 +129,7 @@ class UserSettingsPageListsInitializer extends core.Initializer {
   }
 
   _create_active_generator(UListElement list, [parent=null]) {
-    new ElementChildrenGenerator<Page, LIElement>(
+    var generator = new ElementChildrenGenerator<Page, LIElement>(
             (Page p) => _active_element.clone(true),
         list,
         _pageSelector)
@@ -138,6 +138,19 @@ class UserSettingsPageListsInitializer extends core.Initializer {
       ..addHandler(_activeDragHandler)
       ..addUpdater(_updater)
       ..onAdd.listen((_) => _moveEmptyLast(list));
+
+    pageOrder.onChangeOrder.where((Page page) => page == parent).listen((Page page) => _reorder_page(page, list, generator.elements));
+
+  }
+
+  _reorder_page(Page page, UListElement list, Iterable<core.Pair<Page, LIElement>> elements) {
+    var element_map = new Map.fromIterable(elements, key:(core.Pair p) => p.k, value:(core.Pair p) => p.v);
+    pageOrder.listPageOrder(page).forEach((Page page) {
+      if(!element_map.containsKey(page)){
+        return;
+      }
+      list.append(element_map[page]);
+    });
   }
 
   _show_page(Page page, LIElement li) {
@@ -211,7 +224,7 @@ class UserSettingsPageListsInitializer extends core.Initializer {
       ..onDragEnd.listen((_) async {
       li.classes.remove('dragging');
       var new_index = li.parent.children.indexOf(li);
-      if(index == new_index){
+      if (index == new_index) {
         return;
       }
       _activeList.classes.add('blur');
