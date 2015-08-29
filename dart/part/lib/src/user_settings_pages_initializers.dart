@@ -151,6 +151,7 @@ class UserSettingsPageListsInitializer extends core.Initializer {
       }
       list.append(element_map[page]);
     });
+    _moveEmptyLast(list);
   }
 
   _show_page(Page page, LIElement li) {
@@ -217,13 +218,15 @@ class UserSettingsPageListsInitializer extends core.Initializer {
     var index;
     li
       ..draggable = true
-      ..onDragStart.listen((_) {
+      ..onDragStart.listen((MouseEvent event) {
       li.classes.add('dragging');
-      index = li.parent.children.indexOf(li);
+      index = _calculate_index(li);
+      event.stopPropagation();
     })
-      ..onDragEnd.listen((_) async {
+      ..onDragEnd.listen((MouseEvent event) async {
+      event.stopPropagation();
       li.classes.remove('dragging');
-      var new_index = li.parent.children.indexOf(li);
+      var new_index = _calculate_index(li);
       if (index == new_index) {
         return;
       }
@@ -234,6 +237,7 @@ class UserSettingsPageListsInitializer extends core.Initializer {
       ..onDragEnter.listen((_) => li.classes.add('drag_over'))
       ..onDragLeave.listen((_) => li.classes.remove('drag_over'))
       ..onDragOver.listen((MouseEvent event) {
+      event.stopPropagation();
       var dragging = li.parent.querySelector("li.dragging");
       if (dragging == li) {
         return;
@@ -241,4 +245,6 @@ class UserSettingsPageListsInitializer extends core.Initializer {
       li.insertAdjacentElement(event.offset.y < li.client.height / 2 ? 'beforeBegin' : 'afterEnd', dragging);
     });
   }
+
+  _calculate_index(Element element) => element.parent.children.where((Element element)=>!element.classes.contains('empty')).toList().indexOf(element);
 }
