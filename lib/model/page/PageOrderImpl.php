@@ -231,7 +231,6 @@ ORDER BY parent_id,order_no");
         $this->deactivatePageId($page->getID());
 
 
-
     }
 
     private function deactivatePageId($page_id)
@@ -324,14 +323,8 @@ ORDER BY parent_id,order_no");
     {
 
         $order = $this->pageOrder[$parent_id];
-
-        if ($place == PageOrder::PAGE_ORDER_LAST) {
-            $place = count($order);
-        } else {
-            $place = min($place, count($order));
-            $place = max(0, $place);
-        }
-        $new_order_array = array_merge(array_slice($order, 0, $place), [$pageId], array_slice($order,$place));
+        $place = $this->decidePlace($place, count($order));
+        $new_order_array = array_merge(array_slice($order, 0, $place), [$pageId], array_slice($order, $place));
 
         if (empty($parent_id)) {
             $stm = $this->connection->prepare("INSERT INTO PageOrder (page_id, order_no, parent_id) VALUES (:page_id, :order_no, NULL) ON DUPLICATE KEY UPDATE order_no = :order_no, parent_id = NULL");
@@ -387,7 +380,7 @@ ORDER BY parent_id,order_no");
     {
         if (($r = $this->findPage($page)) == 'inactive') {
             return array();
-        } else if ($r == false) {
+        } else if ($r === false) {
             return false;
         }
 
@@ -483,5 +476,15 @@ ORDER BY parent_id,order_no");
                 }
             }
         }
+    }
+
+    private function decidePlace($place, $max_size)
+    {
+
+        if ($place == PageOrder::PAGE_ORDER_LAST) {
+            return $max_size;
+        }
+
+        return max(0,min($place, $max_size));
     }
 }
