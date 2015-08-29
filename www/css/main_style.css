@@ -490,7 +490,7 @@ select.better_select_select {
     padding: 1px 0;
 }
 
-.colorList > li.emptyListInfo {
+.colorList > li.empty {
     text-align: center;
     padding: 0;
     font-style: italic;
@@ -617,7 +617,7 @@ body.offline .disable_on_offline::before {
     display: block;
 }
 
-.colorList > li:not(.emptyListInfo):hover, .colorList > li.dragging {
+.colorList > li:not(.empty):hover, .colorList > li.dragging {
     background: #ededed;
 }
 

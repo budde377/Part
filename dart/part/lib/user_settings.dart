@@ -98,7 +98,7 @@ class UserSettingsInitializer extends core.Initializer {
 
     _initLib.registerInitializer(new TitleURLUpdateInitializer(order, client));
     _initLib.registerInitializer(new UserSettingsDecorationInitializer());
-    _initLib.registerInitializer(new UserSettingsPageListsInitializer(order));
+    _initLib.registerInitializer(new UserSettingsPageListsInitializer());
     _initLib.registerInitializer(new UserSettingsEditPageFormInitializer(order));
     _initLib.registerInitializer(new UserSettingsChangeUserInfoFormInitializer(userLib));
     _initLib.registerInitializer(new UserSettingsAddPageFormInitializer(order));

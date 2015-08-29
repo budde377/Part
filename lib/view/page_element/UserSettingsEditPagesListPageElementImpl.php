@@ -1,5 +1,6 @@
 <?php
 namespace ChristianBudde\Part\view\page_element;
+
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\model\page\Page;
 
@@ -37,12 +38,11 @@ class UserSettingsEditPagesListPageElementImpl extends PageElementImpl
     {
         parent::generateContent();
 
-        $levelClass = !$this->cPrivileges->hasRootPrivileges() && !$this->cPrivileges->hasSitePrivileges()? 'levelPage':'draggable';
+        $levelClass = !$this->cPrivileges->hasRootPrivileges() && !$this->cPrivileges->hasSitePrivileges() ? 'levelPage' : 'draggable';
 
         $output = "
         <div id='ActiveListPath'>
-            <span class='up hidden'> Tilbage </span>
-            <span class='dot'> </span>  /
+            <span class='dot'> </span>
         </div>
         {$this->recursivePageListGenerator(null,"id='ActivePageList'",$levelClass)}
         ";
@@ -53,21 +53,21 @@ class UserSettingsEditPagesListPageElementImpl extends PageElementImpl
 
     public function pageDataSetGenerator(Page $page)
     {
-        $hidden = $page->isHidden()?"true":"false";
+        $hidden = $page->isHidden() ? "true" : "false";
         return "data-id='{$page->getId()}' data-template='{$page->getTemplate()}' data-alias='{$page->getAlias()}' data-title='{$page->getTitle()}' data-hidden='$hidden'";
     }
 
-    private function recursivePageListGenerator($parentPage= null, $attr="", $class = "",$path="/"){
+    private function recursivePageListGenerator($parentPage = null, $attr = "", $class = "", $path = "/")
+    {
         $list = "";
-        foreach($this->pageOrder->getPageOrder($parentPage) as $page){
+        foreach ($this->pageOrder->getPageOrder($parentPage) as $page) {
             /** @var $page Page */
-            $current = $page->getID() == $this->currentPage->getID()?'current':'';
+            $current = $page->getID() == $this->currentPage->getID() ? 'current' : '';
             $pageId = $page->getID();
-            $current .= $page->isHidden()?" ishidden":"";
-            $hideShow = $page->isHidden()?"Vis":"Skjul";
+            $current .= $page->isHidden() ? " ishidden" : "";
+            $hideShow = $page->isHidden() ? "Vis" : "Skjul";
             $list .= "
             <li class='$current' {$this->pageDataSetGenerator($page)}>
-                <div class='padding'> &nbsp;</div>
                 <a href='$path$pageId' class='val'>{$page->getTitle()}</a>
                 <div class='link delete' title='Slet'>&nbsp;</div>
                 <div class='link activate' title='Deaktiver'>&nbsp;</div>
@@ -77,15 +77,8 @@ class UserSettingsEditPagesListPageElementImpl extends PageElementImpl
             </li>
             ";
         }
-        if($list == ""){
-            $list = "<li class='emptyListInfo'>Der er ingen aktive sider</li>";
-        }
-        return "<ul $attr class='colorList $class'> $list </ul>";
+        return "<ul $attr class='colorList $class'> $list <li class='empty'>Der er ingen aktive sider</li></ul>";
     }
-
-
-
-
 
 
 }

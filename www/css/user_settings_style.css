@@ -56,7 +56,6 @@ body.offline #OnlineOfflineIndicator::before {
     height: auto;
 }
 
-
 #UserSettingsContainer h3 {
     line-height: 25px;
     font-weight: 100;
@@ -76,7 +75,7 @@ body.offline #OnlineOfflineIndicator::before {
 
 }
 
-#UserSettingsContent > ul > li > *{
+#UserSettingsContent > ul > li > * {
     width: 98%;
     margin-left: 1%;
     margin-right: 1%;
@@ -131,9 +130,10 @@ body.offline #OnlineOfflineIndicator::before {
     width: 250px;
 }
 
-#UserSettingsContent .better_select{
+#UserSettingsContent .better_select {
     width: 252px;
 }
+
 #UserSettingsContent > ul > li {
     padding-bottom: 20px;
     height: 100%;
@@ -149,6 +149,12 @@ body.offline #OnlineOfflineIndicator::before {
     margin-top: 5px;
     margin-bottom: 20px;
 }
+
+#UserSettingsContent ul.colorList  ul.colorList {
+    margin: 0;
+    padding: 0;
+}
+
 
 #UserSettingsContent ul.colorList li > .activate {
     color: #2f5377;
@@ -368,7 +374,7 @@ form.justDistribution > div:nth-of-type(2n+2) {
     transition: height 0.2s;
 }
 
-#UserSettingsExpandLink:hover{
+#UserSettingsExpandLink:hover {
     height: 70px;
 }
 
@@ -434,26 +440,29 @@ form.initial input.invalid {
     display: none;
 }
 
-#UserSettingsContent .showSubList {
-    padding: 0 !important;
-    margin: 0 !important;
+#UserSettingsContent .show_sub_list {
     width: 100%;
 }
 
-#UserSettingsContent .showSubList > li:not(.hasSubList) {
+#UserSettingsContent .show_sub_list > li:not(.has_sub_list) {
     display: none;
 }
 
-#UserSettingsContent .showSubList > .hasSubList {
+
+#UserSettingsContent .show_sub_list > .has_sub_list {
     background: transparent !important;
     padding: 0;
 }
 
-#UserSettingsContent .showSubList > .hasSubList > *:not(ul) {
+#UserSettingsContent .show_sub_list > .has_sub_list:before {
+    display: none;
+}
+
+#UserSettingsContent .show_sub_list > .has_sub_list > *:not(ul) {
     display: none !important;
 }
 
-#UserSettingsContent .showSubList > .hasSubList > ul {
+#UserSettingsContent .show_sub_list > .has_sub_list > ul {
     display: block !important;
     margin-left: 10px;
 }
@@ -510,7 +519,7 @@ form.initial input.invalid {
     height: 30px;
 }
 
-#ActivePageList li.ishidden:not(.hasSubList) {
+#ActivePageList li.ishidden:not(.has_sub_list) {
     opacity: 0.4;
     text-decoration: line-through;
 }
@@ -520,7 +529,6 @@ form.initial input.invalid {
 }
 
 #InactivePageList li:not(.empty) {
-    padding-right: 30px;
     padding-left: 0;
 }
 
@@ -528,17 +536,16 @@ form.initial input.invalid {
     padding-left: 0;
 }
 
-#InactivePageList li.empty, #ActivePageList li.empty{
+#InactivePageList li.empty, #ActivePageList li.empty {
     display: none;
 }
 
-#InactivePageList li.empty:only-child, #ActivePageList li.empty:only-child{
+#InactivePageList li.empty:only-child, #ActivePageList li.empty:only-child {
     display: block;
 }
 
-
-
-#InactivePageList .padding, #ActivePageList .padding {
+#InactivePageList li:not(.empty):before, #ActivePageList li:not(.empty):before {
+    content: '';
     border: 4px solid transparent;
     width: 0;
     height: 0;
@@ -547,46 +554,20 @@ form.initial input.invalid {
     background: transparent;
 }
 
-#ActivePageList li.current > .link.delete, #InactivePageList li.current > .link.delete,
-#ActivePageList.levelPage .link:not(.subpages), #InactivePageList.levelPage .link:not(.subpages),
-#ActivePageList.levelPage .handle, #InactivePageList.levelPage .handle {
-    display: none;
-}
-
-#ActivePageList.levelPage li.current,
-#InactivePageList.levelPage li.current {
-    padding-right: 0;
-}
-
-#ActivePageList li.current {
-    padding-right: 30px;
-}
-
-#ActivePageList li.current > .padding, #InactivePageList li.current > .padding {
+#ActivePageList li.current:before, #InactivePageList li.current:before {
     border-color: transparent transparent transparent #253977;
 }
 
-#ActivePageList li.loading > .padding, #InactivePageList li.loading > .padding {
-    background: transparent url(/_common/img/smallloader.gif) scroll no-repeat center center;
-    margin: 0;
-    padding: 0;
-    width: 21px;
-    height: 30px;
-    border: 0;
-    opacity: 0.6;
+#ActivePageList li.current > .link.delete, #InactivePageList li.current > .link.delete{
+    display: none;
 }
 
-#ActiveListPath .up {
-    cursor: pointer;
-    float: right;
-    background: #fff;
-    color: rgb(80, 80, 80);
-    padding: 0 15px;
+
+#ActivePageList li.current, #InactivePageList li.current {
+    padding-right: 30px;
 }
 
-#ActiveListPath .up:hover {
-    text-decoration: underline;
-}
+
 
 #UserSettingsContent span.version {
     background: #FFF;
@@ -666,7 +647,7 @@ form.initial input.invalid {
     display: none;
 }
 
-#LogInfoParagraph{
+#LogInfoParagraph {
     float: left;
 }
 
@@ -705,7 +686,7 @@ form.initial input.invalid {
 
 }
 
-#UserSettingsContent .floating_list.points_to > li:not(.empty_list){
+#UserSettingsContent .floating_list.points_to > li:not(.empty_list) {
     padding: 0;
 }
 
@@ -720,7 +701,7 @@ form.initial input.invalid {
     border-radius: 3px 0 0 3px;
 }
 
-#UserSettingsContent .floating_list.points_to > li > div:not(.delete):last-of-type{
+#UserSettingsContent .floating_list.points_to > li > div:not(.delete):last-of-type {
     padding-left: 10px;
 }
 
@@ -733,12 +714,12 @@ form.initial input.invalid {
     border-left: 6px solid #e0e0e0;
     padding: 0;
 }
-#UserSettingsContent .has_deletable.floating_list > li{
-    position:relative;
+
+#UserSettingsContent .has_deletable.floating_list > li {
+    position: relative;
 }
 
-
-#UserSettingsContent .has_deletable.floating_list > li > .delete::after{
+#UserSettingsContent .has_deletable.floating_list > li > .delete::after {
     background: url(/_common/img/redx.png) no-repeat center center;
     width: 100%;
     height: 100%;
@@ -746,33 +727,31 @@ form.initial input.invalid {
     position: absolute;
 
 }
+
 #UserSettingsContent .has_deletable.floating_list > li > .delete {
     cursor: pointer;
     opacity: 0;
-    padding:0;
-    position:absolute;
-    right:0;
+    padding: 0;
+    position: absolute;
+    right: 0;
     top: 0;
-    height:26px;
-    width:30px;
+    height: 26px;
+    width: 30px;
     transition: 0.2s opacity;
     z-index: 150;
-    background-color: rgb(255,255,255);
+    background-color: rgb(255, 255, 255);
 }
 
-#UserSettingsContent .has_deletable.floating_list > li:hover > .delete{
+#UserSettingsContent .has_deletable.floating_list > li:hover > .delete {
     opacity: 0.7;
     display: block;
 }
 
-#UserSettingsContent .has_deletable.floating_list > li:hover > .delete:hover{
+#UserSettingsContent .has_deletable.floating_list > li:hover > .delete:hover {
     opacity: 1;
 }
 
-
-
-
-#UserSettingsContent ul > li.empty_list{
+#UserSettingsContent ul > li.empty_list {
     display: none;
     width: 100%;
     padding: 10px 0;
@@ -783,7 +762,7 @@ form.initial input.invalid {
     margin: 0;
 }
 
-#UserSettingsContent ul.empty > li.empty_list{
+#UserSettingsContent ul.empty > li.empty_list {
     display: block;
 }
 
@@ -817,12 +796,12 @@ form.initial input.invalid {
     transition: 0.5s max-height;
 }
 
-#UserSettingsContent .mail_form > form  {
+#UserSettingsContent .mail_form > form {
     transition: 0.3s opacity;
     opacity: 1;
 }
 
-#UserSettingsContent .mail_form:not(.expanded)  > form  {
+#UserSettingsContent .mail_form:not(.expanded) > form {
     opacity: 0;
 }
 
@@ -865,7 +844,7 @@ form.initial input.invalid {
     opacity: 1;
 }
 
-#UserSettingsContent .mail_form > form   {
+#UserSettingsContent .mail_form > form {
     float: left;
     padding: 20px 10px;
     width: 530px;
@@ -895,7 +874,7 @@ form.initial input.invalid {
     width: 240px;
 }
 
-#UserSettingsContent select{
+#UserSettingsContent select {
     width: 252px;
 }
 
@@ -938,7 +917,6 @@ form.initial input.invalid {
     padding-right: 26px;
 }
 
-
 #UserSettingsEditMailAddAddressAddMailboxCheckbox + label + div {
 
     transition: 0.3s height;
@@ -948,7 +926,8 @@ form.initial input.invalid {
     overflow: hidden;
     height: 0;
 }
-#UserSettingsEditMailAddAddressAddMailboxCheckbox + label + div > label:nth-of-type(3){
+
+#UserSettingsEditMailAddAddressAddMailboxCheckbox + label + div > label:nth-of-type(3) {
     float: right;
 }
 
@@ -975,37 +954,34 @@ form.initial input.invalid {
     display: none;
 }
 
-
-#UserSettingsEditMailAddressLists{
+#UserSettingsEditMailAddressLists {
     float: left;
     list-style-type: none;
 }
 
-
-#UserSettingsEditMailAddressLists li.can_edit{
+#UserSettingsEditMailAddressLists li.can_edit {
     cursor: pointer;
 }
 
-
-#UserSettingsEditMailAddressLists li.active{
-    background-color: #4F8FA8 ;
-    color: #fff ;
-    border-color: #025C6D ;
-
-}
-#UserSettingsContent #UserSettingsEditMailAddressLists  .has_deletable.floating_list > li.active > .delete{
-    background-color: #4F8FA8 ;
+#UserSettingsEditMailAddressLists li.active {
+    background-color: #4F8FA8;
+    color: #fff;
+    border-color: #025C6D;
 
 }
 
-#UserSettingsEditMailAddAddressForm.editing .submit.create{
+#UserSettingsContent #UserSettingsEditMailAddressLists .has_deletable.floating_list > li.active > .delete {
+    background-color: #4F8FA8;
+
+}
+
+#UserSettingsEditMailAddAddressForm.editing .submit.create {
     display: none;
 }
 
-#UserSettingsEditMailAddAddressForm:not(.editing) .submit.edit{
+#UserSettingsEditMailAddAddressForm:not(.editing) .submit.edit {
     display: none;
 }
-
 
 @media screen and (max-width: 550px) {
     #UserSettingsContent .justDistribution > div,
@@ -1015,51 +991,53 @@ form.initial input.invalid {
         width: 100%;
     }
 
-    #UserSettingsContent input:not([type=submit]){
+    #UserSettingsContent input:not([type=submit]) {
         width: 98% !important;
         padding: 0 1%;
     }
 
-    #UserSettingsContent select, #UserSettingsContent input[type=submit]{
+    #UserSettingsContent select, #UserSettingsContent input[type=submit] {
         width: 100%;
     }
 
-    #UserSettingsContent .better_select{
+    #UserSettingsContent .better_select {
         width: 100%;
     }
 
-    #UserSettingsContent input:not([type=checkbox]):not([type=radio]){
+    #UserSettingsContent input:not([type=checkbox]):not([type=radio]) {
     }
-    #UserSettingsContent .oneLineForm{
+
+    #UserSettingsContent .oneLineForm {
         min-width: 0;
     }
-    #UserSettingsContent .oneLineForm input[type=submit]{
+
+    #UserSettingsContent .oneLineForm input[type=submit] {
         margin-left: 0;
 
     }
 
-    #UserSettingsContent .mail_form{
+    #UserSettingsContent .mail_form {
         width: 98%;
     }
 
-    #UserSettingsContent .mail_form > form{
+    #UserSettingsContent .mail_form > form {
         width: 100%;
         padding: 20px 0;
     }
-    #UserSettingsContent .mail_form > form .at{
+
+    #UserSettingsContent .mail_form > form .at {
         width: 100%;
         font-size: 40px;
         margin-top: 0;
         line-height: 60px;
     }
 
-    #UserSettingsContent .mail_form > form label{
+    #UserSettingsContent .mail_form > form label {
         width: 100%;
     }
 
-
-    #UserSettingsContent p.text{
-	text-align:justify; 
+    #UserSettingsContent p.text {
+        text-align: justify;
     }
 }
 

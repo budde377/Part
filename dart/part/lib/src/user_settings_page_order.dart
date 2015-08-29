@@ -20,7 +20,7 @@ class UserSettingsJSONPageOrder extends PageOrder {
   }
 
   void _build_page_order(UListElement activePageList, UListElement inactivePageList) {
-    _inactive = inactivePageList.children.map(_element_to_object).where((element) => element != null).map((Page p) => p.id);
+    _inactive = inactivePageList.children.map(_element_to_object).where((element) => element != null).map((Page p) => p.id).toList();
     _order[null] = _recursive_build_order(activePageList);
   }
 
