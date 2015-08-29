@@ -606,6 +606,19 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
     }
 
+    public function testBug133(){
+        $page1 = $this->pageOrder->getPage('page');
+        $page2 = $this->pageOrder->getPage('page2');
+        $page3 = $this->pageOrder->getPage('page3');
+
+        $this->pageOrder->setPageOrder($page3, 0, $page2);
+        $this->pageOrder->deactivatePage($page1);
+        $this->assertFalse($this->pageOrder->isActive($page1));
+        $this->assertFalse($this->pageOrder->isActive($page2));
+        $this->assertFalse($this->pageOrder->isActive($page3));
+    }
+
+
     public function testGetCurrentPageReturnsInstanceFromStrategy()
     {
         $strategy = new StubCurrentPageStrategyImpl();

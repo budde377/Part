@@ -228,24 +228,26 @@ ORDER BY parent_id,order_no");
         if (!$this->isActive($page)) {
             return;
         }
-        $this->connection->prepare("DELETE FROM PageOrder WHERE page_id = :id OR parent_id = :id")->execute(['id' => $page->getID()]);
-        $this->removeIDFromSubLists($page->getID());
         $this->deactivatePageId($page->getID());
 
-        if (!isset($this->pageOrder[$page->getID()])) {
-            return;
-        }
-        foreach ($this->pageOrder[$page->getID()] as $page_id) {
-            $this->deactivatePageId($page_id);
-        }
-        unset($this->pageOrder[$page->getID()]);
+
 
     }
 
     private function deactivatePageId($page_id)
     {
+        $this->connection->prepare("DELETE FROM PageOrder WHERE page_id = :id OR parent_id = :id")->execute(['id' => $page_id]);
+        $this->removeIDFromSubLists($page_id);
         $this->inactivePages[$page_id] = $this->activePages[$page_id];
         unset($this->activePages[$page_id]);
+
+        if (!isset($this->pageOrder[$page_id])) {
+            return;
+        }
+        foreach ($this->pageOrder[$page_id] as $sub_page_id) {
+            $this->deactivatePageId($sub_page_id);
+        }
+        unset($this->pageOrder[$page_id]);
     }
 
 
