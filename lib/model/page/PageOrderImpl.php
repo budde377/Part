@@ -378,9 +378,9 @@ ORDER BY parent_id,order_no");
      */
     public function getPagePath(Page $page)
     {
-        if (($r = $this->findPage($page)) == 'inactive') {
+        if (($status = $this->findPage($page)) == 'inactive') {
             return array();
-        } else if ($r === false) {
+        } else if ($status === false) {
             return false;
         }
 
