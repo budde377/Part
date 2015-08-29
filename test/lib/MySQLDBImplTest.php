@@ -278,16 +278,6 @@ class MySQLDBImplTest extends CustomDatabaseTestCase
 
     }
 
-    public function testCanSerialize()
-    {
-        $this->mysql->getConnection();
-        $this->mysql->getMailConnection($this->mailPassword);
-        $string = serialize($this->mysql);
-        /** @var MySQLDBImpl $instance*/
-        $instance = unserialize($string);
-        $this->assertTrue($instance->getConnection() === $instance->getConnection());
-        $this->assertTrue($instance->getMailConnection($this->mailPassword) === $instance->getMailConnection($this->mailPassword));
-    }
 
 
     protected function tearDown()

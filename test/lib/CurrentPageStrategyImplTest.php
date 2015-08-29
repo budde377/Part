@@ -7,7 +7,6 @@
  */
 namespace ChristianBudde\Part\test;
 
-use ChristianBudde\Part\model\page\CurrentPageStrategy;
 use ChristianBudde\Part\model\page\CurrentPageStrategyImpl;
 use ChristianBudde\Part\model\page\DefaultPageImpl;
 use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
@@ -41,17 +40,6 @@ class CurrentPageStrategyImplTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testSerialize()
-    {
-        $page = $this->strategy->getCurrentPage();
-        $string = serialize($this->strategy);
-        $_GET['page'] = 'p2';
-        /** @var CurrentPageStrategy $strategy */
-        $strategy = unserialize($string);
-        $this->assertEquals($this->defaultPageArray['p2'], $strategy->getCurrentPage());
-        $this->assertNotEquals($page, $strategy->getCurrentPage());
-
-    }
 
     public function testCurrentPageWillReturnInstanceOfPageWithNoPagesIndPageOrder()
     {
