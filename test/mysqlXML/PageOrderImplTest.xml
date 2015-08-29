@@ -24,12 +24,12 @@
         <table_data name="PageOrder">
             <row>
                 <field name="page_id">page</field>
-                <field name="order_no">1</field>
+                <field name="order_no">0</field>
                 <field name="parent_id" xsi:nil="true"/>
             </row>
             <row>
                 <field name="page_id">page2</field>
-                <field name="order_no">1</field>
+                <field name="order_no">0</field>
                 <field name="parent_id">page</field>
             </row>
         </table_data>
