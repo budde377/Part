@@ -20,11 +20,6 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     /** @var  ConfigImpl */
     private $config;
 
-    public function testCanSerialize()
-    {
-
-        serialize($this->config);
-    }
 
     protected function setUp()
     {
