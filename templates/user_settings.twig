@@ -117,9 +117,12 @@
                     <h2>Administrer Sider</h2>
 
                     <h3>Aktive sider</h3>
+                    <div id='ActiveListPath'>
+                        <span class='dot'> </span>
+                    </div>
                     {% page_element "\\ChristianBudde\\Part\\view\\page_element\\UserSettingsEditPagesListPageElementImpl" %}
                     <h3>Inaktive sider</h3>
-                    <ul class="colorList {{ has_site_privileges?"draggable":"" }}" id="InactivePageList">
+                    <ul class="colorList" id="InactivePageList">
                         {% set no_inactive = true %}
                         {% for page in page_order.listpages(constant('ChristianBudde\\Part\\model\\page\\PageOrder::LIST_INACTIVE')) %}
                             {% set no_inactive = false %}

@@ -37,17 +37,7 @@ class UserSettingsEditPagesListPageElementImpl extends PageElementImpl
     public function generateContent()
     {
         parent::generateContent();
-
-        $levelClass = !$this->cPrivileges->hasRootPrivileges() && !$this->cPrivileges->hasSitePrivileges() ? 'levelPage' : 'draggable';
-
-        $output = "
-        <div id='ActiveListPath'>
-            <span class='dot'> </span>
-        </div>
-        {$this->recursivePageListGenerator(null,"id='ActivePageList'",$levelClass)}
-        ";
-
-        return $output;
+        return $this->recursivePageListGenerator(null,"id='ActivePageList'");
 
     }
 
@@ -57,7 +47,7 @@ class UserSettingsEditPagesListPageElementImpl extends PageElementImpl
         return "data-id='{$page->getId()}' data-template='{$page->getTemplate()}' data-alias='{$page->getAlias()}' data-title='{$page->getTitle()}' data-hidden='$hidden'";
     }
 
-    private function recursivePageListGenerator($parentPage = null, $attr = "", $class = "", $path = "/")
+    private function recursivePageListGenerator($parentPage = null, $attr = "", $path = "/")
     {
         $list = "";
         foreach ($this->pageOrder->getPageOrder($parentPage) as $page) {
@@ -73,11 +63,11 @@ class UserSettingsEditPagesListPageElementImpl extends PageElementImpl
                 <div class='link activate' title='Deaktiver'>&nbsp;</div>
                 <div class='link showhide' title='$hideShow'> &nbsp;</div>
                 <div class='link subpages' title='Undersider'>&nbsp;</div>
-                {$this->recursivePageListGenerator($page,"","",$path.$pageId."/")}
+                {$this->recursivePageListGenerator($page,"",$path.$pageId."/")}
             </li>
             ";
         }
-        return "<ul $attr class='colorList $class'> $list <li class='empty'>Der er ingen aktive sider</li></ul>";
+        return "<ul $attr class='colorList'> $list <li class='empty'>Der er ingen aktive sider</li></ul>";
     }
 
 

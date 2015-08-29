@@ -71,6 +71,7 @@ class UserSettingsPageListsInitializer extends core.Initializer {
                 <div class='link subpages' title='Undersider'>&nbsp;</div>
                 <ul  class='colorList '><li class='empty'>Der er ingen aktive sider</li></ul>
         </li>""");
+
   }
 
   bool get canBeSetUp => _activeList != null && _inactiveList != null && _active_list_path != null;
@@ -123,6 +124,8 @@ class UserSettingsPageListsInitializer extends core.Initializer {
     });
     li.querySelector('div.link.subpages').onClick.listen((_) => _show_page(page, li));
     _create_active_generator(li.querySelector('ul'), page);
+
+
   }
 
   _create_active_generator(UListElement list, [parent=null]) {
@@ -132,6 +135,7 @@ class UserSettingsPageListsInitializer extends core.Initializer {
         _pageSelector)
       ..dependsOn(pageOrder.pageOrderView(parent))
       ..addHandler(_activeHandler)
+      ..addHandler(_activeDragHandler)
       ..addUpdater(_updater)
       ..onAdd.listen((_) => _moveEmptyLast(list));
   }
@@ -194,5 +198,34 @@ class UserSettingsPageListsInitializer extends core.Initializer {
       ..classes.toggle('ishidden', page.hidden);
     var a = li.querySelector('a');
     a.text = page.title;
+  }
+
+  void _activeDragHandler(Page page, LIElement li) {
+    var index;
+    li
+      ..draggable = true
+      ..onDragStart.listen((_) {
+      li.classes.add('dragging');
+      index = li.parent.children.indexOf(li);
+    })
+      ..onDragEnd.listen((_) async {
+      li.classes.remove('dragging');
+      var new_index = li.parent.children.indexOf(li);
+      if(index == new_index){
+        return;
+      }
+      _activeList.classes.add('blur');
+      await pageOrder.changePageOrder(page, place:new_index, parent:_showing_page);
+      _activeList.classes.remove('blur');
+    })
+      ..onDragEnter.listen((_) => li.classes.add('drag_over'))
+      ..onDragLeave.listen((_) => li.classes.remove('drag_over'))
+      ..onDragOver.listen((MouseEvent event) {
+      var dragging = li.parent.querySelector("li.dragging");
+      if (dragging == li) {
+        return;
+      }
+      li.insertAdjacentElement(event.offset.y < li.client.height / 2 ? 'beforeBegin' : 'afterEnd', dragging);
+    });
   }
 }

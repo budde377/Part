@@ -501,24 +501,6 @@ form.initial input.invalid {
 
 }
 
-#ActivePageList li.dragging {
-    cursor: move;
-}
-
-#ActivePageList li.dragging > .link {
-    display: none;
-}
-
-#ActivePageList li.divider {
-    height: 0;
-    background: transparent;
-    transition: height 0.2s;
-}
-
-#ActivePageList li.divider.expanded {
-    height: 30px;
-}
-
 #ActivePageList li.ishidden:not(.has_sub_list) {
     opacity: 0.4;
     text-decoration: line-through;
@@ -567,6 +549,10 @@ form.initial input.invalid {
     padding-right: 30px;
 }
 
+#ActivePageList .dragging{
+    outline: #ff7d1a solid 1px;
+    cursor: move;
+}
 
 
 #UserSettingsContent span.version {
