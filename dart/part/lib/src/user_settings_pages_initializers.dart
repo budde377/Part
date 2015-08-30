@@ -1,6 +1,5 @@
 part of user_settings;
 
-// TODO fix
 class UserSettingsAddPageFormInitializer extends core.Initializer {
   PageOrder _order;
 
