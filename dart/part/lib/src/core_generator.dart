@@ -17,26 +17,6 @@ abstract class GeneratorDependable<K> {
 
 }
 
-abstract class PairGeneratorDependable<K, V> extends GeneratorDependable<Pair<K, V>> {
-  GeneratorDependable<K> get firstOfPairDependable => new FirstOfPairGeneratorDependableTransformer<K, V>(this);
-
-  GeneratorDependable<V> get secondOfPairDependable => new SecondOfPairGeneratorDependableTransformer<K, V>(this);
-
-}
-
-
-class FirstOfPairGeneratorDependableTransformer<K, V> extends GeneratorDependableTransformer<Pair<K, V>, K> {
-
-  FirstOfPairGeneratorDependableTransformer(GeneratorDependable<Pair<K, V>> dependable) : super(dependable, (Pair<K, V> p) => p.k);
-
-}
-
-class SecondOfPairGeneratorDependableTransformer<K, V> extends GeneratorDependableTransformer<Pair<K, V>, V> {
-
-  SecondOfPairGeneratorDependableTransformer(GeneratorDependable<Pair<K, V>> dependable) : super(dependable, (Pair<K, V> p) => p.v);
-
-}
-
 class GeneratorDependableTransformer<K, T> extends GeneratorDependable<T> {
 
   final GeneratorDependable<K> dependable;
@@ -56,11 +36,28 @@ class GeneratorDependableTransformer<K, T> extends GeneratorDependable<T> {
 
 
 }
+class FirstOfPairGeneratorDependableTransformer<K, V> extends GeneratorDependableTransformer<Pair<K, V>, K> {
+
+  FirstOfPairGeneratorDependableTransformer(GeneratorDependable<Pair<K, V>> dependable) : super(dependable, (Pair<K, V> p) => p.k);
+
+}
+
+class SecondOfPairGeneratorDependableTransformer<K, V> extends GeneratorDependableTransformer<Pair<K, V>, V> {
+
+  SecondOfPairGeneratorDependableTransformer(GeneratorDependable<Pair<K, V>> dependable) : super(dependable, (Pair<K, V> p) => p.v);
+
+}
 
 
-class Generator<K, V> extends PairGeneratorDependable<K,V>{
+abstract class PairGeneratorDependable<K, V> extends GeneratorDependable<Pair<K, V>> {
+  GeneratorDependable<K> get firstOfPairDependable => new FirstOfPairGeneratorDependableTransformer<K, V>(this);
+
+  GeneratorDependable<V> get secondOfPairDependable => new SecondOfPairGeneratorDependableTransformer<K, V>(this);
+
+}
 
 
+class Generator<K, V> extends PairGeneratorDependable<K, V> {
 
   Map<K, V> _cache;
   Function _generator;
@@ -166,9 +163,6 @@ class Generator<K, V> extends PairGeneratorDependable<K,V>{
   }
 
 
-  Iterable<Pair<K,V>> get elements => _cache.keys.map((K k) => new Pair<K,V>(k, _cache[k]));
-
-
-
+  Iterable<Pair<K, V>> get elements => _cache.keys.map((K k) => new Pair<K, V>(k, _cache[k]));
 
 }
