@@ -10,7 +10,7 @@ use ChristianBudde\Part\util\traits\RequestTrait;
  * Date: 6/20/12
  * Time: 12:50 PM
  */
-class CurrentPageStrategyImpl implements CurrentPageStrategy, \Serializable
+class CurrentPageStrategyImpl implements CurrentPageStrategy
 {
     use RequestTrait;
     private $pageOrder;
@@ -134,32 +134,4 @@ class CurrentPageStrategyImpl implements CurrentPageStrategy, \Serializable
         return null;
     }
 
-
-    /**
-     * (PHP 5 &gt;= 5.1.0)<br/>
-     * String representation of object
-     * @link http://php.net/manual/en/serializable.serialize.php
-     * @return string the string representation of the object or null
-     */
-    public function serialize()
-    {
-        return serialize([$this->container, $this->pageOrder, $this->defaultPagesLib]);
-    }
-
-    /**
-     * (PHP 5 &gt;= 5.1.0)<br/>
-     * Constructs the object
-     * @link http://php.net/manual/en/serializable.unserialize.php
-     * @param string $serialized <p>
-     * The string representation of the object.
-     * </p>
-     * @return void
-     */
-    public function unserialize($serialized)
-    {
-        $array = unserialize($serialized);
-        $this->container = $array[0];
-        $this->pageOrder = $array[1];
-        $this->defaultPagesLib = $array[2];
-    }
 }

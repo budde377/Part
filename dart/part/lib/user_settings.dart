@@ -18,7 +18,6 @@ part 'src/user_settings_page_order.dart';
 part 'src/user_settings_user_library.dart';
 part 'src/user_settings_mail.dart';
 part 'src/user_settings_decoration.dart';
-part 'src/user_settings_page_li.dart';
 part 'src/user_settings_page_initializers.dart';
 part 'src/user_settings_pages_initializers.dart';
 part 'src/user_settings_user_initializers.dart';
@@ -98,7 +97,7 @@ class UserSettingsInitializer extends core.Initializer {
 
     _initLib.registerInitializer(new TitleURLUpdateInitializer(order, client));
     _initLib.registerInitializer(new UserSettingsDecorationInitializer());
-    _initLib.registerInitializer(new UserSettingsPageListsInitializer(order));
+    _initLib.registerInitializer(new UserSettingsPageListsInitializer());
     _initLib.registerInitializer(new UserSettingsEditPageFormInitializer(order));
     _initLib.registerInitializer(new UserSettingsChangeUserInfoFormInitializer(userLib));
     _initLib.registerInitializer(new UserSettingsAddPageFormInitializer(order));

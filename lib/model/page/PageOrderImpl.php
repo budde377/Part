@@ -44,7 +44,7 @@ class PageOrderImpl implements PageOrder
         $statement = $this
             ->connection
             ->query("
-SELECT Page.page_id, Page.title, Page.template, Page.alias,UNIX_TIMESTAMP(Page.last_modified) as last_modified, Page.hidden,PageOrder.parent_id
+SELECT Page.page_id, Page.title, Page.template, Page.alias,UNIX_TIMESTAMP(Page.last_modified) AS last_modified, Page.hidden,PageOrder.parent_id
 FROM Page INNER JOIN PageOrder ON Page.page_id = PageOrder.page_id
 ORDER BY parent_id,order_no");
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -60,7 +60,7 @@ ORDER BY parent_id,order_no");
 
         $statement = $this
             ->connection
-            ->query("SELECT *,UNIX_TIMESTAMP(Page.last_modified) as last_modified FROM Page WHERE Page.page_id NOT IN (SELECT page_id FROM PageOrder)");
+            ->query("SELECT *,UNIX_TIMESTAMP(Page.last_modified) AS last_modified FROM Page WHERE Page.page_id NOT IN (SELECT page_id FROM PageOrder)");
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $page = $this->createPageInstance($row['page_id'], $row['title'], $row['template'], $row['alias'], $row['last_modified'], $row['hidden']);
             $this->inactivePages[$row['page_id']] = $page;
@@ -127,7 +127,7 @@ ORDER BY parent_id,order_no");
         } else {
             $parentPageId = '';
         }
-        if(!isset($this->pageOrder[$parentPageId])){
+        if (!isset($this->pageOrder[$parentPageId])) {
             $this->pageOrder[$parentPageId] = [];
         }
 
@@ -188,22 +188,22 @@ ORDER BY parent_id,order_no");
      * @param bool $hidden
      * @return bool|Page Returns FALSE on invalid id or other error, else instance of Page
      */
-    public function createPage($id, $title='', $template = '', $alias = '', $hidden = false)
+    public function createPage($id, $title = '', $template = '', $alias = '', $hidden = false)
     {
-        if($this->getPage($id) != null){
+        if ($this->getPage($id) != null) {
             return false;
         }
 
-        try{
-            $page = new PageImpl($this->backendContainer, $this, $id,$title, $template, $alias, 0, $hidden);
-        } catch (MalformedParameterException $e){
+        try {
+            $page = new PageImpl($this->backendContainer, $this, $id, $title, $template, $alias, 0, $hidden);
+        } catch (MalformedParameterException $e) {
             return false;
         }
         $createStm = $this->connection->prepare("
             INSERT INTO Page (page_id,template,title,alias,hidden)
             VALUES (:page_id,:template,:title,:alias,:hidden)");
         try {
-            $createStm->execute(['page_id'=>$id, 'template'=>$template, 'title'=>$title, 'alias'=>$alias, 'hidden'=>$hidden]);
+            $createStm->execute(['page_id' => $id, 'template' => $template, 'title' => $title, 'alias' => $alias, 'hidden' => $hidden]);
         } catch (PDOException $e) {
             return false;
         }
@@ -228,27 +228,30 @@ ORDER BY parent_id,order_no");
         if (!$this->isActive($page)) {
             return;
         }
-        $this->connection->prepare("DELETE FROM PageOrder WHERE page_id = :id OR parent_id = :id")->execute(['id'=>$page->getID()]);
-        $this->removeIDFromSubLists($page->getID());
         $this->deactivatePageId($page->getID());
 
-        if (!isset($this->pageOrder[$page->getID()])) {
-            return;
-        }
-        foreach ($this->pageOrder[$page->getID()] as $page_id) {
-            $this->deactivatePageId($page_id);
-        }
-        unset($this->pageOrder[$page->getID()]);
 
     }
 
-    private function deactivatePageId($page_id){
+    private function deactivatePageId($page_id)
+    {
+        $this->connection->prepare("DELETE FROM PageOrder WHERE page_id = :id OR parent_id = :id")->execute(['id' => $page_id]);
+        $this->removeIDFromSubLists($page_id);
         $this->inactivePages[$page_id] = $this->activePages[$page_id];
         unset($this->activePages[$page_id]);
+
+        if (!isset($this->pageOrder[$page_id])) {
+            return;
+        }
+        foreach ($this->pageOrder[$page_id] as $sub_page_id) {
+            $this->deactivatePageId($sub_page_id);
+        }
+        unset($this->pageOrder[$page_id]);
     }
 
 
-    private function activatePageId($page_id){
+    private function activatePageId($page_id)
+    {
         $this->activePages[$page_id] = $this->inactivePages[$page_id];
         unset($this->inactivePages[$page_id]);
     }
@@ -316,30 +319,28 @@ ORDER BY parent_id,order_no");
         return $loopDetected;
     }
 
-    private function insertPageID($pageId, $place, $parentId)
+    private function insertPageID($pageId, $place, $parent_id)
     {
 
-        $order = $this->pageOrder[$parentId];
+        $order = $this->pageOrder[$parent_id];
+        $place = $this->decidePlace($place, count($order));
+        $new_order_array = array_merge(array_slice($order, 0, $place), [$pageId], array_slice($order, $place));
 
-        if($place == PageOrder::PAGE_ORDER_LAST){
-            $place = count($order);
-        } else {
-            $place = min($place, count($order));
-            $place = max(0, $place);
-        }
-
-
-        if ($place < count($order)) {
-            $this->insertPageID($order[$place], $place + 1, $parentId);
-        }
-        if (empty($parentId)) {
+        if (empty($parent_id)) {
             $stm = $this->connection->prepare("INSERT INTO PageOrder (page_id, order_no, parent_id) VALUES (:page_id, :order_no, NULL) ON DUPLICATE KEY UPDATE order_no = :order_no, parent_id = NULL");
-            $stm->execute(['page_id' => $pageId, 'order_no' => $place]);
+            $array = [];
         } else {
             $stm = $this->connection->prepare("INSERT INTO PageOrder (page_id, order_no, parent_id) VALUES (:page_id, :order_no, :parent_id) ON DUPLICATE KEY UPDATE order_no = :order_no, parent_id = :parent_id ");
-            $stm->execute(['page_id' => $pageId, 'order_no' => $place, 'parent_id' => $parentId]);
+            $array = ['parent_id' => $parent_id];
         }
-        $this->pageOrder[$parentId][$place] = $pageId;
+        $this->connection->prepare("DELETE FROM PageOrder WHERE  parent_id = :parent_id")->execute(['parent_id' => $parent_id]);
+        foreach ($new_order_array as $current_place => $page_id) {
+            $array['page_id'] = $page_id;
+            $array['order_no'] = $current_place;
+            $stm->execute($array);
+        }
+
+        $this->pageOrder[$parent_id] = $new_order_array;
 
     }
 
@@ -377,9 +378,9 @@ ORDER BY parent_id,order_no");
      */
     public function getPagePath(Page $page)
     {
-        if (($r = $this->findPage($page)) == 'inactive') {
+        if (($status = $this->findPage($page)) == 'inactive') {
             return array();
-        } else if ($r == false) {
+        } else if ($status === false) {
             return false;
         }
 
@@ -467,13 +468,23 @@ ORDER BY parent_id,order_no");
             $this->pageOrder[$newId] = $this->pageOrder[$oldId];
             unset($this->pageOrder[$oldId]);
         }
-        foreach($this->pageOrder as $keyId=>$order){
-            foreach($order as $key=>$id){
-                if($id == $oldId){
+        foreach ($this->pageOrder as $keyId => $order) {
+            foreach ($order as $key => $id) {
+                if ($id == $oldId) {
                     $this->pageOrder[$keyId][$key] = $newId;
                     return;
                 }
             }
         }
+    }
+
+    private function decidePlace($place, $max_size)
+    {
+
+        if ($place == PageOrder::PAGE_ORDER_LAST) {
+            return $max_size;
+        }
+
+        return max(0,min($place, $max_size));
     }
 }

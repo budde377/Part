@@ -10,29 +10,31 @@ class TitleURLUpdateInitializer extends Initializer {
 
   PageOrder _order;
 
-  JSONClient _client;
+  JSONClient _client = ajaxClient;
 
   TitleURLUpdateInitializer(PageOrder this._order, JSONClient this._client);
 
   bool get canBeSetUp => _order.currentPage != null;
 
   void setUp() {
-    var updateAddress = () {
-      var currentPagePath = _order.currentPagePath;
-      var currentPageAddress = currentPagePath.map((Page p) => p.id).join('/') ;
-      var currentPageTitle = document.title.split(' - ').first + " - " + currentPagePath.map((Page p) => p.title).join(' - ');
-      document.title = currentPageTitle;
-      _client.urlPrefix = currentPageAddress;
-      window.history.replaceState(null, currentPageTitle, "/" + currentPageAddress);
-    };
+
     updateAddress();
     _order.currentPage.onChange.listen((_) {
       updateAddress();
     });
-    _order.onUpdate.listen((_){
+    _order.onChangeOrder.listen((_){
       updateAddress();
     });
 
+  }
+
+  updateAddress(){
+    var currentPagePath = _order.currentPagePath;
+    var currentPageAddress = currentPagePath.map((Page p) => p.id).join('/') ;
+    var currentPageTitle = document.title.split(' - ').first + " - " + currentPagePath.map((Page p) => p.title).join(' - ');
+    document.title = currentPageTitle;
+    _client.urlPrefix = currentPageAddress;
+    window.history.replaceState(null, currentPageTitle, "/" + currentPageAddress);
   }
 
 }

@@ -46,11 +46,6 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testCanSerialize()
-    {
-        $this->setupFactory();
-        $string = serialize($this->factory);
-    }
 
     public function testBuildPreAndPostScriptWillReturnScriptChainOnEmptyConfig()
     {

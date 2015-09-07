@@ -587,6 +587,46 @@ class PageOrderImplTest extends CustomDatabaseTestCase
 
     }
 
+    public function testBug134(){
+        $page1 = $this->pageOrder->getPage('page');
+        $page2 = $this->pageOrder->getPage('page2');
+        $page3 = $this->pageOrder->getPage('page3');
+        $page4 = $this->pageOrder->createPage('page4');
+        $this->pageOrder->setPageOrder($page2, 1);
+        $this->pageOrder->setPageOrder($page3, 2);
+        $this->pageOrder->setPageOrder($page4, 3);
+        $this->pageOrder->setPageOrder($page1, 3);
+        $this->assertEquals([$page2, $page3, $page4, $page1], $this->pageOrder->getPageOrder());
+        $pageOrder = new PageOrderImpl($this->backendContainer);
+        $page1 = $pageOrder->getPage('page');
+        $page2 = $pageOrder->getPage('page2');
+        $page3 = $pageOrder->getPage('page3');
+        $page4 = $pageOrder->getPage('page4');
+        $this->assertEquals([$page2, $page3, $page4, $page1], $pageOrder->getPageOrder());
+
+    }
+
+    public function testBug133(){
+        $page1 = $this->pageOrder->getPage('page');
+        $page2 = $this->pageOrder->getPage('page2');
+        $page3 = $this->pageOrder->getPage('page3');
+
+        $this->pageOrder->setPageOrder($page3, 0, $page2);
+        $this->pageOrder->deactivatePage($page1);
+        $this->assertFalse($this->pageOrder->isActive($page1));
+        $this->assertFalse($this->pageOrder->isActive($page2));
+        $this->assertFalse($this->pageOrder->isActive($page3));
+    }
+
+    public function testBug135(){
+        $page1 = $this->pageOrder->getPage('page');
+        $page3 = $this->pageOrder->getPage('page3');
+        $this->pageOrder->setPageOrder($page3, 1, $page1);
+        $this->pageOrder->setPageOrder($page3, 0, $page1);
+
+    }
+
+
     public function testGetCurrentPageReturnsInstanceFromStrategy()
     {
         $strategy = new StubCurrentPageStrategyImpl();
