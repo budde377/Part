@@ -36,17 +36,17 @@ class ElementChildrenGenerator<K, V extends Element> extends core.Generator<K, V
 }
 
 
-class SortedElementsChildrenGenerator<K, V extends Element> extends ElementChildrenGenerator<K, V> {
+class SortedElementChildrenGenerator<K, V extends Element> extends ElementChildrenGenerator<K, V> {
 
-  factory SortedElementsChildrenGenerator.compareDataEntry(String entry, V generator(K), Element element, K selector(V, Element elm)) => new SortedElementsChildrenGenerator(
+  factory SortedElementChildrenGenerator.SortedElementChildrenGenerator(String entry, V generator(K), Element element, K selector(V, Element elm)) => new SortedElementChildrenGenerator(
           (Element e1, Element e2) => e1.dataset[entry].compareTo(e2.dataset[entry]),
       generator, element, selector);
 
-  factory SortedElementsChildrenGenerator.compareText(V generator(K), Element element, K selector(V, Element elm)) => new SortedElementsChildrenGenerator(
+  factory SortedElementChildrenGenerator.SortedElementChildrenGenerator(V generator(K), Element element, K selector(V, Element elm)) => new SortedElementChildrenGenerator(
           (Element e1, Element e2) => e1.text.compareTo(e2.text),
       generator, element, selector);
 
-  SortedElementsChildrenGenerator(int compare(V, V), V generator(K), Element element, K selector(V, Element elm)):
+  SortedElementChildrenGenerator(int compare(V, V), V generator(K), Element element, K selector(V, Element elm)):
   super._internal(generator, element, selector,
       (core.Pair<K, V> pair) {
     var child = element.children.firstWhere((Element child) => compare(child, pair.v) >= 0, orElse: () => null);
