@@ -38,11 +38,11 @@ class ElementChildrenGenerator<K, V extends Element> extends core.Generator<K, V
 
 class SortedElementChildrenGenerator<K, V extends Element> extends ElementChildrenGenerator<K, V> {
 
-  factory SortedElementChildrenGenerator.SortedElementChildrenGenerator(String entry, V generator(K), Element element, K selector(V, Element elm)) => new SortedElementChildrenGenerator(
+  factory SortedElementChildrenGenerator.fromDataset(String entry, V generator(K), Element element, K selector(V, Element elm)) => new SortedElementChildrenGenerator(
           (Element e1, Element e2) => e1.dataset[entry].compareTo(e2.dataset[entry]),
       generator, element, selector);
 
-  factory SortedElementChildrenGenerator.SortedElementChildrenGenerator(V generator(K), Element element, K selector(V, Element elm)) => new SortedElementChildrenGenerator(
+  factory SortedElementChildrenGenerator.fromText(V generator(K), Element element, K selector(V, Element elm)) => new SortedElementChildrenGenerator(
           (Element e1, Element e2) => e1.text.compareTo(e2.text),
       generator, element, selector);
 
