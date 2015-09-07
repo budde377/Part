@@ -57,5 +57,7 @@ class SortedElementChildrenGenerator<K, V extends Element> extends ElementChildr
     }
   }, (core.Pair<K, V> pair) => pair.v.remove());
 
+  //TODO reorder on update
+
 
 }
