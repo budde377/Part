@@ -180,6 +180,7 @@ class AJAXPageOrder extends PageOrder {
     //Setting new order
     _order[parent] = new_order;
     _onChangeOrderStreamController.add(parent);
+    _onUpdateStreamController.add(page);
     return new Response.success(parent);
   });
 
