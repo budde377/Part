@@ -56,9 +56,9 @@ class SortedElementChildrenGenerator<K, V extends Element> extends ElementChildr
   static _updateOrder(element, compare) {
     return (core.Pair pair) {
       pair.v.remove();
-      var child = element.children.firstWhere((Element child) => compare(child, pair.v) >= 0, orElse: () => null);
+      var child = element.children.firstWhere((Element child) => compare(child, pair.v) > 0, orElse: () => null);
       if (child != null) {
-        child.insertAdjacentElement('afterEnd', pair.v);
+        child.insertAdjacentElement('beforeBegin', pair.v);
       } else {
         element.append(pair.v);
       }
