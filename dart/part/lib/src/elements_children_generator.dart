@@ -48,16 +48,19 @@ class SortedElementChildrenGenerator<K, V extends Element> extends ElementChildr
 
   SortedElementChildrenGenerator(int compare(V, V), V generator(K), Element element, K selector(V, Element elm)):
   super._internal(generator, element, selector,
-      (core.Pair<K, V> pair) {
+      _updateOrder,
+      (core.Pair<K, V> pair) => pair.v.remove()){
+    onUpdate.listen(_updateOrder);
+  }
+  void _updateOrder(Pair<K,V> pair) {
     var child = element.children.firstWhere((Element child) => compare(child, pair.v) >= 0, orElse: () => null);
     if (child != null) {
       child.insertAdjacentElement('afterEnd', pair.v);
     } else {
       element.append(pair.v);
     }
-  }, (core.Pair<K, V> pair) => pair.v.remove());
+  }
 
-  //TODO reorder on update
 
 
 }
