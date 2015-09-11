@@ -46,21 +46,23 @@ class SortedElementChildrenGenerator<K, V extends Element> extends ElementChildr
           (Element e1, Element e2) => e1.text.compareTo(e2.text),
       generator, element, selector);
 
-  SortedElementChildrenGenerator(int compare(V, V), V generator(K), Element element, K selector(V, Element elm)):
+  SortedElementChildrenGenerator(int compare(V v1, V v2), V generator(K), Element element, K selector(V, Element elm)):
   super._internal(generator, element, selector,
-      _updateOrder,
-      (core.Pair<K, V> pair) => pair.v.remove()){
-    onUpdate.listen(_updateOrder);
-  }
-  void _updateOrder(Pair<K,V> pair) {
-    var child = element.children.firstWhere((Element child) => compare(child, pair.v) >= 0, orElse: () => null);
-    if (child != null) {
-      child.insertAdjacentElement('afterEnd', pair.v);
-    } else {
-      element.append(pair.v);
-    }
+  _updateOrder(element, compare),
+      (core.Pair<K, V> pair) => pair.v.remove()) {
+    onUpdate.listen(_updateOrder(element, compare));
   }
 
+  static _updateOrder(element, compare) {
+    return (core.Pair pair) {
+      var child = element.children.firstWhere((Element child) => compare(child, pair.v) >= 0, orElse: () => null);
+      if (child != null) {
+        child.insertAdjacentElement('afterEnd', pair.v);
+      } else {
+        element.append(pair.v);
+      }
+    };
+  }
 
 
 }
