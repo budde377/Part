@@ -61,7 +61,9 @@ class SortedElementChildrenGenerator<K, V extends Element> extends ElementChildr
     onUpdate.listen(_updateOrder(element, compare, selector));
   }
 
-  static _updateOrder(Element element, int compare(core.Pair<dynamic, Element> p1, core.Pair<dynamic, Element> p2), dynamic selector(Element, Element)) {
+  static _updateOrder(Element element,
+                      int compare(core.Pair<dynamic, Element> p1, core.Pair<dynamic, Element> p2),
+                      dynamic selector(Element element, Element key)) {
     return (core.Pair pair) {
       pair.v.remove();
       var child = element.children.firstWhere(
