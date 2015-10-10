@@ -46,11 +46,11 @@ class SortedElementChildrenGenerator<K, V extends Element> extends ElementChildr
       generator, element, selector);
 
   factory SortedElementChildrenGenerator.fromKey(int compare(K k1, K k2), V generator(K), Element element, K selector(V, Element elm)) => new SortedElementChildrenGenerator(
-          (core.Pair<K, V> p1, core.Pair<K, V> p2) => compare(p1.k, p1.k),
+          (core.Pair<K, V> p1, core.Pair<K, V> p2) => compare(p1.k, p2.k),
       generator, element, selector);
 
   factory SortedElementChildrenGenerator.fromValue(int compare(V k1, V k2), V generator(K), Element element, K selector(V, Element elm)) => new SortedElementChildrenGenerator(
-          (core.Pair<K, V> p1, core.Pair<K, V> p2) => compare(p1.v, p1.v),
+          (core.Pair<K, V> p1, core.Pair<K, V> p2) => compare(p1.v, p2.v),
       generator, element, selector);
 
   SortedElementChildrenGenerator(int compare(core.Pair<K, V> p1, core.Pair<K, V> p2), V generator(K), Element element, K selector(V, Element elm)):
