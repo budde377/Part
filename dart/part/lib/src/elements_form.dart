@@ -54,7 +54,7 @@ class FormHandler {
             onSuccess: f('on-success-function-string', 'on-success-notion', NOTION_TYPE_SUCCESS),
             onError:f('on-error-function-string', 'on-error-notion', NOTION_TYPE_ERROR));
 
-        return true;
+        return false;
       };
 
     }
