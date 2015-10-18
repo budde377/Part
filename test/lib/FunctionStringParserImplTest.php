@@ -81,7 +81,48 @@ class FunctionStringParserImplTest extends PHPUnit_Framework_TestCase
                 new NameNotStartingWithUnderscoreImpl('f'),
                 new BoolScalarImpl('true'))), $p);
     }
+    public function testParseProgramWithStringArgument()
+    {
+        $l = LexerImpl::lex("A.f('bob')");
+        $p = $this->parser->parse($l);
+        $this->assertEquals(new FunctionChainProgramImpl(
+            new NameNotStartingWithUnderscoreImpl('A'),
+            new NamedFunctionImpl(
+                new NameNotStartingWithUnderscoreImpl('f'),
+                new SingleQuotedStringScalarImpl("'bob'"))), $p);
+    }
+    public function testParseProgramWithDoubleQuotedStringArgument()
+    {
+        $l = LexerImpl::lex("A.f(\"bob\")");
+        $p = $this->parser->parse($l);
+        $this->assertEquals(new FunctionChainProgramImpl(
+            new NameNotStartingWithUnderscoreImpl('A'),
+            new NamedFunctionImpl(
+                new NameNotStartingWithUnderscoreImpl('f'),
+                new DoubleQuotedStringScalarImpl('"bob"'))), $p);
+    }
 
+    public function testParseProgramWithEscapedQuotes()
+    {
+        $l = LexerImpl::lex('A.f("b\"o\"b")');
+        $p = $this->parser->parse($l);
+        $this->assertEquals(new FunctionChainProgramImpl(
+            new NameNotStartingWithUnderscoreImpl('A'),
+            new NamedFunctionImpl(
+                new NameNotStartingWithUnderscoreImpl('f'),
+                new DoubleQuotedStringScalarImpl('"b\"o\"b"'))), $p);
+    }
+
+    public function testParseProgramWithEscapedSingleQuotes()
+    {
+        $l = LexerImpl::lex("A.f('b\\'o\\'b')");
+        $p = $this->parser->parse($l);
+        $this->assertEquals(new FunctionChainProgramImpl(
+            new NameNotStartingWithUnderscoreImpl('A'),
+            new NamedFunctionImpl(
+                new NameNotStartingWithUnderscoreImpl('f'),
+                new SingleQuotedStringScalarImpl("'b\\'o\\'b'"))), $p);
+    }
     public function testParseFunctionChain()
     {
         $l = LexerImpl::lex("A.f().g()");
