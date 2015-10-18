@@ -37,6 +37,25 @@ class FunctionStringLexerImplTest extends \PHPUnit_Framework_TestCase
         ], $this->simplify($r));
     }
 
+    public function testLexerLexesEscapes()
+    {
+        $r = LexerImpl::lex('"foo\"bar\"baz"');
+        $this->assertEquals([
+            Lexer::T_DOUBLE_QUOTED_STRING,
+            Lexer::T_EOF
+
+        ], $this->simplify($r));
+    }
+
+    public function testLexerLexesSingleEscapes()
+    {
+        $r = LexerImpl::lex("'foo\\'bar\\'baz'");
+        $this->assertEquals([
+            Lexer::T_SINGLE_QUOTED_STRING,
+            Lexer::T_EOF
+
+        ], $this->simplify($r));
+    }
     public function testLexerGetsNamesRight(){
         $r = LexerImpl::lex("_hej hej");
         $this->assertEquals([
