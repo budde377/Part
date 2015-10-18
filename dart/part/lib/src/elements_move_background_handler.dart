@@ -62,7 +62,7 @@ class MoveBackgroundHandler {
       mouseMoveListener = document.onMouseMove.listen((MouseEvent evt) {
         var x = evt.movement.x;
         var y = evt.movement.y;
-        var computedStyle = element.getComputedStyle();
+        var computedStyle = element.style;
         switch (_moveMode) {
           case MOVE_BACKGROUND_BOTH:
             var currentX = num.parse(computedStyle.backgroundPositionX.replaceAll("px","").replaceAll("%",""));
@@ -71,6 +71,7 @@ class MoveBackgroundHandler {
             break;
           case MOVE_BACKGROUND_Y:
             var currentX = computedStyle.backgroundPositionX;
+            core.debug([computedStyle.backgroundPositionX, computedStyle.backgroundPositionY]);
             var currentY = num.parse(computedStyle.backgroundPositionY.replaceAll("px","").replaceAll("%",""));
             element.style.backgroundPosition = background.style.backgroundPosition = "${currentX} ${currentY + y}px";
             break;
