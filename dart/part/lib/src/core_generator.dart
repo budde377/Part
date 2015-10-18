@@ -17,6 +17,54 @@ abstract class GeneratorDependable<K> {
 
 }
 
+
+class IterableStreamUpdateGeneratorDependable<T> extends GeneratorDependable<T> {
+  final Function fetch;
+  final Stream updateStream;
+  Iterable<T> _lastIterable;
+
+  final StreamController<T>
+  _onAddController = new StreamController<T>.broadcast(),
+  _onUpdateController = new StreamController<T>.broadcast(),
+  _onRemoveController = new StreamController<T>.broadcast();
+
+  IterableStreamUpdateGeneratorDependable(Iterable<T> fetch(), Stream updateStream) :
+  this.fetch = fetch, this.updateStream = updateStream {
+    updateStream.listen(_update);
+    _lastIterable = fetch();
+
+  }
+
+  Stream<T> get onAdd => _onAddController.stream;
+
+  Stream<T> get onUpdate => _onUpdateController.stream;
+
+  Stream<T> get onRemove => _onRemoveController.stream;
+
+  Iterable<T> get elements => fetch();
+
+  void _update(event) {
+    Iterable<T> new_iterable = fetch();
+    _lastIterable.forEach((T element) {
+      if (new_iterable.contains(element)) {
+        return;
+      }
+      debug(["Removing", element]);
+      _onRemoveController.add(element);
+    });
+    new_iterable.forEach((T element) {
+      if (_lastIterable.contains(element)) {
+        return;
+      }
+      debug(["Adding", element]);
+      _onAddController.add(element);
+    });
+
+    new_iterable.forEach(_onUpdateController.add);
+    _lastIterable = new_iterable;
+  }
+}
+
 class GeneratorDependableTransformer<K, T> extends GeneratorDependable<T> {
 
   final GeneratorDependable<K> dependable;

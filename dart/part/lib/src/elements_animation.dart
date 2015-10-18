@@ -103,8 +103,8 @@ class ScrollAnimation{
     return completer.future;
   }
 
-  Future<bool> scrollToElement(Element elm, {num animationFunction(num start, num end, num pct), Duration duration}) =>
-    scrollToPosition(elm.documentOffset, animationFunction: animationFunction, duration : duration);
+  Future<bool> scrollToElement(Element elm, {num animationFunction(num start, num end, num pct), Duration duration, num padding:0}) =>
+    scrollToPosition(elm.documentOffset-new Point(0, padding), animationFunction: animationFunction, duration : duration);
 
 }
 

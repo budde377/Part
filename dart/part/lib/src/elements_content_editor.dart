@@ -1428,6 +1428,7 @@ class ContentEditor {
 
   void _setUpListeners() {
     element.onInput.listen((_) {
+      _updateHeaderIds();
       _onContentChangeStreamController.add(true);
       _inputSinceSave = true;
     });
@@ -1671,6 +1672,7 @@ class ContentEditor {
 
 
   ElementList<HeadingElement> get headers => element.querySelectorAll("h2, h1, h3").toList();
+
 
   void save() {
     if (!changed) {

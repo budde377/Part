@@ -54,7 +54,7 @@ class FormHandler {
             onSuccess: f('on-success-function-string', 'on-success-notion', NOTION_TYPE_SUCCESS),
             onError:f('on-error-function-string', 'on-error-notion', NOTION_TYPE_ERROR));
 
-        return true;
+        return false;
       };
 
     }
@@ -65,14 +65,11 @@ class FormHandler {
         return;
       }
 
-
-      e.preventDefault();
-      e.stopImmediatePropagation();
-
       if (ValidatingForm.hasValidator(form) && !validatingForm.valid) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
         return;
       }
-
 
       if (!_submitFunction(formDataMap)) {
         e.preventDefault();
@@ -113,7 +110,7 @@ class FormHandler {
   }
 
 
-  FormData get formData =>  new FormData(form);
+  FormData get formData => new FormData(form);
 
   void changeNotion(String message, String notion_type) {
 
