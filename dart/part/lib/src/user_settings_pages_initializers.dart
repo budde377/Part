@@ -210,7 +210,8 @@ class UserSettingsPageListsInitializer extends core.Initializer {
       ..classes.toggle('current', pageOrder.currentPage == page)
       ..classes.toggle('ishidden', page.hidden);
     var a = li.querySelector('a');
-    a.text = page.title;
+    a..text = page.title
+     ..href = page.path.map((Page p) => p.id).join("/");
   }
 
   void _activeDragHandler(Page page, LIElement li) {
