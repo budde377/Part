@@ -16,7 +16,6 @@ import 'pcre_syntax_checker.dart' as PCRE;
 
 part 'src/user_settings_page_order.dart';
 part 'src/user_settings_user_library.dart';
-part 'src/user_settings_mail.dart';
 part 'src/user_settings_decoration.dart';
 part 'src/user_settings_page_initializers.dart';
 part 'src/user_settings_pages_initializers.dart';
@@ -24,7 +23,6 @@ part 'src/user_settings_user_initializers.dart';
 part 'src/user_settings_users_initializers.dart';
 part 'src/user_settings_log_initializers.dart';
 part 'src/user_settings_update_initializers.dart';
-part 'src/user_settings_mail_initializers.dart';
 
 bool get pageOrderAvailable => querySelector("#ActivePageList") != null && querySelector("#InactivePageList") != null;
 
@@ -37,7 +35,6 @@ PageOrder get pageOrder => pageOrderAvailable ? new UserSettingsJSONPageOrder() 
 
 UserLibrary get userLibrary => userLibraryAvailable ? new UserSettingsJSONUserLibrary() : new NullUserLibrary();
 
-MailDomainLibrary get mailDomainLibrary => mailDomainLibraryAvailable ? new UserSettingsMailDomainLibrary() : new NullMailDomainLibrary();
 
 
 String _errorMessage(int error_code) {
@@ -87,7 +84,6 @@ class UserSettingsInitializer extends core.Initializer {
       ..addType(User, userLibrary.userLoggedIn);
     if (mailDomainLibraryAvailable) {
       FS.register
-        ..addType(MailDomainLibrary, mailDomainLibrary)
         ..addType(MailDomain)
         ..addType(MailAddressLibrary)
         ..addType(MailAddress)
@@ -106,7 +102,6 @@ class UserSettingsInitializer extends core.Initializer {
     _initLib.registerInitializer(new UserSettingsPageUserListFormInitializer(userLib, order));
     _initLib.registerInitializer(new UserSettingsUpdateSiteInitializer());
     _initLib.registerInitializer(new UserSettingsLoggerInitializer());
-    _initLib.registerInitializer(new UserSettingsMailInitializer());
 
     /* SET UP LOGIN USER MESSAGE*/
     var loginUserMessage = querySelector('#LoginUserMessage');

@@ -35,7 +35,6 @@ class ConfigImpl implements Config
     private $log;
     private $ajaxTypeHandlers;
     private $fbAppCredentials;
-    private $enableCache;
 
     /**
      * @param SimpleXMLElement $configFile
@@ -306,20 +305,6 @@ class ConfigImpl implements Config
 
     }
 
-    /**
-     * @return bool
-     */
-    public function isCacheEnabled()
-    {
-        if ($this->enableCache !== null) {
-            return $this->enableCache;
-        }
-        if (!$this->configFile->enableCache->getName()) {
-            return $this->enableCache = false;
-        }
-
-        return $this->enableCache = (string)$this->configFile->enableCache == "true";
-    }
 
     /**
      * @return string String containing the domain (name.ext)

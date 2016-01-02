@@ -50,9 +50,6 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
         $username = self::$mysqlOptions->getUsername();
         $password = self::$mysqlOptions->getPassword();
         $database = self::$mysqlOptions->getDatabase();
-        $mHost = self::$mailMySQLOptions->getHost();
-        $mUsername = self::$mailMySQLOptions->getUsername();
-        $mDatabase = self::$mailMySQLOptions->getDatabase();
         $tmpFolder = "/tmp/cbweb-test/" . uniqid();
         $folder = new FolderImpl($tmpFolder);
         $folder->create(true);
@@ -75,11 +72,6 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
         <username>$username</username>
         <password>$password</password>
     </MySQLConnection>
-        <MailMySQLConnection>
-        <host>$mHost</host>
-        <database>$mDatabase</database>
-        <username>$mUsername</username>
-    </MailMySQLConnection>
     <enableUpdater>true</enableUpdater>
     <debugMode>false</debugMode>
     <tmpFolder path='$tmpFolder'/>
@@ -404,10 +396,6 @@ class BackendAJAXTypeHandlerImplTest extends CustomDatabaseTestCase
         $this->assertResponsePayloadEquals("GET['test']", 2);
     }
 
-    public function  testMailDomainWorks(){
-        $this->setUpPageUserLogin();
-        $this->assertResponsePayloadEquals('MailDomainLibrary.listDomains()', $this->container->getMailDomainLibraryInstance()->listDomains());
-    }
 
 
     public function testLoggerCanLogPost(){

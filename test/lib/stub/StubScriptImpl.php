@@ -37,6 +37,7 @@ class StubScriptImpl implements Script
         $this->lastRun = microtime(true);
         $this->lastRunName = $name;
         $this->lastRunArgs = $args;
+        sleep(1);
     }
 
 

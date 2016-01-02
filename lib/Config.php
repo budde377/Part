@@ -93,12 +93,14 @@ interface Config extends \ArrayAccess
 
     /**
      * @abstract
+     * @deprecated
      * @return array A map with entries: host, user and database.
      */
 
     public function getMailMySQLConnection();
 
     /**
+     * @deprecated
      * Returns true if mail support is enabled. Else false.
      * @return bool
      */
@@ -108,11 +110,6 @@ interface Config extends \ArrayAccess
      * @return bool
      */
     public function isDebugMode();
-
-    /**
-     * @return bool
-     */
-    public function isCacheEnabled();
 
     /**
      * @return bool
@@ -130,7 +127,7 @@ interface Config extends \ArrayAccess
     public function getDomain();
 
     /**
-     * @return Array containing owner information
+     * @return array containing owner information
      */
     public function getOwner();
 

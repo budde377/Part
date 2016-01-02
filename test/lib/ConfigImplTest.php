@@ -581,70 +581,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testGetMailMySQLConnectionWillReturnArrayWithInfoAsInConfigXML()
-    {
-        /** @var $configXML SimpleXMLElement */
-        $config =  $this->setupConfig("
-        <config>{$this->defaultOwner}
-            <MailMySQLConnection>
-                <host>someHost</host>
-                <database>someDatabase</database>
-                <username>someUser</username>
-            </MailMySQLConnection>
-        </config>");
-        $connArray = $config->getMailMySQLConnection();
-        $this->assertEquals([
-            'user'=>'someUser',
-            'host'=>'someHost',
-            'database'=>'someDatabase'
-        ], $connArray);
 
 
-    }
-
-    public function testIsMailManagementIsSupportedReflectsConnection()
-    {
-        /** @var $configXML SimpleXMLElement */
-        $config =  $this->setupConfig("
-        <config>{$this->defaultOwner}
-            <MailMySQLConnection>
-                <host>someHost</host>
-                <database>someDatabase</database>
-                <username>someUser</username>
-            </MailMySQLConnection>
-        </config>");
-        $this->assertTrue($config->isMailManagementEnabled());
-        $this->assertFalse($this->config->isMailManagementEnabled());
-
-    }
-
-
-    public function testGetMailMySQLConnectionWillReturnRightArrayAfterReturningMySQL()
-    {
-        /** @var $configXML SimpleXMLElement */
-        $config =  $this->setupConfig("
-        <config>{$this->defaultOwner}
-            <MySQLConnection>
-                <host>asd</host>
-                <database>asd</database>
-                <username>asd</username>
-                <password>asd</password>
-            </MySQLConnection>
-            <MailMySQLConnection>
-                <host>someHost</host>
-                <database>someDatabase</database>
-                <username>someUser</username>
-            </MailMySQLConnection>
-        </config>");
-        $config->getMySQLConnection();
-        $connArray = $config->getMailMySQLConnection();
-        $this->assertEquals([
-            'user'=>'someUser',
-            'host'=>'someHost',
-            'database'=>'someDatabase'
-        ], $connArray);
-
-    }
 
     public function testWillReturnNullIfNotSpecifiedInConfig()
     {
@@ -678,33 +616,6 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         <debugMode>true</debugMode>
         </config>");
         $this->assertTrue($config->isDebugMode());
-
-    }
-    public function testIsCacheEnabledWillReturnFalseOnEmpty()
-    {
-        /** @var $configXML SimpleXMLElement */
-        $config = $this->setupConfig("<config>{$this->defaultOwner}</config>");
-        $this->assertFalse($config->isCacheEnabled());
-
-    }
-
-    public function testIsCacheEnabledWillReturnFalseOnFalse()
-    {
-        /** @var $configXML SimpleXMLElement */
-        $config =  $this->setupConfig("<config>{$this->defaultOwner}
-        <enableCache>false</enableCache>
-        </config>");
-        $this->assertFalse($config->isCacheEnabled());
-
-    }
-
-    public function testIsCacheEnabledWillReturnTrueOnTrue()
-    {
-        /** @var $configXML SimpleXMLElement */
-        $config =  $this->setupConfig("<config>{$this->defaultOwner}
-        <enableCache>true</enableCache>
-        </config>");
-        $this->assertTrue($config->isCacheEnabled());
 
     }
 

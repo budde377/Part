@@ -38,11 +38,6 @@
             <folder path="db/part/" name="part" />
         </folders>
     </MySQLConnection>
-    <MailMySQLConnection>
-        <host>localhost</host>
-        <database>test_postfix</database>
-        <username>root</username>
-    </MailMySQLConnection>
     <optimizers>
         <class name="css" >ChristianBudde\Part\util\file\CSSYUICompressorOptimizerImpl</class>
         <class name="js" >ChristianBudde\Part\util\file\JSYUICompressorOptimizerImpl</class>

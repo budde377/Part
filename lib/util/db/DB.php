@@ -18,6 +18,7 @@ interface DB
     public function getConnection();
 
     /**
+     * @deprecated
      * @param string $password
      * @return PDO
      */

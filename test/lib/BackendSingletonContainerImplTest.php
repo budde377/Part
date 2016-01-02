@@ -168,19 +168,10 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
 
     }
 
-    public function testGetMailDomainLibraryWillReturnNullIfNoPathInConfig()
-    {
-        $ret1 = $this->backContainer->getMailDomainLibraryInstance();
-        $this->assertInstanceOf('ChristianBudde\Part\model\mail\DomainLibrary', $ret1);
-        $ret2 = $this->backContainer->getMailDomainLibraryInstance();
-        $this->assertTrue($ret1 === $ret2);
-
-    }
 
 
     public function testMagicGetterWillGetOtherGetters()
     {
-        $this->assertTrue($this->backContainer->getMailDomainLibraryInstance()  === $this->backContainer->mailDomainLibrary);
         $this->assertTrue($this->backContainer->getAJAXServerInstance()  === $this->backContainer->AJAXServer);
         $this->assertTrue($this->backContainer->getAJAXServerInstance()  === $this->backContainer->ajaxServer);
         $this->assertTrue($this->backContainer->getAJAXServerInstance()  === $this->backContainer->ajaxserver);

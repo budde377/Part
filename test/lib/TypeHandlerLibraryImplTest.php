@@ -69,9 +69,6 @@ class TypeHandlerLibraryImplTest extends CustomDatabaseTestCase
         $username = self::$mysqlOptions->getUsername();
         $password = self::$mysqlOptions->getPassword();
         $database = self::$mysqlOptions->getDatabase();
-        $mHost = self::$mailMySQLOptions->getHost();
-        $mUsername = self::$mailMySQLOptions->getUsername();
-        $mDatabase = self::$mailMySQLOptions->getDatabase();
         $tmpFolder = "/tmp/cbweb-test/" . uniqid();
         $folder = new FolderImpl($tmpFolder);
         $folder->create(true);
@@ -94,11 +91,6 @@ class TypeHandlerLibraryImplTest extends CustomDatabaseTestCase
         <username>$username</username>
         <password>$password</password>
     </MySQLConnection>
-        <MailMySQLConnection>
-        <host>$mHost</host>
-        <database>$mDatabase</database>
-        <username>$mUsername</username>
-    </MailMySQLConnection>
     <enableUpdater>true</enableUpdater>
     <debugMode>false</debugMode>
     <tmpFolder path='$tmpFolder'/>
@@ -148,16 +140,6 @@ class TypeHandlerLibraryImplTest extends CustomDatabaseTestCase
         $result = $this->typeHandlerLibrary->getPageOrderTypeHandlerInstance(new StubPageOrderImpl());
         $this->assertNotNull($result);
 
-        $result = $this->typeHandlerLibrary->getMailDomainLibraryTypeHandlerInstance(new StubMailDomainLibraryImpl());
-        $this->assertNotNull($result);
-        $result = $this->typeHandlerLibrary->getMailDomainTypeHandlerInstance($domain = new StubMailDomainImpl(false, 'test.dk'));
-        $this->assertNotNull($result);
-        $result = $this->typeHandlerLibrary->getMailAddressLibraryTypeHandlerInstance($addressLibrary = new AddressLibraryImpl($this->container, $domain));
-        $this->assertNotNull($result);
-        $result = $this->typeHandlerLibrary->getMailAddressTypeHandlerInstance($address = new AddressImpl($this->container, 'test', $addressLibrary));
-        $this->assertNotNull($result);
-        $result = $this->typeHandlerLibrary->getMailboxTypeHandlerInstance(new MailboxImpl($this->container, $address));
-        $this->assertNotNull($result);
 
         $result = $this->typeHandlerLibrary->getPageContentLibraryTypeHandlerInstance(new PageContentLibraryImpl($this->container, $page));
         $this->assertNotNull($result);
@@ -201,17 +183,6 @@ class TypeHandlerLibraryImplTest extends CustomDatabaseTestCase
         $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\type_handler\PageTypeHandlerImpl',$result);
         $result = $this->typeHandlerLibrary->getPageOrderTypeHandlerInstance(new StubPageOrderImpl());
         $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\type_handler\PageOrderTypeHandlerImpl',$result);
-
-        $result = $this->typeHandlerLibrary->getMailDomainLibraryTypeHandlerInstance(new StubMailDomainLibraryImpl());
-        $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\type_handler\MailDomainLibraryTypeHandlerImpl',$result);
-        $result = $this->typeHandlerLibrary->getMailDomainTypeHandlerInstance($domain = new StubMailDomainImpl(false, 'test.dk'));
-        $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\type_handler\MailDomainTypeHandlerImpl',$result);
-        $result = $this->typeHandlerLibrary->getMailAddressLibraryTypeHandlerInstance($addressLibrary = new AddressLibraryImpl($this->container, $domain));
-        $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\type_handler\MailAddressLibraryTypeHandlerImpl',$result);
-        $result = $this->typeHandlerLibrary->getMailAddressTypeHandlerInstance($address = new AddressImpl($this->container, 'test', $addressLibrary));
-        $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\type_handler\MailAddressTypeHandlerImpl',$result);
-        $result = $this->typeHandlerLibrary->getMailboxTypeHandlerInstance(new MailboxImpl($this->container, $address));
-        $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\type_handler\MailboxTypeHandlerImpl',$result);
 
         $result = $this->typeHandlerLibrary->getPageContentLibraryTypeHandlerInstance(new PageContentLibraryImpl($this->container, $page));
         $this->assertInstanceOf('ChristianBudde\Part\controller\ajax\type_handler\PageContentLibraryTypeHandlerImpl',$result);
@@ -264,22 +235,6 @@ class TypeHandlerLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue($result !== $result2);
         $result = $this->typeHandlerLibrary->getPageOrderTypeHandlerInstance(new StubPageOrderImpl());
         $result2 = $this->typeHandlerLibrary->getPageOrderTypeHandlerInstance(new StubPageOrderImpl());
-        $this->assertTrue($result !== $result2);
-
-        $result = $this->typeHandlerLibrary->getMailDomainLibraryTypeHandlerInstance(new StubMailDomainLibraryImpl());
-        $result2 = $this->typeHandlerLibrary->getMailDomainLibraryTypeHandlerInstance(new StubMailDomainLibraryImpl());
-        $this->assertTrue($result !== $result2);
-        $result = $this->typeHandlerLibrary->getMailDomainTypeHandlerInstance($domain = new StubMailDomainImpl(false, 'test.dk'));
-        $result2 = $this->typeHandlerLibrary->getMailDomainTypeHandlerInstance($domain = new StubMailDomainImpl(false, 'test.dk'));
-        $this->assertTrue($result !== $result2);
-        $result = $this->typeHandlerLibrary->getMailAddressLibraryTypeHandlerInstance($addressLibrary = new AddressLibraryImpl($this->container, $domain));
-        $result2 = $this->typeHandlerLibrary->getMailAddressLibraryTypeHandlerInstance($addressLibrary = new AddressLibraryImpl($this->container, $domain));
-        $this->assertTrue($result !== $result2);
-        $result = $this->typeHandlerLibrary->getMailAddressTypeHandlerInstance($address = new AddressImpl($this->container, 'test', $addressLibrary));
-        $result2 = $this->typeHandlerLibrary->getMailAddressTypeHandlerInstance($address = new AddressImpl($this->container, 'test', $addressLibrary));
-        $this->assertTrue($result !== $result2);
-        $result = $this->typeHandlerLibrary->getMailboxTypeHandlerInstance(new MailboxImpl($this->container, $address));
-        $result2 = $this->typeHandlerLibrary->getMailboxTypeHandlerInstance(new MailboxImpl($this->container, $address));
         $this->assertTrue($result !== $result2);
 
         $result = $this->typeHandlerLibrary->getPageContentLibraryTypeHandlerInstance(new PageContentLibraryImpl($this->container, $page));
@@ -337,22 +292,6 @@ class TypeHandlerLibraryImplTest extends CustomDatabaseTestCase
         $this->assertTrue($result === $result2);
         $result = $this->typeHandlerLibrary->getPageOrderTypeHandlerInstance($instance = new StubPageOrderImpl());
         $result2 = $this->typeHandlerLibrary->getPageOrderTypeHandlerInstance($instance);
-        $this->assertTrue($result === $result2);
-
-        $result = $this->typeHandlerLibrary->getMailDomainLibraryTypeHandlerInstance($instance = new StubMailDomainLibraryImpl());
-        $result2 = $this->typeHandlerLibrary->getMailDomainLibraryTypeHandlerInstance($instance);
-        $this->assertTrue($result === $result2);
-        $result = $this->typeHandlerLibrary->getMailDomainTypeHandlerInstance($instance = $domain = new StubMailDomainImpl(false, 'test.dk'));
-        $result2 = $this->typeHandlerLibrary->getMailDomainTypeHandlerInstance($instance);
-        $this->assertTrue($result === $result2);
-        $result = $this->typeHandlerLibrary->getMailAddressLibraryTypeHandlerInstance($instance = $addressLibrary = new AddressLibraryImpl($this->container, $domain));
-        $result2 = $this->typeHandlerLibrary->getMailAddressLibraryTypeHandlerInstance($instance);
-        $this->assertTrue($result === $result2);
-        $result = $this->typeHandlerLibrary->getMailAddressTypeHandlerInstance($instance = $address = new AddressImpl($this->container, 'test', $addressLibrary));
-        $result2 = $this->typeHandlerLibrary->getMailAddressTypeHandlerInstance($instance);
-        $this->assertTrue($result === $result2);
-        $result = $this->typeHandlerLibrary->getMailboxTypeHandlerInstance($instance = new MailboxImpl($this->container, $address));
-        $result2 = $this->typeHandlerLibrary->getMailboxTypeHandlerInstance($instance);
         $this->assertTrue($result === $result2);
 
         $result = $this->typeHandlerLibrary->getPageContentLibraryTypeHandlerInstance($instance = new PageContentLibraryImpl($this->container, $page));

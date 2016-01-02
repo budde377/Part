@@ -126,11 +126,6 @@ interface BackendSingletonContainer
     public function getTmpFolderInstance();
 
 
-    /**
-     * Will Create and reuse instance of MailDomainLibrary.
-     * @return DomainLibrary
-     */
-    public function getMailDomainLibraryInstance();
 
     /**
      * @param string $name

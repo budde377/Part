@@ -222,19 +222,6 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     }
 
     /**
-     * Will Create and reuse instance of MailDomainLibrary.
-     * @return DomainLibrary
-     */
-    public function getMailDomainLibraryInstance()
-    {
-        if ($this->mailDomainLibrary == null) {
-            $this->mailDomainLibrary = new DomainLibraryImpl($this, $this->getConfigInstance(), $this->getDBInstance(), $this->getUserLibraryInstance());
-        }
-
-        return $this->mailDomainLibrary;
-    }
-
-    /**
      * @param string $name
      * @return mixed
      */
@@ -244,9 +231,6 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
         switch ($name) {
             case 'site':
                 return $this->getSiteInstance();
-                break;
-            case 'maildomainlibrary':
-                return $this->getMailDomainLibraryInstance();
                 break;
             case 'ajaxserver':
                 return $this->getAJAXServerInstance();

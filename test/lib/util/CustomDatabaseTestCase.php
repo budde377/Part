@@ -67,9 +67,7 @@ class CustomDatabaseTestCase extends PHPUnit_Extensions_Database_TestCase
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        self::$mailMySQLOptions = new MailMySQLConstantsImpl();
         if (self::$mysqlOptions == null) {
-
             self::$mysqlOptions = new StandardMySQLConstantsImpl();
         }
         self::$pdo = new PDO('mysql:dbname=' . self::$mysqlOptions->getDatabase() . ';host=' . self::$mysqlOptions->getHost(), self::$mysqlOptions->getUsername(), self::$mysqlOptions->getPassword(), array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
