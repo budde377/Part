@@ -88,13 +88,6 @@
                         <xs:field xpath="@key"/>
                     </xs:unique>
                 </xs:element>
-                <xs:element name="facebookApp" minOccurs="0">
-                    <xs:complexType>
-                        <xs:attribute name="id" type="xs:string" use="required"/>
-                        <xs:attribute name="secret" type="xs:string" use="required"/>
-                        <xs:attribute name="permanent_token" type="xs:string" use="optional"/>
-                    </xs:complexType>
-                </xs:element>
             </xs:all>
         </xs:complexType>
     </xs:element>

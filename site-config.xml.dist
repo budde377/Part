@@ -2,7 +2,6 @@
 <config xmlns="http://christianbud.de/site-config"
         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
         xsi:schemaLocation="http://christianbud.de/site-config common/xsd/site-config.xsd">
-    <facebookApp id="ID" secret="SECRET" />
     <siteInfo>
         <domain name="YOUR COMPANY" extension="EXTENSION"/>
         <owner name="JOHN DOE" mail="test@example.com" username="root"/>

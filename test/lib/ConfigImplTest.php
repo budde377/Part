@@ -681,31 +681,6 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("/some/path", $config->getLogPath());
     }
 
-    public function testGetFacebookCredentialsIsNullWhenNotDefined()
-    {
-        /** @var $configXML SimpleXMLElement */
-        $config =  $this->setupConfig("<config>{$this->defaultOwner}
-        </config>");
-        $this->assertEquals(['id' => '', 'secret' => '', 'permanent_access_token' => ''], $config->getFacebookAppCredentials());
-    }
-
-    public function testGetFacebookCredentialsIsRightArrayWhenDefined()
-    {
-        /** @var $configXML SimpleXMLElement */
-        $config =  $this->setupConfig("<config>{$this->defaultOwner}
-            <facebookApp id='ID' secret='SECRET'/>
-        </config>");
-        $this->assertEquals(['id' => 'ID', 'secret' => 'SECRET', 'permanent_access_token' => ''], $config->getFacebookAppCredentials());
-    }
-
-    public function testGetFacebookCredentialsIsRightArrayWhenDefinedWithToken()
-    {
-        /** @var $configXML SimpleXMLElement */
-        $config =  $this->setupConfig("<config>{$this->defaultOwner}
-            <facebookApp id='ID' secret='SECRET' permanent_token='TOKEN'/>
-        </config>");
-        $this->assertEquals(['id' => 'ID', 'secret' => 'SECRET', 'permanent_access_token' => 'TOKEN'], $config->getFacebookAppCredentials());
-    }
 
 
     public function testGetErrorLogReturnsReturnsEmptyWhenNotDefined()

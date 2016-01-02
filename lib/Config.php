@@ -143,6 +143,7 @@ interface Config extends \ArrayAccess
 
 
     /**
+     * @deprecated
      * @return array An assoc array with keys: `id`, `secret` and `permanent_access_token` which contains the facebook app id, secret and permanent access token respectively. Values are empty if element is not defined.
      */
     public function getFacebookAppCredentials();
