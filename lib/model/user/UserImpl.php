@@ -159,7 +159,7 @@ class UserImpl implements User
 
         if ($wasLoggedIn) {
 
-            $this->updateLoginSession($password);
+            $this->updateLoginSession();
         }
 
         return true;

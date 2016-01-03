@@ -69,6 +69,7 @@ class SiteFactoryImpl implements SiteFactory
                 if (!file_exists($location)) {
                     throw new FileNotFoundException($location);
                 }
+                /** @noinspection PhpIncludeInspection */
                 require_once $location;
 
             }

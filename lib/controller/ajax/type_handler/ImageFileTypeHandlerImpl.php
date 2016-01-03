@@ -41,6 +41,7 @@ class ImageFileTypeHandlerImpl extends FileTypeHandlerImpl
         $this->addFunctionPreCallFunction('ImageFile', 'mirrorHorizontal', $f = $this->createSpliceAndTrueEndPreFunction(0));
         $this->addFunctionPreCallFunction('ImageFile', 'mirrorVertical', $f);
 
+        /** @noinspection PhpUnusedParameterInspection */
         $this->addTypeAuthFunction('ImageFile', function ($type, $instance, $function)  {
             return
                 !in_array($function, ['scaleToWidth',
@@ -62,6 +63,12 @@ class ImageFileTypeHandlerImpl extends FileTypeHandlerImpl
 
     private function createSpliceAndTrueEndPreFunction($length)
     {
+        /** @noinspection PhpUnusedParameterInspection
+         * @param $type
+         * @param $instance
+         * @param $functionName
+         * @param $arguments
+         */
         return function ($type, $instance, $functionName, &$arguments) use ($length) {
             $arguments = array_splice($arguments, 0, $length);
             $arguments[$length] = true;

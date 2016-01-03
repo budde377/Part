@@ -78,13 +78,6 @@ interface Config extends \ArrayAccess
 
     /**
      * @abstract
-     * @param $name
-     * @return array | null Array with entrance className, name, path with ClassName, name provided, and absolute path respectively.
-     */
-    public function getOptimizer($name);
-
-    /**
-     * @abstract
      * @return array A map with entries: host, user, database, password and a list of folders.
      */
     public function getMySQLConnection();

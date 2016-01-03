@@ -25,7 +25,6 @@ class ConfigImpl implements Config
     private $pageElements = null;
     private $preScripts = null;
     private $postScripts = null;
-    private $optimizers = null;
     private $mysql = null;
     private $debugMode;
     private $defaultPages;
@@ -87,6 +86,7 @@ class ConfigImpl implements Config
             return $this->postScripts;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         return $this->postScripts = $this->getScripts($this->configFile->postScripts);
     }
 
@@ -116,6 +116,7 @@ class ConfigImpl implements Config
             return $this->preScripts;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         return $this->preScripts = $this->getScripts($this->configFile->preScripts);
     }
 
@@ -128,6 +129,7 @@ class ConfigImpl implements Config
     public function getPageElement($name)
     {
         if ($this->pageElements == null) {
+            /** @noinspection PhpUndefinedFieldInspection */
             $this->pageElements = $this->buildClasses($this->configFile->pageElements->class);
         }
 
@@ -159,19 +161,6 @@ class ConfigImpl implements Config
         return $returnArray;
     }
 
-    /**
-     * @param $name
-     * @return array | null Array with entrance className, name, path with ClassName, name provided, and absolute path respectively.
-     */
-    public function getOptimizer($name)
-    {
-        if ($this->optimizers == null) {
-            $this->optimizers = $this->buildClasses($this->configFile->optimizers->class);
-        }
-
-
-        return isset($this->optimizers[$name]) ? $this->optimizers[$name] : null;
-    }
 
 
     public function getMySQLConnection()
@@ -181,17 +170,21 @@ class ConfigImpl implements Config
             return $this->mysql === false ? null : $this->mysql;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         if (empty($this->configFile->MySQLConnection)) {
             $this->mysql = false;
             return null;
         }
+        /** @noinspection PhpUndefinedFieldInspection */
         $this->mysql = [
             'user' => (string)$this->configFile->MySQLConnection->username,
             'password' => (string)$this->configFile->MySQLConnection->password,
             'database' => (string)$this->configFile->MySQLConnection->database,
             'host' => (string)$this->configFile->MySQLConnection->host,
             'folders' => []];
+        /** @noinspection PhpUndefinedFieldInspection */
         if (!empty($this->configFile->MySQLConnection->folders)) {
+            /** @noinspection PhpUndefinedFieldInspection */
             foreach ($this->configFile->MySQLConnection->folders->folder as $folder) {
                 $this->mysql['folders'][(string)$folder['name']] = (string)$folder['path'];
             }
@@ -226,7 +219,9 @@ class ConfigImpl implements Config
             return $this->defaultPages;
         }
         $this->defaultPages = [];
+        /** @noinspection PhpUndefinedFieldInspection */
         if ($this->configFile->defaultPages->getName()) {
+            /** @noinspection PhpUndefinedFieldInspection */
             foreach ($this->configFile->defaultPages->page as $page) {
                 $title = (string)$page;
                 $this->defaultPages[$title]["template"] = (string)$page["template"];
@@ -246,16 +241,19 @@ class ConfigImpl implements Config
         }
 
         $this->templates = [];
+        /** @noinspection PhpUndefinedFieldInspection */
         $templates = $this->configFile->templates;
         if (!empty($templates)) {
             $this->setUpTemplateHelper($templates);
             return;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         if (empty($this->configFile->templateCollection)) {
             return;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         foreach ($this->configFile->templateCollection->templates as $templates) {
             $this->setUpTemplateHelper($templates);
         }
@@ -272,10 +270,12 @@ class ConfigImpl implements Config
             return $this->debugMode;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         if (!$this->configFile->debugMode->getName()) {
             return $this->debugMode = false;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         return $this->debugMode = (string)$this->configFile->debugMode == "true";
     }
 
@@ -295,10 +295,12 @@ class ConfigImpl implements Config
         if ($this->enableUpdater !== null) {
             return $this->enableUpdater;
         }
+        /** @noinspection PhpUndefinedFieldInspection */
         if (!$this->configFile->enableUpdater->getName()) {
             return $this->enableUpdater = true;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         return $this->enableUpdater = (string)$this->configFile->enableUpdater == "true";
 
     }
@@ -312,6 +314,8 @@ class ConfigImpl implements Config
         if ($this->domain !== null) {
             return $this->domain;
         }
+        /** @noinspection PhpUndefinedFieldInspection */
+        /** @noinspection PhpUndefinedFieldInspection */
         return $this->domain = (string)$this->configFile->siteInfo->domain['name'] . "." . (string)$this->configFile->siteInfo->domain['extension'];
     }
 
@@ -324,6 +328,9 @@ class ConfigImpl implements Config
             return $this->owner;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
+        /** @noinspection PhpUndefinedFieldInspection */
+        /** @noinspection PhpUndefinedFieldInspection */
         return $this->owner = array(
             'name' => (string)$this->configFile->siteInfo->owner['name'],
             'mail' => (string)$this->configFile->siteInfo->owner['mail'],
@@ -351,6 +358,7 @@ class ConfigImpl implements Config
             return $this->tmpFolderPath;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         $result = $this->tmpFolderPath = (string)$this->configFile->tmpFolder['path'];
         return $result === null ? $this->tmpFolderPath = "" : $result;
     }
@@ -364,6 +372,7 @@ class ConfigImpl implements Config
             return $this->log;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         $result = $this->log = (string)$this->configFile->log['path'];
         return $result === null ? $this->log = "" : $result;
 
@@ -383,11 +392,13 @@ class ConfigImpl implements Config
 
         $this->ajaxTypeHandlers = array();
 
+        /** @noinspection PhpUndefinedFieldInspection */
         if (!$this->configFile->AJAXTypeHandlers->getName()) {
             return $this->ajaxTypeHandlers;
         }
 
 
+        /** @noinspection PhpUndefinedFieldInspection */
         foreach ($this->configFile->AJAXTypeHandlers->class as $handler) {
             $class_array = array("class_name" => (string)$handler);
             if (isset($handler['link'])) {
@@ -407,6 +418,7 @@ class ConfigImpl implements Config
         if ($this->variables !== null) {
             return $this->variables;
         }
+        /** @noinspection PhpUndefinedFieldInspection */
         $variables = $this->configFile->variables->var;
         $this->variables = [];
 

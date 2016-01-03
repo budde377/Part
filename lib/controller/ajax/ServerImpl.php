@@ -82,6 +82,7 @@ class ServerImpl implements Server
                 if (!file_exists($path)) {
                     throw new FileNotFoundException($path, "AJAXTypeHandler class file");
                 }
+                /** @noinspection PhpIncludeInspection */
                 require_once $path;
             }
 

@@ -27,6 +27,7 @@ class UserPrivilegesTypeHandlerImpl extends GenericObjectTypeHandlerImpl
         parent::__construct($privileges);
 
         $this->addGetInstanceFunction("UserPrivileges");
+        /** @noinspection PhpUnusedParameterInspection */
         $this->addTypePreCallFunction('UserPrivileges', function ($type, $instance, $functionName, &$arguments) {
             if ($functionName != 'addPagePrivileges' && $functionName != 'hasPagePrivileges' && $functionName != 'revokePagePrivileges') {
                 return;
@@ -39,6 +40,7 @@ class UserPrivilegesTypeHandlerImpl extends GenericObjectTypeHandlerImpl
             }
             $arguments[0] = $this->container->getPageOrderInstance()->getPage($arguments[0]);
         });
+        /** @noinspection PhpUnusedParameterInspection */
         $this->addTypeAuthFunction('UserPrivileges', function ($type, UserPrivileges $instance, $functionName) {
             if (in_array($functionName, [
                 'hasRootPrivileges',

@@ -159,50 +159,6 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testGetOptimizerReturnNullWithEmptyConfigXML()
-    {
-
-        $template = $this->config->getOptimizer('main');
-        $this->assertNull($template, 'The getOptimizer was not null with empty config XML');
-    }
-
-    public function testGetOptimizerReturnNullWithTemplateElementNIL()
-    {
-        $config = $this->setupConfig("
-        <config>{$this->defaultOwner}
-            <optimizers>
-                <class name='someName' link='someLink'>SomeClass</class>
-            </optimizers>
-        </config>");
-        $template = $config->getOptimizer('nil');
-        $this->assertNull($template, 'The getOptimizer was not null with optimizer NIL');
-    }
-
-    public function testGetOptimizerReturnArrayWithOptimizerInList()
-    {
-        $config = $this->setupConfig("
-        <config>{$this->defaultOwner}
-        <optimizers>
-        <class name='someName' link='someLink'>SomeClassName</class>
-        </optimizers>
-        </config>");
-        $element = $config->getOptimizer('someName');
-        $this->assertEquals(['name'=>'someName', 'className'=>'SomeClassName', 'link'=>$config->getRootPath().'someLink'], $element);
-
-    }
-
-    public function testGetOptimizerReturnArrayWithOptimizerInListButNoLink()
-    {
-        $config = $this->setupConfig("
-        <config>{$this->defaultOwner}
-        <optimizers>
-        <class name='someName'>SomeClassName</class>
-        </optimizers>
-        </config>");
-        $element = $config->getOptimizer('someName');
-        $this->assertEquals(['name'=>'someName', 'className'=>'SomeClassName'], $element);
-
-    }
 
     public function testGetPreScriptReturnEmptyArrayWithEmptyConfig()
     {
