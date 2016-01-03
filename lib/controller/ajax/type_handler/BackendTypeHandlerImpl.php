@@ -4,7 +4,7 @@ use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\controller\ajax\Server;
 use ChristianBudde\Part\controller\json\JSONFunction;
 use ChristianBudde\Part\util\traits\ValidationTrait;
-use SebastianBergmann\Exporter\Exception;
+use Exception;
 
 /**
  * Created by PhpStorm.
@@ -83,6 +83,7 @@ class BackendTypeHandlerImpl implements TypeHandler
      * @param \ChristianBudde\Part\controller\json\JSONFunction $function
      * @param mixed $instance
      * @return mixed
+     * @throws Exception
      */
     public function handle($type, JSONFunction $function, $instance = null)
     {

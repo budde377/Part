@@ -10,9 +10,8 @@ For now the system has only been tested on machines running Ubuntu, but other li
 
 You'll need the following software:
 
- * A LAMP server with PHP 5.5
+ * A LAMP server with PHP 5.6
  * `dart-pub`
- * `php5-json`
  * `php5-imagick`
 
 ## Install
