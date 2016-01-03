@@ -148,7 +148,7 @@ class ServerImplTest extends PHPUnit_Framework_TestCase
     public function testRegisterFromConfigWithWrongInstanceThrowsException()
     {
         $this->config->setAJAXTypeHandlers([
-            ['class_name' => 'ChristianBudde\Part\util\file\NullOptimizerImpl']
+            ['class_name' => 'ChristianBudde\Part\util\script\StubScriptImpl']
         ]);
 
         $this->setExpectedException('ChristianBudde\Part\exception\ClassNotInstanceOfException');

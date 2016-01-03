@@ -64,12 +64,6 @@
                 <xs:element name="debugMode" type="xs:boolean" minOccurs="0"/>
                 <xs:element name="enableCache" type="xs:boolean" minOccurs="0"/>
                 <xs:element name="enableUpdater" type="xs:boolean" minOccurs="0"/>
-                <xs:element name="optimizers" type="namedLinkedValClassSequence" minOccurs="0">
-                    <xs:unique name="optimizerName">
-                        <xs:selector xpath="t:class"/>
-                        <xs:field xpath="@name"/>
-                    </xs:unique>
-                </xs:element>
                 <xs:element name="tmpFolder" type="requiredPathAttribute" minOccurs="0"/>
                 <xs:element name="log" type="requiredPathAttribute" minOccurs="0"/>
                 <xs:element name="variables" minOccurs="0">

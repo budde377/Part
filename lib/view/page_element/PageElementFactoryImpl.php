@@ -48,6 +48,7 @@ class PageElementFactoryImpl implements PageElementFactory
                 if (!file_exists($element['link'])) {
                     throw new FileNotFoundException($element['link'], 'PageElement');
                 }
+                /** @noinspection PhpIncludeInspection */
                 require_once $element['link'];
             }
             if (!class_exists($element['className'])) {

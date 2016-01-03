@@ -57,7 +57,8 @@ class UserLibraryTypeHandlerImpl extends GenericObjectTypeHandlerImpl
 
     }
 
-    private function checkLoginAuthFunction($type, UserLibrary $instance, $functionName)
+    private function checkLoginAuthFunction(/** @noinspection PhpUnusedParameterInspection */
+        $type, UserLibrary $instance, $functionName)
     {
         if ($instance->getUserLoggedIn() == null &&
             $functionName != "userLogin" &&
@@ -102,7 +103,8 @@ class UserLibraryTypeHandlerImpl extends GenericObjectTypeHandlerImpl
 
     }
 
-    private function createUserFromMailAuthFunction($type, UserLibrary $instance)
+    private function createUserFromMailAuthFunction(/** @noinspection PhpUnusedParameterInspection */
+        $type, UserLibrary $instance)
     {
         $args = func_get_arg(3);
         $privileges = $instance->getUserLoggedIn()->getUserPrivileges();
@@ -197,6 +199,7 @@ class UserLibraryTypeHandlerImpl extends GenericObjectTypeHandlerImpl
 
     private function addAuthFunctions()
     {
+        /** @noinspection PhpUnusedParameterInspection */
         $this->addFunctionAuthFunction('UserLibrary', 'deleteUser', function($type, UserLibrary $instance, $function, $args){
             return $this->isChildAuthFunction($args[0], $instance->getUserLoggedIn(), $instance);
         });
