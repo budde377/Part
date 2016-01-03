@@ -90,11 +90,11 @@ class TypeHandlerLibraryImplTest extends CustomDatabaseTestCase
     <enableUpdater>true</enableUpdater>
     <debugMode>false</debugMode>
     <tmpFolder path='$tmpFolder'/>
-    <preScripts>
+    <preTasks>
         <class >ChristianBudde\\Part\\util\\script\\UserLoginCheckPreScript</class>
         <class >ChristianBudde\\Part\\util\\script\\UserLoginUpdateCheckPreScript</class>
         <class >ChristianBudde\\Part\\util\\script\\RequireHTTPSPreScript</class>
-    </preScripts>
+    </preTasks>
     <log path='$logFile' />
 </config>"), $tmpFolder);
         $this->container = new BackendSingletonContainerImpl($this->config);

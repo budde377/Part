@@ -182,7 +182,7 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
         <config>
         {$this->defaultOwner}
         <pageElements>
-            <class name='someElement' link='../../util/script/StubScriptImpl.php'>ChristianBudde\\Part\\util\\script\\StubScriptImpl</class>
+            <class name='someElement' link='../../util/task/StubTaskImpl.php'>ChristianBudde\\Part\\util\\task\\StubTaskImpl</class>
         </pageElements>
         </config>");
 
@@ -193,7 +193,7 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
             /** @var $exception \ChristianBudde\Part\exception\ClassNotInstanceOfException */
             $this->assertInstanceOf('ChristianBudde\Part\exception\ClassNotInstanceOfException', $exception);
             $exceptionWasThrown = true;
-            $this->assertEquals('ChristianBudde\\Part\\util\\script\\StubScriptImpl', $exception->getClass(), 'Was not expected class');
+            $this->assertEquals('ChristianBudde\\Part\\util\\task\\StubTaskImpl', $exception->getClass(), 'Was not expected class');
             $this->assertEquals('PageElement', $exception->getExpectedInstance(), 'Was not expected instance');
 
         }
@@ -213,12 +213,12 @@ class PageElementFactoryTest extends PHPUnit_Framework_TestCase
 
         $exceptionWasThrown = false;
         try {
-            $this->pageElementFactory->getPageElement('ChristianBudde\Part\util\script\StubScriptImpl');
+            $this->pageElementFactory->getPageElement('ChristianBudde\Part\util\task\StubTaskImpl');
         } catch (ClassNotInstanceOfException $exception) {
             /** @var $exception ClassNotInstanceOfException */
             $this->assertInstanceOf('ChristianBudde\Part\exception\ClassNotInstanceOfException', $exception);
             $exceptionWasThrown = true;
-            $this->assertEquals('ChristianBudde\Part\util\script\StubScriptImpl', $exception->getClass(), 'Was not expected class');
+            $this->assertEquals('ChristianBudde\Part\util\task\StubTaskImpl', $exception->getClass(), 'Was not expected class');
             $this->assertEquals('PageElement', $exception->getExpectedInstance(), 'Was not expected instance');
 
         }

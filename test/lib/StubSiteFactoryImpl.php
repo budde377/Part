@@ -1,8 +1,8 @@
 <?php
 namespace ChristianBudde\Part;
 
-use ChristianBudde\Part\util\script\ScriptChain;
-use ChristianBudde\Part\util\script\ScriptChainImpl;
+use ChristianBudde\Part\util\task\TaskQueue;
+use ChristianBudde\Part\util\task\TaskQueueImpl;
 
 /**
  * User: budde
@@ -21,17 +21,17 @@ class StubSiteFactoryImpl implements SiteFactory
 
     public function __construct()
     {
-        $this->preScriptChain = new ScriptChainImpl();
-        $this->postScriptChain = new ScriptChainImpl();
+        $this->preScriptChain = new TaskQueueImpl();
+        $this->postScriptChain = new TaskQueueImpl();
     }
 
     /**
      * Builds a new PreScriptChain and returns it. This must contain prescripts specified
      * in some config (it must be ready to run).
      * @param BackendSingletonContainer $backendContainer
-     * @return \ChristianBudde\Part\util\script\ScriptChain
+     * @return \ChristianBudde\Part\util\task\TaskQueue
      */
-    public function buildPreScriptChain(BackendSingletonContainer $backendContainer)
+    public function buildPreTaskQueue(BackendSingletonContainer $backendContainer)
     {
         return $this->preScriptChain;
     }
@@ -40,9 +40,9 @@ class StubSiteFactoryImpl implements SiteFactory
      * Builds a new PostScriptChain and returns it. This must contain prescripts specified
      * in some config (it must be ready to run).
      * @param BackendSingletonContainer $backendContainer
-     * @return \ChristianBudde\Part\util\script\ScriptChain
+     * @return \ChristianBudde\Part\util\task\TaskQueue
      */
-    public function buildPostScriptChain(BackendSingletonContainer $backendContainer)
+    public function buildPostTaskQueue(BackendSingletonContainer $backendContainer)
     {
         return $this->postScriptChain;
     }
@@ -65,7 +65,7 @@ class StubSiteFactoryImpl implements SiteFactory
     }
 
     /**
-     * @param ScriptChain $preScriptChain
+     * @param TaskQueue $preScriptChain
      */
     public function setPreScriptChain($preScriptChain)
     {

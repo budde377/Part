@@ -24,8 +24,8 @@ class WebsiteImpl implements Website
         $this->backendContainer = $factory->buildBackendSingletonContainer($this->config);
 
         // RUN PRESCRIPTS
-        $preScriptChain = $factory->buildPreScriptChain($this->backendContainer);
-        $preScriptChain->run(Website::WEBSITE_SCRIPT_TYPE_PRESCRIPT, null);
+        $preScriptChain = $factory->buildPreTaskQueue($this->backendContainer);
+        $preScriptChain->execute();
 
     }
 
@@ -72,8 +72,8 @@ class WebsiteImpl implements Website
 
         // RUN POSTSCRIPTS
 
-        $postScriptChain = $this->factory->buildPostScriptChain($this->backendContainer);
-        $postScriptChain->run(Website::WEBSITE_SCRIPT_TYPE_POSTSCRIPT, null);
+        $postScriptChain = $this->factory->buildPostTaskQueue($this->backendContainer);
+        $postScriptChain->execute();
 
     }
 

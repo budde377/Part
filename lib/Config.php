@@ -61,7 +61,7 @@ interface Config extends \ArrayAccess
      * The link should be relative to a root path provided.
      * @return array
      */
-    public function getPreScripts();
+    public function getPreTasks();
 
 
     /**
@@ -70,7 +70,7 @@ interface Config extends \ArrayAccess
      * The link should be relative to a root path provided.
      * @return array
      */
-    public function getPostScripts();
+    public function getPostTasks();
 
 
 

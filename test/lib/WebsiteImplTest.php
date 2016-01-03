@@ -3,8 +3,8 @@
 namespace ChristianBudde\Part;
 
 
-use ChristianBudde\Part\util\script\ScriptChainImpl;
-use ChristianBudde\Part\util\script\StubScriptImpl;
+use ChristianBudde\Part\util\task\TaskQueueImpl;
+use ChristianBudde\Part\util\task\StubTaskImpl;
 use PHPUnit_Framework_TestCase;
 
 /**
@@ -26,27 +26,25 @@ class WebsiteImplTest extends PHPUnit_Framework_TestCase
 
     public function testWebsiteWillRunPreScriptOnConstructWithStringPreScriptAsNameAndNullAsArg()
     {
-        $chain = new ScriptChainImpl();
-        $script = new StubScriptImpl();
+        $chain = new TaskQueueImpl();
+        $script = new StubTaskImpl();
         $config = new StubConfigImpl();
-        $chain->addScript($script);
+        $chain->addTask($script);
         $this->factory->setPreScriptChain($chain);
         $this->factory->setConfig($config);
         $this->factory->setBackendSingletonContainer(new BackendSingletonContainerImpl($config));
 
         new WebsiteImpl($this->factory);
         $this->assertEquals(1, $script->getNumRuns(), 'The PreScripts did not run the right number of times at construct');
-        $this->assertEquals(Website::WEBSITE_SCRIPT_TYPE_PRESCRIPT, $script->getLastRunName(), 'The preScript did not run with preScript as name');
-        $this->assertNull($script->getLastRunArgs(), 'The preScript did not run with arg null');
     }
 
     public function testWebsiteWillRunPostScriptOnDestructWithStringPostScriptAsNameAndNullAsArg()
     {
         $config = new StubConfigImpl();
 
-        $chain = new ScriptChainImpl();
-        $script = new StubScriptImpl();
-        $chain->addScript($script);
+        $chain = new TaskQueueImpl();
+        $script = new StubTaskImpl();
+        $chain->addTask($script);
         $this->factory->setPostScriptChain($chain);
         $this->factory->setConfig($config);
         $this->factory->setBackendSingletonContainer(new BackendSingletonContainerImpl($config));
@@ -54,8 +52,6 @@ class WebsiteImplTest extends PHPUnit_Framework_TestCase
         $website = new WebsiteImpl($this->factory);
         unset($website);
         $this->assertEquals(1, $script->getNumRuns(), 'The postScripts did not run the right number of times at construct');
-        $this->assertEquals(Website::WEBSITE_SCRIPT_TYPE_POSTSCRIPT, $script->getLastRunName(), 'The postScripts did not run with postScript as name');
-        $this->assertNull($script->getLastRunArgs(), 'The postScripts did not run with arg null');
     }
 
 

@@ -51,7 +51,7 @@ class StubConfigImpl implements Config
      * The link should be relative to a root path provided.
      * @return array
      */
-    public function getPreScripts()
+    public function getPreTasks()
     {
         return $this->preScripts;
     }
@@ -61,7 +61,7 @@ class StubConfigImpl implements Config
      * The link should be relative to a root path provided.
      * @return array
      */
-    public function getPostScripts()
+    public function getPostTasks()
     {
         return $this->postScripts;
     }

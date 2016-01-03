@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\Part\util\script;
+namespace ChristianBudde\Part\util\task;
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\Website;
 
@@ -10,7 +10,7 @@ use ChristianBudde\Part\Website;
  * Time: 8:41 PM
  */
 
-class UserLoginUpdateCheckPreScriptImpl implements  Script{
+class UserLoginUpdateCheckPreTaskImpl implements  Task{
 
     /** @var  BackendSingletonContainer */
     private  $backendContainer;
@@ -21,16 +21,8 @@ class UserLoginUpdateCheckPreScriptImpl implements  Script{
     }
 
 
-    /**
-     * This function runs the script
-     * @param $name string
-     * @param $args array | null
-     */
-    public function run($name, $args)
+    public function run()
     {
-        if($name != Website::WEBSITE_SCRIPT_TYPE_PRESCRIPT){
-            return;
-        }
 
         if(($user = $this->backendContainer->getUserLibraryInstance()->getUserLoggedIn()) == null){
             return;

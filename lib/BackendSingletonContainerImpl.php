@@ -293,6 +293,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
      */
     public function __isset($name)
     {
+        /** @noinspection SpellCheckingInspection */
         $preDefined = [
             'site',
             'maildomainlibrary',

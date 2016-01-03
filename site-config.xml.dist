@@ -40,11 +40,11 @@
     <enableUpdater>true</enableUpdater>
     <debugMode>true</debugMode>
     <tmpFolder path="TMP FOLDER PATH"/>
-    <preScripts>
+    <preTasks>
         <class >ChristianBudde\Part\util\script\UserLoginCheckPreScriptImpl</class>
         <class >ChristianBudde\Part\util\script\UserLoginUpdateCheckPreScriptImpl</class>
         <class >ChristianBudde\Part\util\script\RequireHTTPSPreScriptImpl</class>
-    </preScripts>
+    </preTasks>
     <log path="LOG FILE PATH " />
     <variables>
         <var key="k" value="" />

@@ -123,7 +123,6 @@ interface BackendSingletonContainer
     public function getTmpFolderInstance();
 
 
-
     /**
      * @param string $name
      * @return mixed
