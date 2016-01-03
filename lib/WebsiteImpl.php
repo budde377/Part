@@ -5,11 +5,9 @@ use ChristianBudde\Part\util\traits\RequestTrait;
 use ChristianBudde\Part\view\template\TemplateImpl;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 5/10/12
  * Time: 11:03 AM
- * To change this template use File | Settings | File Templates.
  */
 class WebsiteImpl implements Website
 {

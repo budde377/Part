@@ -8,11 +8,9 @@ use PHPUnit_Framework_TestCase;
 use SimpleXMLElement;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 6/11/12
  * Time: 9:41 AM
- * To change this template use File | Settings | File Templates.
  */
 class OptimizerFactoryImplTest extends PHPUnit_Framework_TestCase
 {

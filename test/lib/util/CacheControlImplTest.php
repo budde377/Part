@@ -1,11 +1,9 @@
 <?php
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 9/8/13
  * Time: 10:25 PM
- * To change this template use File | Settings | File Templates.
  */
 
 namespace ChristianBudde\Part\util;

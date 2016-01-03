@@ -6,11 +6,9 @@ use Imagick;
 use ImagickException;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 8/13/13
  * Time: 5:48 PM
- * To change this template use File | Settings | File Templates.
  */
 class ImageFileImpl extends FileImpl implements ImageFile
 {

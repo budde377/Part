@@ -3,11 +3,9 @@ namespace ChristianBudde\Part\view\page_element;
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 10/27/12
  * Time: 10:48 AM
- * To change this template use File | Settings | File Templates.
  */
 class ReturnIncrementPageElementImpl extends PageElementImpl
 {

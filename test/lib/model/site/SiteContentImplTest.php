@@ -9,11 +9,9 @@ use ChristianBudde\Part\util\db\StubDBImpl;
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 8/13/13
  * Time: 11:41 AM
- * To change this template use File | Settings | File Templates.
  */
 class SiteContentImplTest extends CustomDatabaseTestCase
 {

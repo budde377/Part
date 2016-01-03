@@ -2,11 +2,9 @@
 namespace ChristianBudde\Part\model\user;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 10/22/13
  * Time: 3:46 PM
- * To change this template use File | Settings | File Templates.
  */
 use ChristianBudde\Part\model\BindParamObserverVariablesImpl;
 use ChristianBudde\Part\util\db\DB;

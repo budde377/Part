@@ -9,11 +9,9 @@ use ChristianBudde\Part\util\script\ScriptChain;
 use ChristianBudde\Part\util\script\ScriptChainImpl;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 5/10/12
  * Time: 11:26 AM
- * To change this template use File | Settings | File Templates.
  */
 class SiteFactoryImpl implements SiteFactory
 {

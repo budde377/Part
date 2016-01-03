@@ -8,11 +8,9 @@ use ChristianBudde\Part\view;
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 5/29/12
  * Time: 11:10 AM
- * To change this template use File | Settings | File Templates.
  */
 class PageElementFactoryImpl implements PageElementFactory
 {

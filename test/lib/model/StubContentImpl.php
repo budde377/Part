@@ -5,11 +5,9 @@ use ChristianBudde\Part\controller\json\ContentObjectImpl;
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 9/15/13
  * Time: 10:41 PM
- * To change this template use File | Settings | File Templates.
  */
 
 class StubContentImpl implements Content

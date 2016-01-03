@@ -31,11 +31,9 @@ use ChristianBudde\Part\util\file\FolderImpl;
 use ChristianBudde\Part\util\file\LogFile;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 6/13/12
  * Time: 4:54 PM
- * To change this template use File | Settings | File Templates.
  */
 class BackendSingletonContainerImpl implements BackendSingletonContainer
 {

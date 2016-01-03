@@ -8,11 +8,9 @@ use ChristianBudde\Part\util\file\FolderImpl;
 use PDO;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 6/11/12
  * Time: 10:09 AM
- * To change this template use File | Settings | File Templates.
  */
 class MySQLDBImpl implements DB
 {

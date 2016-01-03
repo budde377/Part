@@ -1,10 +1,8 @@
 <?php
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 24/01/13
  * Time: 09:26
- * To change this template use File | Settings | File Templates.
  */
 namespace ChristianBudde\Part\controller\json;
 

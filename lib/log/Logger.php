@@ -3,11 +3,9 @@ namespace ChristianBudde\Part\log;
 use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 6/3/12
  * Time: 9:31 PM
- * To change this template use File | Settings | File Templates.
  */
 interface Logger extends TypeHandlerGenerator
 {

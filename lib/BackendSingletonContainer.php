@@ -16,11 +16,9 @@ use ChristianBudde\Part\util\file\FileLibrary;
 use ChristianBudde\Part\util\file\Folder;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 5/10/12
  * Time: 10:59 AM
- * To change this template use File | Settings | File Templates.
  */
 interface BackendSingletonContainer
 {

@@ -1,11 +1,9 @@
 <?php
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 5/10/12
  * Time: 11:26 AM
- * To change this template use File | Settings | File Templates.
  */
 session_start();
 

@@ -5,11 +5,9 @@ namespace ChristianBudde\Part\util\file;
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 6/3/12
  * Time: 11:48 PM
- * To change this template use File | Settings | File Templates.
  */
 class StubOptimizerImpl implements Optimizer
 {

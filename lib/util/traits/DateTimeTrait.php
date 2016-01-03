@@ -1,11 +1,9 @@
 <?php
 namespace ChristianBudde\Part\util\traits;
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 10/27/12
  * Time: 11:31 AM
- * To change this template use File | Settings | File Templates.
  */
 trait DateTimeTrait
 {

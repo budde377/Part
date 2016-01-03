@@ -3,11 +3,9 @@ namespace ChristianBudde\Part\util\db;
 use PDO;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 5/10/12
  * Time: 11:00 AM
- * To change this template use File | Settings | File Templates.
  */
 interface DB
 {

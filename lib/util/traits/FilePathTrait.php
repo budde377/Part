@@ -4,11 +4,9 @@ use ChristianBudde\Part\util\file\File;
 use ChristianBudde\Part\util\file\FileImpl;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 10/27/12
  * Time: 1:11 PM
- * To change this template use File | Settings | File Templates.
  */
 trait FilePathTrait
 {

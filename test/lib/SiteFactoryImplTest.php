@@ -2,11 +2,9 @@
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 5/28/12
  * Time: 2:53 PM
- * To change this template use File | Settings | File Templates.
  */
 namespace ChristianBudde\Part;
 

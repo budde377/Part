@@ -4,11 +4,9 @@ use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 use ChristianBudde\Part\model\user\User;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 10/05/13
  * Time: 21:45
- * To change this template use File | Settings | File Templates.
  */
 
 interface Updater extends TypeHandlerGenerator{

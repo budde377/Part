@@ -7,11 +7,9 @@ use ChristianBudde\Part\model\user\StubUserPrivilegesImpl;
 use PHPUnit_Framework_TestCase;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 24/01/13
  * Time: 10:28
- * To change this template use File | Settings | File Templates.
  */
 class UserJSONObjectImplTest extends PHPUnit_Framework_TestCase
 {

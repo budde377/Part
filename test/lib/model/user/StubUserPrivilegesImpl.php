@@ -1,10 +1,8 @@
 <?php
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 23/04/13
  * Time: 22:47
- * To change this template use File | Settings | File Templates.
  */
 namespace ChristianBudde\Part\model\user;
 

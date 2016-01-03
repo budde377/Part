@@ -4,11 +4,9 @@ namespace ChristianBudde\Part\util\script;
 use PHPUnit_Framework_TestCase;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 5/16/12
  * Time: 9:02 AM
- * To change this template use File | Settings | File Templates.
  */
 class ScriptChainImplTest extends PHPUnit_Framework_TestCase
 {

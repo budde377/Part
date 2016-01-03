@@ -4,11 +4,9 @@ use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\Website;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 9/8/13
  * Time: 11:45 PM
- * To change this template use File | Settings | File Templates.
  */
 
 class UserLoginCheckPreScriptImpl implements Script{

@@ -4,11 +4,9 @@ namespace ChristianBudde\Part\util\db;
 use PDO;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 6/16/12
  * Time: 10:32 PM
- * To change this template use File | Settings | File Templates.
  */
 class StubDBImpl implements DB
 {

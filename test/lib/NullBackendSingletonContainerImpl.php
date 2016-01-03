@@ -7,11 +7,9 @@ use ChristianBudde\Part\util\file\Folder;
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 6/13/12
  * Time: 5:21 PM
- * To change this template use File | Settings | File Templates.
  */
 class NullBackendSingletonContainerImpl implements BackendSingletonContainer
 {

@@ -4,11 +4,9 @@ namespace ChristianBudde\Part\controller\json;
 use PHPUnit_Framework_TestCase;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 22/01/13
  * Time: 14:58
- * To change this template use File | Settings | File Templates.
  */
 class ObjectImplTest extends PHPUnit_Framework_TestCase
 {

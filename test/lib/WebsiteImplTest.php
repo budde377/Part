@@ -8,11 +8,9 @@ use ChristianBudde\Part\util\script\StubScriptImpl;
 use PHPUnit_Framework_TestCase;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 5/28/12
  * Time: 3:52 PM
- * To change this template use File | Settings | File Templates.
  */
 class WebsiteImplTest extends PHPUnit_Framework_TestCase
 {

@@ -10,11 +10,9 @@ use PDOException;
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 6/16/12
  * Time: 9:13 PM
- * To change this template use File | Settings | File Templates.
  */
 class PageOrderImpl implements PageOrder
 {

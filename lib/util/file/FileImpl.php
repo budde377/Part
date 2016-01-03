@@ -6,11 +6,9 @@ use ChristianBudde\Part\util\traits\FilePathTrait;
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 6/1/12
  * Time: 10:31 AM
- * To change this template use File | Settings | File Templates.
  */
 class FileImpl implements File
 {

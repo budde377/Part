@@ -17,11 +17,9 @@ use ChristianBudde\Part\util\file\FileLibrary;
 use ChristianBudde\Part\util\file\Folder;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 9/15/13
  * Time: 4:57 PM
- * To change this template use File | Settings | File Templates.
  */
 class StubBackendSingletonContainerImpl implements BackendSingletonContainer
 {

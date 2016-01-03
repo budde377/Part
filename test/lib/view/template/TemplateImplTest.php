@@ -22,11 +22,9 @@ use SimpleXMLElement;
 use Twig_Error;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 5/29/12
  * Time: 10:46 AM
- * To change this template use File | Settings | File Templates.
  */
 class TemplateImplTest extends PHPUnit_Framework_TestCase
 {

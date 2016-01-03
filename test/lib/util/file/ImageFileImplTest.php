@@ -8,11 +8,9 @@ use PHPUnit_Framework_TestCase;
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 6/3/12
  * Time: 8:46 PM
- * To change this template use File | Settings | File Templates.
  */
 class ImageFileImplTest extends PHPUnit_Framework_TestCase
 {
