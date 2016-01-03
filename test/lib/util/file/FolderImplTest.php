@@ -93,7 +93,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testCreateWillCreateFolder()
     {
-        $folder = dirname(__FILE__) . '/../stubs/testFolder';
+        $folder = $GLOBALS['STUBS_DIR'] .  '/testFolder';
         @$this->rrmdir($folder);
         $f = new FolderImpl($folder);
         $this->assertFalse($f->exists(), 'Folder did exist');
@@ -103,7 +103,7 @@ class FolderImplTest extends PHPUnit_Framework_TestCase
 
     public function testCreateRecursiveWillCreateFolderRecursive()
     {
-        $folder = dirname(__FILE__) . '/../stubs/testFolder';
+        $folder = $GLOBALS['STUBS_DIR'] .  '/testFolder';
         @$this->rrmdir($folder);
         $f = new FolderImpl($folder . '/test');
         $this->assertFalse($f->exists(), 'Folder did exist');
