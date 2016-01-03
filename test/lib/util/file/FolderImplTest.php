@@ -4,13 +4,7 @@ namespace ChristianBudde\Part\util\file;
 use ChristianBudde\Part\util\traits\FilePathTrait;
 use PHPUnit_Framework_TestCase;
 
-/**
- * Created by JetBrains PhpStorm.
- * User: budde
- * Date: 10/27/12
- * Time: 1:38 PM
- * To change this template use File | Settings | File Templates.
- */
+
 class FolderImplTest extends PHPUnit_Framework_TestCase
 {
 

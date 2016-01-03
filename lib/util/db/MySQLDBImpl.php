@@ -24,13 +24,6 @@ class MySQLDBImpl implements DB
     private $username = null;
     private $folders = [];
 
-    /** @var PDO */
-    private $mailConnection = null;
-    private $mailDatabase = null;
-    private $mailHost = null;
-    private $mailUsername = null;
-    private $mailPassword = null;
-
     private $version;
 
 
@@ -66,23 +59,6 @@ class MySQLDBImpl implements DB
         return $this->connection;
     }
 
-    /**
-     * @param string $password
-     * @return PDO
-     */
-    public function getMailConnection($password)
-    {
-        if ($this->mailConnection === null || $this->mailPassword != $password) {
-            $this->mailPassword = $password;
-            $this->mailConnection = new PDO(
-                'mysql:dbname=' . $this->mailDatabase . ';host=' . $this->mailHost,
-                $this->mailUsername,
-                $password,
-                array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
-        }
-
-        return $this->mailConnection;
-    }
 
     /**
      * Updates the database according to the sql files

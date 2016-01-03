@@ -19,13 +19,11 @@ class StubConfigImpl implements Config
     private $pageElement;
     private $optimizer;
     private $mysqlConnection;
-    private $mailMysqlConnection;
     private $AJAXTypeHandlers;
 
 
     private $defaultPages = array();
     private $logPath;
-    private $facebookAppCredentials;
     private $domain = "";
 
     /**
@@ -217,22 +215,6 @@ class StubConfigImpl implements Config
     }
 
     /**
-     * @return array | null Array with entries host, user, prefix, database and File setupFile, or null if not specified
-     */
-    public function getMailMySQLConnection()
-    {
-        return $this->mailMysqlConnection;
-    }
-
-    /**
-     * @param mixed $mailMysqlConnection
-     */
-    public function setMailMysqlConnection($mailMysqlConnection)
-    {
-        $this->mailMysqlConnection = $mailMysqlConnection;
-    }
-
-    /**
      * Will return AJAXTypeHandlers as an array, with the num key and an array containing "class_name" and "path" as value.
      * The link should be relative to a root path provided.
      * @return array
@@ -250,32 +232,6 @@ class StubConfigImpl implements Config
     {
         $this->AJAXTypeHandlers = $AJAXTypeHandlers;
     }
-
-    /**
-     * Returns true if mail support is enabled. Else false.
-     * @return bool
-     */
-    public function isMailManagementEnabled()
-    {
-        return $this->getMailMySQLConnection() != null;
-    }
-
-    /**
-     * @return array|null An assoc array with keys: `id` and `secret` which contains the facebook app id and secret respectively. Returns null if not set.
-     */
-    public function getFacebookAppCredentials()
-    {
-        return $this->facebookAppCredentials;
-    }
-
-    /**
-     * @param mixed $facebookAppCredentials
-     */
-    public function setFacebookAppCredentials($facebookAppCredentials)
-    {
-        $this->facebookAppCredentials = $facebookAppCredentials;
-    }
-
 
     /**
      * @return array

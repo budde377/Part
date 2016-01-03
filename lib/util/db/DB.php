@@ -17,13 +17,6 @@ interface DB
      */
     public function getConnection();
 
-    /**
-     * @deprecated
-     * @param string $password
-     * @return PDO
-     */
-    public function getMailConnection($password);
-
 
     /**
      * Updates the database according to the sql files

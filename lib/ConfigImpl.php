@@ -27,14 +27,12 @@ class ConfigImpl implements Config
     private $postScripts = null;
     private $optimizers = null;
     private $mysql = null;
-    private $mailMysql = null;
     private $debugMode;
     private $defaultPages;
     private $enableUpdater;
     private $tmpFolderPath;
     private $log;
     private $ajaxTypeHandlers;
-    private $fbAppCredentials;
 
     /**
      * @param SimpleXMLElement $configFile
@@ -371,20 +369,6 @@ class ConfigImpl implements Config
 
     }
 
-    /**
-     * @return array | null Array with entries host, user, prefix, database and File setupFile, or null if not specified
-     */
-    public function getMailMySQLConnection()
-    {
-        if ($this->mailMysql === null && $this->configFile->MailMySQLConnection->getName()) {
-            $this->mailMysql = array(
-                'user' => (string)$this->configFile->MailMySQLConnection->username,
-                'database' => (string)$this->configFile->MailMySQLConnection->database,
-                'host' => (string)$this->configFile->MailMySQLConnection->host);
-        }
-
-        return $this->mailMysql;
-    }
 
     /**
      * Will return AJAXTypeHandlers as an array, with the num key and an array containing "class_name" and "path" as value.
@@ -412,30 +396,6 @@ class ConfigImpl implements Config
             $this->ajaxTypeHandlers[] = $class_array;
         }
         return $this->ajaxTypeHandlers;
-    }
-
-    /**
-     * Returns true if mail support is enabled. Else false.
-     * @return bool
-     */
-    public function isMailManagementEnabled()
-    {
-        return $this->getMailMySQLConnection() != null;
-    }
-
-    /**
-     * @return array An assoc array with keys: `id`, `secret` and `permanent_access_token` which contains the facebook app id, secret and permanent access token respectively. Values are empty if element is not defined.
-     */
-    public function getFacebookAppCredentials()
-    {
-        if ($this->fbAppCredentials !== null) {
-            return $this->fbAppCredentials;
-        }
-
-        $app_id = $this->fbAppCredentials = (string)$this->configFile->facebookApp['id'];
-        $secret = $this->fbAppCredentials = (string)$this->configFile->facebookApp['secret'];
-        $token = $this->fbAppCredentials = (string)$this->configFile->facebookApp['permanent_token'];
-        return $this->fbAppCredentials = ['id' => $app_id, 'secret' => $secret, 'permanent_access_token' => $token];
     }
 
     /**

@@ -92,21 +92,6 @@ interface Config extends \ArrayAccess
     public function getMySQLConnection();
 
     /**
-     * @abstract
-     * @deprecated
-     * @return array A map with entries: host, user and database.
-     */
-
-    public function getMailMySQLConnection();
-
-    /**
-     * @deprecated
-     * Returns true if mail support is enabled. Else false.
-     * @return bool
-     */
-    public function isMailManagementEnabled();
-
-    /**
      * @return bool
      */
     public function isDebugMode();
@@ -140,13 +125,6 @@ interface Config extends \ArrayAccess
      * @return string Path to the error log.
      */
     public function getLogPath();
-
-
-    /**
-     * @deprecated
-     * @return array An assoc array with keys: `id`, `secret` and `permanent_access_token` which contains the facebook app id, secret and permanent access token respectively. Values are empty if element is not defined.
-     */
-    public function getFacebookAppCredentials();
 
     /**
      * @return array
