@@ -2,7 +2,7 @@
   "name": "christianbud.de/part",
   "description": "A way better CMS",
   "require": {
-    "php": ">=5.5",
+    "php": ">=5.6",
     "twig/twig": "1.*",
     "ext-imagick":"*"
   },
