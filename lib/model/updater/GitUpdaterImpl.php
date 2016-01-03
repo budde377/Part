@@ -6,11 +6,9 @@ use ChristianBudde\Part\model;
 use ChristianBudde\Part\model\user\User;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 10/05/13
  * Time: 21:51
- * To change this template use File | Settings | File Templates.
  */
 class GitUpdaterImpl implements Updater
 {

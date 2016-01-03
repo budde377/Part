@@ -6,10 +6,8 @@
         <var name="DB_USER" value="root"/>
         <var name="DB_PASSWORD" value=""/>
         <var name="DB_NAME" value="test_cms"/>
-        <var name="DB_MAIL_HOST" value="localhost"/>
-        <var name="DB_MAIL_USER" value="root"/>
-        <var name="DB_MAIL_PASSWORD" value=""/>
-        <var name="DB_MAIL_NAME" value="test_postfix"/>
+        <var name="MYSQL_XML_DIR" value="test/mysqlXML"/>
+        <var name="STUBS_DIR" value="test/stubs"/>
     </php>
     <logging>
           <log type="coverage-clover" target="build/logs/clover.xml"/>

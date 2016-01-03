@@ -5,11 +5,9 @@ use ChristianBudde\Part\model\page\PageContentImpl;
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 25/05/13
  * Time: 21:55
- * To change this template use File | Settings | File Templates.
  */
 
 class FrontPageTextPageElementImpl extends PageElementImpl

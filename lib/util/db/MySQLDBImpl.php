@@ -8,11 +8,9 @@ use ChristianBudde\Part\util\file\FolderImpl;
 use PDO;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 6/11/12
  * Time: 10:09 AM
- * To change this template use File | Settings | File Templates.
  */
 class MySQLDBImpl implements DB
 {
@@ -23,13 +21,6 @@ class MySQLDBImpl implements DB
     private $password = null;
     private $username = null;
     private $folders = [];
-
-    /** @var PDO */
-    private $mailConnection = null;
-    private $mailDatabase = null;
-    private $mailHost = null;
-    private $mailUsername = null;
-    private $mailPassword = null;
 
     private $version;
 
@@ -46,12 +37,6 @@ class MySQLDBImpl implements DB
             $this->folders = $connectionArray['folders'];
         }
 
-        $connectionArray = $config->getMailMySQLConnection();
-        if ($connectionArray !== null) {
-            $this->mailDatabase = $connectionArray['database'];
-            $this->mailHost = $connectionArray['host'];
-            $this->mailUsername = $connectionArray['user'];
-        }
     }
 
 
@@ -72,23 +57,6 @@ class MySQLDBImpl implements DB
         return $this->connection;
     }
 
-    /**
-     * @param string $password
-     * @return PDO
-     */
-    public function getMailConnection($password)
-    {
-        if ($this->mailConnection === null || $this->mailPassword != $password) {
-            $this->mailPassword = $password;
-            $this->mailConnection = new PDO(
-                'mysql:dbname=' . $this->mailDatabase . ';host=' . $this->mailHost,
-                $this->mailUsername,
-                $password,
-                array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
-        }
-
-        return $this->mailConnection;
-    }
 
     /**
      * Updates the database according to the sql files

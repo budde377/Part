@@ -7,8 +7,6 @@ use ChristianBudde\Part\controller\ajax\TypeHandlerLibrary;
 use ChristianBudde\Part\controller\ajax\TypeHandlerLibraryImpl;
 use ChristianBudde\Part\log\Logger;
 use ChristianBudde\Part\log\LoggerImpl;
-use ChristianBudde\Part\model\mail\DomainLibrary;
-use ChristianBudde\Part\model\mail\DomainLibraryImpl;
 use ChristianBudde\Part\model\page\CurrentPageStrategy;
 use ChristianBudde\Part\model\page\CurrentPageStrategyImpl;
 use ChristianBudde\Part\model\page\DefaultPageLibrary;
@@ -33,11 +31,9 @@ use ChristianBudde\Part\util\file\FolderImpl;
 use ChristianBudde\Part\util\file\LogFile;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 6/13/12
  * Time: 4:54 PM
- * To change this template use File | Settings | File Templates.
  */
 class BackendSingletonContainerImpl implements BackendSingletonContainer
 {
@@ -65,8 +61,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $fileLibrary;
     /** @var  LogFile */
     private $log;
-    /** @var  DomainLibrary */
-    private $mailDomainLibrary;
+
 
     private $dynamicInstances = [];
     private $typeHandlerLib;
@@ -222,19 +217,6 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     }
 
     /**
-     * Will Create and reuse instance of MailDomainLibrary.
-     * @return DomainLibrary
-     */
-    public function getMailDomainLibraryInstance()
-    {
-        if ($this->mailDomainLibrary == null) {
-            $this->mailDomainLibrary = new DomainLibraryImpl($this, $this->getConfigInstance(), $this->getDBInstance(), $this->getUserLibraryInstance());
-        }
-
-        return $this->mailDomainLibrary;
-    }
-
-    /**
      * @param string $name
      * @return mixed
      */
@@ -244,9 +226,6 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
         switch ($name) {
             case 'site':
                 return $this->getSiteInstance();
-                break;
-            case 'maildomainlibrary':
-                return $this->getMailDomainLibraryInstance();
                 break;
             case 'ajaxserver':
                 return $this->getAJAXServerInstance();

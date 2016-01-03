@@ -1,19 +1,14 @@
 <?php
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 6/13/12
  * Time: 4:59 PM
- * To change this template use File | Settings | File Templates.
  */
 
-namespace ChristianBudde\Part\test;
+namespace ChristianBudde\Part;
 
-use ChristianBudde\Part\BackendSingletonContainer;
-use ChristianBudde\Part\BackendSingletonContainerImpl;
-use ChristianBudde\Part\test\stub\StubConfigImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\util\CustomDatabaseTestCase;
 
 class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
 {
@@ -168,19 +163,10 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
 
     }
 
-    public function testGetMailDomainLibraryWillReturnNullIfNoPathInConfig()
-    {
-        $ret1 = $this->backContainer->getMailDomainLibraryInstance();
-        $this->assertInstanceOf('ChristianBudde\Part\model\mail\DomainLibrary', $ret1);
-        $ret2 = $this->backContainer->getMailDomainLibraryInstance();
-        $this->assertTrue($ret1 === $ret2);
-
-    }
 
 
     public function testMagicGetterWillGetOtherGetters()
     {
-        $this->assertTrue($this->backContainer->getMailDomainLibraryInstance()  === $this->backContainer->mailDomainLibrary);
         $this->assertTrue($this->backContainer->getAJAXServerInstance()  === $this->backContainer->AJAXServer);
         $this->assertTrue($this->backContainer->getAJAXServerInstance()  === $this->backContainer->ajaxServer);
         $this->assertTrue($this->backContainer->getAJAXServerInstance()  === $this->backContainer->ajaxserver);

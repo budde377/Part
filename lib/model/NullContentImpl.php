@@ -4,11 +4,9 @@ use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 25/05/13
  * Time: 22:27
- * To change this template use File | Settings | File Templates.
  */
 
 class NullContentImpl implements Content{

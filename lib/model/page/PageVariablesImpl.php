@@ -2,11 +2,9 @@
 namespace ChristianBudde\Part\model\page;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 10/22/13
  * Time: 3:46 PM
- * To change this template use File | Settings | File Templates.
  */
 use ChristianBudde\Part\model\VariablesImpl;
 use ChristianBudde\Part\util\db\DB;
@@ -15,6 +13,7 @@ class PageVariablesImpl extends VariablesImpl
 {
 
     private $page_id;
+    private $page;
 
     function __construct(DB $database, Page $page)
     {

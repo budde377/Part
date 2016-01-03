@@ -5,11 +5,9 @@ use ChristianBudde\Part\exception\MalformedParameterException;
 use ChristianBudde\Part\util\traits\FilePathTrait;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 10/27/12
  * Time: 1:37 PM
- * To change this template use File | Settings | File Templates.
  */
 class FolderImpl implements Folder
 {

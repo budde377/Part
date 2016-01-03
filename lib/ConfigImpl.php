@@ -25,17 +25,14 @@ class ConfigImpl implements Config
     private $pageElements = null;
     private $preScripts = null;
     private $postScripts = null;
-    private $optimizers = null;
     private $mysql = null;
-    private $mailMysql = null;
     private $debugMode;
     private $defaultPages;
     private $enableUpdater;
     private $tmpFolderPath;
     private $log;
     private $ajaxTypeHandlers;
-    private $fbAppCredentials;
-    private $enableCache;
+    private $defaultTemplate;
 
     /**
      * @param SimpleXMLElement $configFile
@@ -80,6 +77,26 @@ class ConfigImpl implements Config
     }
 
     /**
+     * Will return the default template if defined. Else null.
+     * @return string
+     */
+    public function getDefaultTemplateName()
+    {
+        $this->setUpTemplate();
+        return $this->defaultTemplate;
+
+    }
+
+    /**
+     * Will return the default template if defined. Else null.
+     * @return string
+     */
+    public function getDefaultTemplate()
+    {
+        return $this->getTemplate($this->getDefaultTemplateName());
+    }
+
+    /**
      * Will return PostScripts as an array, with the ClassName as key and the link as value.
      * The link should be relative to a root path provided.
      * @return array
@@ -90,8 +107,10 @@ class ConfigImpl implements Config
             return $this->postScripts;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         return $this->postScripts = $this->getScripts($this->configFile->postScripts);
     }
+
 
     private function getScripts($scriptsXml)
     {
@@ -119,8 +138,10 @@ class ConfigImpl implements Config
             return $this->preScripts;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         return $this->preScripts = $this->getScripts($this->configFile->preScripts);
     }
+
 
 
     /**
@@ -131,6 +152,7 @@ class ConfigImpl implements Config
     public function getPageElement($name)
     {
         if ($this->pageElements == null) {
+            /** @noinspection PhpUndefinedFieldInspection */
             $this->pageElements = $this->buildClasses($this->configFile->pageElements->class);
         }
 
@@ -162,21 +184,6 @@ class ConfigImpl implements Config
         return $returnArray;
     }
 
-    /**
-     * @param $name
-     * @return array | null Array with entrance className, name, path with ClassName, name provided, and absolute path respectively.
-     */
-    public function getOptimizer($name)
-    {
-        if ($this->optimizers == null) {
-            $this->optimizers = $this->buildClasses($this->configFile->optimizers->class);
-        }
-
-
-        return isset($this->optimizers[$name]) ? $this->optimizers[$name] : null;
-    }
-
-
     public function getMySQLConnection()
     {
 
@@ -184,17 +191,21 @@ class ConfigImpl implements Config
             return $this->mysql === false ? null : $this->mysql;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         if (empty($this->configFile->MySQLConnection)) {
             $this->mysql = false;
             return null;
         }
+        /** @noinspection PhpUndefinedFieldInspection */
         $this->mysql = [
             'user' => (string)$this->configFile->MySQLConnection->username,
             'password' => (string)$this->configFile->MySQLConnection->password,
             'database' => (string)$this->configFile->MySQLConnection->database,
             'host' => (string)$this->configFile->MySQLConnection->host,
             'folders' => []];
+        /** @noinspection PhpUndefinedFieldInspection */
         if (!empty($this->configFile->MySQLConnection->folders)) {
+            /** @noinspection PhpUndefinedFieldInspection */
             foreach ($this->configFile->MySQLConnection->folders->folder as $folder) {
                 $this->mysql['folders'][(string)$folder['name']] = (string)$folder['path'];
             }
@@ -218,6 +229,7 @@ class ConfigImpl implements Config
         return $ret;
     }
 
+
     /**
      * Will return an array with default pages. Pages hardcoded into the website.
      * The array will have the page title as key and another array, containing alias', as value.
@@ -229,7 +241,9 @@ class ConfigImpl implements Config
             return $this->defaultPages;
         }
         $this->defaultPages = [];
+        /** @noinspection PhpUndefinedFieldInspection */
         if ($this->configFile->defaultPages->getName()) {
+            /** @noinspection PhpUndefinedFieldInspection */
             foreach ($this->configFile->defaultPages->page as $page) {
                 $title = (string)$page;
                 $this->defaultPages[$title]["template"] = (string)$page["template"];
@@ -249,22 +263,24 @@ class ConfigImpl implements Config
         }
 
         $this->templates = [];
+        /** @noinspection PhpUndefinedFieldInspection */
         $templates = $this->configFile->templates;
         if (!empty($templates)) {
             $this->setUpTemplateHelper($templates);
             return;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         if (empty($this->configFile->templateCollection)) {
             return;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         foreach ($this->configFile->templateCollection->templates as $templates) {
             $this->setUpTemplateHelper($templates);
         }
 
     }
-
 
     /**
      * @return bool
@@ -275,12 +291,15 @@ class ConfigImpl implements Config
             return $this->debugMode;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         if (!$this->configFile->debugMode->getName()) {
             return $this->debugMode = false;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         return $this->debugMode = (string)$this->configFile->debugMode == "true";
     }
+
 
     /**
      * @return string Root path
@@ -298,27 +317,14 @@ class ConfigImpl implements Config
         if ($this->enableUpdater !== null) {
             return $this->enableUpdater;
         }
+        /** @noinspection PhpUndefinedFieldInspection */
         if (!$this->configFile->enableUpdater->getName()) {
             return $this->enableUpdater = true;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         return $this->enableUpdater = (string)$this->configFile->enableUpdater == "true";
 
-    }
-
-    /**
-     * @return bool
-     */
-    public function isCacheEnabled()
-    {
-        if ($this->enableCache !== null) {
-            return $this->enableCache;
-        }
-        if (!$this->configFile->enableCache->getName()) {
-            return $this->enableCache = false;
-        }
-
-        return $this->enableCache = (string)$this->configFile->enableCache == "true";
     }
 
     /**
@@ -329,11 +335,13 @@ class ConfigImpl implements Config
         if ($this->domain !== null) {
             return $this->domain;
         }
+        /** @noinspection PhpUndefinedFieldInspection */
+        /** @noinspection PhpUndefinedFieldInspection */
         return $this->domain = (string)$this->configFile->siteInfo->domain['name'] . "." . (string)$this->configFile->siteInfo->domain['extension'];
     }
 
     /**
-     * @return Array containing owner information
+     * @return array containing owner information
      */
     public function getOwner()
     {
@@ -341,6 +349,9 @@ class ConfigImpl implements Config
             return $this->owner;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
+        /** @noinspection PhpUndefinedFieldInspection */
+        /** @noinspection PhpUndefinedFieldInspection */
         return $this->owner = array(
             'name' => (string)$this->configFile->siteInfo->owner['name'],
             'mail' => (string)$this->configFile->siteInfo->owner['mail'],
@@ -359,6 +370,7 @@ class ConfigImpl implements Config
         return !isset($this->templatePath[$name]) ? null : "{$this->rootPath}/{$this->templatePath[$name]}";
     }
 
+
     /**
      * @return string Path to the tmp folder
      */
@@ -368,6 +380,7 @@ class ConfigImpl implements Config
             return $this->tmpFolderPath;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         $result = $this->tmpFolderPath = (string)$this->configFile->tmpFolder['path'];
         return $result === null ? $this->tmpFolderPath = "" : $result;
     }
@@ -381,24 +394,10 @@ class ConfigImpl implements Config
             return $this->log;
         }
 
+        /** @noinspection PhpUndefinedFieldInspection */
         $result = $this->log = (string)$this->configFile->log['path'];
         return $result === null ? $this->log = "" : $result;
 
-    }
-
-    /**
-     * @return array | null Array with entries host, user, prefix, database and File setupFile, or null if not specified
-     */
-    public function getMailMySQLConnection()
-    {
-        if ($this->mailMysql === null && $this->configFile->MailMySQLConnection->getName()) {
-            $this->mailMysql = array(
-                'user' => (string)$this->configFile->MailMySQLConnection->username,
-                'database' => (string)$this->configFile->MailMySQLConnection->database,
-                'host' => (string)$this->configFile->MailMySQLConnection->host);
-        }
-
-        return $this->mailMysql;
     }
 
     /**
@@ -414,11 +413,13 @@ class ConfigImpl implements Config
 
         $this->ajaxTypeHandlers = array();
 
+        /** @noinspection PhpUndefinedFieldInspection */
         if (!$this->configFile->AJAXTypeHandlers->getName()) {
             return $this->ajaxTypeHandlers;
         }
 
 
+        /** @noinspection PhpUndefinedFieldInspection */
         foreach ($this->configFile->AJAXTypeHandlers->class as $handler) {
             $class_array = array("class_name" => (string)$handler);
             if (isset($handler['link'])) {
@@ -430,30 +431,6 @@ class ConfigImpl implements Config
     }
 
     /**
-     * Returns true if mail support is enabled. Else false.
-     * @return bool
-     */
-    public function isMailManagementEnabled()
-    {
-        return $this->getMailMySQLConnection() != null;
-    }
-
-    /**
-     * @return array An assoc array with keys: `id`, `secret` and `permanent_access_token` which contains the facebook app id, secret and permanent access token respectively. Values are empty if element is not defined.
-     */
-    public function getFacebookAppCredentials()
-    {
-        if ($this->fbAppCredentials !== null) {
-            return $this->fbAppCredentials;
-        }
-
-        $app_id = $this->fbAppCredentials = (string)$this->configFile->facebookApp['id'];
-        $secret = $this->fbAppCredentials = (string)$this->configFile->facebookApp['secret'];
-        $token = $this->fbAppCredentials = (string)$this->configFile->facebookApp['permanent_token'];
-        return $this->fbAppCredentials = ['id' => $app_id, 'secret' => $secret, 'permanent_access_token' => $token];
-    }
-
-    /**
      * @return array
      */
     public function getVariables()
@@ -462,6 +439,7 @@ class ConfigImpl implements Config
         if ($this->variables !== null) {
             return $this->variables;
         }
+        /** @noinspection PhpUndefinedFieldInspection */
         $variables = $this->configFile->variables->var;
         $this->variables = [];
 
@@ -492,6 +470,7 @@ class ConfigImpl implements Config
     {
         return isset($this->getVariables()[$offset]);
     }
+
 
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
@@ -524,7 +503,6 @@ class ConfigImpl implements Config
 
     }
 
-
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Offset to unset
@@ -538,6 +516,7 @@ class ConfigImpl implements Config
     {
 
     }
+
 
     /**
      * Lists the folders where to look for other templates.
@@ -575,8 +554,10 @@ class ConfigImpl implements Config
         foreach ($templates->template as $template) {
             $this->templates[(string)$template] = (string)$template['filename'];
             $this->templatePath[(string)$template] = (string)$templates['path'];
+            if(((string) $template['default']) == 'true'){
+                $this->defaultTemplate = (string) $template;
+            }
+
         }
     }
-
-
 }

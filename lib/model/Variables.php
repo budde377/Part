@@ -1,11 +1,9 @@
 <?php
 namespace ChristianBudde\Part\model;
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 10/22/13
  * Time: 3:42 PM
- * To change this template use File | Settings | File Templates.
  */
 
 use ArrayAccess;

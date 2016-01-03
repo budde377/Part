@@ -5,11 +5,9 @@ use ChristianBudde\Part\model\page\Page;
 use ChristianBudde\Part\model\site\Site;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 9/8/13
  * Time: 10:24 PM
- * To change this template use File | Settings | File Templates.
  */
 
 class CacheControlImpl implements CacheControl{

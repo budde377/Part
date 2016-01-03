@@ -1,11 +1,9 @@
 <?php
 namespace ChristianBudde\Part;
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 5/10/12
  * Time: 10:59 AM
- * To change this template use File | Settings | File Templates.
  */
 interface Config extends \ArrayAccess
 {
@@ -18,6 +16,18 @@ interface Config extends \ArrayAccess
      * @return string | null
      */
     public function getTemplate($name);
+
+    /**
+     * Will return the name of the default template if defined. Else null.
+     * @return string
+     */
+    public function getDefaultTemplateName();
+
+    /**
+     * Will return the default template if defined. Else null.
+     * @return string
+     */
+    public function getDefaultTemplate();
 
     /**
      * Will path relative to project root to templates.
@@ -80,39 +90,14 @@ interface Config extends \ArrayAccess
 
     /**
      * @abstract
-     * @param $name
-     * @return array | null Array with entrance className, name, path with ClassName, name provided, and absolute path respectively.
-     */
-    public function getOptimizer($name);
-
-    /**
-     * @abstract
      * @return array A map with entries: host, user, database, password and a list of folders.
      */
     public function getMySQLConnection();
 
     /**
-     * @abstract
-     * @return array A map with entries: host, user and database.
-     */
-
-    public function getMailMySQLConnection();
-
-    /**
-     * Returns true if mail support is enabled. Else false.
-     * @return bool
-     */
-    public function isMailManagementEnabled();
-
-    /**
      * @return bool
      */
     public function isDebugMode();
-
-    /**
-     * @return bool
-     */
-    public function isCacheEnabled();
 
     /**
      * @return bool
@@ -130,7 +115,7 @@ interface Config extends \ArrayAccess
     public function getDomain();
 
     /**
-     * @return Array containing owner information
+     * @return array containing owner information
      */
     public function getOwner();
 
@@ -143,12 +128,6 @@ interface Config extends \ArrayAccess
      * @return string Path to the error log.
      */
     public function getLogPath();
-
-
-    /**
-     * @return array An assoc array with keys: `id`, `secret` and `permanent_access_token` which contains the facebook app id, secret and permanent access token respectively. Values are empty if element is not defined.
-     */
-    public function getFacebookAppCredentials();
 
     /**
      * @return array

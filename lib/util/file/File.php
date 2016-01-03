@@ -4,11 +4,9 @@ use ChristianBudde\Part\controller\json\JSONObjectSerializable;
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 6/1/12
  * Time: 10:30 AM
- * To change this template use File | Settings | File Templates.
  */
 interface File extends JSONObjectSerializable
 {

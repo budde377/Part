@@ -8,17 +8,16 @@ use ChristianBudde\Part\model\ContentImpl;
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 25/05/13
  * Time: 22:45
- * To change this template use File | Settings | File Templates.
  */
 class PageContentImpl extends ContentImpl implements PageContent
 {
 
     private $page;
     private $page_id;
+    private $container;
 
 
     public function __construct(BackendSingletonContainer $container, Page $page, $id = "")

@@ -3,11 +3,9 @@ namespace ChristianBudde\Part\util\file;
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 8/13/13
  * Time: 5:49 PM
- * To change this template use File | Settings | File Templates.
  */
 
 interface ImageFile extends File{

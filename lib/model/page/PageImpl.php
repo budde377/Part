@@ -11,11 +11,9 @@ use ChristianBudde\Part\model\Variables;
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 6/16/12
  * Time: 9:15 PM
- * To change this template use File | Settings | File Templates.
  */
 class PageImpl implements Page
 {
@@ -92,7 +90,15 @@ class PageImpl implements Page
      */
     public function getTemplate()
     {
-        return $this->template;
+        if($this->template != ''){
+            return $this->template;
+        }
+
+        if(($defaultTemplate = $this->container->getConfigInstance()->getDefaultTemplateName()) == null){
+            return '';
+        }
+
+        return $defaultTemplate;
     }
 
     /**

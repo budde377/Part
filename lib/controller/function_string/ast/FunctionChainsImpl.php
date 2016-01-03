@@ -10,9 +10,10 @@ namespace ChristianBudde\Part\controller\function_string\ast;
 
 
 use ChristianBudde\Part\controller\json\CompositeFunction as JCompositeFunction;
+
+use ChristianBudde\Part\controller\json\CompositeFunctionImpl;
 use ChristianBudde\Part\controller\json\JSONFunction;
 use ChristianBudde\Part\controller\json\Target;
-use ChristianBudde\Part\test\JSONCompositeFunctionImplTest;
 
 class FunctionChainsImpl implements FunctionChains{
     private $function;
@@ -47,7 +48,7 @@ class FunctionChainsImpl implements FunctionChains{
      */
     public function toJSONCompositeFunction(Target $target)
     {
-        return new JSONCompositeFunctionImplTest($target, [$this->toJSONFunction($target)]);
+        return new CompositeFunctionImpl($target, [$this->toJSONFunction($target)]);
     }
 
     /**

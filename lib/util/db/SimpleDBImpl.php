@@ -35,7 +35,8 @@ class SimpleDBImpl implements DB
      * @param string $password
      * @return PDO
      */
-    public function getMailConnection($password)
+    public function getMailConnection(/** @noinspection PhpUnusedParameterInspection */
+        $password)
     {
         return $this->mailConnection;
     }

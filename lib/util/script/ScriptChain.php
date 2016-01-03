@@ -2,11 +2,9 @@
 namespace ChristianBudde\Part\util\script;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 5/10/12
  * Time: 10:51 AM
- * To change this template use File | Settings | File Templates.
  */
 interface ScriptChain
 {

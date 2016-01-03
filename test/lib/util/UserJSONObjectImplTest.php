@@ -1,17 +1,15 @@
 <?php
-namespace ChristianBudde\Part\test\util;
+namespace ChristianBudde\Part\controller\ajax\type_handler\util;
 
 use ChristianBudde\Part\controller\json\UserObjectImpl;
-use ChristianBudde\Part\test\stub\StubUserImpl;
-use ChristianBudde\Part\test\stub\StubUserPrivilegesImpl;
+use ChristianBudde\Part\model\user\StubUserImpl;
+use ChristianBudde\Part\model\user\StubUserPrivilegesImpl;
 use PHPUnit_Framework_TestCase;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 24/01/13
  * Time: 10:28
- * To change this template use File | Settings | File Templates.
  */
 class UserJSONObjectImplTest extends PHPUnit_Framework_TestCase
 {

@@ -43,7 +43,7 @@ class JSONFunctionImpl extends ProgramImpl implements JSONFunction
 
     /**
      * Will return a numerical array of arguments
-     * @return Array
+     * @return array
      */
     public function getArgs()
     {

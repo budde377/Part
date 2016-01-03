@@ -4,11 +4,9 @@ use ChristianBudde\Part\controller\ajax\TypeHandlerGenerator;
 use ChristianBudde\Part\controller\json\JSONObjectSerializable;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 25/05/13
  * Time: 22:13
- * To change this template use File | Settings | File Templates.
  */
 
 interface Content extends JSONObjectSerializable, TypeHandlerGenerator{
@@ -40,7 +38,7 @@ interface Content extends JSONObjectSerializable, TypeHandlerGenerator{
 
     /**
      * @param int $time Seconds since epoch
-     * @return Array | null Returns content at time or null if no content
+     * @return array | null Returns content at time or null if no content
      */
     public function getContentAt($time);
 

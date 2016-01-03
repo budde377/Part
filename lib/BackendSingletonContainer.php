@@ -4,7 +4,6 @@ namespace ChristianBudde\Part;
 use ChristianBudde\Part\controller\ajax\Server;
 use ChristianBudde\Part\controller\ajax\TypeHandlerLibrary;
 use ChristianBudde\Part\log\Logger;
-use ChristianBudde\Part\model\mail\DomainLibrary;
 use ChristianBudde\Part\model\page\CurrentPageStrategy;
 use ChristianBudde\Part\model\page\DefaultPageLibrary;
 use ChristianBudde\Part\model\page\PageOrder;
@@ -17,11 +16,9 @@ use ChristianBudde\Part\util\file\FileLibrary;
 use ChristianBudde\Part\util\file\Folder;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 5/10/12
  * Time: 10:59 AM
- * To change this template use File | Settings | File Templates.
  */
 interface BackendSingletonContainer
 {
@@ -126,11 +123,6 @@ interface BackendSingletonContainer
     public function getTmpFolderInstance();
 
 
-    /**
-     * Will Create and reuse instance of MailDomainLibrary.
-     * @return DomainLibrary
-     */
-    public function getMailDomainLibraryInstance();
 
     /**
      * @param string $name

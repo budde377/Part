@@ -7,11 +7,9 @@ use ChristianBudde\Part\util\file\LogFileImpl;
 use ChristianBudde\Part\util\file\StubLogFileImpl;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 6/3/12
  * Time: 9:38 PM
- * To change this template use File | Settings | File Templates.
  */
 class LoggerImpl implements Logger
 {

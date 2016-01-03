@@ -28,7 +28,8 @@ class PageContentTypeHandlerImpl extends GenericObjectTypeHandlerImpl{
     }
 
 
-    private function userHasPagePrivilegesAuthFunction($type, PageContent $instance) {
+    private function userHasPagePrivilegesAuthFunction(/** @noinspection PhpUnusedParameterInspection */
+        $type, PageContent $instance) {
         return
             ($current = $this->container->getUserLibraryInstance()->getUserLoggedIn()) != null &&
             $current->getUserPrivileges()->hasPagePrivileges($instance->getPage());

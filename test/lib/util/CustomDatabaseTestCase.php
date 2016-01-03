@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\Part\test\util;
+namespace ChristianBudde\Part\util;
 
 use PDO;
 use PHPUnit_Extensions_Database_DataSet_IDataSet;
@@ -27,8 +27,9 @@ class CustomDatabaseTestCase extends PHPUnit_Extensions_Database_TestCase
 
     function __construct($dataset = null)
     {
+        parent::__construct();
 
-        $this->dataset = $dataset == null ? dirname(__FILE__) . '/../../mysqlXML/PageContentImplTest.xml' : $dataset;
+        $this->dataset = $dataset == null ? $GLOBALS['MYSQL_XML_DIR'] .  '/PageContentImplTest.xml' : $dataset;
     }
 
 
@@ -67,9 +68,7 @@ class CustomDatabaseTestCase extends PHPUnit_Extensions_Database_TestCase
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        self::$mailMySQLOptions = new MailMySQLConstantsImpl();
         if (self::$mysqlOptions == null) {
-
             self::$mysqlOptions = new StandardMySQLConstantsImpl();
         }
         self::$pdo = new PDO('mysql:dbname=' . self::$mysqlOptions->getDatabase() . ';host=' . self::$mysqlOptions->getHost(), self::$mysqlOptions->getUsername(), self::$mysqlOptions->getPassword(), array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));

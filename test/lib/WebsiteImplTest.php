@@ -1,27 +1,21 @@
 <?php
 
-namespace ChristianBudde\Part\test;
+namespace ChristianBudde\Part;
 
-use ChristianBudde\Part\BackendSingletonContainerImpl;
-use ChristianBudde\Part\test\stub\StubConfigImpl;
-use ChristianBudde\Part\test\stub\StubScriptImpl;
-use ChristianBudde\Part\test\stub\StubSiteFactoryImpl;
+
 use ChristianBudde\Part\util\script\ScriptChainImpl;
-use ChristianBudde\Part\Website;
-use ChristianBudde\Part\WebsiteImpl;
+use ChristianBudde\Part\util\script\StubScriptImpl;
 use PHPUnit_Framework_TestCase;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 5/28/12
  * Time: 3:52 PM
- * To change this template use File | Settings | File Templates.
  */
 class WebsiteImplTest extends PHPUnit_Framework_TestCase
 {
 
-    /** @var $factory \ChristianBudde\Part\test\stub\StubSiteFactoryImpl */
+    /** @var $factory StubSiteFactoryImpl */
     public $factory;
 
     protected function setUp()

@@ -4,11 +4,9 @@ namespace ChristianBudde\Part\exception;
 use Exception;
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 5/14/12
  * Time: 5:07 PM
- * To change this template use File | Settings | File Templates.
  */
 class FileNotFoundException extends Exception
 {

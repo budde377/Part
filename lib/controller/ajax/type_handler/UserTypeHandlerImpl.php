@@ -43,9 +43,11 @@ class UserTypeHandlerImpl extends GenericObjectTypeHandlerImpl{
             "delete",
             "getInstance");
         $this->addGetInstanceFunction('User');
+        /** @noinspection PhpUnusedParameterInspection */
         $this->addTypeAuthFunction('User', function ($type, $instance, $functionName, $args) {
             return substr($functionName, 0, 3) != "set" || $this->container->getUserLibraryInstance()->getUserLoggedIn() === $instance;
         });
+        /** @noinspection PhpUnusedParameterInspection */
         $this->addFunctionAuthFunction('User', 'delete', function ($type, $instance) {
             $userLibrary = $this->container->getUserLibraryInstance();
             return $this->isChildAuthFunction($instance, $userLibrary->getUserLoggedIn(), $userLibrary);

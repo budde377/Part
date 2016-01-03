@@ -2,7 +2,6 @@
 <config xmlns="http://christianbud.de/site-config"
         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
         xsi:schemaLocation="http://christianbud.de/site-config common/xsd/site-config.xsd">
-    <facebookApp id="ID" secret="SECRET" />
     <siteInfo>
         <domain name="YOUR COMPANY" extension="EXTENSION"/>
         <owner name="JOHN DOE" mail="test@example.com" username="root"/>
@@ -38,15 +37,6 @@
             <folder path="db/part/" name="part" />
         </folders>
     </MySQLConnection>
-    <MailMySQLConnection>
-        <host>localhost</host>
-        <database>test_postfix</database>
-        <username>root</username>
-    </MailMySQLConnection>
-    <optimizers>
-        <class name="css" >ChristianBudde\Part\util\file\CSSYUICompressorOptimizerImpl</class>
-        <class name="js" >ChristianBudde\Part\util\file\JSYUICompressorOptimizerImpl</class>
-    </optimizers>
     <enableUpdater>true</enableUpdater>
     <debugMode>true</debugMode>
     <tmpFolder path="TMP FOLDER PATH"/>

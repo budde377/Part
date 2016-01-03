@@ -8,11 +8,9 @@ use ChristianBudde\Part\view;
 
 
 /**
- * Created by JetBrains PhpStorm.
  * User: budde
  * Date: 5/29/12
  * Time: 11:10 AM
- * To change this template use File | Settings | File Templates.
  */
 class PageElementFactoryImpl implements PageElementFactory
 {
@@ -50,6 +48,7 @@ class PageElementFactoryImpl implements PageElementFactory
                 if (!file_exists($element['link'])) {
                     throw new FileNotFoundException($element['link'], 'PageElement');
                 }
+                /** @noinspection PhpIncludeInspection */
                 require_once $element['link'];
             }
             if (!class_exists($element['className'])) {
