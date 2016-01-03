@@ -32,6 +32,7 @@ class ConfigImpl implements Config
     private $tmpFolderPath;
     private $log;
     private $ajaxTypeHandlers;
+    private $defaultTemplate;
 
     /**
      * @param SimpleXMLElement $configFile
@@ -76,6 +77,26 @@ class ConfigImpl implements Config
     }
 
     /**
+     * Will return the default template if defined. Else null.
+     * @return string
+     */
+    public function getDefaultTemplateName()
+    {
+        $this->setUpTemplate();
+        return $this->defaultTemplate;
+
+    }
+
+    /**
+     * Will return the default template if defined. Else null.
+     * @return string
+     */
+    public function getDefaultTemplate()
+    {
+        return $this->getTemplate($this->getDefaultTemplateName());
+    }
+
+    /**
      * Will return PostScripts as an array, with the ClassName as key and the link as value.
      * The link should be relative to a root path provided.
      * @return array
@@ -89,6 +110,7 @@ class ConfigImpl implements Config
         /** @noinspection PhpUndefinedFieldInspection */
         return $this->postScripts = $this->getScripts($this->configFile->postScripts);
     }
+
 
     private function getScripts($scriptsXml)
     {
@@ -119,6 +141,7 @@ class ConfigImpl implements Config
         /** @noinspection PhpUndefinedFieldInspection */
         return $this->preScripts = $this->getScripts($this->configFile->preScripts);
     }
+
 
 
     /**
@@ -160,8 +183,6 @@ class ConfigImpl implements Config
 
         return $returnArray;
     }
-
-
 
     public function getMySQLConnection()
     {
@@ -207,6 +228,7 @@ class ConfigImpl implements Config
         }
         return $ret;
     }
+
 
     /**
      * Will return an array with default pages. Pages hardcoded into the website.
@@ -260,7 +282,6 @@ class ConfigImpl implements Config
 
     }
 
-
     /**
      * @return bool
      */
@@ -278,6 +299,7 @@ class ConfigImpl implements Config
         /** @noinspection PhpUndefinedFieldInspection */
         return $this->debugMode = (string)$this->configFile->debugMode == "true";
     }
+
 
     /**
      * @return string Root path
@@ -304,7 +326,6 @@ class ConfigImpl implements Config
         return $this->enableUpdater = (string)$this->configFile->enableUpdater == "true";
 
     }
-
 
     /**
      * @return string String containing the domain (name.ext)
@@ -349,6 +370,7 @@ class ConfigImpl implements Config
         return !isset($this->templatePath[$name]) ? null : "{$this->rootPath}/{$this->templatePath[$name]}";
     }
 
+
     /**
      * @return string Path to the tmp folder
      */
@@ -377,7 +399,6 @@ class ConfigImpl implements Config
         return $result === null ? $this->log = "" : $result;
 
     }
-
 
     /**
      * Will return AJAXTypeHandlers as an array, with the num key and an array containing "class_name" and "path" as value.
@@ -450,6 +471,7 @@ class ConfigImpl implements Config
         return isset($this->getVariables()[$offset]);
     }
 
+
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Offset to retrieve
@@ -481,7 +503,6 @@ class ConfigImpl implements Config
 
     }
 
-
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Offset to unset
@@ -495,6 +516,7 @@ class ConfigImpl implements Config
     {
 
     }
+
 
     /**
      * Lists the folders where to look for other templates.
@@ -532,8 +554,10 @@ class ConfigImpl implements Config
         foreach ($templates->template as $template) {
             $this->templates[(string)$template] = (string)$template['filename'];
             $this->templatePath[(string)$template] = (string)$templates['path'];
+            if(((string) $template['default']) == 'true'){
+                $this->defaultTemplate = (string) $template;
+            }
+
         }
     }
-
-
 }

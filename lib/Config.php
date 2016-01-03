@@ -18,6 +18,18 @@ interface Config extends \ArrayAccess
     public function getTemplate($name);
 
     /**
+     * Will return the name of the default template if defined. Else null.
+     * @return string
+     */
+    public function getDefaultTemplateName();
+
+    /**
+     * Will return the default template if defined. Else null.
+     * @return string
+     */
+    public function getDefaultTemplate();
+
+    /**
      * Will path relative to project root to templates.
      * @param string $name The name of the template
      * @return null|string Null if template not defined

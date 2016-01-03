@@ -427,6 +427,59 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['main', 'main2'], $templates);
     }
 
+    public function testGetDefaultTemplateWillReturnNullIfNotDefined()
+    {
+        $config = $this->setupConfig(/** @lang XML */
+            "
+        <config>{$this->defaultOwner}
+        <templates path='folder'>
+            <template filename='some_link'>main</template>
+            <template filename='some_link2'>main2</template>
+        </templates>
+        </config>");
+        $this->assertNull($config->getDefaultTemplate());
+    }
+
+    public function testGetDefaultTemplateNameWillReturnNullIfNotDefined()
+    {
+        $config = $this->setupConfig(/** @lang XML */
+            "
+        <config>{$this->defaultOwner}
+        <templates path='folder'>
+            <template filename='some_link'>main</template>
+            <template filename='some_link2'>main2</template>
+        </templates>
+        </config>");
+        $this->assertNull($config->getDefaultTemplateName());
+    }
+
+    public function testGetDefaultTemplateWillReturnCorrectValueIfDefined()
+    {
+        $config = $this->setupConfig(/** @lang XML */
+            "
+        <config>{$this->defaultOwner}
+        <templates path='folder'>
+            <template filename='some_link'>main</template>
+            <template filename='some_link2' default='true'>main2</template>
+        </templates>
+        </config>");
+        $this->assertEquals('some_link2',$config->getDefaultTemplate());
+    }
+
+    public function testGetDefaultTemplateNameWillReturnCorrectValueIfDefined()
+    {
+        $config = $this->setupConfig(/** @lang XML */
+            "
+        <config>{$this->defaultOwner}
+        <templates path='folder'>
+            <template filename='some_link'>main</template>
+            <template filename='some_link2' default='true'>main2</template>
+        </templates>
+        </config>");
+        $this->assertEquals('main2',$config->getDefaultTemplateName());
+    }
+
+
     public function testUsingTemplateCollectionIsCool()
     {
         $config = $this->setupConfig(/** @lang XML */
