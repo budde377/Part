@@ -23,8 +23,8 @@ class ConfigImpl implements Config
     private $templatePath = [];
     private $templateNamespace = [];
     private $pageElements = null;
-    private $preScripts = null;
-    private $postScripts = null;
+    private $preTasks = null;
+    private $postTasks = null;
     private $mysql = null;
     private $debugMode;
     private $defaultPages;
@@ -97,18 +97,18 @@ class ConfigImpl implements Config
     }
 
     /**
-     * Will return PostScripts as an array, with the ClassName as key and the link as value.
+     * Will return PostTasks as an array, with the ClassName as key and the link as value.
      * The link should be relative to a root path provided.
      * @return array
      */
-    public function getPostScripts()
+    public function getPostTasks()
     {
-        if ($this->postScripts != null) {
-            return $this->postScripts;
+        if ($this->postTasks != null) {
+            return $this->postTasks;
         }
 
         /** @noinspection PhpUndefinedFieldInspection */
-        return $this->postScripts = $this->getScripts($this->configFile->postScripts);
+        return $this->postTasks = $this->getScripts($this->configFile->postTasks);
     }
 
 
@@ -128,18 +128,18 @@ class ConfigImpl implements Config
     }
 
     /**
-     * Will return PreScripts as an array, with the ClassName as key and the link as value.
+     * Will return pre tasks as an array, with the ClassName as key and the link as value.
      * The link should be relative to a root path provided.
      * @return array
      */
-    public function getPreScripts()
+    public function getPreTasks()
     {
-        if ($this->preScripts != null) {
-            return $this->preScripts;
+        if ($this->preTasks != null) {
+            return $this->preTasks;
         }
 
         /** @noinspection PhpUndefinedFieldInspection */
-        return $this->preScripts = $this->getScripts($this->configFile->preScripts);
+        return $this->preTasks = $this->getScripts($this->configFile->preTasks);
     }
 
 

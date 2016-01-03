@@ -1,6 +1,6 @@
 <?php
 namespace ChristianBudde\Part;
-use ChristianBudde\Part\util\script\ScriptChain;
+use ChristianBudde\Part\util\task\TaskQueue;
 
 /**
  * User: budde
@@ -15,9 +15,9 @@ interface SiteFactory
      * Builds a new PreScriptChain and returns it. This must contain prescripts specified
      * in some config (it must be ready to run).
      * @param BackendSingletonContainer $backendContainer
-     * @return ScriptChain
+     * @return TaskQueue
      */
-    public function buildPreScriptChain(BackendSingletonContainer $backendContainer);
+    public function buildPreTaskQueue(BackendSingletonContainer $backendContainer);
 
 
     /**
@@ -25,9 +25,9 @@ interface SiteFactory
      * Builds a new PostScriptChain and returns it. This must contain prescripts specified
      * in some config (it must be ready to run).
      * @param BackendSingletonContainer $backendContainer
-     * @return ScriptChain
+     * @return TaskQueue
      */
-    public function buildPostScriptChain(BackendSingletonContainer $backendContainer);
+    public function buildPostTaskQueue(BackendSingletonContainer $backendContainer);
 
     /**
      * @abstract

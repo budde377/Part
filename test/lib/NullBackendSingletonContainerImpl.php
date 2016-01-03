@@ -4,6 +4,7 @@ namespace ChristianBudde\Part;
 
 use ChristianBudde\Part\controller\ajax\TypeHandlerLibrary;
 use ChristianBudde\Part\util\file\Folder;
+use ChristianBudde\Part\util\task\TaskQueue;
 
 
 /**
@@ -183,6 +184,15 @@ class NullBackendSingletonContainerImpl implements BackendSingletonContainer
     public function getTypeHandlerLibraryInstance()
     {
 
+    }
+
+    /**
+     * Returns a TaskQueue for delayed execution.
+     * @return TaskQueue
+     */
+    public function getDelayedExecutionTaskQueue()
+    {
+        return null;
     }
 }
 

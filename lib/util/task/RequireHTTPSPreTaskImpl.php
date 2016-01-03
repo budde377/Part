@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\Part\util\script;
+namespace ChristianBudde\Part\util\task;
 use ChristianBudde\Part\BackendSingletonContainer;
 use ChristianBudde\Part\util\helper\HTTPHeaderHelper;
 use ChristianBudde\Part\Website;
@@ -11,22 +11,14 @@ use ChristianBudde\Part\Website;
  * Time: 5:05 PM
  */
 
-class RequireHTTPSPreScriptImpl implements Script{
+class RequireHTTPSPreTaskImpl implements Task{
     private $backendContainer;
     public function __construct(BackendSingletonContainer $backendContainer){
         $this->backendContainer = $backendContainer;
     }
 
-    /**
-     * This function runs the script
-     * @param $name string
-     * @param $args array | null
-     */
-    public function run($name, $args)
+    public function execute()
     {
-        if($name != Website::WEBSITE_SCRIPT_TYPE_PRESCRIPT){
-            return;
-        }
 
         if($this->backendContainer->getConfigInstance()->getDomain() !== $_SERVER['HTTP_HOST']){
             return;

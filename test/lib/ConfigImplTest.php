@@ -160,122 +160,122 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
 
 
-    public function testGetPreScriptReturnEmptyArrayWithEmptyConfig()
+    public function testGetPreTaskReturnEmptyArrayWithEmptyConfig()
     {
 
-        $preScript = $this->config->getPreScripts();
-        $this->assertTrue(is_array($preScript), 'getPreScripts did not return an array with empty config.');
-        $this->assertTrue(empty($preScript), 'getPreScripts did not return an empty array with empty config.');
+        $preTask = $this->config->getPreTasks();
+        $this->assertTrue(is_array($preTask), 'getPreTasks did not return an array with empty config.');
+        $this->assertTrue(empty($preTask), 'getPreTasks did not return an empty array with empty config.');
     }
 
 
-    public function testGetPreScriptHasEntrySpecifiedInConfigWithLinkAsVal()
+    public function testGetPreTaskHasEntrySpecifiedInConfigWithLinkAsVal()
     {
         $config = $this->setupConfig("
         <config>{$this->defaultOwner}
-        <preScripts>
+        <preTasks>
         <class link='some_link'>main</class>
-        </preScripts>
+        </preTasks>
         </config>");
-        $preScript = $config->getPreScripts();
-        $this->assertArrayHasKey('main', $preScript, 'getPreScripts did not return array with right entrance');
-        $this->assertEquals($config->getRootPath() . 'some_link', $preScript['main'], 'getPreScripts did not return array with right link');
+        $preTask = $config->getPreTasks();
+        $this->assertArrayHasKey('main', $preTask, 'getPreTasks did not return array with right entrance');
+        $this->assertEquals($config->getRootPath() . 'some_link', $preTask['main'], 'getPreTasks did not return array with right link');
 
     }
 
-    public function testGetPreScriptHasEntrySpecifiedInConfigWithLinkAsValButNoLink()
+    public function testGetPreTaskHasEntrySpecifiedInConfigWithLinkAsValButNoLink()
     {
         $config = $this->setupConfig("
         <config>{$this->defaultOwner}
-        <preScripts>
+        <preTasks>
         <class >main</class>
-        </preScripts>
+        </preTasks>
         </config>");
-        $preScript = $config->getPreScripts();
-        $this->assertArrayHasKey('main', $preScript, 'getPreScripts did not return array with right entrance');
-        $this->assertNull($preScript['main'], 'getPreScripts did not return array with right link');
+        $preTask = $config->getPreTasks();
+        $this->assertArrayHasKey('main', $preTask, 'getPreTasks did not return array with right entrance');
+        $this->assertNull($preTask['main'], 'getPreTasks did not return array with right link');
 
     }
 
-    public function testGetPostScriptReturnEmptyArrayWithEmptyConfig()
+    public function testGetPostTaskReturnEmptyArrayWithEmptyConfig()
     {
         $emptyConfigXML = simplexml_load_string("<config>{$this->defaultOwner}</config>");
         $rootPath = dirname(__FILE__) . '/';
         $config = new ConfigImpl($emptyConfigXML, $rootPath);
-        $preScript = $config->getPostScripts();
-        $this->assertTrue(is_array($preScript), 'getPostScripts did not return an array with empty config.');
-        $this->assertTrue(empty($preScript), 'getPostScripts did not return an empty array with empty config.');
+        $preTask = $config->getPostTasks();
+        $this->assertTrue(is_array($preTask), 'getPostTasks did not return an array with empty config.');
+        $this->assertTrue(empty($preTask), 'getPostTasks did not return an empty array with empty config.');
     }
 
-    public function testGetPostScriptHasEntrySpecifiedInConfig()
+    public function testGetPostTaskHasEntrySpecifiedInConfig()
     {
         $config = $this->setupConfig("
         <config>{$this->defaultOwner}
-        <postScripts>
+        <postTasks>
         <class link=''>main</class>
         <class link=''>main2</class>
-        </postScripts>
+        </postTasks>
         </config>");
-        $preScript = $config->getPostScripts();
-        $this->assertArrayHasKey('main', $preScript, 'getPostScripts did not return array with right entrance');
-        $this->assertArrayHasKey('main2', $preScript, 'getPostScripts did not return array with right entrance');
+        $preTask = $config->getPostTasks();
+        $this->assertArrayHasKey('main', $preTask, 'getPostTasks did not return array with right entrance');
+        $this->assertArrayHasKey('main2', $preTask, 'getPostTasks did not return array with right entrance');
     }
 
-    public function testGetPostScriptHasEntrySpecifiedInConfigWithLinkAsValAndRootPrepended()
+    public function testGetPostTaskHasEntrySpecifiedInConfigWithLinkAsValAndRootPrepended()
     {
         $config = $this->setupConfig("
         <config>{$this->defaultOwner}
-        <postScripts>
+        <postTasks>
         <class link='some_link'>main</class>
-        </postScripts>
+        </postTasks>
         </config>");
-        $preScript = $config->getPostScripts();
-        $this->assertEquals($config->getRootPath() . 'some_link', $preScript['main'], 'getPostScripts did not return array with right link');
+        $preTask = $config->getPostTasks();
+        $this->assertEquals($config->getRootPath() . 'some_link', $preTask['main'], 'getPostTasks did not return array with right link');
 
     }
 
-    public function testGetPostScriptHasEntrySpecifiedInConfigWithLinkAsValAndRootPrependedButNoLink()
+    public function testGetPostTaskHasEntrySpecifiedInConfigWithLinkAsValAndRootPrependedButNoLink()
     {
         $config = $this->setupConfig("
         <config>{$this->defaultOwner}
-        <postScripts>
+        <postTasks>
         <class >main</class>
-        </postScripts>
+        </postTasks>
         </config>");
-        $preScript = $config->getPostScripts();
-        $this->assertNull($preScript['main'], 'getPostScripts did not return array with right link');
+        $preTask = $config->getPostTasks();
+        $this->assertNull($preTask['main'], 'getPostTasks did not return array with right link');
 
     }
 
-    public function testOrderOfPostScriptIsTheSameInFileAsOutput()
+    public function testOrderOfPostTaskIsTheSameInFileAsOutput()
     {
         $config = $this->setupConfig("
         <config>{$this->defaultOwner}
-        <postScripts>
+        <postTasks>
         <class link='some_link2'>main2</class>
         <class link='some_link'>main</class>
-        </postScripts>
+        </postTasks>
         </config>");
-        $postScripts = $config->getPostScripts();
-        $postScriptsCopy = $postScripts;
-        ksort($postScriptsCopy);
-        $this->assertNotEquals(array_pop($postScripts), array_pop($postScriptsCopy), 'The order was not as defined in file');
+        $postTasks = $config->getPostTasks();
+        $postTasksCopy = $postTasks;
+        ksort($postTasksCopy);
+        $this->assertNotEquals(array_pop($postTasks), array_pop($postTasksCopy), 'The order was not as defined in file');
 
     }
 
-    public function testOrderOfPreScriptIsTheSameInFileAsOutput()
+    public function testOrderOfPreTaskIsTheSameInFileAsOutput()
     {
         $config = $this->setupConfig("
         <config>{$this->defaultOwner}
-        <preScripts>
+        <preTasks>
         <class link='some_link2'>main2</class>
         <class link='some_link'>main</class>
-        </preScripts>
+        </preTasks>
         </config>");
-        $preScripts = $config->getPreScripts();
-        $preScriptsCopy = $preScripts;
-        ksort($preScriptsCopy);
-        $this->assertNotEquals(array_pop($preScripts), array_pop($preScriptsCopy), 'The order was not as defined in file');
+        $preTasks = $config->getPreTasks();
+        $preTasksCopy = $preTasks;
+        ksort($preTasksCopy);
+        $this->assertNotEquals(array_pop($preTasks), array_pop($preTasksCopy), 'The order was not as defined in file');
 
     }
 

@@ -12,7 +12,7 @@ namespace ChristianBudde\Part;
 use ChristianBudde\Part\exception\ClassNotInstanceOfException;
 
 use ChristianBudde\Part\exception\ForceExitException;
-use ChristianBudde\Part\exception\ScriptHasRunException;
+use ChristianBudde\Part\exception\TaskHasRunException;
 use Exception;
 use PHPUnit_Framework_TestCase;
 use SimpleXMLElement;
@@ -32,9 +32,10 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         $this->backFactory = new NullBackendSingletonContainerImpl();
     }
 
-    private function setupFactory($config = null){
+    private function setupFactory($config = null)
+    {
 
-        if($config == null){
+        if ($config == null) {
             $config = "<config>{$this->defaultOwner}</config>";
         }
         $configXML = simplexml_load_string($config);
@@ -44,232 +45,214 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testBuildPreAndPostScriptWillReturnScriptChainOnEmptyConfig()
+    public function testBuildPreAndPostTaskWillReturnTaskChainOnEmptyConfig()
     {
         $this->setupFactory();
 
-        $this->assertInstanceOf('ChristianBudde\Part\util\script\ScriptChain', $this->factory->buildPostScriptChain($this->backFactory), 'The buildPostScriptChain return must be instance of ScriptChain');
-        $this->assertInstanceOf('ChristianBudde\Part\util\script\ScriptChain', $this->factory->buildPreScriptChain($this->backFactory), 'The buildPreScriptChain return must be instance of ScriptChain');
+        $this->assertInstanceOf('ChristianBudde\Part\util\task\TaskQueue', $this->factory->buildPostTaskQueue($this->backFactory), 'The buildPostTaskChain return must be instance of TaskChain');
+        $this->assertInstanceOf('ChristianBudde\Part\util\task\TaskQueue', $this->factory->buildPreTaskQueue($this->backFactory), 'The buildPreTaskChain return must be instance of TaskChain');
 
     }
 
-    public function testBuildPreScriptWillReturnScriptChainWithScriptsSpecifiedInConfig()
+    public function testBuildPreTaskWillReturnTaskChainWithTasksSpecifiedInConfig()
     {
 
         $this->setupFactory("
         <config>{$this->defaultOwner}
-        <preScripts>
-        <class link='util/script/ExceptionStubScriptImpl.php'>ChristianBudde\Part\util\script\ExceptionStubScriptImpl</class>
-        </preScripts>
+        <preTasks>
+        <class link='util/task/ExceptionStubTaskImpl.php'>ChristianBudde\Part\util\\task\ExceptionStubTaskImpl</class>
+        </preTasks>
         </config>");
-        $preScripts = $this->factory->buildPreScriptChain($this->backFactory);
+        $preTasks = $this->factory->buildPreTaskQueue($this->backFactory);
 
-        $exceptionWasThrown = false;
-        try {
-            $preScripts->run('PreScript', null);
-
-        } catch (Exception $exception) {
-            $this->assertInstanceOf('ChristianBudde\Part\exception\ScriptHasRunException', $exception, 'The wrong exception was thrown.');
-            /** @var $exception ScriptHasRunException */
-            $exceptionWasThrown = true;
-            $this->assertEquals('PreScript', $exception->getName(), 'The Script ran with wrong name.');
-            $this->assertNull($exception->getArgs(), 'Script ran with wrong argument');
-        }
-        $this->assertTrue($exceptionWasThrown, 'A exception was not thrown.');
+        $this->setExpectedException('ChristianBudde\Part\exception\TaskHasRunException');
+        $preTasks->execute();
 
     }
 
-    public function testBuildPreScriptWillReturnScriptChainWithScriptsSpecifiedInConfigButNoLink()
+    public function testBuildPreTaskWillReturnTaskChainWithTasksSpecifiedInConfigButNoLink()
     {
 
         $this->setupFactory("
         <config>{$this->defaultOwner}
-        <preScripts>
-        <class>ChristianBudde\\Part\\util\\script\\ExceptionStubScriptImpl</class>
-        </preScripts>
+        <preTasks>
+        <class>ChristianBudde\\Part\\util\\task\\ExceptionStubTaskImpl</class>
+        </preTasks>
         </config>");
-        $preScripts = $this->factory->buildPreScriptChain($this->backFactory);
+        $preTasks = $this->factory->buildPreTaskQueue($this->backFactory);
 
-        $exceptionWasThrown = false;
-        try {
-            $preScripts->run('PreScript', null);
 
-        } catch (Exception $exception) {
-            $this->assertInstanceOf('ChristianBudde\Part\exception\ScriptHasRunException', $exception, 'The wrong exception was thrown.');
-            /** @var $exception ScriptHasRunException */
-            $exceptionWasThrown = true;
-            $this->assertEquals('PreScript', $exception->getName(), 'The Script ran with wrong name.');
-            $this->assertNull($exception->getArgs(), 'Script ran with wrong argument');
-        }
-        $this->assertTrue($exceptionWasThrown, 'A exception was not thrown.');
+        $this->setExpectedException('ChristianBudde\Part\exception\TaskHasRunException');
+        $preTasks->execute();
 
     }
 
-    public function testBuildPreScriptWillThrowExceptionWithNotScriptInConfig()
+    public function testBuildPreTaskWillThrowExceptionWithNotTaskInConfig()
     {
         /** @var $configXML SimpleXMLElement */
         $this->setupFactory("
         <config>{$this->defaultOwner}
-        <preScripts>
+        <preTasks>
         <class link='view/page_element/NullPageElementImpl.php'>ChristianBudde\\Part\\view\\page_element\\NullPageElementImpl</class>
-        </preScripts>
+        </preTasks>
         </config>");
 
         $exceptionWasThrown = false;
         try {
-            $this->factory->buildPreScriptChain($this->backFactory);
+            $this->factory->buildPreTaskQueue($this->backFactory);
         } catch (Exception $exception) {
             $this->assertInstanceOf('ChristianBudde\Part\exception\ClassNotInstanceOfException', $exception, 'The wrong exception was thrown.');
             /** @var $exception \ChristianBudde\Part\exception\ClassNotInstanceOfException */
             $exceptionWasThrown = true;
             $this->assertEquals('ChristianBudde\Part\view\page_element\NullPageElementImpl', $exception->getClass(), 'Was not expected class');
-            $this->assertEquals('Script', $exception->getExpectedInstance(), 'Was not expected instance');
+            $this->assertEquals('Task', $exception->getExpectedInstance(), 'Was not expected instance');
         }
         $this->assertTrue($exceptionWasThrown, 'A exception was not thrown.');
 
     }
 
 
-    public function testBuildPostScriptWillThrowExceptionWithNotScriptInConfig()
+    public function testBuildPostTaskWillThrowExceptionWithNotTaskInConfig()
     {
         /** @var $configXML SimpleXMLElement */
         $this->setupFactory("
         <config>{$this->defaultOwner}
-        <postScripts>
+        <postTasks>
         <class link='view/page_element/NullPageElementImpl.php'>ChristianBudde\\Part\\view\\page_element\\NullPageElementImpl</class>
-        </postScripts>
+        </postTasks>
         </config>");
 
         $exceptionWasThrown = false;
         try {
-            $this->factory->buildPostScriptChain($this->backFactory);
+            $this->factory->buildPostTaskQueue($this->backFactory);
         } catch (Exception $exception) {
             $this->assertInstanceOf('ChristianBudde\Part\exception\ClassNotInstanceOfException', $exception, 'The wrong exception was thrown.');
             /** @var $exception ClassNotInstanceOfException */
             $exceptionWasThrown = true;
             $this->assertEquals('ChristianBudde\Part\view\page_element\NullPageElementImpl', $exception->getClass(), 'Was not expected class');
-            $this->assertEquals('Script', $exception->getExpectedInstance(), 'Was not expected instance');
+            $this->assertEquals('Task', $exception->getExpectedInstance(), 'Was not expected instance');
         }
         $this->assertTrue($exceptionWasThrown, 'A exception was not thrown.');
 
     }
 
-    public function testBuildPostScriptWillReturnScriptChainWithScriptsSpecifiedInConfig()
+    public function testBuildPostTaskWillReturnTaskChainWithTasksSpecifiedInConfig()
     {
 
         $this->setupFactory("
         <config>{$this->defaultOwner}
-        <postScripts>
-        <class link='util/script/ExceptionStubScriptImpl.php'>ChristianBudde\\Part\\util\\script\\ExceptionStubScriptImpl</class>
-        </postScripts>
+        <postTasks>
+        <class link='util/task/ExceptionStubTaskImpl.php'>ChristianBudde\\Part\\util\\task\\ExceptionStubTaskImpl</class>
+        </postTasks>
         </config>");
-        $postScripts = $this->factory->buildPostScriptChain($this->backFactory);
+        $postTasks = $this->factory->buildPostTaskQueue($this->backFactory);
 
-        $this->setExpectedException('ChristianBudde\\Part\\exception\\ScriptHasRunException');
-        $postScripts->run('PostScript', null);
+        $this->setExpectedException('ChristianBudde\\Part\\exception\\TaskHasRunException');
+        $postTasks->execute('PostTask', null);
 
     }
 
-    public function testBuildPostScriptWillReturnScriptChainWithScriptsSpecifiedInConfigButNoLink()
+    public function testBuildPostTaskWillReturnTaskChainWithTasksSpecifiedInConfigButNoLink()
     {
 
         $this->setupFactory("
         <config>{$this->defaultOwner}
-        <postScripts>
-        <class>ChristianBudde\\Part\\util\\script\\ExceptionStubScriptImpl</class>
-        </postScripts>
+        <postTasks>
+        <class>ChristianBudde\\Part\\util\\task\\ExceptionStubTaskImpl</class>
+        </postTasks>
         </config>");
-        $postScripts = $this->factory->buildPostScriptChain($this->backFactory);
+        $postTasks = $this->factory->buildPostTaskQueue($this->backFactory);
 
-        $this->setExpectedException('ChristianBudde\\Part\\exception\\ScriptHasRunException');
-        $postScripts->run('PostScript', null);
+        $this->setExpectedException('ChristianBudde\\Part\\exception\\TaskHasRunException');
+        $postTasks->execute('PostTask', null);
 
     }
 
-    public function testBuildPreScriptWillThrowExceptionIfFileNotFound()
+    public function testBuildPreTaskWillThrowExceptionIfFileNotFound()
     {
         $this->setExpectedException('ChristianBudde\Part\exception\FileNotFoundException');
 
         $this->setupFactory("
         <config>{$this->defaultOwner}
-        <preScripts>
-        <class link='stubs/ThisFileIsNotFound.php'>ChristianBudde\\Part\\test\\stub\\ScriptExceptionStubImpl</class>
-        </preScripts>
+        <preTasks>
+        <class link='stubs/ThisFileIsNotFound.php'>ChristianBudde\\Part\\test\\stub\\TaskExceptionStubImpl</class>
+        </preTasks>
         </config>");
-        $this->factory->buildPreScriptChain($this->backFactory);
+        $this->factory->buildPreTaskQueue($this->backFactory);
 
     }
 
-    public function testBuildPreScriptWillThrowExceptionIfScriptClassIsNotDefined()
+    public function testBuildPreTaskWillThrowExceptionIfTaskClassIsNotDefined()
     {
         $this->setExpectedException('ChristianBudde\Part\exception\ClassNotDefinedException');
 
         $this->setupFactory("
         <config>{$this->defaultOwner}
-        <preScripts>
-        <class link='util/script/ExceptionStubScriptImpl.php'>WrongClassName</class>
-        </preScripts>
+        <preTasks>
+        <class link='util/task/ExceptionStubTaskImpl.php'>WrongClassName</class>
+        </preTasks>
         </config>");
-        $this->factory->buildPreScriptChain($this->backFactory);
+        $this->factory->buildPreTaskQueue($this->backFactory);
 
     }
 
-    public function testBuildPreScriptWillGiveRightArgumentToConstructor()
+    public function testBuildPreTaskWillGiveRightArgumentToConstructor()
     {
         $this->setupFactory("
         <config>{$this->defaultOwner}
-        <preScripts>
-        <class>ChristianBudde\\Part\\util\\script\\ConstructorStubScriptImpl</class>
-        </preScripts>
+        <preTasks>
+        <class>ChristianBudde\\Part\\util\\task\\ConstructorStubTaskImpl</class>
+        </preTasks>
         </config>");
-        try{
-            $this->factory->buildPreScriptChain($this->backFactory);
-        } catch (ForceExitException $e){
-            $this->assertTrue($e->data[0] === $this->backFactory);
-        }
-
-    }
-    public function testBuildPostScriptWillGiveRightArgumentToConstructor()
-    {
-        $this->setupFactory("
-        <config>{$this->defaultOwner}
-        <postScripts>
-        <class>ChristianBudde\\Part\\util\\script\\ConstructorStubScriptImpl</class>
-        </postScripts>
-        </config>");
-        try{
-            $this->factory->buildPostScriptChain($this->backFactory);
-        } catch (ForceExitException $e){
+        try {
+            $this->factory->buildPreTaskQueue($this->backFactory);
+        } catch (ForceExitException $e) {
             $this->assertTrue($e->data[0] === $this->backFactory);
         }
 
     }
 
-    public function testBuildPostScriptWillThrowExceptionIfFileNotFound()
+    public function testBuildPostTaskWillGiveRightArgumentToConstructor()
+    {
+        $this->setupFactory("
+        <config>{$this->defaultOwner}
+        <postTasks>
+        <class>ChristianBudde\\Part\\util\\task\\ConstructorStubTaskImpl</class>
+        </postTasks>
+        </config>");
+        try {
+            $this->factory->buildPostTaskQueue($this->backFactory);
+        } catch (ForceExitException $e) {
+            $this->assertTrue($e->data[0] === $this->backFactory);
+        }
+
+    }
+
+    public function testBuildPostTaskWillThrowExceptionIfFileNotFound()
     {
 
         $this->setExpectedException('ChristianBudde\Part\exception\FileNotFoundException');
 
         $this->setupFactory("
         <config>{$this->defaultOwner}
-        <postScripts>
-        <class link='stubs/ThisFileIsNotFound.php'>ScriptExceptionStubImpl</class>
-        </postScripts>
+        <postTasks>
+        <class link='stubs/ThisFileIsNotFound.php'>TaskExceptionStubImpl</class>
+        </postTasks>
         </config>");
-        $this->factory->buildPostScriptChain($this->backFactory);
+        $this->factory->buildPostTaskQueue($this->backFactory);
 
     }
 
-    public function testBuildPostScriptWillThrowExceptionIfScriptClassIsNotDefined()
+    public function testBuildPostTaskWillThrowExceptionIfTaskClassIsNotDefined()
     {
         $this->setExpectedException('ChristianBudde\Part\exception\ClassNotDefinedException');
         $this->setupFactory("
         <config>{$this->defaultOwner}
-        <postScripts>
-        <class link='util/script/ExceptionStubScriptImpl.php'>WrongClassName</class>
-        </postScripts>
+        <postTasks>
+        <class link='util/task/ExceptionStubTaskImpl.php'>WrongClassName</class>
+        </postTasks>
         </config>");
-        $this->factory->buildPostScriptChain($this->backFactory);
+        $this->factory->buildPostTaskQueue($this->backFactory);
 
     }
 

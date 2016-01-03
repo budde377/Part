@@ -6,13 +6,13 @@
  * Time: 6:40 PM
  */
 
-namespace ChristianBudde\Part\util\script;
+namespace ChristianBudde\Part\util\task;
 
 
 
 use ChristianBudde\Part\exception\ForceExitException;
 
-class ConstructorStubScriptImpl {
+class ConstructorStubTaskImpl {
 
 
     function __construct()

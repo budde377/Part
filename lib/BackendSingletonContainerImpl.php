@@ -29,6 +29,8 @@ use ChristianBudde\Part\util\file\FileLibraryImpl;
 use ChristianBudde\Part\util\file\Folder;
 use ChristianBudde\Part\util\file\FolderImpl;
 use ChristianBudde\Part\util\file\LogFile;
+use ChristianBudde\Part\util\task\TaskQueue;
+use ChristianBudde\Part\util\task\TaskQueueImpl;
 
 /**
  * User: budde
@@ -38,6 +40,7 @@ use ChristianBudde\Part\util\file\LogFile;
 class BackendSingletonContainerImpl implements BackendSingletonContainer
 {
 
+    private $delayedExecutionTaskQueue;
     private $config;
     /** @var $database DB */
     private $database = null;
@@ -227,41 +230,54 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
             case 'site':
                 return $this->getSiteInstance();
                 break;
+            /** @noinspection SpellCheckingInspection */
             case 'ajaxserver':
                 return $this->getAJAXServerInstance();
                 break;
+            /** @noinspection SpellCheckingInspection */
             case 'cachecontrol':
                 return $this->getCacheControlInstance();
                 break;
             case 'config':
                 return $this->getConfigInstance();
                 break;
+            /** @noinspection SpellCheckingInspection */
             case 'currentpagestrategy':
                 return $this->getCurrentPageStrategyInstance();
                 break;
             case 'db':
                 return $this->getDBInstance();
                 break;
+            /** @noinspection SpellCheckingInspection */
             case 'defaultpagelibrary':
                 return $this->getDefaultPageLibraryInstance();
                 break;
+            /** @noinspection SpellCheckingInspection */
             case 'filelibrary':
                 return $this->getFileLibraryInstance();
                 break;
             case 'logger':
                 return $this->getLoggerInstance();
                 break;
+            /** @noinspection SpellCheckingInspection */
             case 'pageorder':
                 return $this->getPageOrderInstance();
                 break;
+            /** @noinspection SpellCheckingInspection */
             case 'updater':
                 return $this->getUpdaterInstance();
                 break;
+            /** @noinspection SpellCheckingInspection */
             case 'userlibrary':
                 return $this->getUserLibraryInstance();
                 break;
+            /** @noinspection SpellCheckingInspection */
             case 'tmpfolder':
                 return $this->getTmpFolderInstance();
+                break;
+            /** @noinspection SpellCheckingInspection */
+            case 'delayedexecutiontaskqueue':
+                return $this->getDelayedExecutionTaskQueue();
                 break;
 
         }
@@ -293,6 +309,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
      */
     public function __isset($name)
     {
+        /** @noinspection SpellCheckingInspection */
         $preDefined = [
             'site',
             'maildomainlibrary',
@@ -344,5 +361,14 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     public function getTypeHandlerLibraryInstance()
     {
         return $this->typeHandlerLib == null ? $this->typeHandlerLib = new TypeHandlerLibraryImpl($this) : $this->typeHandlerLib;
+    }
+
+    /**
+     * Returns a TaskQueue for delayed execution.
+     * @return TaskQueue
+     */
+    public function getDelayedExecutionTaskQueue()
+    {
+        return $this->delayedExecutionTaskQueue == null? $this->delayedExecutionTaskQueue = new TaskQueueImpl(): $this->delayedExecutionTaskQueue;
     }
 }

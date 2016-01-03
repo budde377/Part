@@ -4,9 +4,9 @@ namespace ChristianBudde\Part;
 use ChristianBudde\Part\exception\ClassNotDefinedException;
 use ChristianBudde\Part\exception\ClassNotInstanceOfException;
 use ChristianBudde\Part\exception\FileNotFoundException;
-use ChristianBudde\Part\util\script\Script;
-use ChristianBudde\Part\util\script\ScriptChain;
-use ChristianBudde\Part\util\script\ScriptChainImpl;
+use ChristianBudde\Part\util\task\Task;
+use ChristianBudde\Part\util\task\TaskQueue;
+use ChristianBudde\Part\util\task\TaskQueueImpl;
 
 /**
  * User: budde
@@ -33,11 +33,11 @@ class SiteFactoryImpl implements SiteFactory
      * @throws ClassNotDefinedException
      * @throws FileNotFoundException
      * @throws ClassNotInstanceOfException
-     * @return ScriptChain
+     * @return TaskQueue
      */
-    public function buildPreScriptChain(BackendSingletonContainer $backendContainer)
+    public function buildPreTaskQueue(BackendSingletonContainer $backendContainer)
     {
-        return $this->buildScriptChain($backendContainer, $this->config->getPreScripts());
+        return $this->buildTaskQueue($backendContainer, $this->config->getPreTasks());
 
     }
 
@@ -50,18 +50,18 @@ class SiteFactoryImpl implements SiteFactory
      * @throws ClassNotDefinedException
      * @throws FileNotFoundException
      * @throws ClassNotInstanceOfException
-     * @return ScriptChain
+     * @return TaskQueue
      */
-    public function buildPostScriptChain(BackendSingletonContainer $backendContainer)
+    public function buildPostTaskQueue(BackendSingletonContainer $backendContainer)
     {
 
-        return $this->buildScriptChain($backendContainer, $this->config->getPostScripts());
+        return $this->buildTaskQueue($backendContainer, $this->config->getPostTasks());
     }
 
 
-    private function buildScriptChain(BackendSingletonContainer $container, $scriptArray)
+    private function buildTaskQueue(BackendSingletonContainer $container, $scriptArray)
     {
-        $chain = new ScriptChainImpl();
+        $chain = new TaskQueueImpl();
 
         foreach ($scriptArray as $className => $location) {
 
@@ -80,11 +80,11 @@ class SiteFactoryImpl implements SiteFactory
 
             $preScript = new $className($container);
 
-            if (!($preScript instanceof Script)) {
-                throw new ClassNotInstanceOfException($className, 'Script');
+            if (!($preScript instanceof Task)) {
+                throw new ClassNotInstanceOfException($className, 'Task');
             }
 
-            $chain->addScript($preScript);
+            $chain->addTask($preScript);
         }
 
         return $chain;
