@@ -37,10 +37,6 @@
             <folder path="db/part/" name="part" />
         </folders>
     </MySQLConnection>
-    <optimizers>
-        <class name="css" >ChristianBudde\Part\util\file\CSSYUICompressorOptimizerImpl</class>
-        <class name="js" >ChristianBudde\Part\util\file\JSYUICompressorOptimizerImpl</class>
-    </optimizers>
     <enableUpdater>true</enableUpdater>
     <debugMode>true</debugMode>
     <tmpFolder path="TMP FOLDER PATH"/>
