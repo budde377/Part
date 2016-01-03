@@ -23,6 +23,8 @@ class StubConfigImpl implements Config
     private $defaultPages = array();
     private $logPath;
     private $domain = "";
+    private $defaultTemplateName;
+    private $defaultTemplate;
 
     /**
      * @param array $defaultPages
@@ -345,4 +347,36 @@ class StubConfigImpl implements Config
     {
         return false;
     }
+
+    /**
+     * Will return the default template if defined. Else null.
+     * @return string
+     */
+    public function getDefaultTemplateName()
+    {
+        return $this->defaultTemplateName;
+    }
+
+    public function getDefaultTemplate()
+    {
+        return $this->defaultTemplate;
+    }
+
+    /**
+     * @param mixed $defaultTemplate
+     */
+    public function setDefaultTemplate($defaultTemplate)
+    {
+        $this->defaultTemplate = $defaultTemplate;
+    }
+
+    /**
+     * @param mixed $defaultTemplateName
+     */
+    public function setDefaultTemplateName($defaultTemplateName)
+    {
+        $this->defaultTemplateName = $defaultTemplateName;
+    }
+
+
 }

@@ -7,7 +7,9 @@
 namespace ChristianBudde\Part\model\page;
 
 use ChristianBudde\Part\exception\MalformedParameterException;
+use ChristianBudde\Part\model\StubContentImpl;
 use ChristianBudde\Part\StubBackendSingletonContainerImpl;
+use ChristianBudde\Part\StubConfigImpl;
 use ChristianBudde\Part\util\CustomDatabaseTestCase;
 use ChristianBudde\Part\util\db\StubDBImpl;
 use Exception;
@@ -24,6 +26,8 @@ class PageImplTest extends CustomDatabaseTestCase
     private $container;
     /** @var  PageOrderImpl */
     private $pageOrder;
+    /** @var  StubConfigImpl */
+    private $config;
 
 
     function __construct()
@@ -39,6 +43,7 @@ class PageImplTest extends CustomDatabaseTestCase
         $this->db->setConnection(self::$pdo);
         $this->container = new StubBackendSingletonContainerImpl();
         $this->container->setDBInstance($this->db);
+        $this->container->setConfigInstance($this->config = new StubConfigImpl());
         $this->pageOrder = new PageOrderImpl($this->container);
         $this->testPage = $this->createPage('testpage');
         $this->testPage2 = $this->createPage('testpage2');
@@ -152,6 +157,15 @@ class PageImplTest extends CustomDatabaseTestCase
         $this->assertEquals('alias', $this->testPage->getAlias());
         $this->assertEquals('testpage', $this->testPage->getID());
     }
+
+    public function testGetWillReturnDefaultTemplateOnEmpty()
+    {
+        $this->testPage->setTemplate('');
+        $this->assertEquals('', $this->testPage->getTemplate());
+        $this->testPage->setTemplate('test123');
+        $this->assertEquals('test123', $this->testPage->getTemplate());
+    }
+
 
 
     public function testSetsWillBePersistent()

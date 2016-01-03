@@ -62,7 +62,6 @@
                 </xs:element>
                 <xs:element name="MySQLConnection" type="dbConnectionWithPasswordAndFolder" minOccurs="0"/>
                 <xs:element name="debugMode" type="xs:boolean" minOccurs="0"/>
-                <xs:element name="enableCache" type="xs:boolean" minOccurs="0"/>
                 <xs:element name="enableUpdater" type="xs:boolean" minOccurs="0"/>
                 <xs:element name="tmpFolder" type="requiredPathAttribute" minOccurs="0"/>
                 <xs:element name="log" type="requiredPathAttribute" minOccurs="0"/>
@@ -151,6 +150,7 @@
                         <xs:simpleContent>
                             <xs:extension base="xs:string">
                                 <xs:attribute name="filename" type="xs:string"/>
+                                <xs:attribute name="default" type="xs:boolean" use="optional"/>
                             </xs:extension>
                         </xs:simpleContent>
                     </xs:complexType>
@@ -162,6 +162,10 @@
         <xs:unique name="templates">
             <xs:selector xpath="t:template"/>
             <xs:field xpath="."/>
+        </xs:unique>
+        <xs:unique name="onlyOneDefault">
+            <xs:selector xpath="t:template"/>
+            <xs:field xpath="@default" />
         </xs:unique>
     </xs:element>
 
@@ -179,28 +183,12 @@
             <xs:selector xpath="t:templates/t:template"/>
             <xs:field xpath="."/>
         </xs:unique>
+        <xs:unique name="default_templates_in_path">
+            <xs:selector xpath="t:templates/t:template"/>
+            <xs:field xpath="@default"/>
+        </xs:unique>
     </xs:element>
-    <!--
-                          <xs:element name="templates" type="templateSequence" minOccurs="0">
 
-                          </xs:element>
-                          <xs:element name="templateFolders" minOccurs="0">
-                              <xs:complexType>
-                                  <xs:sequence>
-
-                                      <xs:element name="folder" minOccurs="1" maxOccurs="unbounded">
-                                          <xs:complexType>
-                                              <xs:attribute name="path" type="xs:anyURI" use="required"/>
-                                              <xs:attribute name="namespace" type="xs:string" use="optional"/>
-                                          </xs:complexType>
-                                      </xs:element>
-                                  </xs:sequence>
-                              </xs:complexType>
-                              <xs:unique name="templateFolders">
-                                  <xs:selector xpath="t:folder" />
-                                  <xs:field xpath="@path" />
-                              </xs:unique>
-                          </xs:element>-->
 
 
     <xs:complexType name="requiredPathAttribute">

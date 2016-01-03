@@ -90,7 +90,15 @@ class PageImpl implements Page
      */
     public function getTemplate()
     {
-        return $this->template;
+        if($this->template != ''){
+            return $this->template;
+        }
+
+        if(($defaultTemplate = $this->container->getConfigInstance()->getDefaultTemplateName()) == null){
+            return '';
+        }
+
+        return $defaultTemplate;
     }
 
     /**
