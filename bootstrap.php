@@ -19,7 +19,7 @@ if(isset($siteConfig, $GLOBALS['DB_NAME'], $GLOBALS['DB_HOST'], $GLOBALS['DB_USE
 
     $config = new ChristianBudde\Part\ConfigImpl($siteConfig, ".");
 
-    $newConfig = new \ChristianBudde\Part\test\stub\StubConfigImpl();
+    $newConfig = new \ChristianBudde\Part\StubConfigImpl();
     $connection = $config->getMySQLConnection();
     $connection['database'] = $GLOBALS['DB_NAME'];
     $connection['host'] = $GLOBALS['DB_HOST'];

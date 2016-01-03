@@ -11,11 +11,6 @@ namespace ChristianBudde\Part\controller\ajax;
 
 use ChristianBudde\Part\controller\ajax\type_handler\TypeHandler;
 use ChristianBudde\Part\log\Logger;
-use ChristianBudde\Part\model\mail\Address;
-use ChristianBudde\Part\model\mail\AddressLibrary;
-use ChristianBudde\Part\model\mail\Domain;
-use ChristianBudde\Part\model\mail\DomainLibrary;
-use ChristianBudde\Part\model\mail\Mailbox;
 use ChristianBudde\Part\model\page\Page;
 use ChristianBudde\Part\model\page\PageContent;
 use ChristianBudde\Part\model\page\PageContentLibrary;
@@ -75,36 +70,6 @@ interface TypeHandlerLibrary
      * @return TypeHandler
      */
     public function getUserPrivilegesTypeHandlerInstance(UserPrivileges $privileges);
-
-    /**
-     * @param DomainLibrary $library
-     * @return TypeHandler
-     */
-    public function getMailDomainLibraryTypeHandlerInstance(DomainLibrary $library);
-
-    /**
-     * @param Domain $domain
-     * @return TypeHandler
-     */
-    public function getMailDomainTypeHandlerInstance(Domain $domain);
-
-    /**
-     * @param AddressLibrary $address
-     * @return TypeHandler
-     */
-    public function getMailAddressLibraryTypeHandlerInstance(AddressLibrary $address);
-
-    /**
-     * @param Address $address
-     * @return TypeHandler
-     */
-    public function getMailAddressTypeHandlerInstance(Address $address);
-
-    /**
-     * @param Mailbox $mailbox
-     * @return TypeHandler
-     */
-    public function getMailboxTypeHandlerInstance(Mailbox $mailbox);
 
     /**
      * @param Site $site

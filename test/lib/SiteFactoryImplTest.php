@@ -8,15 +8,13 @@
  * Time: 2:53 PM
  * To change this template use File | Settings | File Templates.
  */
-namespace ChristianBudde\Part\test;
+namespace ChristianBudde\Part;
 
-use ChristianBudde\Part\BackendSingletonContainer;
-use ChristianBudde\Part\ConfigImpl;
+
 use ChristianBudde\Part\exception\ClassNotInstanceOfException;
-use ChristianBudde\Part\SiteFactoryImpl;
-use ChristianBudde\Part\test\stub\ForceExitException;
-use ChristianBudde\Part\test\stub\NullBackendSingletonContainerImpl;
-use ChristianBudde\Part\test\stub\ScriptHasRunException;
+
+use ChristianBudde\Part\exception\ForceExitException;
+use ChristianBudde\Part\exception\ScriptHasRunException;
 use Exception;
 use PHPUnit_Framework_TestCase;
 use SimpleXMLElement;
@@ -25,7 +23,8 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
 {
     /** @var $backFactory BackendSingletonContainer */
     private $backFactory;
-    private $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
+    private $defaultOwner = /** @lang XML */
+        "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
     /** @var  SiteFactoryImpl */
     private $factory;
     private $config;
@@ -62,7 +61,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         $this->setupFactory("
         <config>{$this->defaultOwner}
         <preScripts>
-        <class link='stub/ExceptionStubScriptImpl.php'>ChristianBudde\Part\\test\stub\ExceptionStubScriptImpl</class>
+        <class link='util/script/ExceptionStubScriptImpl.php'>ChristianBudde\Part\util\script\ExceptionStubScriptImpl</class>
         </preScripts>
         </config>");
         $preScripts = $this->factory->buildPreScriptChain($this->backFactory);
@@ -72,8 +71,8 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
             $preScripts->run('PreScript', null);
 
         } catch (Exception $exception) {
-            $this->assertInstanceOf('ChristianBudde\Part\test\stub\ScriptHasRunException', $exception, 'The wrong exception was thrown.');
-            /** @var $exception \ChristianBudde\Part\test\stub\ScriptHasRunException */
+            $this->assertInstanceOf('ChristianBudde\Part\exception\ScriptHasRunException', $exception, 'The wrong exception was thrown.');
+            /** @var $exception ScriptHasRunException */
             $exceptionWasThrown = true;
             $this->assertEquals('PreScript', $exception->getName(), 'The Script ran with wrong name.');
             $this->assertNull($exception->getArgs(), 'Script ran with wrong argument');
@@ -88,7 +87,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         $this->setupFactory("
         <config>{$this->defaultOwner}
         <preScripts>
-        <class>ChristianBudde\\Part\\test\\stub\\ExceptionStubScriptImpl</class>
+        <class>ChristianBudde\\Part\\util\\script\\ExceptionStubScriptImpl</class>
         </preScripts>
         </config>");
         $preScripts = $this->factory->buildPreScriptChain($this->backFactory);
@@ -98,7 +97,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
             $preScripts->run('PreScript', null);
 
         } catch (Exception $exception) {
-            $this->assertInstanceOf('ChristianBudde\Part\test\stub\ScriptHasRunException', $exception, 'The wrong exception was thrown.');
+            $this->assertInstanceOf('ChristianBudde\Part\exception\ScriptHasRunException', $exception, 'The wrong exception was thrown.');
             /** @var $exception ScriptHasRunException */
             $exceptionWasThrown = true;
             $this->assertEquals('PreScript', $exception->getName(), 'The Script ran with wrong name.');
@@ -114,7 +113,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         $this->setupFactory("
         <config>{$this->defaultOwner}
         <preScripts>
-        <class link='stub/NullPageElementImpl.php'>ChristianBudde\\Part\\test\\stub\\NullPageElementImpl</class>
+        <class link='view/page_element/NullPageElementImpl.php'>ChristianBudde\\Part\\view\\page_element\\NullPageElementImpl</class>
         </preScripts>
         </config>");
 
@@ -125,7 +124,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
             $this->assertInstanceOf('ChristianBudde\Part\exception\ClassNotInstanceOfException', $exception, 'The wrong exception was thrown.');
             /** @var $exception \ChristianBudde\Part\exception\ClassNotInstanceOfException */
             $exceptionWasThrown = true;
-            $this->assertEquals('ChristianBudde\Part\test\stub\NullPageElementImpl', $exception->getClass(), 'Was not expected class');
+            $this->assertEquals('ChristianBudde\Part\view\page_element\NullPageElementImpl', $exception->getClass(), 'Was not expected class');
             $this->assertEquals('Script', $exception->getExpectedInstance(), 'Was not expected instance');
         }
         $this->assertTrue($exceptionWasThrown, 'A exception was not thrown.');
@@ -139,7 +138,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         $this->setupFactory("
         <config>{$this->defaultOwner}
         <postScripts>
-        <class link='stub/NullPageElementImpl.php'>ChristianBudde\\Part\\test\\stub\\NullPageElementImpl</class>
+        <class link='view/page_element/NullPageElementImpl.php'>ChristianBudde\\Part\\view\\page_element\\NullPageElementImpl</class>
         </postScripts>
         </config>");
 
@@ -150,7 +149,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
             $this->assertInstanceOf('ChristianBudde\Part\exception\ClassNotInstanceOfException', $exception, 'The wrong exception was thrown.');
             /** @var $exception ClassNotInstanceOfException */
             $exceptionWasThrown = true;
-            $this->assertEquals('ChristianBudde\Part\test\stub\NullPageElementImpl', $exception->getClass(), 'Was not expected class');
+            $this->assertEquals('ChristianBudde\Part\view\page_element\NullPageElementImpl', $exception->getClass(), 'Was not expected class');
             $this->assertEquals('Script', $exception->getExpectedInstance(), 'Was not expected instance');
         }
         $this->assertTrue($exceptionWasThrown, 'A exception was not thrown.');
@@ -163,12 +162,12 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         $this->setupFactory("
         <config>{$this->defaultOwner}
         <postScripts>
-        <class link='stub/ExceptionStubScriptImpl.php'>ChristianBudde\\Part\\test\\stub\\ExceptionStubScriptImpl</class>
+        <class link='util/script/ExceptionStubScriptImpl.php'>ChristianBudde\\Part\\util\\script\\ExceptionStubScriptImpl</class>
         </postScripts>
         </config>");
         $postScripts = $this->factory->buildPostScriptChain($this->backFactory);
 
-        $this->setExpectedException('ChristianBudde\\Part\\test\\stub\\ScriptHasRunException');
+        $this->setExpectedException('ChristianBudde\\Part\\exception\\ScriptHasRunException');
         $postScripts->run('PostScript', null);
 
     }
@@ -179,12 +178,12 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         $this->setupFactory("
         <config>{$this->defaultOwner}
         <postScripts>
-        <class>ChristianBudde\\Part\\test\\stub\\ExceptionStubScriptImpl</class>
+        <class>ChristianBudde\\Part\\util\\script\\ExceptionStubScriptImpl</class>
         </postScripts>
         </config>");
         $postScripts = $this->factory->buildPostScriptChain($this->backFactory);
 
-        $this->setExpectedException('ChristianBudde\\Part\\test\\stub\\ScriptHasRunException');
+        $this->setExpectedException('ChristianBudde\\Part\\exception\\ScriptHasRunException');
         $postScripts->run('PostScript', null);
 
     }
@@ -210,7 +209,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         $this->setupFactory("
         <config>{$this->defaultOwner}
         <preScripts>
-        <class link='stub/ExceptionStubScriptImpl.php'>WrongClassName</class>
+        <class link='util/script/ExceptionStubScriptImpl.php'>WrongClassName</class>
         </preScripts>
         </config>");
         $this->factory->buildPreScriptChain($this->backFactory);
@@ -222,7 +221,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         $this->setupFactory("
         <config>{$this->defaultOwner}
         <preScripts>
-        <class>ChristianBudde\\Part\\test\\stub\\ConstructorStubScriptImpl</class>
+        <class>ChristianBudde\\Part\\util\\script\\ConstructorStubScriptImpl</class>
         </preScripts>
         </config>");
         try{
@@ -237,7 +236,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         $this->setupFactory("
         <config>{$this->defaultOwner}
         <postScripts>
-        <class>ChristianBudde\\Part\\test\\stub\\ConstructorStubScriptImpl</class>
+        <class>ChristianBudde\\Part\\util\\script\\ConstructorStubScriptImpl</class>
         </postScripts>
         </config>");
         try{
@@ -269,7 +268,7 @@ class SiteFactoryImplTest extends PHPUnit_Framework_TestCase
         $this->setupFactory("
         <config>{$this->defaultOwner}
         <postScripts>
-        <class link='stub/ExceptionStubScriptImpl.php'>WrongClassName</class>
+        <class link='util/script/ExceptionStubScriptImpl.php'>WrongClassName</class>
         </postScripts>
         </config>");
         $this->factory->buildPostScriptChain($this->backFactory);

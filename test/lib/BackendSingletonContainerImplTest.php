@@ -8,12 +8,9 @@
  * To change this template use File | Settings | File Templates.
  */
 
-namespace ChristianBudde\Part\test;
+namespace ChristianBudde\Part;
 
-use ChristianBudde\Part\BackendSingletonContainer;
-use ChristianBudde\Part\BackendSingletonContainerImpl;
-use ChristianBudde\Part\test\stub\StubConfigImpl;
-use ChristianBudde\Part\test\util\CustomDatabaseTestCase;
+use ChristianBudde\Part\util\CustomDatabaseTestCase;
 
 class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace ChristianBudde\Part\test\util;
+namespace ChristianBudde\Part\util;
 use PHPUnit_Extensions_Database_DataSet_IDataSet;
 use PHPUnit_Extensions_Database_DB_IDatabaseConnection;
 use PHPUnit_Extensions_Database_Operation_Truncate;

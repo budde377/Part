@@ -1,9 +1,9 @@
 <?php
-namespace ChristianBudde\Part\test\util;
+namespace ChristianBudde\Part\controller\ajax\type_handler\util;
 
 use ChristianBudde\Part\controller\json\UserObjectImpl;
-use ChristianBudde\Part\test\stub\StubUserImpl;
-use ChristianBudde\Part\test\stub\StubUserPrivilegesImpl;
+use ChristianBudde\Part\model\user\StubUserImpl;
+use ChristianBudde\Part\model\user\StubUserPrivilegesImpl;
 use PHPUnit_Framework_TestCase;
 
 /**

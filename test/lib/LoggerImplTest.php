@@ -1,9 +1,8 @@
 <?php
-namespace ChristianBudde\Part\test;
+namespace ChristianBudde\Part;
 
 use ChristianBudde\Part\log\Logger;
 use ChristianBudde\Part\log\LoggerImpl;
-use ChristianBudde\Part\test\stub\StubBackendSingletonContainerImpl;
 use ChristianBudde\Part\util\file\Folder;
 use ChristianBudde\Part\util\file\FolderImpl;
 use ChristianBudde\Part\util\file\LogFileImpl;

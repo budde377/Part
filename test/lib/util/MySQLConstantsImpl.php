@@ -1,5 +1,5 @@
 <?php
-namespace ChristianBudde\Part\test\util;
+namespace ChristianBudde\Part\util;
 
 
 /**

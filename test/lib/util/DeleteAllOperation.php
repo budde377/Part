@@ -6,7 +6,7 @@
  * Time: 2:49 PM
  */
 
-namespace ChristianBudde\Part\test\util;
+namespace ChristianBudde\Part\util;
 
 
 use PHPUnit_Extensions_Database_DataSet_IDataSet;

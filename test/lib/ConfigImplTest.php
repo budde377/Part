@@ -6,9 +6,8 @@
  * Time: 7:07 PM
  * To change this template use File | Settings | File Templates.
  */
-namespace ChristianBudde\Part\test;
+namespace ChristianBudde\Part;
 
-use ChristianBudde\Part\ConfigImpl;
 use ChristianBudde\Part\exception\InvalidXMLException;
 use PHPUnit_Framework_TestCase;
 use SimpleXMLElement;
@@ -16,7 +15,8 @@ use SimpleXMLElement;
 class ConfigImplTest extends PHPUnit_Framework_TestCase
 {
 
-    private $defaultOwner = "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
+    private $defaultOwner = /** @lang XML */
+        "<siteInfo><domain name='test' extension='dk'/><owner name='Admin Jensen' mail='test@test.dk' username='asd' /></siteInfo>";
     /** @var  ConfigImpl */
     private $config;
 
@@ -71,7 +71,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetTemplateReturnNullWithTemplateNIL()
     {
-        $config = $this->setupConfig("
+        $config = $this->setupConfig(/** @lang XML */
+            "
         <config>{$this->defaultOwner}
         <templates path='folder'>
             <template filename='some_link'>main</template>
@@ -84,7 +85,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetTemplateFolderPathReturnsRightPath()
     {
 
-        $config = $this->setupConfig("
+        $config = $this->setupConfig(/** @lang XML */
+            "
         <config>{$this->defaultOwner}
         <templates path='folder'>
             <template filename='some_link'>main</template>
@@ -100,7 +102,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetTemplateReturnLinkWithTemplateInList()
     {
-        $config = $this->setupConfig("
+        $config = $this->setupConfig(/** @lang XML */
+            "
         <config>{$this->defaultOwner}
         <templates path='folder'>
             <template filename='some_link'>main</template>
@@ -332,7 +335,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetVariablesReflectsTheVariables()
     {
-        $config = $this->setupConfig("
+        $config = $this->setupConfig(/** @lang XML */
+            "
         <config>{$this->defaultOwner}
             <variables>
                 <var key='KEY1' value='VALUE1' />
@@ -344,7 +348,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testArrayAccessIsRight()
     {
-        $config = $this->setupConfig("
+        $config = $this->setupConfig(/** @lang XML */
+            "
         <config>{$this->defaultOwner}
             <variables>
                 <var key='KEY1' value='VALUE1' />
@@ -356,7 +361,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testArrayAccessSetterDoesNotSet()
     {
-        $config = $this->setupConfig("
+        $config = $this->setupConfig(/** @lang XML */
+            "
         <config>{$this->defaultOwner}
             <variables>
                 <var key='KEY1' value='VALUE1' />
@@ -455,7 +461,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testListTemplateNamesWillReturnArraySimilarToConfig()
     {
-        $config = $this->setupConfig("
+        $config = $this->setupConfig(/** @lang XML */
+            "
         <config>{$this->defaultOwner}
         <templates path='folder'>
             <template filename='some_link'>main</template>
@@ -468,7 +475,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testUsingTemplateCollectionIsCool()
     {
-        $config = $this->setupConfig("
+        $config = $this->setupConfig(/** @lang XML */
+            "
         <config>{$this->defaultOwner}
         <templateCollection>
         <templates path='folder'>
@@ -486,7 +494,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testUsingEmptyTemplatesIsAlsoCool()
     {
-        $config = $this->setupConfig("
+        $config = $this->setupConfig(/** @lang XML */
+            "
         <config>{$this->defaultOwner}
         <templates path='folder' />
         </config>");
@@ -496,7 +505,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testTemplateFoldersWillReturnTemplateFolders()
     {
-        $config = $this->setupConfig("
+        $config = $this->setupConfig(/** @lang XML */
+            "
         <config>{$this->defaultOwner}
         <templateCollection>
             <templates path='somePath' />
@@ -535,7 +545,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetMySQLConnectionWillReturnArrayWithInfoAsInConfigXMLEvenWhenEmptyPassword()
     {
         /** @var $configXML SimpleXMLElement */
-        $config =  $this->setupConfig("
+        $config =  $this->setupConfig(/** @lang XML */
+            "
         <config>{$this->defaultOwner}
             <MySQLConnection>
                 <host>someHost</host>
@@ -556,7 +567,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetMySQLConnectionWillAddFolderArrays()
     {
         /** @var $configXML SimpleXMLElement */
-        $config =  $this->setupConfig("
+        $config =  $this->setupConfig(/** @lang XML */
+            "
         <config>{$this->defaultOwner}
             <MySQLConnection>
                 <host>someHost</host>
@@ -650,7 +662,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetTmpPathReturnsRightPath()
     {
         /** @var $configXML SimpleXMLElement */
-        $config =  $this->setupConfig("<config>{$this->defaultOwner}
+        $config =  $this->setupConfig(/** @lang XML */
+            "<config>{$this->defaultOwner}
                 <tmpFolder path='/some/path' />
         </config>");
         $this->assertEquals("/some/path", $config->getTmpFolderPath());
@@ -675,7 +688,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
     public function testGetErrorLogReturnsRightPath()
     {
         /** @var $configXML SimpleXMLElement */
-        $config =  $this->setupConfig("<config>{$this->defaultOwner}
+        $config =  $this->setupConfig(/** @lang XML */
+            "<config>{$this->defaultOwner}
                 <log path='/some/path' />
         </config>");
         $this->assertEquals("/some/path", $config->getLogPath());
@@ -694,7 +708,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetDomainWillReturnDomainOnExist()
     {
-        $config =  $this->setupConfig("<config>
+        $config =  $this->setupConfig(/** @lang XML */
+            "<config>
         <siteInfo>
             <domain name='test' extension='com' />
             <owner name='Test Testesen' mail='test@test.dk' username='test' />
@@ -706,7 +721,8 @@ class ConfigImplTest extends PHPUnit_Framework_TestCase
 
     public function testGetOwnerWillReturnArrayOfRightFormat()
     {
-        $config =  $this->setupConfig("<config>
+        $config =  $this->setupConfig(/** @lang XML */
+            "<config>
         <siteInfo>
             <domain name='test' extension='com' />
             <owner name='test' mail='test@test.dk' username='test' />
