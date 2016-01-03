@@ -15,6 +15,7 @@ use ChristianBudde\Part\util\CacheControl;
 use ChristianBudde\Part\util\db\DB;
 use ChristianBudde\Part\util\file\FileLibrary;
 use ChristianBudde\Part\util\file\Folder;
+use ChristianBudde\Part\util\task\TaskQueue;
 
 /**
  * User: budde
@@ -40,6 +41,7 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer
     private $vars = [];
     private $tmpFolder;
     private $handlerLibrary;
+    private $delayedExecutionTaskQueue;
 
     function __construct()
     {
@@ -344,5 +346,22 @@ class StubBackendSingletonContainerImpl implements BackendSingletonContainer
     public function getTypeHandlerLibraryInstance()
     {
         return $this->handlerLibrary;
+    }
+
+    /**
+     * Returns a TaskQueue for delayed execution.
+     * @return TaskQueue
+     */
+    public function getDelayedExecutionTaskQueue()
+    {
+        return $this->delayedExecutionTaskQueue;
+    }
+
+    /**
+     * @param mixed $delayedExecutionTaskQueue
+     */
+    public function setDelayedExecutionTaskQueue($delayedExecutionTaskQueue)
+    {
+        $this->delayedExecutionTaskQueue = $delayedExecutionTaskQueue;
     }
 }

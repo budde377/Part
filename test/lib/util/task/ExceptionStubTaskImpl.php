@@ -12,7 +12,7 @@ class ExceptionStubTaskImpl implements Task
 
 
 
-    public function run()
+    public function execute()
     {
         throw new TaskHasRunException();
     }

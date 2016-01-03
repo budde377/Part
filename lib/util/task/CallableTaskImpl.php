@@ -27,7 +27,7 @@ class CallableTaskImpl implements Task
      * This function runs the script
      * @return mixed
      */
-    public function run()
+    public function execute()
     {
         $callable = $this->callable;
         return $callable();

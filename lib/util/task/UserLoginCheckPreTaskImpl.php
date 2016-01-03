@@ -16,7 +16,7 @@ class UserLoginCheckPreTaskImpl implements Task{
     }
 
 
-    public function run()
+    public function execute()
     {
 
         if($this->backendContainer->getUserLibraryInstance()->getUserLoggedIn() == null){

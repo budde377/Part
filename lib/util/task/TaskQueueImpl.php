@@ -16,7 +16,7 @@ class TaskQueueImpl implements TaskQueue
     public function execute()
     {
         return array_map(function (Task $script){
-            return $script->run();
+            return $script->execute();
         }, $this->queue);
 
     }

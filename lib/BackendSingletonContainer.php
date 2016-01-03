@@ -14,6 +14,8 @@ use ChristianBudde\Part\util\CacheControl;
 use ChristianBudde\Part\util\db\DB;
 use ChristianBudde\Part\util\file\FileLibrary;
 use ChristianBudde\Part\util\file\Folder;
+use ChristianBudde\Part\util\task\TaskQueue;
+
 
 /**
  * User: budde
@@ -122,6 +124,11 @@ interface BackendSingletonContainer
      */
     public function getTmpFolderInstance();
 
+    /**
+     * Returns a TaskQueue for delayed execution.
+     * @return TaskQueue
+     */
+    public function getDelayedExecutionTaskQueue();
 
     /**
      * @param string $name

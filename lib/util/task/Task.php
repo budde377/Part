@@ -12,5 +12,5 @@ interface Task
      * This function runs the script
      * @return mixed
      */
-    public function run();
+    public function execute();
 }

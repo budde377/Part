@@ -17,7 +17,7 @@ class RequireHTTPSPreTaskImpl implements Task{
         $this->backendContainer = $backendContainer;
     }
 
-    public function run()
+    public function execute()
     {
 
         if($this->backendContainer->getConfigInstance()->getDomain() !== $_SERVER['HTTP_HOST']){

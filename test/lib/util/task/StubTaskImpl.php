@@ -24,7 +24,7 @@ class StubTaskImpl implements Task
     }
 
 
-    public function run()
+    public function execute()
     {
         $this->numRuns++;
         $this->lastRun = microtime(true);

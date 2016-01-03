@@ -163,6 +163,13 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
 
     }
 
+    public function testGetDelayedExecutionQueueWillReturnSameInstance()
+    {
+        $ret1 = $this->backContainer->getDelayedExecutionTaskQueue();
+        $this->assertInstanceOf('ChristianBudde\Part\util\task\TaskQueueImpl', $ret1);
+        $ret2 = $this->backContainer->getDelayedExecutionTaskQueue();
+        $this->assertTrue($ret1 === $ret2);
+    }
 
 
     public function testMagicGetterWillGetOtherGetters()
@@ -182,6 +189,7 @@ class BackendSingletonContainerImplTest extends CustomDatabaseTestCase
         $this->assertTrue($this->backContainer->getUpdaterInstance()  === $this->backContainer->updater);
         $this->assertTrue($this->backContainer->getUserLibraryInstance()  === $this->backContainer->userLibrary);
         $this->assertTrue($this->backContainer->getTmpFolderInstance()  === $this->backContainer->tmpfolder);
+        $this->assertTrue($this->backContainer->getDelayedExecutionTaskQueue()  === $this->backContainer->delayedExecutionTaskQueue);
 
         $this->assertTrue(isset($this->backContainer->site));
         $this->assertTrue(isset($this->backContainer->tmpfolder));

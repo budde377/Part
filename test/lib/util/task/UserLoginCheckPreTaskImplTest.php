@@ -39,7 +39,7 @@ class UserLoginCheckPreTaskImplTest extends \PHPUnit_Framework_TestCase{
     public function testRunWithNullUserDoesNothing()
     {
 
-        $this->script->run();
+        $this->script->execute();
         $this->assertTrue($this->cacheControl->isEnabled());
 
     }
@@ -47,7 +47,7 @@ class UserLoginCheckPreTaskImplTest extends \PHPUnit_Framework_TestCase{
     public function testRunWithUserDoesDisable()
     {
         $this->userLibrary->setUserLoggedIn(new StubUserImpl());
-        $this->script->run();
+        $this->script->execute();
         $this->assertFalse($this->cacheControl->isEnabled());
     }
 
