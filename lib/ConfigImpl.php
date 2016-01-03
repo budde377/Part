@@ -318,7 +318,7 @@ class ConfigImpl implements Config
     }
 
     /**
-     * @return Array containing owner information
+     * @return array containing owner information
      */
     public function getOwner()
     {

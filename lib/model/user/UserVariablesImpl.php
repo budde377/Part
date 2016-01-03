@@ -16,6 +16,8 @@ class UserVariablesImpl extends BindParamObserverVariablesImpl implements Observ
 {
 
 
+    private $user;
+
     function __construct(DB $database, User $user)
     {
 

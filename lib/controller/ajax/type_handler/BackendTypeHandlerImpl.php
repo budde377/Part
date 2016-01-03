@@ -49,9 +49,6 @@ class BackendTypeHandlerImpl implements TypeHandler
         $server->registerHandler($this->backend->getUpdaterInstance()->generateTypeHandler());
         $server->registerHandler($this->backend->getSiteInstance()->generateTypeHandler());
         $server->registerHandler($this->backend->getFileLibraryInstance()->generateTypeHandler());
-        if($this->backend->getConfigInstance()->isMailManagementEnabled()){
-            $server->registerHandler($this->backend->getMailDomainLibraryInstance()->generateTypeHandler());
-        }
         $server->registerHandler(new PostGetFilesArrayAccessTypeHandlerImpl());
         $server->registerHandler(new ParserTypeHandlerImpl());
 

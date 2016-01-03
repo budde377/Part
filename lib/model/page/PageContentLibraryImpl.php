@@ -15,6 +15,7 @@ class PageContentLibraryImpl extends ContentLibraryImpl implements PageContentLi
 {
     private $page;
     private $page_id;
+    private $container;
 
 
     function __construct(BackendSingletonContainer $container, Page $page)

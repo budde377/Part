@@ -19,6 +19,7 @@ class PageContentImpl extends ContentImpl implements PageContent
 
     private $page;
     private $page_id;
+    private $container;
 
 
     public function __construct(BackendSingletonContainer $container, Page $page, $id = "")

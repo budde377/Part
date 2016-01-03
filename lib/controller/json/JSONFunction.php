@@ -14,7 +14,7 @@ interface JSONFunction extends Target, Program
 
     /**
      * Will return a numerical array of arguments
-     * @return Array
+     * @return array
      */
     public function getArgs();
 

@@ -46,12 +46,6 @@ class MySQLDBImpl implements DB
             $this->folders = $connectionArray['folders'];
         }
 
-        $connectionArray = $config->getMailMySQLConnection();
-        if ($connectionArray !== null) {
-            $this->mailDatabase = $connectionArray['database'];
-            $this->mailHost = $connectionArray['host'];
-            $this->mailUsername = $connectionArray['user'];
-        }
     }
 
 

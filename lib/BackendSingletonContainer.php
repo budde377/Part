@@ -4,7 +4,6 @@ namespace ChristianBudde\Part;
 use ChristianBudde\Part\controller\ajax\Server;
 use ChristianBudde\Part\controller\ajax\TypeHandlerLibrary;
 use ChristianBudde\Part\log\Logger;
-use ChristianBudde\Part\model\mail\DomainLibrary;
 use ChristianBudde\Part\model\page\CurrentPageStrategy;
 use ChristianBudde\Part\model\page\DefaultPageLibrary;
 use ChristianBudde\Part\model\page\PageOrder;

@@ -7,8 +7,6 @@ use ChristianBudde\Part\controller\ajax\TypeHandlerLibrary;
 use ChristianBudde\Part\controller\ajax\TypeHandlerLibraryImpl;
 use ChristianBudde\Part\log\Logger;
 use ChristianBudde\Part\log\LoggerImpl;
-use ChristianBudde\Part\model\mail\DomainLibrary;
-use ChristianBudde\Part\model\mail\DomainLibraryImpl;
 use ChristianBudde\Part\model\page\CurrentPageStrategy;
 use ChristianBudde\Part\model\page\CurrentPageStrategyImpl;
 use ChristianBudde\Part\model\page\DefaultPageLibrary;
@@ -65,8 +63,7 @@ class BackendSingletonContainerImpl implements BackendSingletonContainer
     private $fileLibrary;
     /** @var  LogFile */
     private $log;
-    /** @var  DomainLibrary */
-    private $mailDomainLibrary;
+
 
     private $dynamicInstances = [];
     private $typeHandlerLib;

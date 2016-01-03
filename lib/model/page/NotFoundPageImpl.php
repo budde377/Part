@@ -20,6 +20,8 @@ use ChristianBudde\Part\util\Observer;
 class NotFoundPageImpl implements Page
 {
 
+    private $container;
+
     public function __construct(BackendSingletonContainer $container)
     {
         if(!isset($_GET['ajax'])){

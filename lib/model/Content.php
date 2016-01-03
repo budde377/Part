@@ -40,7 +40,7 @@ interface Content extends JSONObjectSerializable, TypeHandlerGenerator{
 
     /**
      * @param int $time Seconds since epoch
-     * @return Array | null Returns content at time or null if no content
+     * @return array | null Returns content at time or null if no content
      */
     public function getContentAt($time);
 

@@ -15,6 +15,7 @@ class PageVariablesImpl extends VariablesImpl
 {
 
     private $page_id;
+    private $page;
 
     function __construct(DB $database, Page $page)
     {
